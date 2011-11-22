@@ -1,0 +1,9 @@
+<launch>
+    <node name="ptam_filter" pkg="pose_filter_updates" type="ptam_filter" clear_params="true" output="screen">
+	    <remap from="pose_filter/imu_state_input" to="/hex/fcu/imu" />
+	    <remap from="pose_filter/pose_measurement" to="/vslam/pose" />
+	    <!--remap from="pose_filter/pose_measurement" to="/vicon/pose" /-->
+	    <!--remap from="pose_filter/state_out" to="hex/fcu/ekf_state_in"/-->
+	    <rosparam file="$(find pose_filter_updates)/ptam_filter_fix.yaml"/>
+    </node>
+</launch>

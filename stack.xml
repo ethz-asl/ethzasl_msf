@@ -1,0 +1,9 @@
+<stack>
+  <description brief="sensor_fusion">sensor_fusion</description>
+  <author>Maintained by sweiss</author>
+  <license>BSD</license>  
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/sensor_fusion</url>
+  <depend stack="ros" />
+
+</stack>
