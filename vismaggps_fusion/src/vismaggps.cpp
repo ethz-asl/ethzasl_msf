@@ -15,7 +15,7 @@
 
 void VisMagGPSHandler::subscribe(){
 
-	ros::NodeHandle nh("pose_filter");
+	ros::NodeHandle nh("sensor_fusion");
 	subVisMeas_ = nh.subscribe("vision_pose", 1, &VisMagGPSHandler::visionCallback, this);
 	subMagMeas_ = nh.subscribe("mag_dir", 1, &VisMagGPSHandler::magCallback, this);
 	subGPSMeas_ = nh.subscribe("gps_pos", 1, &VisMagGPSHandler::gpsCallback, this);
@@ -154,7 +154,7 @@ void VisMagGPSHandler::gpsCallback(const vismaggps_fusion::GpsCustomCartesianCon
 
 		H_old(11, 15) = 1; // scale
 
-		Eigen::Matrix<double, 2, 1> gpsvelestim = C_wv.transpose() * (state_old.v_ + C_q.transpose() * w_sk * state_old.p_ic_) * state_old.L_;
+		Eigen::Matrix<double, 3, 1> gpsvelestim = C_wv.transpose() * (state_old.v_ + C_q.transpose() * w_sk * state_old.p_ic_) * state_old.L_;
 		r_old.block(0, 0, 3, 1) = z_gp_ - C_wv.transpose() * (state_old.p_ + C_q.transpose() * state_old.p_ic_) * state_old.L_;
 		r_old.block(3, 0, 2, 1) = z_gv_ - gpsvelestim.block(0, 0, 2, 1); // only take xy vel measurements
 		r_old.block(5, 0, 3, 1) = Eigen::Matrix<double,3,1>::Constant(0); //-state_old.q_wv_.vec() / state_old.q_wv_.w() * 2;

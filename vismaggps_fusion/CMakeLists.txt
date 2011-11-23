@@ -21,7 +21,9 @@ add_definitions (-Wall)
 #rosbuild_add_boost_directories()
 #rosbuild_link_boost(${PROJECT_NAME} thread)
 
-rosbuild_add_executable(vismaggps_fusion src/main.cpp src/vision_pose.cpp src/gps_pos.cpp src/mag_dir.cpp)
+rosbuild_genmsg()
+
+rosbuild_add_executable(vismaggps_fusion src/main.cpp src/vismaggps.cpp)
 #set_property(TARGET vismaggps_fusion PROPERTY COMPILE_DEFINITIONS SOME_DEFINITIONS)
 rosbuild_add_compile_flags(vismaggps_fusion "-O3")
 

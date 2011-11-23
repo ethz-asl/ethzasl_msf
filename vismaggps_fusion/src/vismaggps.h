@@ -41,7 +41,7 @@ class VisMagGPSHandler: public MeasurementHandler
 	std::vector<GPSMeas> GPSBuff_;
 
 	// PTAM watchdog
-	int PTAMwatch;
+	int PTAMwatch_;
 
 
 	ros::Subscriber subVisMeas_;

@@ -9,9 +9,7 @@
 #define VISMAGGPS_MEASUREMENTS_H_
 
 #include <sensor_fusion_core/measurement.h>
-#include "vision_pose.h"
-#include "gps_pos.h"
-#include "mag_dir.h"
+#include "vismaggps.h"
 
 namespace Sensors
 {
@@ -19,7 +17,8 @@ namespace Sensors
   {
      VISION=1,
      MAG=2,
-     GPS=3
+     GPS=3,
+     VISMAGGPS=4
   };
 }
 typedef Sensors::Sensor Sensor;
@@ -30,13 +29,12 @@ public:
 	// measurements
 	Eigen::Quaternion<double> q_cv_;	// attitude camera -> vision frame
 	Eigen::Matrix<double, 3, 1> p_vc_;	// position camera -> vision frame
-	Eigen::Matrix<double, 3, 1> p_wg_;	// position world -> GPS sensor
 	Eigen::Matrix<double, 3, 1> p_m_;	// mag direction vector in mag frame
+	Eigen::Matrix<double, 3, 1> p_wg_;	// position world -> GPS sensor
+	Eigen::Matrix<double, 2, 1> v_wg_;	// velocity world -> GPS sensor
 	VisMagGPSMeasurements()
 	{
-		addHandler(Sensors::VISION, new VisionPoseHandler(this));
-		addHandler(Sensors::GPS, new GPSPosHandler(this));
-		addHandler(Sensors::MAG, new MagDirHandler(this));
+		addHandler(Sensors::VISMAGGPS, new VisMagGPSHandler(this));
 		poseFilter_.registerCallback(&VisMagGPSMeasurements::Config, this);
 	};
 
