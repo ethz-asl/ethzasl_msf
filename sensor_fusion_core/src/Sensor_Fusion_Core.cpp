@@ -757,7 +757,6 @@ void Sensor_Fusion_Core::propPToIdx(unsigned char idx)
 //}
 
 
-
 bool Sensor_Fusion_Core::applyMeasurement(unsigned char idx_delaystate, const MatrixXSd& H_delayed, const Eigen::VectorXd& res_delayed, const Eigen::MatrixXd& R_delayed,double fuzzythres){
 
 //	boost::mutex::scoped_lock lock(ekf_mutex_);
