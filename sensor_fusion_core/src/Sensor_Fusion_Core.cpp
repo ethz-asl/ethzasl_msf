@@ -744,7 +744,6 @@ void Sensor_Fusion_Core::propPToIdx(unsigned char idx)
 //	unsigned char idx_now = idx_state_; //save this so we know what time it is now
 //	while(it!=MeasBuffer_.begin())
 //	{
-//		std::list<Meas>::iterator previt=it;
 //		previt--;
 //		idx_state_= previt->stateidx_+1;		// emulate fake now time until next measurement
 //		it->measfunc_(it->message_, it->stateidx_);
