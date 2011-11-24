@@ -10,8 +10,8 @@
 
 // measurement size
 #define nVisMeas_ 6
-#define nVisMagGPSMeas_ 15
-#define nGPSMeas_ 12	// safety mode
+#define nVisMagGPSMeas_ 14
+#define nGPSMeas_ 5	// safety mode
 
 void VisMagGPSHandler::subscribe(){
 
@@ -106,14 +106,14 @@ void VisMagGPSHandler::gpsCallback(const vismaggps_fusion::GpsCustomCartesianCon
 
 		Eigen::Matrix<double, 3, 3> skewold_p;
 		Eigen::Matrix<double, 3, 1> vecold_p;
-		vecold_p = (state_old.p_ + C_q.transpose() * state_old.p_ic_) * state_old.L_;
+		vecold_p = (state_old.p_ + C_q.transpose() * state_old.p_ic_);
 		skewold_p << 0, -vecold_p(2), vecold_p(1),
 				vecold_p(2), 0, -vecold_p(0),
 				-vecold_p(1), vecold_p(0), 0;
 
 		Eigen::Matrix<double, 3, 3> skewold_v;
 		Eigen::Matrix<double, 3, 1> vecold_v;
-		vecold_v = (state_old.v_ + C_q.transpose() * w_sk * state_old.p_ic_) * state_old.L_;
+		vecold_v = (state_old.v_ + C_q.transpose() * w_sk * state_old.p_ic_);
 		skewold_v << 0, -vecold_v(2), vecold_v(1),
 				vecold_v(2), 0, -vecold_v(0),
 				-vecold_v(1), vecold_v(0), 0;
@@ -135,31 +135,28 @@ void VisMagGPSHandler::gpsCallback(const vismaggps_fusion::GpsCustomCartesianCon
 		//		q_vw*(pwi+Transpose[R1wi].pig)*L
 
 		// construct H matrix using H-blockx :-)
-		H_old.block(0, 0, 3, 3) = C_wv.transpose() * state_old.L_;
-		H_old.block(0, 6, 3, 3) = -C_wv.transpose() * C_q.transpose() * pic_sk * state_old.L_;
-		H_old.block(0, 15, 3, 1) = C_wv.transpose() * C_q.transpose() * state_old.p_ic_ + C_wv.transpose() * state_old.p_;
+		H_old.block(0, 0, 3, 3) = C_wv.transpose();
+		H_old.block(0, 6, 3, 3) = -C_wv.transpose() * C_q.transpose() * pic_sk;
 		H_old.block(0, 16, 3, 3) = -C_wv.transpose() * skewold_p;
-		H_old.block(0, 22, 3, 3) = C_wv.transpose() * C_q.transpose() * state_old.L_;
+		H_old.block(0, 22, 3, 3) = C_wv.transpose() * C_q.transpose();
 
 		Eigen::Matrix<double, 3, nState_> H_gpsvel = Eigen::Matrix<double, 3, nState_>::Constant(0);
-		H_gpsvel.block(0, 3, 3, 3) = C_wv.transpose() * state_old.L_;
-		H_gpsvel.block(0, 6, 3, 3) = -C_wv.transpose() * C_q.transpose() * wpic_sk * state_old.L_;
-		H_gpsvel.block(0, 15, 3, 1) = C_wv.transpose() * C_q.transpose() * w_sk * state_old.p_ic_ + C_wv.transpose() * state_old.v_;
+		H_gpsvel.block(0, 3, 3, 3) = C_wv.transpose();
+		H_gpsvel.block(0, 6, 3, 3) = -C_wv.transpose() * C_q.transpose() * wpic_sk;
 		H_gpsvel.block(0, 16, 3, 3) = -C_wv.transpose() * skewold_v;
-		H_gpsvel.block(0, 22, 3, 3) = C_wv.transpose() * C_q.transpose() * w_sk * state_old.L_;
+		H_gpsvel.block(0, 22, 3, 3) = C_wv.transpose() * C_q.transpose() * w_sk;
 		H_old.block(3, 0, 2, nState_) = H_gpsvel.block(0, 0, 2, nState_); // only take xy vel measurements
 
-		H_old.block(5, 16, 3, 3) = Eigen::Matrix<double, 3, 3>::Identity(); //q_ic
-		H_old.block(8, 19, 3, 3) = Eigen::Matrix<double, 3, 3>::Identity(); //q_vw
+//		H_old.block(5, 16, 3, 3) = Eigen::Matrix<double, 3, 3>::Identity(); //q_ic
+//		H_old.block(8, 19, 3, 3) = Eigen::Matrix<double, 3, 3>::Identity(); //q_vw
+//		H_old(11, 15) = 1; // scale
 
-		H_old(11, 15) = 1; // scale
-
-		Eigen::Matrix<double, 3, 1> gpsvelestim = C_wv.transpose() * (state_old.v_ + C_q.transpose() * w_sk * state_old.p_ic_) * state_old.L_;
-		r_old.block(0, 0, 3, 1) = z_gp_ - C_wv.transpose() * (state_old.p_ + C_q.transpose() * state_old.p_ic_) * state_old.L_;
+		Eigen::Matrix<double, 3, 1> gpsvelestim = C_wv.transpose() * (state_old.v_ + C_q.transpose() * w_sk * state_old.p_ic_);
+		r_old.block(0, 0, 3, 1) = z_gp_ - C_wv.transpose() * (state_old.p_ + C_q.transpose() * state_old.p_ic_);
 		r_old.block(3, 0, 2, 1) = z_gv_ - gpsvelestim.block(0, 0, 2, 1); // only take xy vel measurements
-		r_old.block(5, 0, 3, 1) = Eigen::Matrix<double,3,1>::Constant(0); //-state_old.q_wv_.vec() / state_old.q_wv_.w() * 2;
-		r_old.block(8, 0, 3, 1) = Eigen::Matrix<double,3,1>::Constant(0); //-state_old.q_ci_.vec() / state_old.q_ci_.w() * 2;
-		r_old(11) = 0; //1 - state_old.L_;
+//		r_old.block(5, 0, 3, 1) = Eigen::Matrix<double,3,1>::Constant(0); //-state_old.q_wv_.vec() / state_old.q_wv_.w() * 2;
+//		r_old.block(8, 0, 3, 1) = Eigen::Matrix<double,3,1>::Constant(0); //-state_old.q_ci_.vec() / state_old.q_ci_.w() * 2;
+//		r_old(11) = 0; //1 - state_old.L_;
 
 		measurements->poseFilter_.applyMeasurement(idx, H_old, r_old, R);
 	}
