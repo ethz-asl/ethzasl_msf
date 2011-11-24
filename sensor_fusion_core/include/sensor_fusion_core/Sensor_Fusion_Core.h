@@ -213,7 +213,7 @@ private:
 	{
 		std::vector<double> mediandistvec;
 		for(int i=0; i<nBuff_; ++i)
-			mediandistvec[i]=data(i);
+			mediandistvec.push_back(data(i));
 
 		if(mediandistvec.size()>0)
 		{

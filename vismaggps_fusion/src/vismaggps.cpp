@@ -202,37 +202,46 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 		return; // EARLY ABORT getting first vision measurement: init difftime (i.e. meas frequency)
 	}
 
-	int measidx = 0;
+	unsigned int measidx = 0;
 	double timedist = 1e100;
 	double timenow = state_old.time_;
-	while (fabs(timenow-MagBuff_[measidx].time_)<timedist) // timedist decreases continuously until best point reached... then rises again
+	if(MagBuff_.size()>0)
 	{
-		timedist = fabs(timenow-MagBuff_[measidx].time_);
-		measidx++;
+		while (fabs(timenow-MagBuff_[measidx].time_)<timedist) // timedist decreases continuously until best point reached... then rises again
+		{
+			timedist = fabs(timenow-MagBuff_[measidx].time_);
+			measidx++;
+			if(!(measidx<MagBuff_.size()))
+				break;
+		}
+		if(timedist<difftime/2)
+		{
+			hasmag=true;
+			mag=MagBuff_[measidx-1];
+			for(unsigned int i=0;i<measidx;i++)
+				MagBuff_.erase(MagBuff_.begin());	//delete n times the first element...
+		}
 	}
-	if(timedist<difftime/2)
-	{
-		hasmag=true;
-		mag=MagBuff_[measidx-1];
-		for(int i=0;i<measidx;i++)
-			MagBuff_.erase(MagBuff_.begin());	//delete n times the first element...
-	}
-
 
 	measidx = 0;
 	timedist = 1e100;
 	timenow = state_old.time_;
-	while (fabs(timenow-GPSBuff_[measidx].time_)<timedist) // timedist decreases continuously until best point reached... then rises again
+	if(GPSBuff_.size()>0)
 	{
-		timedist = fabs(timenow-GPSBuff_[measidx].time_);
-		measidx++;
-	}
-	if(timedist<difftime/2)
-	{
-		hasgps=true;
-		gps=GPSBuff_[measidx-1];
-		for(int i=0;i<measidx;i++)
-			GPSBuff_.erase(GPSBuff_.begin());	//delete n times the first element...
+		while (fabs(timenow-GPSBuff_[measidx].time_)<timedist) // timedist decreases continuously until best point reached... then rises again
+		{
+			timedist = fabs(timenow-GPSBuff_[measidx].time_);
+			measidx++;
+			if(!(measidx<GPSBuff_.size()))
+				break;
+		}
+		if(timedist<difftime/2)
+		{
+			hasgps=true;
+			gps=GPSBuff_[measidx-1];
+			for(unsigned int i=0;i<measidx;i++)
+				GPSBuff_.erase(GPSBuff_.begin());	//delete n times the first element...
+		}
 	}
 
 	Sensor_Fusion_Core::MatrixXSd H_old = Eigen::Matrix<double,nVisMeas_,nState_>::Constant(0);
@@ -354,47 +363,45 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 
 		Eigen::Matrix<double,3,3> skewold_p;
 		Eigen::Matrix<double,3,1> vecold_p;
-		vecold_p = (state_old.p_+C_q.transpose()*state_old.p_ic_)*state_old.L_;
+		vecold_p = (state_old.p_+C_q.transpose()*state_old.p_ig_);
 		skewold_p << 0, -vecold_p(2), vecold_p(1)
 				,vecold_p(2), 0, -vecold_p(0)
 				,-vecold_p(1), vecold_p(0), 0;
 
 		Eigen::Matrix<double,3,3> skewold_v;
 		Eigen::Matrix<double,3,1> vecold_v;
-		vecold_v = (state_old.v_+C_q.transpose()*w_sk*state_old.p_ic_)*state_old.L_;
+		vecold_v = (state_old.v_+C_q.transpose()*w_sk*state_old.p_ig_);
 		skewold_v << 0, -vecold_v(2), vecold_v(1)
 				,vecold_v(2), 0, -vecold_v(0)
 				,-vecold_v(1), vecold_v(0), 0;
 
-		Eigen::Matrix<double,3,3> pic_sk;
-		pic_sk << 0, -state_old.p_ic_(2), state_old.p_ic_(1)
-				,state_old.p_ic_(2), 0, -state_old.p_ic_(0)
-				,-state_old.p_ic_(1), state_old.p_ic_(0), 0;
+		Eigen::Matrix<double,3,3> pig_sk;
+		pig_sk << 0, -state_old.p_ig_(2), state_old.p_ig_(1)
+				,state_old.p_ig_(2), 0, -state_old.p_ig_(0)
+				,-state_old.p_ig_(1), state_old.p_ig_(0), 0;
 
-		Eigen::Matrix<double,3,3> wpic_sk;
-		Eigen::Matrix<double,3,1> wpic_vec;
-		wpic_vec = w_sk*state_old.p_ic_;
-		wpic_sk << 0, -wpic_vec(2), wpic_vec(1)
-				,wpic_vec(2), 0, -wpic_vec(0)
-				,-wpic_vec(1), wpic_vec(0), 0;
+		Eigen::Matrix<double,3,3> wpig_sk;
+		Eigen::Matrix<double,3,1> wpig_vec;
+		wpig_vec = w_sk*state_old.p_ig_;
+		wpig_sk << 0, -wpig_vec(2), wpig_vec(1)
+				,wpig_vec(2), 0, -wpig_vec(0)
+				,-wpig_vec(1), wpig_vec(0), 0;
 
 		// construct H matrix using H-blockx :-)
-		Htot.block(nVisMeas_+3,0,3,3) = C_wv.transpose()*state_old.L_;
-		Htot.block(nVisMeas_+3,6,3,3) = -C_wv.transpose()*C_q.transpose()*pic_sk*state_old.L_;
-		Htot.block(nVisMeas_+3,15,3,1) = C_wv.transpose()*C_q.transpose()*state_old.p_ic_ + C_wv.transpose()*state_old.p_;
+		Htot.block(nVisMeas_+3,0,3,3) = C_wv.transpose();
+		Htot.block(nVisMeas_+3,6,3,3) = -C_wv.transpose()*C_q.transpose()*pig_sk;
 		Htot.block(nVisMeas_+3,16,3,3) = -C_wv.transpose()*skewold_p;
-		Htot.block(nVisMeas_+3,22,3,3) = C_wv.transpose()*C_q.transpose()*state_old.L_;
+		Htot.block(nVisMeas_+3,22,3,3) = C_wv.transpose()*C_q.transpose();
 
 		Eigen::Matrix<double,3,nState_> H_gpsvel = Eigen::Matrix<double,3,nState_>::Constant(0);
-		H_gpsvel.block(0,3,3,3) = C_wv.transpose()*state_old.L_;
-		H_gpsvel.block(0,6,3,3) = -C_wv.transpose()*C_q.transpose()*wpic_sk*state_old.L_;
-		H_gpsvel.block(0,15,3,1) = C_wv.transpose()*C_q.transpose()*w_sk*state_old.p_ic_ + C_wv.transpose()*state_old.v_;
+		H_gpsvel.block(0,3,3,3) = C_wv.transpose();
+		H_gpsvel.block(0,6,3,3) = -C_wv.transpose()*C_q.transpose()*wpig_sk;
 		H_gpsvel.block(0,16,3,3) = -C_wv.transpose()*skewold_v;
-		H_gpsvel.block(0,22,3,3) = C_wv.transpose()*C_q.transpose()*w_sk*state_old.L_;
+		H_gpsvel.block(0,22,3,3) = C_wv.transpose()*C_q.transpose()*w_sk;
 		Htot.block(nVisMeas_+3+3,0,2,nState_) = H_gpsvel.block(0,0,2,nState_); // only take xy vel measurements
 
-		Eigen::Matrix<double,3,1> gpsvelest = C_wv.transpose()*(state_old.v_ + C_q.transpose()*w_sk*state_old.p_ic_)*state_old.L_;
-		r_old.block(nVisMeas_+3,0,3,1) = z_gp_ - C_wv.transpose()*(state_old.p_ + C_q.transpose()*state_old.p_ic_)*state_old.L_;
+		Eigen::Matrix<double,3,1> gpsvelest = C_wv.transpose()*(state_old.v_ + C_q.transpose()*w_sk*state_old.p_ig_);
+		r_old.block(nVisMeas_+3,0,3,1) = z_gp_ - C_wv.transpose()*(state_old.p_ + C_q.transpose()*state_old.p_ig_);
 		r_old.block(nVisMeas_+3+3,0,2,1) = z_gv_ - gpsvelest.block(0,0,2,1);;	// only take xy vel measurements
 
 		measurements->poseFilter_.applyMeasurement(idx,Htot,rtot,Rtot);

@@ -10,4 +10,4 @@ fi
 echo " ### plotting gyro bias x y z [rad/s] ###"
 echo " ### buffer = " $T "sec"
 
-rxplot pose_filter/state_out/data[10]:data[11]:data[12] -b $T -t "gyr bias" -l x,y,z &
+rxplot sensor_fusion/state_out/data[10]:data[11]:data[12] -b $T -t "gyr bias" -l x,y,z &

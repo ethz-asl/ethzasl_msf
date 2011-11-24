@@ -10,4 +10,4 @@ fi
 echo " ### plotting vision-world drift qw qx qy qz [quat] ###"
 echo " ### buffer = " $T "sec"
 
-rxplot pose_filter/state_out/data[17]:data[18]:data[19]:data[20] -b $T -t "q_vw" -l w,x,y,z &
+rxplot sensor_fusion/state_out/data[17]:data[18]:data[19]:data[20] -b $T -t "q_vw" -l w,x,y,z &

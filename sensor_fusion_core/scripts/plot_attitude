@@ -10,4 +10,4 @@ fi
 echo " ### plotting attitude qw qx qy qz [quat] ###"
 echo " ### buffer = " $T "sec"
 
-rxplot pose_filter/state_out/data[6]:data[7]:data[8]:data[9] -b $T -t "attitude" -l w,x,y,z &
+rxplot sensor_fusion/state_out/data[6]:data[7]:data[8]:data[9] -b $T -t "attitude" -l w,x,y,z &

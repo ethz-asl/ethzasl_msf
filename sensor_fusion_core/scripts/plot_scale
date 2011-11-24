@@ -10,4 +10,4 @@ fi
 echo " ### plotting scale ###"
 echo " ### buffer = " $T "sec"
 
-rxplot pose_filter/state_out/data[16] -b $T -t "scale" -l L &
+rxplot sensor_fusion/state_out/data[16] -b $T -t "scale" -l L &

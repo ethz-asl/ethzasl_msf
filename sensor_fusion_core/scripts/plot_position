@@ -10,4 +10,4 @@ fi
 echo " ### plotting position x y z [m] ###"
 echo " ### buffer = " $T "sec"
 
-rxplot pose_filter/state_out/data[0]:data[1]:data[2] -b $T -t "position" -l x,y,z &
+rxplot sensor_fusion/state_out/data[0]:data[1]:data[2] -b $T -t "position" -l x,y,z &
