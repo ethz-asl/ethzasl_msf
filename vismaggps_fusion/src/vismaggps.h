@@ -12,16 +12,22 @@
 
 #include <sensor_fusion_core/measurement.h>
 #include <vismaggps_fusion/GpsCustomCartesian.h>
+#include <geometry_msgs/Vector3Stamped.h>
+#include <Eigen/StdVector>	// include this to use std::vectors with eigen...
 
 
-struct MagMeas
+class MagMeas
 {
+public:
+	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 	Eigen::Matrix<double, 3, 1> mag_;
 	double time_;
 };
 
-struct GPSMeas
+class GPSMeas
 {
+public:
+	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 	Eigen::Matrix<double, 3, 1> gp_;
 	Eigen::Matrix<double, 2, 1> gv_;
 	double time_;
@@ -37,8 +43,11 @@ class VisMagGPSHandler: public MeasurementHandler
 	Eigen::Matrix<double, 2, 1> z_gv_;
 	double n_zvq_, n_zvp_, n_zm_, n_zgxy_, n_zgz_, n_zgv_;
 
-	std::vector<MagMeas> MagBuff_;
-	std::vector<GPSMeas> GPSBuff_;
+	double DELAY_;	/// const time delay of measurements
+
+
+	std::vector<MagMeas,Eigen::aligned_allocator<MagMeas> > MagBuff_;
+	std::vector<GPSMeas,Eigen::aligned_allocator<GPSMeas> > GPSBuff_;
 
 	// PTAM watchdog
 	int PTAMwatch_;
@@ -50,11 +59,14 @@ class VisMagGPSHandler: public MeasurementHandler
 	void subscribe();
 
 	void visionCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg);
-	void magCallback(const geometry_msgs::PointStampedConstPtr & msg);
+	void magCallback(const geometry_msgs::Vector3StampedConstPtr & msg);
 	void gpsCallback(const vismaggps_fusion::GpsCustomCartesianConstPtr & msg);
 	void noiseConfig(sensor_fusion_core::Sensor_Fusion_CoreConfig& config, uint32_t level);
 
+	void setDELAY(double val) {DELAY_ = val;};
+
 public:
+	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 	VisMagGPSHandler(Measurements* meas):MeasurementHandler(meas){subscribe();}
 };
 

@@ -27,4 +27,3 @@ rosbuild_add_executable(vismaggps_fusion src/main.cpp src/vismaggps.cpp)
 #set_property(TARGET vismaggps_fusion PROPERTY COMPILE_DEFINITIONS SOME_DEFINITIONS)
 rosbuild_add_compile_flags(vismaggps_fusion "-O3")
 
-

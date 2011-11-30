@@ -28,4 +28,5 @@ add_definitions (-Wall)
 rosbuild_add_library(sensor_fusion_core src/Sensor_Fusion_Core.cpp src/measurement.cpp)
 rosbuild_add_compile_flags(sensor_fusion_core "-O3")
 
-
+rosbuild_add_executable(plot_state src/Plot_State.cpp)
+rosbuild_add_compile_flags(plot_state "-O3")

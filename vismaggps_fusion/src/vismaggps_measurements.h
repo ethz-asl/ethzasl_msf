@@ -57,14 +57,14 @@ public:
 		p_ic = Eigen::Matrix<double,3,1>(0, 0, 0);
 		q_ci=Eigen::Quaternion<double>(0, 1, 0, 0);
 		q_ci.normalize();
-		q_wv=Eigen::Quaternion<double>(1, 0, 0, 0);
+		q_wv=Eigen::Quaternion<double>(0.75, 0, 0, -0.75);
 		q_wv.normalize();
 		q_mi=Eigen::Quaternion<double>(1, 0, 0, 0);
 		q_mi.normalize();
 		p_ig = Eigen::Matrix<double,3,1>(0, 0, 0);
 		p_vw = Eigen::Matrix<double,3,1>(0, 0, 0);
 		double alpha=3.14159/3;
-		double beta=0;
+		double beta=-3.14159/2;
 
 
 		P = Eigen::Matrix<double,nState_,nState_>::Constant(0);
@@ -113,13 +113,23 @@ public:
 		if(p_wg_.norm()==0)
 			ROS_WARN_STREAM("No position measurements received yet from gps");
 
-		q = ( q_ci * q_cv_ *q_wv).conjugate();
+		if((q_cv_.norm()==1) & (q_cv_.w()==1))
+		{
+			q = Eigen::Quaternion<double>(0.75, 0, 0, 0.75);
+			q.normalize();
+		}
+		else
+			q = ( q_ci * q_cv_ *q_wv).conjugate();
 
 		if(p_wg_.norm()!=0)
 		{
+			 if(p_vc_[2]*p_wg_[2]!=0)
+			 {
+				 scale = p_vc_(2)/p_wg_(2);
+				 ROS_WARN_STREAM("pv, pg, scale: " << p_vc_[2] << " , " << p_wg_[2] << " , " << scale);
+			 }
 			 p = q_wv.conjugate().toRotationMatrix()*p_wg_ - q.toRotationMatrix()*p_ig;
-			 p_vw = p_vc_ + q_cv_.conjugate().toRotationMatrix()*q_ci.conjugate().toRotationMatrix()*p_ic + q_wv.conjugate().toRotationMatrix()*p;
-			 scale = p_vc_[2]/p_wg_[2];
+			 p_vw = -q_cv_.toRotationMatrix().transpose()*p_vc_/scale - q_cv_.conjugate().toRotationMatrix()*q_ci.conjugate().toRotationMatrix()*p_ic - q_wv.conjugate().toRotationMatrix()*p;
 		}
 		else	// no gps measurements received
 			p = q_wv.conjugate().toRotationMatrix()*p_vc_/scale - q.toRotationMatrix()*p_ic ;

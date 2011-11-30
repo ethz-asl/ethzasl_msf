@@ -43,6 +43,7 @@ Sensor_Fusion_Core::Sensor_Fusion_Core(){
 
 	// ros stuff
 	ros::NodeHandle nh("sensor_fusion");
+	ros::NodeHandle pnh("~");
 
 	pubState_ = nh.advertise<sensor_fusion_core::DoubleArrayStamped>("state_out", 1);
 	pubCorrect_ = nh.advertise<sensor_fusion_core::ext_ekf>("correction", 1);
@@ -58,6 +59,7 @@ Sensor_Fusion_Core::Sensor_Fusion_Core(){
 
 	qvw_inittimer_ = 1;
 
+	pnh.param("data_playback", data_playback_, false);
 	reconfServer_ = new ReconfigureServer(ros::NodeHandle("~"));
 	ReconfigureServer::CallbackType f = boost::bind(&Sensor_Fusion_Core::Config, this , _1, _2);
 	reconfServer_->setCallback(f);
@@ -78,6 +80,11 @@ void Sensor_Fusion_Core::initialize(Eigen::Matrix<double, 3, 1> p, Eigen::Matrix
 		Eigen::Quaternion<double> q_mi,  Eigen::Matrix<double, 3, 1> p_ig, Eigen::Matrix<double, 3, 1> p_vw,
 		double alpha, double beta)
 {
+	initialized_ = false;
+	predictionMade_ = false;
+	fixedScale_ = false;
+	qvw_inittimer_ = 1;
+
 
 //	boost::mutex::scoped_lock lock(ekf_mutex_);
 
@@ -145,35 +152,35 @@ void Sensor_Fusion_Core::initialize(Eigen::Matrix<double, 3, 1> p, Eigen::Matrix
 	idx_state_++;
 	idx_P_++;
 
-//	ROS_INFO_STREAM("init: \n"
-//			<<"p: "<<StateBuffer_[(unsigned char)(idx_state_-1)].p_<<"\n"
-//			<<"v: "<<StateBuffer_[(unsigned char)(idx_state_-1)].v_<<"\n"
-//			<<"q: "<<StateBuffer_[(unsigned char)(idx_state_-1)].q_.coeffs()<<"\n"
-//			<<"b_w: "<<StateBuffer_[(unsigned char)(idx_state_-1)].b_w_<<"\n"
-//			<<"b_a: "<<StateBuffer_[(unsigned char)(idx_state_-1)].b_a_<<"\n"
-//			<<"L: "<<StateBuffer_[(unsigned char)(idx_state_-1)].L_<<"\n"
-//			<<"q_wv: "<<StateBuffer_[(unsigned char)(idx_state_-1)].q_wv_.coeffs()<<"\n"
-//			<<"q_ci: "<<StateBuffer_[(unsigned char)(idx_state_-1)].q_ci_.coeffs()<<"\n"
-//			<<"p_ic: "<<StateBuffer_[(unsigned char)(idx_state_-1)].p_ic_<<"\n"
-//			<<"q_mi: "<<StateBuffer_[(unsigned char)(idx_state_-1)].q_mi_<<"\n"
-//			<<"p_ig: "<<StateBuffer_[(unsigned char)(idx_state_-1)].p_ig_<<"\n"
-//			<<"p_vw: "<<StateBuffer_[(unsigned char)(idx_state_-1)].p_vw_<<"\n"
-//			<<"alpha: "<<StateBuffer_[(unsigned char)(idx_state_-1)].alpha_<<"\n"
-//			<<"beta: "<<StateBuffer_[(unsigned char)(idx_state_-1)].beta_<<"\n"
-//			<<"n_a: "<<n_a_<<"\n"
-//			<<"n_ba_: "<<n_ba_<<"\n"
-//			<<"n_w_: "<<n_w_<<"\n"
-//			<<"n_bw: "<<n_bw_<<"\n"
-//			<<"n_L_: "<<n_L_<<"\n"
-//			<<"n_qwv_: "<<n_qwv_<<"\n"
-//			<<"n_qci_: "<<n_qci_<<"\n"
-//			<<"n_pic_: "<<n_pic_<<"\n"
-//			<<"n_qmi_: "<<n_qmi_<<"\n"
-//			<<"n_pig_: "<<n_pig_<<"\n"
-//			<<"n_pvw_: "<<n_pvw_<<"\n"
-//			<<"n_alpha_: "<<n_alpha_<<"\n"
-//			<<"n_beta_: "<<n_beta_<<"\n"
-//			);
+	ROS_INFO_STREAM("init: \n"
+			<<"p: "<<StateBuffer_[(unsigned char)(idx_state_-1)].p_<<"\n"
+			<<"v: "<<StateBuffer_[(unsigned char)(idx_state_-1)].v_<<"\n"
+			<<"q: "<<StateBuffer_[(unsigned char)(idx_state_-1)].q_.coeffs()<<"\n"
+			<<"b_w: "<<StateBuffer_[(unsigned char)(idx_state_-1)].b_w_<<"\n"
+			<<"b_a: "<<StateBuffer_[(unsigned char)(idx_state_-1)].b_a_<<"\n"
+			<<"L: "<<StateBuffer_[(unsigned char)(idx_state_-1)].L_<<"\n"
+			<<"q_wv: "<<StateBuffer_[(unsigned char)(idx_state_-1)].q_wv_.coeffs()<<"\n"
+			<<"q_ci: "<<StateBuffer_[(unsigned char)(idx_state_-1)].q_ci_.coeffs()<<"\n"
+			<<"p_ic: "<<StateBuffer_[(unsigned char)(idx_state_-1)].p_ic_<<"\n"
+			<<"q_mi: "<<StateBuffer_[(unsigned char)(idx_state_-1)].q_mi_.coeffs()<<"\n"
+			<<"p_ig: "<<StateBuffer_[(unsigned char)(idx_state_-1)].p_ig_<<"\n"
+			<<"p_vw: "<<StateBuffer_[(unsigned char)(idx_state_-1)].p_vw_<<"\n"
+			<<"alpha: "<<StateBuffer_[(unsigned char)(idx_state_-1)].alpha_<<"\n"
+			<<"beta: "<<StateBuffer_[(unsigned char)(idx_state_-1)].beta_<<"\n"
+			<<"n_a: "<<n_a_<<"\n"
+			<<"n_ba_: "<<n_ba_<<"\n"
+			<<"n_w_: "<<n_w_<<"\n"
+			<<"n_bw: "<<n_bw_<<"\n"
+			<<"n_L_: "<<n_L_<<"\n"
+			<<"n_qwv_: "<<n_qwv_<<"\n"
+			<<"n_qci_: "<<n_qci_<<"\n"
+			<<"n_pic_: "<<n_pic_<<"\n"
+			<<"n_qmi_: "<<n_qmi_<<"\n"
+			<<"n_pig_: "<<n_pig_<<"\n"
+			<<"n_pvw_: "<<n_pvw_<<"\n"
+			<<"n_alpha_: "<<n_alpha_<<"\n"
+			<<"n_beta_: "<<n_beta_<<"\n"
+			);
 
 	msgCorrect_.header.stamp = ros::Time::now();
 	msgCorrect_.header.seq = 0;
@@ -409,9 +416,6 @@ void Sensor_Fusion_Core::stateCallback(const sensor_fusion_core::ext_ekfConstPtr
 	if(StateBuffer_[idx_state_].a_m_.norm() > 50) StateBuffer_[idx_state_].a_m_ = last_am;
 	else last_am = StateBuffer_[idx_state_].a_m_;
 
-	bool isnumeric = checkForNumeric(&msg->state[0],10, "prediction p,v,q");
-
-
 	if(!predictionMade_)
 	{
 		if (fabs(StateBuffer_[(unsigned char)(idx_state_)].time_-StateBuffer_[(unsigned char)(idx_state_-1)].time_)>5)
@@ -422,7 +426,15 @@ void Sensor_Fusion_Core::stateCallback(const sensor_fusion_core::ext_ekfConstPtr
 		}
 	}
 
-	if(msg->flag==sensor_fusion_core::ext_ekf::current_state && isnumeric)	// state propagation is made externally, so we read the actual state
+	int32_t flag = msg->flag;
+	if (data_playback_)
+	  flag = sensor_fusion_core::ext_ekf::ignore_state;
+
+	bool isnumeric = true;
+	if(flag==sensor_fusion_core::ext_ekf::current_state)
+		isnumeric = checkForNumeric(&msg->state[0],10, "prediction p,v,q");
+
+	if(flag==sensor_fusion_core::ext_ekf::current_state && isnumeric)	// state propagation is made externally, so we read the actual state
 	{
 		StateBuffer_[idx_state_].p_ = Eigen::Matrix<double,3,1>(msg->state[0], msg->state[1], msg->state[2]);
 		StateBuffer_[idx_state_].v_ = Eigen::Matrix<double,3,1>(msg->state[3], msg->state[4], msg->state[5]);
@@ -439,11 +451,13 @@ void Sensor_Fusion_Core::stateCallback(const sensor_fusion_core::ext_ekfConstPtr
 
 		hl_state_buf_ = *msg;
 	}
-	else if(msg->flag==sensor_fusion_core::ext_ekf::ignore_state || !isnumeric)	// otherwise let's do the state prop. here
+	else if(flag==sensor_fusion_core::ext_ekf::ignore_state || !isnumeric)	// otherwise let's do the state prop. here
 		propagateState(StateBuffer_[idx_state_].time_-StateBuffer_[(unsigned char)(idx_state_-1)].time_);
 
 
 	predictProcessCovariance(StateBuffer_[idx_P_].time_-StateBuffer_[(unsigned char)(idx_P_-1)].time_);
+
+	isnumeric = checkForNumeric((double*)(&StateBuffer_[idx_state_-1].p_[0]),3, "prediction p");
 
 	predictionMade_ = true;
 
@@ -777,7 +791,7 @@ bool Sensor_Fusion_Core::applyMeasurement(unsigned char idx_delaystate, const Ma
 //			<<"q_wv: "<<StateBuffer_[idx_delaystate].q_wv_.coeffs()<<"\n"
 //			<<"q_ci: "<<StateBuffer_[idx_delaystate].q_ci_.coeffs()<<"\n"
 //			<<"p_ic: "<<StateBuffer_[idx_delaystate].p_ic_<<"\n"
-//			<<"q_mi: "<<StateBuffer_[idx_delaystate].q_mi_<<"\n"
+//			<<"q_mi: "<<StateBuffer_[idx_delaystate].q_mi_.coeffs()<<"\n"
 //			<<"p_ig: "<<StateBuffer_[idx_delaystate].p_ig_<<"\n"
 //			<<"p_vw: "<<StateBuffer_[idx_delaystate].p_vw_<<"\n"
 //			<<"alpha: "<<StateBuffer_[idx_delaystate].alpha_<<"\n"

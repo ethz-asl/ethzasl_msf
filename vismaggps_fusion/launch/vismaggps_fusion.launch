@@ -1,9 +1,12 @@
 <launch>
     <node name="vismaggps_fusion" pkg="vismaggps_fusion" type="vismaggps_fusion" clear_params="true" output="screen">
-	    <remap from="sensor_fusion/imu_state_input" to="/hex/fcu/imu" />
+	    <remap from="sensor_fusion/imu_state_input" to="/mav2/fcu/imu" />
 	    <remap from="sensor_fusion/vision_pose" to="/vslam/pose" />
+	    <remap from="sensor_fusion/mag_dir" to="/mav2/fcu/mag" />
+	    <remap from="sensor_fusion/gps_pos" to="/mav2/fcu/gps_position_custom" />
 	    <!--remap from="pose_filter/pose_measurement" to="/vicon/pose" /-->
 	    <!--remap from="pose_filter/state_out" to="hex/fcu/ekf_state_in"/-->
-	    <rosparam file="$(find pose_filter_updates)/ptam_filter_fix.yaml"/>
+	    <rosparam file="$(find vismaggps_fusion)/vismaggps_fix.yaml"/>
     </node>
 </launch>
+
