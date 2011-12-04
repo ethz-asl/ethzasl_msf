@@ -37,21 +37,21 @@ typedef dynamic_reconfigure::Server<sensor_fusion_core::Sensor_Fusion_CoreConfig
 
 
 struct State
-{
-	Eigen::Matrix<double, 3, 1> p_;		// 0- 2
-	Eigen::Matrix<double, 3, 1> v_;		// 3- 5
-	Eigen::Quaternion<double> q_;		// 6- 9
-	Eigen::Matrix<double, 3, 1> b_w_;	//10-12
-	Eigen::Matrix<double, 3, 1> b_a_;	//13-15
-	double L_;							//16
-	Eigen::Quaternion<double> q_wv_;	//17-20
-	Eigen::Quaternion<double> q_ci_;	//21-24
-	Eigen::Matrix<double, 3, 1> p_ic_;	//25-27
-	Eigen::Quaternion<double> q_mi_;	//28-31
-	Eigen::Matrix<double, 3, 1> p_ig_;	//32-34
-	Eigen::Matrix<double, 3, 1> p_vw_;	//35-37
-	double alpha_;// mag vec elevation	//38
-	double beta_;// mag vec azimuth		//39
+{										//state	//error state
+	Eigen::Matrix<double, 3, 1> p_;		// 0- 2	//  0- 2
+	Eigen::Matrix<double, 3, 1> v_;		// 3- 5	//  3- 5
+	Eigen::Quaternion<double> q_;		// 6- 9	//  6- 8
+	Eigen::Matrix<double, 3, 1> b_w_;	//10-12	//  9-11
+	Eigen::Matrix<double, 3, 1> b_a_;	//13-15	// 12-14
+	double L_;							//16	// 15
+	Eigen::Quaternion<double> q_wv_;	//17-20	// 16-18
+	Eigen::Quaternion<double> q_ci_;	//21-24 // 19-21
+	Eigen::Matrix<double, 3, 1> p_ic_;	//25-27	// 22-24
+	Eigen::Quaternion<double> q_mi_;	//28-31 // 25-27
+	Eigen::Matrix<double, 3, 1> p_ig_;	//32-34 // 28-30
+	Eigen::Matrix<double, 3, 1> p_vw_;	//35-37 // 31-33
+	double alpha_;// mag vec elevation	//38	// 34
+	double beta_;// mag vec azimuth		//39	// 35
 
 	Eigen::Matrix<double, nState_, nState_> P_;
 	Eigen::Matrix<double,3,1> w_m_;
@@ -183,7 +183,7 @@ public:
 			Eigen::Quaternion<double> q_mi,  Eigen::Matrix<double, 3, 1> p_ig, Eigen::Matrix<double, 3, 1> p_vw,
 			double alpha, double beta);
 
-	bool applyMeasurement(unsigned char idx_delaystate, const MatrixXSd& H_delayed, const Eigen::VectorXd& res_delayed, const Eigen::MatrixXd& R_delayed,double fuzzythres=0.1);
+	bool applyMeasurement(unsigned char idx_delaystate, const MatrixXSd& H_delayed, const Eigen::VectorXd& res_delayed, const Eigen::MatrixXd& R_delayed,double fuzzythres=0.15);
 //	bool registerMeasurement(void (*measfunc)(char*, unsigned char), char* message, unsigned int msize, unsigned char stateidx,ros::Time tstamp);
 	unsigned char getClosestState(State* timestate, ros::Time tstamp, double delay=0.00);
 	bool getStateAtIdx(State* timestate, unsigned char idx);

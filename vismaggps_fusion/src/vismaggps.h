@@ -21,6 +21,7 @@ class MagMeas
 public:
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 	Eigen::Matrix<double, 3, 1> mag_;
+	Eigen::Matrix<double, 3, 1> n_mag_;
 	double time_;
 };
 
@@ -29,7 +30,9 @@ class GPSMeas
 public:
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 	Eigen::Matrix<double, 3, 1> gp_;
+	Eigen::Matrix<double, 3, 1> n_gp_;
 	Eigen::Matrix<double, 2, 1> gv_;
+	Eigen::Matrix<double, 2, 1> n_gv_;
 	double time_;
 };
 
@@ -49,8 +52,9 @@ class VisMagGPSHandler: public MeasurementHandler
 	std::vector<MagMeas,Eigen::aligned_allocator<MagMeas> > MagBuff_;
 	std::vector<GPSMeas,Eigen::aligned_allocator<GPSMeas> > GPSBuff_;
 
-	// PTAM watchdog
+	// PTAM watchdog and init sequence
 	int PTAMwatch_;
+	int INITsequence_;
 
 
 	ros::Subscriber subVisMeas_;

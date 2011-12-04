@@ -670,7 +670,7 @@ unsigned char Sensor_Fusion_Core::getClosestState(State* timestate, ros::Time ts
 	if(!predictionMade_)
 	{
 		timestate->time_=-1;
-		return false;
+		return false;	//EARLY ABORT no prediction made
 	}
 
 	unsigned char idx = (unsigned char)(idx_state_-1);
@@ -687,6 +687,9 @@ unsigned char Sensor_Fusion_Core::getClosestState(State* timestate, ros::Time ts
 	static bool started=false;
 	if (idx==1 && !started) idx=2;
 	started=true;
+
+	if(StateBuffer_[idx].time_==0)
+		return false; //EARLY ABORT not enough predictions made yet to apply measurement (too far in past)
 
 	propPToIdx(idx);
 
@@ -872,6 +875,11 @@ bool Sensor_Fusion_Core::applyMeasurement(unsigned char idx_delaystate, const Ma
 	StateBuffer_[idx_delaystate].b_w_ = StateBuffer_[idx_delaystate].b_w_ + correction_.block(9,0,3,1);
 	StateBuffer_[idx_delaystate].b_a_ = StateBuffer_[idx_delaystate].b_a_ + correction_.block(12,0,3,1);
 	StateBuffer_[idx_delaystate].L_ = StateBuffer_[idx_delaystate].L_ + correction_(15);
+	if(StateBuffer_[idx_delaystate].L_<0)
+	{
+		ROS_WARN_STREAM("Negative scale detected: " << StateBuffer_[idx_delaystate].L_ <<  ". Correcting to 0.1");
+		StateBuffer_[idx_delaystate].L_=0.1;
+	}
 
 	Eigen::Matrix<double,3,1> theta = correction_.block(6,0,3,1);
 	Eigen::Quaternion<double> qbuff_q = Eigen::Quaternion<double>(1,0,0,0);
@@ -944,9 +952,9 @@ bool Sensor_Fusion_Core::applyMeasurement(unsigned char idx_delaystate, const Ma
 	if (qvw_inittimer_>nBuff_)
 	{
 		Eigen::Quaternion<double> errq = StateBuffer_[idx_delaystate].q_wv_.conjugate()*Eigen::Quaternion<double>(getMedian(qbuff_.block(0,3,nBuff_,1)), getMedian(qbuff_.block(0,0,nBuff_,1)),getMedian(qbuff_.block(0,1,nBuff_,1)),getMedian(qbuff_.block(0,2,nBuff_,1)));	// should be unit quaternion if no error
-		if  (std::max(errq.vec().maxCoeff(), -errq.vec().minCoeff())/fabs(errq.w())*2>fuzzythres)	// fuzzy tracking (small angle approx)
+		if  ((std::max(errq.vec().maxCoeff(), -errq.vec().minCoeff())/fabs(errq.w())*2>fuzzythres))	// fuzzy tracking (small angle approx)
 		{
-			ROS_WARN_STREAM("fuzzy tracking triggered: " << std::max(errq.vec().maxCoeff(), -errq.vec().minCoeff())/fabs(errq.w())*2 << "\n");
+			ROS_WARN_STREAM("fuzzy tracking triggered: " << std::max(errq.vec().maxCoeff(), -errq.vec().minCoeff())/fabs(errq.w())*2 << " limit: " << fuzzythres <<"\n");
 
 			//state_.q_ = buff_q;
 			StateBuffer_[idx_delaystate].b_w_ = buff_bw;
@@ -1024,6 +1032,7 @@ bool Sensor_Fusion_Core::applyMeasurement(unsigned char idx_delaystate, const Ma
 	msgCorrect_.linear_acceleration.y = 0;
 	msgCorrect_.linear_acceleration.z = 0;
 
+
 	const unsigned char idx = (unsigned char)(idx_state_-1);
 	msgCorrect_.state[0] = StateBuffer_[idx].p_[0] - hl_state_buf_.state[0];
 	msgCorrect_.state[1] = StateBuffer_[idx].p_[1] - hl_state_buf_.state[1];
@@ -1049,6 +1058,7 @@ bool Sensor_Fusion_Core::applyMeasurement(unsigned char idx_delaystate, const Ma
 	msgCorrect_.flag=sensor_fusion_core::ext_ekf::state_correction;
 	pubCorrect_.publish(msgCorrect_);
 
+
 	msgState_.header = msgCorrect_.header;
 	msgState_.data[0] = StateBuffer_[(unsigned char)(idx_state_-1)].p_[0];
 	msgState_.data[1] = StateBuffer_[(unsigned char)(idx_state_-1)].p_[1];
@@ -1060,9 +1070,9 @@ bool Sensor_Fusion_Core::applyMeasurement(unsigned char idx_delaystate, const Ma
 	msgState_.data[7] = StateBuffer_[(unsigned char)(idx_state_-1)].q_.x();
 	msgState_.data[8] = StateBuffer_[(unsigned char)(idx_state_-1)].q_.y();
 	msgState_.data[9] = StateBuffer_[(unsigned char)(idx_state_-1)].q_.z();
-	msgState_.data[10] = StateBuffer_[(unsigned char)(idx_state_-1)].b_w_[0];
-	msgState_.data[11] = StateBuffer_[(unsigned char)(idx_state_-1)].b_w_[1];
-	msgState_.data[12] = StateBuffer_[(unsigned char)(idx_state_-1)].b_w_[2];
+	msgState_.data[10] = StateBuffer_[(unsigned char)(idx_state_-1)].P_.trace();//StateBuffer_[(unsigned char)(idx_state_-1)].b_w_[0];
+	msgState_.data[11] = StateBuffer_[(unsigned char)(idx_state_-2)].P_.trace()-StateBuffer_[(unsigned char)(idx_state_-1)].P_.trace();//StateBuffer_[(unsigned char)(idx_state_-1)].b_w_[1];
+	msgState_.data[12] = 0;//StateBuffer_[(unsigned char)(idx_state_-1)].b_w_[2];
 	msgState_.data[13] = StateBuffer_[(unsigned char)(idx_state_-1)].b_a_[0];
 	msgState_.data[14] = StateBuffer_[(unsigned char)(idx_state_-1)].b_a_[1];
 	msgState_.data[15] = StateBuffer_[(unsigned char)(idx_state_-1)].b_a_[2];

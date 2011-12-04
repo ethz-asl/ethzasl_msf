@@ -13,7 +13,10 @@
 #define nVisMagGPSMeas_ 14
 //#define nVisMagGPSMeas_ 11
 #define nGPSMeas_ 5	// safety mode
+#define nMagMeas_ 3
 #define C_DELAY 0	//constant delay of camera measurement (added to that set in reconfigure gui)
+#define GPS_SWITCH 5 // number of GPS measurements without a vision measurement in between (safety switch)
+#define INIT_ROUNDS 200	// number of GPS readings together with vision measurement to ensure state convergence
 
 void VisMagGPSHandler::subscribe(){
 
@@ -41,6 +44,7 @@ void VisMagGPSHandler::subscribe(){
 	MagBuff_.clear();
 	GPSBuff_.clear();
 	PTAMwatch_ = 0;
+	INITsequence_ = 0;
 }
 
 
@@ -52,6 +56,7 @@ void VisMagGPSHandler::noiseConfig(sensor_fusion_core::Sensor_Fusion_CoreConfig&
 		MagBuff_.clear();
 		GPSBuff_.clear();
 		PTAMwatch_ = 0;
+		INITsequence_ = 0;
 	}
 	this->n_zvq_ = config.meas_noise1;
 	this->n_zvp_ = config.meas_noise2;
@@ -69,60 +74,69 @@ void VisMagGPSHandler::magCallback(const geometry_msgs::Vector3StampedConstPtr &
 	buffmag.mag_[0]=msg->vector.x;
 	buffmag.mag_[1]=msg->vector.y;
 	buffmag.mag_[2]=msg->vector.z;
+	buffmag.mag_.normalize();
 	buffmag.time_=msg->header.stamp.toSec();
 	MagBuff_.push_back(buffmag);
+	if(MagBuff_.size()>255)
+		MagBuff_.erase(MagBuff_.begin());
+	VisMagGPSMeasurements* customMeas = (VisMagGPSMeasurements*)(measurements);
+	customMeas->p_m_ = z_m_;
 }
 
 
 void VisMagGPSHandler::gpsCallback(const vismaggps_fusion::GpsCustomCartesianConstPtr & msg)
 {
-	if(PTAMwatch_>5)	// we received 5 gps measurements and no vision measurements...PTAM is dead (?)
+	static double samesame=0;
+	if(samesame==msg->position.x)
+		return;	//EARLY ABORT no new measurement
+	samesame=msg->position.x;
+
+	if(PTAMwatch_>GPS_SWITCH)	// we received GPS_SWITCH gps measurements and no vision measurements...PTAM is dead (?)
 	{
-		ROS_WARN_STREAM_THROTTLE(1,"MAV state estimaten runs in safety mode (GPS only)!!");
+		ROS_WARN_STREAM_THROTTLE(1,"MAV state estimate runs in safety mode (GPS & MAG)!!");
 		State state_old;
 		ros::Time time_old = msg->header.stamp;
-		Sensor_Fusion_Core::MatrixXSd H_old = Eigen::Matrix<double, nGPSMeas_, nState_>::Constant(0);
-		Eigen::VectorXd r_old = Eigen::Matrix<double, nGPSMeas_, 1>::Constant(0);
-		Eigen::MatrixXd R = Eigen::Matrix<double, nGPSMeas_, nGPSMeas_>::Constant(0);
+		Sensor_Fusion_Core::MatrixXSd H_old = Eigen::Matrix<double, nGPSMeas_+nMagMeas_, nState_>::Constant(0);
+		Eigen::VectorXd r_old = Eigen::Matrix<double, nGPSMeas_+nMagMeas_, 1>::Constant(0);
+		Eigen::MatrixXd R = Eigen::Matrix<double, nGPSMeas_+nMagMeas_, nGPSMeas_+nMagMeas_>::Constant(0);
 
 		z_gp_ = Eigen::Matrix<double, 3, 1>(msg->position.x, msg->position.y, msg->position.z); // change here for different topics
 		z_gv_ = Eigen::Matrix<double, 2, 1>(msg->velocity_x, msg->velocity_y); // get here the gps velocities.... // change here for different topics
 
 		Eigen::Matrix<double, nGPSMeas_, 1> buffvec;
-		buffvec << n_zgxy_, n_zgxy_, n_zgz_, msg->velocity_covariance[0], msg->velocity_covariance[3];
-		R = buffvec.asDiagonal();
+		buffvec << n_zgxy_*n_zgxy_, n_zgxy_*n_zgxy_, n_zgz_*n_zgz_, msg->velocity_covariance[0]*msg->velocity_covariance[0], msg->velocity_covariance[3]*msg->velocity_covariance[3];
+		R.block(0,0,nGPSMeas_,nGPSMeas_) = buffvec.asDiagonal();
 
-		VisMagGPSMeasurements* customMeas = (VisMagGPSMeasurements*)(measurements);
-		customMeas->p_wg_ = z_gp_;
-		customMeas->v_wg_ = z_gv_;
+//		VisMagGPSMeasurements* customMeas = (VisMagGPSMeasurements*)(measurements);
+//		customMeas->p_wg_ = z_gp_;
+//		customMeas->v_wg_ = z_gv_;
 
-		unsigned char idx = measurements->poseFilter_.getClosestState(&state_old, time_old, -DELAY_); //compensate for vision delay used in core...
+		unsigned char idx = measurements->poseFilter_.getClosestState(&state_old, time_old);
 		if (state_old.time_ == -1)
 			return; /// no prediction made yet, EARLY ABORT
+
+		if(PTAMwatch_==GPS_SWITCH+1)
+		{
+			// reinit filter in order to set new setpoint for MAV controller... actually just make sure that GPS pos is used...
+			measurements->poseFilter_.initialize(z_gp_,state_old.v_,state_old.q_,state_old.b_w_,state_old.b_a_,state_old.L_,state_old.q_wv_,state_old.P_,state_old.w_m_,state_old.a_m_,Eigen::Matrix<double,3,1>(0, 0, 9.81),state_old.q_ci_,state_old.p_ic_,state_old.q_mi_,state_old.p_ig_,state_old.p_vw_,state_old.alpha_,state_old.beta_);
+			PTAMwatch_++;
+		}
+
+		Eigen::Matrix<double,3,3> C_mi = state_old.q_mi_.conjugate().toRotationMatrix();
 		Eigen::Matrix<double, 3, 3> C_q = state_old.q_.conjugate().toRotationMatrix();
 		Eigen::Matrix<double, 3, 1> ew = state_old.w_m_ - state_old.b_w_;
 
 		Eigen::Matrix<double, 3, 3> w_sk;
-		w_sk << 0, -ew(2), ew(1), ew(2), 0, -ew(0), -ew(1), ew(0), 0;
-
-		Eigen::Matrix<double, 3, 3> skewold_p;
-		Eigen::Matrix<double, 3, 1> vecold_p;
-		vecold_p = (state_old.p_ + C_q.transpose() * state_old.p_ig_);
-		skewold_p << 0, -vecold_p(2), vecold_p(1),
-				vecold_p(2), 0, -vecold_p(0),
-				-vecold_p(1), vecold_p(0), 0;
-
-		Eigen::Matrix<double, 3, 3> skewold_v;
-		Eigen::Matrix<double, 3, 1> vecold_v;
-		vecold_v = (state_old.v_ + C_q.transpose() * w_sk * state_old.p_ig_);
-		skewold_v << 0, -vecold_v(2), vecold_v(1),
-				vecold_v(2), 0, -vecold_v(0),
-				-vecold_v(1), vecold_v(0), 0;
+		w_sk << 0, -ew(2), ew(1),
+				ew(2), 0, -ew(0),
+				-ew(1), ew(0), 0;
 
 		Eigen::Matrix<double, 3, 3> pig_sk;
-		pig_sk << 0, -state_old.p_ig_(2), state_old.p_ig_(1),
-				state_old.p_ig_(2), 0, -state_old.p_ig_(0),
-				-state_old.p_ig_(1), state_old.p_ig_(0), 0;
+		Eigen::Matrix<double, 3, 1> pig_vec;
+		pig_vec = state_old.p_ig_;
+		pig_sk << 0, -pig_vec(2), pig_vec(1),
+				pig_vec(2), 0, -pig_vec(0),
+				-pig_vec(1), pig_vec(0), 0;
 
 		Eigen::Matrix<double, 3, 3> wpig_sk;
 		Eigen::Matrix<double, 3, 1> wpig_vec;
@@ -142,35 +156,71 @@ void VisMagGPSHandler::gpsCallback(const vismaggps_fusion::GpsCustomCartesianCon
 
 		Eigen::Matrix<double, 3, nState_> H_gpsvel = Eigen::Matrix<double, 3, nState_>::Constant(0);
 		H_gpsvel.block(0, 3, 3, 3) = Eigen::Matrix<double, 3, 3>::Identity();
-		H_gpsvel.block(0, 6, 3, 3) = -C_q.transpose() * wpig_sk;
+		H_gpsvel.block(0, 6, 3, 3) = -C_q.transpose()*wpig_sk;
 		H_gpsvel.block(0, 28, 3, 3) = C_q.transpose() * w_sk;
 		H_old.block(3, 0, 2, nState_) = H_gpsvel.block(0, 0, 2, nState_); // only take xy vel measurements
-
-//		H_old.block(5, 16, 3, 3) = Eigen::Matrix<double, 3, 3>::Identity(); //q_ic
-//		H_old.block(8, 19, 3, 3) = Eigen::Matrix<double, 3, 3>::Identity(); //q_vw
-//		H_old(11, 15) = 1; // scale
 
 		Eigen::Matrix<double, 3, 1> gpsvelestim = (state_old.v_ + C_q.transpose() * w_sk * state_old.p_ig_);
 		r_old.block(0, 0, 3, 1) = z_gp_ - (state_old.p_ + C_q.transpose() * state_old.p_ig_);
 		r_old.block(3, 0, 2, 1) = z_gv_ - gpsvelestim.block(0, 0, 2, 1); // only take xy vel measurements
-//		r_old.block(5, 0, 3, 1) = Eigen::Matrix<double,3,1>::Constant(0); //-state_old.q_wv_.vec() / state_old.q_wv_.w() * 2;
-//		r_old.block(8, 0, 3, 1) = Eigen::Matrix<double,3,1>::Constant(0); //-state_old.q_ci_.vec() / state_old.q_ci_.w() * 2;
-//		r_old(11) = 0; //1 - state_old.L_;
 
-		measurements->poseFilter_.applyMeasurement(idx, H_old, r_old, R);
+		z_m_ = MagBuff_.back().mag_;
+
+		Eigen::Matrix<double,3,1> magRvec;
+		magRvec  << n_zm_*n_zm_,n_zm_*n_zm_,n_zm_*n_zm_;
+		R.block(nGPSMeas_,nGPSMeas_,nMagMeas_,nMagMeas_) = magRvec.asDiagonal();
+//		customMeas->p_m_ = z_m_;
+
+		Eigen::Matrix<double,3,1> vec_m;	// x-axis points north (i.e. beta==0)
+		vec_m << cos(state_old.beta_)*cos(state_old.alpha_), sin(state_old.beta_)*cos(state_old.alpha_), sin(state_old.alpha_);
+		Eigen::Matrix<double,3,1> vec_m_dalpha;
+		vec_m_dalpha << -cos(state_old.beta_)*sin(state_old.alpha_), -sin(state_old.beta_)*sin(state_old.alpha_), cos(state_old.alpha_);
+		Eigen::Matrix<double,3,1> vec_m_dbeta;
+		vec_m_dbeta << -sin(state_old.beta_)*cos(state_old.alpha_), cos(state_old.beta_)*cos(state_old.alpha_), 0;
+
+		Eigen::Matrix<double,3,3> mw_sk1;
+		Eigen::Matrix<double,3,1> vec1_mw = C_q*vec_m;
+		mw_sk1 << 0, -vec1_mw(2), vec1_mw(1)
+				,vec1_mw(2), 0, -vec1_mw(0)
+				,-vec1_mw(1), vec1_mw(0), 0;
+
+		Eigen::Matrix<double,3,3> mw_sk2;
+		Eigen::Matrix<double,3,1> vec2_mw = C_mi*C_q*vec_m;
+		mw_sk2 << 0, -vec2_mw(2), vec2_mw(1)
+				,vec2_mw(2), 0, -vec2_mw(0)
+				,-vec2_mw(1), vec2_mw(0), 0;
+
+		// construct H matrix using H-blockx :-)
+		H_old.block(nGPSMeas_,6,3,3) = C_mi*mw_sk1;
+		H_old.block(nGPSMeas_,25,3,3) = mw_sk2;
+		H_old.block(nGPSMeas_,34,3,1) = C_mi*C_q*vec_m_dalpha;
+		H_old.block(nGPSMeas_,35,3,1) =C_mi*C_q*vec_m_dbeta;
+
+		r_old.block(nGPSMeas_,0,3,1) = z_m_ - C_mi*C_q*(vec_m);
+
+		measurements->poseFilter_.applyMeasurement(idx, H_old, r_old, R,3);	//disable fuzzy tracking...
 	}
-	else
-	{
-		GPSMeas buffgps;
-		buffgps.gp_(0,0)=msg->position.x;
-		buffgps.gp_(1,0)=msg->position.y;
-		buffgps.gp_(2,0)=msg->position.z;
-		buffgps.gv_(0,0)=msg->velocity_x;
-		buffgps.gv_(1,0)=msg->velocity_y;
-		buffgps.time_=msg->header.stamp.toSec();
-		GPSBuff_.push_back(buffgps);
-		PTAMwatch_++;
-	}
+	GPSMeas buffgps;
+	buffgps.gp_(0,0)=msg->position.x;
+	buffgps.gp_(1,0)=msg->position.y;
+	buffgps.gp_(2,0)=msg->position.z;
+	buffgps.n_gp_(0,0)=n_zgxy_;
+	buffgps.n_gp_(1,0)=n_zgxy_;
+	buffgps.n_gp_(2,0)=n_zgz_;
+	buffgps.gv_(0,0)=msg->velocity_x;
+	buffgps.gv_(1,0)=msg->velocity_y;
+	buffgps.n_gv_(0,0)=msg->velocity_covariance[0];
+	buffgps.n_gv_(1,0)=msg->velocity_covariance[3];
+
+	buffgps.time_=msg->header.stamp.toSec();
+	GPSBuff_.push_back(buffgps);
+	if(GPSBuff_.size()>255)
+		GPSBuff_.erase(GPSBuff_.begin());
+
+	VisMagGPSMeasurements* customMeas = (VisMagGPSMeasurements*)(measurements);
+	customMeas->p_wg_ = buffgps.gp_;
+	customMeas->v_wg_ = buffgps.gv_;
+	PTAMwatch_++;
 }
 
 
@@ -180,6 +230,11 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 	MagMeas mag;
 	GPSMeas gps;
 
+	if(PTAMwatch_>GPS_SWITCH)	// we had a map loss... re-init as good as possible
+	{
+		INITsequence_=-1;	//use first few measurements of all sensors before switching to vision only
+
+	}
 	PTAMwatch_=0;	// PTAM is running...good
 
 	static double prevtime = 0;
@@ -244,15 +299,12 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 
 	if(hasmag)
 	{
-		z_m_ = Eigen::Matrix<double,3,1>(mag.mag_[0],mag.mag_[1],mag.mag_[2]);
-		z_m_.normalize();
+		z_m_ = mag.mag_;
 	}
 	if(hasgps)
 	{
-		z_gp_ = Eigen::Matrix<double,3,1>(gps.gp_[0], gps.gp_[1], gps.gp_[2]);
-		z_gv_ = Eigen::Matrix<double,2,1>(gps.gv_[0], gps.gv_[1]);
-		customMeas->p_wg_ = z_gp_;
-		customMeas->v_wg_ = z_gv_;
+		z_gp_ = gps.gp_;
+		z_gv_ = gps.gv_;
 	}
 
 	State state_old;
@@ -260,6 +312,32 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 	unsigned char idx = measurements->poseFilter_.getClosestState(&state_old,time_old,C_DELAY);
 	if (state_old.time_ == -1)
 		return;		/// no prediction made yet, EARLY ABORT
+
+	if(INITsequence_==-1)	// we had a map loss... re-init unobservable states...
+	{
+		if( hasmag & hasgps)
+		{
+			state_old.q_wv_ = z_vq_.conjugate()*state_old.q_ci_.conjugate()*state_old.q_.conjugate();
+
+			if(z_gp_.norm()!=0)
+			{
+				 if(z_vp_[2]*z_gp_[2]!=0)
+					 state_old.L_ = fabs(z_vp_(2)/z_gp_(2));
+				 state_old.p_vw_ = z_vp_/state_old.L_ - z_vq_.conjugate().toRotationMatrix()*state_old.q_ci_.conjugate().toRotationMatrix()*state_old.p_ic_ - state_old.q_wv_.conjugate().toRotationMatrix()*state_old.p_;
+			}
+
+			Eigen::Matrix<double,3,3> Pincr1 = (Eigen::Matrix<double,3,1>::Constant(1)).asDiagonal(); // q_vw
+			Eigen::Matrix<double,3,3> Pincr2 = (Eigen::Matrix<double,3,1>::Constant((z_gp_-z_vp_/state_old.L_).norm())).asDiagonal(); //p_vw
+			state_old.P_(15,15)+=state_old.L_/2;	//scale
+			state_old.P_.block(16,16,3,3)+=Pincr1;	//q_vw
+			state_old.P_.block(31,31,3,3)+=Pincr2;	//p_vw
+
+			measurements->poseFilter_.initialize(state_old.p_,state_old.v_,state_old.q_,state_old.b_w_,state_old.b_a_,state_old.L_,state_old.q_wv_,state_old.P_,state_old.w_m_,state_old.a_m_,Eigen::Matrix<double,3,1>(0, 0, 9.81),state_old.q_ci_,state_old.p_ic_,state_old.q_mi_,state_old.p_ig_,state_old.p_vw_,state_old.alpha_,state_old.beta_);
+			INITsequence_++;
+		}
+		else
+			return; // EARLY ABORT
+	}
 
 
 	Sensor_Fusion_Core::MatrixXSd H_old = Eigen::Matrix<double,nVisMeas_,nState_>::Constant(0);
@@ -307,8 +385,10 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 	r_old.block(3,0,3,1) = q_err.vec()/q_err.w()*2;
 
 
-	if(hasmag && hasgps)
+	if(hasmag & hasgps & (INITsequence_<INIT_ROUNDS))	// use 100 cam measurements for convergence
 	{
+		ROS_WARN_STREAM("initializing... ");
+
 		Sensor_Fusion_Core::MatrixXSd Htot = Eigen::Matrix<double,nVisMagGPSMeas_,nState_>::Constant(0);
 		Eigen::VectorXd rtot = Eigen::Matrix<double,nVisMagGPSMeas_,1>::Constant(0);
 		Eigen::MatrixXd Rtot = Eigen::Matrix<double,nVisMagGPSMeas_,nVisMagGPSMeas_>::Constant(0);
@@ -320,18 +400,18 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 /////////////////// fill in mag measurement ////////////////////////////////////////////////////////////////
 
 		Eigen::Matrix<double,3,1> magRvec;
-		magRvec  << n_zm_,n_zm_,n_zm_;
+		magRvec  << n_zm_*n_zm_,n_zm_*n_zm_,n_zm_*n_zm_;
 		Rtot.block(nVisMeas_,nVisMeas_,3,3) = magRvec.asDiagonal();
 		customMeas->p_m_ = z_m_;
 
 		Eigen::Matrix<double,3,3> C_mi = state_old.q_mi_.conjugate().toRotationMatrix();
 
-		Eigen::Matrix<double,3,1> vec_m;
-		vec_m << sin(state_old.beta_)*cos(state_old.alpha_), cos(state_old.beta_)*cos(state_old.alpha_), sin(state_old.alpha_);
+		Eigen::Matrix<double,3,1> vec_m;	// x-axis points north (i.e. beta==0)
+		vec_m << cos(state_old.beta_)*cos(state_old.alpha_), sin(state_old.beta_)*cos(state_old.alpha_), sin(state_old.alpha_);
 		Eigen::Matrix<double,3,1> vec_m_dalpha;
-		vec_m_dalpha << -sin(state_old.beta_)*sin(state_old.alpha_), -cos(state_old.beta_)*sin(state_old.alpha_), cos(state_old.alpha_);
+		vec_m_dalpha << -cos(state_old.beta_)*sin(state_old.alpha_), -sin(state_old.beta_)*sin(state_old.alpha_), cos(state_old.alpha_);
 		Eigen::Matrix<double,3,1> vec_m_dbeta;
-		vec_m_dbeta << cos(state_old.beta_)*cos(state_old.alpha_), -sin(state_old.beta_)*cos(state_old.alpha_), 0;
+		vec_m_dbeta << -sin(state_old.beta_)*cos(state_old.alpha_), cos(state_old.beta_)*cos(state_old.alpha_), 0;
 
 		Eigen::Matrix<double,3,3> mw_sk1;
 		Eigen::Matrix<double,3,1> vec1_mw = C_q*vec_m;
@@ -345,6 +425,7 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 				,vec2_mw(2), 0, -vec2_mw(0)
 				,-vec2_mw(1), vec2_mw(0), 0;
 
+
 		// construct H matrix using H-blockx :-)
 		Htot.block(nVisMeas_,6,3,3) = C_mi*mw_sk1;
 		Htot.block(nVisMeas_,25,3,3) = mw_sk2;
@@ -356,116 +437,68 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 /////////////////// fill in gps measurement ////////////////////////////////////////////////////////////////
 
 		Eigen::Matrix<double,5,1> gpsRvec;
-		gpsRvec  << n_zgxy_,n_zgxy_,n_zgz_,n_zgv_,n_zgv_;
-		Rtot.block(nVisMeas_+3,nVisMeas_+3,5,5) = gpsRvec.asDiagonal();
+		gpsRvec << gps.n_gp_[0]*gps.n_gp_[0], gps.n_gp_[1]*gps.n_gp_[1], gps.n_gp_[2]*gps.n_gp_[2], gps.n_gv_[0]*gps.n_gv_[0], gps.n_gv_[1]*gps.n_gv_[1];
+		Rtot.block(nVisMeas_+nMagMeas_,nVisMeas_+nMagMeas_,5,5) = gpsRvec.asDiagonal();
 
-		Eigen::Matrix<double,3,1> ew = state_old.w_m_-state_old.b_w_;
+		Eigen::Matrix<double, 3, 3> C_q = state_old.q_.conjugate().toRotationMatrix();
+		Eigen::Matrix<double, 3, 1> ew = state_old.w_m_ - state_old.b_w_;
 
-		Eigen::Matrix<double,3,3> w_sk;
-		w_sk << 0, -ew(2), ew(1)
-				,ew(2), 0, -ew(0)
-				,-ew(1), ew(0), 0;
+		Eigen::Matrix<double, 3, 3> w_sk;
+		w_sk << 0, -ew(2), ew(1),
+				ew(2), 0, -ew(0),
+				-ew(1), ew(0), 0;
 
-		Eigen::Matrix<double,3,3> skewold_p;
-		Eigen::Matrix<double,3,1> vecold_p;
-		vecold_p = (state_old.p_+C_q.transpose()*state_old.p_ig_);
-		skewold_p << 0, -vecold_p(2), vecold_p(1)
-				,vecold_p(2), 0, -vecold_p(0)
-				,-vecold_p(1), vecold_p(0), 0;
+		Eigen::Matrix<double, 3, 3> pig_sk;
+		Eigen::Matrix<double, 3, 1> pig_vec;
+		pig_vec = state_old.p_ig_;
+		pig_sk << 0, -pig_vec(2), pig_vec(1),
+				pig_vec(2), 0, -pig_vec(0),
+				-pig_vec(1), pig_vec(0), 0;
 
-		Eigen::Matrix<double,3,3> skewold_v;
-		Eigen::Matrix<double,3,1> vecold_v;
-		vecold_v = (state_old.v_+C_q.transpose()*w_sk*state_old.p_ig_);
-		skewold_v << 0, -vecold_v(2), vecold_v(1)
-				,vecold_v(2), 0, -vecold_v(0)
-				,-vecold_v(1), vecold_v(0), 0;
+		Eigen::Matrix<double, 3, 3> wpig_sk;
+		Eigen::Matrix<double, 3, 1> wpig_vec;
+		wpig_vec = w_sk * state_old.p_ig_;
+		wpig_sk << 0, -wpig_vec(2), wpig_vec(1),
+				wpig_vec(2), 0, -wpig_vec(0),
+				-wpig_vec(1), wpig_vec(0), 0;
 
-		Eigen::Matrix<double,3,3> pig_sk;
-		pig_sk << 0, -state_old.p_ig_(2), state_old.p_ig_(1)
-				,state_old.p_ig_(2), 0, -state_old.p_ig_(0)
-				,-state_old.p_ig_(1), state_old.p_ig_(0), 0;
-
-		Eigen::Matrix<double,3,3> wpig_sk;
-		Eigen::Matrix<double,3,1> wpig_vec;
-		wpig_vec = w_sk*state_old.p_ig_;
-		wpig_sk << 0, -wpig_vec(2), wpig_vec(1)
-				,wpig_vec(2), 0, -wpig_vec(0)
-				,-wpig_vec(1), wpig_vec(0), 0;
+		//		//measurements (kind of from mathematica...)
+		//		q_vw*(vwi+Transpose[R1wi].skeww.pig)*L
+		//		q_vw*(pwi+Transpose[R1wi].pig)*L
 
 		// construct H matrix using H-blockx :-)
-		Htot.block(nVisMeas_+3,0,3,3) = C_wv.transpose();
-		Htot.block(nVisMeas_+3,6,3,3) = -C_wv.transpose()*C_q.transpose()*pig_sk;
-		Htot.block(nVisMeas_+3,16,3,3) = -C_wv.transpose()*skewold_p;
-		Htot.block(nVisMeas_+3,22,3,3) = C_wv.transpose()*C_q.transpose();
+		Htot.block(nVisMeas_+nMagMeas_, 0, 3, 3) = Eigen::Matrix<double, 3, 3>::Identity();
+		Htot.block(nVisMeas_+nMagMeas_, 6, 3, 3) = -C_q.transpose() * pig_sk;
+		Htot.block(nVisMeas_+nMagMeas_, 28, 3, 3) = C_q.transpose();
 
-		Eigen::Matrix<double,3,nState_> H_gpsvel = Eigen::Matrix<double,3,nState_>::Constant(0);
-		H_gpsvel.block(0,3,3,3) = C_wv.transpose();
-		H_gpsvel.block(0,6,3,3) = -C_wv.transpose()*C_q.transpose()*wpig_sk;
-		H_gpsvel.block(0,16,3,3) = -C_wv.transpose()*skewold_v;
-		H_gpsvel.block(0,22,3,3) = C_wv.transpose()*C_q.transpose()*w_sk;
-		Htot.block(nVisMeas_+3+3,0,2,nState_) = H_gpsvel.block(0,0,2,nState_); // only take xy vel measurements
+		Eigen::Matrix<double, 3, nState_> H_gpsvel = Eigen::Matrix<double, 3, nState_>::Constant(0);
+		H_gpsvel.block(0, 3, 3, 3) = Eigen::Matrix<double, 3, 3>::Identity();
+		H_gpsvel.block(0, 6, 3, 3) = -C_q.transpose()*wpig_sk;
+		H_gpsvel.block(0, 28, 3, 3) = C_q.transpose() * w_sk;
+		Htot.block(nVisMeas_+nMagMeas_+3, 0, 2, nState_) = H_gpsvel.block(0, 0, 2, nState_); // only take xy vel measurements
 
-		Eigen::Matrix<double,3,1> gpsvelest = C_wv.transpose()*(state_old.v_ + C_q.transpose()*w_sk*state_old.p_ig_);
-		rtot.block(nVisMeas_+3,0,3,1) = z_gp_ - C_wv.transpose()*(state_old.p_ + C_q.transpose()*state_old.p_ig_);
-		rtot.block(nVisMeas_+3+3,0,2,1) = z_gv_ - gpsvelest.block(0,0,2,1);;	// only take xy vel measurements
+		Eigen::Matrix<double, 3, 1> gpsvelestim = (state_old.v_ + C_q.transpose() * w_sk * state_old.p_ig_);
+		rtot.block(nVisMeas_+nMagMeas_, 0, 3, 1) = z_gp_ - (state_old.p_ + C_q.transpose() * state_old.p_ig_);
+		rtot.block(nVisMeas_+nMagMeas_+3, 0, 2, 1) = z_gv_ - gpsvelestim.block(0, 0, 2, 1); // only take xy vel measurements
 
+		measurements->poseFilter_.applyMeasurement(idx,Htot,rtot,Rtot,3);	//disable fuzzy tracking to let states converge
 
-//		Eigen::Matrix<double,5,1> gpsRvec;
-//		gpsRvec  << n_zgxy_,n_zgxy_,n_zgz_,n_zgv_,n_zgv_;
-//		Rtot.block(nVisMeas_,nVisMeas_,5,5) = gpsRvec.asDiagonal();
-//
-//		Eigen::Matrix<double,3,1> ew = state_old.w_m_-state_old.b_w_;
-//
-//		Eigen::Matrix<double,3,3> w_sk;
-//		w_sk << 0, -ew(2), ew(1)
-//				,ew(2), 0, -ew(0)
-//				,-ew(1), ew(0), 0;
-//
-//		Eigen::Matrix<double,3,3> skewold_p;
-//		Eigen::Matrix<double,3,1> vecold_p;
-//		vecold_p = (state_old.p_+C_q.transpose()*state_old.p_ig_);
-//		skewold_p << 0, -vecold_p(2), vecold_p(1)
-//				,vecold_p(2), 0, -vecold_p(0)
-//				,-vecold_p(1), vecold_p(0), 0;
-//
-//		Eigen::Matrix<double,3,3> skewold_v;
-//		Eigen::Matrix<double,3,1> vecold_v;
-//		vecold_v = (state_old.v_+C_q.transpose()*w_sk*state_old.p_ig_);
-//		skewold_v << 0, -vecold_v(2), vecold_v(1)
-//				,vecold_v(2), 0, -vecold_v(0)
-//				,-vecold_v(1), vecold_v(0), 0;
-//
-//		Eigen::Matrix<double,3,3> pig_sk;
-//		pig_sk << 0, -state_old.p_ig_(2), state_old.p_ig_(1)
-//				,state_old.p_ig_(2), 0, -state_old.p_ig_(0)
-//				,-state_old.p_ig_(1), state_old.p_ig_(0), 0;
-//
-//		Eigen::Matrix<double,3,3> wpig_sk;
-//		Eigen::Matrix<double,3,1> wpig_vec;
-//		wpig_vec = w_sk*state_old.p_ig_;
-//		wpig_sk << 0, -wpig_vec(2), wpig_vec(1)
-//				,wpig_vec(2), 0, -wpig_vec(0)
-//				,-wpig_vec(1), wpig_vec(0), 0;
-//
-//		// construct H matrix using H-blockx :-)
-//		Htot.block(nVisMeas_,0,3,3) = C_wv.transpose();
-//		Htot.block(nVisMeas_,6,3,3) = -C_wv.transpose()*C_q.transpose()*pig_sk;
-//		Htot.block(nVisMeas_,16,3,3) = -C_wv.transpose()*skewold_p;
-//		Htot.block(nVisMeas_,22,3,3) = C_wv.transpose()*C_q.transpose();
-//
-//		Eigen::Matrix<double,3,nState_> H_gpsvel = Eigen::Matrix<double,3,nState_>::Constant(0);
-//		H_gpsvel.block(0,3,3,3) = C_wv.transpose();
-//		H_gpsvel.block(0,6,3,3) = -C_wv.transpose()*C_q.transpose()*wpig_sk;
-//		H_gpsvel.block(0,16,3,3) = -C_wv.transpose()*skewold_v;
-//		H_gpsvel.block(0,22,3,3) = C_wv.transpose()*C_q.transpose()*w_sk;
-//		Htot.block(nVisMeas_+3,0,2,nState_) = H_gpsvel.block(0,0,2,nState_); // only take xy vel measurements
-//
-//		Eigen::Matrix<double,3,1> gpsvelest = C_wv.transpose()*(state_old.v_ + C_q.transpose()*w_sk*state_old.p_ig_);
-//		rtot.block(nVisMeas_,0,3,1) = z_gp_ - C_wv.transpose()*(state_old.p_ + C_q.transpose()*state_old.p_ig_);
-//		rtot.block(nVisMeas_+3,0,2,1) = z_gv_ - gpsvelest.block(0,0,2,1);;	// only take xy vel measurements
+		INITsequence_++;
+		if(!(INITsequence_<INIT_ROUNDS))
+		{
+			Eigen::Matrix<double,3,1> poscorrect = z_vp_/state_old.L_ - (state_old.p_vw_+C_wv.transpose()*(state_old.p_ + C_q.transpose()*state_old.p_ic_));
 
-		measurements->poseFilter_.applyMeasurement(idx,Htot,rtot,Rtot,0.2);
+			if(poscorrect.norm()<0.5)	// pos jump must be <0.5m
+				ROS_WARN_STREAM("switching to vision only... (pos correction: " << poscorrect.norm() << " [m])");
+			else
+			{
+				INITsequence_=INIT_ROUNDS-5;	// add 5 init rounds
+				ROS_WARN_STREAM("further init needed. Pos correction: " << poscorrect.norm() << " [m]");
+			}
+		}
 	}
+	else if(INITsequence_<INIT_ROUNDS)	//disable fuzzy tracking to let states converge
+		measurements->poseFilter_.applyMeasurement(idx,H_old,r_old,R,3);
 	else
 		measurements->poseFilter_.applyMeasurement(idx,H_old,r_old,R);
 
