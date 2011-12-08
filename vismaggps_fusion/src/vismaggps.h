@@ -16,6 +16,16 @@
 #include <Eigen/StdVector>	// include this to use std::vectors with eigen...
 
 
+class CVGMeas
+{
+public:
+	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+	Eigen::Matrix<double, 3, 1> cvgp_;
+	Eigen::Quaternion<double> cvgq_;
+	Eigen::Matrix<double, 6, 1> n_cvgcov_;
+	double time_;
+};
+
 class MagMeas
 {
 public:
@@ -49,6 +59,7 @@ class VisMagGPSHandler: public MeasurementHandler
 	double DELAY_;	/// const time delay of measurements
 
 
+	std::vector<CVGMeas,Eigen::aligned_allocator<CVGMeas> > CVGBuff_;
 	std::vector<MagMeas,Eigen::aligned_allocator<MagMeas> > MagBuff_;
 	std::vector<GPSMeas,Eigen::aligned_allocator<GPSMeas> > GPSBuff_;
 
@@ -57,12 +68,14 @@ class VisMagGPSHandler: public MeasurementHandler
 	int INITsequence_;
 
 
+	ros::Subscriber subCVGMeas_;
 	ros::Subscriber subVisMeas_;
 	ros::Subscriber subMagMeas_;
 	ros::Subscriber subGPSMeas_;
 	void subscribe();
 
 	void visionCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg);
+	void CVGCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg);
 	void magCallback(const geometry_msgs::Vector3StampedConstPtr & msg);
 	void gpsCallback(const vismaggps_fusion::GpsCustomCartesianConstPtr & msg);
 	void noiseConfig(sensor_fusion_core::Sensor_Fusion_CoreConfig& config, uint32_t level);
