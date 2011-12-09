@@ -39,7 +39,6 @@ bool checkForNumeric(T vec, int size, const std::string & info)
 Sensor_Fusion_Core::Sensor_Fusion_Core(){
 	initialized_ = false;
 	predictionMade_ = false;
-	fixedScale_ = false;
 
 	// ros stuff
 	ros::NodeHandle nh("sensor_fusion");
@@ -82,7 +81,6 @@ void Sensor_Fusion_Core::initialize(Eigen::Matrix<double, 3, 1> p, Eigen::Matrix
 {
 	initialized_ = false;
 	predictionMade_ = false;
-	fixedScale_ = false;
 	qvw_inittimer_ = 1;
 
 
@@ -853,6 +851,20 @@ bool Sensor_Fusion_Core::applyMeasurement(unsigned char idx_delaystate, const Ma
 		correction_(14) = 0; //gyro bias z
 	}
 
+	if(fixedCalib_){
+		correction_(19) = 0;  //q_ic x
+		correction_(20) = 0; //q_ic bias y
+		correction_(21) = 0; //q_ic bias z
+		correction_(22) = 0; //p_ic bias x
+		correction_(23) = 0; //p_ic bias y
+		correction_(24) = 0; //p_ic bias z
+		correction_(28) = 0; //p_ig bias x
+		correction_(29) = 0; //p_ig bias y
+		correction_(30) = 0; //p_ig bias z
+		correction_(34) = 0; //alpha
+		correction_(35) = 0; //beta
+	}
+
 	// state update:
 
 	// store old values in case of FUZZY tracking
@@ -1117,6 +1129,7 @@ void Sensor_Fusion_Core::DynConfig(sensor_fusion_core::Sensor_Fusion_CoreConfig&
 //	{
 		this->setFixedScale(config.fixed_scale);
 		this->setFixedBias(config.fixed_bias);
+		this->setFixedCalib(config.fixed_calib);
 		this->setNoiseAcc(config.noise_acc);
 		this->setNoiseAccBias(config.noise_accbias);
 		this->setNoiseGyr(config.noise_gyr);

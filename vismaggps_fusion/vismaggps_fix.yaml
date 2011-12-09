@@ -1,4 +1,4 @@
-scale_init: 1
+scale_init: 0.5
 fixed_scale: 0
 fixed_bias: 0
 noise_acc: 0.083
@@ -14,7 +14,7 @@ noise_pig: 0.0
 noise_pvw: 0.0
 noise_alpha: 0.0
 noise_beta: 0.0
-delay: 0.0
+delay: 0.02
 meas_noise1: 0.01
 meas_noise2: 0.02
 meas_noise3: 0.01

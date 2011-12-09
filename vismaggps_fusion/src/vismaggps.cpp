@@ -291,7 +291,7 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 
 	static double prevtime = 0;
 	static double difftime = 0;
-	difftime = 0.9*difftime + 0.1*(msg->header.stamp.toSec()-C_DELAY-DELAY_-prevtime);
+	difftime = 0.5*difftime + 0.5*(msg->header.stamp.toSec()-C_DELAY-DELAY_-prevtime);
 
 	if(prevtime==0)
 	{
@@ -311,7 +311,7 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 			if(!(measidx<MagBuff_.size()))
 				break;
 		}
-		if(timedist<difftime/2)
+		if(timedist<difftime)
 		{
 			hasmag=true;
 			mag=MagBuff_[measidx-1];
@@ -332,7 +332,7 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 			if(!(measidx<GPSBuff_.size()))
 				break;
 		}
-		if(timedist<difftime/2)
+		if(timedist<difftime)
 		{
 			hasgps=true;
 			gps=GPSBuff_[measidx-1];
@@ -353,7 +353,7 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 			if(!(measidx<CVGBuff_.size()))
 				break;
 		}
-		if(timedist<difftime/2)
+		if(timedist<difftime)
 		{
 			hascvg=true;
 			cvg=CVGBuff_[measidx-1];
@@ -458,7 +458,7 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 	r_old.block(3,0,3,1) = q_err.vec()/q_err.w()*2;
 
 
-	if(hasmag & hasgps & (INITsequence_<INIT_ROUNDS))	// use 100 cam measurements for convergence
+	if(hasmag & hasgps & (INITsequence_<INIT_ROUNDS))	// use INIT_ROUNDS cam measurements for convergence
 	{
 		ROS_WARN_STREAM("initializing... ");
 
@@ -571,7 +571,7 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 		}
 	}
 
-	else if(hascvg & !(INITsequence_<INIT_ROUNDS))	// initialized and running on CVG reloc. mode
+	else if(hascvg /*& !(INITsequence_<INIT_ROUNDS)*/)	// initialized and running on CVG reloc. mode
 	{
 		Sensor_Fusion_Core::MatrixXSd Htot = Eigen::Matrix<double,nVisMeas_+nCVGMeas_,nState_>::Constant(0);
 		Eigen::VectorXd rtot = Eigen::Matrix<double,nVisMeas_+nCVGMeas_,1>::Constant(0);
@@ -605,12 +605,12 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 		measurements->poseFilter_.applyMeasurement(idx,Htot,rtot,Rtot,3);	//disable fuzzy tracking to let states converge
 	}
 
-	else if(INITsequence_<INIT_ROUNDS)	//disable fuzzy tracking to let states converge
-		measurements->poseFilter_.applyMeasurement(idx,H_old,r_old,R,3);
+//	else if(INITsequence_<INIT_ROUNDS)	//disable fuzzy tracking to let states converge
+//		measurements->poseFilter_.applyMeasurement(idx,H_old,r_old,R,3);
 	else
 		measurements->poseFilter_.applyMeasurement(idx,H_old,r_old,R);
 
-	prevtime = state_old.time_;
+	prevtime=msg->header.stamp.toSec()-C_DELAY-DELAY_;
 
 }
 

@@ -133,6 +133,7 @@ private:
 
 	bool fixedScale_;
 	bool fixedBias_;
+	bool fixedCalib_;
 	bool predictionMade_;
 	bool initialized_;
 	bool data_playback_ ;//< used to determine if internal states get overwritten by the external state prediction (online) or internal state prediction is peformed (offline / logs)
@@ -192,6 +193,7 @@ public:
 	int stateSize(){return nState_;};
 	void setFixedScale(bool fixedScale) {fixedScale_ = fixedScale;};
 	void setFixedBias(bool fixedBias) {fixedBias_ = fixedBias;};
+	void setFixedCalib(bool fixedCalib) {fixedCalib_ = fixedCalib;};
 	void setNoiseAcc(double val) {n_a_ = val;};
 	void setNoiseAccBias(double val) {n_ba_ = val;};
 	void setNoiseGyr(double val) {n_w_ = val;};

@@ -59,7 +59,7 @@ public:
 		w_m << 0,0,0;
 		a_m =g;	// zero vel initialization....
 
-		p_ic = Eigen::Matrix<double,3,1>(0.08, 0, -0.05);
+		p_ic = Eigen::Matrix<double,3,1>(0, 0, 0);
 		q_ci=Eigen::Quaternion<double>(0, 1, -1, 0);	//180° about x, then 90° about z
 		q_ci.normalize();
 		q_wv=Eigen::Quaternion<double>(1, 0, 0, -1);
