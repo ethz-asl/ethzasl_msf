@@ -11,10 +11,10 @@
 // measurement size
 #define nVisMeas_ 6
 #define nCVGMeas_ 6
-#define nVisMagGPSMeas_ 14
-//#define nVisMagGPSMeas_ 11
+//#define nVisMagGPSMeas_ 14
+#define nVisMagGPSMeas_ 11
 #define nGPSMeas_ 5	// safety mode
-#define nMagMeas_ 3
+#define nMagMeas_ 3*0
 #define C_DELAY 0	//constant delay of camera measurement (added to that set in reconfigure gui)
 #define GPS_SWITCH 5 // number of GPS measurements without a vision measurement in between (safety switch)
 #define INIT_ROUNDS 200	// number of GPS readings together with vision measurement to ensure state convergence
@@ -72,40 +72,40 @@ void VisMagGPSHandler::noiseConfig(sensor_fusion_core::Sensor_Fusion_CoreConfig&
 }
 
 
-//void VisMagGPSHandler::CVGCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg)
-void VisMagGPSHandler::CVGCallback(const geometry_msgs::TransformStampedConstPtr & msg)
+void VisMagGPSHandler::CVGCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg)
+//void VisMagGPSHandler::CVGCallback(const geometry_msgs::TransformStampedConstPtr & msg)
 {
 	CVGMeas buffCVG;
-//	buffCVG.cvgp_[0]=msg->pose.pose.position.x;
-//	buffCVG.cvgp_[1]=msg->pose.pose.position.y;
-//	buffCVG.cvgp_[2]=msg->pose.pose.position.z;
-//	buffCVG.cvgq_.w()=msg->pose.pose.orientation.w;
-//	buffCVG.cvgq_.x()=msg->pose.pose.orientation.x;
-//	buffCVG.cvgq_.y()=msg->pose.pose.orientation.y;
-//	buffCVG.cvgq_.z()=msg->pose.pose.orientation.z;
+	buffCVG.cvgp_[0]=msg->pose.pose.position.x;
+	buffCVG.cvgp_[1]=msg->pose.pose.position.y;
+	buffCVG.cvgp_[2]=msg->pose.pose.position.z;
+	buffCVG.cvgq_.w()=msg->pose.pose.orientation.w;
+	buffCVG.cvgq_.x()=msg->pose.pose.orientation.x;
+	buffCVG.cvgq_.y()=msg->pose.pose.orientation.y;
+	buffCVG.cvgq_.z()=msg->pose.pose.orientation.z;
+
+	buffCVG.n_cvgcov_[0] = msg->pose.covariance[0];
+	buffCVG.n_cvgcov_[1] = msg->pose.covariance[7];
+	buffCVG.n_cvgcov_[2] = msg->pose.covariance[14];
+	buffCVG.n_cvgcov_[3] = msg->pose.covariance[21];
+	buffCVG.n_cvgcov_[4] = msg->pose.covariance[28];
+	buffCVG.n_cvgcov_[5] = msg->pose.covariance[35];
+
+//	buffCVG.cvgp_[0]=msg->transform.translation.x;
+//	buffCVG.cvgp_[1]=msg->transform.translation.y;
+//	buffCVG.cvgp_[2]=msg->transform.translation.z;
+//	buffCVG.cvgq_.w()=msg->transform.rotation.w;
+//	buffCVG.cvgq_.x()=msg->transform.rotation.x;
+//	buffCVG.cvgq_.y()=msg->transform.rotation.y;
+//	buffCVG.cvgq_.z()=msg->transform.rotation.z;
+//	buffCVG.cvgq_ = buffCVG.cvgq_.conjugate();
 //
-//	buffCVG.n_cvgcov_[0] = msg->pose.covariance[0];
-//	buffCVG.n_cvgcov_[1] = msg->pose.covariance[7];
-//	buffCVG.n_cvgcov_[2] = msg->pose.covariance[14];
-//	buffCVG.n_cvgcov_[3] = msg->pose.covariance[21];
-//	buffCVG.n_cvgcov_[4] = msg->pose.covariance[28];
-//	buffCVG.n_cvgcov_[5] = msg->pose.covariance[35];
-
-	buffCVG.cvgp_[0]=msg->transform.translation.x;
-	buffCVG.cvgp_[1]=msg->transform.translation.y;
-	buffCVG.cvgp_[2]=msg->transform.translation.z;
-	buffCVG.cvgq_.w()=msg->transform.rotation.w;
-	buffCVG.cvgq_.x()=msg->transform.rotation.x;
-	buffCVG.cvgq_.y()=msg->transform.rotation.y;
-	buffCVG.cvgq_.z()=msg->transform.rotation.z;
-	buffCVG.cvgq_ = buffCVG.cvgq_.conjugate();
-
-	buffCVG.n_cvgcov_[0] = 0.001;//msg->pose.covariance[0];
-	buffCVG.n_cvgcov_[1] = 0.001;//msg->pose.covariance[7];
-	buffCVG.n_cvgcov_[2] = 0.001;//msg->pose.covariance[14];
-	buffCVG.n_cvgcov_[3] = 0.001;//msg->pose.covariance[21];
-	buffCVG.n_cvgcov_[4] = 0.001;//msg->pose.covariance[28];
-	buffCVG.n_cvgcov_[5] = 0.001;//msg->pose.covariance[35];
+//	buffCVG.n_cvgcov_[0] = 0.001;//msg->pose.covariance[0];
+//	buffCVG.n_cvgcov_[1] = 0.001;//msg->pose.covariance[7];
+//	buffCVG.n_cvgcov_[2] = 0.001;//msg->pose.covariance[14];
+//	buffCVG.n_cvgcov_[3] = 0.001;//msg->pose.covariance[21];
+//	buffCVG.n_cvgcov_[4] = 0.001;//msg->pose.covariance[28];
+//	buffCVG.n_cvgcov_[5] = 0.001;//msg->pose.covariance[35];
 
 	buffCVG.time_=msg->header.stamp.toSec();
 	CVGBuff_.push_back(buffCVG);
