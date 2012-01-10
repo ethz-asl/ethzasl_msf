@@ -167,6 +167,7 @@ void VisMagGPSHandler::gpsCallback(const vismaggps_fusion::GpsCustomCartesianCon
 
 		if(PTAMwatch_==GPS_SWITCH+1)
 		{
+			//ToDo: clean init the first time switched to safety mode. i.e. include yaw from magnetometer...
 			Eigen::Matrix<double,3,1> newpos = z_gp_ - C_q.transpose()*state_old.p_ig_;
 			double yaw = acos((state_old.p_[0]*newpos[0]+state_old.p_[1]*newpos[1])/(state_old.p_.norm()*newpos.norm()));
 			Eigen::Quaternion<double> yawq(cos(yaw/2),0,0,sin(yaw/2));
@@ -394,8 +395,8 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 
 			if(z_gp_.norm()!=0)
 			{
-				 if(z_vp_[2]*z_gp_[2]!=0)
-					 state_old.L_ = fabs(z_vp_(2)/z_gp_(2));
+				 if((state_old.q_wv_*z_vp_)[2]*z_gp_[2]!=0)
+					 state_old.L_ = fabs((state_old.q_wv_*z_vp_)(2)/z_gp_(2));
 				 state_old.p_vw_ = z_vp_/state_old.L_ - z_vq_.conjugate().toRotationMatrix()*state_old.q_ci_.conjugate().toRotationMatrix()*state_old.p_ic_ - state_old.q_wv_.conjugate().toRotationMatrix()*state_old.p_;
 			}
 

@@ -212,10 +212,10 @@ void Sensor_Fusion_Core::initialize(Eigen::Matrix<double, 3, 1> p, Eigen::Matrix
 }
 
 
-//void Pose_Filter::imuCallback(const sfly_msgs::ext_ekfConstPtr & msg){ // real
-//void Pose_Filter::imuCallback(const sfly_msgs::ext_imuConstPtr & msg){ // debug, state prop here, old version
-//void Pose_Filter::imuCallback(const sensor_fusion_core::ext_imuConstPtr & msg){ // debug, state prop here, old version
-void Sensor_Fusion_Core::imuCallback(const sensor_msgs::ImuConstPtr & msg){ // debug, state prop here
+
+
+// on IMU callback we do the state propagation anyway here, use the state callback for external propagation...
+void Sensor_Fusion_Core::imuCallback(const sensor_msgs::ImuConstPtr & msg){
 
 	if(!initialized_)
 		return;  ////////////// early abort!!
@@ -227,10 +227,6 @@ void Sensor_Fusion_Core::imuCallback(const sensor_msgs::ImuConstPtr & msg){ // d
 	// get inputs
 	StateBuffer_[idx_state_].a_m_ << msg->linear_acceleration.x, msg->linear_acceleration.y, msg->linear_acceleration.z;
 	StateBuffer_[idx_state_].w_m_ << msg->angular_velocity.x, msg->angular_velocity.y, msg->angular_velocity.z;
-//	StateBuffer_[idx_state_].a_m_ << msg->acceleration.x, msg->acceleration.y, msg->acceleration.z;
-//	StateBuffer_[idx_state_].w_m_ << msg->angularVelocity.x, msg->angularVelocity.y, msg->angularVelocity.z;
-//	StateBuffer_[idx_state_].a_m_ << msg->acceleration.x, msg->acceleration.y, msg->acceleration.z;
-//	StateBuffer_[idx_state_].w_m_ << msg->angular_velocity.x, msg->angular_velocity.y, msg->angular_velocity.z;
 
 	//TODO: find out reason for acc spikes! (for now just eliminate them)
 	static Eigen::Matrix<double,3,1> last_am = Eigen::Matrix<double,3,1>(0, 0, 0);
@@ -246,154 +242,52 @@ void Sensor_Fusion_Core::imuCallback(const sensor_msgs::ImuConstPtr & msg){ // d
 			return; // early abort!! (if timegap too big...
 		}
 	}
- // debug, state prop here
-//	if(msg->flag==0)	// state propagation is made externally, so we read the actual state
-//	{
-//		StateBuffer_[idx_state_].p_ = Eigen::Matrix<double,3,1>(msg->state[0], msg->state[1], msg->state[2]);
-//		StateBuffer_[idx_state_].v_ = Eigen::Matrix<double,3,1>(msg->state[3], msg->state[4], msg->state[5]);
-//		StateBuffer_[idx_state_].q_ = Eigen::Quaternion<double>(msg->state[9], msg->state[6], msg->state[7], msg->state[8]);
-//		StateBuffer_[idx_state_].b_w_ = Eigen::Matrix<double,3,1>(msg->state[10], msg->state[11], msg->state[12]);
-//		StateBuffer_[idx_state_].b_a_ = Eigen::Matrix<double,3,1>(msg->state[13], msg->state[14], msg->state[15]);
-//		StateBuffer_[idx_state_].L_ = double(msg->state[16]);
-//		StateBuffer_[idx_state_].q_wv_ = Eigen::Quaternion<double>(msg->state[20], msg->state[19], msg->state[18],msg->state[19]);
-//	}
-//	else if(msg->flag!=0)	// otherwise let's do the state prop. here
-		propagateState(StateBuffer_[idx_state_].time_-StateBuffer_[(unsigned char)(idx_state_-1)].time_);
+
+	propagateState(StateBuffer_[idx_state_].time_-StateBuffer_[(unsigned char)(idx_state_-1)].time_);
 
 	predictProcessCovariance(StateBuffer_[idx_P_].time_-StateBuffer_[(unsigned char)(idx_P_-1)].time_);
 
+	bool isnumeric = checkForNumeric((double*)(&StateBuffer_[idx_state_-1].p_[0]),3, "prediction p");
+
 	predictionMade_ = true;
 
-//	// publish propagated state
-//	msgState_.header.stamp = ros::Time::now();
-//	msgState_.header.seq = seq;
-//	msgState_.data[0] = StateBuffer_[(unsigned char)(idx_state_-1)].p_[0];
-//	msgState_.data[1] = StateBuffer_[(unsigned char)(idx_state_-1)].p_[1];
-//	msgState_.data[2] = StateBuffer_[(unsigned char)(idx_state_-1)].p_[2];
-//	msgState_.data[3] = StateBuffer_[(unsigned char)(idx_state_-1)].v_[0];
-//	msgState_.data[4] = StateBuffer_[(unsigned char)(idx_state_-1)].v_[1];
-//	msgState_.data[5] = StateBuffer_[(unsigned char)(idx_state_-1)].v_[2];
-//	msgState_.data[6] = StateBuffer_[(unsigned char)(idx_state_-1)].q_.w();
-//	msgState_.data[7] = StateBuffer_[(unsigned char)(idx_state_-1)].q_.x();
-//	msgState_.data[8] = StateBuffer_[(unsigned char)(idx_state_-1)].q_.y();
-//	msgState_.data[9] = StateBuffer_[(unsigned char)(idx_state_-1)].q_.z();
-//	msgState_.data[10] = StateBuffer_[(unsigned char)(idx_state_-1)].b_w_[0];
-//	msgState_.data[11] = StateBuffer_[(unsigned char)(idx_state_-1)].b_w_[1];
-//	msgState_.data[12] = StateBuffer_[(unsigned char)(idx_state_-1)].b_w_[2];
-//	msgState_.data[13] = StateBuffer_[(unsigned char)(idx_state_-1)].b_a_[0];
-//	msgState_.data[14] = StateBuffer_[(unsigned char)(idx_state_-1)].b_a_[1];
-//	msgState_.data[15] = StateBuffer_[(unsigned char)(idx_state_-1)].b_a_[2];
-//	msgState_.data[16] = StateBuffer_[(unsigned char)(idx_state_-1)].L_;
-//	msgState_.data[17] = StateBuffer_[(unsigned char)(idx_state_-1)].q_wv_.w();
-//	msgState_.data[18] = StateBuffer_[(unsigned char)(idx_state_-1)].q_wv_.x();
-//	msgState_.data[19] = StateBuffer_[(unsigned char)(idx_state_-1)].q_wv_.y();
-//	msgState_.data[20] = StateBuffer_[(unsigned char)(idx_state_-1)].q_wv_.z();
-//	msgState_.data[21] = StateBuffer_[(unsigned char)(idx_state_-1)].q_ci_.w();
-//	msgState_.data[22] = StateBuffer_[(unsigned char)(idx_state_-1)].q_ci_.x();
-//	msgState_.data[23] = StateBuffer_[(unsigned char)(idx_state_-1)].q_ci_.y();
-//	msgState_.data[24] = StateBuffer_[(unsigned char)(idx_state_-1)].q_ci_.z();
-//	msgState_.data[25] = StateBuffer_[(unsigned char)(idx_state_-1)].p_ic_[0];
-//	msgState_.data[26] = StateBuffer_[(unsigned char)(idx_state_-1)].p_ic_[1];
-//	msgState_.data[27] = StateBuffer_[(unsigned char)(idx_state_-1)].p_ic_[2];
-//	pubState_.publish(msgState_);
-
-//	ROS_INFO_STREAM("predict: \n"
-//			<<"p: "<<StateBuffer_[(unsigned char)(idx_P_-1)].p_<<"\n"
-//			<<"v: "<<StateBuffer_[(unsigned char)(idx_P_-1)].v_<<"\n"
-//			<<"q: "<<StateBuffer_[(unsigned char)(idx_P_-1)].q_.coeffs()<<"\n"
-//			<<"b_a: "<<StateBuffer_[(unsigned char)(idx_P_-1)].b_a_<<"\n"
-//			<<"b_w: "<<StateBuffer_[(unsigned char)(idx_P_-1)].b_w_<<"\n"
-//			<<"L_: "<<StateBuffer_[(unsigned char)(idx_P_-1)].L_<<"\n"
-//			<<"q_wv: "<<StateBuffer_[(unsigned char)(idx_P_-1)].q_wv_.coeffs()<<"\n"
-//			<<"q_ci: "<<StateBuffer_[(unsigned char)(idx_P_-1)].q_ci_.coeffs()<<"\n"
-//			<<"p_ic: "<<StateBuffer_[(unsigned char)(idx_P_-1)].p_ic_<<"\n"
-//			<<"q_mi: "<<StateBuffer_[(unsigned char)(idx_P_-1)].q_mi_<<"\n"
-//			<<"p_ig: "<<StateBuffer_[(unsigned char)(idx_P_-1)].p_ig_<<"\n"
-//			<<"p_vw: "<<StateBuffer_[(unsigned char)(idx_P_-1)].p_vw_<<"\n"
-//			<<"alpha: "<<StateBuffer_[(unsigned char)(idx_P_-1)].alpha_<<"\n"
-//			<<"beta: "<<StateBuffer_[(unsigned char)(idx_P_-1)].beta_<<"\n"
-//			<<"n_a: "<<n_a_<<"\n"
-//			<<"n_ba_: "<<n_ba_<<"\n"
-//			<<"n_w_: "<<n_w_<<"\n"
-//			<<"n_bw: "<<n_bw_<<"\n"
-//			<<"n_L_: "<<n_L_<<"\n"
-//			<<"n_qwv_: "<<n_qwv_<<"\n"
-//			<<"n_qci_: "<<n_qci_<<"\n"
-//			<<"n_pic_: "<<n_pic_<<"\n"
-//			<<"n_qmi_: "<<n_qmi_<<"\n"
-//			<<"n_pig_: "<<n_pig_<<"\n"
-//			<<"n_pvw_: "<<n_pvw_<<"\n"
-//			<<"n_alpha_: "<<n_alpha_<<"\n"
-//			<<"n_beta_: "<<n_beta_<<"\n"
-//			<<"dt state: "<<StateBuffer_[(unsigned char)(idx_state_-1)].time_-StateBuffer_[idx_state_-2].time_<<"\n"
-//			<<"dt P: "<<StateBuffer_[(unsigned char)(idx_state_-1)].time_-StateBuffer_[idx_P_-2].time_<<"\n"
-//			<<"a_m_: "<<StateBuffer_[(unsigned char)(idx_state_-1)].a_m_<<"\n"
-//			<<"w_m_: "<<StateBuffer_[(unsigned char)(idx_state_-1)].w_m_<<"\n"
-//			<<"idx_state_: "<<int(idx_state_)<<"\n"
-//			<<"idx_state_ -1: "<<int((unsigned char)(idx_state_-1))<<"\n"
-//			);
-
-	msgPose_.header.stamp = ros::Time::now();
-	msgPose_.header.seq = seq;
-	geometry_msgs::Quaternion msgq;
-	msgq.w=StateBuffer_[(unsigned char)(idx_state_-1)].q_.w(); msgq.x=StateBuffer_[(unsigned char)(idx_state_-1)].q_.x(); msgq.y=StateBuffer_[(unsigned char)(idx_state_-1)].q_.y(); msgq.z=StateBuffer_[(unsigned char)(idx_state_-1)].q_.z();
-	msgPose_.pose.pose.orientation = msgq;
-	geometry_msgs::Point msgp;
-	msgp.x=StateBuffer_[(unsigned char)(idx_state_-1)].p_(0); msgp.y=StateBuffer_[(unsigned char)(idx_state_-1)].p_(1); msgp.z=StateBuffer_[(unsigned char)(idx_state_-1)].p_(2);
-	msgPose_.pose.pose.position = msgp;
-	boost::array<double, 36> cov;
-//	if (filter_quality_ == BAD)
-//		cov.assign(1e9);
-//	else
-	{	// put position and orientation covariance together...
-		for (int i=0;i<9;i++)
-		{
-//			if(StateBuffer_[(unsigned char)(idx_state_-1)].P_(i/3*nState_ + i%3)>1)
-//				ROS_WARN_STREAM("got a value above 1");
-			cov[i/3*6 + i%3]=StateBuffer_[(unsigned char)(idx_state_-1)].P_(i/3*nState_ + i%3);
-		}
-		for (int i=0;i<9;i++)
-		{
-//			if(StateBuffer_[(unsigned char)(idx_state_-1)].P_(i/3*nState_ + (i%3+6))>1)
-//				ROS_WARN_STREAM("got a value above 1");
-			cov[i/3*6 + (i%3+3)]=StateBuffer_[(unsigned char)(idx_state_-1)].P_(i/3*nState_ + (i%3+6));
-		}
-		for (int i=0;i<9;i++)
-		{
-//			if(StateBuffer_[(unsigned char)(idx_state_-1)].P_((i/3+6)*nState_ + i%3)>1)
-//				ROS_WARN_STREAM("got a value above 1");
-			cov[(i/3+3)*6 + i%3]=StateBuffer_[(unsigned char)(idx_state_-1)].P_((i/3+6)*nState_ + i%3);
-		}
-		for (int i=0;i<9;i++)
-		{
-//			if(StateBuffer_[(unsigned char)(idx_state_-1)].P_((i/3+6)*nState_ + (i%3+6))>1)
-//				ROS_WARN_STREAM("got a value above 1");
-			cov[(i/3+3)*6 + (i%3+3)]=StateBuffer_[(unsigned char)(idx_state_-1)].P_((i/3+6)*nState_ + (i%3+6));
-		}
-	}
-	msgPose_.pose.covariance = cov;
-	pubPose_.publish(msgPose_);
+//	msgPose_.header.stamp = ros::Time::now();
+//	msgPose_.header.seq = seq;
+//	geometry_msgs::Quaternion msgq;
+//	msgq.w=StateBuffer_[(unsigned char)(idx_state_-1)].q_.w(); msgq.x=StateBuffer_[(unsigned char)(idx_state_-1)].q_.x(); msgq.y=StateBuffer_[(unsigned char)(idx_state_-1)].q_.y(); msgq.z=StateBuffer_[(unsigned char)(idx_state_-1)].q_.z();
+//	msgPose_.pose.pose.orientation = msgq;
+//	geometry_msgs::Point msgp;
+//	msgp.x=StateBuffer_[(unsigned char)(idx_state_-1)].p_(0); msgp.y=StateBuffer_[(unsigned char)(idx_state_-1)].p_(1); msgp.z=StateBuffer_[(unsigned char)(idx_state_-1)].p_(2);
+//	msgPose_.pose.pose.position = msgp;
+//	boost::array<double, 36> cov;
+//	for (int i=0;i<9;i++)
+//		cov[i/3*6 + i%3]=StateBuffer_[(unsigned char)(idx_state_-1)].P_(i/3*nState_ + i%3);
+//	for (int i=0;i<9;i++)
+//		cov[i/3*6 + (i%3+3)]=StateBuffer_[(unsigned char)(idx_state_-1)].P_(i/3*nState_ + (i%3+6));
+//	for (int i=0;i<9;i++)
+//		cov[(i/3+3)*6 + i%3]=StateBuffer_[(unsigned char)(idx_state_-1)].P_((i/3+6)*nState_ + i%3);
+//	for (int i=0;i<9;i++)
+//		cov[(i/3+3)*6 + (i%3+3)]=StateBuffer_[(unsigned char)(idx_state_-1)].P_((i/3+6)*nState_ + (i%3+6));
+//	msgPose_.pose.covariance = cov;
+//	pubPose_.publish(msgPose_);
 
 	msgPoseCtrl_.header.stamp = ros::Time::now();
 	msgPoseCtrl_.header.seq = seq;
+	geometry_msgs::Quaternion msgq;
 	msgq.w=StateBuffer_[(unsigned char)(idx_state_-1)].q_.w(); msgq.x=StateBuffer_[(unsigned char)(idx_state_-1)].q_.x(); msgq.y=StateBuffer_[(unsigned char)(idx_state_-1)].q_.y(); msgq.z=StateBuffer_[(unsigned char)(idx_state_-1)].q_.z();
 	msgPoseCtrl_.pose.orientation = msgq;
+	geometry_msgs::Point msgp;
 	msgp.x=StateBuffer_[(unsigned char)(idx_state_-1)].p_(0); msgp.y=StateBuffer_[(unsigned char)(idx_state_-1)].p_(1); msgp.z=StateBuffer_[(unsigned char)(idx_state_-1)].p_(2);
 	msgPoseCtrl_.pose.position = msgp;
 	geometry_msgs::Vector3 msgv;
 	msgv.x=StateBuffer_[(unsigned char)(idx_state_-1)].v_(0); msgv.y=StateBuffer_[(unsigned char)(idx_state_-1)].v_(1); msgv.z=StateBuffer_[(unsigned char)(idx_state_-1)].v_(2);
 	msgPoseCtrl_.velocity = msgv;
 
-//	if (filter_quality_ == BAD)
-//		cov.assign(1e9);
-//	else
 	if(sqrt(msgv.x*msgv.x+msgv.y*msgv.y+msgv.z*msgv.z)<1)
 		pubPoseCrtl_.publish(msgPoseCtrl_);
 
 	seq++;
 }
-
-
 
 
 void Sensor_Fusion_Core::stateCallback(const sensor_fusion_core::ext_ekfConstPtr & msg){
@@ -458,6 +352,28 @@ void Sensor_Fusion_Core::stateCallback(const sensor_fusion_core::ext_ekfConstPtr
 	isnumeric = checkForNumeric((double*)(&StateBuffer_[idx_state_-1].p_[0]),3, "prediction p");
 
 	predictionMade_ = true;
+
+
+	//	msgPose_.header.stamp = ros::Time::now();
+	//	msgPose_.header.seq = seq;
+	//	geometry_msgs::Quaternion msgq;
+	//	msgq.w=StateBuffer_[(unsigned char)(idx_state_-1)].q_.w(); msgq.x=StateBuffer_[(unsigned char)(idx_state_-1)].q_.x(); msgq.y=StateBuffer_[(unsigned char)(idx_state_-1)].q_.y(); msgq.z=StateBuffer_[(unsigned char)(idx_state_-1)].q_.z();
+	//	msgPose_.pose.pose.orientation = msgq;
+	//	geometry_msgs::Point msgp;
+	//	msgp.x=StateBuffer_[(unsigned char)(idx_state_-1)].p_(0); msgp.y=StateBuffer_[(unsigned char)(idx_state_-1)].p_(1); msgp.z=StateBuffer_[(unsigned char)(idx_state_-1)].p_(2);
+	//	msgPose_.pose.pose.position = msgp;
+	//	boost::array<double, 36> cov;
+	//	for (int i=0;i<9;i++)
+	//		cov[i/3*6 + i%3]=StateBuffer_[(unsigned char)(idx_state_-1)].P_(i/3*nState_ + i%3);
+	//	for (int i=0;i<9;i++)
+	//		cov[i/3*6 + (i%3+3)]=StateBuffer_[(unsigned char)(idx_state_-1)].P_(i/3*nState_ + (i%3+6));
+	//	for (int i=0;i<9;i++)
+	//		cov[(i/3+3)*6 + i%3]=StateBuffer_[(unsigned char)(idx_state_-1)].P_((i/3+6)*nState_ + i%3);
+	//	for (int i=0;i<9;i++)
+	//		cov[(i/3+3)*6 + (i%3+3)]=StateBuffer_[(unsigned char)(idx_state_-1)].P_((i/3+6)*nState_ + (i%3+6));
+	//	msgPose_.pose.covariance = cov;
+	//	pubPose_.publish(msgPose_);
+
 
 	msgPoseCtrl_.header.stamp = ros::Time::now();
 	msgPoseCtrl_.header.seq = seq;
