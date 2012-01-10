@@ -11,10 +11,10 @@
 // measurement size
 #define nVisMeas_ 6
 #define nCVGMeas_ 6
-//#define nVisMagGPSMeas_ 14
-#define nVisMagGPSMeas_ 11
+#define nVisMagGPSMeas_ 14
+//#define nVisMagGPSMeas_ 11
 #define nGPSMeas_ 5	// safety mode
-#define nMagMeas_ 3*0
+#define nMagMeas_ 3
 #define C_DELAY 0	//constant delay of camera measurement (added to that set in reconfigure gui)
 #define GPS_SWITCH 5 // number of GPS measurements without a vision measurement in between (safety switch)
 #define INIT_ROUNDS 200	// number of GPS readings together with vision measurement to ensure state convergence
@@ -510,9 +510,9 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 
 /////////////////// fill in gps measurement ////////////////////////////////////////////////////////////////
 
-		Eigen::Matrix<double,5,1> gpsRvec;
+		Eigen::Matrix<double,nGPSMeas_,1> gpsRvec;
 		gpsRvec << gps.n_gp_[0]*gps.n_gp_[0], gps.n_gp_[1]*gps.n_gp_[1], gps.n_gp_[2]*gps.n_gp_[2], gps.n_gv_[0]*gps.n_gv_[0], gps.n_gv_[1]*gps.n_gv_[1];
-		Rtot.block(nVisMeas_+nMagMeas_,nVisMeas_+nMagMeas_,5,5) = gpsRvec.asDiagonal();
+		Rtot.block(nVisMeas_+nMagMeas_,nVisMeas_+nMagMeas_,nGPSMeas_,nGPSMeas_) = gpsRvec.asDiagonal();
 
 		Eigen::Matrix<double, 3, 3> C_q = state_old.q_.conjugate().toRotationMatrix();
 		Eigen::Matrix<double, 3, 1> ew = state_old.w_m_ - state_old.b_w_;

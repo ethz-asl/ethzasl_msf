@@ -16,7 +16,7 @@ int main(int argc, char** argv)
 	ros::init(argc, argv, "vismaggps_fusion");
 	VisMagGPSMeasurements vismaggpsMeas;
 	ROS_INFO_STREAM("Filter type: vismaggps_fusion");
-	ROS_WARN_STREAM("z part of p_ig is used for IMU-depth sensor translation!!")
+	ROS_WARN_STREAM("z part of p_ig is used for IMU-depth sensor translation!!");
 
 	//  print published/subscribed topics
 	ros::V_string topics;

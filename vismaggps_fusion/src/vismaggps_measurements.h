@@ -9,8 +9,11 @@
 #define VISMAGGPS_MEASUREMENTS_H_
 
 #include <sensor_fusion_core/measurement.h>
-#include "vismaggps.h"
-
+#ifndef VICONTEST
+	#include "vismaggps.h"
+#else
+	#include "vismaggps_vicontest.h"
+#endif
 namespace Sensors
 {
   enum Sensor

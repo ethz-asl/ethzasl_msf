@@ -75,8 +75,8 @@ class VisMagGPSHandler: public MeasurementHandler
 	void subscribe();
 
 	void visionCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg);
-//	void CVGCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg);
-	void CVGCallback(const geometry_msgs::TransformStampedConstPtr & msg);
+	void CVGCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg);
+//	void CVGCallback(const geometry_msgs::TransformStampedConstPtr & msg);
 	void magCallback(const geometry_msgs::Vector3StampedConstPtr & msg);
 	void gpsCallback(const vismaggps_fusion::GpsCustomCartesianConstPtr & msg);
 	void noiseConfig(sensor_fusion_core::Sensor_Fusion_CoreConfig& config, uint32_t level);
