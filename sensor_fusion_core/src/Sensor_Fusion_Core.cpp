@@ -884,6 +884,8 @@ bool Sensor_Fusion_Core::applyMeasurement(unsigned char idx_delaystate, const Ma
 		{
 			ROS_WARN_STREAM("fuzzy tracking triggered: " << std::max(errq.vec().maxCoeff(), -errq.vec().minCoeff())/fabs(errq.w())*2 << " limit: " << fuzzythres <<"\n");
 
+			ROS_WARN_STREAM("max P " << StateBuffer_[idx_delaystate].P_.maxCoeff() << " min: " << StateBuffer_[idx_delaystate].P_.minCoeff());
+
 			//state_.q_ = buff_q;
 			StateBuffer_[idx_delaystate].b_w_ = buff_bw;
 			StateBuffer_[idx_delaystate].b_a_ = buff_ba;
@@ -948,7 +950,9 @@ bool Sensor_Fusion_Core::applyMeasurement(unsigned char idx_delaystate, const Ma
 //			<<"beta: "<<StateBuffer_[idx_state_-1].beta_<<"\n"
 //	);
 
-	checkForNumeric(&correction_[0], HLI_EKF_STATE_SIZE, "update");
+	if(!checkForNumeric(&correction_[0], HLI_EKF_STATE_SIZE, "update"))
+		ROS_WARN_STREAM("max P " << StateBuffer_[idx_state_-1].P_.maxCoeff() << " min: " << StateBuffer_[idx_state_-1].P_.minCoeff());
+
 
 	// publish correction
 	msgCorrect_.header.stamp = ros::Time::now();

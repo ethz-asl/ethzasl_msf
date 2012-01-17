@@ -6,7 +6,7 @@
 	    <remap from="sensor_fusion/vision_pose" to="/vslam/pose" />
 	    <remap from="sensor_fusion/mag_dir" to="/mav2/fcu/mag" />
 	    <remap from="sensor_fusion/gps_pos" to="/mav2/fcu/gps_position_custom" />
-	    <remap from="sensor_fusion/cvg_pose" to="/tf_distort/sfly_hex" />
+	    <!--remap from="sensor_fusion/cvg_pose" to="/tf_distort/sfly_hex" /-->
 	    <!--remap from="pose_filter/pose_measurement" to="/vicon/pose" /-->
 	    <!--remap from="pose_filter/state_out" to="hex/fcu/ekf_state_in"/-->
 	    <rosparam file="$(find vismaggps_fusion)/vismaggps_fix.yaml"/>
