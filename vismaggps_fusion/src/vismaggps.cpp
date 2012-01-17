@@ -281,6 +281,8 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 	bool hascvg=false, hasmag=false, hasgps=false;
 	CVGMeas cvg;
 	MagMeas mag;
+	mag.mag_ << 5,5,5;
+	
 	GPSMeas gps;
 
 	if(PTAMwatch_>GPS_SWITCH)	// we had a map loss... re-init as good as possible
@@ -408,9 +410,14 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 
 			measurements->poseFilter_.initialize(state_old.p_,state_old.v_,state_old.q_,state_old.b_w_,state_old.b_a_,state_old.L_,state_old.q_wv_,state_old.P_,state_old.w_m_,state_old.a_m_,Eigen::Matrix<double,3,1>(0, 0, 9.81),state_old.q_ci_,state_old.p_ic_,state_old.q_mi_,state_old.p_ig_,state_old.p_vw_,state_old.alpha_,state_old.beta_);
 			INITsequence_++;
+			ROS_WARN_STREAM("Vision init done");
+			return;
 		}
 		else
+		{
+			ROS_WARN_STREAM("Vision init requested but no GPS/MAG");
 			return; // EARLY ABORT
+		}
 	}
 
 
