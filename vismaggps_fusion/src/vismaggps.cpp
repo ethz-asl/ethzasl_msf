@@ -281,8 +281,8 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 	bool hascvg=false, hasmag=false, hasgps=false;
 	CVGMeas cvg;
 	MagMeas mag;
+
 	mag.mag_ << 5,5,5;
-	
 	GPSMeas gps;
 
 	if(PTAMwatch_>GPS_SWITCH)	// we had a map loss... re-init as good as possible
@@ -613,8 +613,8 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 		measurements->poseFilter_.applyMeasurement(idx,Htot,rtot,Rtot,3);	//disable fuzzy tracking to let states converge
 	}
 
-//	else if(INITsequence_<INIT_ROUNDS)	//disable fuzzy tracking to let states converge
-//		measurements->poseFilter_.applyMeasurement(idx,H_old,r_old,R,3);
+	else if(INITsequence_<INIT_ROUNDS)	//disable fuzzy tracking to let states converge
+		measurements->poseFilter_.applyMeasurement(idx,H_old,r_old,R,3);
 	else
 		measurements->poseFilter_.applyMeasurement(idx,H_old,r_old,R);
 
