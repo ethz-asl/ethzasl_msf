@@ -14,6 +14,15 @@
 #include <vismaggps_fusion/GpsCustomCartesian.h>
 #include <geometry_msgs/Vector3Stamped.h>
 #include <Eigen/StdVector>	// include this to use std::vectors with eigen...
+#include <deque>
+
+class CVGMeas;
+class MagMeas;
+class GPSMeas;
+
+typedef std::deque<CVGMeas,Eigen::aligned_allocator<CVGMeas> > CVGBuff_t;
+typedef std::deque<MagMeas,Eigen::aligned_allocator<MagMeas> > MagBuff_t;
+typedef std::deque<GPSMeas,Eigen::aligned_allocator<GPSMeas> > GPSBuff_t;
 
 
 class CVGMeas
@@ -59,9 +68,9 @@ class VisMagGPSHandler: public MeasurementHandler
 	double DELAY_;	/// const time delay of measurements
 
 
-	std::vector<CVGMeas,Eigen::aligned_allocator<CVGMeas> > CVGBuff_;
-	std::vector<MagMeas,Eigen::aligned_allocator<MagMeas> > MagBuff_;
-	std::vector<GPSMeas,Eigen::aligned_allocator<GPSMeas> > GPSBuff_;
+	CVGBuff_t CVGBuff_;
+	MagBuff_t MagBuff_;
+	GPSBuff_t GPSBuff_;
 
 	// PTAM watchdog and init sequence
 	int PTAMwatch_;

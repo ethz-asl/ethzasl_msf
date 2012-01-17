@@ -22,13 +22,13 @@ bool checkForNumeric(T vec, int size, const std::string & info)
   {
     if (isnan(vec[i]))
     {
-      ROS_ERROR_STREAM(info.c_str() << ": NAN at index " << i);
+      std::cout << "ERROR: " << info.c_str() << ": NAN at index " << i << std::endl;
 //      ROS_BREAK();
       return false;
     }
     if (isinf(vec[i]))
     {
-        ROS_ERROR_STREAM(info.c_str() << ": INF at index " << i);
+    	std::cout << "ERROR: "<< info.c_str() << ": INF at index " << i <<std::endl;
 //      ROS_BREAK();
         return false;
     }
@@ -324,13 +324,16 @@ void Sensor_Fusion_Core::stateCallback(const sensor_fusion_core::ext_ekfConstPtr
 
 	bool isnumeric = true;
 	if(flag==sensor_fusion_core::ext_ekf::current_state)
-		isnumeric = checkForNumeric(&msg->state[0],10, "prediction p,v,q");
+		isnumeric = checkForNumeric(&msg->state[0],10, "before prediction p,v,q");
+
+	isnumeric = checkForNumeric((double*)(&StateBuffer_[idx_state_].p_[0]),3, "before prediction p");
 
 	if(flag==sensor_fusion_core::ext_ekf::current_state && isnumeric)	// state propagation is made externally, so we read the actual state
 	{
 		StateBuffer_[idx_state_].p_ = Eigen::Matrix<double,3,1>(msg->state[0], msg->state[1], msg->state[2]);
 		StateBuffer_[idx_state_].v_ = Eigen::Matrix<double,3,1>(msg->state[3], msg->state[4], msg->state[5]);
 		StateBuffer_[idx_state_].q_ = Eigen::Quaternion<double>(msg->state[6], msg->state[7], msg->state[8], msg->state[9]);
+		StateBuffer_[idx_state_].q_.normalize();
 
 		// zero props:
 		StateBuffer_[idx_state_].b_w_ = StateBuffer_[(unsigned char)(idx_state_-1)].b_w_;
@@ -349,7 +352,8 @@ void Sensor_Fusion_Core::stateCallback(const sensor_fusion_core::ext_ekfConstPtr
 
 	predictProcessCovariance(StateBuffer_[idx_P_].time_-StateBuffer_[(unsigned char)(idx_P_-1)].time_);
 
-	isnumeric = checkForNumeric((double*)(&StateBuffer_[idx_state_-1].p_[0]),3, "prediction p");
+	isnumeric = checkForNumeric((double*)(&StateBuffer_[idx_state_-1].p_[0]),3, "prediction done p");
+	isnumeric = checkForNumeric((double*)(&StateBuffer_[idx_state_-1].P_[0]),nState_*nState_, "prediction done P");
 
 	predictionMade_ = true;
 
@@ -445,9 +449,21 @@ void Sensor_Fusion_Core::propagateState(const double dt )
 		MatExp = MatExp + OmegaMean/div;
 		OmegaMean *= OmegaMean;
 	}
-	StateBuffer_[idx_state_].q_.coeffs() = (MatExp + 1/48*(Omega*OmegaOld-OmegaOld*Omega)*dt*dt)*StateBuffer_[(unsigned char)(idx_state_-1)].q_.coeffs();		// first oder quat integr.
-	StateBuffer_[idx_state_].q_int_.coeffs() = (MatExp + 1/48*(Omega*OmegaOld-OmegaOld*Omega)*dt*dt)*StateBuffer_[(unsigned char)(idx_state_-1)].q_int_.coeffs();		// first oder quat integr.
+
+//	if(StateBuffer_[idx_state_].q_.norm()>0.9)
+//		std::cout << "-----Quat before int: " << StateBuffer_[idx_state_].q_.coeffs() << std::endl;
+
+	StateBuffer_[idx_state_].q_.coeffs() = (MatExp + 1.0/48.0*(Omega*OmegaOld-OmegaOld*Omega)*dt*dt)*StateBuffer_[(unsigned char)(idx_state_-1)].q_.coeffs();		// first oder quat integr.
+	StateBuffer_[idx_state_].q_.normalize();
+	StateBuffer_[idx_state_].q_int_.coeffs() = (MatExp + 1.0/48.0*(Omega*OmegaOld-OmegaOld*Omega)*dt*dt)*StateBuffer_[(unsigned char)(idx_state_-1)].q_int_.coeffs();		// first oder quat integr.
 	StateBuffer_[idx_state_].q_int_.normalize();
+
+//	if(StateBuffer_[idx_state_].q_.norm()>0.9)
+//	{
+//		std::cout << "-----wm after int " << StateBuffer_[idx_state_].w_m_ << "\n bw: " <<  StateBuffer_[idx_state_].b_w_ << std::endl;
+//		std::cout << "-----am after int " << StateBuffer_[idx_state_].a_m_ << "\n ba: " <<  StateBuffer_[idx_state_].b_a_ << std::endl;
+//		std::cout << "-----Quat after int: " << StateBuffer_[idx_state_].q_.coeffs() << std::endl;
+//	}
 
 	dv = (StateBuffer_[idx_state_].q_.toRotationMatrix()*ea+StateBuffer_[(unsigned char)(idx_state_-1)].q_.toRotationMatrix()*eaold)/2;
 	StateBuffer_[idx_state_].v_ = StateBuffer_[(unsigned char)(idx_state_-1)].v_ + (dv - g_)*dt;
@@ -521,10 +537,16 @@ void Sensor_Fusion_Core::predictProcessCovariance(const double dt){
 	Fd_.block(6,6,3,3) = E;
 	Fd_.block(6,9,3,3) = F;
 
+	bool doprint = checkForNumeric((double*)(&Qd_[0]),nState_*nState_, "before prediction Q");
+
 	calc_Q(dt, StateBuffer_[idx_P_].q_, ew, ea, nav, nbav, nwv, nbwv, n_L_, nqwvv, nqciv, npicv,
 			nqmiv, npigv, npvwv, nalpha, nbeta, &Qd_);
 
 	StateBuffer_[idx_P_].P_ = Fd_ *  StateBuffer_[(unsigned char)(idx_P_-1)].P_ * Fd_.transpose() + Qd_;
+
+	doprint = doprint || checkForNumeric((double*)(&Qd_[0]),nState_*nState_, "prediction done Q");
+	if(!doprint)
+		std::cout << "dt: " << dt<< "q: " << StateBuffer_[idx_P_].q_.coeffs()<< "ew: " << ew<< "ea: " << ea << "\n";
 
 //	for(int i=0;i<nState_;++i)
 //		for(int j=0;j<nState_;++j)
@@ -747,6 +769,12 @@ bool Sensor_Fusion_Core::applyMeasurement(unsigned char idx_delaystate, const Ma
 //			<<"K: "<<K_<<"\n"
 //			<<"S: "<<S_<<"\n"
 //			);
+
+	checkForNumeric(&correction_[0], nState_, "res_delayed");
+	checkForNumeric(&K_[0], nState_*meas, "K");
+	checkForNumeric(&S_[0], meas*meas, "S");
+	checkForNumeric(&H_delayed[0], meas*nState_, "H");
+	checkForNumeric(&StateBuffer_[idx_delaystate].P_[0], nState_*nState_, "P");
 
 	correction_ = K_ * res_delayed;
 	Eigen::Matrix<double,nState_, nState_> KH = (Eigen::Matrix<double,nState_,nState_>::Identity() - K_ * H_delayed);

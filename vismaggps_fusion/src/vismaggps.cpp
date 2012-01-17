@@ -18,6 +18,7 @@
 #define C_DELAY 0	//constant delay of camera measurement (added to that set in reconfigure gui)
 #define GPS_SWITCH 5 // number of GPS measurements without a vision measurement in between (safety switch)
 #define INIT_ROUNDS 200	// number of GPS readings together with vision measurement to ensure state convergence
+#define CAM_RATE 0.033 // camera framerate: used to determine closest GPS/Mag measurement to cam measurement
 
 void VisMagGPSHandler::subscribe(){
 
@@ -124,7 +125,7 @@ void VisMagGPSHandler::magCallback(const geometry_msgs::Vector3StampedConstPtr &
 	buffmag.time_=msg->header.stamp.toSec();
 	MagBuff_.push_back(buffmag);
 	if(MagBuff_.size()>255)
-		MagBuff_.erase(MagBuff_.begin());
+		MagBuff_.pop_front();
 	VisMagGPSMeasurements* customMeas = (VisMagGPSMeasurements*)(measurements);
 	customMeas->p_m_ = z_m_;
 }
@@ -159,7 +160,10 @@ void VisMagGPSHandler::gpsCallback(const vismaggps_fusion::GpsCustomCartesianCon
 
 		unsigned char idx = measurements->poseFilter_.getClosestState(&state_old, time_old);
 		if (state_old.time_ == -1)
+		{
+			ROS_WARN_STREAM("no closest state found");
 			return; /// no prediction made yet, EARLY ABORT
+		}
 
 		Eigen::Matrix<double,3,3> C_mi = state_old.q_mi_.conjugate().toRotationMatrix();
 		Eigen::Matrix<double, 3, 3> C_q = state_old.q_.conjugate().toRotationMatrix();
@@ -267,7 +271,7 @@ void VisMagGPSHandler::gpsCallback(const vismaggps_fusion::GpsCustomCartesianCon
 	buffgps.time_=msg->header.stamp.toSec();
 	GPSBuff_.push_back(buffgps);
 	if(GPSBuff_.size()>255)
-		GPSBuff_.erase(GPSBuff_.begin());
+		GPSBuff_.pop_front();
 
 	VisMagGPSMeasurements* customMeas = (VisMagGPSMeasurements*)(measurements);
 	customMeas->p_wg_ = buffgps.gp_;
@@ -294,7 +298,9 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 
 	static double prevtime = 0;
 	static double difftime = 0;
-	difftime = 0.5*difftime + 0.5*(msg->header.stamp.toSec()-C_DELAY-DELAY_-prevtime);
+	difftime = CAM_RATE;//0.5*difftime + 0.5*(msg->header.stamp.toSec()-C_DELAY-DELAY_-prevtime);
+
+	std::cout << "difftime:  " << difftime << "\n";
 
 	if(prevtime==0)
 	{
@@ -302,68 +308,65 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 		return; // EARLY ABORT getting first vision measurement: init difftime (i.e. meas frequency)
 	}
 
-	unsigned int measidx = 0;
+	int measidx = MagBuff_.size()-1;
 	double timedist = 1e100;
 	double timenow = msg->header.stamp.toSec()-C_DELAY-DELAY_;
 	if(MagBuff_.size()>0)
 	{
-		while (fabs(timenow-MagBuff_[measidx].time_)<timedist) // timedist decreases continuously until best point reached... then rises again
+		while ((fabs(timenow-MagBuff_[measidx].time_)<timedist) && (measidx>=0)) // timedist decreases continuously until best point reached... then rises again
 		{
 			timedist = fabs(timenow-MagBuff_[measidx].time_);
-			measidx++;
-			if(!(measidx<MagBuff_.size()))
-				break;
+			measidx--;
 		}
+		std::cout << "timedist in mag:  " << timedist << "\n";
 		if(timedist<difftime)
 		{
 			hasmag=true;
-			mag=MagBuff_[measidx-1];
-			for(unsigned int i=0;i<measidx;i++)
-				MagBuff_.erase(MagBuff_.begin());	//delete n times the first element...
+			mag=MagBuff_[measidx+1];
+			MagBuff_.erase(MagBuff_.begin(),MagBuff_.begin()+measidx+1);	//delete n times the first element...
 		}
 	}
 
-	measidx = 0;
+	measidx = GPSBuff_.size()-1;
 	timedist = 1e100;
 	timenow = msg->header.stamp.toSec()-C_DELAY-DELAY_;
 	if(GPSBuff_.size()>0)
 	{
-		while (fabs(timenow-GPSBuff_[measidx].time_)<timedist) // timedist decreases continuously until best point reached... then rises again
+		while ((fabs(timenow-GPSBuff_[measidx].time_)<timedist) && (measidx>=0)) // timedist decreases continuously until best point reached... then rises again
 		{
 			timedist = fabs(timenow-GPSBuff_[measidx].time_);
-			measidx++;
-			if(!(measidx<GPSBuff_.size()))
-				break;
+			measidx--;
 		}
+
+		std::cout << "timedist in gps:  " << timedist << "\n";
 		if(timedist<difftime)
 		{
 			hasgps=true;
-			gps=GPSBuff_[measidx-1];
-			for(unsigned int i=0;i<measidx;i++)
-				GPSBuff_.erase(GPSBuff_.begin());	//delete n times the first element...
+			gps=GPSBuff_[measidx+1];
+			GPSBuff_.erase(GPSBuff_.begin(),GPSBuff_.begin()+measidx+1);	//delete n times the first element...
 		}
 	}
 
-	measidx = 0;
-	timedist = 1e100;
-	timenow = msg->header.stamp.toSec()-C_DELAY-DELAY_;
-	if(CVGBuff_.size()>0)
-	{
-		while (fabs(timenow-CVGBuff_[measidx].time_)<timedist) // timedist decreases continuously until best point reached... then rises again
-		{
-			timedist = fabs(timenow-CVGBuff_[measidx].time_);
-			measidx++;
-			if(!(measidx<CVGBuff_.size()))
-				break;
-		}
-		if(timedist<difftime)
-		{
-			hascvg=true;
-			cvg=CVGBuff_[measidx-1];
-			for(unsigned int i=0;i<measidx;i++)
-				CVGBuff_.erase(CVGBuff_.begin());	//delete n times the first element...
-		}
-	}
+//	measidx = 0;
+//	timedist = 1e100;
+//	timenow = msg->header.stamp.toSec()-C_DELAY-DELAY_;
+//	if(CVGBuff_.size()>0)
+//	{
+//		while (fabs(timenow-CVGBuff_[measidx].time_)<timedist) // timedist decreases continuously until best point reached... then rises again
+//		{
+//			timedist = fabs(timenow-CVGBuff_[measidx].time_);
+//			measidx++;
+//			if(!(measidx<CVGBuff_.size()))
+//				break;
+//		}
+//		if(timedist<difftime)
+//		{
+//			hascvg=true;
+//			cvg=CVGBuff_[measidx-1];
+//			for(unsigned int i=0;i<measidx;i++)
+//				CVGBuff_.erase(CVGBuff_.begin());	//delete n times the first element...
+//		}
+//	}
 
 	z_vp_ = Eigen::Matrix<double,3,1>(msg->pose.pose.position.x, msg->pose.pose.position.y, msg->pose.pose.position.z);
 	z_vq_ = Eigen::Quaternion<double>(msg->pose.pose.orientation.w, msg->pose.pose.orientation.x, msg->pose.pose.orientation.y, msg->pose.pose.orientation.z);
@@ -415,7 +418,7 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 		}
 		else
 		{
-			ROS_WARN_STREAM("Vision init requested but no GPS/MAG");
+			ROS_WARN_STREAM("Vision init requested but no GPS/MAG" << " hasmag: " << hasmag << " hasgps: " << hasgps);
 			return; // EARLY ABORT
 		}
 	}
