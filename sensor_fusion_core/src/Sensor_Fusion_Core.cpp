@@ -342,6 +342,12 @@ void Sensor_Fusion_Core::stateCallback(const sensor_fusion_core::ext_ekfConstPtr
 		StateBuffer_[idx_state_].q_wv_ = StateBuffer_[(unsigned char)(idx_state_-1)].q_wv_;
 		StateBuffer_[idx_state_].q_ci_ = StateBuffer_[(unsigned char)(idx_state_-1)].q_ci_;
 		StateBuffer_[idx_state_].p_ic_ = StateBuffer_[(unsigned char)(idx_state_-1)].p_ic_;
+		StateBuffer_[idx_state_].q_mi_ = StateBuffer_[(unsigned char)(idx_state_-1)].q_mi_;
+		StateBuffer_[idx_state_].p_ig_ = StateBuffer_[(unsigned char)(idx_state_-1)].p_ig_;
+		StateBuffer_[idx_state_].p_vw_ = StateBuffer_[(unsigned char)(idx_state_-1)].p_vw_;
+		StateBuffer_[idx_state_].alpha_ = StateBuffer_[(unsigned char)(idx_state_-1)].alpha_;
+		StateBuffer_[idx_state_].beta_ = StateBuffer_[(unsigned char)(idx_state_-1)].beta_;
+
 		idx_state_++;
 
 		hl_state_buf_ = *msg;
