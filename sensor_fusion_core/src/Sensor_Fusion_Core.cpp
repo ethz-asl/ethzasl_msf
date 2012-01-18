@@ -537,7 +537,7 @@ void Sensor_Fusion_Core::predictProcessCovariance(const double dt){
 	Fd_.block(6,6,3,3) = E;
 	Fd_.block(6,9,3,3) = F;
 
-	bool doprint = checkForNumeric((double*)(&Qd_[0]),nState_*nState_, "before prediction Q");
+	bool doprint = checkForNumeric((double*)(&Qd_(0)),nState_*nState_, "before prediction Q");
 
 	calc_Q(dt, StateBuffer_[idx_P_].q_, ew, ea, nav, nbav, nwv, nbwv, n_L_, nqwvv, nqciv, npicv,
 			nqmiv, npigv, npvwv, nalpha, nbeta, &Qd_);
