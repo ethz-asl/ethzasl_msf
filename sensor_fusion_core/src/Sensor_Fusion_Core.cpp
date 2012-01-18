@@ -544,7 +544,7 @@ void Sensor_Fusion_Core::predictProcessCovariance(const double dt){
 
 	StateBuffer_[idx_P_].P_ = Fd_ *  StateBuffer_[(unsigned char)(idx_P_-1)].P_ * Fd_.transpose() + Qd_;
 
-	doprint = doprint || checkForNumeric((double*)(&Qd_[0]),nState_*nState_, "prediction done Q");
+	doprint = doprint || checkForNumeric((double*)(&Qd_(0)),nState_*nState_, "prediction done Q");
 	if(!doprint)
 		std::cout << "dt: " << dt<< "q: " << StateBuffer_[idx_P_].q_.coeffs()<< "ew: " << ew<< "ea: " << ea << "\n";
 
