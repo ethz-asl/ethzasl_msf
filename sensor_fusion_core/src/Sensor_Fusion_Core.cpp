@@ -353,7 +353,7 @@ void Sensor_Fusion_Core::stateCallback(const sensor_fusion_core::ext_ekfConstPtr
 	predictProcessCovariance(StateBuffer_[idx_P_].time_-StateBuffer_[(unsigned char)(idx_P_-1)].time_);
 
 	isnumeric = checkForNumeric((double*)(&StateBuffer_[idx_state_-1].p_[0]),3, "prediction done p");
-	isnumeric = checkForNumeric((double*)(&StateBuffer_[idx_state_-1].P_[0]),nState_*nState_, "prediction done P");
+	isnumeric = checkForNumeric((double*)(&StateBuffer_[idx_state_-1].P_(0)),nState_*nState_, "prediction done P");
 
 	predictionMade_ = true;
 
@@ -771,10 +771,10 @@ bool Sensor_Fusion_Core::applyMeasurement(unsigned char idx_delaystate, const Ma
 //			);
 
 	checkForNumeric(&correction_[0], nState_, "res_delayed");
-	checkForNumeric(&K_[0], nState_*meas, "K");
-	checkForNumeric(&S_[0], meas*meas, "S");
-	checkForNumeric(&H_delayed[0], meas*nState_, "H");
-	checkForNumeric(&StateBuffer_[idx_delaystate].P_[0], nState_*nState_, "P");
+	checkForNumeric(&K_(0), nState_*meas, "K");
+	checkForNumeric(&S_(0), meas*meas, "S");
+	checkForNumeric(&H_delayed(0), meas*nState_, "H");
+	checkForNumeric(&StateBuffer_[idx_delaystate].P_(0), nState_*nState_, "P");
 
 	correction_ = K_ * res_delayed;
 	Eigen::Matrix<double,nState_, nState_> KH = (Eigen::Matrix<double,nState_,nState_>::Identity() - K_ * H_delayed);
