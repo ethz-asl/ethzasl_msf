@@ -161,7 +161,7 @@ void VisMagGPSHandler::gpsCallback(const vismaggps_fusion::GpsCustomCartesianCon
 		unsigned char idx = measurements->poseFilter_.getClosestState(&state_old, time_old);
 		if (state_old.time_ == -1)
 		{
-			ROS_WARN_STREAM("no closest state found");
+			ROS_WARN_STREAM_THROTTLE(0.5,"No closest state found. Filter initialized? Prediction made?");
 			return; /// no prediction made yet, EARLY ABORT
 		}
 
@@ -300,7 +300,7 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 	static double difftime = 0;
 	difftime = CAM_RATE;//0.5*difftime + 0.5*(msg->header.stamp.toSec()-C_DELAY-DELAY_-prevtime);
 
-	std::cout << "difftime:  " << difftime << "\n";
+//	std::cout << "difftime:  " << difftime << "\n";
 
 	if(prevtime==0)
 	{
@@ -318,7 +318,7 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 			timedist = fabs(timenow-MagBuff_[measidx].time_);
 			measidx--;
 		}
-		std::cout << "timedist in mag:  " << timedist << "\n";
+//		std::cout << "timedist in mag:  " << timedist << "\n";
 		if(timedist<difftime)
 		{
 			hasmag=true;
@@ -338,7 +338,7 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 			measidx--;
 		}
 
-		std::cout << "timedist in gps:  " << timedist << "\n";
+//		std::cout << "timedist in gps:  " << timedist << "\n";
 		if(timedist<difftime)
 		{
 			hasgps=true;
@@ -347,26 +347,23 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 		}
 	}
 
-//	measidx = 0;
-//	timedist = 1e100;
-//	timenow = msg->header.stamp.toSec()-C_DELAY-DELAY_;
-//	if(CVGBuff_.size()>0)
-//	{
-//		while (fabs(timenow-CVGBuff_[measidx].time_)<timedist) // timedist decreases continuously until best point reached... then rises again
-//		{
-//			timedist = fabs(timenow-CVGBuff_[measidx].time_);
-//			measidx++;
-//			if(!(measidx<CVGBuff_.size()))
-//				break;
-//		}
-//		if(timedist<difftime)
-//		{
-//			hascvg=true;
-//			cvg=CVGBuff_[measidx-1];
-//			for(unsigned int i=0;i<measidx;i++)
-//				CVGBuff_.erase(CVGBuff_.begin());	//delete n times the first element...
-//		}
-//	}
+	measidx = CVGBuff_.size()-1;
+	timedist = 1e100;
+	timenow = msg->header.stamp.toSec()-C_DELAY-DELAY_;
+	if(CVGBuff_.size()>0)
+	{
+		while ((fabs(timenow-CVGBuff_[measidx].time_)<timedist) && (measidx>=0)) // timedist decreases continuously until best point reached... then rises again
+		{
+			timedist = fabs(timenow-CVGBuff_[measidx].time_);
+			measidx--;
+		}
+		if(timedist<difftime)
+		{
+			hascvg=true;
+			cvg=CVGBuff_[measidx+1];
+			CVGBuff_.erase(CVGBuff_.begin(),CVGBuff_.begin()+measidx+1);	//delete n times the first element...
+		}
+	}
 
 	z_vp_ = Eigen::Matrix<double,3,1>(msg->pose.pose.position.x, msg->pose.pose.position.y, msg->pose.pose.position.z);
 	z_vq_ = Eigen::Quaternion<double>(msg->pose.pose.orientation.w, msg->pose.pose.orientation.x, msg->pose.pose.orientation.y, msg->pose.pose.orientation.z);
@@ -418,7 +415,7 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 		}
 		else
 		{
-			ROS_WARN_STREAM("Vision init requested but no GPS/MAG" << " hasmag: " << hasmag << " hasgps: " << hasgps);
+			ROS_WARN_STREAM_THROTTLE(1,"Vision init requested but no GPS/MAG" << " hasmag: " << hasmag << " hasgps: " << hasgps);
 			return; // EARLY ABORT
 		}
 	}
@@ -471,7 +468,7 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 
 	if(hasmag & hasgps & (INITsequence_<INIT_ROUNDS))	// use INIT_ROUNDS cam measurements for convergence
 	{
-		ROS_WARN_STREAM("initializing... ");
+		ROS_WARN_STREAM_THROTTLE(1,"initializing... ");
 
 		Sensor_Fusion_Core::MatrixXSd Htot = Eigen::Matrix<double,nVisMagGPSMeas_,nState_>::Constant(0);
 		Eigen::VectorXd rtot = Eigen::Matrix<double,nVisMagGPSMeas_,1>::Constant(0);

@@ -22,13 +22,13 @@ bool checkForNumeric(T vec, int size, const std::string & info)
   {
     if (isnan(vec[i]))
     {
-      std::cout << "ERROR: " << info.c_str() << ": NAN at index " << i << std::endl;
+      std::cout << "=== ERROR ===  " << info.c_str() << ": NAN at index " << i << std::endl;
 //      ROS_BREAK();
       return false;
     }
     if (isinf(vec[i]))
     {
-    	std::cout << "ERROR: "<< info.c_str() << ": INF at index " << i <<std::endl;
+    	std::cout << "=== ERROR ===  "<< info.c_str() << ": INF at index " << i <<std::endl;
 //      ROS_BREAK();
         return false;
     }
@@ -247,7 +247,7 @@ void Sensor_Fusion_Core::imuCallback(const sensor_msgs::ImuConstPtr & msg){
 
 	predictProcessCovariance(StateBuffer_[idx_P_].time_-StateBuffer_[(unsigned char)(idx_P_-1)].time_);
 
-	bool isnumeric = checkForNumeric((double*)(&StateBuffer_[idx_state_-1].p_[0]),3, "prediction p");
+	checkForNumeric((double*)(&StateBuffer_[idx_state_-1].p_[0]),3, "prediction p");
 
 	predictionMade_ = true;
 
@@ -754,7 +754,7 @@ bool Sensor_Fusion_Core::applyMeasurement(unsigned char idx_delaystate, const Ma
 	unsigned char meas = H_delayed.rows();
 	if(res_delayed.rows()!=meas || R_delayed.rows()!=meas || R_delayed.cols()!=meas)
 	{
-		ROS_WARN_STREAM("sizes of update matrices H and R do not match\n");
+		ROS_WARN_STREAM_THROTTLE(0.5,"sizes of update matrices H and R do not match\n");
 		return 0;	//////////////////// ***********early exit***************** /////////////////////
 	}
 
@@ -839,7 +839,7 @@ bool Sensor_Fusion_Core::applyMeasurement(unsigned char idx_delaystate, const Ma
 	StateBuffer_[idx_delaystate].L_ = StateBuffer_[idx_delaystate].L_ + correction_(15);
 	if(StateBuffer_[idx_delaystate].L_<0)
 	{
-		ROS_WARN_STREAM("Negative scale detected: " << StateBuffer_[idx_delaystate].L_ <<  ". Correcting to 0.1");
+		ROS_WARN_STREAM_THROTTLE(1,"Negative scale detected: " << StateBuffer_[idx_delaystate].L_ <<  ". Correcting to 0.1");
 		StateBuffer_[idx_delaystate].L_=0.1;
 	}
 
@@ -916,9 +916,8 @@ bool Sensor_Fusion_Core::applyMeasurement(unsigned char idx_delaystate, const Ma
 		Eigen::Quaternion<double> errq = StateBuffer_[idx_delaystate].q_wv_.conjugate()*Eigen::Quaternion<double>(getMedian(qbuff_.block(0,3,nBuff_,1)), getMedian(qbuff_.block(0,0,nBuff_,1)),getMedian(qbuff_.block(0,1,nBuff_,1)),getMedian(qbuff_.block(0,2,nBuff_,1)));	// should be unit quaternion if no error
 		if  ((std::max(errq.vec().maxCoeff(), -errq.vec().minCoeff())/fabs(errq.w())*2>fuzzythres))	// fuzzy tracking (small angle approx)
 		{
-			ROS_WARN_STREAM("fuzzy tracking triggered: " << std::max(errq.vec().maxCoeff(), -errq.vec().minCoeff())/fabs(errq.w())*2 << " limit: " << fuzzythres <<"\n");
-
-			ROS_WARN_STREAM("max P " << StateBuffer_[idx_delaystate].P_.maxCoeff() << " min: " << StateBuffer_[idx_delaystate].P_.minCoeff());
+			ROS_WARN_STREAM_THROTTLE(1,"fuzzy tracking triggered: " << std::max(errq.vec().maxCoeff(), -errq.vec().minCoeff())/fabs(errq.w())*2 << " limit: " << fuzzythres <<"\n");
+//			ROS_WARN_STREAM("max P " << StateBuffer_[idx_delaystate].P_.maxCoeff() << " min: " << StateBuffer_[idx_delaystate].P_.minCoeff());
 
 			//state_.q_ = buff_q;
 			StateBuffer_[idx_delaystate].b_w_ = buff_bw;
@@ -984,8 +983,9 @@ bool Sensor_Fusion_Core::applyMeasurement(unsigned char idx_delaystate, const Ma
 //			<<"beta: "<<StateBuffer_[idx_state_-1].beta_<<"\n"
 //	);
 
-	if(!checkForNumeric(&correction_[0], HLI_EKF_STATE_SIZE, "update"))
-		ROS_WARN_STREAM("max P " << StateBuffer_[idx_state_-1].P_.maxCoeff() << " min: " << StateBuffer_[idx_state_-1].P_.minCoeff());
+	checkForNumeric(&correction_[0], HLI_EKF_STATE_SIZE, "update");
+//	if(!checkForNumeric(&correction_[0], HLI_EKF_STATE_SIZE, "update"))
+//		ROS_WARN_STREAM("max P " << StateBuffer_[idx_state_-1].P_.maxCoeff() << " min: " << StateBuffer_[idx_state_-1].P_.minCoeff());
 
 
 	// publish correction
