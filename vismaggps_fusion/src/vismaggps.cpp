@@ -30,7 +30,7 @@ void VisMagGPSHandler::subscribe(){
 
 	nh.param("/vismaggps_fusion/meas_noise1",n_zvq_,0.01);
 	nh.param("/vismaggps_fusion/meas_noise2",n_zvp_,0.02);
-	nh.param("/vismaggps_fusion/meas_noise3",n_zm_,0.002);
+	nh.param("/vismaggps_fusion/meas_noise3",n_zm_,0.02);
 	nh.param("/vismaggps_fusion/meas_noise4",n_zgxy_,0.5);
 	nh.param("/vismaggps_fusion/meas_noise5",n_zgz_,0.1);
 	nh.param("/vismaggps_fusion/meas_noise6",n_zgv_,0.2);
@@ -140,19 +140,40 @@ void VisMagGPSHandler::gpsCallback(const vismaggps_fusion::GpsCustomCartesianCon
 
 	if(PTAMwatch_>GPS_SWITCH)	// we received GPS_SWITCH gps measurements and no vision measurements...PTAM is dead (?)
 	{
-		ROS_WARN_STREAM_THROTTLE(1,"MAV state estimate runs in safety mode (GPS & MAG)!!");
+		ROS_WARN_STREAM_THROTTLE(0.5,"MAV state estimate runs in safety mode (GPS & MAG)!!");
+		if(n_zm_==-1)
+			ROS_WARN_STREAM_THROTTLE(0.5,"ignoring MAG");
 		State state_old;
 		ros::Time time_old = msg->header.stamp;
-		Sensor_Fusion_Core::MatrixXSd H_old = Eigen::Matrix<double, nGPSMeas_+nMagMeas_, nState_>::Constant(0);
-		Eigen::VectorXd r_old = Eigen::Matrix<double, nGPSMeas_+nMagMeas_, 1>::Constant(0);
-		Eigen::MatrixXd R = Eigen::Matrix<double, nGPSMeas_+nMagMeas_, nGPSMeas_+nMagMeas_>::Constant(0);
+
+		Sensor_Fusion_Core::MatrixXSd H_old;
+		Eigen::VectorXd r_old;
+		Eigen::MatrixXd R;
+		if(n_zm_==-1)	// magnetometer disabled
+		{
+			H_old.resize(nGPSMeas_, nState_);
+			r_old.resize( nGPSMeas_, 1);
+			R.resize(nGPSMeas_, nGPSMeas_);
+			H_old = Eigen::Matrix<double, nGPSMeas_, nState_>::Constant(0);
+			r_old = Eigen::Matrix<double, nGPSMeas_, 1>::Constant(0);
+			R = Eigen::Matrix<double, nGPSMeas_, nGPSMeas_>::Constant(0);
+		}
+		else
+		{
+			H_old.resize(nGPSMeas_+nMagMeas_, nState_);
+			r_old.resize( nGPSMeas_+nMagMeas_, 1);
+			R.resize(nGPSMeas_+nMagMeas_, nGPSMeas_+nMagMeas_);
+			H_old = Eigen::Matrix<double, nGPSMeas_+nMagMeas_, nState_>::Constant(0);
+			r_old = Eigen::Matrix<double, nGPSMeas_+nMagMeas_, 1>::Constant(0);
+			R = Eigen::Matrix<double, nGPSMeas_+nMagMeas_, nGPSMeas_+nMagMeas_>::Constant(0);
+		}
 
 		z_gp_ = Eigen::Matrix<double, 3, 1>(msg->position.x, msg->position.y, msg->position.z); // change here for different topics
 		z_gv_ = Eigen::Matrix<double, 2, 1>(msg->velocity_x, msg->velocity_y); // get here the gps velocities.... // change here for different topics
 
-		Eigen::Matrix<double, nGPSMeas_, 1> buffvec;
-		buffvec << n_zgxy_*n_zgxy_, n_zgxy_*n_zgxy_, n_zgz_*n_zgz_, msg->velocity_covariance[0]*msg->velocity_covariance[0], msg->velocity_covariance[3]*msg->velocity_covariance[3];
-		R.block(0,0,nGPSMeas_,nGPSMeas_) = buffvec.asDiagonal();
+		Eigen::Matrix<double, nGPSMeas_, 1> buffvecgps;
+		buffvecgps << n_zgxy_*n_zgxy_, n_zgxy_*n_zgxy_, n_zgz_*n_zgz_, msg->velocity_covariance[0]*msg->velocity_covariance[0], msg->velocity_covariance[3]*msg->velocity_covariance[3];
+		R.block(0,0,nGPSMeas_,nGPSMeas_) = buffvecgps.asDiagonal();
 
 //		VisMagGPSMeasurements* customMeas = (VisMagGPSMeasurements*)(measurements);
 //		customMeas->p_wg_ = z_gp_;
@@ -220,39 +241,43 @@ void VisMagGPSHandler::gpsCallback(const vismaggps_fusion::GpsCustomCartesianCon
 		r_old.block(0, 0, 3, 1) = z_gp_ - (state_old.p_ + C_q.transpose() * state_old.p_ig_);
 		r_old.block(3, 0, 2, 1) = z_gv_ - gpsvelestim.block(0, 0, 2, 1); // only take xy vel measurements
 
-		z_m_ = MagBuff_.back().mag_;
 
-		Eigen::Matrix<double,3,1> magRvec;
-		magRvec  << n_zm_*n_zm_,n_zm_*n_zm_,n_zm_*n_zm_;
-		R.block(nGPSMeas_,nGPSMeas_,nMagMeas_,nMagMeas_) = magRvec.asDiagonal();
-//		customMeas->p_m_ = z_m_;
+		if(!(n_zm_==-1))	// magnetometer not disabled
+		{
+			z_m_ = MagBuff_.back().mag_;
 
-		Eigen::Matrix<double,3,1> vec_m;	// x-axis points north (i.e. beta==0)
-		vec_m << cos(state_old.beta_)*cos(state_old.alpha_), sin(state_old.beta_)*cos(state_old.alpha_), sin(state_old.alpha_);
-		Eigen::Matrix<double,3,1> vec_m_dalpha;
-		vec_m_dalpha << -cos(state_old.beta_)*sin(state_old.alpha_), -sin(state_old.beta_)*sin(state_old.alpha_), cos(state_old.alpha_);
-		Eigen::Matrix<double,3,1> vec_m_dbeta;
-		vec_m_dbeta << -sin(state_old.beta_)*cos(state_old.alpha_), cos(state_old.beta_)*cos(state_old.alpha_), 0;
+			Eigen::Matrix<double,3,1> magRvec;
+			magRvec  << n_zm_*n_zm_,n_zm_*n_zm_,n_zm_*n_zm_;
+			R.block(nGPSMeas_,nGPSMeas_,nMagMeas_,nMagMeas_) = magRvec.asDiagonal();
+	//		customMeas->p_m_ = z_m_;
 
-		Eigen::Matrix<double,3,3> mw_sk1;
-		Eigen::Matrix<double,3,1> vec1_mw = C_q*vec_m;
-		mw_sk1 << 0, -vec1_mw(2), vec1_mw(1)
-				,vec1_mw(2), 0, -vec1_mw(0)
-				,-vec1_mw(1), vec1_mw(0), 0;
+			Eigen::Matrix<double,3,1> vec_m;	// x-axis points north (i.e. beta==0)
+			vec_m << cos(state_old.beta_)*cos(state_old.alpha_), sin(state_old.beta_)*cos(state_old.alpha_), sin(state_old.alpha_);
+			Eigen::Matrix<double,3,1> vec_m_dalpha;
+			vec_m_dalpha << -cos(state_old.beta_)*sin(state_old.alpha_), -sin(state_old.beta_)*sin(state_old.alpha_), cos(state_old.alpha_);
+			Eigen::Matrix<double,3,1> vec_m_dbeta;
+			vec_m_dbeta << -sin(state_old.beta_)*cos(state_old.alpha_), cos(state_old.beta_)*cos(state_old.alpha_), 0;
 
-		Eigen::Matrix<double,3,3> mw_sk2;
-		Eigen::Matrix<double,3,1> vec2_mw = C_mi*C_q*vec_m;
-		mw_sk2 << 0, -vec2_mw(2), vec2_mw(1)
-				,vec2_mw(2), 0, -vec2_mw(0)
-				,-vec2_mw(1), vec2_mw(0), 0;
+			Eigen::Matrix<double,3,3> mw_sk1;
+			Eigen::Matrix<double,3,1> vec1_mw = C_q*vec_m;
+			mw_sk1 << 0, -vec1_mw(2), vec1_mw(1)
+					,vec1_mw(2), 0, -vec1_mw(0)
+					,-vec1_mw(1), vec1_mw(0), 0;
 
-		// construct H matrix using H-blockx :-)
-		H_old.block(nGPSMeas_,6,3,3) = C_mi*mw_sk1;
-		H_old.block(nGPSMeas_,25,3,3) = mw_sk2;
-		H_old.block(nGPSMeas_,34,3,1) = C_mi*C_q*vec_m_dalpha;
-		H_old.block(nGPSMeas_,35,3,1) =C_mi*C_q*vec_m_dbeta;
+			Eigen::Matrix<double,3,3> mw_sk2;
+			Eigen::Matrix<double,3,1> vec2_mw = C_mi*C_q*vec_m;
+			mw_sk2 << 0, -vec2_mw(2), vec2_mw(1)
+					,vec2_mw(2), 0, -vec2_mw(0)
+					,-vec2_mw(1), vec2_mw(0), 0;
 
-		r_old.block(nGPSMeas_,0,3,1) = z_m_ - C_mi*C_q*(vec_m);
+			// construct H matrix using H-blockx :-)
+			H_old.block(nGPSMeas_,6,3,3) = C_mi*mw_sk1;
+			H_old.block(nGPSMeas_,25,3,3) = mw_sk2;
+			H_old.block(nGPSMeas_,34,3,1) = C_mi*C_q*vec_m_dalpha;
+			H_old.block(nGPSMeas_,35,3,1) =C_mi*C_q*vec_m_dbeta;
+
+			r_old.block(nGPSMeas_,0,3,1) = z_m_ - C_mi*C_q*(vec_m);
+		}
 
 		measurements->poseFilter_.applyMeasurement(idx, H_old, r_old, R,3);	//disable fuzzy tracking...
 	}
@@ -468,58 +493,41 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 
 	if(hasmag & hasgps & (INITsequence_<INIT_ROUNDS))	// use INIT_ROUNDS cam measurements for convergence
 	{
-		ROS_WARN_STREAM_THROTTLE(1,"initializing... ");
+		ROS_WARN_STREAM_THROTTLE(0.5,"initializing... ");
+		if(n_zm_==-1)
+			ROS_WARN_STREAM_THROTTLE(0.5,"ignoring MAG");
 
-		Sensor_Fusion_Core::MatrixXSd Htot = Eigen::Matrix<double,nVisMagGPSMeas_,nState_>::Constant(0);
-		Eigen::VectorXd rtot = Eigen::Matrix<double,nVisMagGPSMeas_,1>::Constant(0);
-		Eigen::MatrixXd Rtot = Eigen::Matrix<double,nVisMagGPSMeas_,nVisMagGPSMeas_>::Constant(0);
+		Sensor_Fusion_Core::MatrixXSd Htot;
+		Eigen::VectorXd rtot;
+		Eigen::MatrixXd Rtot;
+		if(n_zm_==-1)	// magnetometer not disabled
+		{
+			H_old.resize(nVisMeas_+nGPSMeas_, nState_);
+			r_old.resize(nVisMeas_+nGPSMeas_, 1);
+			R.resize(nVisMeas_+nGPSMeas_, nVisMeas_+nGPSMeas_);
+			Htot = Eigen::Matrix<double,nVisMeas_+nGPSMeas_,nState_>::Constant(0);
+			rtot = Eigen::Matrix<double,nVisMeas_+nGPSMeas_,1>::Constant(0);
+			Rtot = Eigen::Matrix<double,nVisMeas_+nGPSMeas_,nVisMeas_+nGPSMeas_>::Constant(0);
+		}
+		else
+		{
+			H_old.resize(nVisMagGPSMeas_, nState_);
+			r_old.resize(nVisMagGPSMeas_, 1);
+			R.resize(nVisMagGPSMeas_, nVisMagGPSMeas_);
+			Htot = Eigen::Matrix<double,nVisMagGPSMeas_,nState_>::Constant(0);
+			rtot = Eigen::Matrix<double,nVisMagGPSMeas_,1>::Constant(0);
+			Rtot = Eigen::Matrix<double,nVisMagGPSMeas_,nVisMagGPSMeas_>::Constant(0);
+		}
 		// copy vision measurement
 		Htot.block(0,0,nVisMeas_,nState_) = H_old;
 		rtot.block(0,0,nVisMeas_,1) = r_old;
 		Rtot.block(0,0,nVisMeas_,nVisMeas_) = R;
 
-/////////////////// fill in mag measurement ////////////////////////////////////////////////////////////////
-
-		Eigen::Matrix<double,3,1> magRvec;
-		magRvec  << n_zm_*n_zm_,n_zm_*n_zm_,n_zm_*n_zm_;
-		Rtot.block(nVisMeas_,nVisMeas_,3,3) = magRvec.asDiagonal();
-		customMeas->p_m_ = z_m_;
-
-		Eigen::Matrix<double,3,3> C_mi = state_old.q_mi_.conjugate().toRotationMatrix();
-
-		Eigen::Matrix<double,3,1> vec_m;	// x-axis points north (i.e. beta==0)
-		vec_m << cos(state_old.beta_)*cos(state_old.alpha_), sin(state_old.beta_)*cos(state_old.alpha_), sin(state_old.alpha_);
-		Eigen::Matrix<double,3,1> vec_m_dalpha;
-		vec_m_dalpha << -cos(state_old.beta_)*sin(state_old.alpha_), -sin(state_old.beta_)*sin(state_old.alpha_), cos(state_old.alpha_);
-		Eigen::Matrix<double,3,1> vec_m_dbeta;
-		vec_m_dbeta << -sin(state_old.beta_)*cos(state_old.alpha_), cos(state_old.beta_)*cos(state_old.alpha_), 0;
-
-		Eigen::Matrix<double,3,3> mw_sk1;
-		Eigen::Matrix<double,3,1> vec1_mw = C_q*vec_m;
-		mw_sk1 << 0, -vec1_mw(2), vec1_mw(1)
-				,vec1_mw(2), 0, -vec1_mw(0)
-				,-vec1_mw(1), vec1_mw(0), 0;
-
-		Eigen::Matrix<double,3,3> mw_sk2;
-		Eigen::Matrix<double,3,1> vec2_mw = C_mi*C_q*vec_m;
-		mw_sk2 << 0, -vec2_mw(2), vec2_mw(1)
-				,vec2_mw(2), 0, -vec2_mw(0)
-				,-vec2_mw(1), vec2_mw(0), 0;
-
-
-		// construct H matrix using H-blockx :-)
-		Htot.block(nVisMeas_,6,3,3) = C_mi*mw_sk1;
-		Htot.block(nVisMeas_,25,3,3) = mw_sk2;
-		Htot.block(nVisMeas_,34,3,1) = C_mi*C_q*vec_m_dalpha;
-		Htot.block(nVisMeas_,35,3,1) =C_mi*C_q*vec_m_dbeta;
-
-		rtot.block(nVisMeas_,0,3,1) = z_m_ - C_mi*C_q*(vec_m);
-
-/////////////////// fill in gps measurement ////////////////////////////////////////////////////////////////
+		/////////////////// fill in gps measurement ////////////////////////////////////////////////////////////////
 
 		Eigen::Matrix<double,nGPSMeas_,1> gpsRvec;
 		gpsRvec << gps.n_gp_[0]*gps.n_gp_[0], gps.n_gp_[1]*gps.n_gp_[1], gps.n_gp_[2]*gps.n_gp_[2], gps.n_gv_[0]*gps.n_gv_[0], gps.n_gv_[1]*gps.n_gv_[1];
-		Rtot.block(nVisMeas_+nMagMeas_,nVisMeas_+nMagMeas_,nGPSMeas_,nGPSMeas_) = gpsRvec.asDiagonal();
+		Rtot.block(nVisMeas_,nVisMeas_,nGPSMeas_,nGPSMeas_) = gpsRvec.asDiagonal();
 
 		Eigen::Matrix<double, 3, 3> C_q = state_old.q_.conjugate().toRotationMatrix();
 		Eigen::Matrix<double, 3, 1> ew = state_old.w_m_ - state_old.b_w_;
@@ -548,19 +556,60 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 		//		q_vw*(pwi+Transpose[R1wi].pig)*L
 
 		// construct H matrix using H-blockx :-)
-		Htot.block(nVisMeas_+nMagMeas_, 0, 3, 3) = Eigen::Matrix<double, 3, 3>::Identity();
-		Htot.block(nVisMeas_+nMagMeas_, 6, 3, 3) = -C_q.transpose() * pig_sk;
-		Htot.block(nVisMeas_+nMagMeas_, 28, 3, 3) = C_q.transpose();
+		Htot.block(nVisMeas_, 0, 3, 3) = Eigen::Matrix<double, 3, 3>::Identity();
+		Htot.block(nVisMeas_, 6, 3, 3) = -C_q.transpose() * pig_sk;
+		Htot.block(nVisMeas_, 28, 3, 3) = C_q.transpose();
 
 		Eigen::Matrix<double, 3, nState_> H_gpsvel = Eigen::Matrix<double, 3, nState_>::Constant(0);
 		H_gpsvel.block(0, 3, 3, 3) = Eigen::Matrix<double, 3, 3>::Identity();
 		H_gpsvel.block(0, 6, 3, 3) = -C_q.transpose()*wpig_sk;
 		H_gpsvel.block(0, 28, 3, 3) = C_q.transpose() * w_sk;
-		Htot.block(nVisMeas_+nMagMeas_+3, 0, 2, nState_) = H_gpsvel.block(0, 0, 2, nState_); // only take xy vel measurements
+		Htot.block(nVisMeas_+3, 0, 2, nState_) = H_gpsvel.block(0, 0, 2, nState_); // only take xy vel measurements
 
 		Eigen::Matrix<double, 3, 1> gpsvelestim = (state_old.v_ + C_q.transpose() * w_sk * state_old.p_ig_);
-		rtot.block(nVisMeas_+nMagMeas_, 0, 3, 1) = z_gp_ - (state_old.p_ + C_q.transpose() * state_old.p_ig_);
-		rtot.block(nVisMeas_+nMagMeas_+3, 0, 2, 1) = z_gv_ - gpsvelestim.block(0, 0, 2, 1); // only take xy vel measurements
+		rtot.block(nVisMeas_, 0, 3, 1) = z_gp_ - (state_old.p_ + C_q.transpose() * state_old.p_ig_);
+		rtot.block(nVisMeas_+3, 0, 2, 1) = z_gv_ - gpsvelestim.block(0, 0, 2, 1); // only take xy vel measurements
+
+
+/////////////////// fill in mag measurement ////////////////////////////////////////////////////////////////
+
+		if(!(n_zm_==-1))	// magnetometer not disabled
+		{
+			Eigen::Matrix<double,3,1> magRvec;
+			magRvec  << n_zm_*n_zm_,n_zm_*n_zm_,n_zm_*n_zm_;
+			Rtot.block(nVisMeas_+nGPSMeas_,nVisMeas_+nGPSMeas_,3,3) = magRvec.asDiagonal();
+			customMeas->p_m_ = z_m_;
+
+			Eigen::Matrix<double,3,3> C_mi = state_old.q_mi_.conjugate().toRotationMatrix();
+
+			Eigen::Matrix<double,3,1> vec_m;	// x-axis points north (i.e. beta==0)
+			vec_m << cos(state_old.beta_)*cos(state_old.alpha_), sin(state_old.beta_)*cos(state_old.alpha_), sin(state_old.alpha_);
+			Eigen::Matrix<double,3,1> vec_m_dalpha;
+			vec_m_dalpha << -cos(state_old.beta_)*sin(state_old.alpha_), -sin(state_old.beta_)*sin(state_old.alpha_), cos(state_old.alpha_);
+			Eigen::Matrix<double,3,1> vec_m_dbeta;
+			vec_m_dbeta << -sin(state_old.beta_)*cos(state_old.alpha_), cos(state_old.beta_)*cos(state_old.alpha_), 0;
+
+			Eigen::Matrix<double,3,3> mw_sk1;
+			Eigen::Matrix<double,3,1> vec1_mw = C_q*vec_m;
+			mw_sk1 << 0, -vec1_mw(2), vec1_mw(1)
+					,vec1_mw(2), 0, -vec1_mw(0)
+					,-vec1_mw(1), vec1_mw(0), 0;
+
+			Eigen::Matrix<double,3,3> mw_sk2;
+			Eigen::Matrix<double,3,1> vec2_mw = C_mi*C_q*vec_m;
+			mw_sk2 << 0, -vec2_mw(2), vec2_mw(1)
+					,vec2_mw(2), 0, -vec2_mw(0)
+					,-vec2_mw(1), vec2_mw(0), 0;
+
+
+			// construct H matrix using H-blockx :-)
+			Htot.block(nVisMeas_+nGPSMeas_,6,3,3) = C_mi*mw_sk1;
+			Htot.block(nVisMeas_+nGPSMeas_,25,3,3) = mw_sk2;
+			Htot.block(nVisMeas_+nGPSMeas_,34,3,1) = C_mi*C_q*vec_m_dalpha;
+			Htot.block(nVisMeas_+nGPSMeas_,35,3,1) =C_mi*C_q*vec_m_dbeta;
+
+			rtot.block(nVisMeas_+nGPSMeas_,0,3,1) = z_m_ - C_mi*C_q*(vec_m);
+		}
 
 		measurements->poseFilter_.applyMeasurement(idx,Htot,rtot,Rtot,3);	//disable fuzzy tracking to let states converge
 
