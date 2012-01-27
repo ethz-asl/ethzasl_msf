@@ -28,7 +28,7 @@ void VisMagGPSHandler::subscribe(){
 	subMagMeas_ = nh.subscribe("mag_dir", 1, &VisMagGPSHandler::magCallback, this);
 	subGPSMeas_ = nh.subscribe("gps_pos", 1, &VisMagGPSHandler::gpsCallback, this);
 
-	pubStatus_ = nh.advertise<vismaggps_fusion::Status>("filter_status", 1);
+	pubStatus_ = nh.advertise<vismaggps_fusion::Status>("status", 1);
 
 	nh.param("/vismaggps_fusion/meas_noise1",n_zvq_,0.01);
 	nh.param("/vismaggps_fusion/meas_noise2",n_zvp_,0.02);
