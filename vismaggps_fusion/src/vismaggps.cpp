@@ -521,18 +521,18 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 		Eigen::MatrixXd Rtot;
 		if(n_zm_==-1)	// magnetometer not disabled
 		{
-			H_old.resize(nVisMeas_+nGPSMeas_, nState_);
-			r_old.resize(nVisMeas_+nGPSMeas_, 1);
-			R.resize(nVisMeas_+nGPSMeas_, nVisMeas_+nGPSMeas_);
+			Htot.resize(nVisMeas_+nGPSMeas_, nState_);
+			rtot.resize(nVisMeas_+nGPSMeas_, 1);
+			Rtot.resize(nVisMeas_+nGPSMeas_, nVisMeas_+nGPSMeas_);
 			Htot = Eigen::Matrix<double,nVisMeas_+nGPSMeas_,nState_>::Constant(0);
 			rtot = Eigen::Matrix<double,nVisMeas_+nGPSMeas_,1>::Constant(0);
 			Rtot = Eigen::Matrix<double,nVisMeas_+nGPSMeas_,nVisMeas_+nGPSMeas_>::Constant(0);
 		}
 		else
 		{
-			H_old.resize(nVisMagGPSMeas_, nState_);
-			r_old.resize(nVisMagGPSMeas_, 1);
-			R.resize(nVisMagGPSMeas_, nVisMagGPSMeas_);
+			Htot.resize(nVisMagGPSMeas_, nState_);
+			rtot.resize(nVisMagGPSMeas_, 1);
+			Rtot.resize(nVisMagGPSMeas_, nVisMagGPSMeas_);
 			Htot = Eigen::Matrix<double,nVisMagGPSMeas_,nState_>::Constant(0);
 			rtot = Eigen::Matrix<double,nVisMagGPSMeas_,1>::Constant(0);
 			Rtot = Eigen::Matrix<double,nVisMagGPSMeas_,nVisMagGPSMeas_>::Constant(0);
