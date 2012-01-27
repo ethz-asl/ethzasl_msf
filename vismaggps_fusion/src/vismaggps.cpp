@@ -28,6 +28,8 @@ void VisMagGPSHandler::subscribe(){
 	subMagMeas_ = nh.subscribe("mag_dir", 1, &VisMagGPSHandler::magCallback, this);
 	subGPSMeas_ = nh.subscribe("gps_pos", 1, &VisMagGPSHandler::gpsCallback, this);
 
+	pubStatus_ = nh.advertise<vismaggps_fusion::Status>("filter_status", 1);
+
 	nh.param("/vismaggps_fusion/meas_noise1",n_zvq_,0.01);
 	nh.param("/vismaggps_fusion/meas_noise2",n_zvp_,0.02);
 	nh.param("/vismaggps_fusion/meas_noise3",n_zm_,0.02);
@@ -49,6 +51,11 @@ void VisMagGPSHandler::subscribe(){
 	GPSBuff_.clear();
 	PTAMwatch_ = 0;
 	INITsequence_ = 0;
+
+	msgStatus_.header.stamp = ros::Time::now();
+	msgStatus_.msg = "Filter started";
+	msgStatus_.status = 0;
+	pubStatus_.publish(msgStatus_);
 }
 
 
@@ -183,6 +190,10 @@ void VisMagGPSHandler::gpsCallback(const vismaggps_fusion::GpsCustomCartesianCon
 		if (state_old.time_ == -1)
 		{
 			ROS_WARN_STREAM_THROTTLE(0.5,"No closest state found. Filter initialized? Prediction made?");
+			msgStatus_.header = msg->header;
+			msgStatus_.msg = "No closest state found. Filter initialized? Prediction made?";
+			msgStatus_.status = 0;
+			pubStatus_.publish(msgStatus_);
 			return; /// no prediction made yet, EARLY ABORT
 		}
 
@@ -280,6 +291,10 @@ void VisMagGPSHandler::gpsCallback(const vismaggps_fusion::GpsCustomCartesianCon
 		}
 
 		measurements->poseFilter_.applyMeasurement(idx, H_old, r_old, R,3);	//disable fuzzy tracking...
+		msgStatus_.header = msg->header;
+		msgStatus_.msg = "MAV state estimate runs in safety mode (GPS & MAG)!!";
+		msgStatus_.status = UPDATE_GPS;
+		pubStatus_.publish(msgStatus_);
 	}
 	GPSMeas buffgps;
 	buffgps.gp_(0,0)=msg->position.x;
@@ -441,6 +456,10 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 		else
 		{
 			ROS_WARN_STREAM_THROTTLE(1,"Vision init requested but no GPS/MAG" << " hasmag: " << hasmag << " hasgps: " << hasgps);
+			msgStatus_.header = msg->header;
+			msgStatus_.msg = "Vision init requested but no GPS/MAG";
+			msgStatus_.status = 0;
+			pubStatus_.publish(msgStatus_);
 			return; // EARLY ABORT
 		}
 	}
@@ -613,6 +632,11 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 
 		measurements->poseFilter_.applyMeasurement(idx,Htot,rtot,Rtot,3);	//disable fuzzy tracking to let states converge
 
+		msgStatus_.header = msg->header;
+		msgStatus_.msg = "initializing... (GPS/mag and vision)";
+		msgStatus_.status = INITIALIZING | UPDATE_GPS | UPDATE_PTAM;
+		pubStatus_.publish(msgStatus_);
+
 		INITsequence_++;
 		if(!(INITsequence_<INIT_ROUNDS))
 		{
@@ -660,12 +684,31 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 		rtot.block(nVisMeas_+3,0,3,1) = q_err.vec()/q_err.w()*2;
 
 		measurements->poseFilter_.applyMeasurement(idx,Htot,rtot,Rtot,3);	//disable fuzzy tracking to let states converge
+
+		msgStatus_.header = msg->header;
+		msgStatus_.msg = "CVG reading received";
+		msgStatus_.status = UPDATE_PTAM | UPDATE_LOC;
+		pubStatus_.publish(msgStatus_);
 	}
 
 	else if(INITsequence_<INIT_ROUNDS)	//disable fuzzy tracking to let states converge
+	{
 		measurements->poseFilter_.applyMeasurement(idx,H_old,r_old,R,3);
+
+		msgStatus_.header = msg->header;
+		msgStatus_.msg = "initializing... (vision only)";
+		msgStatus_.status = INITIALIZING | UPDATE_PTAM;
+		pubStatus_.publish(msgStatus_);
+	}
 	else
+	{
 		measurements->poseFilter_.applyMeasurement(idx,H_old,r_old,R);
+
+		msgStatus_.header = msg->header;
+		msgStatus_.msg = "Vision only mode";
+		msgStatus_.status = UPDATE_PTAM;
+		pubStatus_.publish(msgStatus_);
+	}
 
 	prevtime=msg->header.stamp.toSec()-C_DELAY-DELAY_;
 

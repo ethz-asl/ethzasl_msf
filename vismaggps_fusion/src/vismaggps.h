@@ -12,6 +12,7 @@
 
 #include <sensor_fusion_core/measurement.h>
 #include <vismaggps_fusion/GpsCustomCartesian.h>
+#include <vismaggps_fusion/Status.h>
 #include <geometry_msgs/Vector3Stamped.h>
 #include <Eigen/StdVector>	// include this to use std::vectors with eigen...
 #include <deque>
@@ -82,6 +83,10 @@ class VisMagGPSHandler: public MeasurementHandler
 	ros::Subscriber subMagMeas_;
 	ros::Subscriber subGPSMeas_;
 	void subscribe();
+
+	ros::Publisher pubStatus_;
+	enum{STOPPED=0, INITIALIZING=1, UPDATE_GPS=2, UPDATE_PTAM=4, UPDATE_LOC=8};
+	vismaggps_fusion::Status msgStatus_;
 
 	void visionCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg);
 	void CVGCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg);
