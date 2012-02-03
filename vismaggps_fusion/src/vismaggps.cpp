@@ -56,6 +56,7 @@ void VisMagGPSHandler::subscribe(){
 	msgStatus_.msg = "Filter started";
 	msgStatus_.status = 0;
 	pubStatus_.publish(msgStatus_);
+
 }
 
 

@@ -35,6 +35,9 @@ public:
 	Eigen::Matrix<double, 3, 1> p_m_;	// mag direction vector in mag frame
 	Eigen::Matrix<double, 3, 1> p_wg_;	// position world -> GPS sensor
 	Eigen::Matrix<double, 2, 1> v_wg_;	// velocity world -> GPS sensor
+	double yaw_init_;						// initial yaw direction in rad
+
+
 	VisMagGPSMeasurements()
 	{
 		addHandler(Sensors::VISMAGGPS, new VisMagGPSHandler(this));
@@ -122,8 +125,13 @@ public:
 			ROS_WARN_STREAM("No position measurements received yet from gps");
 
 
+		q=Eigen::Quaternion<double>(cos(yaw_init_/2),0,0,sin(yaw_init_/2));
+		if (q.w()<0)
+		{
+			q.w()*=-1; q.x()*=-1; q.y()*=-1; q.z()*=-1;
+		}
 
-		q = Eigen::Quaternion<double>(1, 0, 0, 1);
+//		q = Eigen::Quaternion<double>(1, 0, 0, 1);
 		q.normalize();
 //		if(((q_cv_.norm()==1) & (q_cv_.w()==1)) | (p_wg_.norm()!=0))	//if we have gps, we need to initialize q northwards!
 //		{
@@ -160,12 +168,13 @@ public:
 		ROS_INFO_STREAM("filter initialized to: \n" <<
 						"position: [" << p[0] << ", " << p[1] << ", " << p[2] << "]" <<
 						"attitude (w,x,y,z): [" << q.w() << ", " << q.x() << ", " << q.y() << ", " << q.z() << "]");
-		};
+	};
 
 
-	void Config(sensor_fusion_core::Sensor_Fusion_CoreConfig& config, uint32_t level){
-
-		if(level & sensor_fusion_core::Sensor_Fusion_Core_SET_HEIGHT){
+	void Config(sensor_fusion_core::Sensor_Fusion_CoreConfig& config, uint32_t level)
+	{
+		if(level & sensor_fusion_core::Sensor_Fusion_Core_SET_HEIGHT)
+		{
 			if(p_vc_.norm()==0)
 			{
 				ROS_WARN_STREAM("No measurements received yet to initialize position - using scale factor " << config.scale_init << " for init");
@@ -175,6 +184,7 @@ public:
 				init(p_vc_[2]/config.set_height);
 			config.set_height = false;
 		}
+		yaw_init_ = config.yaw_init/180*M_PI;
 	}
 };
 
