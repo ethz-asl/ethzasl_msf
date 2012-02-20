@@ -1,0 +1,17 @@
+#!/bin/bash
+
+if [ -n "$1" ]
+then
+T=$1
+else
+T=20
+fi
+
+echo " ### plotting position z [m] ###"
+echo " ### plotting velocities x y z [m/s] ###"
+echo " ### plotting attitude ###"
+echo " ### buffer = " $T "sec"
+
+rxplot sensor_fusion/state_out/data[2] sensor_fusion/state_out/data[3]:data[4]:data[5] sensor_fusion/state_out/data[6]:data[7]:data[8]:data[9] -b $T -t "position & velocity & attitude" -l pz,vx,vy,vz,qw,qx,qy,qz
+
+

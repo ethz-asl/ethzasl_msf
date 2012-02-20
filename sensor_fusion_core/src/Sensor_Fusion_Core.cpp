@@ -314,6 +314,7 @@ void Sensor_Fusion_Core::stateCallback(const sensor_fusion_core::ext_ekfConstPtr
 		{
 			ROS_WARN_STREAM_THROTTLE(2, "large time-gap re-initializing to last state\n");
 			StateBuffer_[(unsigned char)(idx_state_-1)].time_=StateBuffer_[(unsigned char)(idx_state_)].time_;
+			StateBuffer_[(unsigned char)(idx_state_)].time_=0;
 			return; // early abort!! (if timegap too big...
 		}
 	}
@@ -1036,8 +1037,8 @@ bool Sensor_Fusion_Core::applyMeasurement(unsigned char idx_delaystate, const Ma
 	msgState_.data[7] = StateBuffer_[(unsigned char)(idx_state_-1)].q_.x();
 	msgState_.data[8] = StateBuffer_[(unsigned char)(idx_state_-1)].q_.y();
 	msgState_.data[9] = StateBuffer_[(unsigned char)(idx_state_-1)].q_.z();
-	msgState_.data[10] = StateBuffer_[(unsigned char)(idx_state_-1)].P_.trace();//StateBuffer_[(unsigned char)(idx_state_-1)].b_w_[0];
-	msgState_.data[11] = StateBuffer_[(unsigned char)(idx_state_-2)].P_.trace()-StateBuffer_[(unsigned char)(idx_state_-1)].P_.trace();//StateBuffer_[(unsigned char)(idx_state_-1)].b_w_[1];
+	msgState_.data[10] = StateBuffer_[(unsigned char)(idx_P_-1)].P_.trace();//StateBuffer_[(unsigned char)(idx_state_-1)].b_w_[0];
+	msgState_.data[11] = StateBuffer_[(unsigned char)(idx_P_-2)].P_.trace()-StateBuffer_[(unsigned char)(idx_P_-1)].P_.trace();//StateBuffer_[(unsigned char)(idx_state_-1)].b_w_[1];
 	msgState_.data[12] = 0;//StateBuffer_[(unsigned char)(idx_state_-1)].b_w_[2];
 	msgState_.data[13] = StateBuffer_[(unsigned char)(idx_state_-1)].b_a_[0];
 	msgState_.data[14] = StateBuffer_[(unsigned char)(idx_state_-1)].b_a_[1];

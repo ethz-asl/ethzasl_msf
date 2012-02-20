@@ -36,6 +36,7 @@ void VisMagGPSHandler::subscribe(){
 	nh.param("/vismaggps_fusion/meas_noise4",n_zgxy_,0.5);
 	nh.param("/vismaggps_fusion/meas_noise5",n_zgz_,0.1);
 	nh.param("/vismaggps_fusion/meas_noise6",n_zgv_,0.2);
+	nh.param("/vismaggps_fusion/convergence_thrs",full_converged_,0.08);
 
 	// setup: initial pos, att, of measurement sensor
 	VisMagGPSMeasurements* customMeas = (VisMagGPSMeasurements*)(measurements);
@@ -78,6 +79,7 @@ void VisMagGPSHandler::noiseConfig(sensor_fusion_core::Sensor_Fusion_CoreConfig&
 	this->n_zgz_ = config.meas_noise5;
 	this->n_zgv_ = config.meas_noise6;
 	this->setDELAY(config.delay);
+	this->full_converged_ = config.convergence_thrs;
 }
 
 
@@ -148,9 +150,10 @@ void VisMagGPSHandler::gpsCallback(const vismaggps_fusion::GpsCustomCartesianCon
 
 	if(PTAMwatch_>GPS_SWITCH)	// we received GPS_SWITCH gps measurements and no vision measurements...PTAM is dead (?)
 	{
-		ROS_WARN_STREAM_THROTTLE(0.5,"MAV state estimate runs in safety mode (GPS & MAG)!!");
 		if(n_zm_==-1)
-			ROS_WARN_STREAM_THROTTLE(0.5,"ignoring MAG");
+			ROS_WARN_STREAM_THROTTLE(0.5,"MAV state estimate runs in safety mode (GPS only)!!");
+		else
+			ROS_WARN_STREAM_THROTTLE(0.5,"MAV state estimate runs in safety mode (GPS & MAG)!!");
 		State state_old;
 		ros::Time time_old = msg->header.stamp;
 
@@ -452,7 +455,7 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 
 			measurements->poseFilter_.initialize(state_old.p_,state_old.v_,state_old.q_,state_old.b_w_,state_old.b_a_,state_old.L_,state_old.q_wv_,state_old.P_,state_old.w_m_,state_old.a_m_,Eigen::Matrix<double,3,1>(0, 0, 9.81),state_old.q_ci_,state_old.p_ic_,state_old.q_mi_,state_old.p_ig_,state_old.p_vw_,state_old.alpha_,state_old.beta_);
 			INITsequence_++;
-			ROS_WARN_STREAM("Vision init done");
+			ROS_WARN_STREAM("Vision init done, p-trace is: " << state_old.P_.trace());
 			return;
 		}
 		else
@@ -514,9 +517,10 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 
 	if(hasmag & hasgps & (INITsequence_<INIT_ROUNDS))	// use INIT_ROUNDS cam measurements for convergence
 	{
-		ROS_WARN_STREAM_THROTTLE(0.5,"initializing... ");
 		if(n_zm_==-1)
-			ROS_WARN_STREAM_THROTTLE(0.5,"ignoring MAG");
+			ROS_WARN_STREAM_THROTTLE(0.5,"initializing (ignoring MAG)...");
+		else
+			ROS_WARN_STREAM_THROTTLE(0.5,"initializing... ");
 
 		Sensor_Fusion_Core::MatrixXSd Htot;
 		Eigen::VectorXd rtot;
@@ -640,12 +644,17 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 		pubStatus_.publish(msgStatus_);
 
 		INITsequence_++;
-		if(!(INITsequence_<INIT_ROUNDS))
+		if(!(INITsequence_<INIT_ROUNDS) || (state_old.P_.trace()<full_converged_))
 		{
 			Eigen::Matrix<double,3,1> poscorrect = z_vp_/state_old.L_ - (state_old.p_vw_+C_wv.transpose()*(state_old.p_ + C_q.transpose()*state_old.p_ic_));
 
+			ROS_WARN_STREAM("trying to switch to vision only after " << INITsequence_ << " measurements");
+
 			if(poscorrect.norm()<0.5)	// pos jump must be <0.5m
+			{
 				ROS_WARN_STREAM("switching to vision only... (pos correction: " << poscorrect.norm() << " [m])");
+				INITsequence_=INIT_ROUNDS;
+			}
 			else
 			{
 				INITsequence_=INIT_ROUNDS-5;	// add 5 init rounds
