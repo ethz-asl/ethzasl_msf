@@ -7,6 +7,9 @@
 
 #include "vismaggps.h"
 #include "vismaggps_measurements.h"
+#include <string>
+#include <iostream>
+#include <stdio.h>
 
 // measurement size
 #define nVisMeas_ 6
@@ -19,6 +22,20 @@
 #define GPS_SWITCH 5 // number of GPS measurements without a vision measurement in between (safety switch)
 #define INIT_ROUNDS 200	// number of GPS readings together with vision measurement to ensure state convergence
 #define CAM_RATE 0.033 // camera framerate: used to determine closest GPS/Mag measurement to cam measurement
+
+std::string VisMagGPSHandler::sys_exec(const char* cmd) {
+    FILE* pipe = popen(cmd, "r");
+    if (!pipe) return "ERROR";
+    char buffer[128];
+    std::string result = "";
+    while(!feof(pipe)) {
+        if(fgets(buffer, 128, pipe) != NULL)
+                result += buffer;
+    }
+    pclose(pipe);
+    return result;
+}
+
 
 void VisMagGPSHandler::subscribe(){
 
@@ -37,6 +54,16 @@ void VisMagGPSHandler::subscribe(){
 	nh.param("/vismaggps_fusion/meas_noise5",n_zgz_,0.1);
 	nh.param("/vismaggps_fusion/meas_noise6",n_zgv_,0.2);
 	nh.param("/vismaggps_fusion/convergence_thrs",full_converged_,0.08);
+
+	//get top level namespace
+	ros::NodeHandle gnh;
+	namespace_ = gnh.getNamespace();
+	if (namespace_ != "/")
+	{
+		while (namespace_.at(0) == '/')
+			namespace_.erase(0, 1);
+		namespace_ = "/" + namespace_;
+	}
 
 	// setup: initial pos, att, of measurement sensor
 	VisMagGPSMeasurements* customMeas = (VisMagGPSMeasurements*)(measurements);
@@ -143,6 +170,7 @@ void VisMagGPSHandler::magCallback(const geometry_msgs::Vector3StampedConstPtr &
 
 void VisMagGPSHandler::gpsCallback(const vismaggps_fusion::GpsCustomCartesianConstPtr & msg)
 {
+	static bool ptamautoinit=false;
 	static double samesame=0;
 	if(samesame==msg->position.x)
 		return;	//EARLY ABORT no new measurement
@@ -199,6 +227,22 @@ void VisMagGPSHandler::gpsCallback(const vismaggps_fusion::GpsCustomCartesianCon
 			msgStatus_.status = 0;
 			pubStatus_.publish(msgStatus_);
 			return; /// no prediction made yet, EARLY ABORT
+		}
+
+		// activate/deactivate PTAM autoinit if above 4m or below 2m
+		if (state_old.p_(2)>4 && !ptamautoinit)
+		{
+			std::string cmd = "rosparam set " + namespace_ + "/ptam/AutoInit true";
+			ROS_WARN_STREAM("executing: " << cmd);
+			std::string answer = sys_exec(cmd.c_str());
+			ptamautoinit=true;
+		}
+		else if (state_old.p_(2)<2)
+		{
+			std::string cmd = "rosparam set " + namespace_ + "/ptam/AutoInit false";
+			ROS_WARN_STREAM("executing: " << cmd);
+			std::string answer = sys_exec(cmd.c_str());
+			ptamautoinit=false;
 		}
 
 		Eigen::Matrix<double,3,3> C_mi = state_old.q_mi_.conjugate().toRotationMatrix();

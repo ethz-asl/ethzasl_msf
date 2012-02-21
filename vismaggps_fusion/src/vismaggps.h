@@ -85,6 +85,9 @@ class VisMagGPSHandler: public MeasurementHandler
 	ros::Subscriber subGPSMeas_;
 	void subscribe();
 
+	std::string sys_exec(const char* cmd);
+	std::string namespace_;
+
 	ros::Publisher pubStatus_;
 	enum{STOPPED=0, INITIALIZING=1, UPDATE_GPS=2, UPDATE_PTAM=4, UPDATE_LOC=8};
 	vismaggps_fusion::Status msgStatus_;
