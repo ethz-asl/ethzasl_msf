@@ -3,7 +3,7 @@
 	    <!--remap from="sensor_fusion/imu_state_input" to="/mav2/fcu/imu" /-->
 	    <remap from="sensor_fusion/hl_state_input" to="/mav2/fcu/ekf_state_out" />
 	    <!--remap from="sensor_fusion/vision_pose" to="/mav2/vslam/pose" /-->
-	    <remap from="sensor_fusion/vision_pose" to="mav2/vslam/pose" />
+	    <remap from="sensor_fusion/vision_pose" to="/vslam/pose" />
 	    <remap from="sensor_fusion/mag_dir" to="/mav2/fcu/mag" />
 	    <remap from="sensor_fusion/gps_pos" to="/mav2/fcu/gps_position_custom" />
 	    <!--remap from="sensor_fusion/cvg_pose" to="/tf_distort/sfly_hex" /-->
