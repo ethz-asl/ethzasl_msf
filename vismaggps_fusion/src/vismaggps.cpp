@@ -457,15 +457,18 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 			}
 			else if(meancount<5)	//take mean of 5 first measurements
 			{
-				q_wvbuff.w() *= 4/5 + 1/5*(z_vq_.conjugate()*state_old.q_ci_.conjugate()*state_old.q_.conjugate()).w();
-				q_wvbuff.x() *= 4/5 + 1/5*(z_vq_.conjugate()*state_old.q_ci_.conjugate()*state_old.q_.conjugate()).x();
-				q_wvbuff.y() *= 4/5 + 1/5*(z_vq_.conjugate()*state_old.q_ci_.conjugate()*state_old.q_.conjugate()).y();
-				q_wvbuff.z() *= 4/5 + 1/5*(z_vq_.conjugate()*state_old.q_ci_.conjugate()*state_old.q_.conjugate()).z();
+				const double m_old = 0.8;
+				const double m_new = 1-m_old;
+				q_wvbuff.w() = m_old*q_wvbuff.w() + m_new*(z_vq_.conjugate()*state_old.q_ci_.conjugate()*state_old.q_.conjugate()).w();
+				q_wvbuff.x() = m_old*q_wvbuff.x() + m_new*(z_vq_.conjugate()*state_old.q_ci_.conjugate()*state_old.q_.conjugate()).x();
+				q_wvbuff.y() = m_old*q_wvbuff.y() + m_new*(z_vq_.conjugate()*state_old.q_ci_.conjugate()*state_old.q_.conjugate()).y();
+				q_wvbuff.z() = m_old*q_wvbuff.z() + m_new*(z_vq_.conjugate()*state_old.q_ci_.conjugate()*state_old.q_.conjugate()).z();
+				q_wvbuff.normalize();
 				if((state_old.q_wv_*z_vp_)[2]*z_gp_[2]!=0)
-					L_buff *= 4/5 + 1/5*fabs((state_old.q_wv_*z_vp_)(2)/z_gp_(2));
-				p_wvbuff[0] *= 4/5 + 1/5*(z_vp_/state_old.L_ - z_vq_.conjugate().toRotationMatrix()*state_old.q_ci_.conjugate().toRotationMatrix()*state_old.p_ic_ - state_old.q_wv_.conjugate().toRotationMatrix()*state_old.p_)[0];
-				p_wvbuff[1] *= 4/5 + 1/5*(z_vp_/state_old.L_ - z_vq_.conjugate().toRotationMatrix()*state_old.q_ci_.conjugate().toRotationMatrix()*state_old.p_ic_ - state_old.q_wv_.conjugate().toRotationMatrix()*state_old.p_)[1];
-				p_wvbuff[2] *= 4/5 + 1/5*(z_vp_/state_old.L_ - z_vq_.conjugate().toRotationMatrix()*state_old.q_ci_.conjugate().toRotationMatrix()*state_old.p_ic_ - state_old.q_wv_.conjugate().toRotationMatrix()*state_old.p_)[2];
+					L_buff = m_old*L_buff + m_new*fabs((state_old.q_wv_*z_vp_)(2)/z_gp_(2));
+				p_wvbuff[0] = m_old*p_wvbuff[0] + m_new*(z_vp_/state_old.L_ - z_vq_.conjugate().toRotationMatrix()*state_old.q_ci_.conjugate().toRotationMatrix()*state_old.p_ic_ - state_old.q_wv_.conjugate().toRotationMatrix()*state_old.p_)[0];
+				p_wvbuff[1] = m_old*p_wvbuff[1] + m_new*(z_vp_/state_old.L_ - z_vq_.conjugate().toRotationMatrix()*state_old.q_ci_.conjugate().toRotationMatrix()*state_old.p_ic_ - state_old.q_wv_.conjugate().toRotationMatrix()*state_old.p_)[1];
+				p_wvbuff[2] = m_old*p_wvbuff[2] + m_new*(z_vp_/state_old.L_ - z_vq_.conjugate().toRotationMatrix()*state_old.q_ci_.conjugate().toRotationMatrix()*state_old.p_ic_ - state_old.q_wv_.conjugate().toRotationMatrix()*state_old.p_)[2];
 				meancount++;
 			}
 			else
@@ -475,7 +478,7 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 
 				Eigen::Matrix<double,3,3> Pincr1 = (Eigen::Matrix<double,3,1>::Constant(1)).asDiagonal(); // q_vw
 				Eigen::Matrix<double,3,3> Pincr2 = (Eigen::Matrix<double,3,1>::Constant((z_gp_-z_vp_/state_old.L_).norm())).asDiagonal(); //p_vw
-				state_old.P_(15,15)+=state_old.L_/2;	//scale
+				state_old.P_(15,15)+=state_old.L_/2.0;	//scale
 				state_old.P_.block(16,16,3,3)+=Pincr1;	//q_vw
 				state_old.P_.block(31,31,3,3)+=Pincr2;	//p_vw
 
