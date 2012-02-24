@@ -230,14 +230,14 @@ void VisMagGPSHandler::gpsCallback(const vismaggps_fusion::GpsCustomCartesianCon
 		}
 
 		// activate/deactivate PTAM autoinit if above 4m or below 2m
-		if (state_old.p_(2)>4 && !ptamautoinit)
+		if ((state_old.p_(2)>4) && !ptamautoinit)
 		{
 			std::string cmd = "rosparam set " + namespace_ + "/ptam/AutoInit true";
 			ROS_WARN_STREAM("executing: " << cmd);
 			std::string answer = sys_exec(cmd.c_str());
 			ptamautoinit=true;
 		}
-		else if (state_old.p_(2)<2)
+		else if ((state_old.p_(2)<2) && ptamautoinit)
 		{
 			std::string cmd = "rosparam set " + namespace_ + "/ptam/AutoInit false";
 			ROS_WARN_STREAM("executing: " << cmd);
