@@ -212,13 +212,13 @@ void VisMagGPSHandler::gpsCallback(const vismaggps_fusion::GpsCustomCartesianCon
 		if(PTAMwatch_==GPS_SWITCH+1)
 		{
 //			//ToDo: clean init the first time switched to safety mode. i.e. include yaw from magnetometer...
-//			Eigen::Matrix<double,3,1> newpos = z_gp_ - C_q.transpose()*state_old.p_ig_;
+			Eigen::Matrix<double,3,1> newpos = z_gp_;//ToDo: add - C_q.transpose()*state_old.p_ig_;
 //			double yaw = acos((state_old.p_[0]*newpos[0]+state_old.p_[1]*newpos[1])/(state_old.p_.norm()*newpos.norm()));
 //			Eigen::Quaternion<double> yawq(cos(yaw/2),0,0,sin(yaw/2));
 //			yawq.normalize();
 
-//			// reinit filter in order to set new setpoint for MAV controller... actually just make sure that GPS pos is used...
-//			measurements->poseFilter_.initialize(newpos,state_old.v_,yawq*state_old.q_,state_old.b_w_,state_old.b_a_,state_old.L_,state_old.q_wv_,state_old.P_,state_old.w_m_,state_old.a_m_,Eigen::Matrix<double,3,1>(0, 0, 9.81),state_old.q_ci_,state_old.p_ic_,state_old.q_mi_,state_old.p_ig_,state_old.p_vw_,state_old.alpha_,state_old.beta_);
+			// reinit filter in order to set new setpoint for MAV controller... actually just make sure that GPS pos is used...
+			measurements->poseFilter_.initialize(newpos,state_old.v_,state_old.q_,state_old.b_w_,state_old.b_a_,state_old.L_,state_old.q_wv_,state_old.P_,state_old.w_m_,state_old.a_m_,Eigen::Matrix<double,3,1>(0, 0, 9.81),state_old.q_ci_,state_old.p_ic_,state_old.q_mi_,state_old.p_ig_,state_old.p_vw_,state_old.alpha_,state_old.beta_);
 
 			PTAMwatch_++;
 		}
