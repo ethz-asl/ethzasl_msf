@@ -343,7 +343,6 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 		INITsequence_=-1;	//use first few measurements of all sensors before switching to vision only
 
 	}
-	PTAMwatch_=0;	// PTAM is running...good
 
 	static double prevtime = 0;
 	static double difftime = 0;
@@ -442,24 +441,48 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 	{
 		if( hasmag & hasgps)
 		{
-			state_old.q_wv_ = z_vq_.conjugate()*state_old.q_ci_.conjugate()*state_old.q_.conjugate();
 
-			if(z_gp_.norm()!=0)
+			static Eigen::Quaternion<double> q_wvbuff = Eigen::Quaternion<double>::Identity();
+			static Eigen::Matrix<double,3,1> p_wvbuff = Eigen::Matrix<double,3,1>::Constant(0);
+			static double L_buff = 0;
+			static char meancount=0;
+
+			if(meancount==0)
 			{
-				 if((state_old.q_wv_*z_vp_)[2]*z_gp_[2]!=0)
-					 state_old.L_ = fabs((state_old.q_wv_*z_vp_)(2)/z_gp_(2));
-				 state_old.p_vw_ = z_vp_/state_old.L_ - z_vq_.conjugate().toRotationMatrix()*state_old.q_ci_.conjugate().toRotationMatrix()*state_old.p_ic_ - state_old.q_wv_.conjugate().toRotationMatrix()*state_old.p_;
+				q_wvbuff = z_vq_.conjugate()*state_old.q_ci_.conjugate()*state_old.q_.conjugate();
+				if((state_old.q_wv_*z_vp_)[2]*z_gp_[2]!=0)
+					L_buff = fabs((state_old.q_wv_*z_vp_)(2)/z_gp_(2));
+				p_wvbuff = z_vp_/state_old.L_ - z_vq_.conjugate().toRotationMatrix()*state_old.q_ci_.conjugate().toRotationMatrix()*state_old.p_ic_ - state_old.q_wv_.conjugate().toRotationMatrix()*state_old.p_;
+				meancount++;
 			}
+			else if(meancount<5)	//take mean of 5 first measurements
+			{
+				q_wvbuff.w() *= 4/5 + 1/5*(z_vq_.conjugate()*state_old.q_ci_.conjugate()*state_old.q_.conjugate()).w();
+				q_wvbuff.x() *= 4/5 + 1/5*(z_vq_.conjugate()*state_old.q_ci_.conjugate()*state_old.q_.conjugate()).x();
+				q_wvbuff.y() *= 4/5 + 1/5*(z_vq_.conjugate()*state_old.q_ci_.conjugate()*state_old.q_.conjugate()).y();
+				q_wvbuff.z() *= 4/5 + 1/5*(z_vq_.conjugate()*state_old.q_ci_.conjugate()*state_old.q_.conjugate()).z();
+				if((state_old.q_wv_*z_vp_)[2]*z_gp_[2]!=0)
+					L_buff *= 4/5 + 1/5*fabs((state_old.q_wv_*z_vp_)(2)/z_gp_(2));
+				p_wvbuff[0] *= 4/5 + 1/5*(z_vp_/state_old.L_ - z_vq_.conjugate().toRotationMatrix()*state_old.q_ci_.conjugate().toRotationMatrix()*state_old.p_ic_ - state_old.q_wv_.conjugate().toRotationMatrix()*state_old.p_)[0];
+				p_wvbuff[1] *= 4/5 + 1/5*(z_vp_/state_old.L_ - z_vq_.conjugate().toRotationMatrix()*state_old.q_ci_.conjugate().toRotationMatrix()*state_old.p_ic_ - state_old.q_wv_.conjugate().toRotationMatrix()*state_old.p_)[1];
+				p_wvbuff[2] *= 4/5 + 1/5*(z_vp_/state_old.L_ - z_vq_.conjugate().toRotationMatrix()*state_old.q_ci_.conjugate().toRotationMatrix()*state_old.p_ic_ - state_old.q_wv_.conjugate().toRotationMatrix()*state_old.p_)[2];
+				meancount++;
+			}
+			else
+			{
+				meancount=0;
+				PTAMwatch_=0;	// PTAM is running...good
 
-			Eigen::Matrix<double,3,3> Pincr1 = (Eigen::Matrix<double,3,1>::Constant(1)).asDiagonal(); // q_vw
-			Eigen::Matrix<double,3,3> Pincr2 = (Eigen::Matrix<double,3,1>::Constant((z_gp_-z_vp_/state_old.L_).norm())).asDiagonal(); //p_vw
-			state_old.P_(15,15)+=state_old.L_/2;	//scale
-			state_old.P_.block(16,16,3,3)+=Pincr1;	//q_vw
-			state_old.P_.block(31,31,3,3)+=Pincr2;	//p_vw
+				Eigen::Matrix<double,3,3> Pincr1 = (Eigen::Matrix<double,3,1>::Constant(1)).asDiagonal(); // q_vw
+				Eigen::Matrix<double,3,3> Pincr2 = (Eigen::Matrix<double,3,1>::Constant((z_gp_-z_vp_/state_old.L_).norm())).asDiagonal(); //p_vw
+				state_old.P_(15,15)+=state_old.L_/2;	//scale
+				state_old.P_.block(16,16,3,3)+=Pincr1;	//q_vw
+				state_old.P_.block(31,31,3,3)+=Pincr2;	//p_vw
 
-			measurements->poseFilter_.initialize(state_old.p_,state_old.v_,state_old.q_,state_old.b_w_,state_old.b_a_,state_old.L_,state_old.q_wv_,state_old.P_,state_old.w_m_,state_old.a_m_,Eigen::Matrix<double,3,1>(0, 0, 9.81),state_old.q_ci_,state_old.p_ic_,state_old.q_mi_,state_old.p_ig_,state_old.p_vw_,state_old.alpha_,state_old.beta_);
-			INITsequence_++;
-			ROS_WARN_STREAM("Vision init done, p-trace is: " << state_old.P_.trace());
+				measurements->poseFilter_.initialize(state_old.p_,state_old.v_,state_old.q_,state_old.b_w_,state_old.b_a_,L_buff,q_wvbuff,state_old.P_,state_old.w_m_,state_old.a_m_,Eigen::Matrix<double,3,1>(0, 0, 9.81),state_old.q_ci_,state_old.p_ic_,state_old.q_mi_,state_old.p_ig_,p_wvbuff,state_old.alpha_,state_old.beta_);
+				INITsequence_++;
+				ROS_WARN_STREAM("Vision init done, p-trace is: " << state_old.P_.trace());
+			}
 			return;
 		}
 		else
@@ -473,6 +496,7 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 		}
 	}
 
+	PTAMwatch_=0;	// PTAM is running...good
 
 	Sensor_Fusion_Core::MatrixXSd H_old = Eigen::Matrix<double,nVisMeas_,nState_>::Constant(0);
 	Eigen::VectorXd r_old(nVisMeas_);
