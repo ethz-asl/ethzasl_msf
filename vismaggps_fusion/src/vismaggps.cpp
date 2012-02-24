@@ -30,12 +30,14 @@ void VisMagGPSHandler::subscribe(){
 
 	pubStatus_ = nh.advertise<vismaggps_fusion::Status>("status", 1);
 
-	nh.param("/vismaggps_fusion/meas_noise1",n_zvq_,0.01);
-	nh.param("/vismaggps_fusion/meas_noise2",n_zvp_,0.02);
-	nh.param("/vismaggps_fusion/meas_noise3",n_zm_,0.02);
-	nh.param("/vismaggps_fusion/meas_noise4",n_zgxy_,0.5);
-	nh.param("/vismaggps_fusion/meas_noise5",n_zgz_,0.1);
-	nh.param("/vismaggps_fusion/meas_noise6",n_zgv_,0.2);
+	nh.param("/vismaggps_fusion/meas_noise1",n_zvq_,0.01);	// cam att noise
+	nh.param("/vismaggps_fusion/meas_noise2",n_zvp_,0.02);	// cam pos noise
+	nh.param("/vismaggps_fusion/meas_noise3",n_zm_,0.02);	// mag noise
+	nh.param("/vismaggps_fusion/meas_noise4",n_zgxy_,1.0);	// xy GPS noise multiplier
+	nh.param("/vismaggps_fusion/meas_noise5",n_zgz_,0.1);	// z GPS/press noise
+	nh.param("/vismaggps_fusion/meas_noise6",n_zgv_,1.0);	// GPS vel noise multiplier
+	nh.param("/vismaggps_fusion/meas_noise7",n_zcvgq_,1.0);	// CVG att noise multiplier
+	nh.param("/vismaggps_fusion/meas_noise8",n_zcvgp_,1.0);	// CVG pos noise multiplier
 	nh.param("/vismaggps_fusion/convergence_thrs",full_converged_,0.08);
 
 	// setup: initial pos, att, of measurement sensor
@@ -78,6 +80,8 @@ void VisMagGPSHandler::noiseConfig(sensor_fusion_core::Sensor_Fusion_CoreConfig&
 	this->n_zgxy_ = config.meas_noise4;
 	this->n_zgz_ = config.meas_noise5;
 	this->n_zgv_ = config.meas_noise6;
+	this->n_zcvgq_ = config.meas_noise7;
+	this->n_zcvgp_ = config.meas_noise8;
 	this->setDELAY(config.delay);
 	this->full_converged_ = config.convergence_thrs;
 }
@@ -95,12 +99,12 @@ void VisMagGPSHandler::CVGCallback(const geometry_msgs::PoseWithCovarianceStampe
 	buffCVG.cvgq_.y()=msg->pose.pose.orientation.y;
 	buffCVG.cvgq_.z()=msg->pose.pose.orientation.z;
 
-	buffCVG.n_cvgcov_[0] = msg->pose.covariance[0];
-	buffCVG.n_cvgcov_[1] = msg->pose.covariance[7];
-	buffCVG.n_cvgcov_[2] = msg->pose.covariance[14];
-	buffCVG.n_cvgcov_[3] = msg->pose.covariance[21];
-	buffCVG.n_cvgcov_[4] = msg->pose.covariance[28];
-	buffCVG.n_cvgcov_[5] = msg->pose.covariance[35];
+	buffCVG.n_cvgcov_[0] = msg->pose.covariance[0]*n_zcvgp_;
+	buffCVG.n_cvgcov_[1] = msg->pose.covariance[7]*n_zcvgp_;
+	buffCVG.n_cvgcov_[2] = msg->pose.covariance[14]*n_zcvgp_;
+	buffCVG.n_cvgcov_[3] = msg->pose.covariance[21]*n_zcvgq_;
+	buffCVG.n_cvgcov_[4] = msg->pose.covariance[28]*n_zcvgq_;
+	buffCVG.n_cvgcov_[5] = msg->pose.covariance[35]*n_zcvgq_;
 
 //	buffCVG.cvgp_[0]=msg->transform.translation.x;
 //	buffCVG.cvgp_[1]=msg->transform.translation.y;
@@ -305,13 +309,13 @@ void VisMagGPSHandler::gpsCallback(const vismaggps_fusion::GpsCustomCartesianCon
 	buffgps.gp_(0,0)=msg->position.x;
 	buffgps.gp_(1,0)=msg->position.y;
 	buffgps.gp_(2,0)=msg->position.z;
-	buffgps.n_gp_(0,0)=n_zgxy_;
-	buffgps.n_gp_(1,0)=n_zgxy_;
+	buffgps.n_gp_(0,0)=msg->position_covariance[0]*n_zgxy_;
+	buffgps.n_gp_(1,0)=msg->position_covariance[4]*n_zgxy_;
 	buffgps.n_gp_(2,0)=n_zgz_;
 	buffgps.gv_(0,0)=msg->velocity_x;
 	buffgps.gv_(1,0)=msg->velocity_y;
-	buffgps.n_gv_(0,0)=msg->velocity_covariance[0];
-	buffgps.n_gv_(1,0)=msg->velocity_covariance[3];
+	buffgps.n_gv_(0,0)=msg->velocity_covariance[0]*n_zgv_;
+	buffgps.n_gv_(1,0)=msg->velocity_covariance[3]*n_zgv_;
 
 	buffgps.time_=msg->header.stamp.toSec();
 	GPSBuff_.push_back(buffgps);

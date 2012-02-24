@@ -64,7 +64,7 @@ class VisMagGPSHandler: public MeasurementHandler
 	Eigen::Matrix<double, 3, 1> z_m_;
 	Eigen::Matrix<double, 3, 1> z_gp_;
 	Eigen::Matrix<double, 2, 1> z_gv_;
-	double n_zvq_, n_zvp_, n_zm_, n_zgxy_, n_zgz_, n_zgv_;
+	double n_zvq_, n_zvp_, n_zm_, n_zgxy_, n_zgz_, n_zgv_,n_zcvgq_,n_zcvgp_;
 	double full_converged_; // threshold for cov matrix P trace indicating convergence of full filter (all sensors)
 
 	double DELAY_;	/// const time delay of measurements
