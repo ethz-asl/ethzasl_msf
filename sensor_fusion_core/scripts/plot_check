@@ -1,17 +1,28 @@
 #!/bin/bash
 
-if [ -n "$1" ]
+if [ -n "$2" ]
 then
-T=$1
+T=$2
 else
-T=20
+T=10
 fi
 
-echo " ### plotting position z [m] ###"
-echo " ### plotting velocities x y z [m/s] ###"
-echo " ### plotting attitude ###"
+if [ -n "$1" ]
+then
+MAV=$1"/"
+else
+MAV=""
+fi
+
+echo " ### plotting position, velocity, scale ###"
+echo " ### plotting attitude, acc bias, P trace ###"
+echo " ### plotting vision-world drifts ###"
 echo " ### buffer = " $T "sec"
 
-rxplot sensor_fusion/state_out/data[2] sensor_fusion/state_out/data[3]:data[4]:data[5] sensor_fusion/state_out/data[6]:data[7]:data[8]:data[9] -b $T -t "position & velocity & attitude" -l pz,vx,vy,vz,qw,qx,qy,qz
+rxplot /"$MAV"sensor_fusion/state_out/data[0]:data[1]:data[2] /"$MAV"sensor_fusion/state_out/data[3]:data[4]:data[5] /"$MAV"sensor_fusion/state_out/data[16] -b $T -t "position / velocity / scale" -l px,py,pz,vx,vy,vz,L &
+
+rxplot /"$MAV"sensor_fusion/state_out/data[6]:data[7]:data[8]:data[9] /"$MAV"sensor_fusion/state_out/data[13]:data[14]:data[15] /"$MAV"sensor_fusion/state_out/data[10] -b $T -t "attitude / acc bias / P trace" -l w,x,y,z,ax,ay,az,P &
+
+rxplot /"$MAV"sensor_fusion/state_out/data[17]:data[18]:data[19]:data[20] /"$MAV"sensor_fusion/state_out/data[35]:data[36]:data[37] -b $T -t "q_vw / p_vw" -l w,x,y,z,px,py,pz &
 
 
