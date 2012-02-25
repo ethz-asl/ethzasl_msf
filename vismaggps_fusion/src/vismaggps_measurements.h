@@ -147,10 +147,10 @@ public:
 
 		if(p_wg_.norm()!=0)
 		{
-			 if(p_vc_[2]*p_wg_[2]!=0)
-				 scale = fabs(p_vc_(2)/p_wg_(2));
+			 if((q_wv.conjugate()*p_vc_)(2)*p_wg_(2)!=0)
+				 scale = fabs((q_wv.conjugate()*p_vc_)(2)/p_wg_(2));
 			 p = p_wg_ - q.toRotationMatrix()*p_ig;
-			 p_vw = p_vc_/scale - q_cv_.conjugate().toRotationMatrix()*q_ci.conjugate().toRotationMatrix()*p_ic - q_wv.conjugate().toRotationMatrix()*p;
+			 p_vw = p_vc_/scale - q_cv_.conjugate().toRotationMatrix()*q_ci.conjugate().toRotationMatrix()*p_ic - q_wv.toRotationMatrix()*p;
 		}
 		else	// no gps measurements received
 			p = q_wv.conjugate().toRotationMatrix()*p_vc_/scale - q.toRotationMatrix()*p_ic ;

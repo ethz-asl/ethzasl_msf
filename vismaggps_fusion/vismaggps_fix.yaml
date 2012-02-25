@@ -5,7 +5,7 @@ noise_acc: 0.083
 noise_accbias: 0.0083
 noise_gyr: 0.013
 noise_gyrbias: 0.0013
-noise_scale: 0.001
+noise_scale: 0.0
 noise_qwv: 0.0
 noise_qci: 0.0
 noise_pic: 0.0
@@ -17,9 +17,11 @@ noise_beta: 0.0
 delay: 0.02
 meas_noise1: 0.01
 meas_noise2: 0.02
-meas_noise3: 0.01
-meas_noise4: 0.5
+meas_noise3: -1.0
+meas_noise4: 0.3
 meas_noise5: 0.1
-meas_noise6: 0.1
+meas_noise6: 1.0
+meas_noise7: 1.0
+meas_noise8: 1.0
 
-data_playback: False
+data_playback: True

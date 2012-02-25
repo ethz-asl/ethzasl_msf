@@ -72,7 +72,7 @@ void VisMagGPSHandler::noiseConfig(sensor_fusion_core::Sensor_Fusion_CoreConfig&
 		MagBuff_.clear();
 		GPSBuff_.clear();
 		PTAMwatch_ = 0;
-		INITsequence_ = 0;
+		INITsequence_ = -1;
 	}
 	this->n_zvq_ = config.meas_noise1;
 	this->n_zvp_ = config.meas_noise2;
@@ -450,9 +450,9 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 			if(meancount==0)
 			{
 				q_wvbuff = z_vq_.conjugate()*state_old.q_ci_.conjugate()*state_old.q_.conjugate();
-				if((state_old.q_wv_*z_vp_)[2]*z_gp_[2]!=0)
-					L_buff = fabs((state_old.q_wv_*z_vp_)(2)/z_gp_(2));
-				p_wvbuff = z_vp_/state_old.L_ - z_vq_.conjugate().toRotationMatrix()*state_old.q_ci_.conjugate().toRotationMatrix()*state_old.p_ic_ - state_old.q_wv_.conjugate().toRotationMatrix()*state_old.p_;
+				if((q_wvbuff.conjugate()*z_vp_)(2)*z_gp_(2)!=0)
+					L_buff = fabs((q_wvbuff.conjugate()*z_vp_)(2)/z_gp_(2));
+				p_wvbuff = z_vp_/L_buff - z_vq_.conjugate().toRotationMatrix()*state_old.q_ci_.conjugate().toRotationMatrix()*state_old.p_ic_ - q_wvbuff.toRotationMatrix()*state_old.p_;
 				meancount++;
 			}
 			else if(meancount<5)	//take mean of 5 first measurements
@@ -464,11 +464,11 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 				q_wvbuff.y() = m_old*q_wvbuff.y() + m_new*(z_vq_.conjugate()*state_old.q_ci_.conjugate()*state_old.q_.conjugate()).y();
 				q_wvbuff.z() = m_old*q_wvbuff.z() + m_new*(z_vq_.conjugate()*state_old.q_ci_.conjugate()*state_old.q_.conjugate()).z();
 				q_wvbuff.normalize();
-				if((state_old.q_wv_*z_vp_)[2]*z_gp_[2]!=0)
-					L_buff = m_old*L_buff + m_new*fabs((state_old.q_wv_*z_vp_)(2)/z_gp_(2));
-				p_wvbuff[0] = m_old*p_wvbuff[0] + m_new*(z_vp_/state_old.L_ - z_vq_.conjugate().toRotationMatrix()*state_old.q_ci_.conjugate().toRotationMatrix()*state_old.p_ic_ - state_old.q_wv_.conjugate().toRotationMatrix()*state_old.p_)[0];
-				p_wvbuff[1] = m_old*p_wvbuff[1] + m_new*(z_vp_/state_old.L_ - z_vq_.conjugate().toRotationMatrix()*state_old.q_ci_.conjugate().toRotationMatrix()*state_old.p_ic_ - state_old.q_wv_.conjugate().toRotationMatrix()*state_old.p_)[1];
-				p_wvbuff[2] = m_old*p_wvbuff[2] + m_new*(z_vp_/state_old.L_ - z_vq_.conjugate().toRotationMatrix()*state_old.q_ci_.conjugate().toRotationMatrix()*state_old.p_ic_ - state_old.q_wv_.conjugate().toRotationMatrix()*state_old.p_)[2];
+				if((q_wvbuff.conjugate()*z_vp_)(2)*z_gp_(2)!=0)
+					L_buff = m_old*L_buff + m_new*fabs((q_wvbuff.conjugate()*z_vp_)(2)/z_gp_(2));
+				p_wvbuff[0] = m_old*p_wvbuff[0] + m_new*(z_vp_/L_buff - z_vq_.conjugate().toRotationMatrix()*state_old.q_ci_.conjugate().toRotationMatrix()*state_old.p_ic_ - q_wvbuff.toRotationMatrix()*state_old.p_)[0];
+				p_wvbuff[1] = m_old*p_wvbuff[1] + m_new*(z_vp_/L_buff - z_vq_.conjugate().toRotationMatrix()*state_old.q_ci_.conjugate().toRotationMatrix()*state_old.p_ic_ - q_wvbuff.toRotationMatrix()*state_old.p_)[1];
+				p_wvbuff[2] = m_old*p_wvbuff[2] + m_new*(z_vp_/L_buff - z_vq_.conjugate().toRotationMatrix()*state_old.q_ci_.conjugate().toRotationMatrix()*state_old.p_ic_ - q_wvbuff.toRotationMatrix()*state_old.p_)[2];
 				meancount++;
 			}
 			else
@@ -478,9 +478,9 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 
 				Eigen::Matrix<double,3,3> Pincr1 = (Eigen::Matrix<double,3,1>::Constant(1)).asDiagonal(); // q_vw
 				Eigen::Matrix<double,3,3> Pincr2 = (Eigen::Matrix<double,3,1>::Constant((z_gp_-z_vp_/state_old.L_).norm())).asDiagonal(); //p_vw
-				state_old.P_(15,15)+=state_old.L_/2.0;	//scale
-				state_old.P_.block(16,16,3,3)+=Pincr1;	//q_vw
-				state_old.P_.block(31,31,3,3)+=Pincr2;	//p_vw
+//				state_old.P_(15,15)+=state_old.L_/2.0;	//scale
+//				state_old.P_.block(16,16,3,3)+=Pincr1;	//q_vw
+//				state_old.P_.block(31,31,3,3)+=Pincr2;	//p_vw
 
 				measurements->poseFilter_.initialize(state_old.p_,state_old.v_,state_old.q_,state_old.b_w_,state_old.b_a_,L_buff,q_wvbuff,state_old.P_,state_old.w_m_,state_old.a_m_,Eigen::Matrix<double,3,1>(0, 0, 9.81),state_old.q_ci_,state_old.p_ic_,state_old.q_mi_,state_old.p_ig_,p_wvbuff,state_old.alpha_,state_old.beta_);
 				INITsequence_++;
@@ -681,9 +681,9 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 
 			ROS_WARN_STREAM("trying to switch to vision only after " << INITsequence_ << " measurements");
 
-			if(poscorrect.norm()<0.5)	// pos jump must be <0.5m
+			if(fabs(poscorrect[2])<0.5)	// pos jump must be <0.5m in z (ignore x,y, because of GPS drift, z comes from pressure sensor
 			{
-				ROS_WARN_STREAM("switching to vision only... (pos correction: " << poscorrect.norm() << " [m])");
+				ROS_WARN_STREAM("switching to vision only... (z correction: " << fabs(poscorrect[2]) << " [m])");
 				INITsequence_=INIT_ROUNDS;
 			}
 			else
