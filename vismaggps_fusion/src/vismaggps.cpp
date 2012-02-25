@@ -100,6 +100,7 @@ void VisMagGPSHandler::noiseConfig(sensor_fusion_core::Sensor_Fusion_CoreConfig&
 		GPSBuff_.clear();
 		PTAMwatch_ = 0;
 		INITsequence_ = -1;
+		ptamautoinit_=false;
 	}
 	this->n_zvq_ = config.meas_noise1;
 	this->n_zvp_ = config.meas_noise2;
@@ -174,7 +175,6 @@ void VisMagGPSHandler::magCallback(const geometry_msgs::Vector3StampedConstPtr &
 
 void VisMagGPSHandler::gpsCallback(const vismaggps_fusion::GpsCustomCartesianConstPtr & msg)
 {
-	static bool ptamautoinit=false;
 	static double samesame=0;
 	if(samesame==msg->position.x)
 		return;	//EARLY ABORT no new measurement
@@ -234,19 +234,19 @@ void VisMagGPSHandler::gpsCallback(const vismaggps_fusion::GpsCustomCartesianCon
 		}
 
 		// activate/deactivate PTAM autoinit if above 4m or below 2m
-		if ((state_old.p_(2)>4) && !ptamautoinit)
+		if ((state_old.p_(2)>4) && !ptamautoinit_)
 		{
 			std::string cmd = "rosparam set " + namespace_ + "/ptam/AutoInit true";
 			ROS_WARN_STREAM("executing: " << cmd);
 			std::string answer = sys_exec(cmd.c_str());
-			ptamautoinit=true;
+			ptamautoinit_=true;
 		}
-		else if ((state_old.p_(2)<2) && ptamautoinit)
+		else if ((state_old.p_(2)<2) && ptamautoinit_)
 		{
 			std::string cmd = "rosparam set " + namespace_ + "/ptam/AutoInit false";
 			ROS_WARN_STREAM("executing: " << cmd);
 			std::string answer = sys_exec(cmd.c_str());
-			ptamautoinit=false;
+			ptamautoinit_=false;
 		}
 
 		Eigen::Matrix<double,3,3> C_mi = state_old.q_mi_.conjugate().toRotationMatrix();
@@ -520,11 +520,11 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 				meancount=0;
 				PTAMwatch_=0;	// PTAM is running...good
 
-				Eigen::Matrix<double,3,3> Pincr1 = (Eigen::Matrix<double,3,1>::Constant(1)).asDiagonal(); // q_vw
+				Eigen::Matrix<double,3,3> Pincr1 = (Eigen::Matrix<double,3,1>::Constant(0.2)).asDiagonal(); // q_vw
 				Eigen::Matrix<double,3,3> Pincr2 = (Eigen::Matrix<double,3,1>::Constant((z_gp_-z_vp_/state_old.L_).norm())).asDiagonal(); //p_vw
-//				state_old.P_(15,15)+=state_old.L_/2.0;	//scale
-//				state_old.P_.block(16,16,3,3)+=Pincr1;	//q_vw
-//				state_old.P_.block(31,31,3,3)+=Pincr2;	//p_vw
+				state_old.P_(15,15)+=state_old.L_/2.0;	//scale
+				state_old.P_.block(16,16,3,3)+=Pincr1;	//q_vw
+				state_old.P_.block(31,31,3,3)+=Pincr2;	//p_vw
 
 				measurements->poseFilter_.initialize(state_old.p_,state_old.v_,state_old.q_,state_old.b_w_,state_old.b_a_,L_buff,q_wvbuff,state_old.P_,state_old.w_m_,state_old.a_m_,Eigen::Matrix<double,3,1>(0, 0, 9.81),state_old.q_ci_,state_old.p_ic_,state_old.q_mi_,state_old.p_ig_,p_wvbuff,state_old.alpha_,state_old.beta_);
 				INITsequence_++;
@@ -544,6 +544,23 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 	}
 
 	PTAMwatch_=0;	// PTAM is running...good
+
+
+	// activate/deactivate PTAM autoinit if above 4m or below 2m
+	if ((state_old.p_(2)>4) && !ptamautoinit_)
+	{
+		std::string cmd = "rosparam set " + namespace_ + "/ptam/AutoInit true";
+		ROS_WARN_STREAM("executing: " << cmd);
+		std::string answer = sys_exec(cmd.c_str());
+		ptamautoinit_=true;
+	}
+	else if ((state_old.p_(2)<2) && ptamautoinit_)
+	{
+		std::string cmd = "rosparam set " + namespace_ + "/ptam/AutoInit false";
+		ROS_WARN_STREAM("executing: " << cmd);
+		std::string answer = sys_exec(cmd.c_str());
+		ptamautoinit_=false;
+	}
 
 	Sensor_Fusion_Core::MatrixXSd H_old = Eigen::Matrix<double,nVisMeas_,nState_>::Constant(0);
 	Eigen::VectorXd r_old(nVisMeas_);

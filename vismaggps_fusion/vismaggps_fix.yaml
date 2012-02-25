@@ -24,4 +24,4 @@ meas_noise6: 1.0
 meas_noise7: 1.0
 meas_noise8: 1.0
 
-data_playback: True
+data_playback: False
