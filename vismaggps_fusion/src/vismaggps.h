@@ -86,7 +86,8 @@ class VisMagGPSHandler: public MeasurementHandler
 	ros::Subscriber subGPSMeas_;
 	void subscribe();
 
-	std::string sys_exec(const char* cmd);
+	std::string sysExec(const std::string & cmd);
+	bool setDynParam(const std::string & param_string);
 	std::string namespace_;
 
 	ros::Publisher pubStatus_;

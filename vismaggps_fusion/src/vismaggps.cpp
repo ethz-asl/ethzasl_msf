@@ -23,18 +23,33 @@
 #define INIT_ROUNDS 200	// number of GPS readings together with vision measurement to ensure state convergence
 #define CAM_RATE 0.033 // camera framerate: used to determine closest GPS/Mag measurement to cam measurement
 
-std::string VisMagGPSHandler::sys_exec(const char* cmd) {
-    FILE* pipe = popen(cmd, "r");
-    if (!pipe) return "ERROR";
-    char buffer[128];
-    std::string result = "";
-    while(!feof(pipe)) {
-        if(fgets(buffer, 128, pipe) != NULL)
-                result += buffer;
-    }
-    pclose(pipe);
-    return result;
+std::string VisMagGPSHandler::sysExec(const std::string & cmd)
+{
+  FILE* pipe = popen(cmd.c_str(), "r");
+  if (!pipe)
+    return "ERROR";
+  char buffer[128];
+  std::string result = "";
+  while (!feof(pipe))
+  {
+    if (fgets(buffer, 128, pipe) != NULL)
+      result += buffer;
+  }
+  pclose(pipe);
+  return result;
 }
+
+bool VisMagGPSHandler::setDynParam(const std::string & param_string)
+{
+  std::string ret = sysExec(std::string("rosrun dynamic_reconfigure dynparam set --timeout=2 " + param_string));
+  if (ret == "")
+    ROS_INFO_STREAM("SUCCESS: reconfigure call for \""<< param_string <<"\"");
+  else
+    ROS_ERROR_STREAM("ERROR: reconfigure call for "<<param_string <<" failed: "<<ret);
+
+  return ret == "";
+}
+
 
 
 void VisMagGPSHandler::subscribe(){
@@ -236,16 +251,12 @@ void VisMagGPSHandler::gpsCallback(const vismaggps_fusion::GpsCustomCartesianCon
 		// activate/deactivate PTAM autoinit if above 4m or below 2m
 		if ((state_old.p_(2)>4) && !ptamautoinit_)
 		{
-			std::string cmd = "rosparam set " + namespace_ + "/ptam/AutoInit true";
-			ROS_WARN_STREAM("executing: " << cmd);
-			std::string answer = sys_exec(cmd.c_str());
+			setDynParam("ptam \"{'AutoInit':true}\"");
 			ptamautoinit_=true;
 		}
 		else if ((state_old.p_(2)<2) && ptamautoinit_)
 		{
-			std::string cmd = "rosparam set " + namespace_ + "/ptam/AutoInit false";
-			ROS_WARN_STREAM("executing: " << cmd);
-			std::string answer = sys_exec(cmd.c_str());
+			setDynParam("ptam \"{'AutoInit':false}\"");
 			ptamautoinit_=false;
 		}
 
@@ -545,20 +556,15 @@ void VisMagGPSHandler::visionCallback(const geometry_msgs::PoseWithCovarianceSta
 
 	PTAMwatch_=0;	// PTAM is running...good
 
-
 	// activate/deactivate PTAM autoinit if above 4m or below 2m
 	if ((state_old.p_(2)>4) && !ptamautoinit_)
 	{
-		std::string cmd = "rosparam set " + namespace_ + "/ptam/AutoInit true";
-		ROS_WARN_STREAM("executing: " << cmd);
-		std::string answer = sys_exec(cmd.c_str());
+		setDynParam("ptam \"{'AutoInit':true}\"");
 		ptamautoinit_=true;
 	}
 	else if ((state_old.p_(2)<2) && ptamautoinit_)
 	{
-		std::string cmd = "rosparam set " + namespace_ + "/ptam/AutoInit false";
-		ROS_WARN_STREAM("executing: " << cmd);
-		std::string answer = sys_exec(cmd.c_str());
+		setDynParam("ptam \"{'AutoInit':false}\"");
 		ptamautoinit_=false;
 	}
 
