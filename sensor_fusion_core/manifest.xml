@@ -11,7 +11,8 @@
   <depend package="roscpp"/>
   <depend package="sensor_msgs"/>
   <depend package="dynamic_reconfigure"/>
-  <depend package="eigen"/>
+
+  <rosdep name="eigen"/>
 
   <export>
     <cpp cflags="-I${prefix}/include -I${prefix}/cfg/cpp" lflags="-L${prefix}/lib -lsensor_fusion_core" />
