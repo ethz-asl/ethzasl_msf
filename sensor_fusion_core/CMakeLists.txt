@@ -24,6 +24,11 @@ rosbuild_genmsg()
 
 add_definitions (-Wall)
 
+
+# get eigen
+find_package(Eigen REQUIRED)
+include_directories(${Eigen_INCLUDE_DIRS})
+
 #common commands for building c++ executables and libraries
 rosbuild_add_library(sensor_fusion_core src/Sensor_Fusion_Core.cpp src/measurement.cpp)
 rosbuild_add_compile_flags(sensor_fusion_core "-O3")
