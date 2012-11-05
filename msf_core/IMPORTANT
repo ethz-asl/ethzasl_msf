@@ -1,0 +1,7 @@
+Note on ssf_core and pcl from ROS:
+- When pcl libraries used with ssf_core the EKF update yields NaNs
+
+possible reason: pcl libraries conflict with Eigen (overwriting symbols,
+definitions, functions,...??). This yields wierd values in Eigen 
+calculations and eventually to NaNs, INFs etc
+

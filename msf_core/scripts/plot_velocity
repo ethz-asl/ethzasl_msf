@@ -1,0 +1,13 @@
+#!/bin/bash
+
+if [ -n "$1" ]
+then
+T=$1
+else
+T=20
+fi
+
+echo " ### plotting velocities x y z [m/s] ###"
+echo " ### buffer = " $T "sec"
+
+rxplot ssf_core/state_out/data[3]:data[4]:data[5] -b $T -t "velocity" -l x,y,z 
