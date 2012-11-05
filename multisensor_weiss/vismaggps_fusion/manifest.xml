@@ -1,0 +1,17 @@
+<package>
+  <description brief="vismaggps_fusion">
+
+     vismaggps_fusion
+
+  </description>
+  <author>sweiss</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/vismaggps_fusion</url>
+  <depend package="roscpp"/>
+  <depend package="sensor_fusion_core"/>
+  <depend package="geometry_msgs"/>
+
+</package>
+
+
