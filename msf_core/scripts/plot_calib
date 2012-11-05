@@ -1,0 +1,16 @@
+#!/bin/bash
+
+if [ -n "$1" ]
+then
+T=$1
+else
+T=20
+fi
+
+echo " ### plotting attitude q_ii w x y z [quat] ###"
+echo " ### plotting translation p_ic x y z [m] ###"
+echo " ### buffer = " $T "sec"
+
+rxplot ssf_core/state_out/data[21]:data[22]:data[23]:data[24]  ssf_core/state_out/data[25]:data[26]:data[27] -b $T -t "attitude q_ic & translation p_ic" -l qw,qx,qy,qz,tx,ty,tz 
+
+

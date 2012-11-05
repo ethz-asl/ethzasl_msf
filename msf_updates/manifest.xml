@@ -1,0 +1,19 @@
+<package>
+  <description brief="msf_updates">
+
+     Single Sensor Fusion (SSF) framework containing the update sensor modules
+
+  </description>
+  <author>Stephan Weiss, Markus Achtelik</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes="under active development"/>
+  <url>http://ros.org/wiki/ethzasl_sensor_fusion/ssf_updates</url>
+  <depend package="roscpp"/>
+  <depend package="msf_core"/>
+  <depend package="geometry_msgs"/>
+  
+  <depend package="asctec_hl_comm"/>
+
+</package>
+
+
