@@ -11,6 +11,27 @@
 #include <msf_core/msf_fwd.hpp>
 #include <boost/lexical_cast.hpp>
 
+#include <Eigen/Dense>
+#include <sstream>
+#include <iostream>
+
+#define FUSION_MAX_VECTOR_SIZE 20 //maximum number of statevariables (can be set to a larger value)
+
+#include <boost/preprocessor/punctuation/comma.hpp>
+#include <boost/fusion/include/vector.hpp>
+#include <boost/fusion/include/vector_fwd.hpp>
+#include <boost/fusion/include/size.hpp>
+#include <boost/fusion/include/at_c.hpp>
+#include <boost/fusion/include/at.hpp>
+#include <boost/static_assert.hpp>
+#include <boost/fusion/include/for_each.hpp>
+#include <boost/fusion/include/equal_to.hpp>
+#include <boost/fusion/include/begin.hpp>
+#include <boost/fusion/include/end.hpp>
+#include <boost/fusion/include/next.hpp>
+#include <boost/mpl/bool.hpp>
+#include <boost/fusion/include/at_key.hpp>
+
 //this namespace contains some metaprogramming tools
 namespace msf_tmp{
 
@@ -123,6 +144,7 @@ struct CheckStateIndexing<Sequence, First, Last, CurrentIdx, false>{
 
 	};
 private:
+	//Error the ordering in the enum defining the names of the states is not the same ordering as in the type vector for the states
 	BOOST_STATIC_ASSERT_MSG(indexingerrors==0, "Error the ordering in the enum defining the names of the states is not the same ordering as in the type vector for the states");
 };
 //}
