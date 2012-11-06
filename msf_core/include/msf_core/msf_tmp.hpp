@@ -177,7 +177,7 @@ struct ComputeStartIndex<Sequence, StateVarT, OffsetCalculator, First, Last, fal
 
 	enum{//the length of the current state plus the tail of the list
 		value =  CurrentVal + ComputeStartIndex<Sequence, StateVarT, OffsetCalculator, Next, Last, SameType<currentType, constRefLookupType>::value,
-		 OffsetCalculator<currentType>::value, SameType<First, Last>::value>::value
+		OffsetCalculator<currentType>::value, SameType<First, Last>::value>::value
 	};
 };
 //}
@@ -294,8 +294,8 @@ struct EKFState_T{
 
 	//returns the state at position INDEX in the state list
 	template<int INDEX>
-	inline typename boost::fusion::result_of::at<state_T, boost::mpl::int_<INDEX> >::type::state_T& get(){
-		return boost::fusion::result_of::at<state_T, boost::mpl::int_<INDEX> >::type::state_;
+	typename boost::fusion::result_of::at_c<state_T, INDEX >::type get(){
+		return boost::fusion::at<boost::mpl::int_<INDEX> >(statevars_);
 	}
 };
 

@@ -33,4 +33,9 @@ include_directories(${Eigen_INCLUDE_DIRS})
 ##rosbuild_add_library(msf_core src/MSF_Core.cpp src/measurement.cpp src/state.cpp)
 ##rosbuild_add_compile_flags(msf_core "-O3")
 
-rosbuild_add_executable(teststaticstatelist src/teststaticstatelist.cc)
+rosbuild_add_executable(staticstatelist src/teststaticstatelist.cc)
+rosbuild_add_gtest_build_flags(staticstatelist)
+
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+rosbuild_add_gtest(test_staticstatelist src/teststaticstatelist.cc)
+rosbuild_link_boost(test_staticstatelist thread)
