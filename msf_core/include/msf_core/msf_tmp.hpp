@@ -17,15 +17,30 @@ namespace msf_tmp{
 template<typename T> struct echoStateVarType;
 template<int NAME> struct echoStateVarType<const StateVar_T<Eigen::Vector3d, NAME>&>{
 	static std::string value(){
-		return "Eigen::Vector3d";
+		return "const ref Eigen::Vector3d";
 	}
 };
 template<int NAME> struct echoStateVarType<const StateVar_T<Eigen::Quaterniond, NAME>&>{
 	static std::string value(){
-		return "Eigen::Quaterniond";
+		return "const ref Eigen::Quaterniond";
 	}
 };
 template<int NAME> struct echoStateVarType<const StateVar_T<double, NAME>&>{
+	static std::string value(){
+		return "const ref double";
+	}
+};
+template<int NAME> struct echoStateVarType<StateVar_T<Eigen::Vector3d, NAME> >{
+	static std::string value(){
+		return "Eigen::Vector3d";
+	}
+};
+template<int NAME> struct echoStateVarType<StateVar_T<Eigen::Quaterniond, NAME> >{
+	static std::string value(){
+		return "Eigen::Quaterniond";
+	}
+};
+template<int NAME> struct echoStateVarType<StateVar_T<double, NAME> >{
 	static std::string value(){
 		return "double";
 	}
@@ -207,36 +222,36 @@ struct applycorrection
 	template<int NAME>
 	void operator()(StateVar_T<Eigen::Vector3d, NAME>& t) const{
 		typedef StateVar_T<Eigen::Vector3d, NAME> var_T;
-		std::cout<<"called correction for state "<<NAME<<std::endl;
+		std::cout<<"called correction for state "<<NAME<<" of type "<<msf_tmp::echoStateVarType<var_T>::value()<<std::endl;
 		//get index of the data in the correction vector
-		int idxstartcorr = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::CorrectionStateLengthForType>::value;
-		std::cout<<"startindex in correction vector "<<idxstartcorr<<std::endl;
+		static const int  idxstartcorr = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::CorrectionStateLengthForType>::value;
+		std::cout<<"startindex in correction: "<<idxstartcorr<< " size in correction: "<<var_T::sizeInCorrection_<<std::endl;
 
-		int idxstartstate = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::StateLengthForType>::value;
-		std::cout<<"startindex in state vector "<<idxstartstate<<std::endl;
+		static const int  idxstartstate = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::StateLengthForType>::value;
+		std::cout<<"startindex in state: "<<idxstartstate<<" size in state: "<<var_T::sizeInState_<<std::endl;
 
 	}
 	template<int NAME>
 	void operator()(StateVar_T<Eigen::Quaterniond, NAME>& t) const{
 		typedef StateVar_T<Eigen::Quaterniond, NAME> var_T;
-		std::cout<<"called correction for state "<<NAME<<std::endl;
+		std::cout<<"called correction for state "<<NAME<<" of type "<<msf_tmp::echoStateVarType<var_T>::value()<<std::endl;
 		//get index of the data in the correction vector
-		int idxstartcorr = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::CorrectionStateLengthForType>::value;
-		std::cout<<"startindex in correction vector "<<idxstartcorr<<std::endl;
+		static const int idxstartcorr = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::CorrectionStateLengthForType>::value;
+		std::cout<<"startindex in correction: "<<idxstartcorr<< " size in correction: "<<var_T::sizeInCorrection_<<std::endl;
 
-		int idxstartstate = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::StateLengthForType>::value;
-		std::cout<<"startindex in state vector "<<idxstartstate<<std::endl;
+		static const int idxstartstate = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::StateLengthForType>::value;
+		std::cout<<"startindex in state: "<<idxstartstate<<" size in state: "<<var_T::sizeInState_<<std::endl;
 	}
 	template<int NAME>
 	void operator()(StateVar_T<double, NAME>& t) const{
 		typedef StateVar_T<double, NAME> var_T;
-		std::cout<<"called correction for state "<<NAME<<std::endl;
+		std::cout<<"called correction for state "<<NAME<<" of type "<<msf_tmp::echoStateVarType<var_T>::value()<<std::endl;
 		//get index of the data in the correction vector
-		int idxstartcorr = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::CorrectionStateLengthForType>::value;
-		std::cout<<"startindex in correction vector "<<idxstartcorr<<std::endl;
+		static const int idxstartcorr = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::CorrectionStateLengthForType>::value;
+		std::cout<<"startindex in correction: "<<idxstartcorr<< " size in correction: "<<var_T::sizeInCorrection_<<std::endl;
 
-		int idxstartstate = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::StateLengthForType>::value;
-		std::cout<<"startindex in state vector "<<idxstartstate<<std::endl;
+		static const int idxstartstate = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::StateLengthForType>::value;
+		std::cout<<"startindex in state: "<<idxstartstate<<" size in state: "<<var_T::sizeInState_<<std::endl;
 	}
 private:
 	T& data_;
