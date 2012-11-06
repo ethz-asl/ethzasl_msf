@@ -7,7 +7,7 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 #  Release        : w/o debug symbols, w/ optimization
 #  RelWithDebInfo : w/ debug symbols, w/ optimization
 #  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
-#set(ROS_BUILD_TYPE RelWithDebInfo)
+set(ROS_BUILD_TYPE Debug)
 
 rosbuild_init()
 
@@ -17,10 +17,11 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 # Generate dynamic parameters
-rosbuild_find_ros_package(dynamic_reconfigure)
-include(${dynamic_reconfigure_PACKAGE_PATH}/cmake/cfgbuild.cmake)
-gencfg()
-rosbuild_genmsg()
+
+##rosbuild_find_ros_package(dynamic_reconfigure)
+##include(${dynamic_reconfigure_PACKAGE_PATH}/cmake/cfgbuild.cmake)
+##gencfg()
+##rosbuild_genmsg()
 
 add_definitions (-Wall)
 
@@ -29,7 +30,7 @@ find_package(Eigen REQUIRED)
 include_directories(${Eigen_INCLUDE_DIRS})
 
 #common commands for building c++ executables and libraries
-rosbuild_add_library(msf_core src/MSF_Core.cpp src/measurement.cpp src/state.cpp)
-rosbuild_add_compile_flags(msf_core "-O3")
+##rosbuild_add_library(msf_core src/MSF_Core.cpp src/measurement.cpp src/state.cpp)
+##rosbuild_add_compile_flags(msf_core "-O3")
 
 rosbuild_add_executable(teststaticstatelist src/teststaticstatelist.cc)
