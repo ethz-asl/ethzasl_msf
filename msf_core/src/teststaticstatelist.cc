@@ -38,23 +38,38 @@
 #include <boost/fusion/include/end.hpp>
 #include <boost/fusion/include/next.hpp>
 #include <boost/mpl/bool.hpp>
+#include <boost/fusion/include/at_key.hpp>
+
 
 using namespace Loki::TL;
 
-//a state variable with a name as specified in the state name enum
+//fwd decl of state variable with a name as specified in the state name enum
 template<typename type_T, int name_T>
-struct StateVar_T{
-	typedef type_T state_T;
-	enum{
-		name_ = name_T
-	};
-	state_T state_;
-};
+struct StateVar_T;
 
 //some tmp tools
 namespace msf_tmp{
 
+//runtime output of stateVariable Types
+template<typename T> struct echoStateVarType;
+template<int NAME> struct echoStateVarType<const StateVar_T<Eigen::Vector3d, NAME>&>{
+	static std::string value(){
+		return "Eigen::Vector3d";
+	}
+};
+template<int NAME> struct echoStateVarType<const StateVar_T<Eigen::Quaterniond, NAME>&>{
+	static std::string value(){
+		return "Eigen::Quaterniond";
+	}
+};
+template<int NAME> struct echoStateVarType<const StateVar_T<double, NAME>&>{
+	static std::string value(){
+		return "double";
+	}
+};
+
 namespace{//hide these
+
 template <typename T, typename U> struct SameType{enum { value = false };};
 template <typename T> struct SameType<T,T>{enum { value = true };};
 
@@ -90,49 +105,136 @@ template<> struct StateLengthForType<const mpl_::void_&>{
 	enum{value = 0};
 };
 
-template <typename Sequence, typename First, typename Last, bool T>
-struct countCorrectionStatesLinear;
-template <typename Sequence, typename First, typename Last>
-struct countCorrectionStatesLinear<Sequence, First, Last, true>{
+//return the number a state has in the enum
+template<typename T>
+struct getEnumStateName;
+template<typename U,int NAME> struct getEnumStateName<const StateVar_T<U, NAME>& >{
+	enum{value = NAME};
+};
+template<> struct getEnumStateName<const mpl_::void_&>{
+	enum{value = -1};
+};
+
+template <typename Sequence,  template<typename> class Counter, typename First, typename Last, bool T>
+struct countStatesLinear;
+template <typename Sequence,  template<typename> class Counter, typename First, typename Last>
+struct countStatesLinear<Sequence, Counter, First, Last, true>{
 	enum{//the end does not add entries
 		value = 0
 	};
 };
-
-template <class U> struct ReferenceTraits
-{
-	enum { result = false };
-	typedef U ReferredType;
-};
-
-template <class U> struct ReferenceTraits<U&>
-{
-	enum { result = true };
-	typedef U ReferredType;
-};
-
-template <typename Sequence, typename First, typename Last>
-struct countCorrectionStatesLinear<Sequence, First, Last, false>{
+template <typename Sequence, template<typename> class Counter, typename First, typename Last>
+struct countStatesLinear<Sequence, Counter, First, Last, false>{
 	typedef typename boost::fusion::result_of::next<First>::type Next;
 	typedef typename  boost::fusion::result_of::deref<First>::type current_Type;
 	enum{//the length of the current state plus the tail of the list
-		value = CorrectionStateLengthForType<current_Type>::value +
-		countCorrectionStatesLinear<Sequence, Next, Last, SameType<First, Last>::value>::value
+		value = Counter<current_Type>::value +
+		countStatesLinear<Sequence, Counter, Next, Last, SameType<First, Last>::value>::value
 	};
 };
-}
 
+
+
+template <typename Sequence, typename First, typename Last, int CurrentIdx, bool T>
+struct CheckStateIndexing;
+template <typename Sequence, typename First, typename Last, int CurrentIdx>
+struct CheckStateIndexing<Sequence, First, Last, CurrentIdx, true>{
+	enum{//no index no name, no indexing errors
+		indexingerrors = 0
+	};
+};
+template <typename Sequence, typename First, typename Last, int CurrentIdx>
+struct CheckStateIndexing<Sequence, First, Last, CurrentIdx, false>{
+	typedef typename boost::fusion::result_of::next<First>::type Next;
+	typedef typename  boost::fusion::result_of::deref<First>::type current_Type;
+	enum{//the length of the current state plus the tail of the list
+		idxInEnum = boost::mpl::if_c<getEnumStateName<current_Type>::value != -1, //only evaluate if not at the end of the list
+		boost::mpl::int_<getEnumStateName<current_Type>::value>, //if we're not at the end of the list, use the calculated enum index
+		boost::mpl::int_<CurrentIdx> >::type::value, //else use the current index, so the assertion doesn't fail
+
+		idxInState = CurrentIdx,
+
+		indexingerrors = boost::mpl::if_c<idxInEnum == idxInState, boost::mpl::int_<0>, boost::mpl::int_<1> >::type::value + //error here and errors of other states
+		CheckStateIndexing<Sequence, Next, Last, CurrentIdx + 1, SameType<First, Last>::value>::indexingerrors
+
+	};
+private:
+	BOOST_STATIC_ASSERT_MSG(indexingerrors==0, "Error the ordering in the enum defining the names of the states is not the same ordering as in the type vector for the states");
+};
+
+} //end anonymous namespace
+
+
+//checks whether the ordering in the vector is the same as in the enum,
+//which is something that strictly must not change
 template<typename Sequence>
-struct CountCorrectionStates{
+struct CheckCorrectIndexing{
 	typedef typename boost::fusion::result_of::begin<Sequence const>::type First;
 	typedef typename boost::fusion::result_of::end<Sequence const>::type Last;
 	enum{
-		value = countCorrectionStatesLinear<Sequence, First, Last, SameType<First, Last>::value>::value
+		startindex = 0, //must not change
+		indexingerrors = CheckStateIndexing<Sequence, First, Last, startindex, SameType<First, Last>::value>::indexingerrors
 	};
 };
 
+//returns the number of doubles in the state/correction state depending on the counter type supplied
+template<typename Sequence,  template<typename> class Counter>
+struct CountStates{
+	typedef typename boost::fusion::result_of::begin<Sequence const>::type First;
+	typedef typename boost::fusion::result_of::end<Sequence const>::type Last;
+	enum{
+		value = countStatesLinear<Sequence, Counter, First, Last, SameType<First, Last>::value>::value
+		+ CheckCorrectIndexing<Sequence>::indexingerrors //will be zero, if no indexing errors, otherwise fails compilation
+	};
+};
+
+
+//compute start indices in the correction/state vector of a given type
+template <typename Sequence, typename StateVarT, template<typename> class OffsetCalculator,
+typename First, typename Last, bool TypeFound, int CurrentVal, bool EndOfList>
+struct ComputeStartIndex;
+template <typename Sequence,  typename StateVarT, template<typename> class OffsetCalculator,
+typename First, typename Last, int CurrentVal>
+struct ComputeStartIndex<Sequence, StateVarT, OffsetCalculator, First, Last, false, CurrentVal, true>{
+	enum{//return error code if end of list reached and type not found
+		value = -1
+	};
+};
+template <typename Sequence,  typename StateVarT, template<typename> class OffsetCalculator,
+typename First, typename Last, bool TypeFound, int CurrentVal>
+struct ComputeStartIndex<Sequence, StateVarT, OffsetCalculator, First, Last, TypeFound, CurrentVal, false>{
+	enum{//we found the type, do not add additional offset
+		value = 0
+	};
+};
+template <typename Sequence, typename StateVarT, template<typename> class OffsetCalculator,
+typename First, typename Last, int CurrentVal>
+struct ComputeStartIndex<Sequence, StateVarT, OffsetCalculator, First, Last, false, CurrentVal, false>{
+	typedef typename boost::fusion::result_of::next<First>::type Next;
+	typedef typename  boost::fusion::result_of::deref<First>::type currentType;
+	typedef const StateVarT& constRefLookupType;
+
+	enum{//the length of the current state plus the tail of the list
+		value = CurrentVal + ComputeStartIndex<Sequence, StateVarT, OffsetCalculator, Next, Last, SameType<currentType, constRefLookupType>::value,
+		CurrentVal + OffsetCalculator<currentType>::value, SameType<First, Last>::value>::value
+	};
+};
+
+template<typename Sequence, typename StateVarT, template<typename> class Counter>
+struct getStartIndex{
+	typedef typename boost::fusion::result_of::begin<Sequence const>::type First;
+	typedef typename boost::fusion::result_of::end<Sequence const>::type Last;
+	typedef typename  boost::fusion::result_of::deref<First>::type currentType;
+	typedef const StateVarT& constRefLookupType;
+	enum{
+		value = ComputeStartIndex<Sequence, StateVarT, Counter, First, Last, SameType<constRefLookupType, currentType>::value, 0, SameType<First, Last>::value>::value
+	};
+};
+
+
+
 //overloaded for all state types to apply corrections
-template<typename T>
+template<typename T, typename stateList_T>
 struct applycorrection
 {
 	applycorrection(T& correction):data_(correction){
@@ -140,46 +242,74 @@ struct applycorrection
 	}
 	template<int NAME>
 	void operator()(StateVar_T<Eigen::Vector3d, NAME>& t) const{
-		//TODO get index of the data in the correction vector
-		std::cout<<"called correct for Vector3d"<<data_.transpose()<<std::endl;
-		//		std::cout<<"value "<<t.state_<<std::endl;
+		typedef StateVar_T<Eigen::Vector3d, NAME> var_T;
+		std::cout<<"called correction for state "<<NAME<<std::endl;
+		//get index of the data in the correction vector
+		int idxstartcorr = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::CorrectionStateLengthForType>::value;
+		std::cout<<"startindex in correction vector "<<idxstartcorr<<std::endl;
+
+		int idxstartstate = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::StateLengthForType>::value;
+		std::cout<<"startindex in state vector "<<idxstartstate<<std::endl;
+
 	}
 	template<int NAME>
 	void operator()(StateVar_T<Eigen::Quaterniond, NAME>& t) const{
-		std::cout<<"called correct for Quaterniond"<<data_.transpose()<<std::endl;
-		//		std::cout<<"value "<<t.state_<<std::endl;
+		typedef StateVar_T<Eigen::Quaterniond, NAME> var_T;
+		std::cout<<"called correction for state "<<NAME<<std::endl;
+		//get index of the data in the correction vector
+		int idxstartcorr = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::CorrectionStateLengthForType>::value;
+		std::cout<<"startindex in correction vector "<<idxstartcorr<<std::endl;
+
+		int idxstartstate = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::StateLengthForType>::value;
+		std::cout<<"startindex in state vector "<<idxstartstate<<std::endl;
 	}
 	template<int NAME>
 	void operator()(StateVar_T<double, NAME>& t) const{
-		std::cout<<"called correct for double"<<data_.transpose()<<std::endl;
-		//		std::cout<<"value "<<t.state_<<std::endl;
+		typedef StateVar_T<double, NAME> var_T;
+		std::cout<<"called correction for state "<<NAME<<std::endl;
+		//get index of the data in the correction vector
+		int idxstartcorr = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::CorrectionStateLengthForType>::value;
+		std::cout<<"startindex in correction vector "<<idxstartcorr<<std::endl;
+
+		int idxstartstate = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::StateLengthForType>::value;
+		std::cout<<"startindex in state vector "<<idxstartstate<<std::endl;
 	}
 private:
 	T& data_;
 };
-
 }
+
+//a state variable with a name as specified in the state name enum
+template<typename type_T, int name_T>
+struct StateVar_T{
+	typedef type_T state_T;
+	typedef const StateVar_T<type_T, name_T>& constRef_T;
+	typedef const StateVar_T<type_T, name_T>* constPtr_T;
+	typedef StateVar_T<type_T, name_T>& Ref_T;
+	typedef StateVar_T<type_T, name_T>* Ptr_T;
+	enum{
+		name_ = name_T,
+		sizeInCorrection_ = msf_tmp::CorrectionStateLengthForType<const StateVar_T<type_T, name_T>&>::value,
+		sizeInState_ = msf_tmp::StateLengthForType<const StateVar_T<type_T, name_T>&>::value
+	};
+	state_T state_;
+};
 
 template<typename stateVector_T>
 struct EKFState_T{
 	typedef stateVector_T state_T;
-	stateVector_T states_;
+	stateVector_T statevars_;
 	enum{
-		nstates_ = boost::fusion::result_of::size<state_T>::type::value, //n all states
-		ncorrectionstates_ = msf_tmp::CountCorrectionStates<state_T>::value //n correction states
+		nstatevars_ = boost::fusion::result_of::size<state_T>::type::value, //n all states
+		ncorrectionstates_ = msf_tmp::CountStates<state_T, msf_tmp::CorrectionStateLengthForType>::value, //n correction states
+		nstates_ = msf_tmp::CountStates<state_T, msf_tmp::StateLengthForType>::value //n correction states
 	};
 
 	//apply the correction vector to all state vars
 	void correct(const Eigen::Matrix<double, ncorrectionstates_, 1>& correction) {
-		boost::fusion::for_each(states_, msf_tmp::applycorrection<const Eigen::Matrix<double, ncorrectionstates_, 1> >(correction));
-	}
-
-	//checks whether the ordering in the vector is the same as in the enum,
-	//which is something that strictly must not change
-	template<int INDEX>
-	void checkname(){
-		BOOST_STATIC_ASSERT((INDEX ==
-				boost::fusion::result_of::at<state_T, boost::mpl::int_<INDEX> >::type::name_));
+		boost::fusion::for_each(
+				statevars_,
+				msf_tmp::applycorrection<const Eigen::Matrix<double, ncorrectionstates_, 1>, state_T >(correction));
 	}
 
 	//returns the state at position INDEX in the state list
@@ -192,7 +322,7 @@ struct EKFState_T{
 
 int main(int argc, char** argv)
 {
-	enum{
+	enum{ //must not manually set the enum values!
 		p_ci,
 		q_ci,
 		q_wv,
@@ -200,10 +330,10 @@ int main(int argc, char** argv)
 	};
 
 	//setup core state
-
 	typedef boost::fusion::vector<
 			StateVar_T<Eigen::Vector3d, p_ci >,
 			StateVar_T<Eigen::Quaterniond, q_ci >,
+			StateVar_T<Eigen::Quaterniond, q_wv >,
 			StateVar_T<double, L >
 	> coreState_T;
 
@@ -220,6 +350,9 @@ int main(int argc, char** argv)
 	//an instantiation of a state
 	EKFState_T<fullState_T> somestate;
 
+	//number of state variables
+	std::cout<<"nstatevars: "<<EKFState_T<fullState_T>::nstatevars_<<std::endl;
+
 	//number of states
 	std::cout<<"nstates: "<<EKFState_T<fullState_T>::nstates_<<std::endl;
 
@@ -231,9 +364,9 @@ int main(int argc, char** argv)
 	std::cout<<"passing random correction vector"<<std::endl;
 	correction.setRandom();
 	somestate.correct(correction);
-//	std::cout<<"passing random correction vector"<<std::endl;
-//	correction.setRandom();
-//	somestate.correct(correction);
+	//	std::cout<<"passing random correction vector"<<std::endl;
+	//	correction.setRandom();
+	//	somestate.correct(correction);
 
 
 
