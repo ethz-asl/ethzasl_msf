@@ -8,6 +8,8 @@
 #ifndef MSF_STATEDEF_HPP_
 #define MSF_STATEDEF_HPP_
 
+#include <Eigen/Dense>
+
 namespace msf_core{
 namespace{
 
