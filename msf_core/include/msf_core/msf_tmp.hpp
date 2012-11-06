@@ -13,7 +13,7 @@
 //this namespace contains some metaprogramming tools
 namespace msf_tmp{
 
-//runtime output of stateVariable Types
+//runtime output of stateVariable types
 template<typename T> struct echoStateVarType;
 template<int NAME> struct echoStateVarType<const StateVar_T<Eigen::Vector3d, NAME>&>{
 	static std::string value(){
@@ -23,11 +23,6 @@ template<int NAME> struct echoStateVarType<const StateVar_T<Eigen::Vector3d, NAM
 template<int NAME> struct echoStateVarType<const StateVar_T<Eigen::Quaterniond, NAME>&>{
 	static std::string value(){
 		return "const ref Eigen::Quaterniond";
-	}
-};
-template<int NAME> struct echoStateVarType<const StateVar_T<double, NAME>&>{
-	static std::string value(){
-		return "const ref double";
 	}
 };
 template<int NAME> struct echoStateVarType<StateVar_T<Eigen::Vector3d, NAME> >{
@@ -40,11 +35,7 @@ template<int NAME> struct echoStateVarType<StateVar_T<Eigen::Quaterniond, NAME> 
 		return "Eigen::Quaterniond";
 	}
 };
-template<int NAME> struct echoStateVarType<StateVar_T<double, NAME> >{
-	static std::string value(){
-		return "double";
-	}
-};
+
 
 namespace{//hide these
 
@@ -60,9 +51,6 @@ template<int NAME> struct CorrectionStateLengthForType<const StateVar_T<Eigen::V
 template<int NAME> struct CorrectionStateLengthForType<const StateVar_T<Eigen::Quaterniond, NAME>& >{
 	enum{value = 3};
 };
-template<int NAME> struct CorrectionStateLengthForType<const StateVar_T<double, NAME>& >{
-	enum{value = 1};
-};
 template<> struct CorrectionStateLengthForType<const mpl_::void_&>{
 	enum{value = 0};
 };
@@ -75,9 +63,6 @@ template<int NAME> struct StateLengthForType<const StateVar_T<Eigen::Vector3d, N
 };
 template<int NAME> struct StateLengthForType<const StateVar_T<Eigen::Quaterniond, NAME>& >{
 	enum{value = 4};
-};
-template<int NAME> struct StateLengthForType<const StateVar_T<double, NAME>& >{
-	enum{value = 1};
 };
 template<> struct StateLengthForType<const mpl_::void_&>{
 	enum{value = 0};
@@ -112,7 +97,7 @@ struct countStatesLinear<Sequence, Counter, First, Last, false>{
 };
 
 
-
+//helpers for CheckCorrectIndexing call{
 template <typename Sequence, typename First, typename Last, int CurrentIdx, bool T>
 struct CheckStateIndexing;
 template <typename Sequence, typename First, typename Last, int CurrentIdx>
@@ -139,9 +124,10 @@ struct CheckStateIndexing<Sequence, First, Last, CurrentIdx, false>{
 private:
 	BOOST_STATIC_ASSERT_MSG(indexingerrors==0, "Error the ordering in the enum defining the names of the states is not the same ordering as in the type vector for the states");
 };
+//}
 
 
-//compute start indices in the correction/state vector of a given type
+//helper for getStartIndex{
 template <typename Sequence, typename StateVarT, template<typename> class OffsetCalculator,
 typename First, typename Last, bool TypeFound, int CurrentVal, bool EndOfList>
 struct ComputeStartIndex;
@@ -167,11 +153,11 @@ struct ComputeStartIndex<Sequence, StateVarT, OffsetCalculator, First, Last, fal
 	typedef const StateVarT& constRefLookupType;
 
 	enum{//the length of the current state plus the tail of the list
-		value = CurrentVal + ComputeStartIndex<Sequence, StateVarT, OffsetCalculator, Next, Last, SameType<currentType, constRefLookupType>::value,
-		CurrentVal + OffsetCalculator<currentType>::value, SameType<First, Last>::value>::value
+		value =  CurrentVal + ComputeStartIndex<Sequence, StateVarT, OffsetCalculator, Next, Last, SameType<currentType, constRefLookupType>::value,
+		 OffsetCalculator<currentType>::value, SameType<First, Last>::value>::value
 	};
 };
-
+//}
 } //end anonymous namespace
 
 
@@ -187,7 +173,8 @@ struct CheckCorrectIndexing{
 	};
 };
 
-//returns the number of doubles in the state/correction state depending on the counter type supplied
+//returns the number of doubles in the state/correction state
+//depending on the counter type supplied
 template<typename Sequence,  template<typename> class Counter>
 struct CountStates{
 	typedef typename boost::fusion::result_of::begin<Sequence const>::type First;
@@ -198,7 +185,7 @@ struct CountStates{
 	};
 };
 
-
+//compute start indices in the correction/state vector of a given type
 template<typename Sequence, typename StateVarT, template<typename> class Counter>
 struct getStartIndex{
 	typedef typename boost::fusion::result_of::begin<Sequence const>::type First;
@@ -211,8 +198,7 @@ struct getStartIndex{
 	};
 };
 
-
-//overloaded for all state types to apply corrections
+//apply EKF corrections depending on the stateVar type
 template<typename T, typename stateList_T>
 struct applycorrection
 {
@@ -242,24 +228,11 @@ struct applycorrection
 		static const int idxstartstate = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::StateLengthForType>::value;
 		std::cout<<"startindex in state: "<<idxstartstate<<" size in state: "<<var_T::sizeInState_<<std::endl;
 	}
-	template<int NAME>
-	void operator()(StateVar_T<double, NAME>& t) const{
-		typedef StateVar_T<double, NAME> var_T;
-		std::cout<<"called correction for state "<<NAME<<" of type "<<msf_tmp::echoStateVarType<var_T>::value()<<std::endl;
-		//get index of the data in the correction vector
-		static const int idxstartcorr = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::CorrectionStateLengthForType>::value;
-		std::cout<<"startindex in correction: "<<idxstartcorr<< " size in correction: "<<var_T::sizeInCorrection_<<std::endl;
-
-		static const int idxstartstate = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::StateLengthForType>::value;
-		std::cout<<"startindex in state: "<<idxstartstate<<" size in state: "<<var_T::sizeInState_<<std::endl;
-	}
 private:
 	T& data_;
 };
 
 }
-
-
 
 
 //a state variable with a name as specified in the state name enum
@@ -293,7 +266,7 @@ struct EKFState_T{
 		boost::fusion::for_each(
 				statevars_,
 				msf_tmp::applycorrection<const Eigen::Matrix<double, ncorrectionstates_, 1>, state_T >(correction)
-				);
+		);
 	}
 
 	//returns the state at position INDEX in the state list
