@@ -9,15 +9,16 @@
 #define MSF_TMP_HPP_
 
 #include <msf_core/msf_fwd.hpp>
+#include <boost/lexical_cast.hpp>
 
 //this namespace contains some metaprogramming tools
 namespace msf_tmp{
 
 //runtime output of stateVariable types
 template<typename T> struct echoStateVarType;
-template<int NAME> struct echoStateVarType<const StateVar_T<Eigen::Vector3d, NAME>&>{
+template<int NAME, int N> struct echoStateVarType<const StateVar_T<Eigen::Matrix<double, N, 1>, NAME>&>{
 	static std::string value(){
-		return "const ref Eigen::Vector3d";
+		return "const ref Eigen::Matrix<double, "+boost::lexical_cast<std::string>(N)+", 1>";
 	}
 };
 template<int NAME> struct echoStateVarType<const StateVar_T<Eigen::Quaterniond, NAME>&>{
@@ -25,9 +26,9 @@ template<int NAME> struct echoStateVarType<const StateVar_T<Eigen::Quaterniond, 
 		return "const ref Eigen::Quaterniond";
 	}
 };
-template<int NAME> struct echoStateVarType<StateVar_T<Eigen::Vector3d, NAME> >{
+template<int NAME, int N> struct echoStateVarType<StateVar_T<Eigen::Matrix<double, N, 1>, NAME> >{
 	static std::string value(){
-		return "Eigen::Vector3d";
+		return "Eigen::Matrix<double, "+boost::lexical_cast<std::string>(N)+", 1>";
 	}
 };
 template<int NAME> struct echoStateVarType<StateVar_T<Eigen::Quaterniond, NAME> >{
@@ -45,8 +46,8 @@ template <typename T> struct SameType<T,T>{enum { value = true };};
 //the number of entries in the correction vector for a given state var
 template<typename T>
 struct CorrectionStateLengthForType;
-template<int NAME> struct CorrectionStateLengthForType<const StateVar_T<Eigen::Vector3d, NAME>& >{
-	enum{value = 3};
+template<int NAME, int N> struct CorrectionStateLengthForType<const StateVar_T<Eigen::Matrix<double, N, 1>, NAME>& >{
+	enum{value = N};
 };
 template<int NAME> struct CorrectionStateLengthForType<const StateVar_T<Eigen::Quaterniond, NAME>& >{
 	enum{value = 3};
@@ -58,8 +59,8 @@ template<> struct CorrectionStateLengthForType<const mpl_::void_&>{
 //the number of entries in the state for a given state var
 template<typename T>
 struct StateLengthForType;
-template<int NAME> struct StateLengthForType<const StateVar_T<Eigen::Vector3d, NAME>& >{
-	enum{value = 3};
+template<int NAME, int N> struct StateLengthForType<const StateVar_T<Eigen::Matrix<double, N, 1>, NAME>& >{
+	enum{value = N};
 };
 template<int NAME> struct StateLengthForType<const StateVar_T<Eigen::Quaterniond, NAME>& >{
 	enum{value = 4};
@@ -205,15 +206,15 @@ struct applycorrection
 	applycorrection(T& correction):data_(correction){
 		std::cout<<"Got correction vector"<<correction.transpose()<<std::endl;
 	}
-	template<int NAME>
-	void operator()(StateVar_T<Eigen::Vector3d, NAME>& t) const{
-		typedef StateVar_T<Eigen::Vector3d, NAME> var_T;
+	template<int NAME, int N>
+	void operator()(StateVar_T<Eigen::Matrix<double, N, 1>, NAME>& t) const{
+		typedef StateVar_T<Eigen::Matrix<double, N, 1>, NAME> var_T;
 		std::cout<<"called correction for state "<<NAME<<" of type "<<msf_tmp::echoStateVarType<var_T>::value()<<std::endl;
 		//get index of the data in the correction vector
 		static const int  idxstartcorr = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::CorrectionStateLengthForType>::value;
-		std::cout<<"startindex in correction: "<<idxstartcorr<< " size in correction: "<<var_T::sizeInCorrection_<<std::endl;
-
 		static const int  idxstartstate = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::StateLengthForType>::value;
+
+		std::cout<<"startindex in correction: "<<idxstartcorr<< " size in correction: "<<var_T::sizeInCorrection_<<std::endl;
 		std::cout<<"startindex in state: "<<idxstartstate<<" size in state: "<<var_T::sizeInState_<<std::endl;
 
 	}
@@ -223,9 +224,9 @@ struct applycorrection
 		std::cout<<"called correction for state "<<NAME<<" of type "<<msf_tmp::echoStateVarType<var_T>::value()<<std::endl;
 		//get index of the data in the correction vector
 		static const int idxstartcorr = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::CorrectionStateLengthForType>::value;
-		std::cout<<"startindex in correction: "<<idxstartcorr<< " size in correction: "<<var_T::sizeInCorrection_<<std::endl;
-
 		static const int idxstartstate = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::StateLengthForType>::value;
+
+		std::cout<<"startindex in correction: "<<idxstartcorr<< " size in correction: "<<var_T::sizeInCorrection_<<std::endl;
 		std::cout<<"startindex in state: "<<idxstartstate<<" size in state: "<<var_T::sizeInState_<<std::endl;
 	}
 private:

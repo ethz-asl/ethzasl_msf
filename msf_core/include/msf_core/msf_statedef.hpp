@@ -11,21 +11,20 @@
 namespace msf_core{
 namespace{
 
+
 enum{ //must not manually set the enum values!
 	p_ci,
 	q_ci,
-	q_wv
-//	,
-//	L
+	q_wv,
+	L
 };
 
 //setup core state, then auxiliary state
 typedef boost::fusion::vector<
-		StateVar_T<Eigen::Vector3d, p_ci >,
+		StateVar_T<Eigen::Matrix<double, 3, 1>, p_ci >,
 		StateVar_T<Eigen::Quaterniond, q_ci >,
-		StateVar_T<Eigen::Quaterniond, q_wv >
-//,
-//		StateVar_T<double, L >
+		StateVar_T<Eigen::Quaterniond, q_wv >,
+		StateVar_T<Eigen::Matrix<double, 1, 1>, L >
 > fullState_T;
 }
 
