@@ -122,7 +122,6 @@ struct countStatesLinear<Sequence, Counter, First, Last, false>{
 	};
 };
 
-
 //helpers for CheckCorrectIndexing call{
 template <typename Sequence, typename First, typename Last, int CurrentIdx, bool T>
 struct CheckStateIndexing;
@@ -246,12 +245,12 @@ struct resetState
 	template<int NAME, int N>
 	void operator()(msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME>& t) const{
 		typedef msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME> var_T;
-		t.setZero();
+		t.state_.setZero();
 	}
 	template<int NAME>
 	void operator()(msf_core::StateVar_T<Eigen::Quaterniond, NAME>& t) const{
 		typedef msf_core::StateVar_T<Eigen::Quaterniond, NAME> var_T;
-		t.setIdentity();
+		t.state_.setIdentity();
 	}
 };
 

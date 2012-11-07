@@ -63,7 +63,7 @@ struct GenericState_T{
 
 
 	//apply the correction vector to all state vars
-	void correct(const Eigen::Matrix<double, nErrorStatesAtCompileTime, 1>& correction) {
+	inline void correct(const Eigen::Matrix<double, nErrorStatesAtCompileTime, 1>& correction) {
 		boost::fusion::for_each(
 				statevars_,
 				msf_tmp::correctState<const Eigen::Matrix<double, nErrorStatesAtCompileTime, 1>, stateVector_T >(correction)
@@ -72,14 +72,15 @@ struct GenericState_T{
 
 	//returns the state at position INDEX in the state list
 	template<int INDEX>
-	const typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type&
+	inline typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type&
 	get(){
 		return boost::fusion::at<boost::mpl::int_<INDEX> >(statevars_);
 	}
 
 	//returns the state at position INDEX in the state list
 	template<int INDEX>
-	typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type::Q_T getQBlock(){
+	inline typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type::Q_T
+	getQBlock(){
 		return boost::fusion::at<boost::mpl::int_<INDEX> >(statevars_).Q;
 	}
 
@@ -93,10 +94,6 @@ struct GenericState_T{
 				statevars_,
 				msf_tmp::resetState()
 		);
-
-		//set scale to 1
-		get<msf_core::L_>()(0) = 1.0;
-
 		//reset system inputs
 		w_m_.setZero();
 		a_m_.setZero();
@@ -147,17 +144,17 @@ struct GenericState_T{
 	/// assembles a PoseWithCovarianceStamped message from the state
 	/** it does not set the header */
 	void toPoseMsg(geometry_msgs::PoseWithCovarianceStamped & pose){
-		eigen_conversions::vector3dToPoint(get<msf_core::p_>(), pose.pose.pose.position);
-		eigen_conversions::quaternionToMsg(get<msf_core::q_>(), pose.pose.pose.orientation);
+		eigen_conversions::vector3dToPoint(get<msf_core::p_>().state_, pose.pose.pose.position);
+		eigen_conversions::quaternionToMsg(get<msf_core::q_>().state_, pose.pose.pose.orientation);
 		getPoseCovariance(pose.pose.covariance);
 	}
 
 	/// assembles an ExtState message from the state
 	/** it does not set the header */
 	void toExtStateMsg(sensor_fusion_comm::ExtState & state){
-		eigen_conversions::vector3dToPoint(get<msf_core::p_>(), state.pose.position);
-		eigen_conversions::quaternionToMsg(get<msf_core::q_>(), state.pose.orientation);
-		eigen_conversions::vector3dToPoint(get<msf_core::v_>(), state.velocity);
+		eigen_conversions::vector3dToPoint(get<msf_core::p_>().state_, state.pose.position);
+		eigen_conversions::quaternionToMsg(get<msf_core::q_>().state_, state.pose.orientation);
+		eigen_conversions::vector3dToPoint(get<msf_core::v_>().state_, state.velocity);
 	}
 
 	/// assembles a DoubleArrayStamped message from the state

@@ -14,6 +14,8 @@
 
 typedef dynamic_reconfigure::Server<msf_core::MSF_CoreConfig> ReconfigureServer;
 
+namespace msf_core{
+
 class UserDefinedCalculations{
 private:
 	/// dynamic reconfigure config
@@ -56,8 +58,25 @@ public:
 
 	//prior to this call, all states are initialized to zero/identity
 	virtual void initializeState(msf_core::EKFState& state){
-		state.get<msf_core::L_>()(0) = 1.0;
+		//set scale to 1
+		state.get<msf_core::L_>().state_(0) = 1.0;
 	}
+	virtual void initializeFirstState(msf_core::EKFState& state){
+
+		//TODO implement this correctly
+//		state.get<msf_core::p_>().state_ = p;
+//		state.get<msf_core::v_>().state_ = v;
+//		state.get<msf_core::q_>().state_ = q;
+//		state.get<msf_core::b_w_>().state_ = b_w;
+//		state.get<msf_core::b_a_>().state_ = b_a;
+//		state.get<msf_core::L_>().state_ = L;
+//		state.get<msf_core::q_wv_>().state_ = q_wv;
+//		state.get<msf_core::q_ci_>().state_ = q_ci;
+//		state.get<msf_core::p_ci_>().state_ = p_ci;
+
+
+	}
+
 	virtual void calculateQ(msf_core::EKFState& state){
 		ConstVector3 nqwvv = Eigen::Vector3d::Constant(config_.noise_qwv);
 		ConstVector3 nqciv = Eigen::Vector3d::Constant(config_.noise_qci);
@@ -95,5 +114,6 @@ public:
 
 };
 
+}
 
 #endif /* MSF_USERDEFINEDCALCULATIONS_HPP_ */
