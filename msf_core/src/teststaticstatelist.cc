@@ -105,32 +105,34 @@ TEST(CompileTimeComputation, stateLengthCalculation) {
 
 	ASSERT_EQ(EKFState::nstatevars_, 4);
 	ASSERT_EQ(EKFState::nstates_, vectorlength1 + vectorlength2 + 4 + 1);
-	ASSERT_EQ(EKFState::ncorrectionstates_, vectorlength1 + vectorlength2 + 3 +1);
+	ASSERT_EQ(EKFState::nerrorstates_, vectorlength1 + vectorlength2 + 3 +1);
 }
 
 
 
 int main(int argc, char** argv)
 {
-//	//an instantiation of a state
-//	msf_core::EKFState somestate;
-//
-//	std::cout<<"name "<<somestate.get<0>().name_<<std::endl;
-//
-//	//number of state variables
-//	std::cout<<"nstatevars: "<<msf_core::EKFState::nstatevars_<<std::endl;
-//
-//	//number of states
-//	std::cout<<"nstates: "<<msf_core::EKFState::nstates_<<std::endl;
-//
-//	//number of correction states
-//	std::cout<<"ncorrectionstates: "<<msf_core::EKFState::ncorrectionstates_<<std::endl;
-//
-//	//apply correction to all states
-//	Eigen::Matrix<double, msf_core::EKFState::ncorrectionstates_, 1> correction;
-//	std::cout<<"passing random correction vector"<<std::endl;
-//	correction.setRandom();
-//	somestate.correct(correction);
+
+
+	//an instantiation of a state
+	msf_core::EKFState somestate;
+
+	std::cout<<"name "<<somestate.get<0>().name_<<std::endl;
+
+	//number of state variables
+	std::cout<<"nstatevars: "<<msf_core::EKFState::nstatevars_<<std::endl;
+
+	//number of states
+	std::cout<<"nstates: "<<msf_core::EKFState::nstates_<<std::endl;
+
+	//number of correction states
+	std::cout<<"nerrortates: "<<msf_core::EKFState::nerrorstates_<<std::endl;
+
+	//apply correction to all states
+	Eigen::Matrix<double, msf_core::EKFState::nerrorstates_, 1> correction;
+	std::cout<<"passing random correction vector"<<std::endl;
+	correction.setRandom();
+	somestate.correct(correction);
 
 	testing::InitGoogleTest(&argc, argv);
 	return RUN_ALL_TESTS();

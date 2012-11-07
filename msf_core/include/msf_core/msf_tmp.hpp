@@ -100,6 +100,11 @@ template<> struct getEnumStateName<const mpl_::void_&>{
 	enum{value = -1};
 };
 
+template<typename TypeList, int INDEX>
+struct getEnumStateType{
+	typedef typename boost::fusion::result_of::at_c<TypeList, INDEX >::type value;
+};
+
 template <typename Sequence,  template<typename> class Counter, typename First, typename Last, bool T>
 struct countStatesLinear;
 template <typename Sequence,  template<typename> class Counter, typename First, typename Last>
@@ -221,11 +226,26 @@ struct getStartIndex{
 	};
 };
 
+//reset the EKF state
+struct resetState
+{
+	template<int NAME, int N>
+	void operator()(StateVar_T<Eigen::Matrix<double, N, 1>, NAME>& t) const{
+		typedef StateVar_T<Eigen::Matrix<double, N, 1>, NAME> var_T;
+		t.setZero();
+	}
+	template<int NAME>
+	void operator()(StateVar_T<Eigen::Quaterniond, NAME>& t) const{
+		typedef StateVar_T<Eigen::Quaterniond, NAME> var_T;
+		t.setIdentity();
+	}
+};
+
 //apply EKF corrections depending on the stateVar type
 template<typename T, typename stateList_T>
-struct applycorrection
+struct correctState
 {
-	applycorrection(T& correction):data_(correction){
+	correctState(T& correction):data_(correction){
 		std::cout<<"Got correction vector"<<correction.transpose()<<std::endl;
 	}
 	template<int NAME, int N>
@@ -255,48 +275,35 @@ private:
 	T& data_;
 };
 
+//copies the values of the single state vars to the double array provided
+template<typename T, typename stateList_T>
+struct StatetoDoubleArray
+{
+	StatetoDoubleArray(T& statearray):data_(statearray){}
+	template<int NAME, int N>
+	void operator()(StateVar_T<Eigen::Matrix<double, N, 1>, NAME>& t) const{
+		typedef StateVar_T<Eigen::Matrix<double, N, 1>, NAME> var_T;
+		static const int  idxstartstate = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::StateLengthForType>::value; //index of the data in the state vector
+		for(int i = 0;i<var_T::sizeInState_;++i){
+			data_[idxstartstate + i] = t[i];
+		}
+	}
+	template<int NAME>
+	void operator()(StateVar_T<Eigen::Quaterniond, NAME>& t) const{
+		typedef StateVar_T<Eigen::Quaterniond, NAME> var_T;
+		static const int idxstartstate = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::StateLengthForType>::value; //index of the data in the state vector
+		//copy quaternion values
+		data_[idxstartstate + 0] = t.w();
+		data_[idxstartstate + 1] = t.x();
+		data_[idxstartstate + 2] = t.y();
+		data_[idxstartstate + 3] = t.z();
+	}
+private:
+	T& data_;
+};
+
+
 }
 
-
-//a state variable with a name as specified in the state name enum
-template<typename type_T, int name_T>
-struct StateVar_T{
-	typedef type_T state_T;
-	typedef const StateVar_T<type_T, name_T>& constRef_T;
-	typedef const StateVar_T<type_T, name_T>* constPtr_T;
-	typedef StateVar_T<type_T, name_T>& Ref_T;
-	typedef StateVar_T<type_T, name_T>* Ptr_T;
-	enum{
-		name_ = name_T,
-		sizeInCorrection_ = msf_tmp::CorrectionStateLengthForType<const StateVar_T<type_T, name_T>&>::value,
-		sizeInState_ = msf_tmp::StateLengthForType<const StateVar_T<type_T, name_T>&>::value
-	};
-	state_T state_;
-};
-
-template<typename stateVector_T>
-struct EKFState_T{
-	typedef stateVector_T state_T;
-	stateVector_T statevars_;
-	enum{
-		nstatevars_ = boost::fusion::result_of::size<state_T>::type::value, //n all states
-		ncorrectionstates_ = msf_tmp::CountStates<state_T, msf_tmp::CorrectionStateLengthForType>::value, //n correction states
-		nstates_ = msf_tmp::CountStates<state_T, msf_tmp::StateLengthForType>::value //n correction states
-	};
-
-	//apply the correction vector to all state vars
-	void correct(const Eigen::Matrix<double, ncorrectionstates_, 1>& correction) {
-		boost::fusion::for_each(
-				statevars_,
-				msf_tmp::applycorrection<const Eigen::Matrix<double, ncorrectionstates_, 1>, state_T >(correction)
-		);
-	}
-
-	//returns the state at position INDEX in the state list
-	template<int INDEX>
-	typename boost::fusion::result_of::at_c<state_T, INDEX >::type get(){
-		return boost::fusion::at<boost::mpl::int_<INDEX> >(statevars_);
-	}
-};
 
 #endif /* MSF_TMP_HPP_ */
