@@ -32,11 +32,13 @@ struct StateVar_T{
 		sizeInState_ = msf_tmp::StateLengthForType<const StateVar_T<type_T, name_T>&>::value
 	};
 	value_t state_;
+	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 template<typename stateVector_T>
 struct EKFState_T{
 	typedef stateVector_T state_T;
+	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 	enum{
 		nstatevars_ = boost::fusion::result_of::size<state_T>::type::value, //n all states
 		nerrorstates_ = msf_tmp::CountStates<state_T, msf_tmp::CorrectionStateLengthForType>::value, //n correction states
