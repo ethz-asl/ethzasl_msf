@@ -7,12 +7,12 @@ All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-* Redistributions of source code must retain the above copyright
+ * Redistributions of source code must retain the above copyright
 notice, this list of conditions and the following disclaimer.
-* Redistributions in binary form must reproduce the above copyright
+ * Redistributions in binary form must reproduce the above copyright
 notice, this list of conditions and the following disclaimer in the
 documentation and/or other materials provided with the distribution.
-* Neither the name of ETHZ-ASL nor the
+ * Neither the name of ETHZ-ASL nor the
 names of its contributors may be used to endorse or promote products
 derived from this software without specific prior written permission.
 
@@ -27,31 +27,48 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-*/
+ */
 
 #ifndef CALCQ_H_
 #define CALCQ_H_
 
 
 #include <Eigen/Eigen>
-
+#include <msf_core/msf_core.hpp>
 
 
 template <class Derived, class DerivedQ> void calc_Q(
-            double dt,
-            const Eigen::Quaternion<double> & q,
-            const Eigen::MatrixBase<Derived> & ew,
-            const Eigen::MatrixBase<Derived> & ea,
-            const Eigen::MatrixBase<Derived> & n_a,
-            const Eigen::MatrixBase<Derived> & n_ba,
-            const Eigen::MatrixBase<Derived> & n_w,
-            const Eigen::MatrixBase<Derived> & n_bw,
-            double n_L,
-            const Eigen::MatrixBase<Derived> & n_qvw,
-            const Eigen::MatrixBase<Derived> & n_qci,
-            const Eigen::MatrixBase<Derived> & n_pic,
-            Eigen::MatrixBase<DerivedQ> &  Qd)
+		double dt,
+		const Eigen::Quaternion<double> & q,
+		const Eigen::MatrixBase<Derived> & ew,
+		const Eigen::MatrixBase<Derived> & ea,
+		const Eigen::MatrixBase<Derived> & n_a,
+		const Eigen::MatrixBase<Derived> & n_ba,
+		const Eigen::MatrixBase<Derived> & n_w,
+		const Eigen::MatrixBase<Derived> & n_bw,
+		double n_L,
+		const Eigen::MatrixBase<Derived> & n_qvw,
+		const Eigen::MatrixBase<Derived> & n_qci,
+		const Eigen::MatrixBase<Derived> & n_pic,
+		Eigen::MatrixBase<DerivedQ> &  Qd)
 {
+	//slynen{
+	//for now we have no make sure, the core states are in the correct order
+	//(calculation of observation noise cov has hardcoded order)
+	{
+		static const int idxstartcorr_p_ = msf_tmp::getStartIndex<msf_core::fullState_T, msf_tmp::getEnumStateType<msf_core::fullState_T, msf_core::p_>::value, msf_tmp::CorrectionStateLengthForType>::value;
+		static const int idxstartcorr_v_ = msf_tmp::getStartIndex<msf_core::fullState_T, msf_tmp::getEnumStateType<msf_core::fullState_T, msf_core::v_>::value, msf_tmp::CorrectionStateLengthForType>::value;
+		static const int idxstartcorr_q_ = msf_tmp::getStartIndex<msf_core::fullState_T, msf_tmp::getEnumStateType<msf_core::fullState_T, msf_core::q_>::value, msf_tmp::CorrectionStateLengthForType>::value;
+		static const int idxstartcorr_b_w_ = msf_tmp::getStartIndex<msf_core::fullState_T, msf_tmp::getEnumStateType<msf_core::fullState_T, msf_core::b_w_>::value, msf_tmp::CorrectionStateLengthForType>::value;
+		static const int idxstartcorr_b_a_ = msf_tmp::getStartIndex<msf_core::fullState_T, msf_tmp::getEnumStateType<msf_core::fullState_T, msf_core::b_a_>::value, msf_tmp::CorrectionStateLengthForType>::value;
+
+		BOOST_STATIC_ASSERT_MSG(idxstartcorr_p_==0, "Indexing of core states has been altered, but this is currently not allowed");
+		BOOST_STATIC_ASSERT_MSG(idxstartcorr_v_==3, "Indexing of core states has been altered, but this is currently not allowed");
+		BOOST_STATIC_ASSERT_MSG(idxstartcorr_q_==6, "Indexing of core states has been altered, but this is currently not allowed");
+		BOOST_STATIC_ASSERT_MSG(idxstartcorr_b_w_==9, "Indexing of core states has been altered, but this is currently not allowed");
+		BOOST_STATIC_ASSERT_MSG(idxstartcorr_b_a_==12, "Indexing of core states has been altered, but this is currently not allowed");
+	}
+	//}
 
 	double q1=q.w(), q2=q.x(), q3=q.y(), q4=q.z();
 	double ew1=ew(0), ew2=ew(1), ew3=ew(2);
@@ -530,6 +547,9 @@ template <class Derived, class DerivedQ> void calc_Q(
 	Qd(14,4) = t663;
 	Qd(14,5) = t343*t370*t400*(-1.0/2.0);
 	Qd(14,14) = dt*t400;
+
+
+
 	Qd(15,15) = dt*(n_L*n_L);
 	Qd(16,16) = dt*(n_qvw1*n_qvw1);
 	Qd(17,17) = dt*(n_qvw2*n_qvw2);

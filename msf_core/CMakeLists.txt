@@ -23,7 +23,7 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 ##gencfg()
 ##rosbuild_genmsg()
 
-add_definitions (-Wall)
+add_definitions (-Wall -std=c++0x)
 
 # get eigen
 find_package(Eigen REQUIRED)
@@ -34,8 +34,8 @@ include_directories(${Eigen_INCLUDE_DIRS})
 ##rosbuild_add_compile_flags(msf_core "-O3")
 
 rosbuild_add_executable(staticstatelist src/teststaticstatelist.cc)
-rosbuild_add_gtest_build_flags(staticstatelist)
+##rosbuild_add_gtest_build_flags(staticstatelist)
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-rosbuild_add_gtest(test_staticstatelist src/teststaticstatelist.cc)
-rosbuild_link_boost(test_staticstatelist thread)
+##SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+##rosbuild_add_gtest(test_staticstatelist src/teststaticstatelist.cc)
+##rosbuild_link_boost(test_staticstatelist thread)

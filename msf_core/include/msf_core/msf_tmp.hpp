@@ -9,7 +9,7 @@
 #define MSF_TMP_HPP_
 
 #include <msf_core/msf_fwd.hpp>
-#include <boost/lexical_cast.hpp>
+#include <msf_core/msf_typetraits.hpp>
 
 #include <Eigen/Dense>
 #include <sstream>
@@ -17,13 +17,14 @@
 
 #define FUSION_MAX_VECTOR_SIZE 20 //maximum number of statevariables (can be set to a larger value)
 
+#include <boost/lexical_cast.hpp>
+#include <boost/static_assert.hpp>
 #include <boost/preprocessor/punctuation/comma.hpp>
 #include <boost/fusion/include/vector.hpp>
 #include <boost/fusion/include/vector_fwd.hpp>
 #include <boost/fusion/include/size.hpp>
 #include <boost/fusion/include/at_c.hpp>
 #include <boost/fusion/include/at.hpp>
-#include <boost/static_assert.hpp>
 #include <boost/fusion/include/for_each.hpp>
 #include <boost/fusion/include/equal_to.hpp>
 #include <boost/fusion/include/begin.hpp>
@@ -34,6 +35,7 @@
 
 //this namespace contains some metaprogramming tools
 namespace msf_tmp{
+
 
 //runtime output of stateVariable types
 template<typename T> struct echoStateVarType;
@@ -59,11 +61,7 @@ template<int NAME> struct echoStateVarType<StateVar_T<Eigen::Quaterniond, NAME> 
 };
 
 
-namespace{//hide these
-
-template <typename T, typename U> struct SameType{enum { value = false };};
-template <typename T> struct SameType<T,T>{enum { value = true };};
-
+namespace{ //for internal use only
 //the number of entries in the correction vector for a given state var
 template<typename T>
 struct CorrectionStateLengthForType;
@@ -100,6 +98,7 @@ template<> struct getEnumStateName<const mpl_::void_&>{
 	enum{value = -1};
 };
 
+
 template<typename TypeList, int INDEX>
 struct getEnumStateType{
 	typedef typename boost::fusion::result_of::at_c<TypeList, INDEX >::type value;
@@ -119,7 +118,9 @@ struct countStatesLinear<Sequence, Counter, First, Last, false>{
 	typedef typename  boost::fusion::result_of::deref<First>::type current_Type;
 	enum{//the length of the current state plus the tail of the list
 		value = Counter<current_Type>::value +
-		countStatesLinear<Sequence, Counter, Next, Last, SameType<First, Last>::value>::value
+		countStatesLinear<Sequence, Counter, Next, Last,
+		SameType<typename msf_tmp::StripConstReference<First>::value,
+		typename msf_tmp::StripConstReference<Last>::value>::value>::value
 	};
 };
 
@@ -144,13 +145,17 @@ struct CheckStateIndexing<Sequence, First, Last, CurrentIdx, false>{
 
 		idxInState = CurrentIdx,
 
-		indexingerrors = boost::mpl::if_c<idxInEnum == idxInState, boost::mpl::int_<0>, boost::mpl::int_<1> >::type::value + //error here and errors of other states
-		CheckStateIndexing<Sequence, Next, Last, CurrentIdx + 1, SameType<First, Last>::value>::indexingerrors
+		indexingerrors = boost::mpl::if_c<idxInEnum == idxInState,
+		boost::mpl::int_<0>, boost::mpl::int_<1> >::type::value + //error here
+		CheckStateIndexing<Sequence, Next, Last, CurrentIdx + 1, 		//and errors of other states
+		SameType<typename msf_tmp::StripConstReference<First>::value,
+		typename msf_tmp::StripConstReference<Last>::value>::value>::indexingerrors
 
 	};
 private:
 	//Error the ordering in the enum defining the names of the states is not the same ordering as in the type vector for the states
-	BOOST_STATIC_ASSERT_MSG(indexingerrors==0, "Error the ordering in the enum defining the names of the states is not the same ordering as in the type vector for the states");
+	BOOST_STATIC_ASSERT_MSG(indexingerrors==0, "Error the ordering in the enum defining the names _ "
+			"of the states is not the same ordering as in the type vector for the states");
 };
 //}
 
@@ -178,11 +183,13 @@ typename First, typename Last, int CurrentVal>
 struct ComputeStartIndex<Sequence, StateVarT, OffsetCalculator, First, Last, false, CurrentVal, false>{
 	typedef typename boost::fusion::result_of::next<First>::type Next;
 	typedef typename  boost::fusion::result_of::deref<First>::type currentType;
-	typedef const StateVarT& constRefLookupType;
 
 	enum{//the length of the current state plus the tail of the list
-		value =  CurrentVal + ComputeStartIndex<Sequence, StateVarT, OffsetCalculator, Next, Last, SameType<currentType, constRefLookupType>::value,
-		OffsetCalculator<currentType>::value, SameType<First, Last>::value>::value
+		value =  CurrentVal + ComputeStartIndex<Sequence, StateVarT, OffsetCalculator, Next, Last,
+		SameType<typename msf_tmp::StripConstReference<currentType>::value,
+		typename msf_tmp::StripConstReference<StateVarT>::value>::value,
+		OffsetCalculator<currentType>::value, SameType<typename msf_tmp::StripConstReference<First>::value,
+		typename msf_tmp::StripConstReference<Last>::value>::value>::value
 	};
 };
 //}
@@ -195,9 +202,15 @@ template<typename Sequence>
 struct CheckCorrectIndexing{
 	typedef typename boost::fusion::result_of::begin<Sequence const>::type First;
 	typedef typename boost::fusion::result_of::end<Sequence const>::type Last;
+private:
 	enum{
-		startindex = 0, //must not change
-		indexingerrors = CheckStateIndexing<Sequence, First, Last, startindex, SameType<First, Last>::value>::indexingerrors
+		startindex = 0, //must not change this
+	};
+public:
+	enum{
+		indexingerrors = CheckStateIndexing<Sequence, First, Last, startindex,
+		SameType<typename msf_tmp::StripConstReference<First>::value,
+		typename msf_tmp::StripConstReference<Last>::value>::value>::indexingerrors
 	};
 };
 
@@ -208,7 +221,9 @@ struct CountStates{
 	typedef typename boost::fusion::result_of::begin<Sequence const>::type First;
 	typedef typename boost::fusion::result_of::end<Sequence const>::type Last;
 	enum{
-		value = countStatesLinear<Sequence, Counter, First, Last, SameType<First, Last>::value>::value
+		value = countStatesLinear<Sequence, Counter, First, Last,
+		SameType<typename msf_tmp::StripConstReference<First>::value,
+		typename msf_tmp::StripConstReference<Last>::value>::value>::value
 		+ CheckCorrectIndexing<Sequence>::indexingerrors //will be zero, if no indexing errors, otherwise fails compilation
 	};
 };
@@ -219,9 +234,10 @@ struct getStartIndex{
 	typedef typename boost::fusion::result_of::begin<Sequence const>::type First;
 	typedef typename boost::fusion::result_of::end<Sequence const>::type Last;
 	typedef typename  boost::fusion::result_of::deref<First>::type currentType;
-	typedef const StateVarT& constRefLookupType;
 	enum{
-		value = ComputeStartIndex<Sequence, StateVarT, Counter, First, Last, SameType<constRefLookupType, currentType>::value, 0, SameType<First, Last>::value>::value
+		value = ComputeStartIndex<Sequence, StateVarT, Counter, First, Last,
+		SameType<typename msf_tmp::StripConstReference<StateVarT>::value,
+		typename msf_tmp::StripConstReference<currentType>::value>::value, 0, SameType<First, Last>::value>::value
 		+ CheckCorrectIndexing<Sequence>::indexingerrors //will be zero, if no indexing errors, otherwise fails compilation
 	};
 };
@@ -301,6 +317,9 @@ struct StatetoDoubleArray
 private:
 	T& data_;
 };
+
+
+
 
 
 }

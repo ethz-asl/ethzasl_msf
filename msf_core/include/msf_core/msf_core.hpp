@@ -35,6 +35,7 @@ struct StateVar_T{
 	value_t state_;
 };
 
+
 template<typename stateVector_T>
 struct EKFState_T{
 	typedef stateVector_T state_T;
@@ -94,6 +95,8 @@ struct EKFState_T{
 		time_ = 0;
 	}
 
+
+
 	/// writes the covariance corresponding to position and attitude to cov
 	void getPoseCovariance(geometry_msgs::PoseWithCovariance::_covariance_type & cov){
 		BOOST_STATIC_ASSERT(geometry_msgs::PoseWithCovariance::_covariance_type::static_size == 36);
@@ -101,14 +104,20 @@ struct EKFState_T{
 		typedef typename msf_tmp::getEnumStateType<state_T, msf_core::p_>::value p_type;
 		typedef typename msf_tmp::getEnumStateType<state_T, msf_core::q_>::value q_type;
 
+		//get indices of position and attitude in the covariance matrix
 		static const int idxstartcorr_p = msf_tmp::getStartIndex<state_T, p_type, msf_tmp::CorrectionStateLengthForType>::value;
-		static const int idxstartstate_p = msf_tmp::getStartIndex<state_T, p_type, msf_tmp::StateLengthForType>::value;
 		static const int idxstartcorr_q = msf_tmp::getStartIndex<state_T, q_type, msf_tmp::CorrectionStateLengthForType>::value;
-		static const int idxstartstate_q = msf_tmp::getStartIndex<state_T, q_type, msf_tmp::StateLengthForType>::value;
 
 		//TODO: remove the following two lines after initial debug to allow changes in state ordering
 		BOOST_STATIC_ASSERT(idxstartcorr_p==0);
 		BOOST_STATIC_ASSERT(idxstartcorr_q==6);
+
+		/*			| cov_p_p	|	cov_p_q	|
+		 * 			|			|			|
+		 * cov = 	|-----------|-----------|
+		 * 			|			|			|
+		 * 			| cov_q_p	|	cov_q_q	|
+		 */
 
 		for (int i = 0; i < 9; i++)
 			cov[i / 3 * 6 + i % 3] = P_((i / 3 + idxstartcorr_p) * nerrorstates_ + i % 3);
@@ -148,7 +157,6 @@ struct EKFState_T{
 				msf_tmp::StatetoDoubleArray<std::vector<double>, state_T >(state.data)
 		);
 	}
-
 };
 
 #endif /* MSF_CORE_HPP_ */

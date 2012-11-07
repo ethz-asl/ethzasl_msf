@@ -8,6 +8,9 @@
 #include <msf_core/msf_core.hpp>
 #include <gtest/gtest.h>
 
+#define WITHTESTS 0
+
+#if (WITHTESTS == 1)
 //test calculated sizes
 TEST(CompileTimeComputation, stateSizeCalculation) {
 	enum{
@@ -107,23 +110,28 @@ TEST(CompileTimeComputation, stateLengthCalculation) {
 	ASSERT_EQ(EKFState::nstates_, vectorlength1 + vectorlength2 + 4 + 1);
 	ASSERT_EQ(EKFState::nerrorstates_, vectorlength1 + vectorlength2 + 3 +1);
 }
-
+#endif
 
 
 int main(int argc, char** argv)
 {
 
-	Eigen::Matrix3d m;
-	m << 1, 2, 3,
-	4, 5, 6,
-	7, 8, 9;
-	std::cout << m<<std::endl;
+	typedef boost::fusion::vector<int,float,char> vec;
+	BOOST_MPL_ASSERT((boost::is_same<boost::fusion::result_of::at_c<vec, 1>::type, float&>));
+	BOOST_MPL_ASSERT((boost::is_same<msf_tmp::StripConstReference<boost::fusion::result_of::at_c<vec, 1>::type>::value, float>));
 
 
-std::cout<<m(0)<<" "<<m(1)<<" "<<m(2)<<std::endl;
-std::cout<<m(3)<<" "<<m(4)<<" "<<m(5)<<std::endl;
-std::cout<<m(6)<<" "<<m(7)<<" "<<m(8)<<std::endl;
+	static const int idxstartcorr_p_ = msf_tmp::getStartIndex<msf_core::fullState_T, msf_tmp::getEnumStateType<msf_core::fullState_T, msf_core::p_>::value, msf_tmp::CorrectionStateLengthForType>::value;
+	static const int idxstartcorr_v_ = msf_tmp::getStartIndex<msf_core::fullState_T, msf_tmp::getEnumStateType<msf_core::fullState_T, msf_core::v_>::value, msf_tmp::CorrectionStateLengthForType>::value;
+	//	static const int idxstartcorr_q_ = msf_tmp::getStartIndex<msf_core::fullState_T, msf_tmp::getEnumStateType<msf_core::fullState_T, msf_core::q_>::value, msf_tmp::CorrectionStateLengthForType>::value;
+	//	static const int idxstartcorr_b_w_ = msf_tmp::getStartIndex<msf_core::fullState_T, msf_tmp::getEnumStateType<msf_core::fullState_T, msf_core::b_w_>::value, msf_tmp::CorrectionStateLengthForType>::value;
+	//	static const int idxstartcorr_b_a_ = msf_tmp::getStartIndex<msf_core::fullState_T, msf_tmp::getEnumStateType<msf_core::fullState_T, msf_core::b_a_>::value, msf_tmp::CorrectionStateLengthForType>::value;
 
+	std::cout<<"idxstartcorr_p_ "<<idxstartcorr_p_<<std::endl;
+	std::cout<<"idxstartcorr_v_ "<<idxstartcorr_v_<<std::endl;
+	//	std::cout<<"idxstartcorr_q_ "<<idxstartcorr_q_<<std::endl;
+	//	std::cout<<"idxstartcorr_b_w_ "<<idxstartcorr_b_w_<<std::endl;
+	//	std::cout<<"idxstartcorr_b_a_ "<<idxstartcorr_b_a_<<std::endl;
 
 
 	//an instantiation of a state
@@ -146,7 +154,8 @@ std::cout<<m(6)<<" "<<m(7)<<" "<<m(8)<<std::endl;
 	correction.setRandom();
 	somestate.correct(correction);
 
+#if (WITHTESTS == 1)
 	testing::InitGoogleTest(&argc, argv);
 	return RUN_ALL_TESTS();
-
+#endif
 }
