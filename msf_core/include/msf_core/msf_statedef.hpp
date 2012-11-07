@@ -1,15 +1,14 @@
 /*
- * msf_statedef.hpp
- *
- *  Created on: Nov 6, 2012
+ *  Created on: Nov 7, 2012
  *      Author: slynen
  */
+
 
 #ifndef MSF_STATEDEF_HPP_
 #define MSF_STATEDEF_HPP_
 
 #include <Eigen/Dense>
-#include <msf_core/msf_fwd.hpp>
+#include <msf_core/msf_fwds.hpp>
 
 namespace msf_core{
 
@@ -29,7 +28,7 @@ namespace{
 
 //setup core state, then auxiliary state
 typedef boost::fusion::vector<
-		// states varying during propagation
+		// states varying during propagation - must not change the ordering here for now, CalcQ has the ordering hardcoded
 		StateVar_T<Eigen::Matrix<double, 3, 1>, p_>,			///< position (IMU centered)          (0-2 / 0-2)
 		StateVar_T<Eigen::Matrix<double, 3, 1>, v_>,			///< velocity                         (3- 5 / 3- 5)
 		StateVar_T<Eigen::Quaternion<double>, q_>,				///< attitude                         (6- 9 / 6- 8)
@@ -44,8 +43,7 @@ typedef boost::fusion::vector<
 > fullState_T;
 }
 
-typedef EKFState_T<msf_core::fullState_T> EKFState;
-
+typedef GenericState_T<msf_core::fullState_T> EKFState;
 
 }
 #endif /* MSF_STATEDEF_HPP_ */

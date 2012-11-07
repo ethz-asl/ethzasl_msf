@@ -18,10 +18,10 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
 # Generate dynamic parameters
 
-##rosbuild_find_ros_package(dynamic_reconfigure)
-##include(${dynamic_reconfigure_PACKAGE_PATH}/cmake/cfgbuild.cmake)
-##gencfg()
-##rosbuild_genmsg()
+rosbuild_find_ros_package(dynamic_reconfigure)
+include(${dynamic_reconfigure_PACKAGE_PATH}/cmake/cfgbuild.cmake)
+gencfg()
+rosbuild_genmsg()
 
 add_definitions (-Wall -std=c++0x)
 
@@ -30,12 +30,18 @@ find_package(Eigen REQUIRED)
 include_directories(${Eigen_INCLUDE_DIRS})
 
 #common commands for building c++ executables and libraries
-##rosbuild_add_library(msf_core src/MSF_Core.cpp src/measurement.cpp src/state.cpp)
-##rosbuild_add_compile_flags(msf_core "-O3")
+#rosbuild_add_library(msf_core src/MSF_Core.cpp src/measurement.cpp src/state.cpp)
+#rosbuild_add_compile_flags(msf_core)
+#TODO # "-O3")
 
-rosbuild_add_executable(staticstatelist src/teststaticstatelist.cc)
+##rosbuild_add_executable(staticstatelist src/teststaticstatelist.cc)
 ##rosbuild_add_gtest_build_flags(staticstatelist)
 
-##SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-##rosbuild_add_gtest(test_staticstatelist src/teststaticstatelist.cc)
-##rosbuild_link_boost(test_staticstatelist thread)
+
+rosbuild_add_executable(tmp_testbed src/tmp_testbed.cc)
+#rosbuild_add_executable(test_msfcore src/testMsfCore.cc)
+
+
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+#rosbuild_add_gtest(test_staticstatelist src/teststaticstatelist.cc)
+#rosbuild_link_boost(test_staticstatelist thread)

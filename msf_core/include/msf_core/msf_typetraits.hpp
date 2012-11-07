@@ -1,9 +1,8 @@
 /*
- * mdf_typetraits.hpp
- *
  *  Created on: Nov 7, 2012
  *      Author: slynen
  */
+
 
 #ifndef MDF_TYPETRAITS_HPP_
 #define MDF_TYPETRAITS_HPP_

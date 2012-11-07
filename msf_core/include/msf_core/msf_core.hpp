@@ -1,162 +1,226 @@
 /*
- * msf_core.hpp
- *
- *  Created on: Nov 6, 2012
- *      Author: slynen
+
+Copyright (c) 2010, Stephan Weiss, ASL, ETH Zurich, Switzerland
+You can contact the author at <stephan dot weiss at ieee dot org>
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+ * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+ * Neither the name of ETHZ-ASL nor the
+names of its contributors may be used to endorse or promote products
+derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL ETHZ-ASL BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
  */
 
-#ifndef MSF_CORE_HPP_
-#define MSF_CORE_HPP_
+#ifndef MSF_CORE_H_
+#define MSF_CORE_H_
 
-#include <msf_core/msf_tmp.hpp>
-#include <msf_core/msf_statedef.hpp>
-#include <Eigen/Dense>
-#include <Eigen/Geometry>
-#include <vector>
-#include <msf_core/eigen_conversions.h>
-#include <sensor_fusion_comm/ExtState.h>
+
+#include <Eigen/Eigen>
+
+#include <ros/ros.h>
+
+// message includes
 #include <sensor_fusion_comm/DoubleArrayStamped.h>
+#include <sensor_fusion_comm/ExtState.h>
+#include <sensor_fusion_comm/ExtEkf.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <sensor_msgs/Imu.h>
 
-//a state variable with a name as specified in the state name enum
-template<typename type_T, int name_T>
-struct StateVar_T{
-	typedef type_T value_t;
-	typedef const StateVar_T<type_T, name_T>& constRef_T;
-	typedef const StateVar_T<type_T, name_T>* constPtr_T;
-	typedef StateVar_T<type_T, name_T>& Ref_T;
-	typedef StateVar_T<type_T, name_T>* Ptr_T;
+#include <vector>
+#include <msf_core/msf_state.hpp>
+#include <msf_core/msf_userdefinedcalculations.hpp>
+
+#define N_STATE_BUFFER 256	///< size of unsigned char, do not change!
+#define HLI_EKF_STATE_SIZE 16 	///< number of states exchanged with external propagation. Here: p,v,q,bw,bw=16
+
+namespace msf_core{
+
+
+class MSF_Core
+{
 	enum{
-		name_ = name_T,
-		sizeInCorrection_ = msf_tmp::CorrectionStateLengthForType<const StateVar_T<type_T, name_T>&>::value,
-		sizeInState_ = msf_tmp::StateLengthForType<const StateVar_T<type_T, name_T>&>::value
+		nErrorStatesAtCompileTime = msf_core::EKFState::nErrorStatesAtCompileTime,
+		nStatesAtCompileTime = msf_core::EKFState::nStatesAtCompileTime
 	};
-	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-	value_t state_;
-};
 
+public:
+	typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, 1> ErrorState;
+	typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> ErrorStateCov;
 
-template<typename stateVector_T>
-struct EKFState_T{
-	typedef stateVector_T state_T;
-	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-	enum{
-		nstatevars_ = boost::fusion::result_of::size<state_T>::type::value, //n all states
-		nerrorstates_ = msf_tmp::CountStates<state_T, msf_tmp::CorrectionStateLengthForType>::value, //n correction states
-		nstates_ = msf_tmp::CountStates<state_T, msf_tmp::StateLengthForType>::value //n correction states
-	};
-	stateVector_T statevars_; ///< the actual state variables
+	/// big init routine
+	void initialize(const Eigen::Matrix<double, 3, 1> & p, const Eigen::Matrix<double, 3, 1> & v,
+			const Eigen::Quaternion<double> & q, const Eigen::Matrix<double, 3, 1> & b_w,
+			const Eigen::Matrix<double, 3, 1> & b_a, const double & L, const Eigen::Quaternion<double> & q_wv,
+			const Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> & P, const Eigen::Matrix<double, 3, 1> & w_m,
+			const Eigen::Matrix<double, 3, 1> & a_m, const Eigen::Matrix<double, 3, 1> & g,
+			const Eigen::Quaternion<double> & q_ci, const Eigen::Matrix<double, 3, 1> & p_ci);
 
-	// system inputs
-	Eigen::Matrix<double,3,1> w_m_;         ///< angular velocity from IMU
-	Eigen::Matrix<double,3,1> a_m_;         ///< acceleration from IMU
+	/// retreive all state information at time t. Used to build H, residual and noise matrix by update sensors
+	unsigned char getClosestState(msf_core::EKFState* timestate, ros::Time tstamp, double delay = 0.00);
 
-	Eigen::Quaternion<double> q_int_;       ///< this is the integrated ang. vel. no corrections applied, to use for delta rot in external algos...
+	/// get all state information at a given index in the ringbuffer
+	bool getStateAtIdx(msf_core::EKFState* timestate, unsigned char idx);
 
-	double time_; 				///< time of this state estimate
-	Eigen::Matrix<double, nerrorstates_, nerrorstates_> P_;///< error state covariance
+	MSF_Core(boost::shared_ptr<UserDefinedCalculations>);
+	~MSF_Core();
 
-	//apply the correction vector to all state vars
-	void correct(const Eigen::Matrix<double, nerrorstates_, 1>& correction) {
-		boost::fusion::for_each(
-				statevars_,
-				msf_tmp::correctState<const Eigen::Matrix<double, nerrorstates_, 1>, state_T >(correction)
-		);
-	}
+private:
+	const static int nFullState_ = 28; ///< complete state
+	const static int nBuff_ = 30; ///< buffer size for median q_vw
+	const static int nMaxCorr_ = 50; ///< number of IMU measurements buffered for time correction actions
+	const static int QualityThres_ = 1e3;
 
-	//returns the state at position INDEX in the state list
-	template<int INDEX>
-	typename boost::fusion::result_of::at_c<state_T, INDEX >::type
-	get(){
-		return boost::fusion::at<boost::mpl::int_<INDEX> >(statevars_);
-	}
+	Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> Fd_; ///< discrete state propagation matrix
+	Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> Qd_; ///< discrete propagation noise matrix
 
-	/// resets the state
+	/// state variables
+	msf_core::EKFState StateBuffer_[N_STATE_BUFFER]; ///< EKF ringbuffer containing pretty much all info needed at time t
+	unsigned char idx_state_; ///< pointer to state buffer at most recent state
+	unsigned char idx_P_; ///< pointer to state buffer at P latest propagated
+	unsigned char idx_time_; ///< pointer to state buffer at a specific time
+
+	Eigen::Matrix<double, 3, 1> g_; ///< gravity vector
+
+	/// vision-world drift watch dog to determine fuzzy tracking
+	int qvw_inittimer_;
+	Eigen::Matrix<double, nBuff_, 4> qbuff_;
+
+	/// correction from EKF update
+	Eigen::Matrix<double, nErrorStatesAtCompileTime, 1> correction_;
+
+	Eigen::Matrix<double, 3, 3> R_IW_; ///< Rot IMU->World
+	Eigen::Matrix<double, 3, 3> R_CI_; ///< Rot Camera->IMU
+	Eigen::Matrix<double, 3, 3> R_WV_; ///< Rot World->Vision
+
+	bool initialized_;
+	bool predictionMade_;
+
+	/// enables internal state predictions for log replay
 	/**
-	 * 3D vectors: 0; quaternion: unit quaternion; scale: 1; time:0; Error covariance: zeros
+	 * used to determine if internal states get overwritten by the external
+	 * state prediction (online) or internal state prediction is performed
+	 * for log replay, when the external prediction is not available.
 	 */
-	void reset(){
-		// reset all states
-		boost::fusion::for_each(
-				statevars_,
-				msf_tmp::resetState()
-		);
+	bool data_playback_;
 
-		//set scale to 1
-		get<msf_core::L_>()(0) = 1.0;
+	boost::shared_ptr<UserDefinedCalculations> usercalc_; //a function which provides methods for customization
 
-		//reset system inputs
-		w_m_.setZero();
-		a_m_.setZero();
+	enum
+	{
+		NO_UP, GOOD_UP, FUZZY_UP
+	};
 
-		q_int_.setIdentity();
+	ros::Publisher pubState_; ///< publishes all states of the filter
+	sensor_fusion_comm::DoubleArrayStamped msgState_;
 
-		P_.setZero();
-		time_ = 0;
+	ros::Publisher pubPose_; ///< publishes 6DoF pose output
+	geometry_msgs::PoseWithCovarianceStamped msgPose_;
+
+	ros::Publisher pubPoseCrtl_; ///< publishes 6DoF pose including velocity output
+	sensor_fusion_comm::ExtState msgPoseCtrl_;
+
+	ros::Publisher pubCorrect_; ///< publishes corrections for external state propagation
+	sensor_fusion_comm::ExtEkf msgCorrect_;
+
+	ros::Subscriber subState_; ///< subscriber to external state propagation
+	ros::Subscriber subImu_; ///< subscriber to IMU readings
+
+	sensor_fusion_comm::ExtEkf hl_state_buf_; ///< buffer to store external propagation data
+
+
+
+	/// propagates the state with given dt
+	void propagateState(const double dt);
+
+	/// propagets the error state covariance
+	void predictProcessCovariance(const double dt);
+
+	/// applies the correction
+	bool applyCorrection(unsigned char idx_delaystate, const ErrorState & res_delayed, double fuzzythres = 0.1);
+
+	/// propagate covariance to a given index in the ringbuffer
+	void propPToIdx(unsigned char idx);
+
+	/// internal state propagation
+	/**
+	 * This function gets called on incoming imu messages an then performs
+	 * the state prediction internally. Only use this OR stateCallback by
+	 * remapping the topics accordingly.
+	 * \sa{stateCallback}
+	 */
+	void imuCallback(const sensor_msgs::ImuConstPtr & msg);
+
+	/// external state propagation
+	/**
+	 * This function gets called when state prediction is performed externally,
+	 * e.g. by asctec_mav_framework. Msg has to be the latest predicted state.
+	 * Only use this OR imuCallback by remapping the topics accordingly.
+	 * \sa{imuCallback}
+	 */
+	void stateCallback(const sensor_fusion_comm::ExtEkfConstPtr & msg);
+
+
+	/// computes the median of a given vector
+	double getMedian(const Eigen::Matrix<double, nBuff_, 1> & data);
+
+public:
+	// some header implementations
+
+	/// main update routine called by a given sensor
+	template<class H_type, class Res_type, class R_type>
+	bool applyMeasurement(unsigned char idx_delaystate, const Eigen::MatrixBase<H_type>& H_delayed,
+			const Eigen::MatrixBase<Res_type> & res_delayed, const Eigen::MatrixBase<R_type>& R_delayed,
+			double fuzzythres = 0.1)
+	{
+		EIGEN_STATIC_ASSERT_FIXED_SIZE(H_type);
+		EIGEN_STATIC_ASSERT_FIXED_SIZE(R_type);
+
+		// get measurements
+		if (!predictionMade_)
+			return false;
+
+		// make sure we have correctly propagated cov until idx_delaystate
+		propPToIdx(idx_delaystate);
+
+		R_type S;
+		Eigen::Matrix<double, nErrorStatesAtCompileTime, R_type::RowsAtCompileTime> K;
+		ErrorStateCov & P = StateBuffer_[idx_delaystate].P_;
+
+		S = H_delayed * StateBuffer_[idx_delaystate].P_ * H_delayed.transpose() + R_delayed;
+		K = P * H_delayed.transpose() * S.inverse();
+
+		correction_ = K * res_delayed;
+		const ErrorStateCov KH = (ErrorStateCov::Identity() - K * H_delayed);
+		P = KH * P * KH.transpose() + K * R_delayed * K.transpose();
+
+		// make sure P stays symmetric
+		P = 0.5 * (P + P.transpose());
+
+		return applyCorrection(idx_delaystate, correction_, fuzzythres);
 	}
 
-
-
-	/// writes the covariance corresponding to position and attitude to cov
-	void getPoseCovariance(geometry_msgs::PoseWithCovariance::_covariance_type & cov){
-		BOOST_STATIC_ASSERT(geometry_msgs::PoseWithCovariance::_covariance_type::static_size == 36);
-
-		typedef typename msf_tmp::getEnumStateType<state_T, msf_core::p_>::value p_type;
-		typedef typename msf_tmp::getEnumStateType<state_T, msf_core::q_>::value q_type;
-
-		//get indices of position and attitude in the covariance matrix
-		static const int idxstartcorr_p = msf_tmp::getStartIndex<state_T, p_type, msf_tmp::CorrectionStateLengthForType>::value;
-		static const int idxstartcorr_q = msf_tmp::getStartIndex<state_T, q_type, msf_tmp::CorrectionStateLengthForType>::value;
-
-		//TODO: remove the following two lines after initial debug to allow changes in state ordering
-		BOOST_STATIC_ASSERT(idxstartcorr_p==0);
-		BOOST_STATIC_ASSERT(idxstartcorr_q==6);
-
-		/*			| cov_p_p	|	cov_p_q	|
-		 * 			|			|			|
-		 * cov = 	|-----------|-----------|
-		 * 			|			|			|
-		 * 			| cov_q_p	|	cov_q_q	|
-		 */
-
-		for (int i = 0; i < 9; i++)
-			cov[i / 3 * 6 + i % 3] = P_((i / 3 + idxstartcorr_p) * nerrorstates_ + i % 3);
-
-		for (int i = 0; i < 9; i++)
-			cov[i / 3 * 6 + (i % 3 + 3)] = P_((i / 3 + idxstartcorr_p) * nerrorstates_ + (i % 3 + 6));
-
-		for (int i = 0; i < 9; i++)
-			cov[(i / 3 + 3) * 6 + i % 3] = P_((i / 3 + idxstartcorr_q) * nerrorstates_ + i % 3);
-
-		for (int i = 0; i < 9; i++)
-			cov[(i / 3 + 3) * 6 + (i % 3 + 3)] = P_((i / 3 + idxstartcorr_q) * nerrorstates_ + (i % 3 + 6));
-	}
-
-	/// assembles a PoseWithCovarianceStamped message from the state
-	/** it does not set the header */
-	void toPoseMsg(geometry_msgs::PoseWithCovarianceStamped & pose){
-		eigen_conversions::vector3dToPoint(get<msf_core::p_>(), pose.pose.pose.position);
-		eigen_conversions::quaternionToMsg(get<msf_core::q_>(), pose.pose.pose.orientation);
-		getPoseCovariance(pose.pose.covariance);
-	}
-
-	/// assembles an ExtState message from the state
-	/** it does not set the header */
-	void toExtStateMsg(sensor_fusion_comm::ExtState & state){
-		eigen_conversions::vector3dToPoint(get<msf_core::p_>(), state.pose.position);
-		eigen_conversions::quaternionToMsg(get<msf_core::q_>(), state.pose.orientation);
-		eigen_conversions::vector3dToPoint(get<msf_core::v_>(), state.velocity);
-	}
-
-	/// assembles a DoubleArrayStamped message from the state
-	/** it does not set the header */
-	void toStateMsg(sensor_fusion_comm::DoubleArrayStamped & state){
-		state.data.resize(nstates_); //make sure this is correctly sized
-		boost::fusion::for_each(
-				statevars_,
-				msf_tmp::StatetoDoubleArray<std::vector<double>, state_T >(state.data)
-		);
-	}
 };
 
-#endif /* MSF_CORE_HPP_ */
+};// end namespace
+
+#include <msf_core/implementation/msf_core.hpp>
+
+#endif /* MSF_CORE_H_ */
