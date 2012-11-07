@@ -113,6 +113,18 @@ TEST(CompileTimeComputation, stateLengthCalculation) {
 int main(int argc, char** argv)
 {
 
+	Eigen::Matrix3d m;
+	m << 1, 2, 3,
+	4, 5, 6,
+	7, 8, 9;
+	std::cout << m<<std::endl;
+
+
+std::cout<<m(0)<<" "<<m(1)<<" "<<m(2)<<std::endl;
+std::cout<<m(3)<<" "<<m(4)<<" "<<m(5)<<std::endl;
+std::cout<<m(6)<<" "<<m(7)<<" "<<m(8)<<std::endl;
+
+
 
 	//an instantiation of a state
 	msf_core::EKFState somestate;

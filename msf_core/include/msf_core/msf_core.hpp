@@ -31,8 +31,8 @@ struct StateVar_T{
 		sizeInCorrection_ = msf_tmp::CorrectionStateLengthForType<const StateVar_T<type_T, name_T>&>::value,
 		sizeInState_ = msf_tmp::StateLengthForType<const StateVar_T<type_T, name_T>&>::value
 	};
-	value_t state_;
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+	value_t state_;
 };
 
 template<typename stateVector_T>
@@ -106,41 +106,21 @@ struct EKFState_T{
 		static const int idxstartcorr_q = msf_tmp::getStartIndex<state_T, q_type, msf_tmp::CorrectionStateLengthForType>::value;
 		static const int idxstartstate_q = msf_tmp::getStartIndex<state_T, q_type, msf_tmp::StateLengthForType>::value;
 
-#pragma unroll(3)
+		//TODO: remove the following two lines after initial debug to allow changes in state ordering
+		BOOST_STATIC_ASSERT(idxstartcorr_p==0);
+		BOOST_STATIC_ASSERT(idxstartcorr_q==6);
+
 		for (int i = 0; i < 9; i++)
-			cov[i / 3 * 6 + i % 3] = P_((i + idxstartcorr_p) / 3 * nerrorstates_ + (i + idxstartcorr_p) % 3);
+			cov[i / 3 * 6 + i % 3] = P_((i / 3 + idxstartcorr_p) * nerrorstates_ + i % 3);
 
-
-		cov[0] = P_(0);
-		cov[1] = P_(1);
-		cov[2] = P_(2);
-		cov[6] = P_(25);
-		cov[7] = P_(26);
-		cov[8] = P_(27);
-		cov[12] = P_(50);
-		cov[13] = P_(51);
-		cov[14] = P_(52);
-
-		//TODO fix this
-#pragma unroll(3)
 		for (int i = 0; i < 9; i++)
-			cov[i / 3 * 6 + (i % 3 + 3)] = P_(i / 3 * nerrorstates_ + (i % 3 + 6));
+			cov[i / 3 * 6 + (i % 3 + 3)] = P_((i / 3 + idxstartcorr_p) * nerrorstates_ + (i % 3 + 6));
 
-		cov[3] = P_(6);
-		cov[4] = P_(7);
-		cov[5] = P_(8);
-		cov[9] = P_(31);
-		cov[10] = P_(32);
-		cov[11] = P_(33);
-		cov[15] = P_(56);
-		cov[16] = P_(57);
-		cov[17] = P_(58);
+		for (int i = 0; i < 9; i++)
+			cov[(i / 3 + 3) * 6 + i % 3] = P_((i / 3 + idxstartcorr_q) * nerrorstates_ + i % 3);
 
-		//		  for (int i = 0; i < 9; i++)
-		//		    cov[(i / 3 + 3) * 6 + i % 3] = P_((i / 3 + 6) * N_STATE + i % 3);
-		//
-		//		  for (int i = 0; i < 9; i++)
-		//		    cov[(i / 3 + 3) * 6 + (i % 3 + 3)] = P_((i / 3 + 6) * N_STATE + (i % 3 + 6));
+		for (int i = 0; i < 9; i++)
+			cov[(i / 3 + 3) * 6 + (i % 3 + 3)] = P_((i / 3 + idxstartcorr_q) * nerrorstates_ + (i % 3 + 6));
 	}
 
 	/// assembles a PoseWithCovarianceStamped message from the state
