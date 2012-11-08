@@ -27,8 +27,25 @@ int main(int argc, char** argv)
 	std::cout<<"idxstartcorr_b_w_ "<<idxstartcorr_b_w_<<std::endl;
 	std::cout<<"idxstartcorr_b_a_ "<<idxstartcorr_b_a_<<std::endl;
 
+	Eigen::Matrix<double, 3, 1> v1;
+	v1<<1,2,4;
+
+	Eigen::Matrix<double, 3, 3> m;
+
+	m = (v1.cwiseProduct(v1)).asDiagonal();
+	std::cout<<(v1.cwiseProduct(v1))<<std::endl<<std::endl;
+	std::cout<<m<<std::endl;
+
+	Eigen::Matrix<double, 5, 5> n;
+
+	std::cout<<n<<std::endl;
+
+	Eigen::Matrix<double, 3,3> other;
+//n(2,2)=other(0,0);
+	n.block<2,2>(2,2) = other.block<2,2>(0,0);
 
 
+	std::cout<<n<<std::endl;
 
 }
 

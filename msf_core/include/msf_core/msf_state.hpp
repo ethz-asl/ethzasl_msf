@@ -35,10 +35,10 @@ struct StateVar_T{
 		sizeInCorrection_ = msf_tmp::CorrectionStateLengthForType<const StateVar_T<type_T, name_T>&>::value,
 		sizeInState_ = msf_tmp::StateLengthForType<const StateVar_T<type_T, name_T>&>::value
 	};
-	//	typedef Eigen::Matrix<double, sizeInCorrection_, sizeInCorrection_> Q_T;
-	//	Q_T Q;
-	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+	typedef Eigen::Matrix<double, sizeInCorrection_, sizeInCorrection_> Q_T;
+	Q_T Q_;
 	value_t state_;
+	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 

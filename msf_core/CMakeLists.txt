@@ -38,7 +38,7 @@ rosbuild_add_executable(staticstatelist src/test_staticstatelist.cc)
 rosbuild_add_gtest_build_flags(staticstatelist)
 
 #rosbuild_add_executable(test_tmptestbed src/test_tmptestbed.cc)
-#rosbuild_add_executable(test_msfcore src/test_msf_core.cc)
+rosbuild_add_executable(test_msfcore src/test_msf_core.cc)
 
 
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")

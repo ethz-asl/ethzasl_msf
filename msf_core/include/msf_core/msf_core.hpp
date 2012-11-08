@@ -49,17 +49,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <msf_core/msf_userdefinedcalculations.hpp>
 
 #define N_STATE_BUFFER 256	///< size of unsigned char, do not change!
-#define HLI_EKF_STATE_SIZE 16 	///< number of states exchanged with external propagation. Here: p,v,q,bw,bw=16
+
 
 namespace msf_core{
 
+enum{
+	HLI_EKF_STATE_SIZE = 16 ///< number of states exchanged with external propagation. Here: p,v,q,bw,bw=16
+};
 
 class MSF_Core
 {
-	enum{
-		nErrorStatesAtCompileTime = msf_core::EKFState::nErrorStatesAtCompileTime,
-		nStatesAtCompileTime = msf_core::EKFState::nStatesAtCompileTime
-	};
 
 public:
 	typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, 1> ErrorState;
@@ -79,11 +78,14 @@ public:
 	/// get all state information at a given index in the ringbuffer
 	bool getStateAtIdx(msf_core::EKFState* timestate, unsigned char idx);
 
-	MSF_Core(boost::shared_ptr<UserDefinedCalculations>);
+	MSF_Core(boost::shared_ptr<UserDefinedCalculationsBase>);
 	~MSF_Core();
 
 private:
-	const static int nFullState_ = 28; ///< complete state
+	enum{
+		nErrorStatesAtCompileTime = msf_core::EKFState::nErrorStatesAtCompileTime,  ///< error state
+		nStatesAtCompileTime = msf_core::EKFState::nStatesAtCompileTime, ///< complete state
+	};
 	const static int nBuff_ = 30; ///< buffer size for median q_vw
 	const static int nMaxCorr_ = 50; ///< number of IMU measurements buffered for time correction actions
 	const static int QualityThres_ = 1e3;
@@ -121,7 +123,7 @@ private:
 	 */
 	bool data_playback_;
 
-	boost::shared_ptr<UserDefinedCalculations> usercalc_; //a function which provides methods for customization
+	boost::shared_ptr<UserDefinedCalculationsBase> usercalc_; //a function which provides methods for customization
 
 	enum
 	{

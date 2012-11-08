@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace msf_core
 {
 
-MSF_Core::MSF_Core(boost::shared_ptr<UserDefinedCalculations> usercalc)
+MSF_Core::MSF_Core(boost::shared_ptr<UserDefinedCalculationsBase> usercalc)
 {
 	initialized_ = false;
 	predictionMade_ = false;
@@ -97,7 +97,7 @@ void MSF_Core::initialize(const Eigen::Matrix<double, 3, 1> & p, const Eigen::Ma
 
 	msf_core::EKFState & state = StateBuffer_[idx_state_];
 
-	this->usercalc_->initializeFirstState(state);
+	this->usercalc_->initState(state);
 
 	state.q_int_ = state.get<msf_core::q_wv_>().state_;
 	state.w_m_ = w_m;
@@ -311,10 +311,10 @@ void MSF_Core::propagateState(const double dt)
 			msf_tmp::copyNonPropagationStates<EKFState>(prev_state)
 	);
 
-//	cur_state.L_ = prev_state.L_;
-//	cur_state.q_wv_ = prev_state.q_wv_;
-//	cur_state.q_ci_ = prev_state.q_ci_;
-//	cur_state.p_ci_ = prev_state.p_ci_;
+	//	cur_state.L_ = prev_state.L_;
+	//	cur_state.q_wv_ = prev_state.q_wv_;
+	//	cur_state.q_ci_ = prev_state.q_ci_;
+	//	cur_state.p_ci_ = prev_state.p_ci_;
 
 	//  Eigen::Quaternion<double> dq;
 	Eigen::Matrix<double, 3, 1> dv;
@@ -363,11 +363,11 @@ void MSF_Core::propagateState(const double dt)
 void MSF_Core::predictProcessCovariance(const double dt)
 {
 	// noises
-	ConstVector3 nav = Vector3::Constant(config_.noise_acc /* / sqrt(dt) */);
-	ConstVector3 nbav = Vector3::Constant(config_.noise_accbias /* * sqrt(dt) */);
+	ConstVector3 nav = Vector3::Constant(usercalc_->getParam_noise_acc() /* / sqrt(dt) */);
+	ConstVector3 nbav = Vector3::Constant(usercalc_->getParam_noise_accbias() /* * sqrt(dt) */);
 
-	ConstVector3 nwv = Vector3::Constant(config_.noise_gyr /* / sqrt(dt) */);
-	ConstVector3 nbwv = Vector3::Constant(config_.noise_gyrbias /* * sqrt(dt) */);
+	ConstVector3 nwv = Vector3::Constant(usercalc_->getParam_noise_gyr() /* / sqrt(dt) */);
+	ConstVector3 nbwv = Vector3::Constant(usercalc_->getParam_noise_gyrbias() /* * sqrt(dt) */);
 
 	// bias corrected IMU readings
 	ConstVector3 ew = StateBuffer_[idx_P_].w_m_ - StateBuffer_[idx_P_].get<msf_core::b_w_>().state_;
@@ -411,8 +411,16 @@ void MSF_Core::predictProcessCovariance(const double dt)
 
 	calc_QCore(dt, StateBuffer_[idx_P_].get<msf_core::q_>().state_, ew, ea, nav, nbav, nwv, nbwv, Qd_);
 
-	//TODO call user Q calc
+	//call user Q calc to fill in the blocks of aux states
+	usercalc_->calculateQAuxiliaryStates(StateBuffer_[idx_P_], dt);
 
+	//now copy the userdefined blocks to Qd
+	boost::fusion::for_each(
+			StateBuffer_[idx_P_].statevars_,
+			msf_tmp::copyQBlocksFromAuxiliaryStatesToQ<EKFState::stateVector_T>(Qd_)
+	);
+
+	//TODO later: optimize here multiplication of F blockwise, using the fact that aux states have no entries outside their block
 	StateBuffer_[idx_P_].P_ = Fd_ * StateBuffer_[(unsigned char)(idx_P_ - 1)].P_ * Fd_.transpose() + Qd_;
 
 	idx_P_++;
@@ -444,7 +452,7 @@ unsigned char MSF_Core::getClosestState(EKFState* timestate, ros::Time tstamp, d
 
 	unsigned char idx = (unsigned char)(idx_state_ - 1);
 	double timedist = 1e100;
-	double timenow = tstamp.toSec() - delay - config_.delay;
+	double timenow = tstamp.toSec() - delay - usercalc_->getParam_delay();
 
 	while (fabs(timenow - StateBuffer_[idx].time_) < timedist) // timedist decreases continuously until best point reached... then rises again
 	{
@@ -481,35 +489,39 @@ void MSF_Core::propPToIdx(unsigned char idx)
 bool MSF_Core::applyCorrection(unsigned char idx_delaystate, const ErrorState & res_delayed, double fuzzythres)
 {
 	static int seq_m = 0;
-	if (config_.fixed_scale)
-	{
-		correction_(15) = 0; //scale
-	}
 
-	if (config_.fixed_bias)
-	{
-		correction_(9) = 0; //acc bias x
-		correction_(10) = 0; //acc bias y
-		correction_(11) = 0; //acc bias z
-		correction_(12) = 0; //gyro bias x
-		correction_(13) = 0; //gyro bias y
-		correction_(14) = 0; //gyro bias z
-	}
+	//give the user the possibility to fix some states
+	usercalc_->augmentCorrectionVector(correction_);
 
-	if (config_.fixed_calib)
+	//now augment core states
+	if (usercalc_->getParam_fixed_bias())
 	{
-		correction_(19) = 0; //q_ic roll
-		correction_(20) = 0; //q_ic pitch
-		correction_(21) = 0; //q_ic yaw
-		correction_(22) = 0; //p_ci x
-		correction_(23) = 0; //p_ci y
-		correction_(24) = 0; //p_ci z
+		typedef typename msf_tmp::getEnumStateType<msf_core::EKFState::stateVector_T, msf_core::b_a_>::value b_a_type;
+		typedef typename msf_tmp::getEnumStateType<msf_core::EKFState::stateVector_T, msf_core::b_w_>::value b_w_type;
+
+		enum{
+			indexOfState_b_a = msf_tmp::getStartIndex<msf_core::EKFState::stateVector_T, b_a_type, msf_tmp::CorrectionStateLengthForType>::value,
+			indexOfState_b_w = msf_tmp::getStartIndex<msf_core::EKFState::stateVector_T, b_w_type, msf_tmp::CorrectionStateLengthForType>::value
+		};
+
+		//		msf_tmp::echoCompileTimeConstant<indexOfState_b_a>();
+		//		msf_tmp::echoCompileTimeConstant<indexOfState_b_w>();
+
+		BOOST_STATIC_ASSERT_MSG(static_cast<int>(indexOfState_b_w)==9, "The index of the state b_w in the correction vector differs from the expected value");
+		BOOST_STATIC_ASSERT_MSG(static_cast<int>(indexOfState_b_a)==12, "The index of the state b_a in the correction vector differs from the expected value");
+
+		for(int i = 0 ; i < msf_tmp::StripConstReference<b_a_type>::value::sizeInCorrection_ ; ++i){
+			correction_(indexOfState_b_a + i) = 0; //acc bias x,y,z
+		}
+		for(int i = 0 ; i < msf_tmp::StripConstReference<b_w_type>::value::sizeInCorrection_ ; ++i){
+			correction_(indexOfState_b_w + i) = 0; //gyro bias x,y,z
+		}
 	}
 
 	// state update:
 
 	// store old values in case of fuzzy tracking
-	// TODO: what to do with attitude? augment measurement noise?
+	// TODO: sweiss what to do with attitude? augment measurement noise?
 
 	EKFState & delaystate = StateBuffer_[idx_delaystate];
 
@@ -518,17 +530,17 @@ bool MSF_Core::applyCorrection(unsigned char idx_delaystate, const ErrorState & 
 
 	EKFState buffstate = delaystate;
 	//slynen{
-//	const double buff_L = delaystate.get<msf_core::L_>().state_(0);
-//	const Eigen::Quaternion<double> buff_qwv = delaystate.get<msf_core::q_wv_>().state_;
-//	const Eigen::Quaternion<double> buff_qci = delaystate.get<msf_core::q_ci_>().state_;
-//	const Eigen::Matrix<double, 3, 1> buff_pic = delaystate.get<msf_core::p_ci_>().state_;
+	//	const double buff_L = delaystate.get<msf_core::L_>().state_(0);
+	//	const Eigen::Quaternion<double> buff_qwv = delaystate.get<msf_core::q_wv_>().state_;
+	//	const Eigen::Quaternion<double> buff_qci = delaystate.get<msf_core::q_ci_>().state_;
+	//	const Eigen::Matrix<double, 3, 1> buff_pic = delaystate.get<msf_core::p_ci_>().state_;
 	//}
 
 	delaystate.get<msf_core::p_>().state_ = delaystate.get<msf_core::p_>().state_ + correction_.block<3, 1> (0, 0);
 	delaystate.get<msf_core::v_>().state_ = delaystate.get<msf_core::v_>().state_ + correction_.block<3, 1> (3, 0);
 	delaystate.get<msf_core::b_w_>().state_ = delaystate.get<msf_core::b_w_>().state_ + correction_.block<3, 1> (9, 0);
 	delaystate.get<msf_core::b_a_>().state_ = delaystate.get<msf_core::b_a_>().state_ + correction_.block<3, 1> (12, 0);
-	delaystate.get<msf_core::L_>().state_ = delaystate.get<msf_core::L_>().state_ + correction_(15);
+	delaystate.get<msf_core::L_>().state_ = delaystate.get<msf_core::L_>().state_ + correction_.block<1,1>(15,0);
 	if (delaystate.get<msf_core::L_>().state_(0) < 0)
 	{
 		ROS_WARN_STREAM_THROTTLE(1,"Negative scale detected: " << delaystate.get<msf_core::L_>().state_(0) << ". Correcting to 0.1");
@@ -571,10 +583,10 @@ bool MSF_Core::applyCorrection(unsigned char idx_delaystate, const ErrorState & 
 			delaystate.get<msf_core::b_a_>().state_ = buff_ba;
 
 			//slynen{
-//			delaystate.L_ = buff_L;
-//			delaystate.q_wv_ = buff_qwv;
-//			delaystate.q_ci_ = buff_qci;
-//			delaystate.p_ci_ = buff_pic;
+			//			delaystate.L_ = buff_L;
+			//			delaystate.q_wv_ = buff_qwv;
+			//			delaystate.q_ci_ = buff_qci;
+			//			delaystate.p_ci_ = buff_pic;
 			//}
 
 			//copy the non propagation states back from the buffer
