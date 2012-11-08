@@ -12,12 +12,9 @@
 
 namespace msf_core{
 //abstract class defining user configurable calculations for the msf_core
-class UserDefinedCalculationBase{
-	enum{
-		nErrorStatesAtCompileTime = EKFState::nErrorStatesAtCompileTime
-	};
+struct UserDefinedCalculationBase{
+	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-public:
 	virtual ~UserDefinedCalculationBase(){}
 
 	//the state is set to zero/identity, this method will be called to
@@ -32,10 +29,13 @@ public:
 	virtual void calculateQAuxiliaryStates(msf_core::EKFState& state, double dt){};
 
 	//this method will be called for the user to set the initial P matrix
-	virtual void setP(Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime>& P) = 0;
+	virtual void setP(Eigen::Matrix<double, EKFState::nErrorStatesAtCompileTime, EKFState::nErrorStatesAtCompileTime>& P) = 0;
 
 	//this method will be called for the user to have the possibility to augment the correction vector
-	virtual void augmentCorrectionVector(Eigen::Matrix<double, nErrorStatesAtCompileTime,1>& correction){};
+	virtual void augmentCorrectionVector(Eigen::Matrix<double, EKFState::nErrorStatesAtCompileTime,1>& correction){};
+
+	virtual bool sanityCheckCorrection(msf_core::EKFState& delaystate, msf_core::EKFState& buffstate,
+			Eigen::Matrix<double, EKFState::nErrorStatesAtCompileTime,1>& correction, double fuzzythres){return false;};
 
 	//provide a getter for these parameters
 	virtual bool getParam_fixed_bias() = 0;
@@ -44,6 +44,8 @@ public:
 	virtual double getParam_noise_accbias() = 0;
 	virtual double getParam_noise_gyr() = 0;
 	virtual double getParam_noise_gyrbias() = 0;
+
+
 };
 
 }

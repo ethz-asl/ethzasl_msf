@@ -59,7 +59,6 @@ MSF_Core::MSF_Core(boost::shared_ptr<UserDefinedCalculationBase> usercalc)
 	msgCorrect_.state.resize(HLI_EKF_STATE_SIZE, 0);
 	hl_state_buf_.state.resize(HLI_EKF_STATE_SIZE, 0);
 
-	qvw_inittimer_ = 1;
 
 	pnh.param("data_playback", data_playback_, false);
 
@@ -83,12 +82,13 @@ void MSF_Core::initialize(const Eigen::Matrix<double, 3, 1> & p, const Eigen::Ma
 {
 	initialized_ = false;
 	predictionMade_ = false;
-	qvw_inittimer_ = 1;
 
 	// init state buffer
 	for (int i = 0; i < N_STATE_BUFFER; i++)
 	{
+		//slynen{
 		StateBuffer_[i].reset(usercalc_);
+		//}
 	}
 
 	idx_state_ = 0;
@@ -96,9 +96,9 @@ void MSF_Core::initialize(const Eigen::Matrix<double, 3, 1> & p, const Eigen::Ma
 	idx_time_ = 0;
 
 	msf_core::EKFState & state = StateBuffer_[idx_state_];
-
+	//slynen{
 	this->usercalc_->initState(state); //ask the user to provide sensible data for the first state
-
+	//}
 	state.w_m_ = w_m;
 	state.a_m_ = a_m;
 	state.time_ = ros::Time::now().toSec();
@@ -111,10 +111,6 @@ void MSF_Core::initialize(const Eigen::Matrix<double, 3, 1> & p, const Eigen::Ma
 	// constants
 	g_ = g;
 
-	// buffer for vision failure check
-	qvw_inittimer_ = 1;
-	qbuff_ = Eigen::Matrix<double, nBuff_, 4>::Constant(0);
-
 	// init external propagation
 	msgCorrect_.header.stamp = ros::Time::now();
 	msgCorrect_.header.seq = 0;
@@ -125,11 +121,13 @@ void MSF_Core::initialize(const Eigen::Matrix<double, 3, 1> & p, const Eigen::Ma
 	msgCorrect_.linear_acceleration.y = 0;
 	msgCorrect_.linear_acceleration.z = 0;
 
+	//slynen{
 	msgCorrect_.state.resize(nStatesAtCompileTime); //make sure this is correctly sized
-	//	boost::fusion::for_each(
-	//			state.statevars_,
-	//			msf_tmp::CoreStatetoDoubleArray<std::vector<double>, EKFState::stateVector_T >(msgCorrect_.state)
-	//	);
+	boost::fusion::for_each(
+			state.statevars_,
+			msf_tmp::CoreStatetoDoubleArray<std::vector<float>, EKFState::stateVector_T >(msgCorrect_.state)
+	);
+	//}
 
 	msgCorrect_.flag = sensor_fusion_comm::ExtEkf::initialization;
 	pubCorrect_.publish(msgCorrect_);
@@ -277,14 +275,21 @@ void MSF_Core::stateCallback(const sensor_fusion_comm::ExtEkfConstPtr & msg)
 		StateBuffer_[idx_state_].get<msf_core::q_>().state_.normalize();
 
 		// zero props:
+		//TODO later we can remove these two lines, because this will also be done in the loop a couple of lines later
 		StateBuffer_[idx_state_].get<msf_core::b_w_>().state_ = StateBuffer_[(unsigned char)(idx_state_ - 1)].get<msf_core::b_w_>().state_;
 		StateBuffer_[idx_state_].get<msf_core::b_a_>().state_ = StateBuffer_[(unsigned char)(idx_state_ - 1)].get<msf_core::b_a_>().state_;
 
-		//TODO change this to be generic, so move somewhere else
-		StateBuffer_[idx_state_].get<msf_core::L_>().state_ = StateBuffer_[(unsigned char)(idx_state_ - 1)].get<msf_core::L_>().state_;
-		StateBuffer_[idx_state_].get<msf_core::q_wv_>().state_ = StateBuffer_[(unsigned char)(idx_state_ - 1)].get<msf_core::q_wv_>().state_;
-		StateBuffer_[idx_state_].get<msf_core::q_ci_>().state_ = StateBuffer_[(unsigned char)(idx_state_ - 1)].get<msf_core::q_ci_>().state_;
-		StateBuffer_[idx_state_].get<msf_core::p_ci_>().state_ = StateBuffer_[(unsigned char)(idx_state_ - 1)].get<msf_core::p_ci_>().state_;
+		//slynen{ copy non propagation states from last state
+		//		StateBuffer_[idx_state_].get<msf_core::L_>().state_ = StateBuffer_[(unsigned char)(idx_state_ - 1)].get<msf_core::L_>().state_;
+		//		StateBuffer_[idx_state_].get<msf_core::q_wv_>().state_ = StateBuffer_[(unsigned char)(idx_state_ - 1)].get<msf_core::q_wv_>().state_;
+		//		StateBuffer_[idx_state_].get<msf_core::q_ci_>().state_ = StateBuffer_[(unsigned char)(idx_state_ - 1)].get<msf_core::q_ci_>().state_;
+		//		StateBuffer_[idx_state_].get<msf_core::p_ci_>().state_ = StateBuffer_[(unsigned char)(idx_state_ - 1)].get<msf_core::p_ci_>().state_;
+		boost::fusion::for_each(
+				StateBuffer_[idx_state_].statevars_,
+				msf_tmp::copyNonPropagationStates<EKFState>(StateBuffer_[(unsigned char)(idx_state_ - 1)])
+		);
+		//}
+
 		idx_state_++;
 
 		hl_state_buf_ = *msg;
@@ -323,19 +328,21 @@ void MSF_Core::propagateState(const double dt)
 	EKFState& prev_state = StateBuffer_[(unsigned char)(idx_state_ - 1)];
 
 	// zero props:
+	//TODO: we can also remove the next two lines, because this is included in the loop a couple of lines later
 	cur_state.get<msf_core::b_w_>().state_ = prev_state.get<msf_core::b_w_>().state_;
 	cur_state.get<msf_core::b_a_>().state_ = prev_state.get<msf_core::b_a_>().state_;
-
+	//slynen{
 	//copy constant for non propagated states
-	boost::fusion::for_each(
-			cur_state.statevars_,
-			msf_tmp::copyNonPropagationStates<EKFState>(prev_state)
-	);
-
 	//	cur_state.L_ = prev_state.L_;
 	//	cur_state.q_wv_ = prev_state.q_wv_;
 	//	cur_state.q_ci_ = prev_state.q_ci_;
 	//	cur_state.p_ci_ = prev_state.p_ci_;
+	boost::fusion::for_each(
+			cur_state.statevars_,
+			msf_tmp::copyNonPropagationStates<EKFState>(prev_state)
+	);
+	//}
+
 
 	//  Eigen::Quaternion<double> dq;
 	Eigen::Matrix<double, 3, 1> dv;
@@ -511,6 +518,7 @@ bool MSF_Core::applyCorrection(unsigned char idx_delaystate, const ErrorState & 
 {
 	static int seq_m = 0;
 
+	//slynen{
 	//give the user the possibility to fix some states
 	usercalc_->augmentCorrectionVector(correction_);
 
@@ -538,6 +546,7 @@ bool MSF_Core::applyCorrection(unsigned char idx_delaystate, const ErrorState & 
 			correction_(indexOfState_b_w + i) = 0; //gyro bias x,y,z
 		}
 	}
+	//}
 
 	// state update:
 
@@ -545,9 +554,10 @@ bool MSF_Core::applyCorrection(unsigned char idx_delaystate, const ErrorState & 
 	// TODO: sweiss what to do with attitude? augment measurement noise?
 
 	EKFState & delaystate = StateBuffer_[idx_delaystate];
-
-	const Eigen::Matrix<double, 3, 1> buff_bw = delaystate.get<msf_core::b_w_>().state_;
-	const Eigen::Matrix<double, 3, 1> buff_ba = delaystate.get<msf_core::b_a_>().state_;
+	//slynen{
+//	const Eigen::Matrix<double, 3, 1> buff_bw = delaystate.get<msf_core::b_w_>().state_;
+//	const Eigen::Matrix<double, 3, 1> buff_ba = delaystate.get<msf_core::b_a_>().state_;
+//}
 
 	EKFState buffstate = delaystate;
 	//slynen{
@@ -557,82 +567,38 @@ bool MSF_Core::applyCorrection(unsigned char idx_delaystate, const ErrorState & 
 	//	const Eigen::Matrix<double, 3, 1> buff_pic = delaystate.get<msf_core::p_ci_>().state_;
 	//}
 
-	delaystate.get<msf_core::p_>().state_ = delaystate.get<msf_core::p_>().state_ + correction_.block<3, 1> (0, 0);
-	delaystate.get<msf_core::v_>().state_ = delaystate.get<msf_core::v_>().state_ + correction_.block<3, 1> (3, 0);
-	delaystate.get<msf_core::b_w_>().state_ = delaystate.get<msf_core::b_w_>().state_ + correction_.block<3, 1> (9, 0);
-	delaystate.get<msf_core::b_a_>().state_ = delaystate.get<msf_core::b_a_>().state_ + correction_.block<3, 1> (12, 0);
-	delaystate.get<msf_core::L_>().state_ = delaystate.get<msf_core::L_>().state_ + correction_.block<1,1>(15,0);
-	if (delaystate.get<msf_core::L_>().state_(0) < 0)
-	{
-		ROS_WARN_STREAM_THROTTLE(1,"Negative scale detected: " << delaystate.get<msf_core::L_>().state_(0) << ". Correcting to 0.1");
-		delaystate.get<msf_core::L_>().state_(0) = 0.1;
+	//slynen{ call correction function for every state
+	//	delaystate.get<msf_core::p_>().state_ = delaystate.get<msf_core::p_>().state_ + correction_.block<3, 1> (0, 0);
+	//	delaystate.get<msf_core::v_>().state_ = delaystate.get<msf_core::v_>().state_ + correction_.block<3, 1> (3, 0);
+	//	delaystate.get<msf_core::b_w_>().state_ = delaystate.get<msf_core::b_w_>().state_ + correction_.block<3, 1> (9, 0);
+	//	delaystate.get<msf_core::b_a_>().state_ = delaystate.get<msf_core::b_a_>().state_ + correction_.block<3, 1> (12, 0);
+	//	delaystate.get<msf_core::L_>().state_ = delaystate.get<msf_core::L_>().state_ + correction_.block<1,1>(15,0);
+	//
+	//
+	  Eigen::Quaternion<double> qbuff_q = quaternionFromSmallAngle(correction_.block<3, 1> (6, 0));
+	//	delaystate.get<msf_core::q_>().state_ = delaystate.get<msf_core::q_>().state_ * qbuff_q;
+	//	delaystate.get<msf_core::q_>().state_.normalize();
+
+	//	Eigen::Quaternion<double> qbuff_qwv = quaternionFromSmallAngle(correction_.block<3, 1> (16, 0));
+	//	delaystate.get<msf_core::q_wv_>().state_ = delaystate.get<msf_core::q_wv_>().state_ * qbuff_qwv;
+	//	delaystate.get<msf_core::q_wv_>().state_.normalize();
+	//
+	//	Eigen::Quaternion<double> qbuff_qci = quaternionFromSmallAngle(correction_.block<3, 1> (19, 0));
+	//	delaystate.get<msf_core::q_ci_>().state_ = delaystate.get<msf_core::q_ci_>().state_ * qbuff_qci;
+	//	delaystate.get<msf_core::q_ci_>().state_.normalize();
+	//
+	//	delaystate.get<msf_core::p_ci_>().state_ = delaystate.get<msf_core::p_ci_>().state_ + correction_.block<3, 1> (22, 0);
+
+	delaystate.correct(correction_);
+
+	//}
+
+	//slynen{ //allow the user to sanity check the new state (fuzzy tracking detection etc.)
+	bool isfuzzy = usercalc_->sanityCheckCorrection(delaystate, buffstate, correction_, fuzzythres);
+	if(isfuzzy){ //TODO remove this as it seems the value assigned here is never used
+		qbuff_q.setIdentity();
 	}
-
-	Eigen::Quaternion<double> qbuff_q = quaternionFromSmallAngle(correction_.block<3, 1> (6, 0));
-	delaystate.get<msf_core::q_>().state_ = delaystate.get<msf_core::q_>().state_ * qbuff_q;
-	delaystate.get<msf_core::q_>().state_.normalize();
-
-	//TODO: change to be generic
-	Eigen::Quaternion<double> qbuff_qwv = quaternionFromSmallAngle(correction_.block<3, 1> (16, 0));
-	delaystate.get<msf_core::q_wv_>().state_ = delaystate.get<msf_core::q_wv_>().state_ * qbuff_qwv;
-	delaystate.get<msf_core::q_wv_>().state_.normalize();
-
-	Eigen::Quaternion<double> qbuff_qci = quaternionFromSmallAngle(correction_.block<3, 1> (19, 0));
-	delaystate.get<msf_core::q_ci_>().state_ = delaystate.get<msf_core::q_ci_>().state_ * qbuff_qci;
-	delaystate.get<msf_core::q_ci_>().state_.normalize();
-
-	delaystate.get<msf_core::p_ci_>().state_ = delaystate.get<msf_core::p_ci_>().state_ + correction_.block<3, 1> (22, 0);
-
-	// update qbuff_ and check for fuzzy tracking
-	if (qvw_inittimer_ > nBuff_)
-	{
-		// should be unit quaternion if no error
-		Eigen::Quaternion<double> errq = delaystate.get<msf_core::q_wv_>().state_.conjugate() *
-				Eigen::Quaternion<double>(
-						getMedian(qbuff_.block<nBuff_, 1> (0, 3)),
-						getMedian(qbuff_.block<nBuff_, 1> (0, 0)),
-						getMedian(qbuff_.block<nBuff_, 1> (0, 1)),
-						getMedian(qbuff_.block<nBuff_, 1> (0, 2))
-				);
-
-		if (std::max(errq.vec().maxCoeff(), -errq.vec().minCoeff()) / fabs(errq.w()) * 2 > fuzzythres) // fuzzy tracking (small angle approx)
-		{
-			ROS_WARN_STREAM_THROTTLE(1,"fuzzy tracking triggered: " << std::max(errq.vec().maxCoeff(), -errq.vec().minCoeff())/fabs(errq.w())*2 << " limit: " << fuzzythres <<"\n");
-
-			//state_.q_ = buff_q;
-			delaystate.get<msf_core::b_w_>().state_ = buff_bw;
-			delaystate.get<msf_core::b_a_>().state_ = buff_ba;
-
-			//slynen{
-			//			delaystate.L_ = buff_L;
-			//			delaystate.q_wv_ = buff_qwv;
-			//			delaystate.q_ci_ = buff_qci;
-			//			delaystate.p_ci_ = buff_pic;
-			//}
-
-			//copy the non propagation states back from the buffer
-
-			boost::fusion::for_each(
-					delaystate.statevars_,
-					msf_tmp::copyNonPropagationStates<EKFState>(buffstate)
-			);
-
-			correction_.block<16, 1> (9, 0) = Eigen::Matrix<double, 16, 1>::Zero();
-			qbuff_q.setIdentity();
-			qbuff_qwv.setIdentity();
-			qbuff_qci.setIdentity();
-		}
-		else // if tracking ok: update mean and 3sigma of past N q_vw's
-		{
-			qbuff_.block<1, 4> (qvw_inittimer_ - nBuff_ - 1, 0) = Eigen::Matrix<double, 1, 4>(delaystate.get<msf_core::q_wv_>().state_.coeffs());
-			qvw_inittimer_ = (qvw_inittimer_) % nBuff_ + nBuff_ + 1;
-		}
-	}
-	else // at beginning get mean and 3sigma of past N q_vw's
-	{
-		qbuff_.block<1, 4> (qvw_inittimer_ - 1, 0) = Eigen::Matrix<double, 1, 4>(delaystate.get<msf_core::q_wv_>().state_.coeffs());
-		qvw_inittimer_++;
-	}
+	//}
 
 	// idx fiddeling to ensure correct update until now from the past
 	idx_time_ = idx_state_;
@@ -690,23 +656,6 @@ bool MSF_Core::applyCorrection(unsigned char idx_delaystate, const ErrorState & 
 }
 
 
-double MSF_Core::getMedian(const Eigen::Matrix<double, nBuff_, 1> & data)
-{
-	std::vector<double> mediandistvec;
-	mediandistvec.reserve(nBuff_);
-	for (int i = 0; i < nBuff_; ++i)
-		mediandistvec.push_back(data(i));
 
-	if (mediandistvec.size() > 0)
-	{
-		std::vector<double>::iterator first = mediandistvec.begin();
-		std::vector<double>::iterator last = mediandistvec.end();
-		std::vector<double>::iterator middle = first + std::floor((last - first) / 2);
-		std::nth_element(first, middle, last); // can specify comparator as optional 4th arg
-		return *middle;
-	}
-	else
-		return 0;
-}
 
 }; // end namespace

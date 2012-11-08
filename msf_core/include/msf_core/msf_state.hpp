@@ -48,9 +48,11 @@ struct GenericState_T{
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 	enum{
 		nStateVarsAtCompileTime = boost::fusion::result_of::size<stateVector_T>::type::value, //n state vars
-		nErrorStatesAtCompileTime = msf_tmp::CountStates<stateVector_T, msf_tmp::CorrectionStateLengthForType>::value, //n correction states
+		nErrorStatesAtCompileTime = msf_tmp::CountStates<stateVector_T, msf_tmp::CorrectionStateLengthForType>::value, //n error states
 		nStatesAtCompileTime = msf_tmp::CountStates<stateVector_T, msf_tmp::StateLengthForType>::value, //n total states
-		nCoreStatesAtCompileTime = msf_tmp::CountStates<stateVector_T, msf_tmp::CoreStateLengthForType>::value //n total core states
+		nCoreStatesAtCompileTime = msf_tmp::CountStates<stateVector_T, msf_tmp::CoreStateLengthForType>::value, //n total core states
+		nPropagatedCoreStatesAtCompileTime = msf_tmp::CountStates<stateVector_T, msf_tmp::PropagatedCoreStateLengthForType>::value, //n total core states with propagation
+		nPropagatedCoreErrorStatesAtCompileTime = msf_tmp::CountStates<stateVector_T, msf_tmp::PropagatedCoreErrorStateLengthForType>::value //n total error states with propagation
 	};
 	stateVector_T statevars_; ///< the actual state variables
 

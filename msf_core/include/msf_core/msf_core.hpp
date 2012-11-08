@@ -83,7 +83,7 @@ public:
 	~MSF_Core();
 
 private:
-	const static int nBuff_ = 30; ///< buffer size for median q_vw
+
 	const static int nMaxCorr_ = 50; ///< number of IMU measurements buffered for time correction actions
 	const static int QualityThres_ = 1e3;
 
@@ -97,10 +97,6 @@ private:
 	unsigned char idx_time_; ///< pointer to state buffer at a specific time
 
 	Eigen::Matrix<double, 3, 1> g_; ///< gravity vector
-
-	/// vision-world drift watch dog to determine fuzzy tracking
-	int qvw_inittimer_;
-	Eigen::Matrix<double, nBuff_, 4> qbuff_;
 
 	/// correction from EKF update
 	Eigen::Matrix<double, nErrorStatesAtCompileTime, 1> correction_;
@@ -177,8 +173,6 @@ private:
 	void stateCallback(const sensor_fusion_comm::ExtEkfConstPtr & msg);
 
 
-	/// computes the median of a given vector
-	double getMedian(const Eigen::Matrix<double, nBuff_, 1> & data);
 
 public:
 	/// main update routine called by a given sensor

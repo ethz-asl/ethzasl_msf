@@ -10,6 +10,8 @@
 #include <dynamic_reconfigure/server.h>
 #include <msf_core/MSF_CoreConfig.h>
 #include <msf_core/msf_userdefinedcalculationbase.hpp>
+#include <msf_core/eigen_utils.h>
+#include <msf_core/msf_tools.hpp>
 
 typedef dynamic_reconfigure::Server<msf_core::MSF_CoreConfig> ReconfigureServer;
 
@@ -24,17 +26,30 @@ private:
 	ReconfigureServer *reconfServer_;
 	typedef boost::function<void(msf_core::MSF_CoreConfig& config, uint32_t level)> CallbackType;
 	std::vector<CallbackType> callbacks_;
+
+	/// vision-world drift watch dog to determine fuzzy tracking
+	const static int nBuff_ = 30; ///< buffer size for median q_vw
+	int qvw_inittimer_;
+	Eigen::Matrix<double, nBuff_, 4> qbuff_;
+
 public:
+	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 	SSFCalculations(){
 		reconfServer_ = new ReconfigureServer(ros::NodeHandle("~"));
 		ReconfigureServer::CallbackType f = boost::bind(&SSFCalculations::Config, this, _1, _2);
 		reconfServer_->setCallback(f);
 		//register dyn config list
 		registerCallback(&SSFCalculations::DynConfig, this);
+
+		// buffer for vision failure check
+		qvw_inittimer_ = 1;
+		qbuff_ = Eigen::Matrix<double, nBuff_, 4>::Constant(0);
 	}
 	virtual ~SSFCalculations(){
 		delete reconfServer_;
 	}
+
+
 
 	/// gets called by dynamic reconfigure and calls all registered callbacks in callbacks_
 	virtual void Config(msf_core::MSF_CoreConfig &config, uint32_t level)
@@ -63,7 +78,7 @@ public:
 	}
 	virtual void initState(msf_core::EKFState& state){
 
-		//TODO implement this correctly
+		//TODO !! implement this correctly
 		//		state.get<msf_core::p_>().state_ = p;
 		//		state.get<msf_core::v_>().state_ = v;
 		//		state.get<msf_core::q_>().state_ = q;
@@ -158,6 +173,73 @@ public:
 			}
 		}
 	}
+
+	virtual bool sanityCheckCorrection(msf_core::EKFState& delaystate, msf_core::EKFState& buffstate,
+			Eigen::Matrix<double, msf_core::EKFState::nErrorStatesAtCompileTime,1>& correction_, double fuzzythres){
+
+		bool retvalue = false;
+
+		if (delaystate.get<msf_core::L_>().state_(0) < 0)
+		{
+			ROS_WARN_STREAM_THROTTLE(1,"Negative scale detected: " << delaystate.get<msf_core::L_>().state_(0) << ". Correcting to 0.1");
+			delaystate.get<msf_core::L_>().state_(0) = 0.1;
+		}
+
+
+		// update qbuff_ and check for fuzzy tracking
+		if (qvw_inittimer_ > nBuff_)
+		{
+			// should be unit quaternion if no error
+			Eigen::Quaternion<double> errq = delaystate.get<msf_core::q_wv_>().state_.conjugate() *
+					Eigen::Quaternion<double>(
+							getMedian(qbuff_.block<nBuff_, 1> (0, 3)),
+							getMedian(qbuff_.block<nBuff_, 1> (0, 0)),
+							getMedian(qbuff_.block<nBuff_, 1> (0, 1)),
+							getMedian(qbuff_.block<nBuff_, 1> (0, 2))
+					);
+
+			if (std::max(errq.vec().maxCoeff(), -errq.vec().minCoeff()) / fabs(errq.w()) * 2 > fuzzythres) // fuzzy tracking (small angle approx)
+			{
+				ROS_WARN_STREAM_THROTTLE(1,"fuzzy tracking triggered: " << std::max(errq.vec().maxCoeff(), -errq.vec().minCoeff())/fabs(errq.w())*2 << " limit: " << fuzzythres <<"\n");
+
+
+				//state_.q_ = buff_q;
+				//TODO: could remove this, as it is also done two lines later
+				delaystate.get<msf_core::b_w_>().state_ = buffstate.get<msf_core::b_w_>().state_;
+				delaystate.get<msf_core::b_a_>().state_ = buffstate.get<msf_core::b_a_>().state_;
+
+				//copy the non propagation states back from the buffer
+				boost::fusion::for_each(
+						delaystate.statevars_,
+						msf_tmp::copyNonPropagationStates<EKFState>(buffstate)
+				);
+
+				msf_tmp::echoCompileTimeConstant<EKFState::nPropagatedCoreErrorStatesAtCompileTime>();
+
+				BOOST_STATIC_ASSERT_MSG(static_cast<int>(EKFState::nPropagatedCoreErrorStatesAtCompileTime) == 9, "Assumed that nPropagatedCoreStates == 9, which is not the case");
+				BOOST_STATIC_ASSERT_MSG(static_cast<int>(EKFState::nErrorStatesAtCompileTime) -
+						static_cast<int>(EKFState::nPropagatedCoreErrorStatesAtCompileTime) == 16, "Assumed that nErrorStatesAtCompileTime-nPropagatedCoreStates == 16, which is not the case");
+
+				correction_.block<EKFState::nErrorStatesAtCompileTime-EKFState::nPropagatedCoreErrorStatesAtCompileTime, 1> (EKFState::nPropagatedCoreErrorStatesAtCompileTime, 0) =
+						Eigen::Matrix<double, EKFState::nErrorStatesAtCompileTime-EKFState::nPropagatedCoreErrorStatesAtCompileTime, 1>::Zero();
+				retvalue = true; //is fuzzy
+			}
+			else // if tracking ok: update mean and 3sigma of past N q_vw's
+			{
+				qbuff_.block<1, 4> (qvw_inittimer_ - nBuff_ - 1, 0) = Eigen::Matrix<double, 1, 4>(delaystate.get<msf_core::q_wv_>().state_.coeffs());
+				qvw_inittimer_ = (qvw_inittimer_) % nBuff_ + nBuff_ + 1;
+			}
+		}
+		else // at beginning get mean and 3sigma of past N q_vw's
+		{
+			qbuff_.block<1, 4> (qvw_inittimer_ - 1, 0) = Eigen::Matrix<double, 1, 4>(delaystate.get<msf_core::q_wv_>().state_.coeffs());
+			qvw_inittimer_++;
+		}
+
+		return retvalue; //return whether fuzzy
+	}
+
+
 
 	virtual bool getParam_fixed_bias(){
 		return config_.fixed_bias;
