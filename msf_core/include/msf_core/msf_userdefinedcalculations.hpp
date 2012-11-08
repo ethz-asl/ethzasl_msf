@@ -4,52 +4,19 @@
  */
 
 
-#ifndef MSF_USERDEFINEDCALCULATIONS_HPP_
-#define MSF_USERDEFINEDCALCULATIONS_HPP_
+#ifndef MSF_USERDEFINEDCALCULATION_HPP_
+#define MSF_USERDEFINEDCALCULATION_HPP_
 
-#include <msf_core/msf_types.hpp>
-#include <msf_core/msf_state.hpp>
 #include <dynamic_reconfigure/server.h>
 #include <msf_core/MSF_CoreConfig.h>
+#include <msf_core/msf_userdefinedcalculationbase.hpp>
 
 typedef dynamic_reconfigure::Server<msf_core::MSF_CoreConfig> ReconfigureServer;
 
 namespace msf_core{
 
-//abstract class defining user configurable calculations for the msf_core
-class UserDefinedCalculationsBase{
-public:
-	virtual ~UserDefinedCalculationsBase(){}
 
-	//the state is set to zero/identity, this method will be called to
-	//give the user the possibility to change the reset values of some states
-	virtual void resetState(msf_core::EKFState& state){}
-
-	//this method will be called for the user to set the initial state
-	virtual void initState(msf_core::EKFState& state) = 0;
-
-	//this method will be called for the user to set the Q block entries for Auxiliary states
-	//only changes to blocks in Q belonging to the auxiliary states are allowed / evaluated
-	virtual void calculateQAuxiliaryStates(msf_core::EKFState& state, double dt){};
-
-	//this method will be called for the user to set the initial P matrix
-	virtual void setP(Eigen::Matrix<double, msf_core::EKFState::nErrorStatesAtCompileTime, msf_core::EKFState::nErrorStatesAtCompileTime>& P) = 0;
-
-	//this method will be called for the user to have the possibility to augment the correction vector
-	virtual void augmentCorrectionVector(Eigen::Matrix<double, msf_core::EKFState::nErrorStatesAtCompileTime,1>& correction){};
-
-	//provide a getter for these parameters
-	virtual bool getParam_fixed_bias() = 0;
-	virtual double getParam_delay() = 0;
-	virtual double getParam_noise_acc() = 0;
-	virtual double getParam_noise_accbias() = 0;
-	virtual double getParam_noise_gyr() = 0;
-	virtual double getParam_noise_gyrbias() = 0;
-
-
-};
-
-class SSFCalculations:public UserDefinedCalculationsBase{
+class SSFCalculations:public UserDefinedCalculationBase{
 private:
 	/// dynamic reconfigure config
 	msf_core::MSF_CoreConfig config_;
@@ -215,4 +182,4 @@ public:
 
 }
 
-#endif /* MSF_USERDEFINEDCALCULATIONS_HPP_ */
+#endif /* MSF_USERDEFINEDCALCULATION_HPP_ */

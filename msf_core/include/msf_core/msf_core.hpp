@@ -59,7 +59,10 @@ enum{
 
 class MSF_Core
 {
-
+	enum{
+		nErrorStatesAtCompileTime = msf_core::EKFState::nErrorStatesAtCompileTime,  ///< error state
+		nStatesAtCompileTime = msf_core::EKFState::nStatesAtCompileTime ///< complete state
+	};
 public:
 	typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, 1> ErrorState;
 	typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> ErrorStateCov;
@@ -67,10 +70,9 @@ public:
 	/// big init routine
 	void initialize(const Eigen::Matrix<double, 3, 1> & p, const Eigen::Matrix<double, 3, 1> & v,
 			const Eigen::Quaternion<double> & q, const Eigen::Matrix<double, 3, 1> & b_w,
-			const Eigen::Matrix<double, 3, 1> & b_a, const double & L, const Eigen::Quaternion<double> & q_wv,
+			const Eigen::Matrix<double, 3, 1> & b_a,
 			const Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> & P, const Eigen::Matrix<double, 3, 1> & w_m,
-			const Eigen::Matrix<double, 3, 1> & a_m, const Eigen::Matrix<double, 3, 1> & g,
-			const Eigen::Quaternion<double> & q_ci, const Eigen::Matrix<double, 3, 1> & p_ci);
+			const Eigen::Matrix<double, 3, 1> & a_m, const Eigen::Matrix<double, 3, 1> & g);
 
 	/// retreive all state information at time t. Used to build H, residual and noise matrix by update sensors
 	unsigned char getClosestState(msf_core::EKFState* timestate, ros::Time tstamp, double delay = 0.00);
@@ -78,14 +80,10 @@ public:
 	/// get all state information at a given index in the ringbuffer
 	bool getStateAtIdx(msf_core::EKFState* timestate, unsigned char idx);
 
-	MSF_Core(boost::shared_ptr<UserDefinedCalculationsBase>);
+	MSF_Core(boost::shared_ptr<UserDefinedCalculationBase>);
 	~MSF_Core();
 
 private:
-	enum{
-		nErrorStatesAtCompileTime = msf_core::EKFState::nErrorStatesAtCompileTime,  ///< error state
-		nStatesAtCompileTime = msf_core::EKFState::nStatesAtCompileTime, ///< complete state
-	};
 	const static int nBuff_ = 30; ///< buffer size for median q_vw
 	const static int nMaxCorr_ = 50; ///< number of IMU measurements buffered for time correction actions
 	const static int QualityThres_ = 1e3;
@@ -123,7 +121,7 @@ private:
 	 */
 	bool data_playback_;
 
-	boost::shared_ptr<UserDefinedCalculationsBase> usercalc_; //a function which provides methods for customization
+	boost::shared_ptr<UserDefinedCalculationBase> usercalc_; //a function which provides methods for customization
 
 	enum
 	{
@@ -184,40 +182,11 @@ private:
 	double getMedian(const Eigen::Matrix<double, nBuff_, 1> & data);
 
 public:
-	// some header implementations
-
 	/// main update routine called by a given sensor
 	template<class H_type, class Res_type, class R_type>
 	bool applyMeasurement(unsigned char idx_delaystate, const Eigen::MatrixBase<H_type>& H_delayed,
 			const Eigen::MatrixBase<Res_type> & res_delayed, const Eigen::MatrixBase<R_type>& R_delayed,
-			double fuzzythres = 0.1)
-	{
-		EIGEN_STATIC_ASSERT_FIXED_SIZE(H_type);
-		EIGEN_STATIC_ASSERT_FIXED_SIZE(R_type);
-
-		// get measurements
-		if (!predictionMade_)
-			return false;
-
-		// make sure we have correctly propagated cov until idx_delaystate
-		propPToIdx(idx_delaystate);
-
-		R_type S;
-		Eigen::Matrix<double, nErrorStatesAtCompileTime, R_type::RowsAtCompileTime> K;
-		ErrorStateCov & P = StateBuffer_[idx_delaystate].P_;
-
-		S = H_delayed * StateBuffer_[idx_delaystate].P_ * H_delayed.transpose() + R_delayed;
-		K = P * H_delayed.transpose() * S.inverse();
-
-		correction_ = K * res_delayed;
-		const ErrorStateCov KH = (ErrorStateCov::Identity() - K * H_delayed);
-		P = KH * P * KH.transpose() + K * R_delayed * K.transpose();
-
-		// make sure P stays symmetric
-		P = 0.5 * (P + P.transpose());
-
-		return applyCorrection(idx_delaystate, correction_, fuzzythres);
-	}
+			double fuzzythres = 0.1);
 
 };
 

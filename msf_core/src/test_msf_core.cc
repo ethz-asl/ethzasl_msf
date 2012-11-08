@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 int main(int argc, char** argv)
 {
 	ros::init(argc, argv, "msf_core");
-	boost::shared_ptr<msf_core::UserDefinedCalculationsBase> usercalcs(new msf_core::SSFCalculations());
+	boost::shared_ptr<msf_core::UserDefinedCalculationBase> usercalcs(new msf_core::SSFCalculations());
 	msf_core::MSF_Core core(usercalcs);
 
 	//TODO: so on...
