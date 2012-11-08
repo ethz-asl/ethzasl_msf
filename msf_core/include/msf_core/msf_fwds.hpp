@@ -10,7 +10,7 @@
 namespace msf_core{
 //forwards
 //state variable
-template<typename type_T, int name_T>
+template<typename type_T, int name_T, bool PROPAGATED = false>
 struct StateVar_T;
 
 //the state

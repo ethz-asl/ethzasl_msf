@@ -29,10 +29,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
 
-
+#include <ros/ros.h>
 #include <msf_core/msf_core.hpp>
 int main(int argc, char** argv)
 {
-	msf_core::MSF_Core core;
+	ros::init(argc, argv, "msf_core");
+	boost::shared_ptr<msf_core::UserDefinedCalculations> usercalcs(new msf_core::UserDefinedCalculations);
+	msf_core::MSF_Core core(usercalcs);
+
+	//TODO: so on...
+
+	ros::spin();
 }
 

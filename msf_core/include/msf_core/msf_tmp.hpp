@@ -37,22 +37,22 @@ namespace msf_tmp{
 
 //runtime output of stateVariable types
 template<typename T> struct echoStateVarType;
-template<int NAME, int N> struct echoStateVarType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME>&>{
+template<int NAME, int N, bool PROPAGATED> struct echoStateVarType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, PROPAGATED>&>{
 	static std::string value(){
 		return "const ref Eigen::Matrix<double, "+boost::lexical_cast<std::string>(N)+", 1>";
 	}
 };
-template<int NAME> struct echoStateVarType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME>&>{
+template<int NAME, bool PROPAGATED> struct echoStateVarType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, PROPAGATED>&>{
 	static std::string value(){
 		return "const ref Eigen::Quaterniond";
 	}
 };
-template<int NAME, int N> struct echoStateVarType<msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME> >{
+template<int NAME, int N, bool PROPAGATED> struct echoStateVarType<msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, PROPAGATED> >{
 	static std::string value(){
 		return "Eigen::Matrix<double, "+boost::lexical_cast<std::string>(N)+", 1>";
 	}
 };
-template<int NAME> struct echoStateVarType<msf_core::StateVar_T<Eigen::Quaterniond, NAME> >{
+template<int NAME, bool PROPAGATED> struct echoStateVarType<msf_core::StateVar_T<Eigen::Quaterniond, NAME, PROPAGATED> >{
 	static std::string value(){
 		return "Eigen::Quaterniond";
 	}
@@ -63,10 +63,10 @@ namespace{ //for internal use only
 //the number of entries in the correction vector for a given state var
 template<typename T>
 struct CorrectionStateLengthForType;
-template<int NAME, int N> struct CorrectionStateLengthForType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME>& >{
+template<int NAME, int N, bool PROPAGATED> struct CorrectionStateLengthForType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, PROPAGATED>& >{
 	enum{value = N};
 };
-template<int NAME> struct CorrectionStateLengthForType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME>& >{
+template<int NAME, bool PROPAGATED> struct CorrectionStateLengthForType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, PROPAGATED>& >{
 	enum{value = 3};
 };
 template<> struct CorrectionStateLengthForType<const mpl_::void_&>{
@@ -76,10 +76,10 @@ template<> struct CorrectionStateLengthForType<const mpl_::void_&>{
 //the number of entries in the state for a given state var
 template<typename T>
 struct StateLengthForType;
-template<int NAME, int N> struct StateLengthForType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME>& >{
+template<int NAME, int N, bool PROPAGATED> struct StateLengthForType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, PROPAGATED>& >{
 	enum{value = N};
 };
-template<int NAME> struct StateLengthForType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME>& >{
+template<int NAME, bool PROPAGATED> struct StateLengthForType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, PROPAGATED>& >{
 	enum{value = 4};
 };
 template<> struct StateLengthForType<const mpl_::void_&>{
@@ -89,7 +89,7 @@ template<> struct StateLengthForType<const mpl_::void_&>{
 //return the number a state has in the enum
 template<typename T>
 struct getEnumStateName;
-template<typename U,int NAME> struct getEnumStateName<const msf_core::StateVar_T<U, NAME>& >{
+template<typename U,int NAME, bool PROPAGATED> struct getEnumStateName<const msf_core::StateVar_T<U, NAME, PROPAGATED>& >{
 	enum{value = NAME};
 };
 template<> struct getEnumStateName<const mpl_::void_&>{
@@ -242,16 +242,33 @@ struct getStartIndex{
 //reset the EKF state
 struct resetState
 {
-	template<int NAME, int N>
-	void operator()(msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME>& t) const{
-		typedef msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME> var_T;
+	template<int NAME, int N, bool PROPAGATED>
+	void operator()(msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, PROPAGATED>& t) const{
+		typedef msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, PROPAGATED> var_T;
 		t.state_.setZero();
 	}
-	template<int NAME>
-	void operator()(msf_core::StateVar_T<Eigen::Quaterniond, NAME>& t) const{
-		typedef msf_core::StateVar_T<Eigen::Quaterniond, NAME> var_T;
+	template<int NAME, bool PROPAGATED>
+	void operator()(msf_core::StateVar_T<Eigen::Quaterniond, NAME, PROPAGATED>& t) const{
+		typedef msf_core::StateVar_T<Eigen::Quaterniond, NAME, PROPAGATED> var_T;
 		t.state_.setIdentity();
 	}
+};
+
+//copy states from previous to current states, for which there is no propagation
+template<typename stateT>
+struct copyNonPropagationStates
+{
+	copyNonPropagationStates(stateT& oldstate):oldstate_(oldstate){	}
+	template<typename T, int NAME, bool PROPAGATED>
+	void operator()(msf_core::StateVar_T<T, NAME, PROPAGATED>& t) const{
+		t = oldstate_.template get<NAME>().state_; //copy value from old state to new state var
+	}
+	template<typename T, int NAME>
+	void operator()(msf_core::StateVar_T<T, NAME, true>& t) const{
+		//nothing to do for the states, which have propagation
+	}
+private:
+	stateT& oldstate_;
 };
 
 //apply EKF corrections depending on the stateVar type
@@ -259,9 +276,9 @@ template<typename T, typename stateList_T>
 struct correctState
 {
 	correctState(T& correction):data_(correction){	}
-	template<int NAME, int N>
-	void operator()(msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME>& t) const{
-		typedef msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME> var_T;
+	template<int NAME, int N, bool PROPAGATED>
+	void operator()(msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, PROPAGATED>& t) const{
+		typedef msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, PROPAGATED> var_T;
 		std::cout<<"called correction for state "<<NAME<<" of type "<<msf_tmp::echoStateVarType<var_T>::value()<<std::endl;
 		//get index of the data in the correction vector
 		static const int  idxstartcorr = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::CorrectionStateLengthForType>::value;
@@ -273,9 +290,9 @@ struct correctState
 		std::cout<<"startindex in state: "<<idxstartstate<<" size in state: "<<var_T::sizeInState_<<std::endl;
 
 	}
-	template<int NAME>
-	void operator()(msf_core::StateVar_T<Eigen::Quaterniond, NAME>& t) const{
-		typedef msf_core::StateVar_T<Eigen::Quaterniond, NAME> var_T;
+	template<int NAME, bool PROPAGATED>
+	void operator()(msf_core::StateVar_T<Eigen::Quaterniond, NAME, PROPAGATED>& t) const{
+		typedef msf_core::StateVar_T<Eigen::Quaterniond, NAME, PROPAGATED> var_T;
 		std::cout<<"called correction for state "<<NAME<<" of type "<<msf_tmp::echoStateVarType<var_T>::value()<<std::endl;
 		//get index of the data in the correction vector
 		static const int idxstartcorr = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::CorrectionStateLengthForType>::value;
@@ -295,23 +312,23 @@ template<typename T, typename stateList_T>
 struct StatetoDoubleArray
 {
 	StatetoDoubleArray(T& statearray):data_(statearray){}
-	template<int NAME, int N>
-	void operator()(msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME>& t) const{
-		typedef msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME> var_T;
+	template<int NAME, int N, bool PROPAGATED>
+	void operator()(msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, PROPAGATED>& t) const{
+		typedef msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, PROPAGATED> var_T;
 		static const int  idxstartstate = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::StateLengthForType>::value; //index of the data in the state vector
 		for(int i = 0;i<var_T::sizeInState_;++i){
-			data_[idxstartstate + i] = t[i];
+			data_[idxstartstate + i] = t.state_[i];
 		}
 	}
-	template<int NAME>
-	void operator()(msf_core::StateVar_T<Eigen::Quaterniond, NAME>& t) const{
-		typedef msf_core::StateVar_T<Eigen::Quaterniond, NAME> var_T;
+	template<int NAME, bool PROPAGATED>
+	void operator()(msf_core::StateVar_T<Eigen::Quaterniond, NAME, PROPAGATED>& t) const{
+		typedef msf_core::StateVar_T<Eigen::Quaterniond, NAME, PROPAGATED> var_T;
 		static const int idxstartstate = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::StateLengthForType>::value; //index of the data in the state vector
 		//copy quaternion values
-		data_[idxstartstate + 0] = t.w();
-		data_[idxstartstate + 1] = t.x();
-		data_[idxstartstate + 2] = t.y();
-		data_[idxstartstate + 3] = t.z();
+		data_[idxstartstate + 0] = t.state_.w();
+		data_[idxstartstate + 1] = t.state_.x();
+		data_[idxstartstate + 2] = t.state_.y();
+		data_[idxstartstate + 3] = t.state_.z();
 	}
 private:
 	T& data_;

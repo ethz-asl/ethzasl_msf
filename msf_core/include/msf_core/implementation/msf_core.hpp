@@ -80,7 +80,7 @@ void MSF_Core::initialize(const Eigen::Matrix<double, 3, 1> & p, const Eigen::Ma
 		const Eigen::Matrix<double, 3, 1> & w_m, const Eigen::Matrix<double, 3, 1> & a_m,
 		const Eigen::Matrix<double, 3, 1> & g, const Eigen::Quaternion<double> & q_ci,
 		const Eigen::Matrix<double, 3, 1> & p_ci)
-		{
+{
 	initialized_ = false;
 	predictionMade_ = false;
 	qvw_inittimer_ = 1;
@@ -149,7 +149,7 @@ void MSF_Core::initialize(const Eigen::Matrix<double, 3, 1> & p, const Eigen::Ma
 	idx_P_++;
 
 	initialized_ = true;
-		}
+}
 
 
 
@@ -304,10 +304,17 @@ void MSF_Core::propagateState(const double dt)
 	// zero props:
 	cur_state.get<msf_core::b_w_>().state_ = prev_state.get<msf_core::b_w_>().state_;
 	cur_state.get<msf_core::b_a_>().state_ = prev_state.get<msf_core::b_a_>().state_;
-	cur_state.L_ = prev_state.L_;
-	cur_state.q_wv_ = prev_state.q_wv_;
-	cur_state.q_ci_ = prev_state.q_ci_;
-	cur_state.p_ci_ = prev_state.p_ci_;
+
+	//copy constant for non propagated states
+	boost::fusion::for_each(
+			cur_state.statevars_,
+			msf_tmp::copyNonPropagationStates<EKFState>(prev_state)
+	);
+
+//	cur_state.L_ = prev_state.L_;
+//	cur_state.q_wv_ = prev_state.q_wv_;
+//	cur_state.q_ci_ = prev_state.q_ci_;
+//	cur_state.p_ci_ = prev_state.p_ci_;
 
 	//  Eigen::Quaternion<double> dq;
 	Eigen::Matrix<double, 3, 1> dv;
@@ -355,17 +362,12 @@ void MSF_Core::propagateState(const double dt)
 
 void MSF_Core::predictProcessCovariance(const double dt)
 {
-
-
-
 	// noises
 	ConstVector3 nav = Vector3::Constant(config_.noise_acc /* / sqrt(dt) */);
 	ConstVector3 nbav = Vector3::Constant(config_.noise_accbias /* * sqrt(dt) */);
 
 	ConstVector3 nwv = Vector3::Constant(config_.noise_gyr /* / sqrt(dt) */);
 	ConstVector3 nbwv = Vector3::Constant(config_.noise_gyrbias /* * sqrt(dt) */);
-
-
 
 	// bias corrected IMU readings
 	ConstVector3 ew = StateBuffer_[idx_P_].w_m_ - StateBuffer_[idx_P_].get<msf_core::b_w_>().state_;
@@ -513,10 +515,14 @@ bool MSF_Core::applyCorrection(unsigned char idx_delaystate, const ErrorState & 
 
 	const Eigen::Matrix<double, 3, 1> buff_bw = delaystate.get<msf_core::b_w_>().state_;
 	const Eigen::Matrix<double, 3, 1> buff_ba = delaystate.get<msf_core::b_a_>().state_;
-	const double buff_L = delaystate.get<msf_core::L_>().state_(0);
-	const Eigen::Quaternion<double> buff_qwv = delaystate.get<msf_core::q_wv_>().state_;
-	const Eigen::Quaternion<double> buff_qci = delaystate.get<msf_core::q_ci_>().state_;
-	const Eigen::Matrix<double, 3, 1> buff_pic = delaystate.get<msf_core::p_ci_>().state_;
+
+	EKFState buffstate = delaystate;
+	//slynen{
+//	const double buff_L = delaystate.get<msf_core::L_>().state_(0);
+//	const Eigen::Quaternion<double> buff_qwv = delaystate.get<msf_core::q_wv_>().state_;
+//	const Eigen::Quaternion<double> buff_qci = delaystate.get<msf_core::q_ci_>().state_;
+//	const Eigen::Matrix<double, 3, 1> buff_pic = delaystate.get<msf_core::p_ci_>().state_;
+	//}
 
 	delaystate.get<msf_core::p_>().state_ = delaystate.get<msf_core::p_>().state_ + correction_.block<3, 1> (0, 0);
 	delaystate.get<msf_core::v_>().state_ = delaystate.get<msf_core::v_>().state_ + correction_.block<3, 1> (3, 0);
@@ -533,12 +539,13 @@ bool MSF_Core::applyCorrection(unsigned char idx_delaystate, const ErrorState & 
 	delaystate.get<msf_core::q_>().state_ = delaystate.get<msf_core::q_>().state_ * qbuff_q;
 	delaystate.get<msf_core::q_>().state_.normalize();
 
+	//TODO: change to be generic
 	Eigen::Quaternion<double> qbuff_qwv = quaternionFromSmallAngle(correction_.block<3, 1> (16, 0));
-	delaystate.get<msf_core::q_wv_>().state_ = delaystate.q_wv_ * qbuff_qwv;
+	delaystate.get<msf_core::q_wv_>().state_ = delaystate.get<msf_core::q_wv_>().state_ * qbuff_qwv;
 	delaystate.get<msf_core::q_wv_>().state_.normalize();
 
 	Eigen::Quaternion<double> qbuff_qci = quaternionFromSmallAngle(correction_.block<3, 1> (19, 0));
-	delaystate.get<msf_core::q_ci_>().state_ = delaystate.get<msf_core::q_ci_ * qbuff_qci;
+	delaystate.get<msf_core::q_ci_>().state_ = delaystate.get<msf_core::q_ci_>().state_ * qbuff_qci;
 	delaystate.get<msf_core::q_ci_>().state_.normalize();
 
 	delaystate.get<msf_core::p_ci_>().state_ = delaystate.get<msf_core::p_ci_>().state_ + correction_.block<3, 1> (22, 0);
@@ -560,12 +567,22 @@ bool MSF_Core::applyCorrection(unsigned char idx_delaystate, const ErrorState & 
 			ROS_WARN_STREAM_THROTTLE(1,"fuzzy tracking triggered: " << std::max(errq.vec().maxCoeff(), -errq.vec().minCoeff())/fabs(errq.w())*2 << " limit: " << fuzzythres <<"\n");
 
 			//state_.q_ = buff_q;
-			delaystate.b_w_ = buff_bw;
-			delaystate.b_a_ = buff_ba;
-			delaystate.L_ = buff_L;
-			delaystate.q_wv_ = buff_qwv;
-			delaystate.q_ci_ = buff_qci;
-			delaystate.p_ci_ = buff_pic;
+			delaystate.get<msf_core::b_w_>().state_ = buff_bw;
+			delaystate.get<msf_core::b_a_>().state_ = buff_ba;
+
+			//slynen{
+//			delaystate.L_ = buff_L;
+//			delaystate.q_wv_ = buff_qwv;
+//			delaystate.q_ci_ = buff_qci;
+//			delaystate.p_ci_ = buff_pic;
+			//}
+
+			//copy the non propagation states back from the buffer
+			boost::fusion::for_each(
+					delaystate.statevars_,
+					msf_tmp::copyNonPropagationStates<EKFState>(buffstate)
+			);
+
 			correction_.block<16, 1> (9, 0) = Eigen::Matrix<double, 16, 1>::Zero();
 			qbuff_q.setIdentity();
 			qbuff_qwv.setIdentity();
@@ -573,13 +590,13 @@ bool MSF_Core::applyCorrection(unsigned char idx_delaystate, const ErrorState & 
 		}
 		else // if tracking ok: update mean and 3sigma of past N q_vw's
 		{
-			qbuff_.block<1, 4> (qvw_inittimer_ - nBuff_ - 1, 0) = Eigen::Matrix<double, 1, 4>(delaystate.q_wv_.coeffs());
+			qbuff_.block<1, 4> (qvw_inittimer_ - nBuff_ - 1, 0) = Eigen::Matrix<double, 1, 4>(delaystate.get<msf_core::q_wv_>().state_.coeffs());
 			qvw_inittimer_ = (qvw_inittimer_) % nBuff_ + nBuff_ + 1;
 		}
 	}
 	else // at beginning get mean and 3sigma of past N q_vw's
 	{
-		qbuff_.block<1, 4> (qvw_inittimer_ - 1, 0) = Eigen::Matrix<double, 1, 4>(delaystate.q_wv_.coeffs());
+		qbuff_.block<1, 4> (qvw_inittimer_ - 1, 0) = Eigen::Matrix<double, 1, 4>(delaystate.get<msf_core::q_wv_>().state_.coeffs());
 		qvw_inittimer_++;
 	}
 
@@ -605,26 +622,26 @@ bool MSF_Core::applyCorrection(unsigned char idx_delaystate, const ErrorState & 
 	msgCorrect_.linear_acceleration.z = 0;
 
 	const unsigned char idx = (unsigned char)(idx_state_ - 1);
-	msgCorrect_.state[0] = StateBuffer_[idx].get<msf::core<p_>().state_[0] - hl_state_buf_.state[0];
-	msgCorrect_.state[1] = StateBuffer_[idx].get<msf::core<p_>().state_[1] - hl_state_buf_.state[1];
-	msgCorrect_.state[2] = StateBuffer_[idx].get<msf::core<p_>().state_[2] - hl_state_buf_.state[2];
-	msgCorrect_.state[3] = StateBuffer_[idx].get<msf::core<v_>().state_[0] - hl_state_buf_.state[3];
-	msgCorrect_.state[4] = StateBuffer_[idx].get<msf::core<v_>().state_[1] - hl_state_buf_.state[4];
-	msgCorrect_.state[5] = StateBuffer_[idx].get<msf::core<v_>().state_[2] - hl_state_buf_.state[5];
+	msgCorrect_.state[0] = StateBuffer_[idx].get<msf_core::p_>().state_[0] - hl_state_buf_.state[0];
+	msgCorrect_.state[1] = StateBuffer_[idx].get<msf_core::p_>().state_[1] - hl_state_buf_.state[1];
+	msgCorrect_.state[2] = StateBuffer_[idx].get<msf_core::p_>().state_[2] - hl_state_buf_.state[2];
+	msgCorrect_.state[3] = StateBuffer_[idx].get<msf_core::v_>().state_[0] - hl_state_buf_.state[3];
+	msgCorrect_.state[4] = StateBuffer_[idx].get<msf_core::v_>().state_[1] - hl_state_buf_.state[4];
+	msgCorrect_.state[5] = StateBuffer_[idx].get<msf_core::v_>().state_[2] - hl_state_buf_.state[5];
 
 	Eigen::Quaterniond hl_q(hl_state_buf_.state[6], hl_state_buf_.state[7], hl_state_buf_.state[8], hl_state_buf_.state[9]);
-	qbuff_q = hl_q.inverse() * StateBuffer_[idx].get<msf::core<q_>().state_;
+	qbuff_q = hl_q.inverse() * StateBuffer_[idx].get<msf_core::q_>().state_;
 	msgCorrect_.state[6] = qbuff_q.w();
 	msgCorrect_.state[7] = qbuff_q.x();
 	msgCorrect_.state[8] = qbuff_q.y();
 	msgCorrect_.state[9] = qbuff_q.z();
 
-	msgCorrect_.state[10] = StateBuffer_[idx].get<msf::core<b_w_>().state_[0] - hl_state_buf_.state[10];
-	msgCorrect_.state[11] = StateBuffer_[idx].get<msf::core<b_w_>().state_[1] - hl_state_buf_.state[11];
-	msgCorrect_.state[12] = StateBuffer_[idx].get<msf::core<b_w_>().state_[2] - hl_state_buf_.state[12];
-	msgCorrect_.state[13] = StateBuffer_[idx].get<msf::core<b_a_>().state_[0] - hl_state_buf_.state[13];
-	msgCorrect_.state[14] = StateBuffer_[idx].get<msf::core<b_a_>().state_[1] - hl_state_buf_.state[14];
-	msgCorrect_.state[15] = StateBuffer_[idx].get<msf::core<b_a_>().state_[2] - hl_state_buf_.state[15];
+	msgCorrect_.state[10] = StateBuffer_[idx].get<msf_core::b_w_>().state_[0] - hl_state_buf_.state[10];
+	msgCorrect_.state[11] = StateBuffer_[idx].get<msf_core::b_w_>().state_[1] - hl_state_buf_.state[11];
+	msgCorrect_.state[12] = StateBuffer_[idx].get<msf_core::b_w_>().state_[2] - hl_state_buf_.state[12];
+	msgCorrect_.state[13] = StateBuffer_[idx].get<msf_core::b_a_>().state_[0] - hl_state_buf_.state[13];
+	msgCorrect_.state[14] = StateBuffer_[idx].get<msf_core::b_a_>().state_[1] - hl_state_buf_.state[14];
+	msgCorrect_.state[15] = StateBuffer_[idx].get<msf_core::b_a_>().state_[2] - hl_state_buf_.state[15];
 
 	msgCorrect_.flag = sensor_fusion_comm::ExtEkf::state_correction;
 	pubCorrect_.publish(msgCorrect_);

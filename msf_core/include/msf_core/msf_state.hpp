@@ -22,7 +22,7 @@
 namespace msf_core{
 
 //a state variable with a name as specified in the state name enum
-template<typename type_T, int name_T>
+template<typename type_T, int name_T, bool PROPAGATED>
 struct StateVar_T{
 	typedef type_T value_t;
 	typedef const StateVar_T<type_T, name_T>& constRef_T;
@@ -30,6 +30,7 @@ struct StateVar_T{
 	typedef StateVar_T<type_T, name_T>& Ref_T;
 	typedef StateVar_T<type_T, name_T>* Ptr_T;
 	enum{
+		propagated = PROPAGATED,
 		name_ = name_T,
 		sizeInCorrection_ = msf_tmp::CorrectionStateLengthForType<const StateVar_T<type_T, name_T>&>::value,
 		sizeInState_ = msf_tmp::StateLengthForType<const StateVar_T<type_T, name_T>&>::value
@@ -69,6 +70,7 @@ struct GenericState_T{
 				msf_tmp::correctState<const Eigen::Matrix<double, nErrorStatesAtCompileTime, 1>, stateVector_T >(correction)
 		);
 	}
+
 
 	//returns the state at position INDEX in the state list
 	template<int INDEX>
