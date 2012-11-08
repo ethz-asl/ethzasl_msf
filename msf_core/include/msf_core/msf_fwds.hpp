@@ -8,9 +8,17 @@
 #define MSF_FWD_HPP_
 
 namespace msf_core{
+
+//state types used to identify propagated/core/auxiliary states
+enum{
+	CoreStateWithPropagation,
+	CoreStateWithoutPropagation,
+	AuxiliaryState
+};
+
 //forwards
 //state variable
-template<typename type_T, int name_T, bool PROPAGATED = false>
+template<typename type_T, int name_T, int STATETYPE = AuxiliaryState>
 struct StateVar_T;
 
 //the state

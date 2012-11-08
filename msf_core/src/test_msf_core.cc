@@ -37,7 +37,7 @@ int main(int argc, char** argv)
 	boost::shared_ptr<msf_core::UserDefinedCalculationBase> usercalcs(new msf_core::SSFCalculations());
 	msf_core::MSF_Core core(usercalcs);
 
-	//TODO: so on...
+
 
 	ros::spin();
 }

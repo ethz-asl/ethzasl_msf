@@ -46,10 +46,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 #include <msf_core/msf_state.hpp>
-#include <msf_core/msf_userdefinedcalculations.hpp>
+#include <msf_core/implementation/msf_userdefinedcalculations.hpp>
 
 #define N_STATE_BUFFER 256	///< size of unsigned char, do not change!
-
 
 namespace msf_core{
 

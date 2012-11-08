@@ -97,9 +97,8 @@ void MSF_Core::initialize(const Eigen::Matrix<double, 3, 1> & p, const Eigen::Ma
 
 	msf_core::EKFState & state = StateBuffer_[idx_state_];
 
-	this->usercalc_->initState(state);
+	this->usercalc_->initState(state); //ask the user to provide sensible data for the first state
 
-	state.q_int_ = state.get<msf_core::q_wv_>().state_;
 	state.w_m_ = w_m;
 	state.a_m_ = a_m;
 	state.time_ = ros::Time::now().toSec();
@@ -125,22 +124,13 @@ void MSF_Core::initialize(const Eigen::Matrix<double, 3, 1> & p, const Eigen::Ma
 	msgCorrect_.linear_acceleration.x = 0;
 	msgCorrect_.linear_acceleration.y = 0;
 	msgCorrect_.linear_acceleration.z = 0;
-	msgCorrect_.state[0] = state.get<msf_core::p_>().state_(0);
-	msgCorrect_.state[1] = state.get<msf_core::p_>().state_(1);
-	msgCorrect_.state[2] = state.get<msf_core::p_>().state_(2);
-	msgCorrect_.state[3] = state.get<msf_core::v_>().state_(0);
-	msgCorrect_.state[4] = state.get<msf_core::v_>().state_(1);
-	msgCorrect_.state[5] = state.get<msf_core::v_>().state_(2);
-	msgCorrect_.state[6] = state.get<msf_core::q_>().state_.w();
-	msgCorrect_.state[7] = state.get<msf_core::q_>().state_.x();
-	msgCorrect_.state[8] = state.get<msf_core::q_>().state_.y();
-	msgCorrect_.state[9] = state.get<msf_core::q_>().state_.z();
-	msgCorrect_.state[10] = state.get<msf_core::b_w_>().state_(0);
-	msgCorrect_.state[11] = state.get<msf_core::b_w_>().state_(1);
-	msgCorrect_.state[12] = state.get<msf_core::b_w_>().state_(2);
-	msgCorrect_.state[13] = state.get<msf_core::b_a_>().state_(0);
-	msgCorrect_.state[14] = state.get<msf_core::b_a_>().state_(1);
-	msgCorrect_.state[15] = state.get<msf_core::b_a_>().state_(2);
+
+	msgCorrect_.state.resize(nStatesAtCompileTime); //make sure this is correctly sized
+	//	boost::fusion::for_each(
+	//			state.statevars_,
+	//			msf_tmp::CoreStatetoDoubleArray<std::vector<double>, EKFState::stateVector_T >(msgCorrect_.state)
+	//	);
+
 	msgCorrect_.flag = sensor_fusion_comm::ExtEkf::initialization;
 	pubCorrect_.publish(msgCorrect_);
 
@@ -692,7 +682,7 @@ bool MSF_Core::applyCorrection(unsigned char idx_delaystate, const ErrorState & 
 
 	// publish state
 	msgState_.header = msgCorrect_.header;
-	StateBuffer_[idx].toStateMsg(msgState_);
+	StateBuffer_[idx].toFullStateMsg(msgState_);
 	pubState_.publish(msgState_);
 	seq_m++;
 

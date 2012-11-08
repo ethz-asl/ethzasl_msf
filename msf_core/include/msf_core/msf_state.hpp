@@ -22,7 +22,7 @@
 namespace msf_core{
 
 //a state variable with a name as specified in the state name enum
-template<typename type_T, int name_T, bool PROPAGATED>
+template<typename type_T, int name_T, int STATETYPE>
 struct StateVar_T{
 	typedef type_T value_t;
 	typedef const StateVar_T<type_T, name_T>& constRef_T;
@@ -30,7 +30,7 @@ struct StateVar_T{
 	typedef StateVar_T<type_T, name_T>& Ref_T;
 	typedef StateVar_T<type_T, name_T>* Ptr_T;
 	enum{
-		propagated = PROPAGATED,
+		statetype = STATETYPE,
 		name_ = name_T,
 		sizeInCorrection_ = msf_tmp::CorrectionStateLengthForType<const StateVar_T<type_T, name_T>&>::value,
 		sizeInState_ = msf_tmp::StateLengthForType<const StateVar_T<type_T, name_T>&>::value
@@ -49,7 +49,8 @@ struct GenericState_T{
 	enum{
 		nStateVarsAtCompileTime = boost::fusion::result_of::size<stateVector_T>::type::value, //n state vars
 		nErrorStatesAtCompileTime = msf_tmp::CountStates<stateVector_T, msf_tmp::CorrectionStateLengthForType>::value, //n correction states
-		nStatesAtCompileTime = msf_tmp::CountStates<stateVector_T, msf_tmp::StateLengthForType>::value //n total states
+		nStatesAtCompileTime = msf_tmp::CountStates<stateVector_T, msf_tmp::StateLengthForType>::value, //n total states
+		nCoreStatesAtCompileTime = msf_tmp::CountStates<stateVector_T, msf_tmp::CoreStateLengthForType>::value //n total core states
 	};
 	stateVector_T statevars_; ///< the actual state variables
 
@@ -104,7 +105,7 @@ struct GenericState_T{
 
 	/// assembles an ExtState message from the state
 	/** it does not set the header */
-	void toExtStateMsg(sensor_fusion_comm::ExtState & state){ //boost fusion unfortunately doesn't like this to be const
+	void toExtStateMsg(sensor_fusion_comm::ExtState & state) {
 		eigen_conversions::vector3dToPoint(get<msf_core::p_>().state_, state.pose.position);
 		eigen_conversions::quaternionToMsg(get<msf_core::q_>().state_, state.pose.orientation);
 		eigen_conversions::vector3dToPoint(get<msf_core::v_>().state_, state.velocity);
@@ -112,11 +113,21 @@ struct GenericState_T{
 
 	/// assembles a DoubleArrayStamped message from the state
 	/** it does not set the header */
-	void toStateMsg(sensor_fusion_comm::DoubleArrayStamped & state){
+	void toFullStateMsg(sensor_fusion_comm::DoubleArrayStamped & state) { //boost fusion unfortunately doesn't like this to be const
 		state.data.resize(nStatesAtCompileTime); //make sure this is correctly sized
 		boost::fusion::for_each(
 				statevars_,
-				msf_tmp::StatetoDoubleArray<std::vector<double>, stateVector_T >(state.data)
+				msf_tmp::FullStatetoDoubleArray<std::vector<double>, stateVector_T >(state.data)
+		);
+	}
+
+	/// assembles a DoubleArrayStamped message from the state
+	/** it does not set the header */
+	void toCoreStateMsg(sensor_fusion_comm::DoubleArrayStamped & state) {//boost fusion unfortunately doesn't like this to be const
+		state.data.resize(nCoreStatesAtCompileTime); //make sure this is correctly sized
+		boost::fusion::for_each(
+				statevars_,
+				msf_tmp::CoreStatetoDoubleArray<std::vector<double>, stateVector_T >(state.data)
 		);
 	}
 };
