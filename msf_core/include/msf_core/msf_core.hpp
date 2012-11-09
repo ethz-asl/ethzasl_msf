@@ -108,6 +108,11 @@ private:
 	bool initialized_;
 	bool predictionMade_;
 
+	/// vision-world drift watch dog to determine fuzzy tracking
+	const static int nBuff_ = 30; ///< buffer size for median q_vw
+	int qvw_inittimer_;
+	Eigen::Matrix<double, nBuff_, 4> qbuff_;
+
 	/// enables internal state predictions for log replay
 	/**
 	 * used to determine if internal states get overwritten by the external
@@ -139,6 +144,7 @@ private:
 	ros::Subscriber subImu_; ///< subscriber to IMU readings
 
 	sensor_fusion_comm::ExtEkf hl_state_buf_; ///< buffer to store external propagation data
+
 
 
 

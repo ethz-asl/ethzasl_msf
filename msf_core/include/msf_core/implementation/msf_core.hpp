@@ -64,6 +64,10 @@ MSF_Core::MSF_Core(boost::shared_ptr<UserDefinedCalculationBase> usercalc)
 
 	usercalc_ = usercalc; //the interface for the user to customize EKF interna
 
+	// buffer for vision failure check
+	qvw_inittimer_ = 1;
+	qbuff_ = Eigen::Matrix<double, nBuff_, 4>::Constant(0);
+
 	idx_state_ = 0;
 	idx_P_ = 0;
 	idx_time_ = 0;
@@ -73,6 +77,7 @@ MSF_Core::MSF_Core(boost::shared_ptr<UserDefinedCalculationBase> usercalc)
 MSF_Core::~MSF_Core()
 {
 }
+
 
 void MSF_Core::initialize(const Eigen::Matrix<double, 3, 1> & p, const Eigen::Matrix<double, 3, 1> & v,
 		const Eigen::Quaternion<double> & q, const Eigen::Matrix<double, 3, 1> & b_w,
@@ -605,12 +610,65 @@ bool MSF_Core::applyCorrection(unsigned char idx_delaystate, const ErrorState & 
 	//}
 
 	//slynen{ //allow the user to sanity check the new state (fuzzy tracking detection etc.)
-	bool isfuzzy = usercalc_->sanityCheckCorrection(delaystate, buffstate, correction_, fuzzythres);
-	if(isfuzzy){ //TODO remove this as it seems the value assigned here is never used
-		qbuff_q.setIdentity();
-	}
-	//}
+	bool isfuzzy = usercalc_->sanityCheckCorrection(delaystate, buffstate, correction_);
 
+	//get the index of the best state having no temporal drift at compile time
+	enum{
+		indexOfStateWithoutTemporalDrift = msf_tmp::IndexOfBestNonTemporalDriftingState<msf_core::fullState_T>::value
+	};
+
+#if(indexOfStateWithoutTemporalDrift != -1) //is there a state without temporal drift?
+
+	//for now make sure the non drifting state is a quaternion.
+	typedef typename msf_tmp::getEnumStateType<msf_core::fullState_T, msf_tmp::IndexOfBestNonTemporalDriftingState<msf_core::fullState_T>::value>::value nonDriftingStateType;
+	const bool isquaternion = msf_tmp::isQuaternionType<typename msf_tmp::StripConstReference<nonDriftingStateType>::result_t >::value;
+	BOOST_STATIC_ASSERT_MSG(isquaternion, "Assumed that the non drifting state is a Quaternion, "
+			"which is not the case for the currently defined state vector. If you want to use an euclidean state, please first adapt qbuff and the error detection routines");
+
+
+	// update qbuff_ and check for fuzzy tracking
+	if (qvw_inittimer_ > nBuff_)
+	{
+		// should be unit quaternion if no error
+		Eigen::Quaternion<double> errq = const_cast<const EKFState&>(delaystate).get<indexOfStateWithoutTemporalDrift>().conjugate() *
+				Eigen::Quaternion<double>(
+						getMedian(qbuff_.block<nBuff_, 1> (0, 3)),
+						getMedian(qbuff_.block<nBuff_, 1> (0, 0)),
+						getMedian(qbuff_.block<nBuff_, 1> (0, 1)),
+						getMedian(qbuff_.block<nBuff_, 1> (0, 2))
+				);
+
+		if (std::max(errq.vec().maxCoeff(), -errq.vec().minCoeff()) / fabs(errq.w()) * 2 > fuzzythres) // fuzzy tracking (small angle approx)
+		{
+			ROS_WARN_STREAM_THROTTLE(1,"fuzzy tracking triggered: " << std::max(errq.vec().maxCoeff(), -errq.vec().minCoeff())/fabs(errq.w())*2 << " limit: " << fuzzythres <<"\n");
+
+			//copy the non propagation states back from the buffer
+			boost::fusion::for_each(
+					delaystate.statevars_,
+					msf_tmp::copyNonPropagationStates<EKFState>(buffstate)
+			);
+
+			BOOST_STATIC_ASSERT_MSG(static_cast<int>(EKFState::nPropagatedCoreErrorStatesAtCompileTime) == 9, "Assumed that nPropagatedCoreStates == 9, which is not the case");
+			BOOST_STATIC_ASSERT_MSG(static_cast<int>(EKFState::nErrorStatesAtCompileTime) -
+					static_cast<int>(EKFState::nPropagatedCoreErrorStatesAtCompileTime) == 16, "Assumed that nErrorStatesAtCompileTime-nPropagatedCoreStates == 16, which is not the case");
+
+			//TODO: can be eliminated
+			correction_.block<EKFState::nErrorStatesAtCompileTime-EKFState::nPropagatedCoreErrorStatesAtCompileTime, 1> (EKFState::nPropagatedCoreErrorStatesAtCompileTime, 0) =
+					Eigen::Matrix<double, EKFState::nErrorStatesAtCompileTime-EKFState::nPropagatedCoreErrorStatesAtCompileTime, 1>::Zero();
+			qbuff_q.setIdentity();
+		}
+		else // if tracking ok: update mean and 3sigma of past N q_vw's
+		{
+			qbuff_.block<1, 4> (qvw_inittimer_ - nBuff_ - 1, 0) = Eigen::Matrix<double, 1, 4>(const_cast<const EKFState&>(delaystate).get<indexOfStateWithoutTemporalDrift>().coeffs());
+			qvw_inittimer_ = (qvw_inittimer_) % nBuff_ + nBuff_ + 1;
+		}
+	}
+	else // at beginning get mean and 3sigma of past N q_vw's
+	{
+		qbuff_.block<1, 4> (qvw_inittimer_ - 1, 0) = Eigen::Matrix<double, 1, 4>(const_cast<const EKFState&>(delaystate).get<indexOfStateWithoutTemporalDrift>().coeffs());
+		qvw_inittimer_++;
+	}
+#endif //end fuzzy tracking
 	// idx fiddeling to ensure correct update until now from the past
 	idx_time_ = idx_state_;
 	idx_state_ = idx_delaystate + 1;

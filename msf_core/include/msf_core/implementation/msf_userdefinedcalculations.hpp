@@ -27,10 +27,6 @@ private:
 	typedef boost::function<void(msf_core::MSF_CoreConfig& config, uint32_t level)> CallbackType;
 	std::vector<CallbackType> callbacks_;
 
-	/// vision-world drift watch dog to determine fuzzy tracking
-	const static int nBuff_ = 30; ///< buffer size for median q_vw
-	int qvw_inittimer_;
-	Eigen::Matrix<double, nBuff_, 4> qbuff_;
 
 public:
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -41,9 +37,6 @@ public:
 		//register dyn config list
 		registerCallback(&SSFCalculations::DynConfig, this);
 
-		// buffer for vision failure check
-		qvw_inittimer_ = 1;
-		qbuff_ = Eigen::Matrix<double, nBuff_, 4>::Constant(0);
 	}
 	virtual ~SSFCalculations(){
 		delete reconfServer_;
@@ -142,43 +135,33 @@ public:
 		if (this->config_.fixed_scale)
 		{
 			typedef typename msf_tmp::getEnumStateType<msf_core::EKFState::stateVector_T, msf_core::L_>::value L_type;
+			const int L_indexInErrorState = msf_tmp::getStateIndexInErrorState<EKFState::stateVector_T, msf_core::L_>::value;
 
-			enum{
-				indexOfState_L = msf_tmp::getStartIndex<msf_core::EKFState::stateVector_T, L_type, msf_tmp::CorrectionStateLengthForType>::value
-			};
-			//TODO remove after initial debugging
-			BOOST_STATIC_ASSERT_MSG(static_cast<int>(indexOfState_L)==15,
-					"The index of the state L in the correction vector differs from the expected value");
 			for(int i = 0 ; i < msf_tmp::StripConstReference<L_type>::result_t::sizeInCorrection_ ; ++i){
-				correction_(indexOfState_L + i) = 0; //scale
+				correction_(L_indexInErrorState + i) = 0; //scale
 			}
 		}
 
 		if (this->config_.fixed_calib)
 		{
-
 			typedef typename msf_tmp::getEnumStateType<msf_core::EKFState::stateVector_T, msf_core::q_ci_>::value q_ci_type;
-			typedef typename msf_tmp::getEnumStateType<msf_core::EKFState::stateVector_T, msf_core::p_ci_>::value p_ci_type;
-			enum{
-				indexOfState_q_ci_ = msf_tmp::getStartIndex<msf_core::EKFState::stateVector_T, q_ci_type, msf_tmp::CorrectionStateLengthForType>::value,
-				indexOfState_p_ci_ = msf_tmp::getStartIndex<msf_core::EKFState::stateVector_T, p_ci_type, msf_tmp::CorrectionStateLengthForType>::value
-			};
-			//TODO remove after initial debugging
-			BOOST_STATIC_ASSERT_MSG(static_cast<int>(indexOfState_q_ci_)==19,
-					"The index of the state q_ci_ in the correction vector differs from the expected value");
-			BOOST_STATIC_ASSERT_MSG(static_cast<int>(indexOfState_p_ci_)==22,
-					"The index of the state p_ci_ in the correction vector differs from the expected value");
+			const int q_ci_indexInErrorState = msf_tmp::getStateIndexInErrorState<EKFState::stateVector_T, msf_core::q_ci_>::value;
+
 			for(int i = 0 ; i < msf_tmp::StripConstReference<q_ci_type>::result_t::sizeInCorrection_ ; ++i){
-				correction_(indexOfState_q_ci_ + i) = 0; //q_ic roll, pitch, yaw
+				correction_(q_ci_indexInErrorState + i) = 0; //q_ic roll, pitch, yaw
 			}
+
+			typedef typename msf_tmp::getEnumStateType<msf_core::EKFState::stateVector_T, msf_core::p_ci_>::value p_ci_type;
+			const int p_ci_indexInErrorState = msf_tmp::getStateIndexInErrorState<EKFState::stateVector_T, msf_core::p_ci_>::value;
+
 			for(int i = 0 ; i < msf_tmp::StripConstReference<p_ci_type>::result_t::sizeInCorrection_ ; ++i){
-				correction_(indexOfState_p_ci_ + i) = 0; //p_ci x,y,z
+				correction_(p_ci_indexInErrorState + i) = 0; //p_ci x,y,z
 			}
 		}
 	}
 
 	virtual bool sanityCheckCorrection(msf_core::EKFState& delaystate, const msf_core::EKFState& buffstate,
-			Eigen::Matrix<double, msf_core::EKFState::nErrorStatesAtCompileTime,1>& correction_, double fuzzythres){
+			Eigen::Matrix<double, msf_core::EKFState::nErrorStatesAtCompileTime,1>& correction_){
 
 		bool retvalue = false;
 
@@ -186,55 +169,6 @@ public:
 		{
 			ROS_WARN_STREAM_THROTTLE(1,"Negative scale detected: " << const_cast<const EKFState&>(delaystate).get<msf_core::L_>()(0) << ". Correcting to 0.1");
 			delaystate.set<msf_core::L_>(Eigen::Matrix<double, 1, 1>(0.1));
-		}
-
-
-		// update qbuff_ and check for fuzzy tracking
-		if (qvw_inittimer_ > nBuff_)
-		{
-			// should be unit quaternion if no error
-			Eigen::Quaternion<double> errq = const_cast<const EKFState&>(delaystate).get<msf_core::q_wv_>().conjugate() *
-					Eigen::Quaternion<double>(
-							getMedian(qbuff_.block<nBuff_, 1> (0, 3)),
-							getMedian(qbuff_.block<nBuff_, 1> (0, 0)),
-							getMedian(qbuff_.block<nBuff_, 1> (0, 1)),
-							getMedian(qbuff_.block<nBuff_, 1> (0, 2))
-					);
-
-			if (std::max(errq.vec().maxCoeff(), -errq.vec().minCoeff()) / fabs(errq.w()) * 2 > fuzzythres) // fuzzy tracking (small angle approx)
-			{
-				ROS_WARN_STREAM_THROTTLE(1,"fuzzy tracking triggered: " << std::max(errq.vec().maxCoeff(), -errq.vec().minCoeff())/fabs(errq.w())*2 << " limit: " << fuzzythres <<"\n");
-
-
-				//state_.q_ = buff_q;
-				//TODO: could remove this, as it is also done two lines later
-//				delaystate.get<msf_core::b_w_>().state_ = buffstate.get<msf_core::b_w_>().state_;
-//				delaystate.get<msf_core::b_a_>().state_ = buffstate.get<msf_core::b_a_>().state_;
-
-				//copy the non propagation states back from the buffer
-				boost::fusion::for_each(
-						delaystate.statevars_,
-						msf_tmp::copyNonPropagationStates<EKFState>(buffstate)
-				);
-
-				BOOST_STATIC_ASSERT_MSG(static_cast<int>(EKFState::nPropagatedCoreErrorStatesAtCompileTime) == 9, "Assumed that nPropagatedCoreStates == 9, which is not the case");
-				BOOST_STATIC_ASSERT_MSG(static_cast<int>(EKFState::nErrorStatesAtCompileTime) -
-						static_cast<int>(EKFState::nPropagatedCoreErrorStatesAtCompileTime) == 16, "Assumed that nErrorStatesAtCompileTime-nPropagatedCoreStates == 16, which is not the case");
-
-				correction_.block<EKFState::nErrorStatesAtCompileTime-EKFState::nPropagatedCoreErrorStatesAtCompileTime, 1> (EKFState::nPropagatedCoreErrorStatesAtCompileTime, 0) =
-						Eigen::Matrix<double, EKFState::nErrorStatesAtCompileTime-EKFState::nPropagatedCoreErrorStatesAtCompileTime, 1>::Zero();
-				retvalue = true; //is fuzzy
-			}
-			else // if tracking ok: update mean and 3sigma of past N q_vw's
-			{
-				qbuff_.block<1, 4> (qvw_inittimer_ - nBuff_ - 1, 0) = Eigen::Matrix<double, 1, 4>(const_cast<const EKFState&>(delaystate).get<msf_core::q_wv_>().coeffs());
-				qvw_inittimer_ = (qvw_inittimer_) % nBuff_ + nBuff_ + 1;
-			}
-		}
-		else // at beginning get mean and 3sigma of past N q_vw's
-		{
-			qbuff_.block<1, 4> (qvw_inittimer_ - 1, 0) = Eigen::Matrix<double, 1, 4>(const_cast<const EKFState&>(delaystate).get<msf_core::q_wv_>().coeffs());
-			qvw_inittimer_++;
 		}
 
 		return retvalue; //return whether fuzzy

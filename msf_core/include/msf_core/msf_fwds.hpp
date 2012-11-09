@@ -13,12 +13,13 @@ namespace msf_core{
 enum{
 	CoreStateWithPropagation,
 	CoreStateWithoutPropagation,
-	AuxiliaryState
+	Auxiliary,
+	AuxiliaryNonTemporalDrifting
 };
 
 //forwards
 //state variable
-template<typename type_T, int name_T, int STATETYPE = AuxiliaryState>
+template<typename type_T, int name_T, int STATETYPE = Auxiliary>
 struct StateVar_T;
 
 //the state

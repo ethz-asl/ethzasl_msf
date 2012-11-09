@@ -35,7 +35,7 @@ struct UserDefinedCalculationBase{
 	virtual void augmentCorrectionVector(Eigen::Matrix<double, EKFState::nErrorStatesAtCompileTime,1>& correction){};
 
 	virtual bool sanityCheckCorrection(msf_core::EKFState& delaystate, const msf_core::EKFState& buffstate,
-			Eigen::Matrix<double, EKFState::nErrorStatesAtCompileTime,1>& correction, double fuzzythres){return false;};
+			Eigen::Matrix<double, EKFState::nErrorStatesAtCompileTime,1>& correction){return false;};
 
 	//provide a getter for these parameters
 	virtual bool getParam_fixed_bias() = 0;

@@ -167,14 +167,68 @@ template<> struct PropagatedCoreErrorStateLengthForType<const mpl_::void_&>{
 //return the number a state has in the enum
 template<typename T>
 struct getEnumStateName;
-template<typename U,int NAME, int STATETYPE> struct getEnumStateName<const msf_core::StateVar_T<U, NAME, STATETYPE>& >{
+template<typename U,int NAME, int STATETYPE>
+struct getEnumStateName<const msf_core::StateVar_T<U, NAME, STATETYPE>& >{
+	enum{value = NAME};
+};
+template<typename U,int NAME, int STATETYPE>
+struct getEnumStateName<msf_core::StateVar_T<U, NAME, STATETYPE> >{
 	enum{value = NAME};
 };
 template<> struct getEnumStateName<const mpl_::void_&>{
-	enum{value = -1};
+	enum{value = -1}; //must not change this
+};
+template<> struct getEnumStateName<mpl_::void_>{
+	enum{value = -1}; //must not change this
 };
 
 
+template<typename T>
+struct isQuaternionType;
+template<int NAME, int STATETYPE, int M, int N>
+struct isQuaternionType<const msf_core::StateVar_T<Eigen::Matrix<double, M, N>, NAME, STATETYPE>& >{
+	enum{value = false};
+};
+template<int NAME, int STATETYPE, int M, int N>
+struct isQuaternionType<msf_core::StateVar_T<Eigen::Matrix<double, M, N>, NAME, STATETYPE> >{
+	enum{value = false};
+};
+template<int NAME, int STATETYPE>
+struct isQuaternionType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE>& >{
+	enum{value = true};
+};
+template<int NAME, int STATETYPE>
+struct isQuaternionType<msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE> >{
+	enum{value = true};
+};
+template<>
+struct isQuaternionType<const mpl_::void_&>{
+	enum{value = false};
+};
+template<>
+struct isQuaternionType<mpl_::void_>{
+	enum{value = false};
+};
+
+//return whether a state is nontemporaldrifting
+template<typename T>
+struct getStateIsNonTemporalDrifting;
+template<typename U,int NAME, int STATETYPE>
+struct getStateIsNonTemporalDrifting<const msf_core::StateVar_T<U, NAME, STATETYPE>& >{
+	enum{value = static_cast<int>(msf_core::StateVar_T<U, NAME, STATETYPE>::statetype_) ==
+			static_cast<int>(msf_core::AuxiliaryNonTemporalDrifting)};
+};
+template<typename U,int NAME, int STATETYPE>
+struct getStateIsNonTemporalDrifting<msf_core::StateVar_T<U, NAME, STATETYPE> >{
+	enum{value = static_cast<int>(msf_core::StateVar_T<U, NAME, STATETYPE>::statetype_) ==
+			static_cast<int>(msf_core::AuxiliaryNonTemporalDrifting)};
+};
+template<> struct getStateIsNonTemporalDrifting<const mpl_::void_&>{
+	enum{value = false};
+};
+template<> struct getStateIsNonTemporalDrifting<mpl_::void_>{
+	enum{value = false};
+};
 
 
 template <typename Sequence,  template<typename> class Counter, typename First, typename Last, bool T>
@@ -269,8 +323,48 @@ struct ComputeStartIndex<Sequence, StateVarT, OffsetCalculator, First, Last, fal
 	};
 };
 //}
-} //end anonymous namespace
 
+
+
+//helper for find best nontemporal drifting state{
+template <typename Sequence, typename First, typename Last, int CurrentBestIdx, bool foundQuaternion, bool EndOfList>
+struct FindBestNonTemporalDriftingStateImpl;
+template <typename Sequence, typename First, typename Last, int CurrentBestIdx, bool foundQuaternion>
+struct FindBestNonTemporalDriftingStateImpl<Sequence, First, Last, CurrentBestIdx, foundQuaternion, true>{
+	enum{//set to the current index found, which was initially set to -1
+		value = CurrentBestIdx
+	};
+};
+template <typename Sequence, typename First, typename Last, int CurrentBestIdx, bool foundQuaternion>
+struct FindBestNonTemporalDriftingStateImpl<Sequence, First, Last, CurrentBestIdx, foundQuaternion, false>{
+	typedef typename boost::fusion::result_of::next<First>::type Next;
+	typedef typename  boost::fusion::result_of::deref<First>::type current_Type;
+	enum{
+		idxInState = getEnumStateName<typename msf_tmp::StripConstReference<current_Type>::result_t>::value, //we assert before calling that the indexing is correct
+
+		IsCurrentStateAQuaternion = isQuaternionType<typename msf_tmp::StripConstReference<current_Type>::result_t>::value,
+
+		IsCurrentStateNonTemporalDrifting = getStateIsNonTemporalDrifting<typename msf_tmp::StripConstReference<current_Type>::result_t>::value,
+
+		isQuaternionAndNonTemporalDrifting = IsCurrentStateAQuaternion == true && IsCurrentStateNonTemporalDrifting == true,
+		isNonTemporalDriftingPositionAndNoQuaternionHasBeenFound = IsCurrentStateNonTemporalDrifting == true && foundQuaternion == false,
+
+		currBestIdx = boost::mpl::if_c<isQuaternionAndNonTemporalDrifting, boost::mpl::int_<idxInState>, //set to this index if quaternion and nontemporal drifting
+		boost::mpl::int_<boost::mpl::if_c<isNonTemporalDriftingPositionAndNoQuaternionHasBeenFound, boost::mpl::int_<idxInState>, //if we havent found a quaternion yet and this state is non temporal drifting, we take this one
+		boost::mpl::int_<CurrentBestIdx> >::type::value> //else we take the current best one
+		>::type::value,
+
+		value = FindBestNonTemporalDriftingStateImpl<Sequence, Next, Last, currBestIdx, foundQuaternion || isQuaternionAndNonTemporalDrifting,
+		SameType<typename msf_tmp::StripConstReference<First>::result_t,
+		typename msf_tmp::StripConstReference<Last>::result_t>::value >::value
+
+	};
+private:
+	//	BOOST_STATIC_ASSERT_MSG(value!=-1, "We assume there is at least one non temporal drifting state, but none could be found");
+};
+
+
+} //end anonymous namespace
 
 //checks whether the ordering in the vector is the same as in the enum,
 //which is something that strictly must not change
@@ -287,6 +381,29 @@ public:
 		indexingerrors = CheckStateIndexing<Sequence, First, Last, startindex,
 		SameType<typename msf_tmp::StripConstReference<First>::result_t,
 		typename msf_tmp::StripConstReference<Last>::result_t>::value>::indexingerrors
+	};
+};
+
+
+//the goal of this tmp code is to find the best nontemporal drifting state in the
+//full state vector at compile time. We therefore search the state variable list
+//for states that the user has marked as non temporal drifting. If furthermore
+//prefer quaternions over euclidean states. This function will return -1 if no suitable state has been found
+template<typename Sequence>
+struct IndexOfBestNonTemporalDriftingState{
+	typedef typename boost::fusion::result_of::begin<Sequence const>::type First;
+	typedef typename boost::fusion::result_of::end<Sequence const>::type Last;
+private:
+	enum{
+		bestindex = -1, //must not change this
+	};
+	BOOST_STATIC_ASSERT_MSG(CheckCorrectIndexing<Sequence>::indexingerrors == 0, "The indexing of the state vector is not the same as in the enum,"
+			" but this must be the same");
+public:
+	enum{
+		value = FindBestNonTemporalDriftingStateImpl<Sequence, First, Last, bestindex, false,
+		SameType<typename msf_tmp::StripConstReference<First>::result_t,
+		typename msf_tmp::StripConstReference<Last>::result_t>::value>::value
 	};
 };
 
@@ -367,9 +484,9 @@ struct copyQBlocksFromAuxiliaryStatesToQ
 	};
 	typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> Q_T;
 	copyQBlocksFromAuxiliaryStatesToQ(Q_T& Q):Q_(Q){	}
-	template<typename T, int NAME>
-	void operator()(msf_core::StateVar_T<T, NAME, msf_core::AuxiliaryState>& t) const {
-		typedef msf_core::StateVar_T<T, NAME, msf_core::AuxiliaryState> var_T;
+	template<typename T, int NAME, int STATETYPE>
+	void operator()(msf_core::StateVar_T<T, NAME, STATETYPE>& t) const {
+		typedef msf_core::StateVar_T<T, NAME, STATETYPE> var_T;
 		enum{
 			startIdxInCorrection = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::CorrectionStateLengthForType>::value,
 			sizeInCorrection = var_T::sizeInCorrection_
@@ -386,11 +503,12 @@ struct copyQBlocksFromAuxiliaryStatesToQ
 
 		Q_.template block<sizeInCorrection, sizeInCorrection>(startIdxInCorrection, startIdxInCorrection) = t.Q_;
 	}
-	template<typename T, int NAME, int STATETYPE>
-	void operator()(msf_core::StateVar_T<T, NAME, STATETYPE>& t) const {
-		BOOST_STATIC_ASSERT_MSG(STATETYPE == msf_core::CoreStateWithPropagation || STATETYPE == msf_core::CoreStateWithoutPropagation,
-				"copyQBlocksFromAuxiliaryStatesToQ was instantiated for something else than an auxiliary state, "
-				"but the handed over type is not a core state. This is an error.");
+	template<typename T, int NAME>
+	void operator()(msf_core::StateVar_T<T, NAME, msf_core::CoreStateWithPropagation>& t) const {
+		//nothing to do for the states, which have propagation, because Q calculation is done in msf_core
+	}
+	template<typename T, int NAME>
+	void operator()(msf_core::StateVar_T<T, NAME, msf_core::CoreStateWithoutPropagation>& t) const {
 		//nothing to do for the states, which have propagation, because Q calculation is done in msf_core
 	}
 private:
@@ -469,16 +587,45 @@ struct CoreStatetoDoubleArray
 		data_[startIdxInState + 3] = t.state_.z();
 	}
 	template<int NAME, int N>
-	void operator()(msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, msf_core::AuxiliaryState>& t) const {
+	void operator()(msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, msf_core::Auxiliary>& t) const {
 		//don't copy aux states
 	}
 	template<int NAME>
-	void operator()(msf_core::StateVar_T<Eigen::Quaterniond, NAME, msf_core::AuxiliaryState>& t) const {
+	void operator()(msf_core::StateVar_T<Eigen::Quaterniond, NAME, msf_core::Auxiliary>& t) const {
+		//don't copy aux states
+	}
+
+	template<int NAME, int N>
+	void operator()(msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, msf_core::AuxiliaryNonTemporalDrifting>& t) const {
+		//don't copy aux states
+	}
+	template<int NAME>
+	void operator()(msf_core::StateVar_T<Eigen::Quaterniond, NAME, msf_core::AuxiliaryNonTemporalDrifting>& t) const {
 		//don't copy aux states
 	}
 private:
 	T& data_;
 };
+
+//some easy access to indices
+//return the index of a given state variable number in the state matrices
+template<typename stateVector_T, int INDEX>
+struct getStateIndexInState{
+	typedef typename msf_tmp::getEnumStateType<stateVector_T, INDEX>::value state_type;
+	enum{
+		value = msf_tmp::getStartIndex<stateVector_T, state_type, msf_tmp::StateLengthForType>::value,
+	};
+};
+
+//return the index of a given state variable number in the error state matrices
+template<typename stateVector_T,int INDEX>
+struct getStateIndexInErrorState{
+	typedef typename msf_tmp::getEnumStateType<stateVector_T, INDEX>::value state_type;
+	enum{
+		value = msf_tmp::getStartIndex<stateVector_T, state_type, msf_tmp::CorrectionStateLengthForType>::value,
+	};
+};
+
 
 //copies the values of the single state vars to the double array provided
 template<typename T, typename stateList_T>

@@ -161,13 +161,13 @@ struct IsPointerType{
 	};
 };
 template<typename T>
-struct IsPointerType<T&>{
+struct IsPointerType<T*>{
 	enum{
 		value = true
 	};
 };
 template<typename T>
-struct IsPointerType<const T&>{
+struct IsPointerType<const T*>{
 	enum{
 		value = true
 	};
