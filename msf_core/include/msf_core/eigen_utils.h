@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
+#include <iostream>
 
 /// returns the 3D cross product skew symmetric matrix of a given 3D vector
 template<class Derived>

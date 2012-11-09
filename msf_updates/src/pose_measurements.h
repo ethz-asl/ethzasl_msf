@@ -70,7 +70,7 @@ private:
   {
     Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m;
     Eigen::Quaternion<double> q, q_wv;
-    ssf_core::SSF_Core::ErrorStateCov P;
+    msf_core::MSF_Core::ErrorStateCov P;
 
 	// init values
 	g << 0, 0, 9.81;	/// gravity

@@ -69,9 +69,9 @@ public:
 	/// big init routine
 	void initialize(const Eigen::Matrix<double, 3, 1> & p, const Eigen::Matrix<double, 3, 1> & v,
 			const Eigen::Quaternion<double> & q, const Eigen::Matrix<double, 3, 1> & b_w,
-			const Eigen::Matrix<double, 3, 1> & b_a,
-			const Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> & P, const Eigen::Matrix<double, 3, 1> & w_m,
-			const Eigen::Matrix<double, 3, 1> & a_m, const Eigen::Matrix<double, 3, 1> & g);
+			const Eigen::Matrix<double, 3, 1> & b_a, const Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> & P,
+			const Eigen::Matrix<double, 3, 1> & w_m, const Eigen::Matrix<double, 3, 1> & a_m,
+			const Eigen::Matrix<double, 3, 1> & g, const Eigen::Quaternion<double> & q_int);
 
 	/// retreive all state information at time t. Used to build H, residual and noise matrix by update sensors
 	unsigned char getClosestState(msf_core::EKFState* timestate, ros::Time tstamp, double delay = 0.00);

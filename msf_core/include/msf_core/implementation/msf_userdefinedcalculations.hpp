@@ -74,7 +74,9 @@ public:
 	//prior to this call, all states are initialized to zero/identity
 	virtual void resetState(msf_core::EKFState& state){
 		//set scale to 1
-		state.get<msf_core::L_>().state_(0) = 1.0;
+
+		Eigen::Matrix<double, 1, 1> scale(1.0);
+		state.set<msf_core::L_>(scale);
 	}
 	virtual void initState(msf_core::EKFState& state){
 
@@ -89,7 +91,8 @@ public:
 		//		state.get<msf_core::q_ci_>().state_ = q_ci;
 		//		state.get<msf_core::p_ci_>().state_ = p_ci;
 
-		state.q_int_ = state.get<msf_core::q_wv_>().state_;
+		//TODO this probably is a bit more tricky to make generic, also call the init-state method, and include q_int as a real state
+		state.q_int_ = const_cast<const EKFState&>(state).get<msf_core::q_wv_>();
 	}
 
 	virtual void calculateQAuxiliaryStates(msf_core::EKFState& state, double dt){
@@ -100,10 +103,10 @@ public:
 
 		//compute the blockwise Q values and store them with the states,
 		//these then get copied by the core to the correct places in Qd
-		state.get<msf_core::L_>().Q_ 	= (dt * n_L.cwiseProduct(n_L)).asDiagonal();
-		state.get<msf_core::q_wv_>().Q_ = (dt * nqwvv.cwiseProduct(nqwvv)).asDiagonal();
-		state.get<msf_core::q_ci_>().Q_ = (dt * nqciv.cwiseProduct(nqciv)).asDiagonal();
-		state.get<msf_core::p_ci_>().Q_ = (dt * npicv.cwiseProduct(npicv)).asDiagonal();
+		state.getQBlock<msf_core::L_>() 	= (dt * n_L.cwiseProduct(n_L)).asDiagonal();
+		state.getQBlock<msf_core::q_wv_>() = (dt * nqwvv.cwiseProduct(nqwvv)).asDiagonal();
+		state.getQBlock<msf_core::q_ci_>() = (dt * nqciv.cwiseProduct(nqciv)).asDiagonal();
+		state.getQBlock<msf_core::p_ci_>() = (dt * npicv.cwiseProduct(npicv)).asDiagonal();
 	}
 
 	virtual void setP(Eigen::Matrix<double, msf_core::EKFState::nErrorStatesAtCompileTime, msf_core::EKFState::nErrorStatesAtCompileTime>& P){
@@ -146,7 +149,7 @@ public:
 			//TODO remove after initial debugging
 			BOOST_STATIC_ASSERT_MSG(static_cast<int>(indexOfState_L)==15,
 					"The index of the state L in the correction vector differs from the expected value");
-			for(int i = 0 ; i < msf_tmp::StripConstReference<L_type>::value::sizeInCorrection_ ; ++i){
+			for(int i = 0 ; i < msf_tmp::StripConstReference<L_type>::result_t::sizeInCorrection_ ; ++i){
 				correction_(indexOfState_L + i) = 0; //scale
 			}
 		}
@@ -165,24 +168,24 @@ public:
 					"The index of the state q_ci_ in the correction vector differs from the expected value");
 			BOOST_STATIC_ASSERT_MSG(static_cast<int>(indexOfState_p_ci_)==22,
 					"The index of the state p_ci_ in the correction vector differs from the expected value");
-			for(int i = 0 ; i < msf_tmp::StripConstReference<q_ci_type>::value::sizeInCorrection_ ; ++i){
+			for(int i = 0 ; i < msf_tmp::StripConstReference<q_ci_type>::result_t::sizeInCorrection_ ; ++i){
 				correction_(indexOfState_q_ci_ + i) = 0; //q_ic roll, pitch, yaw
 			}
-			for(int i = 0 ; i < msf_tmp::StripConstReference<p_ci_type>::value::sizeInCorrection_ ; ++i){
+			for(int i = 0 ; i < msf_tmp::StripConstReference<p_ci_type>::result_t::sizeInCorrection_ ; ++i){
 				correction_(indexOfState_p_ci_ + i) = 0; //p_ci x,y,z
 			}
 		}
 	}
 
-	virtual bool sanityCheckCorrection(msf_core::EKFState& delaystate, msf_core::EKFState& buffstate,
+	virtual bool sanityCheckCorrection(msf_core::EKFState& delaystate, const msf_core::EKFState& buffstate,
 			Eigen::Matrix<double, msf_core::EKFState::nErrorStatesAtCompileTime,1>& correction_, double fuzzythres){
 
 		bool retvalue = false;
 
-		if (delaystate.get<msf_core::L_>().state_(0) < 0)
+		if (const_cast<const EKFState&>(delaystate).get<msf_core::L_>()(0) < 0)
 		{
-			ROS_WARN_STREAM_THROTTLE(1,"Negative scale detected: " << delaystate.get<msf_core::L_>().state_(0) << ". Correcting to 0.1");
-			delaystate.get<msf_core::L_>().state_(0) = 0.1;
+			ROS_WARN_STREAM_THROTTLE(1,"Negative scale detected: " << const_cast<const EKFState&>(delaystate).get<msf_core::L_>()(0) << ". Correcting to 0.1");
+			delaystate.set<msf_core::L_>(Eigen::Matrix<double, 1, 1>(0.1));
 		}
 
 
@@ -190,7 +193,7 @@ public:
 		if (qvw_inittimer_ > nBuff_)
 		{
 			// should be unit quaternion if no error
-			Eigen::Quaternion<double> errq = delaystate.get<msf_core::q_wv_>().state_.conjugate() *
+			Eigen::Quaternion<double> errq = const_cast<const EKFState&>(delaystate).get<msf_core::q_wv_>().conjugate() *
 					Eigen::Quaternion<double>(
 							getMedian(qbuff_.block<nBuff_, 1> (0, 3)),
 							getMedian(qbuff_.block<nBuff_, 1> (0, 0)),
@@ -205,16 +208,14 @@ public:
 
 				//state_.q_ = buff_q;
 				//TODO: could remove this, as it is also done two lines later
-				delaystate.get<msf_core::b_w_>().state_ = buffstate.get<msf_core::b_w_>().state_;
-				delaystate.get<msf_core::b_a_>().state_ = buffstate.get<msf_core::b_a_>().state_;
+//				delaystate.get<msf_core::b_w_>().state_ = buffstate.get<msf_core::b_w_>().state_;
+//				delaystate.get<msf_core::b_a_>().state_ = buffstate.get<msf_core::b_a_>().state_;
 
 				//copy the non propagation states back from the buffer
 				boost::fusion::for_each(
 						delaystate.statevars_,
 						msf_tmp::copyNonPropagationStates<EKFState>(buffstate)
 				);
-
-				msf_tmp::echoCompileTimeConstant<EKFState::nPropagatedCoreErrorStatesAtCompileTime>();
 
 				BOOST_STATIC_ASSERT_MSG(static_cast<int>(EKFState::nPropagatedCoreErrorStatesAtCompileTime) == 9, "Assumed that nPropagatedCoreStates == 9, which is not the case");
 				BOOST_STATIC_ASSERT_MSG(static_cast<int>(EKFState::nErrorStatesAtCompileTime) -
@@ -226,13 +227,13 @@ public:
 			}
 			else // if tracking ok: update mean and 3sigma of past N q_vw's
 			{
-				qbuff_.block<1, 4> (qvw_inittimer_ - nBuff_ - 1, 0) = Eigen::Matrix<double, 1, 4>(delaystate.get<msf_core::q_wv_>().state_.coeffs());
+				qbuff_.block<1, 4> (qvw_inittimer_ - nBuff_ - 1, 0) = Eigen::Matrix<double, 1, 4>(const_cast<const EKFState&>(delaystate).get<msf_core::q_wv_>().coeffs());
 				qvw_inittimer_ = (qvw_inittimer_) % nBuff_ + nBuff_ + 1;
 			}
 		}
 		else // at beginning get mean and 3sigma of past N q_vw's
 		{
-			qbuff_.block<1, 4> (qvw_inittimer_ - 1, 0) = Eigen::Matrix<double, 1, 4>(delaystate.get<msf_core::q_wv_>().state_.coeffs());
+			qbuff_.block<1, 4> (qvw_inittimer_ - 1, 0) = Eigen::Matrix<double, 1, 4>(const_cast<const EKFState&>(delaystate).get<msf_core::q_wv_>().coeffs());
 			qvw_inittimer_++;
 		}
 

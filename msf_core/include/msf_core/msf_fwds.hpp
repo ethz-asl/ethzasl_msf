@@ -25,6 +25,8 @@ struct StateVar_T;
 template<typename stateVector_T>
 struct GenericState_T;
 
+class MSF_Core;
+
 template<typename T> struct echoStateVarType;
 template<typename T>
 struct CorrectionStateLengthForType;

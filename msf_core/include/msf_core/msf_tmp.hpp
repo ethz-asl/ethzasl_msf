@@ -192,8 +192,8 @@ struct countStatesLinear<Sequence, Counter, First, Last, false>{
 	enum{//the length of the current state plus the tail of the list
 		value = Counter<current_Type>::value +
 		countStatesLinear<Sequence, Counter, Next, Last,
-		SameType<typename msf_tmp::StripConstReference<First>::value,
-		typename msf_tmp::StripConstReference<Last>::value>::value>::value
+		SameType<typename msf_tmp::StripConstReference<First>::result_t,
+		typename msf_tmp::StripConstReference<Last>::result_t>::value>::value
 	};
 };
 
@@ -220,8 +220,8 @@ struct CheckStateIndexing<Sequence, First, Last, CurrentIdx, false>{
 		indexingerrors = boost::mpl::if_c<idxInEnum == idxInState,
 		boost::mpl::int_<0>, boost::mpl::int_<1> >::type::value + //error here
 		CheckStateIndexing<Sequence, Next, Last, CurrentIdx + 1, 		//and errors of other states
-		SameType<typename msf_tmp::StripConstReference<First>::value,
-		typename msf_tmp::StripConstReference<Last>::value>::value>::indexingerrors
+		SameType<typename msf_tmp::StripConstReference<First>::result_t,
+		typename msf_tmp::StripConstReference<Last>::result_t>::value>::indexingerrors
 
 	};
 private:
@@ -262,10 +262,10 @@ struct ComputeStartIndex<Sequence, StateVarT, OffsetCalculator, First, Last, fal
 
 	enum{//the length of the current state plus the tail of the list
 		value =  CurrentVal + ComputeStartIndex<Sequence, StateVarT, OffsetCalculator, Next, Last,
-		SameType<typename msf_tmp::StripConstReference<currentType>::value,
-		typename msf_tmp::StripConstReference<StateVarT>::value>::value,
-		OffsetCalculator<currentType>::value, SameType<typename msf_tmp::StripConstReference<First>::value,
-		typename msf_tmp::StripConstReference<Last>::value>::value>::value
+		SameType<typename msf_tmp::StripConstReference<currentType>::result_t,
+		typename msf_tmp::StripConstReference<StateVarT>::result_t>::value,
+		OffsetCalculator<currentType>::value, SameType<typename msf_tmp::StripConstReference<First>::result_t,
+		typename msf_tmp::StripConstReference<Last>::result_t>::value>::value
 	};
 };
 //}
@@ -285,8 +285,8 @@ private:
 public:
 	enum{
 		indexingerrors = CheckStateIndexing<Sequence, First, Last, startindex,
-		SameType<typename msf_tmp::StripConstReference<First>::value,
-		typename msf_tmp::StripConstReference<Last>::value>::value>::indexingerrors
+		SameType<typename msf_tmp::StripConstReference<First>::result_t,
+		typename msf_tmp::StripConstReference<Last>::result_t>::value>::indexingerrors
 	};
 };
 
@@ -298,8 +298,8 @@ struct CountStates{
 	typedef typename boost::fusion::result_of::end<Sequence const>::type Last;
 	enum{
 		value = countStatesLinear<Sequence, Counter, First, Last,
-		SameType<typename msf_tmp::StripConstReference<First>::value,
-		typename msf_tmp::StripConstReference<Last>::value>::value>::value
+		SameType<typename msf_tmp::StripConstReference<First>::result_t,
+		typename msf_tmp::StripConstReference<Last>::result_t>::value>::value
 		+ CheckCorrectIndexing<Sequence>::indexingerrors //will be zero, if no indexing errors, otherwise fails compilation
 	};
 };
@@ -312,8 +312,8 @@ struct getStartIndex{
 	typedef typename  boost::fusion::result_of::deref<First>::type currentType;
 	enum{
 		value = ComputeStartIndex<Sequence, StateVarT, Counter, First, Last,
-		SameType<typename msf_tmp::StripConstReference<StateVarT>::value,
-		typename msf_tmp::StripConstReference<currentType>::value>::value, 0, SameType<First, Last>::value>::value
+		SameType<typename msf_tmp::StripConstReference<StateVarT>::result_t,
+		typename msf_tmp::StripConstReference<currentType>::result_t>::value, 0, SameType<First, Last>::value>::value
 		+ CheckCorrectIndexing<Sequence>::indexingerrors //will be zero, if no indexing errors, otherwise fails compilation
 	};
 };
@@ -337,19 +337,25 @@ struct resetState
 template<typename stateT>
 struct copyNonPropagationStates
 {
-	copyNonPropagationStates(stateT& oldstate):oldstate_(oldstate){	}
+	copyNonPropagationStates(const stateT& oldstate):oldstate_(oldstate){	}
 	template<typename T, int NAME>
 	void operator()(msf_core::StateVar_T<T, NAME, msf_core::CoreStateWithPropagation>& t) const {
 		//nothing to do for the states, which have propagation
 	}
 	template<typename T, int NAME, int STATETYPE>
 	void operator()(msf_core::StateVar_T<T, NAME, STATETYPE>& t) const {
-		t = oldstate_.template get<NAME>(); //copy value from old state to new state var
+
+		BOOST_STATIC_ASSERT_MSG((msf_tmp::IsPointerType<typename msf_core::StateVar_T<T, NAME, STATETYPE> >::value == false),
+				"The state variable is of pointer type, but this method assumes we can copy without dereferencing");
+
 		BOOST_STATIC_ASSERT_MSG(STATETYPE !=  msf_core::CoreStateWithPropagation,
 				"copyNonPropagationStates was instantiated for a core state. This is an error.");
+
+		t = oldstate_.template getStateVar<NAME>(); //copy value from old state to new state var
 	}
+
 private:
-	stateT& oldstate_;
+	const stateT& oldstate_;
 };
 
 //copy the user calculated values in the Q-blocks to the main Q matrix
@@ -368,9 +374,11 @@ struct copyQBlocksFromAuxiliaryStatesToQ
 			startIdxInCorrection = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::CorrectionStateLengthForType>::value,
 			sizeInCorrection = var_T::sizeInCorrection_
 		};
-		BOOST_STATIC_ASSERT_MSG(static_cast<int>(var_T::statetype) != static_cast<int>(msf_core::CoreStateWithPropagation) &&
-				static_cast<int>(var_T::statetype) != static_cast<int>(msf_core::CoreStateWithoutPropagation),
+
+		BOOST_STATIC_ASSERT_MSG(static_cast<int>(var_T::statetype_) != static_cast<int>(msf_core::CoreStateWithPropagation) &&
+				static_cast<int>(var_T::statetype_) != static_cast<int>(msf_core::CoreStateWithoutPropagation),
 				"copyQBlocksFromAuxiliaryStatesToQ was instantiated for a core state. This is an error.");
+
 		BOOST_STATIC_ASSERT_MSG(static_cast<int>(sizeInCorrection) == static_cast<int>(var_T::Q_T::ColsAtCompileTime) &&
 				static_cast<int>(sizeInCorrection) == static_cast<int>(var_T::Q_T::RowsAtCompileTime),
 				"copyQBlocksFromAuxiliaryStatesToQ size of Matrix Q stored with the stateVar,"
@@ -438,8 +446,8 @@ struct CoreStatetoDoubleArray
 		enum{
 			startIdxInState = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::StateLengthForType>::value //index of the data in the state vector
 		};
-		BOOST_STATIC_ASSERT_MSG(static_cast<int>(var_T::statetype) == static_cast<int>(msf_core::CoreStateWithPropagation) ||
-				static_cast<int>(var_T::statetype) == static_cast<int>(msf_core::CoreStateWithoutPropagation),
+		BOOST_STATIC_ASSERT_MSG(static_cast<int>(var_T::statetype_) == static_cast<int>(msf_core::CoreStateWithPropagation) ||
+				static_cast<int>(var_T::statetype_) == static_cast<int>(msf_core::CoreStateWithoutPropagation),
 				"CoreStatetoDoubleArray: A new statetype was defined, but I don't know whether this should be written to the double array for core states");
 		for(int i = 0;i<var_T::sizeInState_;++i){
 			data_[startIdxInState + i] = t.state_[i];
@@ -451,8 +459,8 @@ struct CoreStatetoDoubleArray
 		enum{
 			startIdxInState = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::StateLengthForType>::value //index of the data in the state vector
 		};
-		BOOST_STATIC_ASSERT_MSG(static_cast<int>(var_T::statetype) == static_cast<int>(msf_core::CoreStateWithPropagation) ||
-				static_cast<int>(var_T::statetype) == static_cast<int>(msf_core::CoreStateWithoutPropagation),
+		BOOST_STATIC_ASSERT_MSG(static_cast<int>(var_T::statetype_) == static_cast<int>(msf_core::CoreStateWithPropagation) ||
+				static_cast<int>(var_T::statetype_) == static_cast<int>(msf_core::CoreStateWithoutPropagation),
 				"CoreStatetoDoubleArray: A new statetype was defined, but I don't know whether this should be written to the double array for core states");
 		//copy quaternion values
 		data_[startIdxInState + 0] = t.state_.w();

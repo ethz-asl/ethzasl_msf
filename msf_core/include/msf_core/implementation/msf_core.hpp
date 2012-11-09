@@ -78,7 +78,7 @@ void MSF_Core::initialize(const Eigen::Matrix<double, 3, 1> & p, const Eigen::Ma
 		const Eigen::Quaternion<double> & q, const Eigen::Matrix<double, 3, 1> & b_w,
 		const Eigen::Matrix<double, 3, 1> & b_a, const Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> & P,
 		const Eigen::Matrix<double, 3, 1> & w_m, const Eigen::Matrix<double, 3, 1> & a_m,
-		const Eigen::Matrix<double, 3, 1> & g)
+		const Eigen::Matrix<double, 3, 1> & g, const Eigen::Quaternion<double> & q_int)
 {
 	initialized_ = false;
 	predictionMade_ = false;
@@ -97,6 +97,17 @@ void MSF_Core::initialize(const Eigen::Matrix<double, 3, 1> & p, const Eigen::Ma
 
 	msf_core::EKFState & state = StateBuffer_[idx_state_];
 	//slynen{
+	state.get<msf_core::p_>() = p;
+	state.get<msf_core::v_>() = v;
+	state.get<msf_core::q_>() = q;
+	state.get<msf_core::b_w_>() = b_w;
+	state.get<msf_core::b_a_>() = b_a;
+	//	  state.L_ = L;
+	//	  state.q_wv_ = q_wv;
+	//	  state.q_ci_ = q_ci;
+	//	  state.p_ci_ = p_ci;
+	state.q_int_ = q_int; //state.q_wv_;
+
 	this->usercalc_->initState(state); //ask the user to provide sensible data for the first state
 	//}
 	state.w_m_ = w_m;
@@ -175,7 +186,7 @@ void MSF_Core::imuCallback(const sensor_msgs::ImuConstPtr & msg)
 	propagateState(StateBuffer_[idx_state_].time_ - StateBuffer_[(unsigned char)(idx_state_ - 1)].time_);
 	predictProcessCovariance(StateBuffer_[idx_P_].time_ - StateBuffer_[(unsigned char)(idx_P_ - 1)].time_);
 
-	checkForNumeric((double*)(&StateBuffer_[idx_state_ - 1].get<msf_core::p_>().state_(0)), 3, "prediction p");
+	checkForNumeric((double*)(&StateBuffer_[idx_state_ - 1].get<msf_core::p_>()(0)), 3, "prediction p");
 
 	predictionMade_ = true;
 
@@ -265,19 +276,19 @@ void MSF_Core::stateCallback(const sensor_fusion_comm::ExtEkfConstPtr & msg)
 	if (flag == sensor_fusion_comm::ExtEkf::current_state)
 		isnumeric = checkForNumeric(&msg->state[0], 10, "before prediction p,v,q");
 
-	isnumeric = checkForNumeric((double*)(&StateBuffer_[idx_state_].get<msf_core::p_>().state_[0]), 3, "before prediction p");
+	isnumeric = checkForNumeric((double*)(&StateBuffer_[idx_state_].get<msf_core::p_>()[0]), 3, "before prediction p");
 
 	if (flag == sensor_fusion_comm::ExtEkf::current_state && isnumeric) // state propagation is made externally, so we read the actual state
 	{
-		StateBuffer_[idx_state_].get<msf_core::p_>().state_ = Eigen::Matrix<double, 3, 1>(msg->state[0], msg->state[1], msg->state[2]);
-		StateBuffer_[idx_state_].get<msf_core::v_>().state_ = Eigen::Matrix<double, 3, 1>(msg->state[3], msg->state[4], msg->state[5]);
-		StateBuffer_[idx_state_].get<msf_core::q_>().state_ = Eigen::Quaternion<double>(msg->state[6], msg->state[7], msg->state[8], msg->state[9]);
-		StateBuffer_[idx_state_].get<msf_core::q_>().state_.normalize();
+		StateBuffer_[idx_state_].get<msf_core::p_>() = Eigen::Matrix<double, 3, 1>(msg->state[0], msg->state[1], msg->state[2]);
+		StateBuffer_[idx_state_].get<msf_core::v_>() = Eigen::Matrix<double, 3, 1>(msg->state[3], msg->state[4], msg->state[5]);
+		StateBuffer_[idx_state_].get<msf_core::q_>() = Eigen::Quaternion<double>(msg->state[6], msg->state[7], msg->state[8], msg->state[9]);
+		StateBuffer_[idx_state_].get<msf_core::q_>().normalize();
 
 		// zero props:
 		//TODO later we can remove these two lines, because this will also be done in the loop a couple of lines later
-		StateBuffer_[idx_state_].get<msf_core::b_w_>().state_ = StateBuffer_[(unsigned char)(idx_state_ - 1)].get<msf_core::b_w_>().state_;
-		StateBuffer_[idx_state_].get<msf_core::b_a_>().state_ = StateBuffer_[(unsigned char)(idx_state_ - 1)].get<msf_core::b_a_>().state_;
+		StateBuffer_[idx_state_].get<msf_core::b_w_>() = StateBuffer_[(unsigned char)(idx_state_ - 1)].get<msf_core::b_w_>();
+		StateBuffer_[idx_state_].get<msf_core::b_a_>() = StateBuffer_[(unsigned char)(idx_state_ - 1)].get<msf_core::b_a_>();
 
 		//slynen{ copy non propagation states from last state
 		//		StateBuffer_[idx_state_].get<msf_core::L_>().state_ = StateBuffer_[(unsigned char)(idx_state_ - 1)].get<msf_core::L_>().state_;
@@ -299,7 +310,7 @@ void MSF_Core::stateCallback(const sensor_fusion_comm::ExtEkfConstPtr & msg)
 
 	predictProcessCovariance(StateBuffer_[idx_P_].time_ - StateBuffer_[(unsigned char)(idx_P_ - 1)].time_);
 
-	isnumeric = checkForNumeric((double*)(&StateBuffer_[idx_state_ - 1].get<msf_core::p_>().state_[0]), 3, "prediction p");
+	isnumeric = checkForNumeric((double*)(&StateBuffer_[idx_state_ - 1].get<msf_core::p_>()[0]), 3, "prediction p");
 	isnumeric = checkForNumeric((double*)(&StateBuffer_[idx_state_ - 1].P_(0)), nErrorStatesAtCompileTime * nErrorStatesAtCompileTime, "prediction done P");
 
 	predictionMade_ = true;
@@ -329,8 +340,8 @@ void MSF_Core::propagateState(const double dt)
 
 	// zero props:
 	//TODO: we can also remove the next two lines, because this is included in the loop a couple of lines later
-	cur_state.get<msf_core::b_w_>().state_ = prev_state.get<msf_core::b_w_>().state_;
-	cur_state.get<msf_core::b_a_>().state_ = prev_state.get<msf_core::b_a_>().state_;
+	cur_state.get<msf_core::b_w_>() = prev_state.get<msf_core::b_w_>();
+	cur_state.get<msf_core::b_a_>() = prev_state.get<msf_core::b_a_>();
 	//slynen{
 	//copy constant for non propagated states
 	//	cur_state.L_ = prev_state.L_;
@@ -346,10 +357,10 @@ void MSF_Core::propagateState(const double dt)
 
 	//  Eigen::Quaternion<double> dq;
 	Eigen::Matrix<double, 3, 1> dv;
-	ConstVector3 ew = cur_state.w_m_ - cur_state.get<msf_core::b_w_>().state_;
-	ConstVector3 ewold = prev_state.w_m_ - prev_state.get<msf_core::b_w_>().state_;
-	ConstVector3 ea = cur_state.a_m_ - cur_state.get<msf_core::b_a_>().state_;
-	ConstVector3 eaold = prev_state.a_m_ - prev_state.get<msf_core::b_a_>().state_;
+	ConstVector3 ew = cur_state.w_m_ - cur_state.get<msf_core::b_w_>();
+	ConstVector3 ewold = prev_state.w_m_ - prev_state.get<msf_core::b_w_>();
+	ConstVector3 ea = cur_state.a_m_ - cur_state.get<msf_core::b_a_>();
+	ConstVector3 eaold = prev_state.a_m_ - prev_state.get<msf_core::b_a_>();
 	ConstMatrix4 Omega = omegaMatJPL(ew);
 	ConstMatrix4 OmegaOld = omegaMatJPL(ewold);
 	Matrix4 OmegaMean = omegaMatJPL((ew + ewold) / 2);
@@ -373,16 +384,16 @@ void MSF_Core::propagateState(const double dt)
 	ConstMatrix4 quat_int = MatExp + 1.0 / 48.0 * (Omega * OmegaOld - OmegaOld * Omega) * dt * dt;
 
 	// first oder quaternion integration
-	cur_state.get<msf_core::q_>().state_.coeffs() = quat_int * prev_state.get<msf_core::q_>().state_.coeffs();
-	cur_state.get<msf_core::q_>().state_.normalize();
+	cur_state.get<msf_core::q_>().coeffs() = quat_int * prev_state.get<msf_core::q_>().coeffs();
+	cur_state.get<msf_core::q_>().normalize();
 
 	// first oder quaternion integration
 	cur_state.q_int_.coeffs() = quat_int * prev_state.q_int_.coeffs();
 	cur_state.q_int_.normalize();
 
-	dv = (cur_state.get<msf_core::q_>().state_.toRotationMatrix() * ea + prev_state.get<msf_core::q_>().state_.toRotationMatrix() * eaold) / 2;
-	cur_state.get<msf_core::v_>().state_ = prev_state.get<msf_core::v_>().state_ + (dv - g_) * dt;
-	cur_state.get<msf_core::p_>().state_ = prev_state.get<msf_core::p_>().state_ + ((cur_state.get<msf_core::v_>().state_ + prev_state.get<msf_core::v_>().state_) / 2 * dt);
+	dv = (cur_state.get<msf_core::q_>().toRotationMatrix() * ea + prev_state.get<msf_core::q_>().toRotationMatrix() * eaold) / 2;
+	cur_state.get<msf_core::v_>() = prev_state.get<msf_core::v_>() + (dv - g_) * dt;
+	cur_state.get<msf_core::p_>() = prev_state.get<msf_core::p_>() + ((cur_state.get<msf_core::v_>() + prev_state.get<msf_core::v_>()) / 2 * dt);
 	idx_state_++;
 }
 
@@ -398,14 +409,14 @@ void MSF_Core::predictProcessCovariance(const double dt)
 	ConstVector3 nbwv = Vector3::Constant(usercalc_->getParam_noise_gyrbias() /* * sqrt(dt) */);
 
 	// bias corrected IMU readings
-	ConstVector3 ew = StateBuffer_[idx_P_].w_m_ - StateBuffer_[idx_P_].get<msf_core::b_w_>().state_;
-	ConstVector3 ea = StateBuffer_[idx_P_].a_m_ - StateBuffer_[idx_P_].get<msf_core::b_a_>().state_;
+	ConstVector3 ew = StateBuffer_[idx_P_].w_m_ - StateBuffer_[idx_P_].get<msf_core::b_w_>();
+	ConstVector3 ea = StateBuffer_[idx_P_].a_m_ - StateBuffer_[idx_P_].get<msf_core::b_a_>();
 
 	ConstMatrix3 a_sk = skew(ea);
 	ConstMatrix3 w_sk = skew(ew);
 	ConstMatrix3 eye3 = Eigen::Matrix<double, 3, 3>::Identity();
 
-	ConstMatrix3 C_eq = StateBuffer_[idx_P_].get<msf_core::q_>().state_.toRotationMatrix();
+	ConstMatrix3 C_eq = StateBuffer_[idx_P_].get<msf_core::q_>().toRotationMatrix();
 
 	const double dt_p2_2 = dt * dt * 0.5; // dt^2 / 2
 	const double dt_p3_6 = dt_p2_2 * dt / 3.0; // dt^3 / 6
@@ -437,7 +448,7 @@ void MSF_Core::predictProcessCovariance(const double dt)
 	Fd_.block<3, 3> (6, 6) = E;
 	Fd_.block<3, 3> (6, 9) = F;
 
-	calc_QCore(dt, StateBuffer_[idx_P_].get<msf_core::q_>().state_, ew, ea, nav, nbav, nwv, nbwv, Qd_);
+	calc_QCore(dt, StateBuffer_[idx_P_].get<msf_core::q_>(), ew, ea, nav, nbav, nwv, nbwv, Qd_);
 
 	//call user Q calc to fill in the blocks of auxiliary states
 	usercalc_->calculateQAuxiliaryStates(StateBuffer_[idx_P_], dt);
@@ -539,10 +550,10 @@ bool MSF_Core::applyCorrection(unsigned char idx_delaystate, const ErrorState & 
 		BOOST_STATIC_ASSERT_MSG(static_cast<int>(indexOfState_b_w)==9, "The index of the state b_w in the correction vector differs from the expected value");
 		BOOST_STATIC_ASSERT_MSG(static_cast<int>(indexOfState_b_a)==12, "The index of the state b_a in the correction vector differs from the expected value");
 
-		for(int i = 0 ; i < msf_tmp::StripConstReference<b_a_type>::value::sizeInCorrection_ ; ++i){
+		for(int i = 0 ; i < msf_tmp::StripConstReference<b_a_type>::result_t::sizeInCorrection_ ; ++i){
 			correction_(indexOfState_b_a + i) = 0; //acc bias x,y,z
 		}
-		for(int i = 0 ; i < msf_tmp::StripConstReference<b_w_type>::value::sizeInCorrection_ ; ++i){
+		for(int i = 0 ; i < msf_tmp::StripConstReference<b_w_type>::result_t::sizeInCorrection_ ; ++i){
 			correction_(indexOfState_b_w + i) = 0; //gyro bias x,y,z
 		}
 	}
@@ -555,9 +566,9 @@ bool MSF_Core::applyCorrection(unsigned char idx_delaystate, const ErrorState & 
 
 	EKFState & delaystate = StateBuffer_[idx_delaystate];
 	//slynen{
-//	const Eigen::Matrix<double, 3, 1> buff_bw = delaystate.get<msf_core::b_w_>().state_;
-//	const Eigen::Matrix<double, 3, 1> buff_ba = delaystate.get<msf_core::b_a_>().state_;
-//}
+	//	const Eigen::Matrix<double, 3, 1> buff_bw = delaystate.get<msf_core::b_w_>().state_;
+	//	const Eigen::Matrix<double, 3, 1> buff_ba = delaystate.get<msf_core::b_a_>().state_;
+	//}
 
 	EKFState buffstate = delaystate;
 	//slynen{
@@ -575,7 +586,7 @@ bool MSF_Core::applyCorrection(unsigned char idx_delaystate, const ErrorState & 
 	//	delaystate.get<msf_core::L_>().state_ = delaystate.get<msf_core::L_>().state_ + correction_.block<1,1>(15,0);
 	//
 	//
-	  Eigen::Quaternion<double> qbuff_q = quaternionFromSmallAngle(correction_.block<3, 1> (6, 0));
+	Eigen::Quaternion<double> qbuff_q = quaternionFromSmallAngle(correction_.block<3, 1> (6, 0));
 	//	delaystate.get<msf_core::q_>().state_ = delaystate.get<msf_core::q_>().state_ * qbuff_q;
 	//	delaystate.get<msf_core::q_>().state_.normalize();
 
@@ -622,26 +633,26 @@ bool MSF_Core::applyCorrection(unsigned char idx_delaystate, const ErrorState & 
 	msgCorrect_.linear_acceleration.z = 0;
 
 	const unsigned char idx = (unsigned char)(idx_state_ - 1);
-	msgCorrect_.state[0] = StateBuffer_[idx].get<msf_core::p_>().state_[0] - hl_state_buf_.state[0];
-	msgCorrect_.state[1] = StateBuffer_[idx].get<msf_core::p_>().state_[1] - hl_state_buf_.state[1];
-	msgCorrect_.state[2] = StateBuffer_[idx].get<msf_core::p_>().state_[2] - hl_state_buf_.state[2];
-	msgCorrect_.state[3] = StateBuffer_[idx].get<msf_core::v_>().state_[0] - hl_state_buf_.state[3];
-	msgCorrect_.state[4] = StateBuffer_[idx].get<msf_core::v_>().state_[1] - hl_state_buf_.state[4];
-	msgCorrect_.state[5] = StateBuffer_[idx].get<msf_core::v_>().state_[2] - hl_state_buf_.state[5];
+	msgCorrect_.state[0] = StateBuffer_[idx].get<msf_core::p_>()[0] - hl_state_buf_.state[0];
+	msgCorrect_.state[1] = StateBuffer_[idx].get<msf_core::p_>()[1] - hl_state_buf_.state[1];
+	msgCorrect_.state[2] = StateBuffer_[idx].get<msf_core::p_>()[2] - hl_state_buf_.state[2];
+	msgCorrect_.state[3] = StateBuffer_[idx].get<msf_core::v_>()[0] - hl_state_buf_.state[3];
+	msgCorrect_.state[4] = StateBuffer_[idx].get<msf_core::v_>()[1] - hl_state_buf_.state[4];
+	msgCorrect_.state[5] = StateBuffer_[idx].get<msf_core::v_>()[2] - hl_state_buf_.state[5];
 
 	Eigen::Quaterniond hl_q(hl_state_buf_.state[6], hl_state_buf_.state[7], hl_state_buf_.state[8], hl_state_buf_.state[9]);
-	qbuff_q = hl_q.inverse() * StateBuffer_[idx].get<msf_core::q_>().state_;
+	qbuff_q = hl_q.inverse() * StateBuffer_[idx].get<msf_core::q_>();
 	msgCorrect_.state[6] = qbuff_q.w();
 	msgCorrect_.state[7] = qbuff_q.x();
 	msgCorrect_.state[8] = qbuff_q.y();
 	msgCorrect_.state[9] = qbuff_q.z();
 
-	msgCorrect_.state[10] = StateBuffer_[idx].get<msf_core::b_w_>().state_[0] - hl_state_buf_.state[10];
-	msgCorrect_.state[11] = StateBuffer_[idx].get<msf_core::b_w_>().state_[1] - hl_state_buf_.state[11];
-	msgCorrect_.state[12] = StateBuffer_[idx].get<msf_core::b_w_>().state_[2] - hl_state_buf_.state[12];
-	msgCorrect_.state[13] = StateBuffer_[idx].get<msf_core::b_a_>().state_[0] - hl_state_buf_.state[13];
-	msgCorrect_.state[14] = StateBuffer_[idx].get<msf_core::b_a_>().state_[1] - hl_state_buf_.state[14];
-	msgCorrect_.state[15] = StateBuffer_[idx].get<msf_core::b_a_>().state_[2] - hl_state_buf_.state[15];
+	msgCorrect_.state[10] = StateBuffer_[idx].get<msf_core::b_w_>()[0] - hl_state_buf_.state[10];
+	msgCorrect_.state[11] = StateBuffer_[idx].get<msf_core::b_w_>()[1] - hl_state_buf_.state[11];
+	msgCorrect_.state[12] = StateBuffer_[idx].get<msf_core::b_w_>()[2] - hl_state_buf_.state[12];
+	msgCorrect_.state[13] = StateBuffer_[idx].get<msf_core::b_a_>()[0] - hl_state_buf_.state[13];
+	msgCorrect_.state[14] = StateBuffer_[idx].get<msf_core::b_a_>()[1] - hl_state_buf_.state[14];
+	msgCorrect_.state[15] = StateBuffer_[idx].get<msf_core::b_a_>()[2] - hl_state_buf_.state[15];
 
 	msgCorrect_.flag = sensor_fusion_comm::ExtEkf::state_correction;
 	pubCorrect_.publish(msgCorrect_);

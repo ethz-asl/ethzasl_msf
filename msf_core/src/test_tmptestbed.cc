@@ -9,10 +9,14 @@
 int main(int argc, char** argv)
 {
 
+	msf_core::EKFState somestate;
+	msf_core::EKFState otherstate;
+
+
 	//qualifier stripping
 	typedef boost::fusion::vector<int,float,char> vec;
 	BOOST_MPL_ASSERT((boost::is_same<boost::fusion::result_of::at_c<vec, 1>::type, float&>));
-	BOOST_MPL_ASSERT((boost::is_same<msf_tmp::StripConstReference<boost::fusion::result_of::at_c<vec, 1>::type>::value, float>));
+	BOOST_MPL_ASSERT((boost::is_same<msf_tmp::StripConstReference<boost::fusion::result_of::at_c<vec, 1>::type>::result_t, float>));
 
 	//counting and index calculation
 	static const int idxstartcorr_p_ = msf_tmp::getStartIndex<msf_core::fullState_T, msf_tmp::getEnumStateType<msf_core::fullState_T, msf_core::p_>::value, msf_tmp::CorrectionStateLengthForType>::value;
@@ -44,6 +48,11 @@ int main(int argc, char** argv)
 //n(2,2)=other(0,0);
 	n.block<2,2>(2,2) = other.block<2,2>(0,0);
 
+	const msf_core::EKFState& stateref = somestate;
+
+	//std::cout<<
+			stateref.get<msf_core::p_>();
+	//<<std::endl;
 
 	std::cout<<n<<std::endl;
 

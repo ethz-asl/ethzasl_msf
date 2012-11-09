@@ -185,6 +185,14 @@ int main(int argc, char** argv)
 
 	//an instantiation of a state
 	msf_core::EKFState somestate;
+	msf_core::EKFState otherstate;
+
+
+	std::cout<<"otherstate init: "<<otherstate.get<0>().initialized<<std::endl;
+	somestate.get<0>().initialized = true;
+	std::cout<<"somestate init: "<<somestate.get<0>().initialized<<std::endl;
+	std::cout<<"otherstate init: "<<otherstate.get<0>().initialized<<std::endl;
+
 
 	std::cout<<"name "<<somestate.get<0>().name_<<std::endl;
 
