@@ -1,0 +1,14 @@
+<launch>
+    <arg name="machine" default="localhost"/>
+    <include file="$(find mav_startup)/machine/$(arg machine).machine" />
+
+    <node machine="$(arg machine)" name="vismaggps_fusion" pkg="vismaggps_fusion" type="vismaggps_fusion"  respawn="true" clear_params="true" output="screen" ns="$(arg machine)">
+	    <remap from="sensor_fusion/hl_state_input" to="fcu/ekf_state_out" />
+	    <remap from="sensor_fusion/correction" to="fcu/ekf_state_in" />
+	    <remap from="sensor_fusion/vision_pose" to="vslam/pose" />
+	    <remap from="sensor_fusion/mag_dir" to="fcu/mag" />
+	    <remap from="sensor_fusion/gps_pos" to="fcu/gps_position_custom" />
+	    <remap from="sensor_fusion/cvg_pose" to="/tf_distort/sfly_hex" />
+	    <rosparam file="$(find mav_startup)/parameters/dekf.yaml"/>
+    </node>
+</launch>

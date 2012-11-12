@@ -31,12 +31,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "calcQCore.h"
 #include <msf_core/eigen_utils.h>
-#include <msf_core/msf_core.hpp>
+#include <msf_core/msf_sensormanager.hpp>
+#include <msf_core/msf_tools.hpp>
 
 namespace msf_core
 {
 
-MSF_Core::MSF_Core(boost::shared_ptr<UserDefinedCalculationBase> usercalc)
+MSF_Core::MSF_Core(MSF_SensorManager* usercalc)
 {
 	initialized_ = false;
 	predictionMade_ = false;
@@ -62,12 +63,14 @@ MSF_Core::MSF_Core(boost::shared_ptr<UserDefinedCalculationBase> usercalc)
 
 	pnh.param("data_playback", data_playback_, false);
 
-	usercalc_ = usercalc; //the interface for the user to customize EKF interna
+	usercalc_ = usercalc; //the interface for the user to customize EKF interna, do NOT USE THIS POINTER INSIDE THE CTOR
 
 	// buffer for vision failure check
-	qvw_inittimer_ = 1;
-	qbuff_ = Eigen::Matrix<double, nBuff_, 4>::Constant(0);
+if(indexOfStateWithoutTemporalDrift != -1){
+	nontemporaldrifting_inittimer_ = 1;
 
+	qbuff_ = Eigen::Matrix<double, nBuff_, qbuffRowsAtCompiletime>::Constant(0);
+}
 	idx_state_ = 0;
 	idx_P_ = 0;
 	idx_time_ = 0;
@@ -83,7 +86,7 @@ void MSF_Core::initialize(const Eigen::Matrix<double, 3, 1> & p, const Eigen::Ma
 		const Eigen::Quaternion<double> & q, const Eigen::Matrix<double, 3, 1> & b_w,
 		const Eigen::Matrix<double, 3, 1> & b_a, const Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> & P,
 		const Eigen::Matrix<double, 3, 1> & w_m, const Eigen::Matrix<double, 3, 1> & a_m,
-		const Eigen::Matrix<double, 3, 1> & g, const Eigen::Quaternion<double> & q_int)
+		const Eigen::Matrix<double, 3, 1> & g)
 {
 	initialized_ = false;
 	predictionMade_ = false;
@@ -107,11 +110,7 @@ void MSF_Core::initialize(const Eigen::Matrix<double, 3, 1> & p, const Eigen::Ma
 	state.get<msf_core::q_>() = q;
 	state.get<msf_core::b_w_>() = b_w;
 	state.get<msf_core::b_a_>() = b_a;
-	//	  state.L_ = L;
-	//	  state.q_wv_ = q_wv;
-	//	  state.q_ci_ = q_ci;
-	//	  state.p_ci_ = p_ci;
-	state.q_int_ = q_int; //state.q_wv_;
+
 
 	this->usercalc_->initState(state); //ask the user to provide sensible data for the first state
 	//}
@@ -291,15 +290,7 @@ void MSF_Core::stateCallback(const sensor_fusion_comm::ExtEkfConstPtr & msg)
 		StateBuffer_[idx_state_].get<msf_core::q_>().normalize();
 
 		// zero props:
-		//TODO later we can remove these two lines, because this will also be done in the loop a couple of lines later
-		StateBuffer_[idx_state_].get<msf_core::b_w_>() = StateBuffer_[(unsigned char)(idx_state_ - 1)].get<msf_core::b_w_>();
-		StateBuffer_[idx_state_].get<msf_core::b_a_>() = StateBuffer_[(unsigned char)(idx_state_ - 1)].get<msf_core::b_a_>();
-
 		//slynen{ copy non propagation states from last state
-		//		StateBuffer_[idx_state_].get<msf_core::L_>().state_ = StateBuffer_[(unsigned char)(idx_state_ - 1)].get<msf_core::L_>().state_;
-		//		StateBuffer_[idx_state_].get<msf_core::q_wv_>().state_ = StateBuffer_[(unsigned char)(idx_state_ - 1)].get<msf_core::q_wv_>().state_;
-		//		StateBuffer_[idx_state_].get<msf_core::q_ci_>().state_ = StateBuffer_[(unsigned char)(idx_state_ - 1)].get<msf_core::q_ci_>().state_;
-		//		StateBuffer_[idx_state_].get<msf_core::p_ci_>().state_ = StateBuffer_[(unsigned char)(idx_state_ - 1)].get<msf_core::p_ci_>().state_;
 		boost::fusion::for_each(
 				StateBuffer_[idx_state_].statevars_,
 				msf_tmp::copyNonPropagationStates<EKFState>(StateBuffer_[(unsigned char)(idx_state_ - 1)])
@@ -344,21 +335,13 @@ void MSF_Core::propagateState(const double dt)
 	EKFState& prev_state = StateBuffer_[(unsigned char)(idx_state_ - 1)];
 
 	// zero props:
-	//TODO: we can also remove the next two lines, because this is included in the loop a couple of lines later
-	cur_state.get<msf_core::b_w_>() = prev_state.get<msf_core::b_w_>();
-	cur_state.get<msf_core::b_a_>() = prev_state.get<msf_core::b_a_>();
 	//slynen{
 	//copy constant for non propagated states
-	//	cur_state.L_ = prev_state.L_;
-	//	cur_state.q_wv_ = prev_state.q_wv_;
-	//	cur_state.q_ci_ = prev_state.q_ci_;
-	//	cur_state.p_ci_ = prev_state.p_ci_;
 	boost::fusion::for_each(
 			cur_state.statevars_,
 			msf_tmp::copyNonPropagationStates<EKFState>(prev_state)
 	);
 	//}
-
 
 	//  Eigen::Quaternion<double> dq;
 	Eigen::Matrix<double, 3, 1> dv;
@@ -391,10 +374,6 @@ void MSF_Core::propagateState(const double dt)
 	// first oder quaternion integration
 	cur_state.get<msf_core::q_>().coeffs() = quat_int * prev_state.get<msf_core::q_>().coeffs();
 	cur_state.get<msf_core::q_>().normalize();
-
-	// first oder quaternion integration
-	cur_state.q_int_.coeffs() = quat_int * prev_state.q_int_.coeffs();
-	cur_state.q_int_.normalize();
 
 	dv = (cur_state.get<msf_core::q_>().toRotationMatrix() * ea + prev_state.get<msf_core::q_>().toRotationMatrix() * eaold) / 2;
 	cur_state.get<msf_core::v_>() = prev_state.get<msf_core::v_>() + (dv - g_) * dt;
@@ -570,64 +549,33 @@ bool MSF_Core::applyCorrection(unsigned char idx_delaystate, const ErrorState & 
 	// TODO: sweiss what to do with attitude? augment measurement noise?
 
 	EKFState & delaystate = StateBuffer_[idx_delaystate];
-	//slynen{
-	//	const Eigen::Matrix<double, 3, 1> buff_bw = delaystate.get<msf_core::b_w_>().state_;
-	//	const Eigen::Matrix<double, 3, 1> buff_ba = delaystate.get<msf_core::b_a_>().state_;
-	//}
 
 	EKFState buffstate = delaystate;
-	//slynen{
-	//	const double buff_L = delaystate.get<msf_core::L_>().state_(0);
-	//	const Eigen::Quaternion<double> buff_qwv = delaystate.get<msf_core::q_wv_>().state_;
-	//	const Eigen::Quaternion<double> buff_qci = delaystate.get<msf_core::q_ci_>().state_;
-	//	const Eigen::Matrix<double, 3, 1> buff_pic = delaystate.get<msf_core::p_ci_>().state_;
-	//}
 
 	//slynen{ call correction function for every state
-	//	delaystate.get<msf_core::p_>().state_ = delaystate.get<msf_core::p_>().state_ + correction_.block<3, 1> (0, 0);
-	//	delaystate.get<msf_core::v_>().state_ = delaystate.get<msf_core::v_>().state_ + correction_.block<3, 1> (3, 0);
-	//	delaystate.get<msf_core::b_w_>().state_ = delaystate.get<msf_core::b_w_>().state_ + correction_.block<3, 1> (9, 0);
-	//	delaystate.get<msf_core::b_a_>().state_ = delaystate.get<msf_core::b_a_>().state_ + correction_.block<3, 1> (12, 0);
-	//	delaystate.get<msf_core::L_>().state_ = delaystate.get<msf_core::L_>().state_ + correction_.block<1,1>(15,0);
-	//
-	//
-	Eigen::Quaternion<double> qbuff_q = quaternionFromSmallAngle(correction_.block<3, 1> (6, 0));
-	//	delaystate.get<msf_core::q_>().state_ = delaystate.get<msf_core::q_>().state_ * qbuff_q;
-	//	delaystate.get<msf_core::q_>().state_.normalize();
 
-	//	Eigen::Quaternion<double> qbuff_qwv = quaternionFromSmallAngle(correction_.block<3, 1> (16, 0));
-	//	delaystate.get<msf_core::q_wv_>().state_ = delaystate.get<msf_core::q_wv_>().state_ * qbuff_qwv;
-	//	delaystate.get<msf_core::q_wv_>().state_.normalize();
-	//
-	//	Eigen::Quaternion<double> qbuff_qci = quaternionFromSmallAngle(correction_.block<3, 1> (19, 0));
-	//	delaystate.get<msf_core::q_ci_>().state_ = delaystate.get<msf_core::q_ci_>().state_ * qbuff_qci;
-	//	delaystate.get<msf_core::q_ci_>().state_.normalize();
-	//
-	//	delaystate.get<msf_core::p_ci_>().state_ = delaystate.get<msf_core::p_ci_>().state_ + correction_.block<3, 1> (22, 0);
+	Eigen::Quaternion<double> qbuff_q = quaternionFromSmallAngle(correction_.block<3, 1> (6, 0));
 
 	delaystate.correct(correction_);
 
 	//}
 
-	//slynen{ //allow the user to sanity check the new state (fuzzy tracking detection etc.)
-	bool isfuzzy = usercalc_->sanityCheckCorrection(delaystate, buffstate, correction_);
+	//slynen{ //allow the user to sanity check the new state
+	usercalc_->sanityCheckCorrection(delaystate, buffstate, correction_);
 
-	//get the index of the best state having no temporal drift at compile time
-	enum{
-		indexOfStateWithoutTemporalDrift = msf_tmp::IndexOfBestNonTemporalDriftingState<msf_core::fullState_T>::value
-	};
+	//TODO: move the whole fuzzy tracking to a templated function, which is specialized for void, Matrix, Quaternion
 
-#if(indexOfStateWithoutTemporalDrift != -1) //is there a state without temporal drift?
+if(indexOfStateWithoutTemporalDrift != -1){ //is there a state without temporal drift?
 
 	//for now make sure the non drifting state is a quaternion.
-	typedef typename msf_tmp::getEnumStateType<msf_core::fullState_T, msf_tmp::IndexOfBestNonTemporalDriftingState<msf_core::fullState_T>::value>::value nonDriftingStateType;
+
 	const bool isquaternion = msf_tmp::isQuaternionType<typename msf_tmp::StripConstReference<nonDriftingStateType>::result_t >::value;
 	BOOST_STATIC_ASSERT_MSG(isquaternion, "Assumed that the non drifting state is a Quaternion, "
 			"which is not the case for the currently defined state vector. If you want to use an euclidean state, please first adapt qbuff and the error detection routines");
 
 
 	// update qbuff_ and check for fuzzy tracking
-	if (qvw_inittimer_ > nBuff_)
+	if (nontemporaldrifting_inittimer_ > nBuff_)
 	{
 		// should be unit quaternion if no error
 		Eigen::Quaternion<double> errq = const_cast<const EKFState&>(delaystate).get<indexOfStateWithoutTemporalDrift>().conjugate() *
@@ -650,7 +598,7 @@ bool MSF_Core::applyCorrection(unsigned char idx_delaystate, const ErrorState & 
 
 			BOOST_STATIC_ASSERT_MSG(static_cast<int>(EKFState::nPropagatedCoreErrorStatesAtCompileTime) == 9, "Assumed that nPropagatedCoreStates == 9, which is not the case");
 			BOOST_STATIC_ASSERT_MSG(static_cast<int>(EKFState::nErrorStatesAtCompileTime) -
-					static_cast<int>(EKFState::nPropagatedCoreErrorStatesAtCompileTime) == 16, "Assumed that nErrorStatesAtCompileTime-nPropagatedCoreStates == 16, which is not the case");
+					static_cast<int>(EKFState::nPropagatedCoreErrorStatesAtCompileTime) == 19, "Assumed that nErrorStatesAtCompileTime-nPropagatedCoreStates == 19, which is not the case");
 
 			//TODO: can be eliminated
 			correction_.block<EKFState::nErrorStatesAtCompileTime-EKFState::nPropagatedCoreErrorStatesAtCompileTime, 1> (EKFState::nPropagatedCoreErrorStatesAtCompileTime, 0) =
@@ -659,16 +607,17 @@ bool MSF_Core::applyCorrection(unsigned char idx_delaystate, const ErrorState & 
 		}
 		else // if tracking ok: update mean and 3sigma of past N q_vw's
 		{
-			qbuff_.block<1, 4> (qvw_inittimer_ - nBuff_ - 1, 0) = Eigen::Matrix<double, 1, 4>(const_cast<const EKFState&>(delaystate).get<indexOfStateWithoutTemporalDrift>().coeffs());
-			qvw_inittimer_ = (qvw_inittimer_) % nBuff_ + nBuff_ + 1;
+			qbuff_.block<1, 4> (nontemporaldrifting_inittimer_ - nBuff_ - 1, 0) = Eigen::Matrix<double, 1, 4>(const_cast<const EKFState&>(delaystate).get<indexOfStateWithoutTemporalDrift>().coeffs());
+			nontemporaldrifting_inittimer_ = (nontemporaldrifting_inittimer_) % nBuff_ + nBuff_ + 1;
 		}
 	}
 	else // at beginning get mean and 3sigma of past N q_vw's
 	{
-		qbuff_.block<1, 4> (qvw_inittimer_ - 1, 0) = Eigen::Matrix<double, 1, 4>(const_cast<const EKFState&>(delaystate).get<indexOfStateWithoutTemporalDrift>().coeffs());
-		qvw_inittimer_++;
+		qbuff_.block<1, 4> (nontemporaldrifting_inittimer_ - 1, 0) = Eigen::Matrix<double, 1, 4>(const_cast<const EKFState&>(delaystate).get<indexOfStateWithoutTemporalDrift>().coeffs());
+		nontemporaldrifting_inittimer_++;
 	}
-#endif //end fuzzy tracking
+} //end fuzzy tracking
+
 	// idx fiddeling to ensure correct update until now from the past
 	idx_time_ = idx_state_;
 	idx_state_ = idx_delaystate + 1;

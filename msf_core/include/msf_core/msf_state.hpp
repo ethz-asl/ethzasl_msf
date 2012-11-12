@@ -21,6 +21,14 @@
 
 namespace msf_core{
 
+class StateVisitor{
+public:
+	//the state is set to zero/identity, this method will be called to
+	//give the user the possibility to change the reset values of some states
+	virtual void resetState(msf_core::EKFState& state)=0;
+	virtual ~StateVisitor(){};
+};
+
 //a state variable with a name as specified in the state name enum
 template<typename type_T, int name_T, int STATETYPE>
 struct StateVar_T{
@@ -80,7 +88,6 @@ public:
 	Eigen::Matrix<double,3,1> w_m_;         ///< angular velocity from IMU
 	Eigen::Matrix<double,3,1> a_m_;         ///< acceleration from IMU
 
-	Eigen::Quaternion<double> q_int_;       ///< this is the integrated ang. vel. no corrections applied, to use for delta rot in external algos...
 
 	double time_; 				///< time of this state estimate
 	Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> P_;///< error state covariance
@@ -102,7 +109,7 @@ public:
 	/**
 	 * 3D vectors: 0; quaternion: unit quaternion; scale: 1; time:0; Error covariance: zeros
 	 */
-	void reset(boost::shared_ptr<UserDefinedCalculationBase> usercalc);
+	void reset(msf_core::StateVisitor* usercalc);
 
 	/// writes the covariance corresponding to position and attitude to cov
 	void getPoseCovariance(geometry_msgs::PoseWithCovariance::_covariance_type & cov); //boost fusion unfortunately doesn't like this to be const

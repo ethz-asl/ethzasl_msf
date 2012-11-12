@@ -30,10 +30,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "position_sensor.h"
-#include <ssf_core/eigen_utils.h>
+#include <msf_core/eigen_utils.h>
 
 #define N_MEAS 9 // measurement size
-PositionSensorHandler::PositionSensorHandler(ssf_core::Measurements* meas) :
+PositionSensorHandler::PositionSensorHandler(msf_core::MSF_Measurements* meas) :
   MeasurementHandler(meas)
 {
   ros::NodeHandle pnh("~");
@@ -51,31 +51,31 @@ PositionSensorHandler::PositionSensorHandler(ssf_core::Measurements* meas) :
 
 void PositionSensorHandler::subscribe()
 {
-	ros::NodeHandle nh("ssf_core");
+	ros::NodeHandle nh("msf_core");
 	subMeasurement_ = nh.subscribe("position_measurement", 1, &PositionSensorHandler::measurementCallback, this);
 
-	measurements->ssf_core_.registerCallback(&PositionSensorHandler::noiseConfig, this);
+	measurements->msf_core_.registerCallback(&PositionSensorHandler::noiseConfig, this);
 
 	nh.param("meas_noise1",n_zp_,0.0001);	// default position noise for laser tracker total station
 
 }
 
-void PositionSensorHandler::noiseConfig(ssf_core::SSF_CoreConfig& config, uint32_t level)
+void PositionSensorHandler::noiseConfig(msf_core::MSF_CoreConfig& config, uint32_t level)
 {
-	//	if(level & ssf_core::SSF_Core_MISC)
+	//	if(level & msf_core::MSF_Core_MISC)
 	//	{
 	this->n_zp_ = config.meas_noise1;
 
 	//	}
 }
 
-void PositionSensorHandler::measurementCallback(const ssf_updates::PositionWithCovarianceStampedConstPtr & msg)
+void PositionSensorHandler::measurementCallback(const msf_updates::PositionWithCovarianceStampedConstPtr & msg)
 {
 	//	ROS_INFO_STREAM("measurement received \n"
 	//					<< "type is: " << typeid(msg).name());
 
 	// init variables
-	ssf_core::State state_old;
+	msf_core::EKFState state_old;
 	ros::Time time_old = msg->header.stamp;
 	Eigen::Matrix<double,N_MEAS,N_STATE>H_old;
 	Eigen::Matrix<double, N_MEAS, 1> r_old;
@@ -103,7 +103,7 @@ void PositionSensorHandler::measurementCallback(const ssf_updates::PositionWithC
 	// feedback for init case
 	measurements->p_vc_ = z_p_;
 
-	unsigned char idx = measurements->ssf_core_.getClosestState(&state_old,time_old,0);
+	unsigned char idx = measurements->msf_core_.getClosestState(&state_old,time_old,0);
 	if (state_old.time_ == -1)
 		return;	// // early abort // //
 
@@ -138,5 +138,5 @@ void PositionSensorHandler::measurementCallback(const ssf_updates::PositionWithC
 	r_old.block<3,1>(6,0) = -state_old.q_ci_.vec()/state_old.q_ci_.w()*2;
 
 	// call update step in core class
-	measurements->ssf_core_.applyMeasurement(idx,H_old,r_old,R);
+	measurements->msf_core_.applyMeasurement(idx,H_old,r_old,R);
 }

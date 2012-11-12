@@ -3,6 +3,7 @@
  *      Author: slynen
  */
 
+#include <msf_core/msf_fwds.hpp>
 #include <msf_core/msf_types.tpp>
 #include <msf_core/msf_tmp.hpp>
 #include <msf_core/msf_statedef.hpp>
@@ -13,7 +14,6 @@
 #include <sensor_fusion_comm/ExtState.h>
 #include <sensor_fusion_comm/DoubleArrayStamped.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
-#include <msf_core/msf_userdefinedcalculationbase.hpp>
 
 namespace msf_core{
 
@@ -164,7 +164,7 @@ inline void GenericState_T<stateVector_T>::set(const typename msf_tmp::StripCons
  * 3D vectors: 0; quaternion: unit quaternion; scale: 1; time:0; Error covariance: zeros
  */
 template<typename stateVector_T>
-void GenericState_T<stateVector_T>::reset(boost::shared_ptr<UserDefinedCalculationBase> usercalc){
+void GenericState_T<stateVector_T>::reset(msf_core::StateVisitor* statevisitor){
 
 	// reset all states
 	boost::fusion::for_each(
@@ -176,13 +176,11 @@ void GenericState_T<stateVector_T>::reset(boost::shared_ptr<UserDefinedCalculati
 	w_m_.setZero();
 	a_m_.setZero();
 
-	q_int_.setIdentity();
-
 	P_.setZero();
 	time_ = 0;
 
 	//now call the user provided function
-	usercalc->resetState(*this);
+	statevisitor->resetState(*this);
 }
 
 

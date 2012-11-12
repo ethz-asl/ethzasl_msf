@@ -32,10 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef POSE_SENSOR_H
 #define POSE_SENSOR_H
 
-#include <ssf_core/measurement.h>
+#include <msf_core/msf_sensormanagerROS.hpp>
 #include <asctec_hl_comm/mav_imu.h>
 
-class PoseSensorHandler : public ssf_core::MeasurementHandler
+class PoseSensorHandler : public msf_core::SensorHandler
 {
 private:
   // measurements
@@ -54,11 +54,13 @@ private:
   void subscribe();
   void measurementCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg);
   void pressureCallback(const asctec_hl_comm::mav_imuConstPtr & msg);
-  void noiseConfig(ssf_core::SSF_CoreConfig& config, uint32_t level);
+  void noiseConfig(msf_core::MSF_CoreConfig& config, uint32_t level);
 
 public:
   PoseSensorHandler();
-  PoseSensorHandler(ssf_core::Measurements* meas);
+  PoseSensorHandler(msf_core::MSF_SensorManager* meas);
 };
+
+#include "pose_sensor.hpp"
 
 #endif /* POSE_SENSOR_H */

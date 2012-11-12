@@ -61,6 +61,7 @@ struct correctState;
 template<typename T, typename stateList_T>
 struct StatetoDoubleArray;
 
+class MeasurementHandler;
 
 //abstract class defining user configurable calculations for the msf_core
 class UserDefinedCalculationBase;

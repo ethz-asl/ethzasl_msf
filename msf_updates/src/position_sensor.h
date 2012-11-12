@@ -32,10 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef POSITION_SENSOR_H
 #define POSITION_SENSOR_H
 
-#include <ssf_core/measurement.h>
-#include <ssf_updates/PositionWithCovarianceStamped.h>
+#include <msf_core/msf_sensormanagerROS.hpp>
+#include <msf_updates/PositionWithCovarianceStamped.h>
 
-class PositionSensorHandler: public ssf_core::MeasurementHandler
+class PositionSensorHandler: public msf_core::SensorHandler
 {
 private:
 	// measurements
@@ -49,12 +49,12 @@ private:
 	bool use_fixed_covariance_; ///< use fixed covariance set by dynamic reconfigure
 
 	void subscribe();
-	void measurementCallback(const ssf_updates::PositionWithCovarianceStampedConstPtr & msg);
-	void noiseConfig(ssf_core::SSF_CoreConfig& config, uint32_t level);
+	void measurementCallback(const msf_updates::PositionWithCovarianceStampedConstPtr & msg);
+	void noiseConfig(msf_core::MSF_CoreConfig& config, uint32_t level);
 
 public:
 	PositionSensorHandler();
-	PositionSensorHandler(ssf_core::Measurements* meas);
+	PositionSensorHandler(msf_core::MSF_SensorManager* meas);
 };
 
 #endif /* POSITION_SENSOR_H */

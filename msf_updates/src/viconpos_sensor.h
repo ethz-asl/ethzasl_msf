@@ -29,63 +29,41 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
 
-#include <msf_core/measurement.h>
+#ifndef POSITION_SENSOR_H
+#define POSITION_SENSOR_H
 
-namespace msf_core{
+#include <geometry_msgs/TransformStamped.h>
+#include <msf_core/msf_sensormanagerROS.hpp>
 
-Measurements::Measurements()
+
+class PositionSensorHandler: public msf_core::SensorHandler
 {
-	//slynen{
-	reconfServer_ = NULL;
-	//}
-	// setup: initial pos, att, of measurement sensor
+private:
+	// measurements
+	Eigen::Quaternion<double> z_q_; /// attitude measurement camera seen from world - here we do not have an attitude measurement
+	Eigen::Matrix<double, 3, 1> z_p_; /// position measurement camera seen from world
+	double n_zp_ /*, n_zq_*/; /// position and attitude measurement noise - here we do not have an attitude measurement
 
-	p_vc_ = Eigen::Matrix<double, 3, 1>::Constant(0);
-	q_cv_ = Eigen::Quaternion<double>(1, 0, 0, 0);
+	ros::Subscriber subMeasurement_;
 
-	press_height_=0;
+	bool measurement_world_sensor_; ///< defines if the pose of the sensor is measured in world coordinates (true, default) or vice versa (false, e.g. PTAM)
+	bool use_fixed_covariance_; ///< use fixed covariance set by dynamic reconfigure
 
-	msf_core_.registerCallback(&Measurements::Config,this);
-}
+	void subscribe();
+	void measurementCallback(const geometry_msgs::TransformStampedConstPtr & msg);
+	void noiseConfig(msf_core::MSF_CoreConfig& config, uint32_t level);
 
-Measurements::~Measurements()
-{
-	for (Handlers::iterator it(handlers.begin()); it != handlers.end(); ++it)
-		delete *it;
+public:
+	PositionSensorHandler();
+	PositionSensorHandler(msf_core::MSF_SensorManager* meas);
 
-	//slynen{
-	if(reconfServer_)
-		//}
-		delete reconfServer_;
-	return;
-}
-
-
-void Measurements::Config(msf_core::MSF_CoreConfig& config, uint32_t level){
-	if(level & msf_core::MSF_Core_INIT_FILTER)
-	{
-		init(config.scale_init);
-		config.init_filter = false;
+	// feedback for init case
+	Eigen::Matrix<double, 3, 1> getPositionMeasurement(){
+		return z_p_;
 	}
-	else if(level & msf_core::MSF_Core_SET_HEIGHT)
-	{
-		if(p_vc_.norm()==0)
-		{
-			ROS_WARN_STREAM("No measurements received yet to initialize position - using scale factor " << config.scale_init << " for init");
-			init(config.scale_init);
-		}
-		else
-		{
-			init(p_vc_[2]/config.height);
-			ROS_WARN_STREAM("init filter (set scale to: " << p_vc_[2]/config.height << ")");
-		}
-		config.set_height = false;
-	}
-	else if(level & msf_core::MSF_Core_SET_PRESS)
-	{
-		init_scale(config.scale_init);
-		config.set_pressure_height = false;
-	}
-}
 
-}; // end namespace
+};
+
+#include "viconpos_sensor.hpp"
+
+#endif /* POSITION_SENSOR_H */

@@ -33,8 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <msf_core/msf_core.hpp>
 int main(int argc, char** argv)
 {
+//just to instantiate all templates, no production code
+
 	ros::init(argc, argv, "msf_core");
-	boost::shared_ptr<msf_core::UserDefinedCalculationBase> usercalcs(new msf_core::SSFCalculations());
+	boost::shared_ptr<msf_core::MSF_Master> usercalcs(new msf_core::SSFCalculations());
 	msf_core::MSF_Core core(usercalcs);
 
 

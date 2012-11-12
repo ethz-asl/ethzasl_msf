@@ -15,6 +15,9 @@
 #include <sstream>
 #include <iostream>
 
+#ifdef FUSION_MAX_VECTOR_SIZE
+#undef FUSION_MAX_VECTOR_SIZE
+#endif
 #define FUSION_MAX_VECTOR_SIZE 20 //maximum number of statevariables (can be set to a larger value)
 
 #include <boost/lexical_cast.hpp>
@@ -38,7 +41,7 @@ namespace msf_tmp{
 
 //output a compile time constant
 template<size_t size>
-struct overflow{ operator char() { return size + 256; } }; //always overflow
+struct overflow{ operator char() { return size + 9999; } }; //always overflow, also for negative values
 template<int VALUE>
 void echoCompileTimeConstant()
 {
@@ -48,22 +51,26 @@ void echoCompileTimeConstant()
 
 //runtime output of stateVariable types
 template<typename T> struct echoStateVarType;
-template<int NAME, int N, int STATETYPE> struct echoStateVarType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE>&>{
+template<int NAME, int N, int STATETYPE>
+struct echoStateVarType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE>&>{
 	static std::string value(){
 		return "const ref Eigen::Matrix<double, "+boost::lexical_cast<std::string>(N)+", 1>";
 	}
 };
-template<int NAME, int STATETYPE> struct echoStateVarType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE>&>{
+template<int NAME, int STATETYPE>
+struct echoStateVarType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE>&>{
 	static std::string value(){
 		return "const ref Eigen::Quaterniond";
 	}
 };
-template<int NAME, int N, int STATETYPE> struct echoStateVarType<msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE> >{
+template<int NAME, int N, int STATETYPE>
+struct echoStateVarType<msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE> >{
 	static std::string value(){
 		return "Eigen::Matrix<double, "+boost::lexical_cast<std::string>(N)+", 1>";
 	}
 };
-template<int NAME, int STATETYPE> struct echoStateVarType<msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE> >{
+template<int NAME, int STATETYPE>
+struct echoStateVarType<msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE> >{
 	static std::string value(){
 		return "Eigen::Quaterniond";
 	}
@@ -74,26 +81,32 @@ namespace{ //for internal use only
 //the number of entries in the correction vector for a given state var
 template<typename T>
 struct CorrectionStateLengthForType;
-template<int NAME, int N, int STATETYPE> struct CorrectionStateLengthForType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE>& >{
+template<int NAME, int N, int STATETYPE>
+struct CorrectionStateLengthForType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE>& >{
 	enum{value = N};
 };
-template<int NAME, int STATETYPE> struct CorrectionStateLengthForType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE>& >{
+template<int NAME, int STATETYPE>
+struct CorrectionStateLengthForType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE>& >{
 	enum{value = 3};
 };
-template<> struct CorrectionStateLengthForType<const mpl_::void_&>{
+template<>
+struct CorrectionStateLengthForType<const mpl_::void_&>{
 	enum{value = 0};
 };
 
 //the number of entries in the state for a given state var
 template<typename T>
 struct StateLengthForType;
-template<int NAME, int N, int STATETYPE> struct StateLengthForType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE>& >{
+template<int NAME, int N, int STATETYPE>
+struct StateLengthForType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE>& >{
 	enum{value = N};
 };
-template<int NAME, int STATETYPE> struct StateLengthForType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE>& >{
+template<int NAME, int STATETYPE>
+struct StateLengthForType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE>& >{
 	enum{value = 4};
 };
-template<> struct StateLengthForType<const mpl_::void_&>{
+template<>
+struct StateLengthForType<const mpl_::void_&>{
 	enum{value = 0};
 };
 
@@ -101,44 +114,56 @@ template<> struct StateLengthForType<const mpl_::void_&>{
 //the number of entries in the state for a given state var if it is core state
 template<typename T>
 struct CoreStateLengthForType;
-template<int NAME, int N, int STATETYPE> struct CoreStateLengthForType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE>& >{
+template<int NAME, int N, int STATETYPE>
+struct CoreStateLengthForType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE>& >{
 	enum{value = 0}; //not a core state, so length is zero
 };
-template<int NAME, int STATETYPE> struct CoreStateLengthForType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE>& >{
+template<int NAME, int STATETYPE>
+struct CoreStateLengthForType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE>& >{
 	enum{value = 0}; //not a core state, so length is zero
 };
-template<int NAME, int N> struct CoreStateLengthForType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, msf_core::CoreStateWithoutPropagation>& >{
+template<int NAME, int N>
+struct CoreStateLengthForType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, msf_core::CoreStateWithoutPropagation>& >{
 	enum{value = N};
 };
-template<int NAME> struct CoreStateLengthForType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, msf_core::CoreStateWithoutPropagation>& >{
+template<int NAME>
+struct CoreStateLengthForType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, msf_core::CoreStateWithoutPropagation>& >{
 	enum{value = 4};
 };
-template<int NAME, int N> struct CoreStateLengthForType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, msf_core::CoreStateWithPropagation>& >{
+template<int NAME, int N>
+struct CoreStateLengthForType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, msf_core::CoreStateWithPropagation>& >{
 	enum{value = N};
 };
-template<int NAME> struct CoreStateLengthForType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, msf_core::CoreStateWithPropagation>& >{
+template<int NAME>
+struct CoreStateLengthForType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, msf_core::CoreStateWithPropagation>& >{
 	enum{value = 4};
 };
-template<> struct CoreStateLengthForType<const mpl_::void_&>{
+template<>
+struct CoreStateLengthForType<const mpl_::void_&>{
 	enum{value = 0};
 };
 
 //the number of entries in the state for a given state var if it is core state with propagation
 template<typename T>
 struct PropagatedCoreStateLengthForType;
-template<int NAME, int N, int STATETYPE> struct PropagatedCoreStateLengthForType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE>& >{
+template<int NAME, int N, int STATETYPE>
+struct PropagatedCoreStateLengthForType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE>& >{
 	enum{value = 0}; //not a core state, so length is zero
 };
-template<int NAME, int STATETYPE> struct PropagatedCoreStateLengthForType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE>& >{
+template<int NAME, int STATETYPE>
+struct PropagatedCoreStateLengthForType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE>& >{
 	enum{value = 0}; //not a core state, so length is zero
 };
-template<int NAME, int N> struct PropagatedCoreStateLengthForType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, msf_core::CoreStateWithPropagation>& >{
+template<int NAME, int N>
+struct PropagatedCoreStateLengthForType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, msf_core::CoreStateWithPropagation>& >{
 	enum{value = N};
 };
-template<int NAME> struct PropagatedCoreStateLengthForType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, msf_core::CoreStateWithPropagation>& >{
+template<int NAME>
+struct PropagatedCoreStateLengthForType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, msf_core::CoreStateWithPropagation>& >{
 	enum{value = 4};
 };
-template<> struct PropagatedCoreStateLengthForType<const mpl_::void_&>{
+template<>
+struct PropagatedCoreStateLengthForType<const mpl_::void_&>{
 	enum{value = 0};
 };
 
@@ -146,19 +171,24 @@ template<> struct PropagatedCoreStateLengthForType<const mpl_::void_&>{
 //the number of entries in the error state for a given state var if it is core state with propagation
 template<typename T>
 struct PropagatedCoreErrorStateLengthForType;
-template<int NAME, int N, int STATETYPE> struct PropagatedCoreErrorStateLengthForType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE>& >{
+template<int NAME, int N, int STATETYPE>
+struct PropagatedCoreErrorStateLengthForType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE>& >{
 	enum{value = 0}; //not a core state, so length is zero
 };
-template<int NAME, int STATETYPE> struct PropagatedCoreErrorStateLengthForType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE>& >{
+template<int NAME, int STATETYPE>
+struct PropagatedCoreErrorStateLengthForType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE>& >{
 	enum{value = 0}; //not a core state, so length is zero
 };
-template<int NAME, int N> struct PropagatedCoreErrorStateLengthForType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, msf_core::CoreStateWithPropagation>& >{
+template<int NAME, int N>
+struct PropagatedCoreErrorStateLengthForType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, msf_core::CoreStateWithPropagation>& >{
 	enum{value = N};
 };
-template<int NAME> struct PropagatedCoreErrorStateLengthForType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, msf_core::CoreStateWithPropagation>& >{
+template<int NAME>
+struct PropagatedCoreErrorStateLengthForType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, msf_core::CoreStateWithPropagation>& >{
 	enum{value = 3};
 };
-template<> struct PropagatedCoreErrorStateLengthForType<const mpl_::void_&>{
+template<>
+struct PropagatedCoreErrorStateLengthForType<const mpl_::void_&>{
 	enum{value = 0};
 };
 

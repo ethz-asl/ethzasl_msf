@@ -36,9 +36,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "position_measurements.h"
 #endif
 
+#ifdef VICONPOS_MEAS
+#include "viconpos_measurements.h"
+#endif
+
+
 int main(int argc, char** argv)
 {
-	ros::init(argc, argv, "ssf_core");
+	ros::init(argc, argv, "msf_core");
 #ifdef POSE_MEAS
 	PoseMeasurements PoseMeas;
 	ROS_INFO_STREAM("Filter type: pose_sensor");
@@ -49,6 +54,10 @@ int main(int argc, char** argv)
 	ROS_INFO_STREAM("Filter type: position_sensor");
 #endif
 
+#ifdef VICONPOS_MEAS
+        PositionMeasurements ViconPosMeas;
+        ROS_INFO_STREAM("Filter type: viconpos_sensor");
+#endif
 
 	//  print published/subscribed topics
 	ros::V_string topics;

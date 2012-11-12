@@ -33,10 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define POSITION_MEASUREMENTS_H
 
 #include <ros/ros.h>
-#include <ssf_core/measurement.h>
+#include <msf_core/msf_sensormanagerROS.hpp>
 #include "position_sensor.h"
 
-class PositionMeasurements: public ssf_core::Measurements
+class PositionMeasurements: public msf_core::MSF_SensorManagerROS
 {
 public:
 	PositionMeasurements()
@@ -64,7 +64,7 @@ private:
 	{
 	    Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m;
 	    Eigen::Quaternion<double> q, q_wv;
-	    ssf_core::SSF_Core::ErrorStateCov P;
+	    msf_core::MSF_Core::ErrorStateCov P;
 
 		// init values
 		g << 0, 0, 9.81;	/// gravity
@@ -77,7 +77,7 @@ private:
 
 	    q_wv.setIdentity(); // vision-world rotation drift
 
-	    P.setZero(); // error state covariance; if zero, a default initialization in ssf_core is used
+	    P.setZero(); // error state covariance; if zero, a default initialization in msf_core is used
 
 		// check if we have already input from the measurement sensor
 		if(p_vc_.norm()==0)
@@ -90,8 +90,9 @@ private:
 		q.normalize();
 		p = q_wv.conjugate().toRotationMatrix()*p_vc_/scale - q.toRotationMatrix()*p_ci_;
 
+
 		// call initialization in core
-		ssf_core_.initialize(p,v,q,b_w,b_a,scale,q_wv,P,w_m,a_m,g,q_ci_,p_ci_);
+		msf_core_.initialize(p,v,q,b_w,b_a,P,w_m,a_m,g);
 
 	    ROS_INFO_STREAM("filter initialized to: \n" <<
 	        "position: [" << p[0] << ", " << p[1] << ", " << p[2] << "]" << std::endl <<

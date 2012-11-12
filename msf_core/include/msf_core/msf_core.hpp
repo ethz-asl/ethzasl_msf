@@ -46,7 +46,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 #include <msf_core/msf_state.hpp>
-#include <msf_core/implementation/msf_userdefinedcalculations.hpp>
 
 #define N_STATE_BUFFER 256	///< size of unsigned char, do not change!
 
@@ -56,13 +55,15 @@ enum{
 	HLI_EKF_STATE_SIZE = 16 ///< number of states exchanged with external propagation. Here: p,v,q,bw,bw=16
 };
 
+class MSF_SensorManager;
+
 class MSF_Core
 {
+public:
 	enum{
 		nErrorStatesAtCompileTime = msf_core::EKFState::nErrorStatesAtCompileTime,  ///< error state
 		nStatesAtCompileTime = msf_core::EKFState::nStatesAtCompileTime ///< complete state
 	};
-public:
 	typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, 1> ErrorState;
 	typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> ErrorStateCov;
 
@@ -71,7 +72,7 @@ public:
 			const Eigen::Quaternion<double> & q, const Eigen::Matrix<double, 3, 1> & b_w,
 			const Eigen::Matrix<double, 3, 1> & b_a, const Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> & P,
 			const Eigen::Matrix<double, 3, 1> & w_m, const Eigen::Matrix<double, 3, 1> & a_m,
-			const Eigen::Matrix<double, 3, 1> & g, const Eigen::Quaternion<double> & q_int);
+			const Eigen::Matrix<double, 3, 1> & g);
 
 	/// retreive all state information at time t. Used to build H, residual and noise matrix by update sensors
 	unsigned char getClosestState(msf_core::EKFState* timestate, ros::Time tstamp, double delay = 0.00);
@@ -79,7 +80,7 @@ public:
 	/// get all state information at a given index in the ringbuffer
 	bool getStateAtIdx(msf_core::EKFState* timestate, unsigned char idx);
 
-	MSF_Core(boost::shared_ptr<UserDefinedCalculationBase>);
+	MSF_Core(MSF_SensorManager* usercalc);
 	~MSF_Core();
 
 private:
@@ -109,9 +110,20 @@ private:
 	bool predictionMade_;
 
 	/// vision-world drift watch dog to determine fuzzy tracking
+
+	//slynen - also allow euclidean states.
+	//get the index of the best state having no temporal drift at compile time
+	enum{
+		indexOfStateWithoutTemporalDrift = msf_tmp::IndexOfBestNonTemporalDriftingState<msf_core::fullState_T>::value
+	};
+	typedef typename msf_tmp::getEnumStateType<msf_core::fullState_T, indexOfStateWithoutTemporalDrift>::value nonDriftingStateType; //returns void type for invalid types
+
+	const static int qbuffRowsAtCompiletime = msf_tmp::StateLengthForType<const msf_tmp::StripConstReference<nonDriftingStateType>::result_t&>::value;
+
 	const static int nBuff_ = 30; ///< buffer size for median q_vw
-	int qvw_inittimer_;
-	Eigen::Matrix<double, nBuff_, 4> qbuff_;
+	int nontemporaldrifting_inittimer_;
+	Eigen::Matrix<double, nBuff_, qbuffRowsAtCompiletime> qbuff_; //if there is no non temporal drifting state this matrix will have zero rows, to make use of it illegal
+
 
 	/// enables internal state predictions for log replay
 	/**
@@ -121,7 +133,7 @@ private:
 	 */
 	bool data_playback_;
 
-	boost::shared_ptr<UserDefinedCalculationBase> usercalc_; //a function which provides methods for customization
+	MSF_SensorManager* usercalc_; //a function which provides methods for customization
 
 	enum
 	{
