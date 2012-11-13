@@ -46,6 +46,10 @@ struct StateVar_T{
 	typedef Eigen::Matrix<double, sizeInCorrection_, sizeInCorrection_> Q_T;
 	Q_T Q_;
 	value_t state_;
+	bool hasResetValue; //indicating that this statevariable has a reset value to be applied to the state
+	StateVar_T(){
+		hasResetValue = false;
+	}
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
@@ -54,6 +58,7 @@ template<typename stateSequence_T>
 struct GenericState_T{
 	friend class msf_core::MSF_Core;
 	friend class msf_core::copyNonPropagationStates<GenericState_T>;
+	friend class msf_core::MSF_InitMeasurement;
 public:
 	typedef stateSequence_T stateVector_T;
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -89,7 +94,7 @@ public:
 	Eigen::Matrix<double,3,1> a_m_;         ///< acceleration from IMU
 
 
-	double time_; 				///< time of this state estimate
+	double time_; 							///< time of this state estimate
 	Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> P_;///< error state covariance
 
 	//apply the correction vector to all state vars

@@ -89,7 +89,7 @@ public:
 	virtual double getParam_noise_accbias() = 0;
 	virtual double getParam_noise_gyr() = 0;
 	virtual double getParam_noise_gyrbias() = 0;
-
+	virtual double getParam_fuzzythres() = 0;
 
 };
 
@@ -97,18 +97,13 @@ class SensorHandler
 {
 protected:
 	MSF_SensorManager* measurements;
-	bool hasInitialMeasurement_;
-
 public:
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-	SensorHandler(MSF_SensorManager* meas):measurements(meas){hasInitialMeasurement_ = false;}
+	SensorHandler(MSF_SensorManager* meas):measurements(meas){}
 	virtual ~SensorHandler() {}
-	bool hasInitialMeasurement(){
-		return hasInitialMeasurement_;
-	}
 };
 
-}; // end namespace
+}; // end msf_core
 
 #include <msf_core/implementation/msf_sensormanager.hpp>
 

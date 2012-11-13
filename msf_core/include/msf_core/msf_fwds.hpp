@@ -62,9 +62,7 @@ template<typename T, typename stateList_T>
 struct StatetoDoubleArray;
 
 class MeasurementHandler;
-
-//abstract class defining user configurable calculations for the msf_core
-class UserDefinedCalculationBase;
+class MSF_InitMeasurement;
 
 }
 #endif /* MSF_FWD_HPP_ */

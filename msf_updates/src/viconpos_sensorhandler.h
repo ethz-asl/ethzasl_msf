@@ -36,11 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <msf_core/msf_sensormanagerROS.hpp>
 
 
-class PositionSensorHandler: public msf_core::SensorHandler
+class ViconPosSensorHandler: public msf_core::SensorHandler
 {
 private:
 	// measurements
-	Eigen::Quaternion<double> z_q_; /// attitude measurement camera seen from world - here we do not have an attitude measurement
 	Eigen::Matrix<double, 3, 1> z_p_; /// position measurement camera seen from world
 	double n_zp_ /*, n_zq_*/; /// position and attitude measurement noise - here we do not have an attitude measurement
 
@@ -53,16 +52,14 @@ private:
 	void measurementCallback(const geometry_msgs::TransformStampedConstPtr & msg);
 	void noiseConfig(msf_core::MSF_CoreConfig& config, uint32_t level);
 public:
-	PositionSensorHandler();
-	PositionSensorHandler(msf_core::MSF_SensorManager* meas);
-
-	// feedback for init case
+	ViconPosSensorHandler();
+	ViconPosSensorHandler(msf_core::MSF_SensorManager* meas);
+	//used for the init
 	Eigen::Matrix<double, 3, 1> getPositionMeasurement(){
 		return z_p_;
 	}
-
 };
 
-#include "viconpos_sensor.hpp"
+#include "viconpos_sensorhandler.hpp"
 
 #endif /* POSITION_SENSOR_H */

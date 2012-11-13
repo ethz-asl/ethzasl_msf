@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 #include <msf_core/msf_state.hpp>
-#include <msf_core/measurement.hpp>
+#include <msf_core/msf_measurement.hpp>
 
 #define N_STATE_BUFFER 256	///< size of unsigned char, do not change!
 
@@ -61,6 +61,7 @@ class MSF_SensorManager;
 class MSF_Core
 {
 public:
+	friend class MSF_Measurement;
 	enum{
 		nErrorStatesAtCompileTime = msf_core::EKFState::nErrorStatesAtCompileTime,  ///< error state
 		nStatesAtCompileTime = msf_core::EKFState::nStatesAtCompileTime ///< complete state
@@ -100,8 +101,8 @@ private:
 
 	Eigen::Matrix<double, 3, 1> g_; ///< gravity vector
 
-	/// correction from EKF update
-	Eigen::Matrix<double, nErrorStatesAtCompileTime, 1> correction_;
+//	/// correction from EKF update
+//	Eigen::Matrix<double, nErrorStatesAtCompileTime, 1> correction_;
 
 	Eigen::Matrix<double, 3, 3> R_IW_; ///< Rot IMU->World
 	Eigen::Matrix<double, 3, 3> R_CI_; ///< Rot Camera->IMU
@@ -158,9 +159,6 @@ private:
 
 	sensor_fusion_comm::ExtEkf hl_state_buf_; ///< buffer to store external propagation data
 
-
-
-
 	/// propagates the state with given dt
 	void propagateState(const double dt);
 
@@ -168,7 +166,7 @@ private:
 	void predictProcessCovariance(const double dt);
 
 	/// applies the correction
-	bool applyCorrection(unsigned char idx_delaystate, const ErrorState & res_delayed, double fuzzythres = 0.1);
+	bool applyCorrection(msf_core::EKFState& delaystate, ErrorState & correction, double fuzzythres = 0.1);
 
 	/// propagate covariance to a given index in the ringbuffer
 	void propPToIdx(unsigned char idx);
@@ -194,11 +192,12 @@ private:
 
 
 public:
-	/// main update routine called by a given sensor
-	template<class H_type, class Res_type, class R_type>
-	bool applyMeasurement(unsigned char idx_delaystate, const Eigen::MatrixBase<H_type>& H_delayed,
-			const Eigen::MatrixBase<Res_type> & res_delayed, const Eigen::MatrixBase<R_type>& R_delayed,
-			double fuzzythres = 0.1);
+//	/// main update routine called by a given sensor
+//	template<class H_type, class Res_type, class R_type>
+//	bool applyMeasurement(unsigned char idx_delaystate, const Eigen::MatrixBase<H_type>& H_delayed,
+//			const Eigen::MatrixBase<Res_type> & res_delayed, const Eigen::MatrixBase<R_type>& R_delayed,
+//			double fuzzythres = 0.1);
+
 
 };
 

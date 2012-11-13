@@ -482,6 +482,23 @@ struct resetState
 
 //copy states from previous to current states, for which there is no propagation
 template<typename stateT>
+struct copyInitStates
+{
+	copyInitStates(const stateT& oldstate):oldstate_(oldstate){	}
+	template<typename T, int NAME, int STATETYPE>
+	void operator()(msf_core::StateVar_T<T, NAME, STATETYPE>& t) const {
+		if(t.hasResetValue){
+			t = oldstate_.template getStateVar<NAME>(); //copy value from old state to new state var
+		}
+	}
+
+private:
+	const stateT& oldstate_;
+};
+
+
+//copy states from previous to current states, for which there is no propagation
+template<typename stateT>
 struct copyNonPropagationStates
 {
 	copyNonPropagationStates(const stateT& oldstate):oldstate_(oldstate){	}
@@ -556,12 +573,12 @@ struct correctState
 		enum{
 			startIdxInCorrection = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::CorrectionStateLengthForType>::value
 		};
-		std::cout<<"called correction for state "<<NAME<<std::endl;
-		std::cout<<"initial value "<<t.state_<<std::endl;
+		//		std::cout<<"called correction for state "<<NAME<<std::endl;
+		//		std::cout<<"initial value "<<t.state_<<std::endl;
 
 		t.state_ = t.state_ + data_.template block<var_T::sizeInCorrection_, 1> (startIdxInCorrection, 0);
 
-		std::cout<<"after update "<<t.state_<<std::endl;
+		//		std::cout<<"after update "<<t.state_<<std::endl;
 
 	}
 	template<int NAME, int STATETYPE>
@@ -570,14 +587,14 @@ struct correctState
 		enum{
 			startIdxInCorrection = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::CorrectionStateLengthForType>::value
 		};
-		std::cout<<"called correction for state "<<NAME<<std::endl;
-		std::cout<<"initial value "<<t.state_.w()<<" "<<t.state_.x()<<" "<<t.state_.y()<<" "<<t.state_.z()<<std::endl;
+		//		std::cout<<"called correction for state "<<NAME<<std::endl;
+		//		std::cout<<"initial value "<<t.state_.w()<<" "<<t.state_.x()<<" "<<t.state_.y()<<" "<<t.state_.z()<<std::endl;
 
 		Eigen::Quaternion<double> qbuff_q = quaternionFromSmallAngle(data_.template block<var_T::sizeInCorrection_, 1> (startIdxInCorrection, 0));
 		t.state_ = t.state_ * qbuff_q;
 		t.state_.normalize();
 
-		std::cout<<"after update "<<t.state_.w()<<" "<<t.state_.x()<<" "<<t.state_.y()<<" "<<t.state_.z()<<std::endl;
+		//		std::cout<<"after update "<<t.state_.w()<<" "<<t.state_.x()<<" "<<t.state_.y()<<" "<<t.state_.z()<<std::endl;
 	}
 private:
 	T& data_;

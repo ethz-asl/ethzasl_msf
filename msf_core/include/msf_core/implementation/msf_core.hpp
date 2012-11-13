@@ -207,38 +207,38 @@ void MSF_Core::imuCallback(const sensor_msgs::ImuConstPtr & msg)
 	seq++;
 }
 
-/// main update routine called by a given sensor
-template<class H_type, class Res_type, class R_type>
-bool MSF_Core::applyMeasurement(unsigned char idx_delaystate, const Eigen::MatrixBase<H_type>& H_delayed,
-		const Eigen::MatrixBase<Res_type> & res_delayed, const Eigen::MatrixBase<R_type>& R_delayed,
-		double fuzzythres)
-{
-	EIGEN_STATIC_ASSERT_FIXED_SIZE(H_type);
-	EIGEN_STATIC_ASSERT_FIXED_SIZE(R_type);
-
-	// get measurements
-	if (!predictionMade_)
-		return false;
-
-	// make sure we have correctly propagated cov until idx_delaystate
-	propPToIdx(idx_delaystate);
-
-	R_type S;
-	Eigen::Matrix<double, nErrorStatesAtCompileTime, R_type::RowsAtCompileTime> K;
-	ErrorStateCov & P = StateBuffer_[idx_delaystate].P_;
-
-	S = H_delayed * StateBuffer_[idx_delaystate].P_ * H_delayed.transpose() + R_delayed;
-	K = P * H_delayed.transpose() * S.inverse();
-
-	correction_ = K * res_delayed;
-	const ErrorStateCov KH = (ErrorStateCov::Identity() - K * H_delayed);
-	P = KH * P * KH.transpose() + K * R_delayed * K.transpose();
-
-	// make sure P stays symmetric
-	P = 0.5 * (P + P.transpose());
-
-	return applyCorrection(idx_delaystate, correction_, fuzzythres);
-}
+///// main update routine called by a given sensor
+//template<class H_type, class Res_type, class R_type>
+//bool MSF_Core::applyMeasurement(unsigned char idx_delaystate, const Eigen::MatrixBase<H_type>& H_delayed,
+//		const Eigen::MatrixBase<Res_type> & res_delayed, const Eigen::MatrixBase<R_type>& R_delayed,
+//		double fuzzythres)
+//{
+//	EIGEN_STATIC_ASSERT_FIXED_SIZE(H_type);
+//	EIGEN_STATIC_ASSERT_FIXED_SIZE(R_type);
+//
+//	// get measurements
+//	if (!predictionMade_)
+//		return false;
+//
+//	// make sure we have correctly propagated cov until idx_delaystate
+//	propPToIdx(idx_delaystate);
+//
+//	R_type S;
+//	Eigen::Matrix<double, nErrorStatesAtCompileTime, R_type::RowsAtCompileTime> K;
+//	ErrorStateCov & P = StateBuffer_[idx_delaystate].P_;
+//
+//	S = H_delayed * StateBuffer_[idx_delaystate].P_ * H_delayed.transpose() + R_delayed;
+//	K = P * H_delayed.transpose() * S.inverse();
+//
+//	correction_ = K * res_delayed;
+//	const ErrorStateCov KH = (ErrorStateCov::Identity() - K * H_delayed);
+//	P = KH * P * KH.transpose() + K * R_delayed * K.transpose();
+//
+//	// make sure P stays symmetric
+//	P = 0.5 * (P + P.transpose());
+//
+//	return applyCorrection(idx_delaystate, correction_, fuzzythres);
+//}
 
 void MSF_Core::stateCallback(const sensor_fusion_comm::ExtEkfConstPtr & msg)
 {
@@ -509,13 +509,13 @@ void MSF_Core::propPToIdx(unsigned char idx)
 }
 
 
-bool MSF_Core::applyCorrection(unsigned char idx_delaystate, const ErrorState & res_delayed, double fuzzythres)
+bool MSF_Core::applyCorrection(msf_core::EKFState& delaystate, ErrorState & correction, double fuzzythres)
 {
 	static int seq_m = 0;
 
 	//slynen{
 	//give the user the possibility to fix some states
-	usercalc_->augmentCorrectionVector(correction_);
+	usercalc_->augmentCorrectionVector(correction);
 
 	//now augment core states
 	if (usercalc_->getParam_fixed_bias())
@@ -535,10 +535,10 @@ bool MSF_Core::applyCorrection(unsigned char idx_delaystate, const ErrorState & 
 		BOOST_STATIC_ASSERT_MSG(static_cast<int>(indexOfState_b_a)==12, "The index of the state b_a in the correction vector differs from the expected value");
 
 		for(int i = 0 ; i < msf_tmp::StripConstReference<b_a_type>::result_t::sizeInCorrection_ ; ++i){
-			correction_(indexOfState_b_a + i) = 0; //acc bias x,y,z
+			correction(indexOfState_b_a + i) = 0; //acc bias x,y,z
 		}
 		for(int i = 0 ; i < msf_tmp::StripConstReference<b_w_type>::result_t::sizeInCorrection_ ; ++i){
-			correction_(indexOfState_b_w + i) = 0; //gyro bias x,y,z
+			correction(indexOfState_b_w + i) = 0; //gyro bias x,y,z
 		}
 	}
 	//}
@@ -548,20 +548,19 @@ bool MSF_Core::applyCorrection(unsigned char idx_delaystate, const ErrorState & 
 	// store old values in case of fuzzy tracking
 	// TODO: sweiss what to do with attitude? augment measurement noise?
 
-	EKFState & delaystate = StateBuffer_[idx_delaystate];
 
 	EKFState buffstate = delaystate;
 
 	//slynen{ call correction function for every state
 
-	Eigen::Quaternion<double> qbuff_q = quaternionFromSmallAngle(correction_.block<3, 1> (6, 0));
+	Eigen::Quaternion<double> qbuff_q = quaternionFromSmallAngle(correction.block<3, 1> (6, 0));
 
-	delaystate.correct(correction_);
+	delaystate.correct(correction);
 
 	//}
 
 	//slynen{ //allow the user to sanity check the new state
-	usercalc_->sanityCheckCorrection(delaystate, buffstate, correction_);
+	usercalc_->sanityCheckCorrection(delaystate, buffstate, correction);
 
 	//TODO: move the whole fuzzy tracking to a templated function, which is specialized for void, Matrix, Quaternion
 
@@ -586,6 +585,8 @@ if(indexOfStateWithoutTemporalDrift != -1){ //is there a state without temporal 
 						getMedian(qbuff_.block<nBuff_, 1> (0, 2))
 				);
 
+		double fuzzythres = usercalc_->getParam_fuzzythres();
+
 		if (std::max(errq.vec().maxCoeff(), -errq.vec().minCoeff()) / fabs(errq.w()) * 2 > fuzzythres) // fuzzy tracking (small angle approx)
 		{
 			ROS_WARN_STREAM_THROTTLE(1,"fuzzy tracking triggered: " << std::max(errq.vec().maxCoeff(), -errq.vec().minCoeff())/fabs(errq.w())*2 << " limit: " << fuzzythres <<"\n");
@@ -601,7 +602,7 @@ if(indexOfStateWithoutTemporalDrift != -1){ //is there a state without temporal 
 					static_cast<int>(EKFState::nPropagatedCoreErrorStatesAtCompileTime) == 16, "Assumed that nErrorStatesAtCompileTime-nPropagatedCoreStates == 16, which is not the case");
 
 			//TODO: can be eliminated
-			correction_.block<EKFState::nErrorStatesAtCompileTime-EKFState::nPropagatedCoreErrorStatesAtCompileTime, 1> (EKFState::nPropagatedCoreErrorStatesAtCompileTime, 0) =
+			correction.block<EKFState::nErrorStatesAtCompileTime-EKFState::nPropagatedCoreErrorStatesAtCompileTime, 1> (EKFState::nPropagatedCoreErrorStatesAtCompileTime, 0) =
 					Eigen::Matrix<double, EKFState::nErrorStatesAtCompileTime-EKFState::nPropagatedCoreErrorStatesAtCompileTime, 1>::Zero();
 			qbuff_q.setIdentity();
 		}
@@ -627,7 +628,7 @@ if(indexOfStateWithoutTemporalDrift != -1){ //is there a state without temporal 
 	while (idx_state_ != idx_time_)
 		propagateState(StateBuffer_[idx_state_].time_ - StateBuffer_[(unsigned char)(idx_state_ - 1)].time_);
 
-	checkForNumeric(&correction_[0], HLI_EKF_STATE_SIZE, "update");
+	checkForNumeric(&correction[0], HLI_EKF_STATE_SIZE, "update");
 
 	// publish correction for external propagation
 	msgCorrect_.header.stamp = ros::Time::now();

@@ -80,7 +80,9 @@ public:
 	virtual double getParam_noise_gyrbias(){
 		return config_.noise_gyrbias;
 	}
-
+	virtual double getParam_fuzzythres(){
+		return 0.1;
+	}
 
 };
 

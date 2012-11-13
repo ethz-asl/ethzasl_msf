@@ -33,37 +33,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VICONPOS_MEASUREMENTMANAGER_H
 
 #include <ros/ros.h>
-#include "viconpos_sensor.h"
+#include "viconpos_sensorhandler.h"
 #include <msf_core/msf_sensormanagerROS.hpp>
 #include <boost/shared_ptr.hpp>
 
-class PositionMeasurements: public msf_core::MSF_SensorManagerROS
+class ViconPositionSensorManager: public msf_core::MSF_SensorManagerROS
 {
 public:
-	PositionMeasurements()
+	ViconPositionSensorManager()
 	{
-		viconPosHandler_.reset(new PositionSensorHandler(this));
+		viconPosHandler_.reset(new ViconPosSensorHandler(this));
 		addHandler(viconPosHandler_);
 
 		// setup: initial pos, att, of measurement sensor
 		p_vc_ = Eigen::Matrix<double, 3, 1>::Constant(0);
-		q_cv_ = Eigen::Quaternion<double>(1, 0, 0, 0);
-
-		press_height_=0;
 	}
 
 private:
-	// measurements
-	Eigen::Quaternion<double> q_cv_;
+	boost::shared_ptr<ViconPosSensorHandler> viconPosHandler_;
 	Eigen::Matrix<double, 3, 1> p_vc_;
-	Eigen::Matrix<double, 3, 1> v_vc_;
-	double press_height_;
-	boost::shared_ptr<PositionSensorHandler> viconPosHandler_;
 
 	void init(double scale)
 	{
 		Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ci_;
-		Eigen::Quaternion<double> q, q_wv, q_ci_;
+		Eigen::Quaternion<double> q, q_wv, q_ci_, q_cv_;
 		msf_core::MSF_Core::ErrorStateCov P;
 
 		// init values
@@ -78,14 +71,15 @@ private:
 		q_wv.setIdentity(); // vision-world rotation drift
 		q_ci_.setIdentity();//camera imu rotation
 		p_ci_.setZero(); 	//camera imu position
+		q_cv_.setIdentity(); 	//measured attitude
+
 
 		P.setZero(); // error state covariance; if zero, a default initialization in msf_core is used
 
 		//slynen{ get measurements
-		bool PosSensorHasMeasurements = viconPosHandler_->hasInitialMeasurement();
-		if(PosSensorHasMeasurements){
+
 			p_vc_ = viconPosHandler_->getPositionMeasurement();
-		}
+
 		//}
 
 		// check if we have already input from the measurement sensor

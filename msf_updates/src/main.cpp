@@ -30,14 +30,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #ifdef POSE_MEAS
-#include "pose_measurements.h"
+#include "pose_sensormanager.h"
 #endif
 #ifdef POSITION_MEAS
-#include "position_measurements.h"
+#include "position_sensormanager.h"
 #endif
 
 #ifdef VICONPOS_MEAS
-#include "viconpos_measurements.h"
+#include "viconpos_sensormanager.h"
 #endif
 
 
@@ -45,17 +45,17 @@ int main(int argc, char** argv)
 {
 	ros::init(argc, argv, "msf_core");
 #ifdef POSE_MEAS
-	PoseMeasurements PoseMeas;
+	PoseSensorHandler PoseMeas;
 	ROS_INFO_STREAM("Filter type: pose_sensor");
 #endif
 
 #ifdef POSITION_MEAS
-	PositionMeasurements PositionMeas;
+	PositionSensorHandler PositionMeas;
 	ROS_INFO_STREAM("Filter type: position_sensor");
 #endif
 
 #ifdef VICONPOS_MEAS
-	PositionMeasurements ViconPosMeas;
+	ViconPositionSensorManager ViconPosMeas;
 	ROS_INFO_STREAM("Filter type: viconpos_sensor");
 #endif
 
