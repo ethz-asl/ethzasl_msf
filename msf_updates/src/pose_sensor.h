@@ -7,12 +7,12 @@ All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-* Redistributions of source code must retain the above copyright
+ * Redistributions of source code must retain the above copyright
 notice, this list of conditions and the following disclaimer.
-* Redistributions in binary form must reproduce the above copyright
+ * Redistributions in binary form must reproduce the above copyright
 notice, this list of conditions and the following disclaimer in the
 documentation and/or other materials provided with the distribution.
-* Neither the name of ETHZ-ASL nor the
+ * Neither the name of ETHZ-ASL nor the
 names of its contributors may be used to endorse or promote products
 derived from this software without specific prior written permission.
 
@@ -27,7 +27,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-*/
+ */
 
 #ifndef POSE_SENSOR_H
 #define POSE_SENSOR_H
@@ -38,27 +38,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class PoseSensorHandler : public msf_core::SensorHandler
 {
 private:
-  // measurements
-  Eigen::Quaternion<double> z_q_; /// attitude measurement camera seen from world
-  Eigen::Matrix<double, 3, 1> z_p_; /// position measurement camera seen from world
-  double n_zp_, n_zq_; /// position and attitude measurement noise
+	// measurements
+	Eigen::Quaternion<double> z_q_; /// attitude measurement camera seen from world
+	Eigen::Matrix<double, 3, 1> z_p_; /// position measurement camera seen from world
+	double n_zp_, n_zq_; /// position and attitude measurement noise
 
-  ros::Subscriber subMeasurement_;
-  ros::Subscriber subPressure_;
+	ros::Subscriber subMeasurement_;
+	ros::Subscriber subPressure_;
 
-  double pressure_offset_;
+	double pressure_offset_;
 
-  bool measurement_world_sensor_; ///< defines if the pose of the sensor is measured in world coordinates (true, default) or vice versa (false, e.g. PTAM)
-  bool use_fixed_covariance_; ///< use fixed covariance set by dynamic reconfigure
+	bool measurement_world_sensor_; ///< defines if the pose of the sensor is measured in world coordinates (true, default) or vice versa (false, e.g. PTAM)
+	bool use_fixed_covariance_; ///< use fixed covariance set by dynamic reconfigure
 
-  void subscribe();
-  void measurementCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg);
-  void pressureCallback(const asctec_hl_comm::mav_imuConstPtr & msg);
-  void noiseConfig(msf_core::MSF_CoreConfig& config, uint32_t level);
+	void subscribe();
+	void measurementCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg);
+	void pressureCallback(const asctec_hl_comm::mav_imuConstPtr & msg);
+	void noiseConfig(msf_core::MSF_CoreConfig& config, uint32_t level);
+	virtual void DynConfig(msf_core::MSF_CoreConfig &config, uint32_t level);
 
 public:
-  PoseSensorHandler();
-  PoseSensorHandler(msf_core::MSF_SensorManager* meas);
+	PoseSensorHandler();
+	PoseSensorHandler(msf_core::MSF_SensorManager* meas);
 };
 
 #include "pose_sensor.hpp"

@@ -29,8 +29,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
 
-#ifndef MEASUREMENT_H
-#define MEASUREMENT_H
+#ifndef SENSORMANAGER_H
+#define SENSORMANAGER_H
 
 #include <msf_core/msf_statedef.hpp>
 #include <msf_core/msf_state.hpp>
@@ -63,6 +63,9 @@ public:
 		handlers.push_back(handler);
 	}
 
+	//init functions for the EKF
+	virtual void init(double scale) = 0;
+
 	//this method will be called for the user to set the initial state
 	virtual void initState(msf_core::EKFState& state) = 0;
 
@@ -92,10 +95,9 @@ public:
 
 class SensorHandler
 {
-private:
-	bool hasInitialMeasurement_;
 protected:
 	MSF_SensorManager* measurements;
+	bool hasInitialMeasurement_;
 
 public:
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -108,6 +110,6 @@ public:
 
 }; // end namespace
 
-#include <msf_core/implementation/msf_measurements.hpp>
+#include <msf_core/implementation/msf_sensormanager.hpp>
 
-#endif /* MEASUREMENT_H */
+#endif /* SENSORMANAGER_H */

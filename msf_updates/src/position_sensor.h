@@ -51,7 +51,7 @@ private:
 	void subscribe();
 	void measurementCallback(const msf_updates::PositionWithCovarianceStampedConstPtr & msg);
 	void noiseConfig(msf_core::MSF_CoreConfig& config, uint32_t level);
-
+	virtual void DynConfig(msf_core::MSF_CoreConfig &config, uint32_t level);
 public:
 	PositionSensorHandler();
 	PositionSensorHandler(msf_core::MSF_SensorManager* meas);

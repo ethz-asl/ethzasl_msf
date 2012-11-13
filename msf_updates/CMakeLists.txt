@@ -18,7 +18,7 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #gencfg()
 rosbuild_genmsg()
 
-add_definitions (-Wall)
+add_definitions (-Wall -std=c++0x)
 
 # get eigen
 find_package(Eigen REQUIRED)
@@ -27,14 +27,11 @@ include_directories(${Eigen_INCLUDE_DIRS})
 #rosbuild_add_executable(pose_sensor src/main.cpp)
 #set_property(TARGET pose_sensor PROPERTY COMPILE_DEFINITIONS POSE_MEAS)
 #rosbuild_add_compile_flags(pose_sensor "-O3")
-#target_link_libraries(pose_sensor msf_core)
 
 #rosbuild_add_executable(position_sensor src/main.cpp)
 #set_property(TARGET position_sensor PROPERTY COMPILE_DEFINITIONS POSITION_MEAS)
 #rosbuild_add_compile_flags(position_sensor "-O3")
-#target_link_libraries(position_sensor ssf_core)
 
-rosbuild_add_executable(viconpos_sensor src/main.cpp)
-set_property(TARGET viconpos_sensor PROPERTY COMPILE_DEFINITIONS VICONPOS_MEAS)
-rosbuild_add_compile_flags(viconpos_sensor "-O3")
-target_link_libraries(viconpos_sensor ssf_core)
+rosbuild_add_executable(msf_viconpos_sensor src/main.cpp)
+set_property(TARGET msf_viconpos_sensor PROPERTY COMPILE_DEFINITIONS VICONPOS_MEAS)
+##rosbuild_add_compile_flags(msf_viconpos_sensor "-O3")

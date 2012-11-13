@@ -1,12 +1,10 @@
 /*
- * msf_masterROS.hpp
- *
  *  Created on: Nov 12, 2012
  *      Author: slynen
  */
 
-#ifndef MSF_MEASUREMENTROS_HPP_
-#define MSF_MEASUREMENTROS_HPP_
+#ifndef SENSORMANAGERROS_H
+#define SENSORMANAGERROS_H
 
 #include <ros/ros.h>
 #include <msf_core/MSF_CoreConfig.h>
@@ -54,16 +52,18 @@ public:
 	/// gets called by dynamic reconfigure and calls all registered callbacks in callbacks_
 	void Config(msf_core::MSF_CoreConfig &config, uint32_t level)
 	{
+		config_ = config;
 		for (std::vector<CallbackType>::iterator it = callbacks_.begin(); it != callbacks_.end(); it++)
 			(*it)(config, level);
 	}
 
-	/// handles the dynamic reconfigure for ssf_core
-	virtual void DynConfig(msf_core::MSF_CoreConfig &config, uint32_t level)
-	{
-		config_ = config;
+	virtual void DynConfig(msf_core::MSF_CoreConfig &config, uint32_t level){
+		if(level & msf_core::MSF_Core_INIT_FILTER)
+		{
+			init(config.scale_init);
+			config.init_filter = false;
+		}
 	}
-
 
 	virtual bool getParam_fixed_bias(){
 		return config_.fixed_bias;
@@ -85,4 +85,4 @@ public:
 };
 
 }
-#endif /* MSF_MEASUREMENTROS_HPP_ */
+#endif /* SENSORMANAGERROS_H */

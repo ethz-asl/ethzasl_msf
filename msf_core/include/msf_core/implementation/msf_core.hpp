@@ -43,9 +43,9 @@ MSF_Core::MSF_Core(MSF_SensorManager* usercalc)
 	predictionMade_ = false;
 
 
-	//TODO later: move all this to the external file and let the user handle this.
+	//TODO later: move all this to the external file and derive from this class. We could by this allow compilation on platforms withour ROS
 	/// ros stuff
-	ros::NodeHandle nh("MSF_Core");
+	ros::NodeHandle nh("msf_core");
 	ros::NodeHandle pnh("~");
 
 	pubState_ = nh.advertise<sensor_fusion_comm::DoubleArrayStamped> ("state_out", 1);
@@ -54,8 +54,8 @@ MSF_Core::MSF_Core(MSF_SensorManager* usercalc)
 	pubPoseCrtl_ = nh.advertise<sensor_fusion_comm::ExtState> ("ext_state", 1);
 	msgState_.data.resize(nStatesAtCompileTime, 0);
 
-	subImu_ = nh.subscribe("imu_state_input", 1 /*N_STATE_BUFFER*/, &MSF_Core::imuCallback, this);
-	subState_ = nh.subscribe("hl_state_input", 1 /*N_STATE_BUFFER*/, &MSF_Core::stateCallback, this);
+	subImu_ = nh.subscribe("imu_state_input", 1, &MSF_Core::imuCallback, this);
+	subState_ = nh.subscribe("hl_state_input", 1, &MSF_Core::stateCallback, this);
 
 	msgCorrect_.state.resize(HLI_EKF_STATE_SIZE, 0);
 	hl_state_buf_.state.resize(HLI_EKF_STATE_SIZE, 0);
@@ -598,7 +598,7 @@ if(indexOfStateWithoutTemporalDrift != -1){ //is there a state without temporal 
 
 			BOOST_STATIC_ASSERT_MSG(static_cast<int>(EKFState::nPropagatedCoreErrorStatesAtCompileTime) == 9, "Assumed that nPropagatedCoreStates == 9, which is not the case");
 			BOOST_STATIC_ASSERT_MSG(static_cast<int>(EKFState::nErrorStatesAtCompileTime) -
-					static_cast<int>(EKFState::nPropagatedCoreErrorStatesAtCompileTime) == 19, "Assumed that nErrorStatesAtCompileTime-nPropagatedCoreStates == 19, which is not the case");
+					static_cast<int>(EKFState::nPropagatedCoreErrorStatesAtCompileTime) == 16, "Assumed that nErrorStatesAtCompileTime-nPropagatedCoreStates == 16, which is not the case");
 
 			//TODO: can be eliminated
 			correction_.block<EKFState::nErrorStatesAtCompileTime-EKFState::nPropagatedCoreErrorStatesAtCompileTime, 1> (EKFState::nPropagatedCoreErrorStatesAtCompileTime, 0) =

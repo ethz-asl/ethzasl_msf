@@ -71,6 +71,8 @@ void PositionSensorHandler::noiseConfig(msf_core::MSF_CoreConfig& config, uint32
 	//	{
 	this->n_zp_ = config.meas_noise1;
 
+
+
 	//	}
 }
 
@@ -95,6 +97,7 @@ void PositionSensorHandler::measurementCallback(const geometry_msgs::TransformSt
 	// get measurements
 	z_p_ = Eigen::Matrix<double,3,1>(msg->transform.translation.x, msg->transform.translation.y, msg->transform.translation.z);
 
+	hasInitialMeasurement_ = true;
 
 	if (!use_fixed_covariance_)  // take covariance from sensor
 	{

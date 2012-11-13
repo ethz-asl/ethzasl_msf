@@ -29,8 +29,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
 
-#ifndef VICONPOS_MEASUREMENTS_H
-#define VICONPOS_MEASUREMENTS_H
+#ifndef VICONPOS_MEASUREMENTMANAGER_H
+#define VICONPOS_MEASUREMENTMANAGER_H
 
 #include <ros/ros.h>
 #include "viconpos_sensor.h"
@@ -102,19 +102,19 @@ private:
 		// call initialization in core
 		msf_core_->initialize(p,v,q,b_w,b_a,P,w_m,a_m,g);
 
-//		ROS_INFO_STREAM("filter initialized to: \n" <<
-//				"position: [" << p[0] << ", " << p[1] << ", " << p[2] << "]" << std::endl <<
-//				"scale:" << scale << std::endl <<
-//				"attitude (w,x,y,z): [" << q.w() << ", " << q.x() << ", " << q.y() << ", " << q.z() << std::endl <<
-//				"p_ci: [" << p_ci_[0] << ", " << p_ci_[1] << ", " << p_ci_[2] << std::endl <<
-//				"q_ci: (w,x,y,z): [" << q_ci_.w() << ", " << q_ci_.x() << ", " << q_ci_.y() << ", " << q_ci_.z() << "]");
+		ROS_INFO_STREAM("filter initialized to: \n" <<
+				"position: [" << p[0] << ", " << p[1] << ", " << p[2] << "]" << std::endl <<
+				"attitude (w,x,y,z): [" << q.w() << ", " << q.x() << ", " << q.y() << ", " << q.z() << std::endl <<
+				"p_ci: [" << p_ci_[0] << ", " << p_ci_[1] << ", " << p_ci_[2] << std::endl <<
+				"q_ci: (w,x,y,z): [" << q_ci_.w() << ", " << q_ci_.x() << ", " << q_ci_.y() << ", " << q_ci_.z() << "]");
 	}
 
 	//prior to this call, all states are initialized to zero/identity
 		virtual void resetState(msf_core::EKFState& state){
 			//set scale to 1
 
-			Eigen::Matrix<double, 1, 1> scale(1.0);
+			Eigen::Matrix<double, 1, 1> scale;
+			scale << 1.0;
 			state.set<msf_core::L_>(scale);
 		}
 		virtual void initState(msf_core::EKFState& state){
@@ -132,7 +132,8 @@ private:
 			msf_core::ConstVector3 nqwvv = Eigen::Vector3d::Constant(config_.noise_qwv);
 			msf_core::ConstVector3 nqciv = Eigen::Vector3d::Constant(config_.noise_qci);
 			msf_core::ConstVector3 npicv = Eigen::Vector3d::Constant(config_.noise_pic);
-			const Eigen::Matrix<double, 1, 1> n_L(config_.noise_scale);
+			Eigen::Matrix<double, 1, 1> n_L;
+			n_L << config_.noise_scale;
 
 			//compute the blockwise Q values and store them with the states,
 			//these then get copied by the core to the correct places in Qd
@@ -207,7 +208,9 @@ private:
 			if (state.get<msf_core::L_>()(0) < 0)
 			{
 				ROS_WARN_STREAM_THROTTLE(1,"Negative scale detected: " << state.get<msf_core::L_>()(0) << ". Correcting to 0.1");
-				delaystate.set<msf_core::L_>(Eigen::Matrix<double, 1, 1>(0.1));
+				Eigen::Matrix<double, 1, 1> L_;
+				L_ << 0.1;
+				delaystate.set<msf_core::L_>(L_);
 			}
 
 		}
@@ -218,4 +221,4 @@ private:
 
 };
 
-#endif /* VICONPOS_MEASUREMENTS_H */
+#endif /* VICONPOS_MEASUREMENTMANAGER_H */

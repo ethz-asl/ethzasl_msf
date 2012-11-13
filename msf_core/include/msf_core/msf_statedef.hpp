@@ -22,8 +22,8 @@ enum{ //must not manually set the enum values!
 	L_,
 	q_wv_,
 	q_ci_,
-	p_ci_,
-	q_int_
+	p_ci_/*,
+	q_int_*/
 };
 
 namespace{
@@ -42,8 +42,8 @@ typedef boost::fusion::vector<
 		StateVar_T<Eigen::Matrix<double, 1, 1>, L_>,										///< visual scale                     (16 / 15)
 		StateVar_T<Eigen::Quaternion<double>, q_wv_, AuxiliaryNonTemporalDrifting>,			///< vision-world attitude drift      (17-20 / 16-18)
 		StateVar_T<Eigen::Quaternion<double>, q_ci_>,										///< camera-imu attitude calibration  (21-24 / 19-21)
-		StateVar_T<Eigen::Matrix<double, 3, 1>, p_ci_>,										///< camera-imu position calibration  (25-27 / 22-24)
-		StateVar_T<Eigen::Quaternion<double>, q_int_>										///< this is the integrated ang. vel. no corrections applied, to use for delta rot in external algos...
+		StateVar_T<Eigen::Matrix<double, 3, 1>, p_ci_>/*,										///< camera-imu position calibration  (25-27 / 22-24)
+		StateVar_T<Eigen::Quaternion<double>, q_int_>	*/									///< this is the integrated ang. vel. no corrections applied, to use for delta rot in external algos...
 
 > fullState_T;
 }

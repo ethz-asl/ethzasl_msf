@@ -69,6 +69,33 @@ void PositionSensorHandler::noiseConfig(msf_core::MSF_CoreConfig& config, uint32
 	//	}
 }
 
+virtual void PoseSensorHandler::DynConfig(msf_core::MSF_CoreConfig &config, uint32_t level){
+	if(level & ssf_core::SSF_Core_INIT_FILTER)
+	{
+		init(config.scale_init);
+		config.init_filter = false;
+	}
+	else if(level & ssf_core::SSF_Core_SET_HEIGHT)
+	{
+		if(p_vc_.norm()==0)
+		{
+			ROS_WARN_STREAM("No measurements received yet to initialize position - using scale factor " << config.scale_init << " for init");
+			init(config.scale_init);
+		}
+		else
+		{
+			init(p_vc_[2]/config.height);
+			ROS_WARN_STREAM("init filter (set scale to: " << p_vc_[2]/config.height << ")");
+		}
+		config.set_height = false;
+	}
+	else if(level & ssf_core::SSF_Core_SET_PRESS)
+	{
+		init_scale(config.scale_init);
+		config.set_pressure_height = false;
+	}
+}
+
 void PositionSensorHandler::measurementCallback(const msf_updates::PositionWithCovarianceStampedConstPtr & msg)
 {
 	//	ROS_INFO_STREAM("measurement received \n"
@@ -87,6 +114,7 @@ void PositionSensorHandler::measurementCallback(const msf_updates::PositionWithC
 	// get measurements
 	z_p_ = Eigen::Matrix<double,3,1>(msg->position.x, msg->position.y, msg->position.z);
 
+	hasInitialMeasurement_ = true;
 
 	if (!use_fixed_covariance_)  // take covariance from sensor
 	{

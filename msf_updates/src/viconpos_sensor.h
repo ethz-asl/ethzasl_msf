@@ -29,8 +29,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
 
-#ifndef POSITION_SENSOR_H
-#define POSITION_SENSOR_H
+#ifndef VICONPOSITION_SENSOR_H
+#define VICONPOSITION_SENSOR_H
 
 #include <geometry_msgs/TransformStamped.h>
 #include <msf_core/msf_sensormanagerROS.hpp>
@@ -52,7 +52,6 @@ private:
 	void subscribe();
 	void measurementCallback(const geometry_msgs::TransformStampedConstPtr & msg);
 	void noiseConfig(msf_core::MSF_CoreConfig& config, uint32_t level);
-
 public:
 	PositionSensorHandler();
 	PositionSensorHandler(msf_core::MSF_SensorManager* meas);

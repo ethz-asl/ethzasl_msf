@@ -29,8 +29,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef POSITION_MEASUREMENTS_H
-#define POSITION_MEASUREMENTS_H
+#ifndef POSITION_MEASUREMENTMANAGER_H
+#define POSITION_MEASUREMENTMANAGER_H
 
 #include <ros/ros.h>
 #include <msf_core/msf_sensormanagerROS.hpp>
@@ -103,4 +103,4 @@ private:
 	}
 };
 
-#endif /* POSITION_MEASUREMENTS_H */
+#endif /* POSITION_MEASUREMENTMANAGER_H */
