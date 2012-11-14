@@ -9,6 +9,9 @@
 
 namespace msf_core{
 
+#include <boost/shared_ptr.hpp>
+#include <iostream>
+
 //state types used to identify propagated/core/auxiliary states
 enum{
 	CoreStateWithPropagation,
@@ -63,6 +66,8 @@ struct StatetoDoubleArray;
 
 class MeasurementHandler;
 class MSF_InitMeasurement;
+class MSF_MeasurementBase;
+class MSF_InvalidMeasurement;
 
 }
 #endif /* MSF_FWD_HPP_ */

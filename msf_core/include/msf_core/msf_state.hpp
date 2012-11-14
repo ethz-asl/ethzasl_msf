@@ -54,6 +54,7 @@ struct StateVar_T{
 };
 
 
+
 template<typename stateSequence_T>
 struct GenericState_T{
 	friend class msf_core::MSF_Core;
@@ -87,6 +88,8 @@ private:
 
 public:
 
+	typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> P_type;
+
 	stateVector_T statevars_; ///< the actual state variables
 
 	// system inputs
@@ -95,7 +98,7 @@ public:
 
 
 	double time_; 							///< time of this state estimate
-	Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> P_;///< error state covariance
+	P_type P_;///< error state covariance
 
 	//apply the correction vector to all state vars
 	inline void correct(const Eigen::Matrix<double, nErrorStatesAtCompileTime, 1>& correction);
@@ -150,6 +153,16 @@ public:
 	template<int INDEX>
 	inline void
 	set(const typename msf_tmp::StripConstReference<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::result_t::value_t& newvalue);
+};
+
+template<typename stateSequence_T>
+class sortStates
+{
+public:
+  bool operator() (const GenericState_T<stateSequence_T>& lhs, const GenericState_T<stateSequence_T>&rhs) const
+  {
+    return (lhs.time_<rhs.time_);
+  }
 };
 
 }

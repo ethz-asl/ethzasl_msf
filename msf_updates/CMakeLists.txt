@@ -36,4 +36,4 @@ rosbuild_add_executable(msf_viconpos_sensor src/main.cpp)
 set_property(TARGET msf_viconpos_sensor PROPERTY COMPILE_DEFINITIONS VICONPOS_MEAS)
 ##rosbuild_add_compile_flags(msf_viconpos_sensor "-O3")
 
-#rosbuild_add_executable(prototype src/prototyping.cc)
+rosbuild_add_executable(prototype src/prototyping.cc)

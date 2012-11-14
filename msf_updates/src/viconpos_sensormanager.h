@@ -93,8 +93,21 @@ private:
 		q.normalize();
 		p = q_wv.conjugate().toRotationMatrix()*p_vc_/scale - q.toRotationMatrix()*p_ci_;
 
+		//prepare init "measurement"
+		boost::shared_ptr<msf_core::MSF_InitMeasurement> meas(new msf_core::MSF_InitMeasurement(true)); //hand over that we will also set the sensor readings
+
+		meas->setStateInitValue<msf_core::p_>(p);
+		meas->setStateInitValue<msf_core::v_>(v);
+		meas->setStateInitValue<msf_core::q_>(q);
+		meas->setStateInitValue<msf_core::b_w_>(b_w);
+		meas->setStateInitValue<msf_core::b_a_>(b_a);
+		setP(meas->get_P());
+		meas->get_w_m() = w_m;
+		meas->get_a_m() = a_m;
+		meas->time_ = ros::Time::now().toSec();
+
 		// call initialization in core
-		msf_core_->initialize(p,v,q,b_w,b_a,P,w_m,a_m,g);
+		msf_core_->addMeasurement(meas);
 
 		ROS_INFO_STREAM("filter initialized to: \n" <<
 				"position: [" << p[0] << ", " << p[1] << ", " << p[2] << "]" << std::endl <<

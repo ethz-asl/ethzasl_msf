@@ -17,49 +17,50 @@ enum{
 };
 }
 
-struct ViconMeasurement:public msf_core::MSF_Measurement,
-public msf_core::MSF_MeasurementCreator<geometry_msgs::TransformStamped, nMeasurements>{
+struct ViconMeasurement:public msf_core::MSF_Measurement<geometry_msgs::TransformStamped, nMeasurements>{
 private:
 	Eigen::Matrix<double, 3, 1> z_p_;
 	double n_zp_;
 	virtual void makeFromSensorReadingImpl(geometry_msgs::TransformStampedConstPtr msg, bool fixedCovariance){
-			// get measurements
-			z_p_ = Eigen::Matrix<double,3,1>(msg->transform.translation.x, msg->transform.translation.y, msg->transform.translation.z);
+		// get measurements
+		z_p_ = Eigen::Matrix<double,3,1>(msg->transform.translation.x, msg->transform.translation.y, msg->transform.translation.z);
 
-			if (!fixedCovariance)  // take covariance from sensor
-			{
-				//		meas.R.block(0,0,3,3) = Eigen::Matrix<double,3,3>(&msg->covariance[0]);
-				//		Eigen::Matrix<double,6,1> buffvec = Eigen::Matrix<double,6,1>::Constant(1e-6);
-				//		meas.R.block(3,3,6,6) = buffvec.asDiagonal(); // measurement noise for q_vw, q_ci
-			}
-			else  // alternatively take fix covariance from reconfigure GUI
-			{
-				const double s_zp = n_zp_ * n_zp_;
-				R_ = (Eigen::Matrix<double, nMeasurements, 1>() << s_zp, s_zp, s_zp, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6).finished().asDiagonal();
-			}
+		if (!fixedCovariance)  // take covariance from sensor
+		{
+			//		meas.R.block(0,0,3,3) = Eigen::Matrix<double,3,3>(&msg->covariance[0]);
+			//		Eigen::Matrix<double,6,1> buffvec = Eigen::Matrix<double,6,1>::Constant(1e-6);
+			//		meas.R.block(3,3,6,6) = buffvec.asDiagonal(); // measurement noise for q_vw, q_ci
 		}
+		else  // alternatively take fix covariance from reconfigure GUI
+		{
+			const double s_zp = n_zp_ * n_zp_;
+			R_ = (Eigen::Matrix<double, nMeasurements, 1>() << s_zp, s_zp, s_zp, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6, 1e-6).finished().asDiagonal();
+		}
+	}
 public:
-	typedef msf_core::EKFState state_T;
+	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
+	typedef msf_core::EKFState state_T;
+	~ViconMeasurement(){};
 	ViconMeasurement(double n_zp){
 		n_zp_ = n_zp;
 	};
-	virtual void apply(state_T& state, msf_core::MSF_Core& core){
+	virtual void apply(boost::shared_ptr<state_T> state, msf_core::MSF_Core& core){
 		// init variables
 		Eigen::Matrix<double,nMeasurements,msf_core::MSF_Core::nErrorStatesAtCompileTime> H_old;
 		Eigen::Matrix<double, nMeasurements, 1> r_old;
 
 		H_old.setZero();
 
-		if (state.time_ == -1)
+		if (state->time_ == -1)
 			return;	// // early abort // //
 
-		const state_T& state_old = state; //to overload for const getters
+		const state_T& state_old = *state; //to overload for const getters
 
 		// get rotation matrices
 		Eigen::Matrix<double,3,3> C_wv = state_old.get<msf_core::q_wv_>().conjugate().toRotationMatrix();
 		Eigen::Matrix<double,3,3> C_q = state_old.get<msf_core::q_>().conjugate().toRotationMatrix();
-		Eigen::Matrix<double,3,3> C_ci = state_old.get<msf_core::q_ci_>().conjugate().toRotationMatrix();
+//		Eigen::Matrix<double,3,3> C_ci = state_old.get<msf_core::q_ci_>().conjugate().toRotationMatrix();
 
 		// preprocess for elements in H matrix
 		Eigen::Matrix<double,3,1> vecold;
@@ -86,8 +87,8 @@ public:
 		// "camera"-IMU drift q_ci
 		r_old.block<3,1>(6,0) = -state_old.get<msf_core::q_ci_>().vec()/state_old.get<msf_core::q_ci_>().w()*2;
 
-		// call update step in core class
-		MSF_Measurement::calculateAndApplyCorrection(state,core, H_old,r_old,R_);
+		// call update step in base class
+		MSF_Measurement::calculateAndApplyCorrection(state, core, H_old,r_old,R_);
 
 	}
 };

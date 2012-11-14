@@ -44,11 +44,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <sensor_msgs/Imu.h>
 
+#include <msf_core/msf_sortedContainer.hpp>
 #include <vector>
 #include <msf_core/msf_state.hpp>
-#include <msf_core/msf_measurement.hpp>
 
-#define N_STATE_BUFFER 256	///< size of unsigned char, do not change!
+//#define N_STATE_BUFFER 256	///< size of unsigned char, do not change!
 
 namespace msf_core{
 
@@ -60,8 +60,10 @@ class MSF_SensorManager;
 
 class MSF_Core
 {
+	bool initialized_;
+	bool predictionMade_;
 public:
-	friend class MSF_Measurement;
+	friend class MSF_MeasurementBase;
 	enum{
 		nErrorStatesAtCompileTime = msf_core::EKFState::nErrorStatesAtCompileTime,  ///< error state
 		nStatesAtCompileTime = msf_core::EKFState::nStatesAtCompileTime ///< complete state
@@ -69,24 +71,36 @@ public:
 	typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, 1> ErrorState;
 	typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> ErrorStateCov;
 
-	/// big init routine
-	void initialize(const Eigen::Matrix<double, 3, 1> & p, const Eigen::Matrix<double, 3, 1> & v,
-			const Eigen::Quaternion<double> & q, const Eigen::Matrix<double, 3, 1> & b_w,
-			const Eigen::Matrix<double, 3, 1> & b_a, const Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> & P,
-			const Eigen::Matrix<double, 3, 1> & w_m, const Eigen::Matrix<double, 3, 1> & a_m,
-			const Eigen::Matrix<double, 3, 1> & g);
+	typedef msf_core::SortedContainer<msf_core::EKFState> stateBufferT;
+	typedef msf_core::SortedContainer<msf_core::MSF_MeasurementBase, msf_core::MSF_InvalidMeasurement> measurementBufferT;
 
-	/// retreive all state information at time t. Used to build H, residual and noise matrix by update sensors
-	unsigned char getClosestState(msf_core::EKFState* timestate, ros::Time tstamp, double delay = 0.00);
+	void addMeasurement(boost::shared_ptr<MSF_MeasurementBase> measurement);
 
-	/// get all state information at a given index in the ringbuffer
-	bool getStateAtIdx(msf_core::EKFState* timestate, unsigned char idx);
+	void initExternalPropagation(boost::shared_ptr<EKFState> state);
+
+//	/// retreive all state information at time t. Used to build H, residual and noise matrix by update sensors
+//	unsigned char getClosestState(msf_core::EKFState* timestate, ros::Time tstamp, double delay = 0.00);
+
+	boost::shared_ptr<EKFState> getClosestState(double tstamp, double delay = 0.00);
+
+
+//	/// get all state information at a given index in the ringbuffer
+//	bool getStateAtIdx(msf_core::EKFState* timestate, unsigned char idx);
 
 	MSF_Core(MSF_SensorManager* usercalc);
 	~MSF_Core();
 
-private:
+	void setInitialized(){
+		typename stateBufferT::iterator_T it = StateBuffer_.getIteratorBegin();
+		if(it!=StateBuffer_.getIteratorEnd()){
+			time_P_propagated = it->second->time_;
+			initialized_ = true;
+		}else{
+			ROS_WARN_STREAM("Wanted to set core to initialized, but there is no state in the state list. Rejecting call.");
+		}
+	}
 
+private:
 	const static int nMaxCorr_ = 50; ///< number of IMU measurements buffered for time correction actions
 	const static int QualityThres_ = 1e3;
 
@@ -94,22 +108,26 @@ private:
 	Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> Qd_; ///< discrete propagation noise matrix
 
 	/// state variables
-	msf_core::EKFState StateBuffer_[N_STATE_BUFFER]; ///< EKF ringbuffer containing pretty much all info needed at time t
-	unsigned char idx_state_; ///< pointer to state buffer at most recent state
-	unsigned char idx_P_; ///< pointer to state buffer at P latest propagated
-	unsigned char idx_time_; ///< pointer to state buffer at a specific time
+	stateBufferT StateBuffer_; ///<EKF buffer containing pretty much all info needed at time t
+//	std::set<msf_core::EKFState> StateBuffer_;
+	measurementBufferT MeasurementBuffer_; ///<EKF Measurement
+	//msf_core::EKFState StateBuffer_[N_STATE_BUFFER];
+
+	//	unsigned char idx_state_; ///< pointer to state buffer at most recent state
+	//	unsigned char idx_P_; ///< pointer to state buffer at P latest propagated
+	//	unsigned char idx_time_; ///< pointer to state buffer at a specific time
+
+	double time_P_propagated;
 
 	Eigen::Matrix<double, 3, 1> g_; ///< gravity vector
 
-//	/// correction from EKF update
-//	Eigen::Matrix<double, nErrorStatesAtCompileTime, 1> correction_;
+	//	/// correction from EKF update
+	//	Eigen::Matrix<double, nErrorStatesAtCompileTime, 1> correction_;
 
 	Eigen::Matrix<double, 3, 3> R_IW_; ///< Rot IMU->World
 	Eigen::Matrix<double, 3, 3> R_CI_; ///< Rot Camera->IMU
 	Eigen::Matrix<double, 3, 3> R_WV_; ///< Rot World->Vision
 
-	bool initialized_;
-	bool predictionMade_;
 
 	/// vision-world drift watch dog to determine fuzzy tracking
 
@@ -160,16 +178,16 @@ private:
 	sensor_fusion_comm::ExtEkf hl_state_buf_; ///< buffer to store external propagation data
 
 	/// propagates the state with given dt
-	void propagateState(const double dt);
+	void propagateState(boost::shared_ptr<EKFState>& state_old, boost::shared_ptr<EKFState>& state_new);
 
 	/// propagets the error state covariance
-	void predictProcessCovariance(const double dt);
+	void predictProcessCovariance(boost::shared_ptr<EKFState>& state_old, boost::shared_ptr<EKFState>& state_new);
 
 	/// applies the correction
-	bool applyCorrection(msf_core::EKFState& delaystate, ErrorState & correction, double fuzzythres = 0.1);
+	bool applyCorrection(boost::shared_ptr<EKFState>& delaystate, ErrorState & correction, double fuzzythres = 0.1);
 
-	/// propagate covariance to a given index in the ringbuffer
-	void propPToIdx(unsigned char idx);
+	/// propagate covariance to a given state in time
+	void propPToState(boost::shared_ptr<EKFState>& state);
 
 	/// internal state propagation
 	/**
@@ -192,11 +210,11 @@ private:
 
 
 public:
-//	/// main update routine called by a given sensor
-//	template<class H_type, class Res_type, class R_type>
-//	bool applyMeasurement(unsigned char idx_delaystate, const Eigen::MatrixBase<H_type>& H_delayed,
-//			const Eigen::MatrixBase<Res_type> & res_delayed, const Eigen::MatrixBase<R_type>& R_delayed,
-//			double fuzzythres = 0.1);
+	//	/// main update routine called by a given sensor
+	//	template<class H_type, class Res_type, class R_type>
+	//	bool applyMeasurement(unsigned char idx_delaystate, const Eigen::MatrixBase<H_type>& H_delayed,
+	//			const Eigen::MatrixBase<Res_type> & res_delayed, const Eigen::MatrixBase<R_type>& R_delayed,
+	//			double fuzzythres = 0.1);
 
 
 };
