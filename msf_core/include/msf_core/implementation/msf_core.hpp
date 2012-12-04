@@ -43,7 +43,7 @@ MSF_Core::MSF_Core(MSF_SensorManager* usercalc)
 
 	usercalc_ = usercalc; //the interface for the user to customize EKF interna, do NOT USE THIS POINTER INSIDE THE CTOR
 
-	initialized_ = false;
+	//	initialized_ = false;
 	predictionMade_ = false;
 
 	g_ << 0, 0, 9.81;
@@ -76,6 +76,10 @@ MSF_Core::MSF_Core(MSF_SensorManager* usercalc)
 		qbuff_ = Eigen::Matrix<double, nBuff_, qbuffRowsAtCompiletime>::Constant(0);
 	}
 
+	//push one state to the buffer to apply the init on
+	boost::shared_ptr<EKFState> state(new EKFState);
+	state->time_ = 0;
+	StateBuffer_.insert(state);
 	time_P_propagated = 0; //will be set upon initialization
 }
 
@@ -107,10 +111,15 @@ void MSF_Core::initExternalPropagation(boost::shared_ptr<EKFState> state) {
 
 void MSF_Core::imuCallback(const sensor_msgs::ImuConstPtr & msg)
 {
+	boost::shared_ptr<EKFState> lastState = StateBuffer_.getClosestBefore(msg->header.stamp.toSec());
 
-	if (!initialized_)
+	if(lastState->time_ == -1){
+		ROS_WARN_STREAM_THROTTLE(2, "ImuCallback: closest state is invalid\n");
 		return; // // early abort // //
+	}
 
+
+	ROS_WARN_STREAM_THROTTLE(2, "got IMU Measurement\n");
 
 	boost::shared_ptr<msf_core::EKFState> currentState(new msf_core::EKFState);
 
@@ -122,7 +131,6 @@ void MSF_Core::imuCallback(const sensor_msgs::ImuConstPtr & msg)
 	currentState->a_m_ << msg->linear_acceleration.x, msg->linear_acceleration.y, msg->linear_acceleration.z;
 	currentState->w_m_ << msg->angular_velocity.x, msg->angular_velocity.y, msg->angular_velocity.z;
 
-	boost::shared_ptr<EKFState> lastState = StateBuffer_.getClosestBefore(currentState->time_);
 
 	// remove acc spikes (TODO: find a cleaner way to do this)
 	static Eigen::Matrix<double, 3, 1> last_am = Eigen::Matrix<double, 3, 1>(0, 0, 0);
@@ -166,11 +174,11 @@ void MSF_Core::imuCallback(const sensor_msgs::ImuConstPtr & msg)
 	msgPose_.header.stamp = msg->header.stamp;
 	msgPose_.header.seq = msg->header.seq;
 
-	currentState->toPoseMsg(msgPose_); //TODO: why were we publishing the last state?
+	currentState->toPoseMsg(msgPose_);
 	pubPose_.publish(msgPose_);
 
 	msgPoseCtrl_.header = msgPose_.header;
-	currentState->toExtStateMsg(msgPoseCtrl_);//TODO: why were we publishing the last state?
+	currentState->toExtStateMsg(msgPoseCtrl_);
 	pubPoseCrtl_.publish(msgPoseCtrl_);
 
 	StateBuffer_.insert(currentState);
@@ -214,15 +222,15 @@ void MSF_Core::imuCallback(const sensor_msgs::ImuConstPtr & msg)
 void MSF_Core::stateCallback(const sensor_fusion_comm::ExtEkfConstPtr & msg)
 {
 
-	if (!initialized_)
+	boost::shared_ptr<EKFState> lastState = StateBuffer_.getClosestBefore(msg->header.stamp.toSec());
+
+	if(lastState->time_ == -1)
 		return; // // early abort // //
 
 
 	boost::shared_ptr<msf_core::EKFState> currentState(new msf_core::EKFState);
 
 	currentState->time_ = msg->header.stamp.toSec();
-
-	boost::shared_ptr<EKFState> lastState = StateBuffer_.getClosestBefore(currentState->time_);
 
 	static int seq = 0;
 
@@ -437,18 +445,38 @@ void MSF_Core::predictProcessCovariance(boost::shared_ptr<EKFState>& state_old, 
 //	return true;
 //}
 
+void MSF_Core::init(boost::shared_ptr<MSF_MeasurementBase> measurement){
+	addMeasurement(measurement);
+}
+
 void MSF_Core::addMeasurement(boost::shared_ptr<MSF_MeasurementBase> measurement){
+
 	typename measurementBufferT::iterator_T it_meas = MeasurementBuffer_.insert(measurement);
 	typename measurementBufferT::iterator_T it_meas_end = MeasurementBuffer_.getIteratorEnd();
 	stateBufferT::iterator_T it_curr;
 
+	bool appliedOne = false;
+
 	for( ; it_meas != it_meas_end; ++it_meas){
 
 		boost::shared_ptr<EKFState> state = getClosestState(it_meas->second->time_); //propagates covariance to state
+
+		assert(state->time_!=-1); //assert we have a valid state
+
+		double tbefore = state->time_;
+
 		it_meas->second->apply(state, *this); //calls back core::applyCorrection()
+
+		if(state->time_ <= 0){ //the filter has not received an init measurement yet
+			continue;
+		}else if(state->time_ != tbefore){
+			//the measurement changed the state's time, update the state buffer to reflect this change
+			StateBuffer_.updateTime(tbefore, state->time_);
+		}
 
 		//make sure to propagate to next measurement or up to now if no more measurements
 		it_curr = StateBuffer_.getIteratorAtValue(state); //propagate from current state
+
 		stateBufferT::iterator_T it_end;
 		typename measurementBufferT::iterator_T it_nextmeas = it_meas;
 		++it_nextmeas; //the next measurement in the list
@@ -468,7 +496,11 @@ void MSF_Core::addMeasurement(boost::shared_ptr<MSF_MeasurementBase> measurement
 		for( ; it_curr != it_end && it_next != it_end; ++it_curr, ++it_next){ //propagate to selected state
 			propagateState(it_curr->second, it_next->second);
 		}
+		appliedOne = true;
 	}
+
+	if(!appliedOne)
+		return;
 
 	//now publish the best current estimate
 	static int seq_m = 0;
@@ -484,7 +516,10 @@ void MSF_Core::addMeasurement(boost::shared_ptr<MSF_MeasurementBase> measurement
 	msgCorrect_.linear_acceleration.y = 0;
 	msgCorrect_.linear_acceleration.z = 0;
 
-	assert(it_curr->second == StateBuffer_.getLast()); //TODO: remove later
+	if(it_curr->second != StateBuffer_.getLast()){
+		std::cout<<"time "<<it_curr->second->time_<<" last "<<StateBuffer_.getLast()->time_<<std::endl;
+		assert(it_curr->second == StateBuffer_.getLast()); //TODO: remove later
+	}
 
 	boost::shared_ptr<EKFState>& latestState = StateBuffer_.getLast();
 	msgCorrect_.state[0] = latestState->get<msf_core::p_>()[0] - hl_state_buf_.state[0];
@@ -521,12 +556,22 @@ void MSF_Core::addMeasurement(boost::shared_ptr<MSF_MeasurementBase> measurement
 
 }
 
+//void MSF_Core::SetInitialized(){
+//		boost::shared_ptr<EKFState> state(new EKFState);
+//		StateBuffer_.insert(state);
+//		measInit->apply(state, *this);
+//
+//		typename stateBufferT::iterator_T it = StateBuffer_.getIteratorBegin();
+//		if(it!=StateBuffer_.getIteratorEnd()){
+//			time_P_propagated = it->second->time_;
+//			initialized_ = true;
+//		}else{
+//			ROS_ERROR_STREAM("Wanted to set core to initialized, but there is no state in the state list. Rejecting call.");
+//		}
+//	}
+
 boost::shared_ptr<EKFState> MSF_Core::getClosestState(double tstamp, double delay)
 {
-	if (!predictionMade_)
-	{
-		return StateBuffer_.getInvalid();
-	}
 
 	//sweiss{
 	// we subtracted one too much before.... :)
@@ -536,9 +581,10 @@ boost::shared_ptr<EKFState> MSF_Core::getClosestState(double tstamp, double dela
 
 	boost::shared_ptr<EKFState>& closestState = StateBuffer_.getClosest(timenow);
 
-	if (closestState->time_ == -1)
+	if (closestState->time_ == -1){
+		ROS_WARN_STREAM("Requested closest state to "<<timenow<<" but there was suitable state in the map");
 		return StateBuffer_.getInvalid(); // // early abort // //  not enough predictions made yet to apply measurement (too far in past)
-
+	}
 	propPToState(closestState); // catch up with covariance propagation if necessary
 
 	return closestState;

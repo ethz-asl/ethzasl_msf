@@ -55,6 +55,8 @@ private:
 
 	void init(double scale)
 	{
+		ROS_WARN_STREAM("Got init request");
+
 		Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ci_;
 		Eigen::Quaternion<double> q, q_wv, q_ci_, q_cv_;
 		msf_core::MSF_Core::ErrorStateCov P;
@@ -94,6 +96,7 @@ private:
 		p = q_wv.conjugate().toRotationMatrix()*p_vc_/scale - q.toRotationMatrix()*p_ci_;
 
 		//prepare init "measurement"
+		//TODO do we really have initial measurements? What if there is no data so far?
 		boost::shared_ptr<msf_core::MSF_InitMeasurement> meas(new msf_core::MSF_InitMeasurement(true)); //hand over that we will also set the sensor readings
 
 		meas->setStateInitValue<msf_core::p_>(p);
@@ -107,7 +110,7 @@ private:
 		meas->time_ = ros::Time::now().toSec();
 
 		// call initialization in core
-		msf_core_->addMeasurement(meas);
+		msf_core_->init(meas);
 
 		ROS_INFO_STREAM("filter initialized to: \n" <<
 				"position: [" << p[0] << ", " << p[1] << ", " << p[2] << "]" << std::endl <<

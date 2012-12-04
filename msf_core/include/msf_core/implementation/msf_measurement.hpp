@@ -14,6 +14,11 @@ template<class H_type, class Res_type, class R_type>
 void MSF_MeasurementBase::calculateAndApplyCorrection(boost::shared_ptr<EKFState> state, MSF_Core& core, const Eigen::MatrixBase<H_type>& H_delayed,
 		const Eigen::MatrixBase<Res_type> & res_delayed, const Eigen::MatrixBase<R_type>& R_delayed)
 {
+
+	if(state->time_ <= 0){ //is the state valid? (init changes the time)
+		return;
+	}
+
 	EIGEN_STATIC_ASSERT_FIXED_SIZE(H_type);
 	EIGEN_STATIC_ASSERT_FIXED_SIZE(R_type);
 
@@ -39,18 +44,21 @@ void MSF_MeasurementBase::calculateAndApplyCorrection(boost::shared_ptr<EKFState
 }
 
 void MSF_InitMeasurement::apply(boost::shared_ptr<EKFState> stateWithCovariance, MSF_Core& core){
-		boost::fusion::for_each(
-				stateWithCovariance->statevars_,
-				msf_tmp::copyInitStates<EKFState>(InitState)
-		);
 
-		if(ContainsInitialSensorReadings_){
-			stateWithCovariance->P_ = InitState.P_;
-			stateWithCovariance->a_m_ = InitState.a_m_;
-			stateWithCovariance->w_m_ = InitState.w_m_;
-		}
-		core.initExternalPropagation(stateWithCovariance);
-		core.setInitialized();
+	stateWithCovariance->time_ = ros::Time::now().toSec(); //makes this state a valid starting point
+
+	boost::fusion::for_each(
+			stateWithCovariance->statevars_,
+			msf_tmp::copyInitStates<EKFState>(InitState)
+	);
+
+	if(ContainsInitialSensorReadings_){
+		stateWithCovariance->P_ = InitState.P_;
+		stateWithCovariance->a_m_ = InitState.a_m_;
+		stateWithCovariance->w_m_ = InitState.w_m_;
 	}
+	core.initExternalPropagation(stateWithCovariance);
+
+}
 
 }

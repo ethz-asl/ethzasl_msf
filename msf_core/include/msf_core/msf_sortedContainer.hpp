@@ -29,12 +29,12 @@ public:
 	}
 
 	inline typename ListT::iterator insert(const boost::shared_ptr<T>& value){
-		std::pair<typename ListT::iterator,bool> it =
+		std::pair<typename ListT::iterator,bool> itpr =
 				stateList.insert(std::pair<double, boost::shared_ptr<T> >(value->time_, value));
-		if(!it.second){
+		if(!itpr.second){
 			ROS_WARN_STREAM("Wanted to insert a measurement at time "<<value->time_<<" but the map already contained a measurement at this time. discarding.");
 		}
-		return it.first;
+		return itpr.first;
 	}
 
 	inline typename ListT::iterator getIteratorBegin(){
@@ -83,13 +83,10 @@ public:
 
 	inline boost::shared_ptr<T>& getClosestBefore(const double& statetime){
 		typename ListT::iterator it = stateList.lower_bound(statetime);
-		if(it == stateList.end()){
-			return getInvalid();
+		if(it == stateList.begin()){
+			return it->second;
 		}
 		it--;
-		if(it == stateList.end()){
-			return getInvalid();
-		}
 		return it->second;
 	};
 
@@ -104,6 +101,17 @@ public:
 	inline boost::shared_ptr<T>& getClosest(const double& statetime){
 		boost::shared_ptr<T>& tauMinus = getClosestBefore(statetime);
 		boost::shared_ptr<T>& tauPlus = getClosestAfter(statetime);
+		//TODO remove in production code{
+		if(tauMinus->time_==-1&&tauPlus->time_==-1){
+			std::cout<<"ERROR neighter getClosestBefore nor getClosestAfter returned a valid value"<<std::endl;
+		}
+		if(tauMinus->time_==-1){
+			return tauPlus;
+		}else if(tauPlus->time_==-1){
+			return tauMinus;
+		}
+		//}
+
 		if(abs(tauPlus->time_ - statetime) < abs(tauMinus->time_ - statetime)){
 			return tauPlus;
 		}else{
@@ -116,16 +124,27 @@ public:
 		return (--end)->second;
 	}
 
-	//this function effectively changes the map ordering
-	inline void updateTime(double timeOld, double timeNew){
+	//this function effectively changes the map ordering, so the previous iterators are invalidated
+	inline boost::shared_ptr<T> updateTime(double timeOld, double timeNew) /*__attribute__ ((warn_unused_result))*/ {
 		typename ListT::iterator it = stateList.find(timeOld);
 		if(it == stateList.end()){
-			ROS_WARN_STREAM("Wanted to update a states/measurements time, but could not find the old state, for which the time was asked to be updated");
+			std::stringstream ss;
+			ss<<"Wanted to update a states/measurements time, but could not find the old state, "
+					"for which the time was asked to be updated. time "<<timeOld<<std::endl;
+
+			ss<<"Map: "<<std::endl;
+			for(typename ListT::iterator it2 = stateList.begin(); it2!= stateList.end(); ++it2){
+				ss<<it2->first<<std::endl;
+			}
+			ROS_ERROR_STREAM_THROTTLE(1,ss.str());
+
+			return getClosest(timeOld);
 		}
 		boost::shared_ptr<T> copy = it->second; //get the data from the map, we need to update, then reinsert
-		stateList.erase(it);
+		stateList.erase(it->first);
 		copy->time_ = timeNew;
-		insert(copy);
+		typename ListT::iterator inserted = insert(copy);
+		return inserted->second;
 	}
 
 

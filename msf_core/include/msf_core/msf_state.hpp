@@ -88,6 +88,7 @@ private:
 
 public:
 
+
 	typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> P_type;
 
 	stateVector_T statevars_; ///< the actual state variables
@@ -99,6 +100,11 @@ public:
 
 	double time_; 							///< time of this state estimate
 	P_type P_;///< error state covariance
+
+
+	GenericState_T(){
+		time_ = -1;
+	}
 
 	//apply the correction vector to all state vars
 	inline void correct(const Eigen::Matrix<double, nErrorStatesAtCompileTime, 1>& correction);

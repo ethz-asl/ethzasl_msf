@@ -19,8 +19,6 @@ enum{
 
 struct ViconMeasurement:public msf_core::MSF_Measurement<geometry_msgs::TransformStamped, nMeasurements>{
 private:
-	Eigen::Matrix<double, 3, 1> z_p_;
-	double n_zp_;
 	virtual void makeFromSensorReadingImpl(geometry_msgs::TransformStampedConstPtr msg, bool fixedCovariance){
 		// get measurements
 		z_p_ = Eigen::Matrix<double,3,1>(msg->transform.translation.x, msg->transform.translation.y, msg->transform.translation.z);
@@ -39,6 +37,9 @@ private:
 	}
 public:
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+	Eigen::Matrix<double, 3, 1> z_p_;
+	double n_zp_;
 
 	typedef msf_core::EKFState state_T;
 	~ViconMeasurement(){};

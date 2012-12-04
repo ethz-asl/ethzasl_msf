@@ -35,12 +35,30 @@ int main(int argc, char** argv)
 {
 //just to instantiate all templates, no production code
 
-	ros::init(argc, argv, "msf_core");
-	boost::shared_ptr<msf_core::MSF_Master> usercalcs(new msf_core::SSFCalculations());
-	msf_core::MSF_Core core(usercalcs);
+//	ros::init(argc, argv, "msf_core");
+//	boost::shared_ptr<msf_core::MSF_SensorManager> usercalcs(new msf_core::MSF_InitMeasurement(true));
+//	msf_core::MSF_Core core(usercalcs);
 
+	 map<double,int> mymap;
+	  map<double,int>::iterator it,itlow,itup;
 
+	  mymap[0.1]=20;
+	  mymap[0]=40;
+	  mymap[5]=60;
+	  mymap[10]=80;
+	  mymap[0.01]=100;
 
-	ros::spin();
+	  itlow=mymap.lower_bound ('b');  // itlow points to b
+	  itup=mymap.upper_bound ('d');   // itup points to e (not d!)
+
+	  mymap.erase(itlow,itup);        // erases [itlow,itup)
+
+	  // print content:
+	  for ( it=mymap.begin() ; it != mymap.end(); it++ )
+	    cout << (*it).first << " => " << (*it).second << endl;
+
+	  return 0;
+
+//	ros::spin();
 }
 

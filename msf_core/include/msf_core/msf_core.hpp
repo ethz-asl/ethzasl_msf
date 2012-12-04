@@ -60,7 +60,7 @@ class MSF_SensorManager;
 
 class MSF_Core
 {
-	bool initialized_;
+//	bool initialized_;
 	bool predictionMade_;
 public:
 	friend class MSF_MeasurementBase;
@@ -76,6 +76,8 @@ public:
 
 	void addMeasurement(boost::shared_ptr<MSF_MeasurementBase> measurement);
 
+	void init(boost::shared_ptr<MSF_MeasurementBase> measurement);
+
 	void initExternalPropagation(boost::shared_ptr<EKFState> state);
 
 //	/// retreive all state information at time t. Used to build H, residual and noise matrix by update sensors
@@ -90,15 +92,7 @@ public:
 	MSF_Core(MSF_SensorManager* usercalc);
 	~MSF_Core();
 
-	void setInitialized(){
-		typename stateBufferT::iterator_T it = StateBuffer_.getIteratorBegin();
-		if(it!=StateBuffer_.getIteratorEnd()){
-			time_P_propagated = it->second->time_;
-			initialized_ = true;
-		}else{
-			ROS_WARN_STREAM("Wanted to set core to initialized, but there is no state in the state list. Rejecting call.");
-		}
-	}
+//	void Initialize(boost::shared_ptr<MSF_InitMeasurement>& measInit);
 
 private:
 	const static int nMaxCorr_ = 50; ///< number of IMU measurements buffered for time correction actions

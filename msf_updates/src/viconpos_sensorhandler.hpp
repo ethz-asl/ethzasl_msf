@@ -73,15 +73,14 @@ void ViconPosSensorHandler::noiseConfig(msf_core::MSF_CoreConfig& config, uint32
 
 void ViconPosSensorHandler::measurementCallback(const geometry_msgs::TransformStampedConstPtr & msg)
 {
-	//	ROS_INFO_STREAM("measurement received \n"
-	//					<< "type is: " << typeid(msg).name());
 	//slow down VICON
 	if (msg->header.seq%5!=0)
 		return;
 
-	// get measurements
+	boost::shared_ptr<ViconMeasurement> meas( new ViconMeasurement(n_zp_));
+	meas->makeFromSensorReading(msg);
 
-	ViconMeasurement meas(n_zp_);
-	meas.makeFromSensorReading(msg);
+	z_p_ = meas->z_p_; //store this for the init procedure
 
+	this->measurements->msf_core_->addMeasurement(meas);
 }
