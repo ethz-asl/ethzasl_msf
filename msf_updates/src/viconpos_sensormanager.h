@@ -2,17 +2,19 @@
 
 Copyright (c) 2010, Stephan Weiss, ASL, ETH Zurich, Switzerland
 You can contact the author at <stephan dot weiss at ieee dot org>
+Copyright (c) 2012, Simon Lynen, ASL, ETH Zurich, Switzerland
+You can contact the author at <slynen at ethz dot org>
 
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
- * Redistributions of source code must retain the above copyright
+* Redistributions of source code must retain the above copyright
 notice, this list of conditions and the following disclaimer.
- * Redistributions in binary form must reproduce the above copyright
+* Redistributions in binary form must reproduce the above copyright
 notice, this list of conditions and the following disclaimer in the
 documentation and/or other materials provided with the distribution.
- * Neither the name of ETHZ-ASL nor the
+* Neither the name of ETHZ-ASL nor the
 names of its contributors may be used to endorse or promote products
 derived from this software without specific prior written permission.
 
@@ -27,7 +29,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
- */
+*/
 
 #ifndef VICONPOS_MEASUREMENTMANAGER_H
 #define VICONPOS_MEASUREMENTMANAGER_H
@@ -104,7 +106,8 @@ private:
 		meas->setStateInitValue<msf_core::q_>(q);
 		meas->setStateInitValue<msf_core::b_w_>(b_w);
 		meas->setStateInitValue<msf_core::b_a_>(b_a);
-		setP(meas->get_P());
+		meas->setStateInitValue<msf_core::L_>(Eigen::Matrix<double, 1, 1>::Constant(scale));
+		setP(meas->get_P()); //call my set P function
 		meas->get_w_m() = w_m;
 		meas->get_a_m() = a_m;
 		meas->time_ = ros::Time::now().toSec();
@@ -139,18 +142,18 @@ private:
 		}
 
 		virtual void calculateQAuxiliaryStates(msf_core::EKFState& state, double dt){
-			msf_core::ConstVector3 nqwvv = Eigen::Vector3d::Constant(config_.noise_qwv);
-			msf_core::ConstVector3 nqciv = Eigen::Vector3d::Constant(config_.noise_qci);
-			msf_core::ConstVector3 npicv = Eigen::Vector3d::Constant(config_.noise_pic);
-			Eigen::Matrix<double, 1, 1> n_L;
-			n_L << config_.noise_scale;
-
-			//compute the blockwise Q values and store them with the states,
-			//these then get copied by the core to the correct places in Qd
-			state.getQBlock<msf_core::L_>() 	= (dt * n_L.cwiseProduct(n_L)).asDiagonal();
-			state.getQBlock<msf_core::q_wv_>() = (dt * nqwvv.cwiseProduct(nqwvv)).asDiagonal();
-			state.getQBlock<msf_core::q_ci_>() = (dt * nqciv.cwiseProduct(nqciv)).asDiagonal();
-			state.getQBlock<msf_core::p_ci_>() = (dt * npicv.cwiseProduct(npicv)).asDiagonal();
+//			msf_core::ConstVector3 nqwvv = Eigen::Vector3d::Constant(config_.noise_qwv);
+//			msf_core::ConstVector3 nqciv = Eigen::Vector3d::Constant(config_.noise_qci);
+//			msf_core::ConstVector3 npicv = Eigen::Vector3d::Constant(config_.noise_pic);
+//			Eigen::Matrix<double, 1, 1> n_L;
+//			n_L << config_.noise_scale;
+//
+//			//compute the blockwise Q values and store them with the states,
+//			//these then get copied by the core to the correct places in Qd
+//			state.getQBlock<msf_core::L_>() 	= (dt * n_L.cwiseProduct(n_L)).asDiagonal();
+//			state.getQBlock<msf_core::q_wv_>() = (dt * nqwvv.cwiseProduct(nqwvv)).asDiagonal();
+//			state.getQBlock<msf_core::q_ci_>() = (dt * nqciv.cwiseProduct(nqciv)).asDiagonal();
+//			state.getQBlock<msf_core::p_ci_>() = (dt * npicv.cwiseProduct(npicv)).asDiagonal();
 		}
 
 		virtual void setP(Eigen::Matrix<double, msf_core::EKFState::nErrorStatesAtCompileTime, msf_core::EKFState::nErrorStatesAtCompileTime>& P){

@@ -1,5 +1,4 @@
 
-#include <msf_core/eigen_matiterator.hpp>
 #include <iostream>
 #include <vector>
 #include <Eigen/Dense>

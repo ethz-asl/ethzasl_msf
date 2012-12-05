@@ -2,17 +2,19 @@
 
 Copyright (c) 2010, Stephan Weiss, ASL, ETH Zurich, Switzerland
 You can contact the author at <stephan dot weiss at ieee dot org>
+Copyright (c) 2012, Simon Lynen, ASL, ETH Zurich, Switzerland
+You can contact the author at <slynen at ethz dot org>
 
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
- * Redistributions of source code must retain the above copyright
+* Redistributions of source code must retain the above copyright
 notice, this list of conditions and the following disclaimer.
- * Redistributions in binary form must reproduce the above copyright
+* Redistributions in binary form must reproduce the above copyright
 notice, this list of conditions and the following disclaimer in the
 documentation and/or other materials provided with the distribution.
- * Neither the name of ETHZ-ASL nor the
+* Neither the name of ETHZ-ASL nor the
 names of its contributors may be used to endorse or promote products
 derived from this software without specific prior written permission.
 
@@ -27,7 +29,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
- */
+*/
 
 #include "calcQCore.h"
 #include <msf_core/eigen_utils.h>
@@ -41,9 +43,11 @@ namespace msf_core
 MSF_Core::MSF_Core(MSF_SensorManager* usercalc)
 {
 
+	Qd_.setZero();
+
 	usercalc_ = usercalc; //the interface for the user to customize EKF interna, do NOT USE THIS POINTER INSIDE THE CTOR
 
-	//	initialized_ = false;
+	initialized_ = false;
 	predictionMade_ = false;
 
 	g_ << 0, 0, 9.81;
@@ -75,12 +79,8 @@ MSF_Core::MSF_Core(MSF_SensorManager* usercalc)
 
 		qbuff_ = Eigen::Matrix<double, nBuff_, qbuffRowsAtCompiletime>::Constant(0);
 	}
+	time_P_propagated = 0;
 
-	//push one state to the buffer to apply the init on
-	boost::shared_ptr<EKFState> state(new EKFState);
-	state->time_ = 0;
-	StateBuffer_.insert(state);
-	time_P_propagated = 0; //will be set upon initialization
 }
 
 
@@ -111,6 +111,9 @@ void MSF_Core::initExternalPropagation(boost::shared_ptr<EKFState> state) {
 
 void MSF_Core::imuCallback(const sensor_msgs::ImuConstPtr & msg)
 {
+	if(!initialized_)
+		return;
+
 	boost::shared_ptr<EKFState> lastState = StateBuffer_.getClosestBefore(msg->header.stamp.toSec());
 
 	if(lastState->time_ == -1){
@@ -118,8 +121,6 @@ void MSF_Core::imuCallback(const sensor_msgs::ImuConstPtr & msg)
 		return; // // early abort // //
 	}
 
-
-	ROS_WARN_STREAM_THROTTLE(2, "got IMU Measurement\n");
 
 	boost::shared_ptr<msf_core::EKFState> currentState(new msf_core::EKFState);
 
@@ -164,8 +165,13 @@ void MSF_Core::imuCallback(const sensor_msgs::ImuConstPtr & msg)
 		return;
 	}
 
+	ROS_INFO_STREAM("prop state before: "<<lastState->get<msf_core::p_>().transpose()<<" "<<lastState->get<msf_core::v_>().transpose());
 	propagateState(lastState, currentState);
+	ROS_INFO_STREAM("prop state after: "<<currentState->get<msf_core::p_>().transpose()<<" "<<currentState->get<msf_core::v_>().transpose());
+
+	ROS_INFO_STREAM("cov before "<<(lastState->P_.block<3,3>(0,0)));
 	predictProcessCovariance(lastState, currentState);
+	ROS_INFO_STREAM("cov after "<<(currentState->P_.block<3,3>(0,0)));
 
 	checkForNumeric((double*)(&currentState->get<msf_core::p_>()(0)), 3, "prediction p");
 
@@ -182,6 +188,8 @@ void MSF_Core::imuCallback(const sensor_msgs::ImuConstPtr & msg)
 	pubPoseCrtl_.publish(msgPoseCtrl_);
 
 	StateBuffer_.insert(currentState);
+
+	ROS_INFO_STREAM("Inserted state to buffer with time "<<currentState->time_);
 
 	seq++;
 }
@@ -315,14 +323,19 @@ void MSF_Core::propagateState(boost::shared_ptr<EKFState>& state_old, boost::sha
 
 	double dt = state_new->time_ - state_old->time_;
 
-	// zero props:
-	//slynen{
-	//copy constant for non propagated states
+	//reset new state to zero
+	boost::fusion::for_each(
+			state_new->statevars_,
+			msf_tmp::resetState()
+	);
+
+	ROS_INFO_STREAM("Will propagate with dt "<<dt);
+
+	// zero props: copy constant for non propagated states
 	boost::fusion::for_each(
 			state_new->statevars_,
 			msf_tmp::copyNonPropagationStates<EKFState>(*state_old)
 	);
-	//}
 
 	//  Eigen::Quaternion<double> dq;
 	Eigen::Matrix<double, 3, 1> dv;
@@ -333,6 +346,8 @@ void MSF_Core::propagateState(boost::shared_ptr<EKFState>& state_old, boost::sha
 	ConstMatrix4 Omega = omegaMatJPL(ew);
 	ConstMatrix4 OmegaOld = omegaMatJPL(ewold);
 	Matrix4 OmegaMean = omegaMatJPL((ew + ewold) / 2);
+
+	//ROS_INFO_STREAM("ew "<<ew.transpose()<<" ewold "<<ewold.transpose()<<" ea "<<ea.transpose()<<" eaold "<<eaold.transpose());
 
 	// zero order quaternion integration
 	//	cur_state.q_ = (Eigen::Matrix<double,4,4>::Identity() + 0.5*Omega*dt)*StateBuffer_[(unsigned char)(idx_state_-1)].q_.coeffs();
@@ -377,14 +392,14 @@ void MSF_Core::predictProcessCovariance(boost::shared_ptr<EKFState>& state_old, 
 	ConstVector3 nbwv = Vector3::Constant(usercalc_->getParam_noise_gyrbias() /* * sqrt(dt) */);
 
 	// bias corrected IMU readings
-	ConstVector3 ew = state_new->w_m_ - state_new->get<msf_core::b_w_>();
-	ConstVector3 ea = state_new->a_m_ - state_new->get<msf_core::b_a_>();
+	ConstVector3 ew = state_old->w_m_ - state_old->get<msf_core::b_w_>();
+	ConstVector3 ea = state_old->a_m_ - state_old->get<msf_core::b_a_>();
 
 	ConstMatrix3 a_sk = skew(ea);
 	ConstMatrix3 w_sk = skew(ew);
 	ConstMatrix3 eye3 = Eigen::Matrix<double, 3, 3>::Identity();
 
-	ConstMatrix3 C_eq = state_new->get<msf_core::q_>().toRotationMatrix();
+	ConstMatrix3 C_eq = state_old->get<msf_core::q_>().toRotationMatrix();
 
 	const double dt_p2_2 = dt * dt * 0.5; // dt^2 / 2
 	const double dt_p3_6 = dt_p2_2 * dt / 3.0; // dt^3 / 6
@@ -416,7 +431,7 @@ void MSF_Core::predictProcessCovariance(boost::shared_ptr<EKFState>& state_old, 
 	Fd_.block<3, 3> (6, 6) = E;
 	Fd_.block<3, 3> (6, 9) = F;
 
-	calc_QCore(dt, state_new->get<msf_core::q_>(), ew, ea, nav, nbav, nwv, nbwv, Qd_);
+	calc_QCore(dt, state_old->get<msf_core::q_>(), ew, ea, nav, nbav, nwv, nbwv, Qd_);
 
 	//call user Q calc to fill in the blocks of auxiliary states
 	usercalc_->calculateQAuxiliaryStates(*state_new, dt);
@@ -446,10 +461,31 @@ void MSF_Core::predictProcessCovariance(boost::shared_ptr<EKFState>& state_old, 
 //}
 
 void MSF_Core::init(boost::shared_ptr<MSF_MeasurementBase> measurement){
-	addMeasurement(measurement);
+	MeasurementBuffer_.clear();
+	StateBuffer_.clear();
+
+	//push one state to the buffer to apply the init on
+	boost::shared_ptr<EKFState> state(new EKFState);
+	state->time_ = 0;
+	//apply init measurement
+	measurement->apply(state, *this);
+
+	//reset new state to zero
+	boost::fusion::for_each(
+			state->statevars_,
+			msf_tmp::resetState()
+	);
+
+	StateBuffer_.insert(state);
+	time_P_propagated = 0; //will be set upon initialization
+
+	initialized_ = true;
 }
 
 void MSF_Core::addMeasurement(boost::shared_ptr<MSF_MeasurementBase> measurement){
+
+	if(!initialized_)
+		return;
 
 	typename measurementBufferT::iterator_T it_meas = MeasurementBuffer_.insert(measurement);
 	typename measurementBufferT::iterator_T it_meas_end = MeasurementBuffer_.getIteratorEnd();
@@ -457,22 +493,20 @@ void MSF_Core::addMeasurement(boost::shared_ptr<MSF_MeasurementBase> measurement
 
 	bool appliedOne = false;
 
+	ROS_INFO_STREAM("Will now add a measurement");
+
 	for( ; it_meas != it_meas_end; ++it_meas){
 
 		boost::shared_ptr<EKFState> state = getClosestState(it_meas->second->time_); //propagates covariance to state
 
-		assert(state->time_!=-1); //assert we have a valid state
-
-		double tbefore = state->time_;
-
-		it_meas->second->apply(state, *this); //calls back core::applyCorrection()
-
 		if(state->time_ <= 0){ //the filter has not received an init measurement yet
+			ROS_WARN_STREAM_THROTTLE(1,"getClosestState returned an invalid state");
 			continue;
-		}else if(state->time_ != tbefore){
-			//the measurement changed the state's time, update the state buffer to reflect this change
-			StateBuffer_.updateTime(tbefore, state->time_);
 		}
+
+		ROS_INFO_STREAM("state before applying meas "<<state->time_<<" "<<state->get<msf_core::p_>().transpose());
+		it_meas->second->apply(state, *this); //calls back core::applyCorrection()
+		ROS_INFO_STREAM("state after applying meas"<<state->get<msf_core::p_>().transpose());
 
 		//make sure to propagate to next measurement or up to now if no more measurements
 		it_curr = StateBuffer_.getIteratorAtValue(state); //propagate from current state
@@ -611,6 +645,9 @@ void MSF_Core::propPToState(boost::shared_ptr<EKFState>& state)
 
 bool MSF_Core::applyCorrection(boost::shared_ptr<EKFState>& delaystate, ErrorState & correction, double fuzzythres)
 {
+
+	if(!initialized_ || !predictionMade_)
+		return false;
 
 	//slynen{
 	//give the user the possibility to fix some states

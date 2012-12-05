@@ -23,6 +23,8 @@ private:
 		// get measurements
 		z_p_ = Eigen::Matrix<double,3,1>(msg->transform.translation.x, msg->transform.translation.y, msg->transform.translation.z);
 
+		R_.setZero();
+
 		if (!fixedCovariance)  // take covariance from sensor
 		{
 			//		meas.R.block(0,0,3,3) = Eigen::Matrix<double,3,3>(&msg->covariance[0]);
@@ -53,8 +55,10 @@ public:
 
 		H_old.setZero();
 
-		if (state->time_ == -1)
+		if (state->time_ == -1){
+			ROS_WARN_STREAM("apply vicon update was called with an invalid state");
 			return;	// // early abort // //
+		}
 
 		const state_T& state_old = *state; //to overload for const getters
 
@@ -69,6 +73,9 @@ public:
 		Eigen::Matrix<double,3,3> skewold = skew(vecold);
 
 		Eigen::Matrix<double,3,3> pci_sk = skew(state_old.get<msf_core::p_ci_>());
+
+		ROS_INFO_STREAM("timediff to state "<<std::fabs(state->time_-time_));
+		ROS_INFO_STREAM("apply meas scale = "<<state_old.get<msf_core::L_>()(0));
 
 		// construct H matrix using H-blockx :-)
 		// position
