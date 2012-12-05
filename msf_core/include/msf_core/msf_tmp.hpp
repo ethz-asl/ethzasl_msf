@@ -1,7 +1,7 @@
 /*
 
 Copyright (c) 2012, Simon Lynen, ASL, ETH Zurich, Switzerland
-You can contact the author at <slynen at ethz dot org>
+You can contact the author at <slynen at ethz dot ch>
 
 All rights reserved.
 
@@ -523,7 +523,7 @@ struct copyInitStates
 	copyInitStates(const stateT& oldstate):oldstate_(oldstate){	}
 	template<typename T, int NAME, int STATETYPE>
 	void operator()(msf_core::StateVar_T<T, NAME, STATETYPE>& t) const {
-		if(t.hasResetValue){
+		if(oldstate_.template getStateVar<NAME>().hasResetValue){
 			t = oldstate_.template getStateVar<NAME>(); //copy value from old state to new state var
 		}
 	}

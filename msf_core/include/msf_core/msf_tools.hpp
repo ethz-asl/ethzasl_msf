@@ -1,7 +1,7 @@
 /*
 
 Copyright (c) 2012, Simon Lynen, ASL, ETH Zurich, Switzerland
-You can contact the author at <slynen at ethz dot org>
+You can contact the author at <slynen at ethz dot ch>
 
 All rights reserved.
 

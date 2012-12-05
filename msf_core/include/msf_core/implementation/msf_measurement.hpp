@@ -1,18 +1,18 @@
 /*
 
 Copyright (c) 2012, Simon Lynen, ASL, ETH Zurich, Switzerland
-You can contact the author at <slynen at ethz dot org>
+You can contact the author at <slynen at ethz dot ch>
 
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-* Redistributions of source code must retain the above copyright
+ * Redistributions of source code must retain the above copyright
 notice, this list of conditions and the following disclaimer.
-* Redistributions in binary form must reproduce the above copyright
+ * Redistributions in binary form must reproduce the above copyright
 notice, this list of conditions and the following disclaimer in the
 documentation and/or other materials provided with the distribution.
-* Neither the name of ETHZ-ASL nor the
+ * Neither the name of ETHZ-ASL nor the
 names of its contributors may be used to endorse or promote products
 derived from this software without specific prior written permission.
 
@@ -27,7 +27,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-*/
+ */
 
 #include <msf_core/msf_core.hpp>
 
@@ -39,10 +39,6 @@ void MSF_MeasurementBase::calculateAndApplyCorrection(boost::shared_ptr<EKFState
 		const Eigen::MatrixBase<Res_type> & res_delayed, const Eigen::MatrixBase<R_type>& R_delayed)
 {
 
-	if(state->time_ <= 0){ //is the state valid?
-		return;
-	}
-
 	EIGEN_STATIC_ASSERT_FIXED_SIZE(H_type);
 	EIGEN_STATIC_ASSERT_FIXED_SIZE(R_type);
 
@@ -53,10 +49,10 @@ void MSF_MeasurementBase::calculateAndApplyCorrection(boost::shared_ptr<EKFState
 	R_type S;
 	Eigen::Matrix<double, MSF_Core::nErrorStatesAtCompileTime, R_type::RowsAtCompileTime> K;
 	MSF_Core::ErrorStateCov & P = state->P_;
-    ROS_INFO_STREAM("covariance for meas "<<(P.block<3,3>(0,0)));
+	ROS_INFO_STREAM("covariance for meas "<<(P));
 
-    ROS_INFO_STREAM("H_delayed "<<(H_delayed.template block<3,3>(0,0)));
-    ROS_INFO_STREAM("R_delayed "<<(R_delayed.template block<3,3>(0,0)));
+	ROS_INFO_STREAM("H_delayed "<<(H_delayed));
+	    ROS_INFO_STREAM("R_delayed "<<(R_delayed));
 
 	S = H_delayed * P * H_delayed.transpose() + R_delayed;
 	K = P * H_delayed.transpose() * S.inverse();
@@ -67,7 +63,7 @@ void MSF_MeasurementBase::calculateAndApplyCorrection(boost::shared_ptr<EKFState
 
 	// make sure P stays symmetric
 	P = 0.5 * (P + P.transpose());
-    ROS_INFO_STREAM("covariance after meas "<<(P.block<3,3>(0,0)));
+	ROS_INFO_STREAM("covariance after meas "<<(P.block<3,3>(0,0)));
 
 	core.applyCorrection(state, correction_);
 }
@@ -82,6 +78,10 @@ void MSF_InitMeasurement::apply(boost::shared_ptr<EKFState> stateWithCovariance,
 			stateWithCovariance->statevars_,
 			msf_tmp::copyInitStates<EKFState>(InitState)
 	);
+
+	//TODO remove{
+	ROS_INFO_STREAM("scale init "<<(stateWithCovariance->get<msf_core::L_>()));
+	//}
 
 	stateWithCovariance->P_ = InitState.P_;
 

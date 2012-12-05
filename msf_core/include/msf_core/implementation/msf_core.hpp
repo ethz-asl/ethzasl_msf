@@ -3,18 +3,18 @@
 Copyright (c) 2010, Stephan Weiss, ASL, ETH Zurich, Switzerland
 You can contact the author at <stephan dot weiss at ieee dot org>
 Copyright (c) 2012, Simon Lynen, ASL, ETH Zurich, Switzerland
-You can contact the author at <slynen at ethz dot org>
+You can contact the author at <slynen at ethz dot ch>
 
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-* Redistributions of source code must retain the above copyright
+ * Redistributions of source code must retain the above copyright
 notice, this list of conditions and the following disclaimer.
-* Redistributions in binary form must reproduce the above copyright
+ * Redistributions in binary form must reproduce the above copyright
 notice, this list of conditions and the following disclaimer in the
 documentation and/or other materials provided with the distribution.
-* Neither the name of ETHZ-ASL nor the
+ * Neither the name of ETHZ-ASL nor the
 names of its contributors may be used to endorse or promote products
 derived from this software without specific prior written permission.
 
@@ -29,7 +29,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-*/
+ */
 
 #include "calcQCore.h"
 #include <msf_core/eigen_utils.h>
@@ -445,6 +445,8 @@ void MSF_Core::predictProcessCovariance(boost::shared_ptr<EKFState>& state_old, 
 	//TODO later: optimize here multiplication of F blockwise, using the fact that aux states have no entries outside their block
 	state_new->P_ = Fd_ * state_old->P_ * Fd_.transpose() + Qd_;
 
+	//set time for best cov prop to now
+	time_P_propagated = state_new->time_;
 }
 
 //bool MSF_Core::getStateAtIdx(EKFState* timestate, unsigned char idx)
@@ -467,8 +469,6 @@ void MSF_Core::init(boost::shared_ptr<MSF_MeasurementBase> measurement){
 	//push one state to the buffer to apply the init on
 	boost::shared_ptr<EKFState> state(new EKFState);
 	state->time_ = 0;
-	//apply init measurement
-	measurement->apply(state, *this);
 
 	//reset new state to zero
 	boost::fusion::for_each(
@@ -476,8 +476,11 @@ void MSF_Core::init(boost::shared_ptr<MSF_MeasurementBase> measurement){
 			msf_tmp::resetState()
 	);
 
+	//apply init measurement
+	measurement->apply(state, *this);
+
 	StateBuffer_.insert(state);
-	time_P_propagated = 0; //will be set upon initialization
+	time_P_propagated = 0; //will be set upon first IMU message
 
 	initialized_ = true;
 }
@@ -493,20 +496,21 @@ void MSF_Core::addMeasurement(boost::shared_ptr<MSF_MeasurementBase> measurement
 
 	bool appliedOne = false;
 
-	ROS_INFO_STREAM("Will now add a measurement");
-
 	for( ; it_meas != it_meas_end; ++it_meas){
 
 		boost::shared_ptr<EKFState> state = getClosestState(it_meas->second->time_); //propagates covariance to state
 
-		if(state->time_ <= 0){ //the filter has not received an init measurement yet
-			ROS_WARN_STREAM_THROTTLE(1,"getClosestState returned an invalid state");
+		if(state->time_ <= 0){
+			ROS_ERROR_STREAM_THROTTLE(1,"getClosestState returned an invalid state");
 			continue;
 		}
 
 		ROS_INFO_STREAM("state before applying meas "<<state->time_<<" "<<state->get<msf_core::p_>().transpose());
-		it_meas->second->apply(state, *this); //calls back core::applyCorrection()
+		it_meas->second->apply(state, *this); //calls back core::applyCorrection(), which sets time_P_propagated to meas time
+
 		ROS_INFO_STREAM("state after applying meas"<<state->get<msf_core::p_>().transpose());
+
+		ROS_INFO_STREAM("cov after applying meas"<<(state->P_.block<3,3>(0,0)));
 
 		//make sure to propagate to next measurement or up to now if no more measurements
 		it_curr = StateBuffer_.getIteratorAtValue(state); //propagate from current state
@@ -628,7 +632,7 @@ boost::shared_ptr<EKFState> MSF_Core::getClosestState(double tstamp, double dela
 void MSF_Core::propPToState(boost::shared_ptr<EKFState>& state)
 {
 	// propagate cov matrix until the current states time
-	typename stateBufferT::iterator_T it = StateBuffer_.getIteratorClosestBefore(time_P_propagated);
+	typename stateBufferT::iterator_T it = StateBuffer_.getIteratorAtValue(time_P_propagated);
 	typename stateBufferT::iterator_T itMinus = it;
 	if(it==StateBuffer_.getIteratorBegin()){ //make sure we are not propagating from a state earlier than the first state in the list
 		++it;
@@ -753,7 +757,7 @@ bool MSF_Core::applyCorrection(boost::shared_ptr<EKFState>& delaystate, ErrorSta
 		}
 	} //end fuzzy tracking
 
-	//slynen: removed all publishing and propagation, because this might not be the latest update we have to apply
+	//slynen: removed all publishing and propagation, because this might not be the last update we have to apply
 
 	checkForNumeric(&correction[0], HLI_EKF_STATE_SIZE, "update");
 

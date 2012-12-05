@@ -3,7 +3,7 @@
 Copyright (c) 2010, Stephan Weiss, ASL, ETH Zurich, Switzerland
 You can contact the author at <stephan dot weiss at ieee dot org>
 Copyright (c) 2012, Simon Lynen, ASL, ETH Zurich, Switzerland
-You can contact the author at <slynen at ethz dot org>
+You can contact the author at <slynen at ethz dot ch>
 
 All rights reserved.
 
@@ -57,7 +57,7 @@ private:
 
 	void init(double scale)
 	{
-		ROS_WARN_STREAM("Got init request");
+		ROS_WARN_STREAM("Got init request with scale "<<scale);
 
 		Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ci_;
 		Eigen::Quaternion<double> q, q_wv, q_ci_, q_cv_;
@@ -107,6 +107,11 @@ private:
 		meas->setStateInitValue<msf_core::b_w_>(b_w);
 		meas->setStateInitValue<msf_core::b_a_>(b_a);
 		meas->setStateInitValue<msf_core::L_>(Eigen::Matrix<double, 1, 1>::Constant(scale));
+		meas->setStateInitValue<msf_core::q_wv_>(q_wv);
+		meas->setStateInitValue<msf_core::q_wv_>(q_wv);
+		meas->setStateInitValue<msf_core::q_ci_>(q_ci_);
+		meas->setStateInitValue<msf_core::p_ci_>(p_ci_);
+
 		setP(meas->get_P()); //call my set P function
 		meas->get_w_m() = w_m;
 		meas->get_a_m() = a_m;

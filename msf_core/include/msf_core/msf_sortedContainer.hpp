@@ -1,7 +1,7 @@
 /*
 
 Copyright (c) 2012, Simon Lynen, ASL, ETH Zurich, Switzerland
-You can contact the author at <slynen at ethz dot org>
+You can contact the author at <slynen at ethz dot ch>
 
 All rights reserved.
 
@@ -76,8 +76,18 @@ public:
 	inline typename ListT::iterator getIteratorAtValue(const boost::shared_ptr<T>& value){
 		typename ListT::iterator it = stateList.find(value->time_);
 		if(it==stateList.end()){ //this state is not known
-			ROS_WARN_STREAM("getIteratorAtValue: Could not find value for time "<<value->time_<<"");
+			ROS_WARN_STREAM("getIteratorAtValue(state): Could not find value for time "<<value->time_<<"");
 			it = stateList.lower_bound(value->time_);
+		}
+		return it;
+	}
+
+
+	inline typename ListT::iterator getIteratorAtValue(const double& time){
+		typename ListT::iterator it = stateList.find(time);
+		if(it==stateList.end()){ //this state is not known
+			ROS_WARN_STREAM("getIteratorAtValue(double): Could not find value for time "<<time<<"");
+			it = stateList.lower_bound(time);
 		}
 		return it;
 	}
@@ -138,9 +148,12 @@ public:
 		}else if(tauPlus->time_==-1){
 			return tauMinus;
 		}
+		//		double tdiff1 = fabs(tauPlus->time_ - statetime);
+		//		double tdiff2 = fabs(tauMinus->time_ - statetime);
+		//		ROS_INFO_STREAM("Requested a state close to "<<statetime<<" dt1 "<<tdiff1<<" dt2 "<<tdiff2);
 		//}
 
-		if(abs(tauPlus->time_ - statetime) < abs(tauMinus->time_ - statetime)){
+		if(fabs(tauPlus->time_ - statetime) < fabs(tauMinus->time_ - statetime)){
 			return tauPlus;
 		}else{
 			return tauMinus;

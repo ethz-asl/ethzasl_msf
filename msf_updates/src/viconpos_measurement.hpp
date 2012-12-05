@@ -1,9 +1,35 @@
 /*
- * viconpos_measurement.hpp
- *
- *  Created on: Nov 13, 2012
- *      Author: slynen
- */
+
+Copyright (c) 2010, Stephan Weiss, ASL, ETH Zurich, Switzerland
+You can contact the author at <stephan dot weiss at ieee dot org>
+Copyright (c) 2012, Simon Lynen, ASL, ETH Zurich, Switzerland
+You can contact the author at <slynen at ethz dot ch>
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+* Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+* Neither the name of ETHZ-ASL nor the
+names of its contributors may be used to endorse or promote products
+derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL ETHZ-ASL BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+*/
 
 #ifndef VICONPOS_MEASUREMENT_HPP_
 #define VICONPOS_MEASUREMENT_HPP_
@@ -75,7 +101,7 @@ public:
 		Eigen::Matrix<double,3,3> pci_sk = skew(state_old.get<msf_core::p_ci_>());
 
 		ROS_INFO_STREAM("timediff to state "<<std::fabs(state->time_-time_));
-		ROS_INFO_STREAM("apply meas scale = "<<state_old.get<msf_core::L_>()(0));
+		ROS_INFO_STREAM("apply meas scale: "<<state_old.get<msf_core::L_>()(0));
 
 		// construct H matrix using H-blockx :-)
 		// position
@@ -94,6 +120,7 @@ public:
 		r_old.block<3,1>(3,0) = -state_old.get<msf_core::q_wv_>().vec()/state_old.get<msf_core::q_wv_>().w()*2;
 		// "camera"-IMU drift q_ci
 		r_old.block<3,1>(6,0) = -state_old.get<msf_core::q_ci_>().vec()/state_old.get<msf_core::q_ci_>().w()*2;
+
 
 		// call update step in base class
 		MSF_Measurement::calculateAndApplyCorrection(state, core, H_old,r_old,R_);
