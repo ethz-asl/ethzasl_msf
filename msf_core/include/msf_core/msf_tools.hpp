@@ -54,6 +54,11 @@ double getMedian(const T & data)
 	else
 		return 0;
 }
+
+double timehuman(double val){
+	return val - floor(val/1000.)*1000;
+}
+
 }
 
 #endif /* MSF_TOOLS_HPP_ */

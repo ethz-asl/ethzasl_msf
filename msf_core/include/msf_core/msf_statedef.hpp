@@ -75,6 +75,8 @@ typedef boost::fusion::vector<
 }
 
 typedef GenericState_T<msf_core::fullState_T> EKFState;
+typedef boost::shared_ptr<EKFState> EKFStatePtr;
+typedef boost::shared_ptr<const EKFState> EKFStateConstPtr;
 
 }
 #endif /* MSF_STATEDEF_HPP_ */

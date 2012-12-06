@@ -100,9 +100,6 @@ public:
 
 		Eigen::Matrix<double,3,3> pci_sk = skew(state_old.get<msf_core::p_ci_>());
 
-		ROS_INFO_STREAM("timediff to state "<<std::fabs(state->time_-time_));
-		ROS_INFO_STREAM("apply meas scale: "<<state_old.get<msf_core::L_>()(0));
-
 		// construct H matrix using H-blockx :-)
 		// position
 		H_old.block<3,3>(0,0) = C_wv.transpose()*state_old.get<msf_core::L_>()(0); // p

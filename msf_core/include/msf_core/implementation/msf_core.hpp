@@ -165,15 +165,17 @@ void MSF_Core::imuCallback(const sensor_msgs::ImuConstPtr & msg)
 		return;
 	}
 
-	ROS_INFO_STREAM("prop state before: "<<lastState->get<msf_core::p_>().transpose()<<" "<<lastState->get<msf_core::v_>().transpose());
 	propagateState(lastState, currentState);
-	ROS_INFO_STREAM("prop state after: "<<currentState->get<msf_core::p_>().transpose()<<" "<<currentState->get<msf_core::v_>().transpose());
 
-	ROS_INFO_STREAM("cov before "<<(lastState->P_.block<3,3>(0,0)));
-	predictProcessCovariance(lastState, currentState);
-	ROS_INFO_STREAM("cov after "<<(currentState->P_.block<3,3>(0,0)));
+	//also propagate the covariance one step further, to distribute the processing load over time
+	stateBufferT::iterator_T stateIteratorPLastPropagated = StateBuffer_.getIteratorAtValue(time_P_propagated);
+	stateBufferT::iterator_T stateIteratorPLastPropagatedNext = stateIteratorPLastPropagated;
+	++stateIteratorPLastPropagatedNext;
+	if(stateIteratorPLastPropagatedNext != StateBuffer_.getIteratorEnd()){ //might happen if there is a measurement in the future
+		predictProcessCovariance(stateIteratorPLastPropagated->second, stateIteratorPLastPropagatedNext->second);
+		checkForNumeric((double*)(&stateIteratorPLastPropagatedNext->second->get<msf_core::p_>()(0)), 3, "prediction p");
+	}
 
-	checkForNumeric((double*)(&currentState->get<msf_core::p_>()(0)), 3, "prediction p");
 
 	predictionMade_ = true;
 
@@ -189,7 +191,6 @@ void MSF_Core::imuCallback(const sensor_msgs::ImuConstPtr & msg)
 
 	StateBuffer_.insert(currentState);
 
-	ROS_INFO_STREAM("Inserted state to buffer with time "<<currentState->time_);
 
 	seq++;
 }
@@ -329,7 +330,6 @@ void MSF_Core::propagateState(boost::shared_ptr<EKFState>& state_old, boost::sha
 			msf_tmp::resetState()
 	);
 
-	ROS_INFO_STREAM("Will propagate with dt "<<dt);
 
 	// zero props: copy constant for non propagated states
 	boost::fusion::for_each(
@@ -346,8 +346,6 @@ void MSF_Core::propagateState(boost::shared_ptr<EKFState>& state_old, boost::sha
 	ConstMatrix4 Omega = omegaMatJPL(ew);
 	ConstMatrix4 OmegaOld = omegaMatJPL(ewold);
 	Matrix4 OmegaMean = omegaMatJPL((ew + ewold) / 2);
-
-	//ROS_INFO_STREAM("ew "<<ew.transpose()<<" ewold "<<ewold.transpose()<<" ea "<<ea.transpose()<<" eaold "<<eaold.transpose());
 
 	// zero order quaternion integration
 	//	cur_state.q_ = (Eigen::Matrix<double,4,4>::Identity() + 0.5*Omega*dt)*StateBuffer_[(unsigned char)(idx_state_-1)].q_.coeffs();
@@ -375,12 +373,16 @@ void MSF_Core::propagateState(boost::shared_ptr<EKFState>& state_old, boost::sha
 	state_new->get<msf_core::v_>() = state_old->get<msf_core::v_>() + (dv - g_) * dt;
 	state_new->get<msf_core::p_>() = state_old->get<msf_core::p_>() + ((state_new->get<msf_core::v_>() + state_old->get<msf_core::v_>()) / 2 * dt);
 
+	ROS_INFO_STREAM("state after prop: "<<state_new->get<msf_core::p_>().transpose());
+
 }
 
 
 
 void MSF_Core::predictProcessCovariance(boost::shared_ptr<EKFState>& state_old, boost::shared_ptr<EKFState>& state_new)
 {
+
+	//TODO: later: find out whether we have to linearize around the current or the last state
 
 	double dt = state_new->time_ - state_old->time_;
 
@@ -392,14 +394,14 @@ void MSF_Core::predictProcessCovariance(boost::shared_ptr<EKFState>& state_old, 
 	ConstVector3 nbwv = Vector3::Constant(usercalc_->getParam_noise_gyrbias() /* * sqrt(dt) */);
 
 	// bias corrected IMU readings
-	ConstVector3 ew = state_old->w_m_ - state_old->get<msf_core::b_w_>();
-	ConstVector3 ea = state_old->a_m_ - state_old->get<msf_core::b_a_>();
+	ConstVector3 ew = state_new->w_m_ - state_new->get<msf_core::b_w_>();
+	ConstVector3 ea = state_new->a_m_ - state_new->get<msf_core::b_a_>();
 
 	ConstMatrix3 a_sk = skew(ea);
 	ConstMatrix3 w_sk = skew(ew);
 	ConstMatrix3 eye3 = Eigen::Matrix<double, 3, 3>::Identity();
 
-	ConstMatrix3 C_eq = state_old->get<msf_core::q_>().toRotationMatrix();
+	ConstMatrix3 C_eq = state_new->get<msf_core::q_>().toRotationMatrix();
 
 	const double dt_p2_2 = dt * dt * 0.5; // dt^2 / 2
 	const double dt_p3_6 = dt_p2_2 * dt / 3.0; // dt^3 / 6
@@ -431,7 +433,7 @@ void MSF_Core::predictProcessCovariance(boost::shared_ptr<EKFState>& state_old, 
 	Fd_.block<3, 3> (6, 6) = E;
 	Fd_.block<3, 3> (6, 9) = F;
 
-	calc_QCore(dt, state_old->get<msf_core::q_>(), ew, ea, nav, nbav, nwv, nbwv, Qd_);
+	calc_QCore(dt, state_new->get<msf_core::q_>(), ew, ea, nav, nbav, nwv, nbwv, Qd_);
 
 	//call user Q calc to fill in the blocks of auxiliary states
 	usercalc_->calculateQAuxiliaryStates(*state_new, dt);
@@ -447,6 +449,7 @@ void MSF_Core::predictProcessCovariance(boost::shared_ptr<EKFState>& state_old, 
 
 	//set time for best cov prop to now
 	time_P_propagated = state_new->time_;
+
 }
 
 //bool MSF_Core::getStateAtIdx(EKFState* timestate, unsigned char idx)
@@ -483,11 +486,12 @@ void MSF_Core::init(boost::shared_ptr<MSF_MeasurementBase> measurement){
 	time_P_propagated = 0; //will be set upon first IMU message
 
 	initialized_ = true;
+	predictionMade_ = false;
 }
 
 void MSF_Core::addMeasurement(boost::shared_ptr<MSF_MeasurementBase> measurement){
 
-	if(!initialized_)
+	if(!initialized_ || !predictionMade_)
 		return;
 
 	typename measurementBufferT::iterator_T it_meas = MeasurementBuffer_.insert(measurement);
@@ -498,31 +502,32 @@ void MSF_Core::addMeasurement(boost::shared_ptr<MSF_MeasurementBase> measurement
 
 	for( ; it_meas != it_meas_end; ++it_meas){
 
-		boost::shared_ptr<EKFState> state = getClosestState(it_meas->second->time_); //propagates covariance to state
+		boost::shared_ptr<EKFState> state = getClosestState(it_meas->second->time_, 0); //propagates covariance to state
 
 		if(state->time_ <= 0){
 			ROS_ERROR_STREAM_THROTTLE(1,"getClosestState returned an invalid state");
 			continue;
 		}
 
-		ROS_INFO_STREAM("state before applying meas "<<state->time_<<" "<<state->get<msf_core::p_>().transpose());
 		it_meas->second->apply(state, *this); //calls back core::applyCorrection(), which sets time_P_propagated to meas time
-
-		ROS_INFO_STREAM("state after applying meas"<<state->get<msf_core::p_>().transpose());
-
-		ROS_INFO_STREAM("cov after applying meas"<<(state->P_.block<3,3>(0,0)));
 
 		//make sure to propagate to next measurement or up to now if no more measurements
 		it_curr = StateBuffer_.getIteratorAtValue(state); //propagate from current state
+		//TODO: remove{
+		assert(it_curr->second->time_== state->time_);
+		//}
 
 		stateBufferT::iterator_T it_end;
 		typename measurementBufferT::iterator_T it_nextmeas = it_meas;
 		++it_nextmeas; //the next measurement in the list
 
-		if(it_nextmeas == it_meas_end){ //that was the last measurement, so propagate to now
+		if(it_nextmeas == it_meas_end){ //that was the last measurement, so propagate state to now
 			it_end = StateBuffer_.getIteratorEnd();
 		}else{
-			it_end = StateBuffer_.getIteratorClosest(it_nextmeas->second->time_); //get state closest to next measurement
+			//TODO remove{
+			ROS_WARN_STREAM("mhh got another measurement after this");
+			//}
+			it_end = StateBuffer_.getIteratorClosest(it_nextmeas->second->time_); //get state closest to next measurement TODO: do we want to also respect the delay here. Otherwise we might propagate a bit to much
 			if(it_end == StateBuffer_.getIteratorEnd()){
 				ROS_ERROR_STREAM("Wanted to get a state close to the next measurement, but got end of list");
 				--it_end;
@@ -531,9 +536,11 @@ void MSF_Core::addMeasurement(boost::shared_ptr<MSF_MeasurementBase> measurement
 
 		stateBufferT::iterator_T it_next = it_curr;
 		++it_next;
+
 		for( ; it_curr != it_end && it_next != it_end; ++it_curr, ++it_next){ //propagate to selected state
 			propagateState(it_curr->second, it_next->second);
 		}
+
 		appliedOne = true;
 	}
 
@@ -589,24 +596,7 @@ void MSF_Core::addMeasurement(boost::shared_ptr<MSF_MeasurementBase> measurement
 	latestState->toFullStateMsg(msgState_);
 	pubState_.publish(msgState_);
 	seq_m++;
-
-
-
 }
-
-//void MSF_Core::SetInitialized(){
-//		boost::shared_ptr<EKFState> state(new EKFState);
-//		StateBuffer_.insert(state);
-//		measInit->apply(state, *this);
-//
-//		typename stateBufferT::iterator_T it = StateBuffer_.getIteratorBegin();
-//		if(it!=StateBuffer_.getIteratorEnd()){
-//			time_P_propagated = it->second->time_;
-//			initialized_ = true;
-//		}else{
-//			ROS_ERROR_STREAM("Wanted to set core to initialized, but there is no state in the state list. Rejecting call.");
-//		}
-//	}
 
 boost::shared_ptr<EKFState> MSF_Core::getClosestState(double tstamp, double delay)
 {
@@ -617,10 +607,22 @@ boost::shared_ptr<EKFState> MSF_Core::getClosestState(double tstamp, double dela
 
 	double timenow = tstamp - delay - usercalc_->getParam_delay();
 
-	boost::shared_ptr<EKFState>& closestState = StateBuffer_.getClosest(timenow);
+	stateBufferT::iterator_T it = StateBuffer_.getIteratorClosest(timenow);
+
+	//TODO: remove this shit or find out why we need it and document here.{
+	stateBufferT::iterator_T itbeg = StateBuffer_.getIteratorBegin();
+	static bool started = false;
+	if (itbeg == it && !started){
+		ROS_ERROR_STREAM("THIS STARTED THING WAS USED");
+		++it;
+	}
+	started = true;
+	//}
+
+	boost::shared_ptr<EKFState>& closestState = it->second;
 
 	if (closestState->time_ == -1){
-		ROS_WARN_STREAM("Requested closest state to "<<timenow<<" but there was suitable state in the map");
+		ROS_WARN_STREAM("Requested closest state to "<<timenow<<" but there was no suitable state in the map");
 		return StateBuffer_.getInvalid(); // // early abort // //  not enough predictions made yet to apply measurement (too far in past)
 	}
 	propPToState(closestState); // catch up with covariance propagation if necessary
@@ -643,7 +645,6 @@ void MSF_Core::propPToState(boost::shared_ptr<EKFState>& state)
 	for( ; it != StateBuffer_.getIteratorEnd() && it->second->time_ <= state->time_ ; ++it, ++itMinus){
 		predictProcessCovariance(itMinus->second, it->second);
 	}
-	time_P_propagated = state->time_; //set time latest propagated
 }
 
 
@@ -684,18 +685,12 @@ bool MSF_Core::applyCorrection(boost::shared_ptr<EKFState>& delaystate, ErrorSta
 	//}
 
 	// state update:
-
 	// TODO: sweiss what to do with attitude? augment measurement noise?
-
-
 	// store old values in case of fuzzy tracking
 	EKFState buffstate = *delaystate;
 
 	//slynen{ call correction function for every state
-
-
 	delaystate->correct(correction);
-
 	//}
 
 	//slynen{ //allow the user to sanity check the new state
@@ -761,7 +756,7 @@ bool MSF_Core::applyCorrection(boost::shared_ptr<EKFState>& delaystate, ErrorSta
 
 	checkForNumeric(&correction[0], HLI_EKF_STATE_SIZE, "update");
 
-	time_P_propagated = delaystate->time_; //set time latest propagated, we need to repropagate from here
+	time_P_propagated = delaystate->time_; //set time latest propagated, we need to repropagate at least from here
 
 	return 1;
 }

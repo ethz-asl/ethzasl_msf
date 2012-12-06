@@ -7,12 +7,12 @@ All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-* Redistributions of source code must retain the above copyright
+ * Redistributions of source code must retain the above copyright
 notice, this list of conditions and the following disclaimer.
-* Redistributions in binary form must reproduce the above copyright
+ * Redistributions in binary form must reproduce the above copyright
 notice, this list of conditions and the following disclaimer in the
 documentation and/or other materials provided with the distribution.
-* Neither the name of ETHZ-ASL nor the
+ * Neither the name of ETHZ-ASL nor the
 names of its contributors may be used to endorse or promote products
 derived from this software without specific prior written permission.
 
@@ -27,10 +27,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-*/
+ */
 
 #ifndef MSF_SORTEDCONTAINER_HPP_
 #define MSF_SORTEDCONTAINER_HPP_
+
+#include <msf_core/msf_tools.hpp>
 
 namespace msf_core{
 template<typename T, typename PrototypeInvalidT = T>
@@ -105,6 +107,7 @@ public:
 	inline typename ListT::iterator getIteratorClosest(const double& statetime){
 		typename ListT::iterator tauMinus = getIteratorClosestBefore(statetime);
 		typename ListT::iterator tauPlus = getIteratorClosestAfter(statetime);
+
 		typename ListT::iterator it_end = getIteratorEnd();
 		if(tauMinus == it_end){
 			return tauPlus;
@@ -112,7 +115,7 @@ public:
 		if(tauPlus == it_end){
 			return tauMinus;
 		}
-		if(abs(tauPlus->second->time_ - statetime) < abs(tauMinus->second->time_ - statetime)){
+		if(fabs(tauPlus->second->time_ - statetime) < fabs(tauMinus->second->time_ - statetime)){
 			return tauPlus;
 		}else{
 			return tauMinus;
@@ -125,6 +128,7 @@ public:
 			return it->second;
 		}
 		it--;
+//		ROS_INFO_STREAM("get closest before found "<<msf_core::timehuman(it->second->time_)<<" for requested time "<<msf_core::timehuman(statetime));
 		return it->second;
 	};
 
@@ -133,25 +137,38 @@ public:
 		if(it==stateList.end()){
 			return getInvalid();
 		}
+//		ROS_INFO_STREAM("get closest after "<<msf_core::timehuman(it->second->time_)<<" for requested time "<<msf_core::timehuman(statetime));
+		return  it->second;
+	};
+
+	inline boost::shared_ptr<T>& getValueAt(const double& statetime){
+		typename ListT::iterator it = stateList.find(statetime);
+		if(it==stateList.end()){
+			return getInvalid();
+		}
 		return  it->second;
 	};
 
 	inline boost::shared_ptr<T>& getClosest(const double& statetime){
+		boost::shared_ptr<T>& at = getValueAt(statetime); //is there one exactly at this point?
+		if(at != getInvalid()){
+			return at;
+		}
+
 		boost::shared_ptr<T>& tauMinus = getClosestBefore(statetime);
 		boost::shared_ptr<T>& tauPlus = getClosestAfter(statetime);
+
 		//TODO remove in production code{
 		if(tauMinus->time_==-1&&tauPlus->time_==-1){
 			std::cout<<"ERROR neighter getClosestBefore nor getClosestAfter returned a valid value"<<std::endl;
+			assert(false&&"ERROR neighter getClosestBefore nor getClosestAfter returned a valid value");
 		}
+		//}
 		if(tauMinus->time_==-1){
 			return tauPlus;
 		}else if(tauPlus->time_==-1){
 			return tauMinus;
 		}
-		//		double tdiff1 = fabs(tauPlus->time_ - statetime);
-		//		double tdiff2 = fabs(tauMinus->time_ - statetime);
-		//		ROS_INFO_STREAM("Requested a state close to "<<statetime<<" dt1 "<<tdiff1<<" dt2 "<<tdiff2);
-		//}
 
 		if(fabs(tauPlus->time_ - statetime) < fabs(tauMinus->time_ - statetime)){
 			return tauPlus;
@@ -171,7 +188,7 @@ public:
 		if(it == stateList.end()){
 			std::stringstream ss;
 			ss<<"Wanted to update a states/measurements time, but could not find the old state, "
-					"for which the time was asked to be updated. time "<<timeOld<<std::endl;
+					"for which the time was asked to be updated. time "<<msf_core::timehuman(timeOld)<<std::endl;
 
 			ss<<"Map: "<<std::endl;
 			for(typename ListT::iterator it2 = stateList.begin(); it2!= stateList.end(); ++it2){
@@ -188,6 +205,16 @@ public:
 		return inserted->second;
 	}
 
+
+	std::string echoBufferContentTimes(){
+		std::stringstream ss;
+
+		for(typename ListT::iterator it = getIteratorBegin();it!=getIteratorEnd();++it){
+			ss<<msf_core::timehuman(it->second->time_)<<std::endl;
+		}
+		return ss.str();
+
+	}
 
 };
 }

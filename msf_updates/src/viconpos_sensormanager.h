@@ -98,7 +98,6 @@ private:
 		p = q_wv.conjugate().toRotationMatrix()*p_vc_/scale - q.toRotationMatrix()*p_ci_;
 
 		//prepare init "measurement"
-		//TODO do we really have initial measurements? What if there is no data so far?
 		boost::shared_ptr<msf_core::MSF_InitMeasurement> meas(new msf_core::MSF_InitMeasurement(true)); //hand over that we will also set the sensor readings
 
 		meas->setStateInitValue<msf_core::p_>(p);
@@ -137,28 +136,22 @@ private:
 		}
 		virtual void initState(msf_core::EKFState& state){
 
-			//TODO !! implement this correctly in the respective sensors
-			//		state.get<msf_core::L_>().state_ = L;
-			//		state.get<msf_core::q_wv_>().state_ = q_wv;
-			//		state.get<msf_core::q_ci_>().state_ = q_ci;
-			//		state.get<msf_core::p_ci_>().state_ = p_ci;
-
 
 		}
 
 		virtual void calculateQAuxiliaryStates(msf_core::EKFState& state, double dt){
-//			msf_core::ConstVector3 nqwvv = Eigen::Vector3d::Constant(config_.noise_qwv);
-//			msf_core::ConstVector3 nqciv = Eigen::Vector3d::Constant(config_.noise_qci);
-//			msf_core::ConstVector3 npicv = Eigen::Vector3d::Constant(config_.noise_pic);
-//			Eigen::Matrix<double, 1, 1> n_L;
-//			n_L << config_.noise_scale;
-//
-//			//compute the blockwise Q values and store them with the states,
-//			//these then get copied by the core to the correct places in Qd
-//			state.getQBlock<msf_core::L_>() 	= (dt * n_L.cwiseProduct(n_L)).asDiagonal();
-//			state.getQBlock<msf_core::q_wv_>() = (dt * nqwvv.cwiseProduct(nqwvv)).asDiagonal();
-//			state.getQBlock<msf_core::q_ci_>() = (dt * nqciv.cwiseProduct(nqciv)).asDiagonal();
-//			state.getQBlock<msf_core::p_ci_>() = (dt * npicv.cwiseProduct(npicv)).asDiagonal();
+			msf_core::ConstVector3 nqwvv = Eigen::Vector3d::Constant(config_.noise_qwv);
+			msf_core::ConstVector3 nqciv = Eigen::Vector3d::Constant(config_.noise_qci);
+			msf_core::ConstVector3 npicv = Eigen::Vector3d::Constant(config_.noise_pic);
+			Eigen::Matrix<double, 1, 1> n_L;
+			n_L << config_.noise_scale;
+
+			//compute the blockwise Q values and store them with the states,
+			//these then get copied by the core to the correct places in Qd
+			state.getQBlock<msf_core::L_>() 	= (dt * n_L.cwiseProduct(n_L)).asDiagonal();
+			state.getQBlock<msf_core::q_wv_>() = (dt * nqwvv.cwiseProduct(nqwvv)).asDiagonal();
+			state.getQBlock<msf_core::q_ci_>() = (dt * nqciv.cwiseProduct(nqciv)).asDiagonal();
+			state.getQBlock<msf_core::p_ci_>() = (dt * npicv.cwiseProduct(npicv)).asDiagonal();
 		}
 
 		virtual void setP(Eigen::Matrix<double, msf_core::EKFState::nErrorStatesAtCompileTime, msf_core::EKFState::nErrorStatesAtCompileTime>& P){

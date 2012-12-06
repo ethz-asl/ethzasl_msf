@@ -49,10 +49,6 @@ void MSF_MeasurementBase::calculateAndApplyCorrection(boost::shared_ptr<EKFState
 	R_type S;
 	Eigen::Matrix<double, MSF_Core::nErrorStatesAtCompileTime, R_type::RowsAtCompileTime> K;
 	MSF_Core::ErrorStateCov & P = state->P_;
-	ROS_INFO_STREAM("covariance for meas "<<(P));
-
-	ROS_INFO_STREAM("H_delayed "<<(H_delayed));
-	    ROS_INFO_STREAM("R_delayed "<<(R_delayed));
 
 	S = H_delayed * P * H_delayed.transpose() + R_delayed;
 	K = P * H_delayed.transpose() * S.inverse();
@@ -63,14 +59,12 @@ void MSF_MeasurementBase::calculateAndApplyCorrection(boost::shared_ptr<EKFState
 
 	// make sure P stays symmetric
 	P = 0.5 * (P + P.transpose());
-	ROS_INFO_STREAM("covariance after meas "<<(P.block<3,3>(0,0)));
 
 	core.applyCorrection(state, correction_);
 }
 
 void MSF_InitMeasurement::apply(boost::shared_ptr<EKFState> stateWithCovariance, MSF_Core& core){
 
-	ROS_INFO_STREAM("Applying init meas");
 
 	stateWithCovariance->time_ = ros::Time::now().toSec(); //makes this state a valid starting point
 
@@ -78,10 +72,6 @@ void MSF_InitMeasurement::apply(boost::shared_ptr<EKFState> stateWithCovariance,
 			stateWithCovariance->statevars_,
 			msf_tmp::copyInitStates<EKFState>(InitState)
 	);
-
-	//TODO remove{
-	ROS_INFO_STREAM("scale init "<<(stateWithCovariance->get<msf_core::L_>()));
-	//}
 
 	stateWithCovariance->P_ = InitState.P_;
 

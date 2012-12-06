@@ -223,9 +223,6 @@ void GenericState_T<stateVector_T>::getPoseCovariance(geometry_msgs::PoseWithCov
 	static const int idxstartcorr_p = msf_tmp::getStartIndex<stateVector_T, p_type, msf_tmp::CorrectionStateLengthForType>::value;
 	static const int idxstartcorr_q = msf_tmp::getStartIndex<stateVector_T, q_type, msf_tmp::CorrectionStateLengthForType>::value;
 
-	//TODO: remove after initial debugging
-	BOOST_STATIC_ASSERT(idxstartcorr_p==0);
-	BOOST_STATIC_ASSERT(idxstartcorr_q==6);
 
 	/*        |  cov_p_p  |  cov_p_q  |
 	 *        |           |           |

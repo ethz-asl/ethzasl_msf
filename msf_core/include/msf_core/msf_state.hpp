@@ -75,6 +75,7 @@ struct StateVar_T{
 	bool hasResetValue; //indicating that this statevariable has a reset value to be applied to the state
 	StateVar_T(){
 		hasResetValue = false;
+		Q_.setZero();
 	}
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
