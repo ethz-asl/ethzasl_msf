@@ -87,6 +87,12 @@ public:
 
 	boost::shared_ptr<EKFState> getClosestState(double tstamp, double delay = 0.00);
 
+	//delete very old states and measurements from the buffers to free memory
+	void CleanUpBuffers(){
+		double timeold = 60; //1 min
+		StateBuffer_.clearOlderThan(timeold);
+		MeasurementBuffer_.clearOlderThan(timeold);
+	}
 
 //	/// get all state information at a given index in the ringbuffer
 //	bool getStateAtIdx(msf_core::EKFState* timestate, unsigned char idx);

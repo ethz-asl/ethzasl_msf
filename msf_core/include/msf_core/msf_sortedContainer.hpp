@@ -158,12 +158,6 @@ public:
 		boost::shared_ptr<T>& tauMinus = getClosestBefore(statetime);
 		boost::shared_ptr<T>& tauPlus = getClosestAfter(statetime);
 
-		//TODO remove in production code{
-		if(tauMinus->time_==-1&&tauPlus->time_==-1){
-			std::cout<<"ERROR neighter getClosestBefore nor getClosestAfter returned a valid value"<<std::endl;
-			assert(false&&"ERROR neighter getClosestBefore nor getClosestAfter returned a valid value");
-		}
-		//}
 		if(tauMinus->time_==-1){
 			return tauPlus;
 		}else if(tauPlus->time_==-1){
@@ -175,6 +169,19 @@ public:
 		}else{
 			return tauMinus;
 		}
+	}
+
+	inline void clearOlderThan(double age){
+		std::stringstream ss;
+//		ss<<"JANITOR: entries before "<<stateList.size();
+		double newest = getLast()->time_;
+		iterator_T it = getIteratorClosest(newest-age);
+		if(newest - it->second->time_ < age)
+			return; //there is no state older than time
+		if(it->second->time_ > stateList.begin()->second->time_)
+			stateList.erase(stateList.begin(),it);
+//		ss<<" after "<<stateList.size()<<std::endl;
+//		ROS_WARN_STREAM(ss.str());
 	}
 
 	inline boost::shared_ptr<T>& getLast(){

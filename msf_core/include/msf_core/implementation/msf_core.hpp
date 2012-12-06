@@ -355,7 +355,7 @@ void MSF_Core::propagateState(boost::shared_ptr<EKFState>& state_old, boost::sha
 	Matrix4 MatExp;
 	MatExp.setIdentity();
 	OmegaMean *= 0.5 * dt;
-	for (int i = 1; i < 5; i++) //TODO make fourth order or less
+	for (int i = 1; i < 5; i++) //can be made fourth order or less
 	{
 		div *= i;
 		MatExp = MatExp + OmegaMean / div;
@@ -452,19 +452,6 @@ void MSF_Core::predictProcessCovariance(boost::shared_ptr<EKFState>& state_old, 
 
 }
 
-//bool MSF_Core::getStateAtIdx(EKFState* timestate, unsigned char idx)
-//{
-//	if (!predictionMade_)
-//	{
-//		timestate->time_ = -1;
-//		return false;
-//	}
-//
-//	*timestate = StateBuffer_[idx];
-//
-//	return true;
-//}
-
 void MSF_Core::init(boost::shared_ptr<MSF_MeasurementBase> measurement){
 	MeasurementBuffer_.clear();
 	StateBuffer_.clear();
@@ -513,9 +500,6 @@ void MSF_Core::addMeasurement(boost::shared_ptr<MSF_MeasurementBase> measurement
 
 		//make sure to propagate to next measurement or up to now if no more measurements
 		it_curr = StateBuffer_.getIteratorAtValue(state); //propagate from current state
-		//TODO: remove{
-		assert(it_curr->second->time_== state->time_);
-		//}
 
 		stateBufferT::iterator_T it_end;
 		typename measurementBufferT::iterator_T it_nextmeas = it_meas;
@@ -524,9 +508,6 @@ void MSF_Core::addMeasurement(boost::shared_ptr<MSF_MeasurementBase> measurement
 		if(it_nextmeas == it_meas_end){ //that was the last measurement, so propagate state to now
 			it_end = StateBuffer_.getIteratorEnd();
 		}else{
-			//TODO remove{
-			ROS_WARN_STREAM("mhh got another measurement after this");
-			//}
 			it_end = StateBuffer_.getIteratorClosest(it_nextmeas->second->time_); //get state closest to next measurement TODO: do we want to also respect the delay here. Otherwise we might propagate a bit to much
 			if(it_end == StateBuffer_.getIteratorEnd()){
 				ROS_ERROR_STREAM("Wanted to get a state close to the next measurement, but got end of list");
@@ -560,11 +541,6 @@ void MSF_Core::addMeasurement(boost::shared_ptr<MSF_MeasurementBase> measurement
 	msgCorrect_.linear_acceleration.x = 0;
 	msgCorrect_.linear_acceleration.y = 0;
 	msgCorrect_.linear_acceleration.z = 0;
-
-	if(it_curr->second != StateBuffer_.getLast()){
-		std::cout<<"time "<<it_curr->second->time_<<" last "<<StateBuffer_.getLast()->time_<<std::endl;
-		assert(it_curr->second == StateBuffer_.getLast()); //TODO: remove later
-	}
 
 	boost::shared_ptr<EKFState>& latestState = StateBuffer_.getLast();
 	msgCorrect_.state[0] = latestState->get<msf_core::p_>()[0] - hl_state_buf_.state[0];
@@ -609,11 +585,11 @@ boost::shared_ptr<EKFState> MSF_Core::getClosestState(double tstamp, double dela
 
 	stateBufferT::iterator_T it = StateBuffer_.getIteratorClosest(timenow);
 
-	//TODO: remove this shit or find out why we need it and document here.{
+	//TODO: remove this relict from the state_idx days or find out why we need it and document here.
+	//it seems this is needed when there was only one imu reading before the first measurement arrives{
 	stateBufferT::iterator_T itbeg = StateBuffer_.getIteratorBegin();
 	static bool started = false;
 	if (itbeg == it && !started){
-		ROS_ERROR_STREAM("THIS STARTED THING WAS USED");
 		++it;
 	}
 	started = true;
@@ -626,6 +602,8 @@ boost::shared_ptr<EKFState> MSF_Core::getClosestState(double tstamp, double dela
 		return StateBuffer_.getInvalid(); // // early abort // //  not enough predictions made yet to apply measurement (too far in past)
 	}
 	propPToState(closestState); // catch up with covariance propagation if necessary
+
+	CleanUpBuffers();
 
 	return closestState;
 }
@@ -735,9 +713,6 @@ bool MSF_Core::applyCorrection(boost::shared_ptr<EKFState>& delaystate, ErrorSta
 				BOOST_STATIC_ASSERT_MSG(static_cast<int>(EKFState::nErrorStatesAtCompileTime) -
 						static_cast<int>(EKFState::nPropagatedCoreErrorStatesAtCompileTime) == 16, "Assumed that nErrorStatesAtCompileTime-nPropagatedCoreStates == 16, which is not the case");
 
-				//TODO: can be eliminated
-				correction.block<EKFState::nErrorStatesAtCompileTime-EKFState::nPropagatedCoreErrorStatesAtCompileTime, 1> (EKFState::nPropagatedCoreErrorStatesAtCompileTime, 0) =
-						Eigen::Matrix<double, EKFState::nErrorStatesAtCompileTime-EKFState::nPropagatedCoreErrorStatesAtCompileTime, 1>::Zero();
 			}
 			else // if tracking ok: update mean and 3sigma of past N q_vw's
 			{
