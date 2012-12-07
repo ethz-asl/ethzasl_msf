@@ -98,9 +98,6 @@ public:
 
 
 private:
-	const static int nMaxCorr_ = 50; ///< number of IMU measurements buffered for time correction actions
-	const static int QualityThres_ = 1e3;
-
 	Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> Fd_; ///< discrete state propagation matrix
 	Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> Qd_; ///< discrete propagation noise matrix
 

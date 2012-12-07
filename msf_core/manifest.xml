@@ -1,13 +1,13 @@
 <package>
   <description brief="msf_core">
 
-     Multi Sensor Fusion (MSF) framework containing the core filter functions including full state propagation and shell for update sensor modules
+     Modular Sensor Fusion (MSF) framework containing the core filter functions including full state propagation and shell for update sensor modules
 
   </description>
-  <author>Stephan Weiss, Markus Achtelik</author>
+  <author>Simon Lynen, Stephan Weiss, Markus Achtelik</author>
   <license>BSD</license>
   <review status="unreviewed" notes="under active development"/>
-  <url>http://ros.org/wiki/ethzasl_sensor_fusion/ssf_core</url>
+  <url>http://ros.org/wiki/ethzasl_modular_sensor_fusion/msf_core</url>
   <depend package="roscpp"/>
   <depend package="sensor_msgs"/>
   <depend package="dynamic_reconfigure"/>
