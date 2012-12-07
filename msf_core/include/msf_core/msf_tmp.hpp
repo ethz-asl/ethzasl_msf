@@ -407,11 +407,8 @@ struct FindBestNonTemporalDriftingStateImpl<Sequence, First, Last, CurrentBestId
 	typedef typename  boost::fusion::result_of::deref<First>::type current_Type;
 	enum{
 		idxInState = getEnumStateName<typename msf_tmp::StripConstReference<current_Type>::result_t>::value, //we assert before calling that the indexing is correct
-
 		IsCurrentStateAQuaternion = isQuaternionType<typename msf_tmp::StripConstReference<current_Type>::result_t>::value,
-
 		IsCurrentStateNonTemporalDrifting = getStateIsNonTemporalDrifting<typename msf_tmp::StripConstReference<current_Type>::result_t>::value,
-
 		isQuaternionAndNonTemporalDrifting = IsCurrentStateAQuaternion == true && IsCurrentStateNonTemporalDrifting == true,
 		isNonTemporalDriftingPositionAndNoQuaternionHasBeenFound = IsCurrentStateNonTemporalDrifting == true && foundQuaternion == false,
 
@@ -425,8 +422,6 @@ struct FindBestNonTemporalDriftingStateImpl<Sequence, First, Last, CurrentBestId
 		typename msf_tmp::StripConstReference<Last>::result_t>::value >::value
 
 	};
-private:
-	//	BOOST_STATIC_ASSERT_MSG(value!=-1, "We assume there is at least one non temporal drifting state, but none could be found");
 };
 
 

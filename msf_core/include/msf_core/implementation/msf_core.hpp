@@ -45,7 +45,7 @@ MSF_Core::MSF_Core(MSF_SensorManager* usercalc)
 
 	Qd_.setZero();
 
-	usercalc_ = usercalc; //the interface for the user to customize EKF interna, do NOT USE THIS POINTER INSIDE THE CTOR
+	usercalc_ = usercalc; //the interface for the user to customize EKF interna, DO ABSOLUTELY NOT USE THIS POINTER INSIDE THIS CTOR!!
 
 	initialized_ = false;
 	predictionMade_ = false;
@@ -195,38 +195,6 @@ void MSF_Core::imuCallback(const sensor_msgs::ImuConstPtr & msg)
 	seq++;
 }
 
-///// main update routine called by a given sensor
-//template<class H_type, class Res_type, class R_type>
-//bool MSF_Core::applyMeasurement(unsigned char idx_delaystate, const Eigen::MatrixBase<H_type>& H_delayed,
-//		const Eigen::MatrixBase<Res_type> & res_delayed, const Eigen::MatrixBase<R_type>& R_delayed,
-//		double fuzzythres)
-//{
-//	EIGEN_STATIC_ASSERT_FIXED_SIZE(H_type);
-//	EIGEN_STATIC_ASSERT_FIXED_SIZE(R_type);
-//
-//	// get measurements
-//	if (!predictionMade_)
-//		return false;
-//
-//	// make sure we have correctly propagated cov until idx_delaystate
-//	propPToIdx(idx_delaystate);
-//
-//	R_type S;
-//	Eigen::Matrix<double, nErrorStatesAtCompileTime, R_type::RowsAtCompileTime> K;
-//	ErrorStateCov & P = StateBuffer_[idx_delaystate].P_;
-//
-//	S = H_delayed * StateBuffer_[idx_delaystate].P_ * H_delayed.transpose() + R_delayed;
-//	K = P * H_delayed.transpose() * S.inverse();
-//
-//	correction_ = K * res_delayed;
-//	const ErrorStateCov KH = (ErrorStateCov::Identity() - K * H_delayed);
-//	P = KH * P * KH.transpose() + K * R_delayed * K.transpose();
-//
-//	// make sure P stays symmetric
-//	P = 0.5 * (P + P.transpose());
-//
-//	return applyCorrection(idx_delaystate, correction_, fuzzythres);
-//}
 
 void MSF_Core::stateCallback(const sensor_fusion_comm::ExtEkfConstPtr & msg)
 {
@@ -282,12 +250,11 @@ void MSF_Core::stateCallback(const sensor_fusion_comm::ExtEkfConstPtr & msg)
 		currentState->get<msf_core::q_>().normalize();
 
 		// zero props:
-		//slynen{ copy non propagation states from last state
+		//copy non propagation states from last state
 		boost::fusion::for_each(
 				currentState->statevars_,
 				msf_tmp::copyNonPropagationStates<EKFState>(*lastState)
 		);
-		//}
 
 		hl_state_buf_ = *msg;
 	}
@@ -337,7 +304,6 @@ void MSF_Core::propagateState(boost::shared_ptr<EKFState>& state_old, boost::sha
 			msf_tmp::copyNonPropagationStates<EKFState>(*state_old)
 	);
 
-	//  Eigen::Quaternion<double> dq;
 	Eigen::Matrix<double, 3, 1> dv;
 	ConstVector3 ew = state_new->w_m_ - state_new->get<msf_core::b_w_>();
 	ConstVector3 ewold = state_old->w_m_ - state_old->get<msf_core::b_w_>();
@@ -603,7 +569,7 @@ boost::shared_ptr<EKFState> MSF_Core::getClosestState(double tstamp, double dela
 	}
 	propPToState(closestState); // catch up with covariance propagation if necessary
 
-	CleanUpBuffers();
+	CleanUpBuffers(); //remove very old states and measurements from the buffers
 
 	return closestState;
 }
@@ -632,7 +598,6 @@ bool MSF_Core::applyCorrection(boost::shared_ptr<EKFState>& delaystate, ErrorSta
 	if(!initialized_ || !predictionMade_)
 		return false;
 
-	//slynen{
 	//give the user the possibility to fix some states
 	usercalc_->augmentCorrectionVector(correction);
 
@@ -667,11 +632,10 @@ bool MSF_Core::applyCorrection(boost::shared_ptr<EKFState>& delaystate, ErrorSta
 	// store old values in case of fuzzy tracking
 	EKFState buffstate = *delaystate;
 
-	//slynen{ call correction function for every state
+	//call correction function for every state
 	delaystate->correct(correction);
-	//}
 
-	//slynen{ //allow the user to sanity check the new state
+	//allow the user to sanity check the new state
 	usercalc_->sanityCheckCorrection(*delaystate, buffstate, correction);
 
 	//TODO: move the whole fuzzy tracking to a templated function, which is specialized for void, Matrix, Quaternion
@@ -727,7 +691,7 @@ bool MSF_Core::applyCorrection(boost::shared_ptr<EKFState>& delaystate, ErrorSta
 		}
 	} //end fuzzy tracking
 
-	//slynen: removed all publishing and propagation, because this might not be the last update we have to apply
+	//no publishing and propagation here, because this might not be the last update we have to apply
 
 	checkForNumeric(&correction[0], HLI_EKF_STATE_SIZE, "update");
 

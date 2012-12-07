@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace msf_core{
 MSF_SensorManager::MSF_SensorManager()
 {
-	msf_core_.reset(new msf_core::MSF_Core(this)); //TODO: make this a (better) design
+	msf_core_.reset(new msf_core::MSF_Core(this)); //TODO: make this a (better) design. This is so aweful.
 }
 }
 

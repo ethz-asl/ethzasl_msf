@@ -51,7 +51,7 @@ template <class Derived, class DerivedQ> void calc_QCore(
 		Eigen::MatrixBase<DerivedQ> &  Qd
 		)
 {
-	//slynen{
+
 	//for now we have no make sure, the core states are in the correct order
 	//(calculation of observation noise cov has hardcoded order)
 	{
@@ -67,7 +67,6 @@ template <class Derived, class DerivedQ> void calc_QCore(
 		BOOST_STATIC_ASSERT_MSG(idxstartcorr_b_w_==9, "Indexing of core states has been altered, but this is currently not allowed");
 		BOOST_STATIC_ASSERT_MSG(idxstartcorr_b_a_==12, "Indexing of core states has been altered, but this is currently not allowed");
 	}
-	//}
 
 	const double q1=q.w(), q2=q.x(), q3=q.y(), q4=q.z();
 	const double ew1=ew(0), ew2=ew(1), ew3=ew(2);

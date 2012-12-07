@@ -50,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <msf_core/msf_state.hpp>
 
+//good old days...
 //#define N_STATE_BUFFER 256	///< size of unsigned char, do not change!
 
 namespace msf_core{
@@ -82,9 +83,6 @@ public:
 
 	void initExternalPropagation(boost::shared_ptr<EKFState> state);
 
-//	/// retreive all state information at time t. Used to build H, residual and noise matrix by update sensors
-//	unsigned char getClosestState(msf_core::EKFState* timestate, ros::Time tstamp, double delay = 0.00);
-
 	boost::shared_ptr<EKFState> getClosestState(double tstamp, double delay = 0.00);
 
 	//delete very old states and measurements from the buffers to free memory
@@ -94,13 +92,10 @@ public:
 		MeasurementBuffer_.clearOlderThan(timeold);
 	}
 
-//	/// get all state information at a given index in the ringbuffer
-//	bool getStateAtIdx(msf_core::EKFState* timestate, unsigned char idx);
 
 	MSF_Core(MSF_SensorManager* usercalc);
 	~MSF_Core();
 
-//	void Initialize(boost::shared_ptr<MSF_InitMeasurement>& measInit);
 
 private:
 	const static int nMaxCorr_ = 50; ///< number of IMU measurements buffered for time correction actions
@@ -111,29 +106,18 @@ private:
 
 	/// state variables
 	stateBufferT StateBuffer_; ///<EKF buffer containing pretty much all info needed at time t
-//	std::set<msf_core::EKFState> StateBuffer_;
 	measurementBufferT MeasurementBuffer_; ///<EKF Measurement
-	//msf_core::EKFState StateBuffer_[N_STATE_BUFFER];
-
-	//	unsigned char idx_state_; ///< pointer to state buffer at most recent state
-	//	unsigned char idx_P_; ///< pointer to state buffer at P latest propagated
-	//	unsigned char idx_time_; ///< pointer to state buffer at a specific time
 
 	double time_P_propagated;
 
 	Eigen::Matrix<double, 3, 1> g_; ///< gravity vector
 
-	//	/// correction from EKF update
-	//	Eigen::Matrix<double, nErrorStatesAtCompileTime, 1> correction_;
-
 	Eigen::Matrix<double, 3, 3> R_IW_; ///< Rot IMU->World
 	Eigen::Matrix<double, 3, 3> R_CI_; ///< Rot Camera->IMU
 	Eigen::Matrix<double, 3, 3> R_WV_; ///< Rot World->Vision
 
-
 	/// vision-world drift watch dog to determine fuzzy tracking
 
-	//slynen - also allow euclidean states.
 	//get the index of the best state having no temporal drift at compile time
 	enum{
 		indexOfStateWithoutTemporalDrift = msf_tmp::IndexOfBestNonTemporalDriftingState<msf_core::fullState_T>::value
@@ -208,15 +192,6 @@ private:
 	 * \sa{imuCallback}
 	 */
 	void stateCallback(const sensor_fusion_comm::ExtEkfConstPtr & msg);
-
-
-
-public:
-	//	/// main update routine called by a given sensor
-	//	template<class H_type, class Res_type, class R_type>
-	//	bool applyMeasurement(unsigned char idx_delaystate, const Eigen::MatrixBase<H_type>& H_delayed,
-	//			const Eigen::MatrixBase<Res_type> & res_delayed, const Eigen::MatrixBase<R_type>& R_delayed,
-	//			double fuzzythres = 0.1);
 
 
 };

@@ -58,6 +58,10 @@ public:
 		stateList.clear();
 	}
 
+	inline typename ListT::size_type size(){
+		return stateList.size();
+	}
+
 	inline typename ListT::iterator insert(const boost::shared_ptr<T>& value){
 		std::pair<typename ListT::iterator,bool> itpr =
 				stateList.insert(std::pair<double, boost::shared_ptr<T> >(value->time_, value));
@@ -128,7 +132,6 @@ public:
 			return it->second;
 		}
 		it--;
-//		ROS_INFO_STREAM("get closest before found "<<msf_core::timehuman(it->second->time_)<<" for requested time "<<msf_core::timehuman(statetime));
 		return it->second;
 	};
 
@@ -137,7 +140,6 @@ public:
 		if(it==stateList.end()){
 			return getInvalid();
 		}
-//		ROS_INFO_STREAM("get closest after "<<msf_core::timehuman(it->second->time_)<<" for requested time "<<msf_core::timehuman(statetime));
 		return  it->second;
 	};
 
@@ -172,16 +174,12 @@ public:
 	}
 
 	inline void clearOlderThan(double age){
-		std::stringstream ss;
-//		ss<<"JANITOR: entries before "<<stateList.size();
 		double newest = getLast()->time_;
 		iterator_T it = getIteratorClosest(newest-age);
 		if(newest - it->second->time_ < age)
 			return; //there is no state older than time
 		if(it->second->time_ > stateList.begin()->second->time_)
 			stateList.erase(stateList.begin(),it);
-//		ss<<" after "<<stateList.size()<<std::endl;
-//		ROS_WARN_STREAM(ss.str());
 	}
 
 	inline boost::shared_ptr<T>& getLast(){
@@ -190,7 +188,8 @@ public:
 	}
 
 	//this function effectively changes the map ordering, so the previous iterators are invalidated
-	inline boost::shared_ptr<T> updateTime(double timeOld, double timeNew) /*__attribute__ ((warn_unused_result))*/ {
+	//the attribute unused can be eliminated for non gcc compilers, its just a little more verbose
+	inline boost::shared_ptr<T> updateTime(double timeOld, double timeNew) __attribute__ ((warn_unused_result)) {
 		typename ListT::iterator it = stateList.find(timeOld);
 		if(it == stateList.end()){
 			std::stringstream ss;

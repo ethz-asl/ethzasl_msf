@@ -39,7 +39,7 @@ namespace msf_tmp{
 template <typename T, typename U> struct SameType{enum { value = false };};
 template <typename T> struct SameType<T,T>{enum { value = true };};
 
-//remove qualifiers
+//strip qualifiers
 template<typename T>
 struct StripReference{
 	typedef T result_t;

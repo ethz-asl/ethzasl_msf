@@ -47,6 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace msf_core{
 
+//visitor pattern to allow the user to set state init values
 class StateVisitor{
 public:
 	//the state is set to zero/identity, this method will be called to
