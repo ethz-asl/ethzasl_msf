@@ -38,8 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace msf_core{
 
-/***
- * The base class for all measurement types.
+/** \class MSF_MeasurementBase
+ * \brief The base class for all measurement types.
  * These are the objects provided to the EKF core to be applied in correct order to the states
  */
 class MSF_MeasurementBase{
@@ -56,8 +56,8 @@ protected:
 			const Eigen::MatrixBase<Res_type> & res_delayed, const Eigen::MatrixBase<R_type>& R_delayed);
 };
 
-/***
- * An invalid measurement needed for the measurement container to report if something went wrong
+/** \class MSF_InvalidMeasurement
+ * \brief An invalid measurement needed for the measurement container to report if something went wrong
  */
 class MSF_InvalidMeasurement:public MSF_MeasurementBase{
 public:
@@ -67,13 +67,12 @@ public:
 	}
 };
 
-/***
- * The class for sensor based measurements which we want to apply to
+/** \class MSF_Measurement
+ * \brief The class for sensor based measurements which we want to apply to
  * a state in the update routine of the EKF. This calls the apply correction
  * method of the EKF core
- * provides an abstract NVI to create measurements from sensor readings
+ * \note provides an abstract NVI to create measurements from sensor readings
  */
-
 template<typename T, int MEASUREMENTSIZE>
 class MSF_Measurement: public MSF_MeasurementBase{
 private:
@@ -89,8 +88,8 @@ public:
 	//apply is implemented by respective sensor measurement types
 };
 
-/***
- * a measurement to be send to initialize parts of or the full EKF state
+/** \class MSF_InitMeasurement
+ * \brief A measurement to be send to initialize parts of or the full EKF state
  * this can especially be used to split the initialization of the EKF
  * between multiple sensors which init different parts of the state
  */
@@ -136,8 +135,8 @@ public:
 };
 
 
-/***
- * a comparator to sort measurements by time
+/** \class sortMeasurements
+ * \brief A comparator to sort measurements by time
  */
 template<typename stateSequence_T>
 class sortMeasurements

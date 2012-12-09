@@ -41,8 +41,8 @@ namespace msf_core{
 class SensorHandler;
 class MSF_Core;
 
-/***
- * A manager for a given sensor set. Handlers for individual sensors (camera/vicon etc.) are
+/** \class MSF_SensorManager
+ * \brief A manager for a given sensor set. Handlers for individual sensors (camera/vicon etc.) are
  * registered with this class as handlers of particular sensors. This class also owns the
  * EKF core instance and handles the initialization of the filter
  */

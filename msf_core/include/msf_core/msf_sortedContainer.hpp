@@ -34,8 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <msf_core/msf_tools.hpp>
 
-/***
- * A class managing a sorted container with strict less than ordering
+/** \class SortedContainer
+ * \brief Manages a sorted container with strict less than ordering
  * used to store state and measurement objects which can then be queried
  * for closest states/measurements to a given time instant
  */
@@ -54,29 +54,31 @@ public:
 		invalid.reset(new PrototypeInvalidT());
 		invalid->time_ = -1;
 	}
-	/***
-	 * returns an invalid object used to signal that a request could not be satisfied
+	/**
+	 * \brief to be called to signal that a request could not be satisfied
+	 * \returns an object of the "invalid" type
 	 */
 	inline boost::shared_ptr<T>& getInvalid(){
 		return invalid;
 	}
 
-	/***
-	 * clears the internal container, dropping all the contents
+	/**
+	 * \brief clears the internal container, dropping all the contents
 	 */
 	inline void clear(){
 		stateList.clear();
 	}
 
-	/***
-	 * returns the size of the internal container
+	/**
+	 * \brief returns the size of the internal container
+	 * \returns size of the container
 	 */
 	inline typename ListT::size_type size(){
 		return stateList.size();
 	}
 
-	/***
-	 * insert an object to the internal container to the position not violating the internal strict less than ordering by time
+	/**
+	 * \brief insert an object to the internal container to the position not violating the internal strict less than ordering by time
 	 */
 	inline typename ListT::iterator insert(const boost::shared_ptr<T>& value){
 		std::pair<typename ListT::iterator,bool> itpr =
@@ -87,23 +89,25 @@ public:
 		return itpr.first;
 	}
 
-	/***
-	 * returns the iterator at the beginning of the internal container
+	/**
+	 * \brief returns the iterator at the beginning of the internal container
 	 */
 	inline typename ListT::iterator getIteratorBegin(){
 		return stateList.begin();
 	}
 
-	/***
-	 * returns the iterator at the end of the internal container
+	/**
+	 * \brief returns the iterator at the end of the internal container
 	 */
 	inline typename ListT::iterator getIteratorEnd(){
 		return stateList.end();
 	}
 
-	/***
-	 * returns the iterator at the specific time instant of the supplied object
+	/**
+	 * \brief returns the iterator at the specific time instant of the supplied object
 	 * or an invalid object if the request cannot be satisfied
+	 * \param value the value to get the iterator for
+	 * \returns iterator
 	 */
 	inline typename ListT::iterator getIteratorAtValue(const boost::shared_ptr<T>& value){
 		typename ListT::iterator it = stateList.find(value->time_);
@@ -115,9 +119,11 @@ public:
 	}
 
 
-	/***
-	 * returns the iterator at a specific time instant
+	/**
+	 * \brief returns the iterator at a specific time instant
 	 * or an invalid object if the request cannot be satisfied
+	 * \param time the time where we want to get an iterator at
+	 * \returns iterator
 	 */
 	inline typename ListT::iterator getIteratorAtValue(const double& time){
 		typename ListT::iterator it = stateList.find(time);
@@ -128,8 +134,10 @@ public:
 		return it;
 	}
 
-	/***
-	 * returns the iterator closest before a specific time instant
+	/**
+	 * \brief returns the iterator closest before a specific time instant
+	 * \param time the time where we want to get an iterator at
+	 * \returns iterator
 	 */
 	inline typename ListT::iterator getIteratorClosestBefore(const double& statetime){
 		typename ListT::iterator it = stateList.lower_bound(statetime);
@@ -137,15 +145,19 @@ public:
 		return it;
 	};
 
-	/***
-	 * returns the iterator closest after a specific time instant
+	/**
+	 * \brief returns the iterator closest after a specific time instant
+	 * \param time the time where we want to get an iterator at
+	 * \returns iterator
 	 */
 	inline typename ListT::iterator getIteratorClosestAfter(const double& statetime){
 		return  stateList.upper_bound(statetime);
 	};
 
-	/***
-	 * returns the iterator closest to a specific time instant
+	/**
+	 * \brief returns the iterator closest to a specific time instant
+	 * \param time the time where we want to get an iterator at
+	 * \returns iterator
 	 */
 	inline typename ListT::iterator getIteratorClosest(const double& statetime){
 		typename ListT::iterator tauMinus = getIteratorClosestBefore(statetime);
@@ -165,8 +177,10 @@ public:
 		}
 	}
 
-	/***
-	 * returns a pointer to the closest object before a specific time instant
+	/**
+	 * \brief returns a pointer to the closest object before a specific time instant
+	 * \param time the time where we want to get the value at
+	 * \returns shared pointer of the object
 	 */
 	inline boost::shared_ptr<T>& getClosestBefore(const double& statetime){
 		typename ListT::iterator it = stateList.lower_bound(statetime);
@@ -177,9 +191,11 @@ public:
 		return it->second;
 	};
 
-	/***
-	 * returns a pointer to the closest after a specific time instant
+	/**
+	 * \brief returns a pointer to the closest after a specific time instant
 	 * or an invalid object if the request cannot be satisfied
+	 * \param time the time where we want to get the value at
+	 * \returns shared pointer of the object
 	 */
 	inline boost::shared_ptr<T>& getClosestAfter(const double& statetime){
 		typename ListT::iterator it = stateList.upper_bound(statetime);
@@ -189,9 +205,11 @@ public:
 		return  it->second;
 	};
 
-	/***
-	 * returns a pointer to the object at a specific time instant
+	/**
+	 * \brief returns a pointer to the object at a specific time instant
 	 * or an invalid object if the request cannot be satisfied
+	 * \param time the time where we want to get the value at
+	 * \returns shared pointer of the object
 	 */
 	inline boost::shared_ptr<T>& getValueAt(const double& statetime){
 		typename ListT::iterator it = stateList.find(statetime);
@@ -201,8 +219,10 @@ public:
 		return  it->second;
 	};
 
-	/***
-	 * returns a pointer to the closest to a specific time instant
+	/**
+	 * \brief returns a pointer to the closest to a specific time instant
+	 * \param time the time where we want to get the value at
+	 * \returns shared pointer of the object
 	 */
 	inline boost::shared_ptr<T>& getClosest(const double& statetime){
 		boost::shared_ptr<T>& at = getValueAt(statetime); //is there one exactly at this point?
@@ -226,8 +246,10 @@ public:
 		}
 	}
 
-	/***
-	 * Clears all objects having a time stamp older than the supplied time in seconds
+	/**
+	 * \brief Clears all objects having a time stamp older than the supplied time in seconds
+	 * \param time the maximum age of states in the container
+	 * \returns shared pointer of the object
 	 */
 	inline void clearOlderThan(double age){
 		double newest = getLast()->time_;
@@ -238,9 +260,10 @@ public:
 			stateList.erase(stateList.begin(),it);
 	}
 
-	/***
-	 * returns a pointer to the last object in the container
+	/**
+	 * \brief returns a pointer to the last object in the container
 	 * or an invalid object if the container is empty
+	 * \returns shared pointer of the object
 	 */
 	inline boost::shared_ptr<T>& getLast(){
 		if(stateList.empty()){
@@ -251,11 +274,14 @@ public:
 		return (--end)->second;
 	}
 
-	/***
-	 * This function updates the time of an object in the container
+	/**
+	 * \brief This function updates the time of an object in the container
 	 * this function effectively changes the map ordering, so the previous iterators are invalidated
 	 * the attribute unused can be eliminated for non gcc compilers, its just a little more verbose
 	 * in cases where the updated value is not used
+	 * \param timeOld the time of the value to update
+	 * \param timeNew the time to update to
+	 * \returns shared pointer of the object
 	 */
 	inline boost::shared_ptr<T> updateTime(double timeOld, double timeNew) __attribute__ ((warn_unused_result)) {
 		typename ListT::iterator it = stateList.find(timeOld);
@@ -279,8 +305,9 @@ public:
 		return inserted->second;
 	}
 
-	/***
-	 * debug output the contents of the container in a human readable time format
+	/**
+	 * \brief debug output the contents of the container in a human readable time format
+	 * \returns string of the buffer contents with line breaks after every entry
 	 */
 	std::string echoBufferContentTimes(){
 		std::stringstream ss;

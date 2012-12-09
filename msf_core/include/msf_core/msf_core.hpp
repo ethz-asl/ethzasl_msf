@@ -61,8 +61,10 @@ enum{
 
 class MSF_SensorManager;
 
-/***
- * The core class of the EKF doing propagation of state and covariance
+/** \class MSF_Core
+ *
+ * \brief The core class of the EKF
+ * Does propagation of state and covariance
  * but also applying measurements and managing states and measurements
  * in lists sorted by time stamp
  */
@@ -82,26 +84,46 @@ public:
 	typedef msf_core::SortedContainer<msf_core::EKFState> stateBufferT; ///< the type of the state buffer containing all the states
 	typedef msf_core::SortedContainer<msf_core::MSF_MeasurementBase, msf_core::MSF_InvalidMeasurement> measurementBufferT; ///< the type of the measurement buffer containing all the measurements
 
-	///add a sensor measurement or an init measurement to the internal queue and apply it to the state
+	/**
+	 * \brief add a sensor measurement or an init measurement to the internal queue and apply it to the state
+	 * \param measurement the measurement to add to the internal measurement queue
+	 */
 	void addMeasurement(boost::shared_ptr<MSF_MeasurementBase> measurement);
 
-	///initializes the filter with the values of the given measurement, other init values from other sensors can be passed in as "measurement" using the initMeasurement structs
+	/**
+	 * \brief initializes the filter with the values of the given measurement, other init values from other
+	 * sensors can be passed in as "measurement" using the initMeasurement structs
+	 * \param an measurement containing initial values for the state
+	 */
 	void init(boost::shared_ptr<MSF_MeasurementBase> measurement);
 
-	///initialize the HLP based propagation
+	/**
+	 * \brief initialize the HLP based propagation
+	 * \param state the state to send to the HLP
+	 */
 	void initExternalPropagation(boost::shared_ptr<EKFState> state);
 
-	///finds the closest state to the requested time in the internal state buffer
+	/**
+	 * \brief finds the closest state to the requested time in the internal state buffer
+	 * adds the delay defined in the parameter file to the tstamp value
+	 * \param tstamp the time stamp to find the closest state to
+	 * \param delay optional additional delay
+	 */
 	boost::shared_ptr<EKFState> getClosestState(double tstamp, double delay = 0.00);
 
-	///delete very old states and measurements from the buffers to free memory
+	/**
+	 * \brief delete very old states and measurements from the buffers to free memory
+	 */
 	void CleanUpBuffers(){
 		double timeold = 60; //1 min
 		StateBuffer_.clearOlderThan(timeold);
 		MeasurementBuffer_.clearOlderThan(timeold);
 	}
 
-	///sets the covariance matrix of the core states to simulated values
+	/***
+	 * \brief sets the covariance matrix of the core states to simulated values
+	 * \param P the error state covariance Matrix to fill
+	 */
 	void setPCore(Eigen::Matrix<double, msf_core::EKFState::nErrorStatesAtCompileTime, msf_core::EKFState::nErrorStatesAtCompileTime>& P){
 		enum{
 			coreErrorStates = 15 // we might want to calculate this, but on the other hand the values for the matrix later on are anyway hardcoded
@@ -130,8 +152,8 @@ public:
 	}
 
 /**
- * ctor takes a pointer to an object which does the user defined calculations and provides interfaces for initialization etc.
- * DO ABSOLUTELY NOT USE THIS REFERENCE INSIDE THIS CTOR!!
+ * \brief ctor takes a pointer to an object which does the user defined calculations and provides interfaces for initialization etc.
+ * \param usercalc the class providing the user defined calculations DO ABSOLUTELY NOT USE THIS REFERENCE INSIDE THIS CTOR!!
  */
 	MSF_Core(MSF_SensorManager& usercalc);
 	~MSF_Core();
@@ -200,23 +222,40 @@ private:
 
 	sensor_fusion_comm::ExtEkf hl_state_buf_; ///< buffer to store external propagation data
 
-	/// propagates the state with given dt
+	/**
+	 * \brief propagates the state with given dt
+	 * \param state_old the state to propagate from
+	 * \param state_new the state to propagate to
+	 */
 	void propagateState(boost::shared_ptr<EKFState>& state_old, boost::shared_ptr<EKFState>& state_new);
 
-	/// propagates the error state covariance
+	/**
+	 * \brief propagates the error state covariance
+	 * \param state_old the state to propagate the covariance from
+	 * \param state_new the state to propagate the covariance to
+	 */
 	void predictProcessCovariance(boost::shared_ptr<EKFState>& state_old, boost::shared_ptr<EKFState>& state_new);
 
-	/// applies the correction
+	/**
+	 * \brief applies the correction
+	 * \param delaystate the state to apply the correction on
+	 * \param correction the correction vector
+	 * \param fuzzythres the error of the non temporal drifting state allowed before fuzzy tracking will be triggered
+	 */
 	bool applyCorrection(boost::shared_ptr<EKFState>& delaystate, ErrorState & correction, double fuzzythres = 0.1);
 
-	/// propagate covariance to a given state in time
+	/**
+	 * \brief propagate covariance to a given state in time
+	 * \param state the state to propagate to
+	 */
 	void propPToState(boost::shared_ptr<EKFState>& state);
 
-	/// internal state propagation
+	//internal state propagation
 	/**
 	 * This function gets called on incoming imu messages an then performs
 	 * the state prediction internally. Only use this OR stateCallback by
 	 * remapping the topics accordingly.
+	 * \param msg the imu ros message
 	 * \sa{stateCallback}
 	 */
 	void imuCallback(const sensor_msgs::ImuConstPtr & msg);
@@ -226,6 +265,7 @@ private:
 	 * This function gets called when state prediction is performed externally,
 	 * e.g. by asctec_mav_framework. Msg has to be the latest predicted state.
 	 * Only use this OR imuCallback by remapping the topics accordingly.
+	 * \param msg the state message from the external propagation
 	 * \sa{imuCallback}
 	 */
 	void stateCallback(const sensor_fusion_comm::ExtEkfConstPtr & msg);

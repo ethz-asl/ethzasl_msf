@@ -47,8 +47,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace msf_core{
 
-/***
- * visitor pattern to allow the user to set state init values
+/** \class StateVisitor
+ * \brief visitor pattern to allow the user to set state init values
  */
 class StateVisitor{
 public:
@@ -58,8 +58,8 @@ public:
 	virtual ~StateVisitor(){};
 };
 
-/***
- * a state variable with a name as specified in the state name enum
+/** \class StateVar_T
+ * \brief a state variable with a name as specified in the state name enum
  */
 template<typename type_T, int name_T, int STATETYPE>
 struct StateVar_T{
@@ -86,8 +86,8 @@ struct StateVar_T{
 };
 
 
-/***
- * the state vector containing all the state variables for this EKF configuration
+/** \class GenericState_T
+ * \brief the state vector containing all the state variables for this EKF configuration
  */
 template<typename stateSequence_T>
 struct GenericState_T{
@@ -108,16 +108,17 @@ public:
 
 private:
 
-	/***
-	 * returns the stateVar at position INDEX in the state list, non const version only for msf_core use
-	 * you must not make these functions public. Instead const_cast the state object to const to use the overload
+	/**
+	 * \brief returns the stateVar at position INDEX in the state list
+	 * non const version only for msf_core use. You must not make these functions public.
+	 * Instead const_cast the state object to const to use the overload
 	 */
 	template<int INDEX>
 	inline typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type
 	getStateVar();
 
-	/***
-	 * returns the state at position INDEX in the state list, non const version
+	/**
+	 * \brief returns the state at position INDEX in the state list, non const version
 	 * you must not make these functions public. Instead const_cast the state object to const to use the overload
 	 */
 	template<int INDEX>
@@ -145,85 +146,85 @@ public:
 		P_.setZero();
 	}
 
-	/***
-	 * apply the correction vector to all state vars
+	/**
+	 * \brief apply the correction vector to all state vars
 	 */
 	inline void correct(const Eigen::Matrix<double, nErrorStatesAtCompileTime, 1>& correction);
 
-	/***
-	 * returns the Q-block of the state at position INDEX in the state list, not allowed for core states
+	/**
+	 * \brief returns the Q-block of the state at position INDEX in the state list, not allowed for core states
 	 */
 	template<int INDEX>
 	inline typename msf_tmp::StripReference<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::result_t::Q_T&
 	getQBlock();
 
-	/***
-	 * returns the Q-block of the state at position INDEX in the state list, also possible for core states, since const
+	/**
+	 * \brief returns the Q-block of the state at position INDEX in the state list, also possible for core states, since const
 	 */
 	template<int INDEX>
 	inline const typename msf_tmp::StripReference<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::result_t::Q_T&
 	getQBlock() const;
 
 	/**
-	 * resets the state
+	 * \brief reset the state
 	 * 3D vectors: 0; quaternion: unit quaternion; scale: 1; time:0; Error covariance: zeros
 	 */
 	void reset(msf_core::StateVisitor* usercalc);
 
-	/***
-	 * writes the covariance corresponding to position and attitude to cov
+	/**
+	 * \brief write the covariance corresponding to position and attitude to cov
 	 */
 	void getPoseCovariance(geometry_msgs::PoseWithCovariance::_covariance_type & cov); //boost fusion unfortunately doesn't like this to be const
 
-	/*
-	 * assembles a PoseWithCovarianceStamped message from the state
+	/**
+	 * \brief assembles a PoseWithCovarianceStamped message from the state
 	 * it does not set the header
 	 */
 	void toPoseMsg(geometry_msgs::PoseWithCovarianceStamped & pose);
 
-	/***
-	 * assembles an ExtState message from the state
-	 * it does not set the header
+	/**
+	 * \brief assemble an ExtState message from the state
+	 * \note it does not set the header
 	 */
 	void toExtStateMsg(sensor_fusion_comm::ExtState & state);
 
 	/***
-	 * assembles a DoubleArrayStamped message from the state
-	 * it does not set the header
+	 * \brief assemble a DoubleArrayStamped message from the state
+	 * \note it does not set the header
 	 */
 	void toFullStateMsg(sensor_fusion_comm::DoubleArrayStamped & state);
 
-	/***
-	 * assembles a DoubleArrayStamped message from the state
-	 * it does not set the header
+	/**
+	 * \brief assembles a DoubleArrayStamped message from the state
+	 * \note it does not set the header
 	 */
 	void toCoreStateMsg(sensor_fusion_comm::DoubleArrayStamped & state);
 
 
-	/***
-	 * returns the state at position INDEX in the state list, const version
+	/**
+	 * \brief returns the state at position INDEX in the state list, const version
 	 */
 	template<int INDEX>
 	inline const typename msf_tmp::StripReference<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::result_t::value_t&
 	get() const;
 
-	/***
-	 * returns the stateVar at position INDEX in the state list, const version
+	/**
+	 * \brief returns the stateVar at position INDEX in the state list, const version
 	 */
 	template<int INDEX>
 	inline typename msf_tmp::AddConstReference<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::result_t
 	getStateVar() const;
 
-	/***
-	 * sets state at position INDEX in the state list, fails for core states at compile time
+	/**
+	 * \brief sets state at position INDEX in the state list, fails for core states at compile time
 	 */
 	template<int INDEX>
 	inline void
 	set(const typename msf_tmp::StripConstReference<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::result_t::value_t& newvalue);
 };
 
-/***
- * comparator for the state objects. sorts by time asc
+/** \class sortStates
+ * \brief comparator for the state objects. sorts by time asc
  */
 template<typename stateSequence_T>
 class sortStates
