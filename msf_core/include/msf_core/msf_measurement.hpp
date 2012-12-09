@@ -38,25 +38,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace msf_core{
 
-/** \class MSF_MeasurementBase
+/**
  * \brief The base class for all measurement types.
  * These are the objects provided to the EKF core to be applied in correct order to the states
  */
 class MSF_MeasurementBase{
 public:
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-	typedef msf_core::EKFState state_T;
+	typedef msf_core::EKFState state_T; ///<the EKF state type this measurement can be applied to
 	virtual ~MSF_MeasurementBase(){}
+	/**
+	 * \brief the method called by the msf_core to apply the measurement represented by this object
+	 */
 	virtual void apply(boost::shared_ptr<EKFState> stateWithCovariance, MSF_Core& core) = 0;
-	double time_;
+	double time_; ///<the time this measurement was taken
 protected:
-	/// main update routine called by a given sensor, will apply the measurement to the core
+	/**
+	 * main update routine called by a given sensor, will apply the measurement to the state inside the core
+	 */
 	template<class H_type, class Res_type, class R_type>
 	void calculateAndApplyCorrection(boost::shared_ptr<EKFState> state, MSF_Core& core, const Eigen::MatrixBase<H_type>& H_delayed,
 			const Eigen::MatrixBase<Res_type> & res_delayed, const Eigen::MatrixBase<R_type>& R_delayed);
 };
 
-/** \class MSF_InvalidMeasurement
+/**
  * \brief An invalid measurement needed for the measurement container to report if something went wrong
  */
 class MSF_InvalidMeasurement:public MSF_MeasurementBase{
@@ -67,7 +72,7 @@ public:
 	}
 };
 
-/** \class MSF_Measurement
+/**
  * \brief The class for sensor based measurements which we want to apply to
  * a state in the update routine of the EKF. This calls the apply correction
  * method of the EKF core
@@ -89,15 +94,15 @@ public:
 	//apply is implemented by respective sensor measurement types
 };
 
-/** \class MSF_InitMeasurement
+/**
  * \brief A measurement to be send to initialize parts of or the full EKF state
  * this can especially be used to split the initialization of the EKF
  * between multiple sensors which init different parts of the state
  */
 class MSF_InitMeasurement:public MSF_MeasurementBase{
 private:
-	MSF_MeasurementBase::state_T InitState;
-	bool ContainsInitialSensorReadings_;
+	MSF_MeasurementBase::state_T InitState; ///< values for initialization of the state
+	bool ContainsInitialSensorReadings_; ///<flag whether this measurement contains initial sensor readings
 	typedef MSF_MeasurementBase::state_T::stateVector_T stateVector_T;
 public:
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -110,22 +115,39 @@ public:
 	MSF_MeasurementBase::state_T::P_type& get_P(){
 		return InitState.P_;
 	}
+	/**
+	 * \brief get the gyro measurment
+	 */
 	Eigen::Matrix<double, 3, 1>& get_w_m(){
 		return InitState.w_m_;
 	}
+	/**
+	 * \brief get the acceleration measurment
+	 */
 	Eigen::Matrix<double, 3, 1>& get_a_m(){
 		return InitState.a_m_;
 	}
 
+	/**
+	 * \brief set the flag that the state variable at index INDEX has init values for the state
+	 */
 	template<int INDEX, typename T>
 	void setStateInitValue(const T& initvalue){
 		InitState.getStateVar<INDEX>().state_ = initvalue;
 		InitState.getStateVar<INDEX>().hasResetValue = true;
 	}
+
+	/**
+	 * \brief reset the flag that the state variable at index INDEX has init values for the state
+	 */
 	template<int INDEX>
 	void resetStateInitValue(){
 		InitState.get<INDEX>().hasResetValue = false;
 	}
+
+	/**
+	 * \brief get the value stored in this object to initialize a state variable at index INDEX
+	 */
 	template<int INDEX>
 	const typename msf_tmp::StripReference<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::result_t::value_t&
 	getStateInitValue() const {
@@ -136,13 +158,16 @@ public:
 };
 
 
-/** \class sortMeasurements
+/**
  * \brief A comparator to sort measurements by time
  */
 template<typename stateSequence_T>
 class sortMeasurements
 {
 public:
+	/**
+	 * implements the sorting by time
+	 */
 	bool operator() (const MSF_MeasurementBase& lhs, const MSF_MeasurementBase&rhs) const
 	{
 		return (lhs.time_<rhs.time_);

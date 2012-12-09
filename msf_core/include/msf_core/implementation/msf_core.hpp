@@ -51,7 +51,7 @@ MSF_Core::MSF_Core(MSF_SensorManager& usercalc):usercalc_(usercalc)  //the inter
 	g_ << 0, 0, 9.81;
 
 	//TODO later: move all this to the external file and derive from this class. We could by this allow compilation on platforms withour ROS
-	/// ros stuff
+	// ros stuff
 	ros::NodeHandle nh("msf_core");
 	ros::NodeHandle pnh("~");
 

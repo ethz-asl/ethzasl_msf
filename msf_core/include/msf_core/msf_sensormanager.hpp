@@ -118,8 +118,9 @@ public:
 
 };
 
-/***
- * handles a sensor driver w
+/**
+ * \class SensorHandler
+ * \brief handles a sensor driver which provides the sensor readings
  */
 class SensorHandler
 {

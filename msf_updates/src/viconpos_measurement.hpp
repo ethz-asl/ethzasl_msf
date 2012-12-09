@@ -42,7 +42,10 @@ enum{
 	nMeasurements = 9
 };
 }
-
+/**
+ * \class ViconMeasurement
+ * \brief a measurement as provided by the vicon tracking system
+ */
 struct ViconMeasurement:public msf_core::MSF_Measurement<geometry_msgs::TransformStamped, nMeasurements>{
 private:
 	virtual void makeFromSensorReadingImpl(geometry_msgs::TransformStampedConstPtr msg, bool fixedCovariance){
@@ -74,6 +77,9 @@ public:
 	ViconMeasurement(double n_zp){
 		n_zp_ = n_zp;
 	};
+	/**
+	 * the method called by the msf_core to apply the measurement represented by this object
+	 */
 	virtual void apply(boost::shared_ptr<state_T> state, msf_core::MSF_Core& core){
 		// init variables
 		Eigen::Matrix<double,nMeasurements,msf_core::MSF_Core::nErrorStatesAtCompileTime> H_old;

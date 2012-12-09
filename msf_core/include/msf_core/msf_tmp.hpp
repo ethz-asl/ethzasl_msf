@@ -75,11 +75,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //this namespace contains some metaprogramming tools
 namespace msf_tmp{
 
-/***
- * output a compile time constant
+/**
+ * \brief output a compile time constant by overflowing a char, producing a warning
  */
 template<size_t size>
 struct overflow{ operator char() { return size + 9999; } }; //always overflow, also for negative values
+/**
+ * \brief output a compile time constant
+ */
 template<int VALUE>
 void echoCompileTimeConstant()
 {
@@ -87,28 +90,41 @@ void echoCompileTimeConstant()
 	return;
 }
 
-/***
- * runtime output of stateVariable types
+/**
+ * \brief runtime output of stateVariable types
  */
 template<typename T> struct echoStateVarType;
+
+/**
+ * \brief runtime output of stateVariable types for const ref eigen matrices
+ */
 template<int NAME, int N, int STATETYPE>
 struct echoStateVarType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE>&>{
 	static std::string value(){
 		return "const ref Eigen::Matrix<double, "+boost::lexical_cast<std::string>(N)+", 1>";
 	}
 };
+/**
+ * \brief runtime output of stateVariable types for const ref eigen quaternions
+ */
 template<int NAME, int STATETYPE>
 struct echoStateVarType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE>&>{
 	static std::string value(){
 		return "const ref Eigen::Quaterniond";
 	}
 };
+/**
+ * \brief runtime output of stateVariable types for eigen matrices
+ */
 template<int NAME, int N, int STATETYPE>
 struct echoStateVarType<msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE> >{
 	static std::string value(){
 		return "Eigen::Matrix<double, "+boost::lexical_cast<std::string>(N)+", 1>";
 	}
 };
+/**
+ * \brief runtime output of stateVariable types for eigen matrices
+ */
 template<int NAME, int STATETYPE>
 struct echoStateVarType<msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE> >{
 	static std::string value(){
@@ -280,7 +296,9 @@ struct isQuaternionType<mpl_::void_>{
 	enum{value = false};
 };
 
-//return whether a state is nontemporaldrifting
+/**
+ * \brief return whether a state is nontemporaldrifting
+ */
 template<typename T>
 struct getStateIsNonTemporalDrifting;
 template<typename U,int NAME, int STATETYPE>
@@ -300,7 +318,9 @@ template<> struct getStateIsNonTemporalDrifting<mpl_::void_>{
 	enum{value = false};
 };
 
-
+/**
+ * \brief count some entity in the state vector using the counter class provided
+ */
 template <typename Sequence,  template<typename> class Counter, typename First, typename Last, bool T>
 struct countStatesLinear;
 template <typename Sequence,  template<typename> class Counter, typename First, typename Last>
@@ -321,7 +341,9 @@ struct countStatesLinear<Sequence, Counter, First, Last, false>{
 	};
 };
 
-//helpers for CheckCorrectIndexing call{
+/**
+ * \brief helpers for CheckCorrectIndexing call{
+ */
 template <typename Sequence, typename First, typename Last, int CurrentIdx, bool T>
 struct CheckStateIndexing;
 template <typename Sequence, typename First, typename Last, int CurrentIdx>
@@ -355,12 +377,17 @@ private:
 };
 //}
 
+/**
+ * \brief return the state type of a given enum value
+ */
 template<typename TypeList, int INDEX>
 struct getEnumStateType{
 	typedef typename boost::fusion::result_of::at_c<TypeList, INDEX >::type value;
 };
 
-//helper for getStartIndex{
+/**
+ * \brief helper for getStartIndex{
+ */
 template <typename Sequence, typename StateVarT, template<typename> class OffsetCalculator,
 typename First, typename Last, bool TypeFound, int CurrentVal, bool EndOfList>
 struct ComputeStartIndex;
@@ -396,7 +423,9 @@ struct ComputeStartIndex<Sequence, StateVarT, OffsetCalculator, First, Last, fal
 
 
 
-//helper for find best nontemporal drifting state{
+/**
+ * \brief helper for find best nontemporal drifting state{
+ */
 template <typename Sequence, typename First, typename Last, int CurrentBestIdx, bool foundQuaternion, bool EndOfList>
 struct FindBestNonTemporalDriftingStateImpl;
 template <typename Sequence, typename First, typename Last, int CurrentBestIdx, bool foundQuaternion>
@@ -431,8 +460,11 @@ struct FindBestNonTemporalDriftingStateImpl<Sequence, First, Last, CurrentBestId
 
 } //end anonymous namespace
 
-//checks whether the ordering in the vector is the same as in the enum,
-//which is something that strictly must not change
+/**
+ * \brief checks whether the ordering in the vector is the same as in the enum
+ *
+ * this ordering is something that strictly must not change
+ */
 template<typename Sequence>
 struct CheckCorrectIndexing{
 	typedef typename boost::fusion::result_of::begin<Sequence const>::type First;
@@ -450,10 +482,14 @@ public:
 };
 
 
-//the goal of this tmp code is to find the best nontemporal drifting state in the
-//full state vector at compile time. We therefore search the state variable list
-//for states that the user has marked as non temporal drifting. If furthermore
-//prefer quaternions over euclidean states. This function will return -1 if no suitable state has been found
+/**
+ * \brief find the best nontemporal drifting state in the full state vector at compile time
+ *
+ * the goal of this tmp code is to find the best nontemporal drifting state in the
+ * full state vector at compile time. We therefore search the state variable list
+ * for states that the user has marked as non temporal drifting. If furthermore
+ * prefer quaternions over euclidean states. This function will return -1 if no suitable state has been found
+ */
 template<typename Sequence>
 struct IndexOfBestNonTemporalDriftingState{
 	typedef typename boost::fusion::result_of::begin<Sequence const>::type First;
@@ -472,8 +508,10 @@ public:
 	};
 };
 
-//returns the number of doubles in the state/correction state
-//depending on the counter type supplied
+/**
+ * \brief returns the number of doubles in the state/correction state
+ * depending on the counter type supplied
+ */
 template<typename Sequence,  template<typename> class Counter>
 struct CountStates{
 	typedef typename boost::fusion::result_of::begin<Sequence const>::type First;
@@ -486,7 +524,9 @@ struct CountStates{
 	};
 };
 
-//compute start indices in the correction/state vector of a given type
+/**
+ * \brief compute start indices in the correction/state vector of a given type
+ */
 template<typename Sequence, typename StateVarT, template<typename> class Counter>
 struct getStartIndex{
 	typedef typename boost::fusion::result_of::begin<Sequence const>::type First;
@@ -500,7 +540,9 @@ struct getStartIndex{
 	};
 };
 
-//reset the EKF state
+/**
+ * \brief reset the EKF state in a boost fusion unrolled call
+ */
 struct resetState
 {
 	template<int NAME, int N, int STATETYPE>
@@ -515,7 +557,10 @@ struct resetState
 	}
 };
 
-//copy states from previous to current states, for which there is no propagation
+/**
+ * \brief copy states from previous to current states, for which there is no propagation
+ * in a boost fusion unrolled call
+ */
 template<typename stateT>
 struct copyInitStates
 {
@@ -532,7 +577,9 @@ private:
 };
 
 
-//copy states from previous to current states, for which there is no propagation
+/**
+ * \brief copy states from previous to current states, for which there is no propagation
+ */
 template<typename stateT>
 struct copyNonPropagationStates
 {
@@ -557,7 +604,9 @@ private:
 	const stateT& oldstate_;
 };
 
-//copy the user calculated values in the Q-blocks to the main Q matrix
+/**
+ * \brief copy the user calculated values in the Q-blocks to the main Q matrix
+ */
 template<typename stateList_T>
 struct copyQBlocksFromAuxiliaryStatesToQ
 {
@@ -597,7 +646,9 @@ private:
 	Q_T& Q_;
 };
 
-//apply EKF corrections depending on the stateVar type
+/**
+ * \brief apply EKF corrections depending on the stateVar type
+ */
 template<typename T, typename stateList_T>
 struct correctState
 {
@@ -635,7 +686,9 @@ private:
 	T& data_;
 };
 
-//copies the values of the single state vars to the double array provided
+/**
+ * \brief copies the values of the single state vars to the double array provided
+ */
 template<typename T, typename stateList_T>
 struct CoreStatetoDoubleArray
 {
@@ -689,8 +742,9 @@ private:
 	T& data_;
 };
 
-//some easy access to indices
-//return the index of a given state variable number in the state matrices
+/**
+ * \brief return the index of a given state variable number in the state matrices
+ */
 template<typename stateVector_T, int INDEX>
 struct getStateIndexInState{
 	typedef typename msf_tmp::getEnumStateType<stateVector_T, INDEX>::value state_type;
@@ -699,7 +753,9 @@ struct getStateIndexInState{
 	};
 };
 
-//return the index of a given state variable number in the error state matrices
+/**
+ * \brief return the index of a given state variable number in the error state matrices
+ */
 template<typename stateVector_T,int INDEX>
 struct getStateIndexInErrorState{
 	typedef typename msf_tmp::getEnumStateType<stateVector_T, INDEX>::value state_type;
@@ -709,7 +765,9 @@ struct getStateIndexInErrorState{
 };
 
 
-//copies the values of the single state vars to the double array provided
+/**
+ * \brief copies the values of the single state vars to the double array provided
+ */
 template<typename T, typename stateList_T>
 struct FullStatetoDoubleArray
 {

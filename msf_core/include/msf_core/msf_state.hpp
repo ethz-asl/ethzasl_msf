@@ -7,12 +7,12 @@ All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-* Redistributions of source code must retain the above copyright
+ * Redistributions of source code must retain the above copyright
 notice, this list of conditions and the following disclaimer.
-* Redistributions in binary form must reproduce the above copyright
+ * Redistributions in binary form must reproduce the above copyright
 notice, this list of conditions and the following disclaimer in the
 documentation and/or other materials provided with the distribution.
-* Neither the name of ETHZ-ASL nor the
+ * Neither the name of ETHZ-ASL nor the
 names of its contributors may be used to endorse or promote products
 derived from this software without specific prior written permission.
 
@@ -27,7 +27,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-*/
+ */
 
 
 
@@ -47,18 +47,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace msf_core{
 
-/** \class StateVisitor
+/**
  * \brief visitor pattern to allow the user to set state init values
  */
 class StateVisitor{
 public:
-	//the state is set to zero/identity, this method will be called to
-	//give the user the possibility to change the reset values of some states
+	/**
+	 * \brief the state is set to zero/identity, this method will be called to
+	 * give the user the possibility to change the reset values of some states
+	 */
 	virtual void resetState(msf_core::EKFState& state)=0;
 	virtual ~StateVisitor(){};
 };
 
-/** \class StateVar_T
+/**
  * \brief a state variable with a name as specified in the state name enum
  */
 template<typename type_T, int name_T, int STATETYPE>
@@ -86,7 +88,7 @@ struct StateVar_T{
 };
 
 
-/** \class GenericState_T
+/**
  * \brief the state vector containing all the state variables for this EKF configuration
  */
 template<typename stateSequence_T>
@@ -95,7 +97,7 @@ struct GenericState_T{
 	friend class msf_core::copyNonPropagationStates<GenericState_T>;
 	friend class msf_core::MSF_InitMeasurement;
 public:
-	typedef stateSequence_T stateVector_T;
+	typedef stateSequence_T stateVector_T; ///<the state vector defining the state variables of this EKF
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 	enum{
 		nStateVarsAtCompileTime = boost::fusion::result_of::size<stateVector_T>::type::value, ///<n state vars
@@ -222,17 +224,20 @@ public:
 	set(const typename msf_tmp::StripConstReference<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::result_t::value_t& newvalue);
 };
 
-/** \class sortStates
+/**
  * \brief comparator for the state objects. sorts by time asc
  */
 template<typename stateSequence_T>
 class sortStates
 {
 public:
-  bool operator() (const GenericState_T<stateSequence_T>& lhs, const GenericState_T<stateSequence_T>&rhs) const
-  {
-    return (lhs.time_<rhs.time_);
-  }
+	/**
+	 * \brief implements the sorting by time
+	 */
+	bool operator() (const GenericState_T<stateSequence_T>& lhs, const GenericState_T<stateSequence_T>&rhs) const
+	{
+		return (lhs.time_<rhs.time_);
+	}
 };
 
 }

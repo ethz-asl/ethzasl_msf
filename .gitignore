@@ -8,6 +8,7 @@ cfg/cpp/*
 .project
 .cproject
 .settings
+doc
 
 
 /msf_core/docs/MSF_CoreConfig.dox

@@ -34,12 +34,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <msf_core/msf_tools.hpp>
 
-/** \class SortedContainer
+namespace msf_core{
+/**
  * \brief Manages a sorted container with strict less than ordering
  * used to store state and measurement objects which can then be queried
  * for closest states/measurements to a given time instant
  */
-namespace msf_core{
 template<typename T, typename PrototypeInvalidT = T>
 class SortedContainer{
 

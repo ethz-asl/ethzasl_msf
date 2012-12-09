@@ -70,13 +70,13 @@ class MSF_SensorManager;
  */
 class MSF_Core
 {
+	friend class MSF_MeasurementBase;
 	bool initialized_; ///< is the filter initialized, so that we can propagate the state?
 	bool predictionMade_; ///< is there a state prediction, so we can apply measurements?
 public:
-	friend class MSF_MeasurementBase;
 	enum{
-		nErrorStatesAtCompileTime = msf_core::EKFState::nErrorStatesAtCompileTime,  ///< error state
-		nStatesAtCompileTime = msf_core::EKFState::nStatesAtCompileTime ///< complete state
+		nErrorStatesAtCompileTime = msf_core::EKFState::nErrorStatesAtCompileTime,  ///< error state length
+		nStatesAtCompileTime = msf_core::EKFState::nStatesAtCompileTime ///< complete state length
 	};
 	typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, 1> ErrorState; ///< the error state type
 	typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> ErrorStateCov; ///<the error state covariance type
@@ -93,7 +93,7 @@ public:
 	/**
 	 * \brief initializes the filter with the values of the given measurement, other init values from other
 	 * sensors can be passed in as "measurement" using the initMeasurement structs
-	 * \param an measurement containing initial values for the state
+	 * \param measurement a measurement containing initial values for the state
 	 */
 	void init(boost::shared_ptr<MSF_MeasurementBase> measurement);
 
@@ -120,7 +120,7 @@ public:
 		MeasurementBuffer_.clearOlderThan(timeold);
 	}
 
-	/***
+	/**
 	 * \brief sets the covariance matrix of the core states to simulated values
 	 * \param P the error state covariance Matrix to fill
 	 */
@@ -163,7 +163,6 @@ private:
 	Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> Fd_; ///< discrete state propagation matrix
 	Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> Qd_; ///< discrete propagation noise matrix
 
-	/// state variables
 	stateBufferT StateBuffer_; ///<EKF buffer containing pretty much all info needed at time t. sorted by t asc
 	measurementBufferT MeasurementBuffer_; ///< EKF Measurements and init values sorted by t asc
 
@@ -177,7 +176,9 @@ private:
 
 	/// vision-world drift watch dog to determine fuzzy tracking
 
-	//get the index of the best state having no temporal drift at compile time
+	/**
+	 * \brief get the index of the best state having no temporal drift at compile time
+	 */
 	enum{
 		indexOfStateWithoutTemporalDrift = msf_tmp::IndexOfBestNonTemporalDriftingState<msf_core::fullState_T>::value
 	};
