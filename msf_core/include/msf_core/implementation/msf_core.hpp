@@ -339,8 +339,6 @@ void MSF_Core::propagateState(boost::shared_ptr<EKFState>& state_old, boost::sha
 	state_new->get<msf_core::v_>() = state_old->get<msf_core::v_>() + (dv - g_) * dt;
 	state_new->get<msf_core::p_>() = state_old->get<msf_core::p_>() + ((state_new->get<msf_core::v_>() + state_old->get<msf_core::v_>()) / 2 * dt);
 
-	ROS_INFO_STREAM("state after prop: "<<state_new->get<msf_core::p_>().transpose());
-
 }
 
 
@@ -432,7 +430,10 @@ void MSF_Core::init(boost::shared_ptr<MSF_MeasurementBase> measurement){
 			msf_tmp::resetState()
 	);
 
-	//apply init measurement
+	//set intialial covariance for core states
+	setPCore(state->P_);
+
+	//apply init measurement, where the user can provide additional values for P
 	measurement->apply(state, *this);
 
 	StateBuffer_.insert(state);

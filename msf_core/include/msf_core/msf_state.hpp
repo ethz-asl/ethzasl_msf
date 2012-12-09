@@ -132,6 +132,7 @@ public:
 
 	GenericState_T(){
 		time_ = -1;
+		P_.setZero();
 	}
 
 	//apply the correction vector to all state vars
