@@ -56,6 +56,7 @@ private:
 	std::vector<CallbackType> callbacks_; ///<callbacks where the core can register to retrieve parameter changes
 
 public:
+	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 	/**
 	 * \brief registers dynamic reconfigure callbacks

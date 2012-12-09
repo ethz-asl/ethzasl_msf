@@ -47,6 +47,7 @@ enum{
 };
 
 //forwards
+
 //state variable
 template<typename type_T, int name_T, int STATETYPE = Auxiliary>
 struct StateVar_T;

@@ -127,7 +127,6 @@ private:
 
 public:
 
-
 	typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> P_type; ///< type of the error state covariance matrix
 
 	stateVector_T statevars_; ///< the actual state variables

@@ -80,6 +80,7 @@ private:
 protected:
 	Eigen::Matrix<double, MEASUREMENTSIZE, MEASUREMENTSIZE> R_;
 public:
+	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 	virtual ~MSF_Measurement(){};
 	void makeFromSensorReading(boost::shared_ptr<T const> reading, bool fixedCovariance){
 		time_ = reading->header.stamp.toSec();

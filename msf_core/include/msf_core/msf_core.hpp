@@ -198,7 +198,7 @@ private:
 	 */
 	bool data_playback_;
 
-	MSF_SensorManager& usercalc_; //a function which provides methods for customization
+	MSF_SensorManager& usercalc_; //a class which provides methods for customization of several calculations
 
 	enum
 	{
@@ -246,15 +246,15 @@ private:
 
 	/**
 	 * \brief propagate covariance to a given state in time
-	 * \param state the state to propagate to
+	 * \param state the state to propagate to from the last propagated time
 	 */
 	void propPToState(boost::shared_ptr<EKFState>& state);
 
 	//internal state propagation
 	/**
-	 * This function gets called on incoming imu messages an then performs
-	 * the state prediction internally. Only use this OR stateCallback by
-	 * remapping the topics accordingly.
+	 * \brief This function gets called on incoming imu messages
+	 * and then performs the state prediction internally.
+	 * Only use this OR stateCallback by remapping the topics accordingly.
 	 * \param msg the imu ros message
 	 * \sa{stateCallback}
 	 */
@@ -262,7 +262,7 @@ private:
 
 	/// external state propagation
 	/**
-	 * This function gets called when state prediction is performed externally,
+	 * \brief This function gets called when state prediction is performed externally,
 	 * e.g. by asctec_mav_framework. Msg has to be the latest predicted state.
 	 * Only use this OR imuCallback by remapping the topics accordingly.
 	 * \param msg the state message from the external propagation
