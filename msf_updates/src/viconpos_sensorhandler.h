@@ -55,7 +55,7 @@ private:
 	void noiseConfig(msf_core::MSF_CoreConfig& config, uint32_t level);
 public:
 	ViconPosSensorHandler();
-	ViconPosSensorHandler(msf_core::MSF_SensorManager* meas);
+	ViconPosSensorHandler(msf_core::MSF_SensorManager& meas);
 	//used for the init
 	Eigen::Matrix<double, 3, 1> getPositionMeasurement(){
 		return z_p_;

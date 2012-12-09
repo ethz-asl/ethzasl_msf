@@ -75,7 +75,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //this namespace contains some metaprogramming tools
 namespace msf_tmp{
 
-//output a compile time constant
+/***
+ * output a compile time constant
+ */
 template<size_t size>
 struct overflow{ operator char() { return size + 9999; } }; //always overflow, also for negative values
 template<int VALUE>
@@ -85,7 +87,9 @@ void echoCompileTimeConstant()
 	return;
 }
 
-//runtime output of stateVariable types
+/***
+ * runtime output of stateVariable types
+ */
 template<typename T> struct echoStateVarType;
 template<int NAME, int N, int STATETYPE>
 struct echoStateVarType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE>&>{

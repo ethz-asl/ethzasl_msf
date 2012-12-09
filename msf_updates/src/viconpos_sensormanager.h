@@ -44,7 +44,7 @@ class ViconPositionSensorManager: public msf_core::MSF_SensorManagerROS
 public:
 	ViconPositionSensorManager()
 	{
-		viconPosHandler_.reset(new ViconPosSensorHandler(this));
+		viconPosHandler_.reset(new ViconPosSensorHandler(*this));
 		addHandler(viconPosHandler_);
 
 		// setup: initial pos, att, of measurement sensor

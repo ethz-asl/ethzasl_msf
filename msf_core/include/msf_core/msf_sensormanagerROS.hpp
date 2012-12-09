@@ -43,20 +43,23 @@ namespace msf_core{
 
 typedef dynamic_reconfigure::Server<msf_core::MSF_CoreConfig> ReconfigureServer;
 
-//abstract class defining user configurable calculations for the msf_core with ROS interfaces
+/***
+ * abstract class defining user configurable calculations for the msf_core with ROS interfaces
+ */
 struct MSF_SensorManagerROS:public msf_core::MSF_SensorManager{
 protected:
-	/// dynamic reconfigure config
-	msf_core::MSF_CoreConfig config_;
+	msf_core::MSF_CoreConfig config_; ///< dynamic reconfigure config
 private:
-	// dynamic reconfigure
-	ReconfigureServer *reconfServer_;
+
+	ReconfigureServer *reconfServer_; ///< dynamic reconfigure server
 	typedef boost::function<void(msf_core::MSF_CoreConfig& config, uint32_t level)> CallbackType;
-	std::vector<CallbackType> callbacks_;
+	std::vector<CallbackType> callbacks_; ///<callbacks where the core can register to retrieve parameter changes
 
 public:
 
-	/// registers dynamic reconfigure callbacks
+	/***
+	 * registers dynamic reconfigure callbacks
+	 */
 	template<class T>
 	void registerCallback(void(T::*cb_func)(msf_core::MSF_CoreConfig& config, uint32_t level), T* p_obj)
 	{
@@ -75,7 +78,9 @@ public:
 		delete reconfServer_;
 	}
 
-	/// gets called by dynamic reconfigure and calls all registered callbacks in callbacks_
+	/***
+	 * gets called by dynamic reconfigure and calls all registered callbacks in callbacks_
+	 */
 	void Config(msf_core::MSF_CoreConfig &config, uint32_t level)
 	{
 		config_ = config;
@@ -83,6 +88,9 @@ public:
 			(*it)(config, level);
 	}
 
+	/***
+	 * gets called by the internal callback caller
+	 */
 	virtual void DynConfig(msf_core::MSF_CoreConfig &config, uint32_t level){
 		if(level & msf_core::MSF_Core_INIT_FILTER)
 		{
@@ -91,6 +99,7 @@ public:
 		}
 	}
 
+	//parameter getters
 	virtual bool getParam_fixed_bias(){
 		return config_.fixed_bias;
 	}

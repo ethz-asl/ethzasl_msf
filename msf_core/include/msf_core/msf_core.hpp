@@ -61,37 +61,47 @@ enum{
 
 class MSF_SensorManager;
 
+/***
+ * The core class of the EKF doing propagation of state and covariance
+ * but also applying measurements and managing states and measurements
+ * in lists sorted by time stamp
+ */
 class MSF_Core
 {
-	bool initialized_;
-	bool predictionMade_;
+	bool initialized_; ///< is the filter initialized, so that we can propagate the state?
+	bool predictionMade_; ///< is there a state prediction, so we can apply measurements?
 public:
 	friend class MSF_MeasurementBase;
 	enum{
 		nErrorStatesAtCompileTime = msf_core::EKFState::nErrorStatesAtCompileTime,  ///< error state
 		nStatesAtCompileTime = msf_core::EKFState::nStatesAtCompileTime ///< complete state
 	};
-	typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, 1> ErrorState;
-	typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> ErrorStateCov;
+	typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, 1> ErrorState; ///< the error state type
+	typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> ErrorStateCov; ///<the error state covariance type
 
-	typedef msf_core::SortedContainer<msf_core::EKFState> stateBufferT;
-	typedef msf_core::SortedContainer<msf_core::MSF_MeasurementBase, msf_core::MSF_InvalidMeasurement> measurementBufferT;
+	typedef msf_core::SortedContainer<msf_core::EKFState> stateBufferT; ///< the type of the state buffer containing all the states
+	typedef msf_core::SortedContainer<msf_core::MSF_MeasurementBase, msf_core::MSF_InvalidMeasurement> measurementBufferT; ///< the type of the measurement buffer containing all the measurements
 
+	///add a sensor measurement or an init measurement to the internal queue and apply it to the state
 	void addMeasurement(boost::shared_ptr<MSF_MeasurementBase> measurement);
 
+	///initializes the filter with the values of the given measurement, other init values from other sensors can be passed in as "measurement" using the initMeasurement structs
 	void init(boost::shared_ptr<MSF_MeasurementBase> measurement);
 
+	///initialize the HLP based propagation
 	void initExternalPropagation(boost::shared_ptr<EKFState> state);
 
+	///finds the closest state to the requested time in the internal state buffer
 	boost::shared_ptr<EKFState> getClosestState(double tstamp, double delay = 0.00);
 
-	//delete very old states and measurements from the buffers to free memory
+	///delete very old states and measurements from the buffers to free memory
 	void CleanUpBuffers(){
 		double timeold = 60; //1 min
 		StateBuffer_.clearOlderThan(timeold);
 		MeasurementBuffer_.clearOlderThan(timeold);
 	}
 
+	///sets the covariance matrix of the core states to simulated values
 	void setPCore(Eigen::Matrix<double, msf_core::EKFState::nErrorStatesAtCompileTime, msf_core::EKFState::nErrorStatesAtCompileTime>& P){
 		enum{
 			coreErrorStates = 15 // we might want to calculate this, but on the other hand the values for the matrix later on are anyway hardcoded
@@ -119,8 +129,11 @@ public:
 		P.block<coreErrorStates, coreErrorStates>(0,0) = P_core;
 	}
 
-
-	MSF_Core(MSF_SensorManager* usercalc);
+/**
+ * ctor takes a pointer to an object which does the user defined calculations and provides interfaces for initialization etc.
+ * DO ABSOLUTELY NOT USE THIS REFERENCE INSIDE THIS CTOR!!
+ */
+	MSF_Core(MSF_SensorManager& usercalc);
 	~MSF_Core();
 
 
@@ -129,10 +142,10 @@ private:
 	Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> Qd_; ///< discrete propagation noise matrix
 
 	/// state variables
-	stateBufferT StateBuffer_; ///<EKF buffer containing pretty much all info needed at time t
-	measurementBufferT MeasurementBuffer_; ///<EKF Measurement
+	stateBufferT StateBuffer_; ///<EKF buffer containing pretty much all info needed at time t. sorted by t asc
+	measurementBufferT MeasurementBuffer_; ///< EKF Measurements and init values sorted by t asc
 
-	double time_P_propagated;
+	double time_P_propagated; ///< last time stamp where we have a valid propagation
 
 	Eigen::Matrix<double, 3, 1> g_; ///< gravity vector
 
@@ -151,7 +164,7 @@ private:
 	const static int qbuffRowsAtCompiletime = msf_tmp::StateLengthForType<const msf_tmp::StripConstReference<nonDriftingStateType>::result_t&>::value;
 
 	const static int nBuff_ = 30; ///< buffer size for median q_vw
-	int nontemporaldrifting_inittimer_;
+	int nontemporaldrifting_inittimer_; ///< a counter for fuzzy tracking detection
 	Eigen::Matrix<double, nBuff_, qbuffRowsAtCompiletime> qbuff_; //if there is no non temporal drifting state this matrix will have zero rows, to make use of it illegal
 
 
@@ -163,7 +176,7 @@ private:
 	 */
 	bool data_playback_;
 
-	MSF_SensorManager* usercalc_; //a function which provides methods for customization
+	MSF_SensorManager& usercalc_; //a function which provides methods for customization
 
 	enum
 	{
@@ -190,7 +203,7 @@ private:
 	/// propagates the state with given dt
 	void propagateState(boost::shared_ptr<EKFState>& state_old, boost::shared_ptr<EKFState>& state_new);
 
-	/// propagets the error state covariance
+	/// propagates the error state covariance
 	void predictProcessCovariance(boost::shared_ptr<EKFState>& state_old, boost::shared_ptr<EKFState>& state_new);
 
 	/// applies the correction

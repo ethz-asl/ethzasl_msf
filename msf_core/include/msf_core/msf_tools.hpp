@@ -33,7 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MSF_TOOLS_HPP_
 
 namespace msf_core{
-/// computes the median of a given vector
+/***
+ * computes the median of a given vector
+ */
 template<typename T>
 double getMedian(const T & data)
 {
@@ -55,6 +57,9 @@ double getMedian(const T & data)
 		return 0;
 }
 
+/***
+ * output the time in seconds in a human readable format for debugging
+ */
 double timehuman(double val){
 	return val - floor(val/1000.)*1000;
 }

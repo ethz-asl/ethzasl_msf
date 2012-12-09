@@ -39,6 +39,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace msf_core{
 
+/*
+ * This file contains the state definition of the EKF
+ */
+
 enum{ //must not manually set the enum values!
 	p_,
 	v_,
@@ -55,7 +59,9 @@ enum{ //must not manually set the enum values!
 namespace{
 
 
-//setup core state, then auxiliary state
+/***
+ * setup core state, then auxiliary state
+ */
 typedef boost::fusion::vector<
 		// states varying during propagation - must not change the ordering here for now, CalcQ has the ordering hardcoded
 		StateVar_T<Eigen::Matrix<double, 3, 1>, p_, CoreStateWithPropagation>,				///< position (IMU centered)          (0-2 / 0-2)
@@ -74,7 +80,7 @@ typedef boost::fusion::vector<
 > fullState_T;
 }
 
-typedef GenericState_T<msf_core::fullState_T> EKFState;
+typedef GenericState_T<msf_core::fullState_T> EKFState; ///<the state we want to use in this EKF
 typedef boost::shared_ptr<EKFState> EKFStatePtr;
 typedef boost::shared_ptr<const EKFState> EKFStateConstPtr;
 

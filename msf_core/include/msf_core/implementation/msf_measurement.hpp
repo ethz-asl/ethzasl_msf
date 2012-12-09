@@ -75,9 +75,9 @@ void MSF_InitMeasurement::apply(boost::shared_ptr<EKFState> stateWithCovariance,
 
 	if(! (InitState.P_.minCoeff() == 0 && InitState.P_.maxCoeff() == 0)){
 		stateWithCovariance->P_ = InitState.P_;
-		ROS_WARN_STREAM("Using user defined initial system noise covariance");
+		ROS_WARN_STREAM("Using user defined initial error state covariance");
 	}else{
-		ROS_WARN_STREAM("Using simulated core plus fixed diag initial system noise covariance");
+		ROS_WARN_STREAM("Using simulated core plus fixed diag initial error state covariance");
 	}
 
 	if(ContainsInitialSensorReadings_){

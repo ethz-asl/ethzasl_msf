@@ -34,14 +34,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <msf_core/msf_tools.hpp>
 
+/***
+ * A class managing a sorted container with strict less than ordering
+ * used to store state and measurement objects which can then be queried
+ * for closest states/measurements to a given time instant
+ */
 namespace msf_core{
 template<typename T, typename PrototypeInvalidT = T>
 class SortedContainer{
 
 private:
-	typedef std::map<double, boost::shared_ptr<T> > ListT;
-	ListT stateList;
-	boost::shared_ptr<T> invalid;
+	typedef std::map<double, boost::shared_ptr<T> > ListT; ///< the container type in which to store the data
+	ListT stateList; ///< the container in which all the data is stored
+	boost::shared_ptr<T> invalid; ///< a object to signal requests which cannot be satisfied
 public:
 	typedef typename ListT::iterator iterator_T;
 
@@ -49,39 +54,60 @@ public:
 		invalid.reset(new PrototypeInvalidT());
 		invalid->time_ = -1;
 	}
-
+	/***
+	 * returns an invalid object used to signal that a request could not be satisfied
+	 */
 	inline boost::shared_ptr<T>& getInvalid(){
 		return invalid;
 	}
 
+	/***
+	 * clears the internal container, dropping all the contents
+	 */
 	inline void clear(){
 		stateList.clear();
 	}
 
+	/***
+	 * returns the size of the internal container
+	 */
 	inline typename ListT::size_type size(){
 		return stateList.size();
 	}
 
+	/***
+	 * insert an object to the internal container to the position not violating the internal strict less than ordering by time
+	 */
 	inline typename ListT::iterator insert(const boost::shared_ptr<T>& value){
 		std::pair<typename ListT::iterator,bool> itpr =
 				stateList.insert(std::pair<double, boost::shared_ptr<T> >(value->time_, value));
 		if(!itpr.second){
-			ROS_WARN_STREAM("Wanted to insert a measurement at time "<<value->time_<<" but the map already contained a measurement at this time. discarding.");
+			ROS_WARN_STREAM("Wanted to insert a value to the sorted container at time "<<value->time_<<" but the map already contained a value at this time. discarding.");
 		}
 		return itpr.first;
 	}
 
+	/***
+	 * returns the iterator at the beginning of the internal container
+	 */
 	inline typename ListT::iterator getIteratorBegin(){
 		return stateList.begin();
 	}
 
+	/***
+	 * returns the iterator at the end of the internal container
+	 */
 	inline typename ListT::iterator getIteratorEnd(){
 		return stateList.end();
 	}
 
+	/***
+	 * returns the iterator at the specific time instant of the supplied object
+	 * or an invalid object if the request cannot be satisfied
+	 */
 	inline typename ListT::iterator getIteratorAtValue(const boost::shared_ptr<T>& value){
 		typename ListT::iterator it = stateList.find(value->time_);
-		if(it==stateList.end()){ //this state is not known
+		if(it==stateList.end()){ //there is no value in the map with this time
 			ROS_WARN_STREAM("getIteratorAtValue(state): Could not find value for time "<<value->time_<<"");
 			it = stateList.lower_bound(value->time_);
 		}
@@ -89,25 +115,38 @@ public:
 	}
 
 
+	/***
+	 * returns the iterator at a specific time instant
+	 * or an invalid object if the request cannot be satisfied
+	 */
 	inline typename ListT::iterator getIteratorAtValue(const double& time){
 		typename ListT::iterator it = stateList.find(time);
-		if(it==stateList.end()){ //this state is not known
+		if(it==stateList.end()){ //there is no value in the map with this time
 			ROS_WARN_STREAM("getIteratorAtValue(double): Could not find value for time "<<time<<"");
 			it = stateList.lower_bound(time);
 		}
 		return it;
 	}
 
+	/***
+	 * returns the iterator closest before a specific time instant
+	 */
 	inline typename ListT::iterator getIteratorClosestBefore(const double& statetime){
 		typename ListT::iterator it = stateList.lower_bound(statetime);
 		it--;
 		return it;
 	};
 
+	/***
+	 * returns the iterator closest after a specific time instant
+	 */
 	inline typename ListT::iterator getIteratorClosestAfter(const double& statetime){
 		return  stateList.upper_bound(statetime);
 	};
 
+	/***
+	 * returns the iterator closest to a specific time instant
+	 */
 	inline typename ListT::iterator getIteratorClosest(const double& statetime){
 		typename ListT::iterator tauMinus = getIteratorClosestBefore(statetime);
 		typename ListT::iterator tauPlus = getIteratorClosestAfter(statetime);
@@ -126,6 +165,9 @@ public:
 		}
 	}
 
+	/***
+	 * returns a pointer to the closest object before a specific time instant
+	 */
 	inline boost::shared_ptr<T>& getClosestBefore(const double& statetime){
 		typename ListT::iterator it = stateList.lower_bound(statetime);
 		if(it == stateList.begin()){
@@ -135,6 +177,10 @@ public:
 		return it->second;
 	};
 
+	/***
+	 * returns a pointer to the closest after a specific time instant
+	 * or an invalid object if the request cannot be satisfied
+	 */
 	inline boost::shared_ptr<T>& getClosestAfter(const double& statetime){
 		typename ListT::iterator it = stateList.upper_bound(statetime);
 		if(it==stateList.end()){
@@ -143,6 +189,10 @@ public:
 		return  it->second;
 	};
 
+	/***
+	 * returns a pointer to the object at a specific time instant
+	 * or an invalid object if the request cannot be satisfied
+	 */
 	inline boost::shared_ptr<T>& getValueAt(const double& statetime){
 		typename ListT::iterator it = stateList.find(statetime);
 		if(it==stateList.end()){
@@ -151,6 +201,9 @@ public:
 		return  it->second;
 	};
 
+	/***
+	 * returns a pointer to the closest to a specific time instant
+	 */
 	inline boost::shared_ptr<T>& getClosest(const double& statetime){
 		boost::shared_ptr<T>& at = getValueAt(statetime); //is there one exactly at this point?
 		if(at != getInvalid()){
@@ -173,6 +226,9 @@ public:
 		}
 	}
 
+	/***
+	 * Clears all objects having a time stamp older than the supplied time in seconds
+	 */
 	inline void clearOlderThan(double age){
 		double newest = getLast()->time_;
 		iterator_T it = getIteratorClosest(newest-age);
@@ -182,13 +238,25 @@ public:
 			stateList.erase(stateList.begin(),it);
 	}
 
+	/***
+	 * returns a pointer to the last object in the container
+	 * or an invalid object if the container is empty
+	 */
 	inline boost::shared_ptr<T>& getLast(){
+		if(stateList.empty()){
+			ROS_ERROR_STREAM("requested the last object in the sorted container, but the container is empty");
+			return getInvalid();
+		}
 		typename ListT::iterator end = stateList.end();
 		return (--end)->second;
 	}
 
-	//this function effectively changes the map ordering, so the previous iterators are invalidated
-	//the attribute unused can be eliminated for non gcc compilers, its just a little more verbose
+	/***
+	 * This function updates the time of an object in the container
+	 * this function effectively changes the map ordering, so the previous iterators are invalidated
+	 * the attribute unused can be eliminated for non gcc compilers, its just a little more verbose
+	 * in cases where the updated value is not used
+	 */
 	inline boost::shared_ptr<T> updateTime(double timeOld, double timeNew) __attribute__ ((warn_unused_result)) {
 		typename ListT::iterator it = stateList.find(timeOld);
 		if(it == stateList.end()){
@@ -211,7 +279,9 @@ public:
 		return inserted->second;
 	}
 
-
+	/***
+	 * debug output the contents of the container in a human readable time format
+	 */
 	std::string echoBufferContentTimes(){
 		std::stringstream ss;
 

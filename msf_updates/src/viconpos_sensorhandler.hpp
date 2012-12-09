@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "viconpos_measurement.hpp"
 
 #define N_MEAS 9 // measurement size
-ViconPosSensorHandler::ViconPosSensorHandler(msf_core::MSF_SensorManager* meas) :
+ViconPosSensorHandler::ViconPosSensorHandler(msf_core::MSF_SensorManager& meas) :
 SensorHandler(meas)
 {
 	ros::NodeHandle pnh("~");
@@ -61,7 +61,7 @@ void ViconPosSensorHandler::subscribe()
 	ros::NodeHandle nh("msf_core");
 	subMeasurement_ = nh.subscribe("position_measurement", 1, &ViconPosSensorHandler::measurementCallback, this);
 
-	dynamic_cast<msf_core::MSF_SensorManagerROS*>(measurements)->registerCallback(&ViconPosSensorHandler::noiseConfig, this);
+	dynamic_cast<msf_core::MSF_SensorManagerROS&>(manager_).registerCallback(&ViconPosSensorHandler::noiseConfig, this);
 
 }
 
@@ -84,5 +84,5 @@ void ViconPosSensorHandler::measurementCallback(const geometry_msgs::TransformSt
 
 	z_p_ = meas->z_p_; //store this for the init procedure
 
-	this->measurements->msf_core_->addMeasurement(meas);
+	this->manager_.msf_core_->addMeasurement(meas);
 }

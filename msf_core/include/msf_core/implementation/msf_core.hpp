@@ -40,12 +40,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace msf_core
 {
 
-MSF_Core::MSF_Core(MSF_SensorManager* usercalc)
+MSF_Core::MSF_Core(MSF_SensorManager& usercalc):usercalc_(usercalc)  //the interface for the user to customize EKF interna, DO ABSOLUTELY NOT USE THIS POINTER INSIDE THIS CTOR!!
 {
 
 	Qd_.setZero();
-
-	usercalc_ = usercalc; //the interface for the user to customize EKF interna, DO ABSOLUTELY NOT USE THIS POINTER INSIDE THIS CTOR!!
 
 	initialized_ = false;
 	predictionMade_ = false;
@@ -351,11 +349,11 @@ void MSF_Core::predictProcessCovariance(boost::shared_ptr<EKFState>& state_old, 
 	double dt = state_new->time_ - state_old->time_;
 
 	// noises
-	ConstVector3 nav = Vector3::Constant(usercalc_->getParam_noise_acc() /* / sqrt(dt) */);
-	ConstVector3 nbav = Vector3::Constant(usercalc_->getParam_noise_accbias() /* * sqrt(dt) */);
+	ConstVector3 nav = Vector3::Constant(usercalc_.getParam_noise_acc() /* / sqrt(dt) */);
+	ConstVector3 nbav = Vector3::Constant(usercalc_.getParam_noise_accbias() /* * sqrt(dt) */);
 
-	ConstVector3 nwv = Vector3::Constant(usercalc_->getParam_noise_gyr() /* / sqrt(dt) */);
-	ConstVector3 nbwv = Vector3::Constant(usercalc_->getParam_noise_gyrbias() /* * sqrt(dt) */);
+	ConstVector3 nwv = Vector3::Constant(usercalc_.getParam_noise_gyr() /* / sqrt(dt) */);
+	ConstVector3 nbwv = Vector3::Constant(usercalc_.getParam_noise_gyrbias() /* * sqrt(dt) */);
 
 	// bias corrected IMU readings
 	ConstVector3 ew = state_new->w_m_ - state_new->get<msf_core::b_w_>();
@@ -400,7 +398,7 @@ void MSF_Core::predictProcessCovariance(boost::shared_ptr<EKFState>& state_old, 
 	calc_QCore(dt, state_new->get<msf_core::q_>(), ew, ea, nav, nbav, nwv, nbwv, Qd_);
 
 	//call user Q calc to fill in the blocks of auxiliary states
-	usercalc_->calculateQAuxiliaryStates(*state_new, dt);
+	usercalc_.calculateQAuxiliaryStates(*state_new, dt);
 
 	//now copy the userdefined blocks to Qd
 	boost::fusion::for_each(
@@ -548,7 +546,7 @@ boost::shared_ptr<EKFState> MSF_Core::getClosestState(double tstamp, double dela
 	// we subtracted one too much before.... :)
 	//}
 
-	double timenow = tstamp - delay - usercalc_->getParam_delay();
+	double timenow = tstamp - delay - usercalc_.getParam_delay();
 
 	stateBufferT::iterator_T it = StateBuffer_.getIteratorClosest(timenow);
 
@@ -600,10 +598,10 @@ bool MSF_Core::applyCorrection(boost::shared_ptr<EKFState>& delaystate, ErrorSta
 		return false;
 
 	//give the user the possibility to fix some states
-	usercalc_->augmentCorrectionVector(correction);
+	usercalc_.augmentCorrectionVector(correction);
 
 	//now augment core states
-	if (usercalc_->getParam_fixed_bias())
+	if (usercalc_.getParam_fixed_bias())
 	{
 		typedef typename msf_tmp::getEnumStateType<msf_core::EKFState::stateVector_T, msf_core::b_a_>::value b_a_type;
 		typedef typename msf_tmp::getEnumStateType<msf_core::EKFState::stateVector_T, msf_core::b_w_>::value b_w_type;
@@ -612,9 +610,6 @@ bool MSF_Core::applyCorrection(boost::shared_ptr<EKFState>& delaystate, ErrorSta
 			indexOfState_b_a = msf_tmp::getStartIndex<msf_core::EKFState::stateVector_T, b_a_type, msf_tmp::CorrectionStateLengthForType>::value,
 			indexOfState_b_w = msf_tmp::getStartIndex<msf_core::EKFState::stateVector_T, b_w_type, msf_tmp::CorrectionStateLengthForType>::value
 		};
-
-		//		msf_tmp::echoCompileTimeConstant<indexOfState_b_a>();
-		//		msf_tmp::echoCompileTimeConstant<indexOfState_b_w>();
 
 		BOOST_STATIC_ASSERT_MSG(static_cast<int>(indexOfState_b_w)==9, "The index of the state b_w in the correction vector differs from the expected value");
 		BOOST_STATIC_ASSERT_MSG(static_cast<int>(indexOfState_b_a)==12, "The index of the state b_a in the correction vector differs from the expected value");
@@ -626,7 +621,6 @@ bool MSF_Core::applyCorrection(boost::shared_ptr<EKFState>& delaystate, ErrorSta
 			correction(indexOfState_b_w + i) = 0; //gyro bias x,y,z
 		}
 	}
-	//}
 
 	// state update:
 	// TODO: sweiss what to do with attitude? augment measurement noise?
@@ -637,7 +631,7 @@ bool MSF_Core::applyCorrection(boost::shared_ptr<EKFState>& delaystate, ErrorSta
 	delaystate->correct(correction);
 
 	//allow the user to sanity check the new state
-	usercalc_->sanityCheckCorrection(*delaystate, buffstate, correction);
+	usercalc_.sanityCheckCorrection(*delaystate, buffstate, correction);
 
 	//TODO: move the whole fuzzy tracking to a templated function, which is specialized for void, Matrix, Quaternion
 
@@ -662,7 +656,7 @@ bool MSF_Core::applyCorrection(boost::shared_ptr<EKFState>& delaystate, ErrorSta
 							getMedian(qbuff_.block<nBuff_, 1> (0, 2))
 					);
 
-			double fuzzythres = usercalc_->getParam_fuzzythres();
+			double fuzzythres = usercalc_.getParam_fuzzythres();
 
 			if (std::max(errq.vec().maxCoeff(), -errq.vec().minCoeff()) / fabs(errq.w()) * 2 > fuzzythres) // fuzzy tracking (small angle approx)
 			{
