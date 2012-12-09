@@ -5,6 +5,9 @@ bin
 lib
 *~
 cfg/cpp/*
+.project
+.cproject
+.settings
 
 
 /msf_core/docs/MSF_CoreConfig.dox
