@@ -31,8 +31,7 @@ include_directories(${Eigen_INCLUDE_DIRS})
 
 #common commands for building c++ executables and libraries
 #rosbuild_add_library(msf_core src/MSF_Core.cpp src/measurement.cpp src/state.cpp)
-#rosbuild_add_compile_flags(msf_core)
-#TODO # "-O3")
+#rosbuild_add_compile_flags(msf_core "-O3")
 
 #rosbuild_add_executable(staticstatelist src/test_staticstatelist.cc)
 #rosbuild_add_gtest_build_flags(staticstatelist)
