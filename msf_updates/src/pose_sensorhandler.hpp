@@ -52,8 +52,9 @@ SensorHandler(meas)
 void PoseSensorHandler::subscribe()
 {
 	ros::NodeHandle nh("msf_core");
-	subMeasurement_ = nh.subscribe("pose_measurement", 1, &PoseSensorHandler::measurementCallback, this);
-	subPressure_ = nh.subscribe("pressure", 1, &PoseSensorHandler::pressureCallback, this);
+	subPoseWithCovarianceStamped_ = nh.subscribe<geometry_msgs::PoseWithCovarianceStamped>("pose_with_covariance", 1, &PoseSensorHandler::measurementCallback, this);
+	subTransformStamped_ = nh.subscribe<geometry_msgs::TransformStamped>("transform", 1, &PoseSensorHandler::measurementCallback, this);
+	subPoseStamped_ = nh.subscribe<geometry_msgs::PoseStamped>("pose", 1, &PoseSensorHandler::measurementCallback, this);
 
 	//TODO: we might need to implement that for initial testing
 	//measurements->msf_core_.registerCallback(&PoseSensorHandler::noiseConfig, this);
@@ -62,9 +63,8 @@ void PoseSensorHandler::subscribe()
 	nh.param("meas_noise2", n_zq_, 0.02);	// default attitude noise is for ethzasl_ptam
 
 	dynamic_cast<msf_core::MSF_SensorManagerROS&>(manager_).registerCallback(&PoseSensorHandler::noiseConfig, this);
-	dynamic_cast<msf_core::MSF_SensorManagerROS&>(manager_).registerCallback(&PoseSensorHandler::DynConfig, this);
+	dynamic_cast<msf_core::MSF_SensorManagerROS&>(manager_).registerCallback(&PoseSensorHandler::dynConfig, this);
 
-	pressure_offset_=0;
 }
 
 void PoseSensorHandler::noiseConfig(msf_core::MSF_CoreConfig& config, uint32_t level)
@@ -74,26 +74,9 @@ void PoseSensorHandler::noiseConfig(msf_core::MSF_CoreConfig& config, uint32_t l
 	this->n_zp_ = config.meas_noise1;
 	this->n_zq_ = config.meas_noise2;
 	//	}
-	if(level & msf_core::MSF_Core_RESET_PRESS)
-	{
-		pressure_offset_=pressure_height_;
-	}
 }
 
-void PoseSensorHandler::pressureCallback(const asctec_hl_comm::mav_imuConstPtr & msg)
-{
-	static double heightbuff[10]={0,0,0,0,0,0,0,0,0,0};
-	memcpy(heightbuff, heightbuff+1, sizeof(double)*9);
-	heightbuff[9] = msg->height;
-	pressure_height_=0;
-	for(int k=0; k<10; ++k)
-		pressure_height_+=heightbuff[k];
-	pressure_height_ /=10;
-	//ROS_WARN_STREAM("Got pressure measurement "<<-msg->height<< " => "<<measurements->press_height_);
-
-}
-
-void PoseSensorHandler::DynConfig(msf_core::MSF_CoreConfig &config, uint32_t level){
+void PoseSensorHandler::dynConfig(msf_core::MSF_CoreConfig &config, uint32_t level){
 	if(level & msf_core::MSF_Core_INIT_FILTER)
 	{
 		manager_.init(config.scale_init);
@@ -123,14 +106,63 @@ void PoseSensorHandler::DynConfig(msf_core::MSF_CoreConfig &config, uint32_t lev
 
 void PoseSensorHandler::measurementCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg)
 {
-	ROS_INFO_STREAM("measurement received \n"
-			<< "type is: " << typeid(msg).name());
-
-	boost::shared_ptr<PoseMeasurement> meas( new PoseMeasurement(n_zp_, n_zq_));
-	meas->makeFromSensorReading(msg, use_fixed_covariance_, measurement_world_sensor_);
+	boost::shared_ptr<pose_measurement::PoseMeasurement> meas( new pose_measurement::PoseMeasurement(n_zp_, n_zq_, use_fixed_covariance_, measurement_world_sensor_));
+	meas->makeFromSensorReading(msg, msg->header.stamp.toSec());
 
 	z_p_ = meas->z_p_; //store this for the init procedure
 	z_q_ = meas->z_q_;
 
 	this->manager_.msf_core_->addMeasurement(meas);
 }
+
+void PoseSensorHandler::measurementCallback(const geometry_msgs::TransformStampedConstPtr & msg)
+{
+
+        geometry_msgs::PoseWithCovarianceStampedPtr pose(new geometry_msgs::PoseWithCovarianceStamped());
+
+        Eigen::Matrix<double, pose_measurement::nMeasurements, pose_measurement::nMeasurements> R_;
+
+        if (!use_fixed_covariance_)  // take covariance from sensor
+        {
+                ROS_WARN_STREAM_THROTTLE(2,"Provided message type without covariance but set fixed_covariance=false at the same time. Discarding message.");
+                return;
+        }
+
+        //fixed covariance will be set in measurement class -> makeFromSensorReadingImpl
+
+        pose->header = msg->header;
+
+        pose->pose.pose.position.x = msg->transform.translation.x;
+        pose->pose.pose.position.y = msg->transform.translation.y;
+        pose->pose.pose.position.z = msg->transform.translation.z;
+
+        pose->pose.pose.orientation.w = msg->transform.rotation.w;
+        pose->pose.pose.orientation.x = msg->transform.rotation.x;
+        pose->pose.pose.orientation.y = msg->transform.rotation.y;
+        pose->pose.pose.orientation.z = msg->transform.rotation.z;
+
+        measurementCallback(pose);
+}
+
+void PoseSensorHandler::measurementCallback(const geometry_msgs::PoseStampedConstPtr & msg)
+{
+
+        geometry_msgs::PoseWithCovarianceStampedPtr pose(new geometry_msgs::PoseWithCovarianceStamped());
+
+        Eigen::Matrix<double, pose_measurement::nMeasurements, pose_measurement::nMeasurements> R_;
+
+        if (!use_fixed_covariance_)  // take covariance from sensor
+        {
+                ROS_WARN_STREAM_THROTTLE(2,"Provided message type without covariance but set fixed_covariance=false at the same time. Discarding message.");
+                return;
+        }
+
+        //fixed covariance will be set in measurement class -> makeFromSensorReadingImpl
+
+        pose->header = msg->header;
+
+        pose->pose.pose = msg->pose;
+
+        measurementCallback(pose);
+}
+

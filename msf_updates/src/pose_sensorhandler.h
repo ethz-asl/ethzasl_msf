@@ -38,6 +38,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pose_sensormanager.h"
 #include <asctec_hl_comm/mav_imu.h>
 #include "pose_measurement.hpp"
+#include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <geometry_msgs/TransformStamped.h>
+#include <geometry_msgs/PoseStamped.h>
 
 class PoseSensorManager;
 
@@ -49,20 +52,19 @@ private:
 	Eigen::Matrix<double, 3, 1> z_p_; /// position measurement camera seen from world
 	double n_zp_, n_zq_; /// position and attitude measurement noise
 
-	ros::Subscriber subMeasurement_;
-	ros::Subscriber subPressure_;
-
-	double pressure_offset_;
-	double pressure_height_;
+	ros::Subscriber subPoseWithCovarianceStamped_;
+        ros::Subscriber subTransformStamped_;
+        ros::Subscriber subPoseStamped_;
 
 	bool measurement_world_sensor_; ///< defines if the pose of the sensor is measured in world coordinates (true, default) or vice versa (false, e.g. PTAM)
 	bool use_fixed_covariance_; ///< use fixed covariance set by dynamic reconfigure
 
 	void subscribe();
 	void measurementCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg);
-	void pressureCallback(const asctec_hl_comm::mav_imuConstPtr & msg);
+	void measurementCallback(const geometry_msgs::PoseStampedConstPtr & msg);
+	void measurementCallback(const geometry_msgs::TransformStampedConstPtr & msg);
 	void noiseConfig(msf_core::MSF_CoreConfig& config, uint32_t level);
-	virtual void DynConfig(msf_core::MSF_CoreConfig &config, uint32_t level);
+	virtual void dynConfig(msf_core::MSF_CoreConfig &config, uint32_t level);
 
 public:
 	PoseSensorHandler(msf_core::MSF_SensorManager& meas);
