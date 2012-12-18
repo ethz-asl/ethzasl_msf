@@ -106,7 +106,7 @@ void PoseSensorHandler::dynConfig(msf_core::MSF_CoreConfig &config, uint32_t lev
 
 void PoseSensorHandler::measurementCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg)
 {
-	boost::shared_ptr<pose_measurement::PoseMeasurement> meas( new pose_measurement::PoseMeasurement(n_zp_, n_zq_, use_fixed_covariance_, measurement_world_sensor_));
+	boost::shared_ptr<pose_measurement::PoseMeasurement> meas( new pose_measurement::PoseMeasurement(n_zp_, n_zq_, measurement_world_sensor_, use_fixed_covariance_));
 	meas->makeFromSensorReading(msg, msg->header.stamp.toSec());
 
 	z_p_ = meas->z_p_; //store this for the init procedure

@@ -113,7 +113,7 @@ public:
   {
   }
   PoseMeasurement(double n_zp, double n_zq, bool measurement_world_sensor, bool fixed_covariance) :
-    n_zp_(n_zp), n_zq_(n_zq), fixed_covariance_(fixed_covariance), measurement_world_sensor_(measurement_world_sensor)
+    n_zp_(n_zp), n_zq_(n_zq), measurement_world_sensor_(measurement_world_sensor), fixed_covariance_(fixed_covariance)
   {
   }
   ;
