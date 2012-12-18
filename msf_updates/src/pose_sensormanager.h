@@ -2,6 +2,8 @@
 
 Copyright (c) 2010, Stephan Weiss, ASL, ETH Zurich, Switzerland
 You can contact the author at <stephan dot weiss at ieee dot org>
+Copyright (c) 2012, Simon Lynen, ASL, ETH Zurich, Switzerland
+You can contact the author at <slynen at ethz dot ch>
 
 All rights reserved.
 
@@ -34,44 +36,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ros/ros.h>
 #include <msf_core/msf_sensormanagerROS.hpp>
-#include "pose_sensor.h"
+#include "pose_sensorhandler.h"
 
-class PoseMeasurements : public msf_core::MSF_SensorManagerROS
+class PoseSensorManager : public msf_core::MSF_SensorManagerROS
 {
+	friend class PoseSensorHandler;
 public:
-	PoseMeasurements()
+	PoseSensorManager()
 	{
-		addHandler(new PoseSensorHandler(this));
-
-		//slynen: moved to usercalc
-		//    ros::NodeHandle pnh("~");
-		//    pnh.param("init/p_ci/x", p_ci_[0], 0.0);
-		//    pnh.param("init/p_ci/y", p_ci_[1], 0.0);
-		//    pnh.param("init/p_ci/z", p_ci_[2], 0.0);
-		//
-		//    pnh.param("init/q_ci/w", q_ci_.w(), 1.0);
-		//    pnh.param("init/q_ci/x", q_ci_.x(), 0.0);
-		//    pnh.param("init/q_ci/y", q_ci_.y(), 0.0);
-		//    pnh.param("init/q_ci/z", q_ci_.z(), 0.0);
-		//    q_ci_.normalize();
+		PoseHandler_.reset(new PoseSensorHandler(*this));
+		addHandler(PoseHandler_);
 	}
 
 private:
-
-	//slynen: moved to usercalc
-	//  Eigen::Matrix<double, 3, 1> p_ci_; ///< initial distance camera-IMU
-	//  Eigen::Quaternion<double> q_ci_; ///< initial rotation camera-IMU
-
-	void init_scale(double scale)
-	{
-		ROS_WARN_STREAM("using pressure height for scale init");
-		init(p_vc_[2]/press_height_);
-	}
+	boost::shared_ptr<PoseSensorHandler> PoseHandler_;
 
 	void init(double scale)
 	{
-		Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m;
-		Eigen::Quaternion<double> q, q_wv;
+		Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ci, p_vc;
+		Eigen::Quaternion<double> q, q_wv, q_ci, q_cv;
 		msf_core::MSF_Core::ErrorStateCov P;
 
 		// init values
@@ -87,43 +70,60 @@ private:
 
 		P.setZero(); // error state covariance; if zero, a default initialization in msf_core is used
 
+		p_vc = PoseHandler_->getPositionMeasurement();
+		q_cv = PoseHandler_->getAttitudeMeasurement();
+
 		// check if we have already input from the measurement sensor
-		if (p_vc_.norm() == 0)
+		if (p_vc.norm() == 0)
 			ROS_WARN_STREAM("No measurements received yet to initialize position - using [0 0 0]");
-		if ((q_cv_.norm() == 1) & (q_cv_.w() == 1))
+		if ((p_vc.norm() == 1) & (q_cv.w() == 1))
 			ROS_WARN_STREAM("No measurements received yet to initialize attitude - using [1 0 0 0]");
 
 		ros::NodeHandle pnh("~");
-		Eigen::Matrix<double, 3, 1> p_ci_; ///< initial distance camera-IMU
-		Eigen::Quaternion<double> q_ci_; ///< initial rotation camera-IMU
-		pnh.param("init/p_ci/x", p_ci_[0], 0.0);
-		pnh.param("init/p_ci/y", p_ci_[1], 0.0);
-		pnh.param("init/p_ci/z", p_ci_[2], 0.0);
+		pnh.param("init/p_ci/x", p_ci[0], 0.0);
+		pnh.param("init/p_ci/y", p_ci[1], 0.0);
+		pnh.param("init/p_ci/z", p_ci[2], 0.0);
 
-		pnh.param("init/q_ci/w", q_ci_.w(), 1.0);
-		pnh.param("init/q_ci/x", q_ci_.x(), 0.0);
-		pnh.param("init/q_ci/y", q_ci_.y(), 0.0);
-		pnh.param("init/q_ci/z", q_ci_.z(), 0.0);
-		q_ci_.normalize();
+		pnh.param("init/q_ci/w", q_ci.w(), 1.0);
+		pnh.param("init/q_ci/x", q_ci.x(), 0.0);
+		pnh.param("init/q_ci/y", q_ci.y(), 0.0);
+		pnh.param("init/q_ci/z", q_ci.z(), 0.0);
+		q_ci.normalize();
 
 
 		// calculate initial attitude and position based on sensor measurements
-		q = (q_ci_ * q_cv_.conjugate() * q_wv).conjugate();
+		q = (q_ci * q_cv.conjugate() * q_wv).conjugate();
 		q.normalize();
-		p = q_wv.conjugate().toRotationMatrix() * p_vc_ / scale - q.toRotationMatrix() * p_ci_;
+		p = q_wv.conjugate().toRotationMatrix() * p_vc / scale - q.toRotationMatrix() * p_ci;
 
-		//TODO init the states that this sensor measures
+		//prepare init "measurement"
+		boost::shared_ptr<msf_core::MSF_InitMeasurement> meas(new msf_core::MSF_InitMeasurement(true)); //hand over that we will also set the sensor readings
+
+		meas->setStateInitValue<msf_core::p_>(p);
+		meas->setStateInitValue<msf_core::v_>(v);
+		meas->setStateInitValue<msf_core::q_>(q);
+		meas->setStateInitValue<msf_core::b_w_>(b_w);
+		meas->setStateInitValue<msf_core::b_a_>(b_a);
+		meas->setStateInitValue<msf_core::L_>(Eigen::Matrix<double, 1, 1>::Constant(scale));
+		meas->setStateInitValue<msf_core::q_wv_>(q_wv);
+		meas->setStateInitValue<msf_core::q_wv_>(q_wv);
+		meas->setStateInitValue<msf_core::q_ci_>(q_ci);
+		meas->setStateInitValue<msf_core::p_ci_>(p_ci);
+
+		setP(meas->get_P()); //call my set P function
+		meas->get_w_m() = w_m;
+		meas->get_a_m() = a_m;
+		meas->time_ = ros::Time::now().toSec();
 
 		// call initialization in core
-		msf_core_.initialize(p, v, q, b_w, b_a, P, w_m, a_m, g);
-
+		msf_core_->init(meas);
 
 		ROS_INFO_STREAM("filter initialized to: \n" <<
 				"position: [" << p[0] << ", " << p[1] << ", " << p[2] << "]" << std::endl <<
 				"scale:" << scale << std::endl <<
 				"attitude (w,x,y,z): [" << q.w() << ", " << q.x() << ", " << q.y() << ", " << q.z() << std::endl <<
-				"p_ci: [" << p_ci_[0] << ", " << p_ci_[1] << ", " << p_ci_[2] << std::endl <<
-				"q_ci: (w,x,y,z): [" << q_ci_.w() << ", " << q_ci_.x() << ", " << q_ci_.y() << ", " << q_ci_.z() << "]");
+				"p_ci: [" << p_ci[0] << ", " << p_ci[1] << ", " << p_ci[2] << std::endl <<
+				"q_ci: (w,x,y,z): [" << q_ci.w() << ", " << q_ci.x() << ", " << q_ci.y() << ", " << q_ci.z() << "]");
 	}
 };
 

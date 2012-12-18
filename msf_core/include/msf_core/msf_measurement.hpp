@@ -81,15 +81,16 @@ public:
 template<typename T, int MEASUREMENTSIZE>
 class MSF_Measurement: public MSF_MeasurementBase{
 private:
-	virtual void makeFromSensorReadingImpl(boost::shared_ptr<T const> reading, bool fixedCovariance) = 0;
+	virtual void makeFromSensorReadingImpl(boost::shared_ptr<T const> reading, bool fixedCovariance, bool measurement_world_sensor) = 0;
 protected:
 	Eigen::Matrix<double, MEASUREMENTSIZE, MEASUREMENTSIZE> R_;
 public:
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+	typedef T measurement_type;
 	virtual ~MSF_Measurement(){};
-	void makeFromSensorReading(boost::shared_ptr<T const> reading, bool fixedCovariance){
+	void makeFromSensorReading(boost::shared_ptr<T const> reading, bool fixedCovariance, bool measurement_world_sensor){
 		time_ = reading->header.stamp.toSec();
-		makeFromSensorReadingImpl(reading, fixedCovariance);
+		makeFromSensorReadingImpl(reading, fixedCovariance, measurement_world_sensor);
 	}
 	//apply is implemented by respective sensor measurement types
 };

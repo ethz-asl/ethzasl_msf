@@ -58,8 +58,8 @@ SensorHandler(meas)
 
 void ViconPosSensorHandler::subscribe()
 {
-	ros::NodeHandle nh("msf_core");
-	subMeasurement_ = nh.subscribe("position_measurement", 1, &ViconPosSensorHandler::measurementCallback, this);
+	ros::NodeHandle nh("msf_update");
+	subMeasurement_ = nh.subscribe("pose_measurement", 1, &ViconPosSensorHandler::measurementCallback, this);
 
 	dynamic_cast<msf_core::MSF_SensorManagerROS&>(manager_).registerCallback(&ViconPosSensorHandler::noiseConfig, this);
 
@@ -80,7 +80,7 @@ void ViconPosSensorHandler::measurementCallback(const geometry_msgs::TransformSt
 		return;
 
 	boost::shared_ptr<ViconMeasurement> meas( new ViconMeasurement(n_zp_));
-	meas->makeFromSensorReading(msg, true);
+	meas->makeFromSensorReading(msg, true, true);
 
 	z_p_ = meas->z_p_; //store this for the init procedure
 

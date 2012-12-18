@@ -97,7 +97,7 @@ void MSF_Core::initExternalPropagation(boost::shared_ptr<EKFState> state) {
 	msgCorrect_.linear_acceleration.y = 0;
 	msgCorrect_.linear_acceleration.z = 0;
 
-	msgCorrect_.state.resize(nStatesAtCompileTime); //make sure this is correctly sized
+	msgCorrect_.state.resize(HLI_EKF_STATE_SIZE); //make sure this is correctly sized
 	boost::fusion::for_each(
 			state->statevars_,
 			msf_tmp::CoreStatetoDoubleArray<std::vector<float>, EKFState::stateVector_T >(msgCorrect_.state)

@@ -80,11 +80,8 @@ private:
 
 		P.setZero(); // error state covariance; if zero, a default initialization in msf_core is used
 
-		//slynen{ get measurements
+		p_vc_ = viconPosHandler_->getPositionMeasurement();
 
-			p_vc_ = viconPosHandler_->getPositionMeasurement();
-
-		//}
 
 		// check if we have already input from the measurement sensor
 		if(p_vc_.norm()==0)
@@ -122,6 +119,7 @@ private:
 		ROS_INFO_STREAM("filter initialized to: \n" <<
 				"position: [" << p[0] << ", " << p[1] << ", " << p[2] << "]" << std::endl <<
 				"attitude (w,x,y,z): [" << q.w() << ", " << q.x() << ", " << q.y() << ", " << q.z() << std::endl <<
+				"scale:" << scale << std::endl <<
 				"p_ci: [" << p_ci_[0] << ", " << p_ci_[1] << ", " << p_ci_[2] << std::endl <<
 				"q_ci: (w,x,y,z): [" << q_ci_.w() << ", " << q_ci_.x() << ", " << q_ci_.y() << ", " << q_ci_.z() << "]");
 	}

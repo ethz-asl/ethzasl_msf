@@ -48,7 +48,7 @@ enum{
  */
 struct ViconMeasurement:public msf_core::MSF_Measurement<geometry_msgs::TransformStamped, nMeasurements>{
 private:
-	virtual void makeFromSensorReadingImpl(geometry_msgs::TransformStampedConstPtr msg, bool fixedCovariance){
+	virtual void makeFromSensorReadingImpl(geometry_msgs::TransformStampedConstPtr msg, bool fixedCovariance, bool measurement_world_sensor){
 		// get measurements
 		z_p_ = Eigen::Matrix<double,3,1>(msg->transform.translation.x, msg->transform.translation.y, msg->transform.translation.z);
 

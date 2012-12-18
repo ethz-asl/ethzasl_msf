@@ -2,6 +2,8 @@
 
 Copyright (c) 2010, Stephan Weiss, ASL, ETH Zurich, Switzerland
 You can contact the author at <stephan dot weiss at ieee dot org>
+Copyright (c) 2012, Simon Lynen, ASL, ETH Zurich, Switzerland
+You can contact the author at <slynen at ethz dot ch>
 
 All rights reserved.
 
@@ -29,11 +31,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
 
-#include "pose_sensor.h"
 #include <msf_core/eigen_utils.h>
 
-#define N_MEAS 7 // measurement size
-PoseSensorHandler::PoseSensorHandler(msf_core::MSF_SensorManager* meas) :
+PoseSensorHandler::PoseSensorHandler(msf_core::MSF_SensorManager& meas) :
 SensorHandler(meas)
 {
 	ros::NodeHandle pnh("~");
@@ -61,6 +61,9 @@ void PoseSensorHandler::subscribe()
 	nh.param("meas_noise1", n_zp_, 0.01);	// default position noise is for ethzasl_ptam
 	nh.param("meas_noise2", n_zq_, 0.02);	// default attitude noise is for ethzasl_ptam
 
+	dynamic_cast<msf_core::MSF_SensorManagerROS&>(manager_).registerCallback(&PoseSensorHandler::noiseConfig, this);
+	dynamic_cast<msf_core::MSF_SensorManagerROS&>(manager_).registerCallback(&PoseSensorHandler::DynConfig, this);
+
 	pressure_offset_=0;
 }
 
@@ -73,7 +76,7 @@ void PoseSensorHandler::noiseConfig(msf_core::MSF_CoreConfig& config, uint32_t l
 	//	}
 	if(level & msf_core::MSF_Core_RESET_PRESS)
 	{
-		pressure_offset_=measurements->press_height_;
+		pressure_offset_=pressure_height_;
 	}
 }
 
@@ -82,38 +85,39 @@ void PoseSensorHandler::pressureCallback(const asctec_hl_comm::mav_imuConstPtr &
 	static double heightbuff[10]={0,0,0,0,0,0,0,0,0,0};
 	memcpy(heightbuff, heightbuff+1, sizeof(double)*9);
 	heightbuff[9] = msg->height;
-	measurements->press_height_=0;
+	pressure_height_=0;
 	for(int k=0; k<10; ++k)
-		measurements->press_height_+=heightbuff[k];
-	measurements->press_height_ /=10;
+		pressure_height_+=heightbuff[k];
+	pressure_height_ /=10;
 	//ROS_WARN_STREAM("Got pressure measurement "<<-msg->height<< " => "<<measurements->press_height_);
 
 }
 
-virtual void PoseSensorHandler::DynConfig(msf_core::MSF_CoreConfig &config, uint32_t level){
-	if(level & ssf_core::SSF_Core_INIT_FILTER)
+void PoseSensorHandler::DynConfig(msf_core::MSF_CoreConfig &config, uint32_t level){
+	if(level & msf_core::MSF_Core_INIT_FILTER)
 	{
-		init(config.scale_init);
+		manager_.init(config.scale_init);
 		config.init_filter = false;
 	}
-	else if(level & ssf_core::SSF_Core_SET_HEIGHT)
+	else if(level & msf_core::MSF_Core_SET_HEIGHT)
 	{
-		if(p_vc_.norm()==0)
+		if(z_p_.norm()==0)
 		{
 			ROS_WARN_STREAM("No measurements received yet to initialize position - using scale factor " << config.scale_init << " for init");
-			init(config.scale_init);
+			manager_.init(config.scale_init);
 		}
 		else
 		{
-			init(p_vc_[2]/config.height);
-			ROS_WARN_STREAM("init filter (set scale to: " << p_vc_[2]/config.height << ")");
+			manager_.init(z_p_[2]/config.height);
+			ROS_WARN_STREAM("init filter (set scale to: " << z_p_[2]/config.height << ")");
 		}
 		config.set_height = false;
 	}
-	else if(level & ssf_core::SSF_Core_SET_PRESS)
+	else if(level & msf_core::MSF_Core_SET_PRESS)
 	{
-		init_scale(config.scale_init);
-		config.set_pressure_height = false;
+		ROS_ERROR_STREAM("PRESSURE SCALE INIT NOT IMPLEMENTED AT THE MOMENT");
+//		dynamic_cast<PoseSensorManager&>(manager_).init_scale(config.scale_init)
+//		config.set_pressure_height = false;
 	}
 }
 
@@ -122,102 +126,11 @@ void PoseSensorHandler::measurementCallback(const geometry_msgs::PoseWithCovaria
 	ROS_INFO_STREAM("measurement received \n"
 			<< "type is: " << typeid(msg).name());
 
-	// init variables
-	msf_core::EKFState state_old_o;
-	ros::Time time_old = msg->header.stamp;
+	boost::shared_ptr<PoseMeasurement> meas( new PoseMeasurement(n_zp_, n_zq_));
+	meas->makeFromSensorReading(msg, use_fixed_covariance_, measurement_world_sensor_);
 
-	Eigen::Matrix<double, N_MEAS, msf_core::MSF_Core::nErrorStatesAtCompileTime> H_old;
-	Eigen::Matrix<double, N_MEAS, 1> r_old;
-	Eigen::Matrix<double, N_MEAS, N_MEAS> R;
+	z_p_ = meas->z_p_; //store this for the init procedure
+	z_q_ = meas->z_q_;
 
-	H_old.setZero();
-	R.setZero();
-
-	// get measurements
-	z_p_ = Eigen::Matrix<double, 3, 1>(msg->pose.pose.position.x, msg->pose.pose.position.y, msg->pose.pose.position.z);
-	z_q_ = Eigen::Quaternion<double>(msg->pose.pose.orientation.w, msg->pose.pose.orientation.x, msg->pose.pose.orientation.y, msg->pose.pose.orientation.z);
-
-	hasInitialMeasurement_ = true;
-
-	// take covariance from sensor
-	R.block<6, 6> (0, 0) = Eigen::Matrix<double, 6, 6>(&msg->pose.covariance[0]);
-	//clear cross-correlations between q and p
-	R.block<3, 3> (0, 3) = Eigen::Matrix<double, 3, 3>::Zero();
-	R.block<3, 3> (3, 0) = Eigen::Matrix<double, 3, 3>::Zero();
-	R(6, 6) = 1e-6; // q_vw yaw-measurement noise
-
-	/*************************************************************************************/
-	// use this if your pose sensor is ethzasl_ptam (www.ros.org/wiki/ethzasl_ptam)
-	// ethzasl_ptam publishes the camera pose as the world seen from the camera
-	if (!measurement_world_sensor_)
-	{
-		Eigen::Matrix<double, 3, 3> C_zq = z_q_.toRotationMatrix();
-		z_q_ = z_q_.conjugate();
-		z_p_ = -C_zq.transpose() * z_p_;
-
-		Eigen::Matrix<double, 6, 6> C_cov(Eigen::Matrix<double, 6, 6>::Zero());
-		C_cov.block<3, 3> (0, 0) = C_zq;
-		C_cov.block<3, 3> (3, 3) = C_zq;
-
-		R.block<6, 6> (0, 0) = C_cov.transpose() * R.block<6, 6> (0, 0) * C_cov;
-	}
-	/*************************************************************************************/
-
-	//  alternatively take fix covariance from reconfigure GUI
-	if (use_fixed_covariance_)
-	{
-		const double s_zp = n_zp_ * n_zp_;
-		const double s_zq = n_zq_ * n_zq_;
-		R = (Eigen::Matrix<double, N_MEAS, 1>() << s_zp, s_zp, s_zp, s_zq, s_zq, s_zq, 1e-6).finished().asDiagonal();
-	}
-
-	// feedback for init case
-	measurements->p_vc_ = z_p_;
-	measurements->q_cv_ = z_q_;
-
-	unsigned char idx = measurements->msf_core_.getClosestState(&state_old_o, time_old);
-	if (state_old_o.time_ == -1)
-		return; // // early abort // //
-
-
-	const msf_core::EKFState& state_old = state_old_o;
-	// get rotation matrices
-	Eigen::Matrix<double, 3, 3> C_wv = state_old.get<msf_core::q_wv_>().conjugate().toRotationMatrix();
-	Eigen::Matrix<double, 3, 3> C_q = state_old.get<msf_core::q_>().conjugate().toRotationMatrix();
-	Eigen::Matrix<double, 3, 3> C_ci = state_old.get<msf_core::q_ci_>().conjugate().toRotationMatrix();
-
-	// preprocess for elements in H matrix
-	Eigen::Matrix<double, 3, 1> vecold;
-	vecold = (state_old.get<msf_core::p_>() + C_q.transpose() * state_old.get<msf_core::p_ci_>()) * state_old.get<msf_core::L_>();
-	Eigen::Matrix<double, 3, 3> skewold = skew(vecold);
-
-	Eigen::Matrix<double, 3, 3> pci_sk = skew(state_old.get<msf_core::p_ci_>());
-
-	// construct H matrix using H-blockx :-)
-	// position:
-	H_old.block<3, 3> (0, 0) = C_wv.transpose() * state_old.get<msf_core::L_>()(0); // p
-	H_old.block<3, 3> (0, 6) = -C_wv.transpose() * C_q.transpose() * pci_sk * state_old.get<msf_core::L_>()(0); // q
-	H_old.block<3, 1> (0, 15) = C_wv.transpose() * C_q.transpose() * state_old.get<msf_core::p_ci_>() + C_wv.transpose() * state_old.get<msf_core::p_>(); // L
-	H_old.block<3, 3> (0, 16) = -C_wv.transpose() * skewold; // q_wv
-	H_old.block<3, 3> (0, 22) = C_wv.transpose() * C_q.transpose() * state_old.get<msf_core::L_>()(0); //p_ci
-
-	// attitude
-	H_old.block<3, 3> (3, 6) = C_ci; // q
-	H_old.block<3, 3> (3, 16) = C_ci * C_q; // q_wv
-	H_old.block<3, 3> (3, 19) = Eigen::Matrix<double, 3, 3>::Identity(); //q_ci
-	H_old(6, 18) = 1.0; // fix vision world yaw drift because unobservable otherwise (see PhD Thesis)
-
-	// construct residuals
-	// position
-	r_old.block<3, 1> (0, 0) = z_p_ - C_wv.transpose() * (state_old.get<msf_core::p_>() + C_q.transpose() * state_old.get<msf_core::p_ci_>()) * state_old.get<msf_core::L_>();
-	// attitude
-	Eigen::Quaternion<double> q_err;
-	q_err = (state_old.get<msf_core::q_wv_>() * state_old.get<msf_core::q_>() * state_old.get<msf_core::q_ci_>()).conjugate() * z_q_;
-	r_old.block<3, 1> (3, 0) = q_err.vec() / q_err.w() * 2;
-	// vision world yaw drift
-	q_err = state_old.get<msf_core::q_wv_>();
-	r_old(6, 0) = -2 * (q_err.w() * q_err.z() + q_err.x() * q_err.y()) / (1 - 2 * (q_err.y() * q_err.y() + q_err.z() * q_err.z()));
-
-	// call update step in core class
-	measurements->msf_core_.applyMeasurement(idx, H_old, r_old, R);
+	this->manager_.msf_core_->addMeasurement(meas);
 }

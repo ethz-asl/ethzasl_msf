@@ -45,12 +45,12 @@ int main(int argc, char** argv)
 {
 	ros::init(argc, argv, "msf_core");
 #ifdef POSE_MEAS
-	PoseSensorHandler PoseMeas;
+	PoseSensorManager PoseMeas;
 	ROS_INFO_STREAM("Filter type: pose_sensor");
 #endif
 
 #ifdef POSITION_MEAS
-	PositionSensorHandler PositionMeas;
+	PositionSensorManager PositionMeas;
 	ROS_INFO_STREAM("Filter type: position_sensor");
 #endif
 

@@ -2,6 +2,8 @@
 
 Copyright (c) 2010, Stephan Weiss, ASL, ETH Zurich, Switzerland
 You can contact the author at <stephan dot weiss at ieee dot org>
+Copyright (c) 2012, Simon Lynen, ASL, ETH Zurich, Switzerland
+You can contact the author at <slynen at ethz dot ch>
 
 All rights reserved.
 
@@ -34,12 +36,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ros/ros.h>
 #include <msf_core/msf_sensormanagerROS.hpp>
-#include "position_sensor.h"
+#include "position_sensorhandler.h"
 
-class PositionMeasurements: public msf_core::MSF_SensorManagerROS
+class PositionSensorManager: public msf_core::MSF_SensorManagerROS
 {
 public:
-	PositionMeasurements()
+	PositionSensorManager()
 	{
 		addHandler(new PositionSensorHandler(this));
 
