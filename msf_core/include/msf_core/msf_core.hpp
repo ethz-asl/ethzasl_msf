@@ -271,6 +271,9 @@ private:
 	 */
 	void stateCallback(const sensor_fusion_comm::ExtEkfConstPtr & msg);
 
+	/// propagates P by one step to distribute processing load
+	void propagatePOneStep();
+
 
 };
 

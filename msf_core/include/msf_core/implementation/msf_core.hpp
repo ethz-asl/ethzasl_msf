@@ -165,15 +165,7 @@ void MSF_Core::imuCallback(const sensor_msgs::ImuConstPtr & msg)
 
 	propagateState(lastState, currentState);
 
-	//also propagate the covariance one step further, to distribute the processing load over time
-	stateBufferT::iterator_T stateIteratorPLastPropagated = StateBuffer_.getIteratorAtValue(time_P_propagated);
-	stateBufferT::iterator_T stateIteratorPLastPropagatedNext = stateIteratorPLastPropagated;
-	++stateIteratorPLastPropagatedNext;
-	if(stateIteratorPLastPropagatedNext != StateBuffer_.getIteratorEnd()){ //might happen if there is a measurement in the future
-		predictProcessCovariance(stateIteratorPLastPropagated->second, stateIteratorPLastPropagatedNext->second);
-		checkForNumeric((double*)(&stateIteratorPLastPropagatedNext->second->get<msf_core::p_>()(0)), 3, "prediction p");
-	}
-
+	propagatePOneStep();
 
 	predictionMade_ = true;
 
@@ -206,8 +198,6 @@ void MSF_Core::stateCallback(const sensor_fusion_comm::ExtEkfConstPtr & msg)
 	boost::shared_ptr<msf_core::EKFState> currentState(new msf_core::EKFState);
 
 	currentState->time_ = msg->header.stamp.toSec();
-
-	static int seq = 0;
 
 	// get inputs
 	currentState->a_m_ << msg->linear_acceleration.x, msg->linear_acceleration.y, msg->linear_acceleration.z;
@@ -260,26 +250,14 @@ void MSF_Core::stateCallback(const sensor_fusion_comm::ExtEkfConstPtr & msg)
 		propagateState(lastState, currentState);
 	}
 
-	predictProcessCovariance(lastState, currentState);
+	propagatePOneStep();
 
 	isnumeric = checkForNumeric((double*)(&currentState->get<msf_core::p_>()[0]), 3, "prediction p");
 	isnumeric = checkForNumeric((double*)(&currentState->P_(0)), nErrorStatesAtCompileTime * nErrorStatesAtCompileTime, "prediction done P");
 
 	predictionMade_ = true;
 
-	msgPose_.header.stamp = msg->header.stamp;
-	msgPose_.header.seq = msg->header.seq;
-
-	lastState->toPoseMsg(msgPose_);
-	pubPose_.publish(msgPose_);
-
-	msgPoseCtrl_.header = msgPose_.header;
-	lastState->toExtStateMsg(msgPoseCtrl_);
-	pubPoseCrtl_.publish(msgPoseCtrl_);
-
 	StateBuffer_.insert(currentState);
-
-	seq++;
 }
 
 
@@ -339,7 +317,16 @@ void MSF_Core::propagateState(boost::shared_ptr<EKFState>& state_old, boost::sha
 
 }
 
-
+void  MSF_Core::propagatePOneStep(){
+  //also propagate the covariance one step further, to distribute the processing load over time
+    stateBufferT::iterator_T stateIteratorPLastPropagated = StateBuffer_.getIteratorAtValue(time_P_propagated);
+    stateBufferT::iterator_T stateIteratorPLastPropagatedNext = stateIteratorPLastPropagated;
+    ++stateIteratorPLastPropagatedNext;
+    if(stateIteratorPLastPropagatedNext != StateBuffer_.getIteratorEnd()){ //might happen if there is a measurement in the future
+            predictProcessCovariance(stateIteratorPLastPropagated->second, stateIteratorPLastPropagatedNext->second);
+            checkForNumeric((double*)(&stateIteratorPLastPropagatedNext->second->get<msf_core::p_>()(0)), 3, "prediction p");
+    }
+}
 
 void MSF_Core::predictProcessCovariance(boost::shared_ptr<EKFState>& state_old, boost::shared_ptr<EKFState>& state_new)
 {
@@ -579,11 +566,7 @@ void MSF_Core::propPToState(boost::shared_ptr<EKFState>& state)
 	// propagate cov matrix until the current states time
 	typename stateBufferT::iterator_T it = StateBuffer_.getIteratorAtValue(time_P_propagated);
 	typename stateBufferT::iterator_T itMinus = it;
-	if(it==StateBuffer_.getIteratorBegin()){ //make sure we are not propagating from a state earlier than the first state in the list
-		++it;
-	}else{
-		--itMinus;
-	}
+	++it;
 	//until we reached the current state or the end of the state list
 	for( ; it != StateBuffer_.getIteratorEnd() && it->second->time_ <= state->time_ ; ++it, ++itMinus){
 		predictProcessCovariance(itMinus->second, it->second);
