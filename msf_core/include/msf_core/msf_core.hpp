@@ -104,10 +104,8 @@ public:
 	void initExternalPropagation(boost::shared_ptr<EKFState> state);
 
 	/**
-	 * \brief finds the closest state to the requested time in the internal state buffer
-	 * adds the delay defined in the parameter file to the tstamp value
+	 * \brief finds the closest state to the requested time in the internal state 
 	 * \param tstamp the time stamp to find the closest state to
-	 * \param delay optional additional delay
 	 */
 	boost::shared_ptr<EKFState> getClosestState(double tstamp);
 
