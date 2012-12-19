@@ -37,11 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 int main(int argc, char** argv)
 {
-	ros::init(argc, argv, "msf_pose_sensor");
+  ros::init(argc, argv, "msf_pose_sensor");
 
-	msf_pose_sensor::PoseSensorManager PoseMeas;
+  msf_pose_sensor::PoseSensorManager PoseMeas;
 
-	ros::spin();
+  ros::spin();
 
-	return 0;
+  return 0;
 }

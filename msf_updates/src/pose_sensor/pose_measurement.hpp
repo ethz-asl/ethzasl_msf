@@ -155,7 +155,7 @@ public:
     H_old.block<3, 3>(0, 0) = C_wv.transpose() * state.get<msf_core::L_>()(0); // p
     H_old.block<3, 3>(0, 6) = -C_wv.transpose() * C_q.transpose() * pci_sk * state.get<msf_core::L_>()(0); // q
     H_old.block<3, 1>(0, 15) = C_wv.transpose() * C_q.transpose() * state.get<msf_core::p_ci_>()
-                        + C_wv.transpose() * state.get<msf_core::p_>(); // L
+                            + C_wv.transpose() * state.get<msf_core::p_>(); // L
     H_old.block<3, 3>(0, 16) = -C_wv.transpose() * skewold; // q_wv
     H_old.block<3, 3>(0, 22) = C_wv.transpose() * C_q.transpose() * state.get<msf_core::L_>()(0); //p_ci
 
@@ -177,7 +177,7 @@ public:
     // vision world yaw drift
     q_err = state.get<msf_core::q_wv_>();
     r_old(6, 0) = -2 * (q_err.w() * q_err.z() + q_err.x() * q_err.y())
-                        / (1 - 2 * (q_err.y() * q_err.y() + q_err.z() * q_err.z()));
+                            / (1 - 2 * (q_err.y() * q_err.y() + q_err.z() * q_err.z()));
 
     // call update step in base class
     MSF_Measurement::calculateAndApplyCorrection(const_state, core, H_old, r_old, R_);

@@ -7,12 +7,12 @@ All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-* Redistributions of source code must retain the above copyright
+ * Redistributions of source code must retain the above copyright
 notice, this list of conditions and the following disclaimer.
-* Redistributions in binary form must reproduce the above copyright
+ * Redistributions in binary form must reproduce the above copyright
 notice, this list of conditions and the following disclaimer in the
 documentation and/or other materials provided with the distribution.
-* Neither the name of ETHZ-ASL nor the
+ * Neither the name of ETHZ-ASL nor the
 names of its contributors may be used to endorse or promote products
 derived from this software without specific prior written permission.
 
@@ -27,7 +27,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-*/
+ */
 
 #ifndef SENSORMANAGER_H
 #define SENSORMANAGER_H
@@ -49,71 +49,71 @@ class MSF_Core;
 class MSF_SensorManager:public StateVisitor
 {
 protected:
-	typedef std::vector<boost::shared_ptr<SensorHandler> > Handlers;
-	Handlers handlers; ///<a list of sensor handlers which provide measurements
+  typedef std::vector<boost::shared_ptr<SensorHandler> > Handlers;
+  Handlers handlers; ///<a list of sensor handlers which provide measurements
 
 public:
-	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-	boost::shared_ptr<MSF_Core> msf_core_; ///< the ekf core instance
+  boost::shared_ptr<MSF_Core> msf_core_; ///< the ekf core instance
 
-	MSF_SensorManager();
+  MSF_SensorManager();
 
-	virtual ~MSF_SensorManager(){
+  virtual ~MSF_SensorManager(){
 
-	};
-/***
- * add a new sensor handler to the list of handlers owned by this manager
- * a sensor handler is in turn owning the sensor (camera/vicon etc.)
- */
-	void addHandler(boost::shared_ptr<SensorHandler> handler)
-	{
-		handlers.push_back(handler);
-	}
+  };
+  /***
+   * add a new sensor handler to the list of handlers owned by this manager
+   * a sensor handler is in turn owning the sensor (camera/vicon etc.)
+   */
+  void addHandler(boost::shared_ptr<SensorHandler> handler)
+  {
+    handlers.push_back(handler);
+  }
 
-	/***
-	 * init function for the EKF
-	 */
-	virtual void init(double scale) = 0;
+  /***
+   * init function for the EKF
+   */
+  virtual void init(double scale) = 0;
 
-	/***
-	 * this method will be called for the user to set the initial state
-	 */
-	virtual void initState(msf_core::EKFState& state) = 0;
+  /***
+   * this method will be called for the user to set the initial state
+   */
+  virtual void initState(msf_core::EKFState& state) = 0;
 
-	/***
-	 * this method will be called for the user to set the Q block entries for Auxiliary states
-	 * only changes to blocks in Q belonging to the auxiliary states are allowed / evaluated
-	 */
-	virtual void calculateQAuxiliaryStates(msf_core::EKFState& state, double dt){};
+  /***
+   * this method will be called for the user to set the Q block entries for Auxiliary states
+   * only changes to blocks in Q belonging to the auxiliary states are allowed / evaluated
+   */
+  virtual void calculateQAuxiliaryStates(msf_core::EKFState& state, double dt){};
 
-	/***
-	 * this method will be called for the user to set the initial P matrix
-	 */
-	virtual void setP(Eigen::Matrix<double, msf_core::EKFState::nErrorStatesAtCompileTime, msf_core::EKFState::nErrorStatesAtCompileTime>& P) = 0;
+  /***
+   * this method will be called for the user to set the initial P matrix
+   */
+  virtual void setP(Eigen::Matrix<double, msf_core::EKFState::nErrorStatesAtCompileTime, msf_core::EKFState::nErrorStatesAtCompileTime>& P) = 0;
 
-	/***
-	 * this method will be called for the user to have the possibility to augment the correction vector
-	 */
-	virtual void augmentCorrectionVector(Eigen::Matrix<double, EKFState::nErrorStatesAtCompileTime,1>& correction){};
+  /***
+   * this method will be called for the user to have the possibility to augment the correction vector
+   */
+  virtual void augmentCorrectionVector(Eigen::Matrix<double, EKFState::nErrorStatesAtCompileTime,1>& correction){};
 
-	/***
-	 * this method will be called for the user to check the correction after it has been applied to the state
-	 * delaystate is the state on which the correction has been applied
-	 * buffstate is the state before the correction was applied
-	 */
-	virtual void sanityCheckCorrection(msf_core::EKFState& delaystate, const msf_core::EKFState& buffstate,
-			Eigen::Matrix<double, EKFState::nErrorStatesAtCompileTime,1>& correction){};
+  /***
+   * this method will be called for the user to check the correction after it has been applied to the state
+   * delaystate is the state on which the correction has been applied
+   * buffstate is the state before the correction was applied
+   */
+  virtual void sanityCheckCorrection(msf_core::EKFState& delaystate, const msf_core::EKFState& buffstate,
+                                     Eigen::Matrix<double, EKFState::nErrorStatesAtCompileTime,1>& correction){};
 
-	/***
-	 * provide a getter for these parameters, this is implemented for a given middleware or param file parser
-	 */
-	virtual bool getParam_fixed_bias() = 0;
-	virtual double getParam_noise_acc() = 0;
-	virtual double getParam_noise_accbias() = 0;
-	virtual double getParam_noise_gyr() = 0;
-	virtual double getParam_noise_gyrbias() = 0;
-	virtual double getParam_fuzzythres() = 0;
+  /***
+   * provide a getter for these parameters, this is implemented for a given middleware or param file parser
+   */
+  virtual bool getParam_fixed_bias() = 0;
+  virtual double getParam_noise_acc() = 0;
+  virtual double getParam_noise_accbias() = 0;
+  virtual double getParam_noise_gyr() = 0;
+  virtual double getParam_noise_gyrbias() = 0;
+  virtual double getParam_fuzzythres() = 0;
 
 };
 
@@ -124,11 +124,11 @@ public:
 class SensorHandler
 {
 protected:
-	MSF_SensorManager& manager_;
+  MSF_SensorManager& manager_;
 public:
-	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-	SensorHandler(MSF_SensorManager& mng):manager_(mng){}
-	virtual ~SensorHandler() {}
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  SensorHandler(MSF_SensorManager& mng):manager_(mng){}
+  virtual ~SensorHandler() {}
 };
 
 }; // end msf_core

@@ -7,12 +7,12 @@ All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-* Redistributions of source code must retain the above copyright
+ * Redistributions of source code must retain the above copyright
 notice, this list of conditions and the following disclaimer.
-* Redistributions in binary form must reproduce the above copyright
+ * Redistributions in binary form must reproduce the above copyright
 notice, this list of conditions and the following disclaimer in the
 documentation and/or other materials provided with the distribution.
-* Neither the name of ETHZ-ASL nor the
+ * Neither the name of ETHZ-ASL nor the
 names of its contributors may be used to endorse or promote products
 derived from this software without specific prior written permission.
 
@@ -27,7 +27,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-*/
+ */
 
 #ifndef SENSORMANAGERROS_H
 #define SENSORMANAGERROS_H
@@ -48,59 +48,59 @@ typedef dynamic_reconfigure::Server<msf_core::MSF_CoreConfig> ReconfigureServer;
  */
 struct MSF_SensorManagerROS:public msf_core::MSF_SensorManager{
 protected:
-	msf_core::MSF_CoreConfig config_; ///< dynamic reconfigure config
+  msf_core::MSF_CoreConfig config_; ///< dynamic reconfigure config
 private:
 
-	ReconfigureServer *reconfServer_; ///< dynamic reconfigure server
+  ReconfigureServer *reconfServer_; ///< dynamic reconfigure server
 
 public:
-	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-	MSF_SensorManagerROS(ros::NodeHandle pnh = ros::NodeHandle("~core")){
-		reconfServer_ = new ReconfigureServer(pnh);
-		ReconfigureServer::CallbackType f = boost::bind(&MSF_SensorManagerROS::Config, this, _1, _2);
-		reconfServer_->setCallback(f);
-	}
+  MSF_SensorManagerROS(ros::NodeHandle pnh = ros::NodeHandle("~core")){
+    reconfServer_ = new ReconfigureServer(pnh);
+    ReconfigureServer::CallbackType f = boost::bind(&MSF_SensorManagerROS::Config, this, _1, _2);
+    reconfServer_->setCallback(f);
+  }
 
-	~MSF_SensorManagerROS(){
-		delete reconfServer_;
-	}
+  ~MSF_SensorManagerROS(){
+    delete reconfServer_;
+  }
 
-        /**
-         * \brief gets called by the internal callback caller
-         */
-        virtual void coreConfig(msf_core::MSF_CoreConfig &config, uint32_t level){
+  /**
+   * \brief gets called by the internal callback caller
+   */
+  virtual void coreConfig(msf_core::MSF_CoreConfig &config, uint32_t level){
 
-        }
+  }
 
-	/**
-	 * \brief gets called by dynamic reconfigure and calls all registered callbacks in callbacks_
-	 */
-	void Config(msf_core::MSF_CoreConfig &config, uint32_t level)
-	{
-		config_ = config;
-		coreConfig(config, level);
-	}
+  /**
+   * \brief gets called by dynamic reconfigure and calls all registered callbacks in callbacks_
+   */
+  void Config(msf_core::MSF_CoreConfig &config, uint32_t level)
+  {
+    config_ = config;
+    coreConfig(config, level);
+  }
 
-	//parameter getters
-	virtual bool getParam_fixed_bias(){
-		return config_.fixed_bias;
-	}
-	virtual double getParam_noise_acc(){
-		return config_.noise_acc;
-	}
-	virtual double getParam_noise_accbias(){
-		return config_.noise_accbias;
-	}
-	virtual double getParam_noise_gyr(){
-		return config_.noise_gyr;
-	}
-	virtual double getParam_noise_gyrbias(){
-		return config_.noise_gyrbias;
-	}
-	virtual double getParam_fuzzythres(){
-		return 0.1;
-	}
+  //parameter getters
+  virtual bool getParam_fixed_bias(){
+    return config_.fixed_bias;
+  }
+  virtual double getParam_noise_acc(){
+    return config_.noise_acc;
+  }
+  virtual double getParam_noise_accbias(){
+    return config_.noise_accbias;
+  }
+  virtual double getParam_noise_gyr(){
+    return config_.noise_gyr;
+  }
+  virtual double getParam_noise_gyrbias(){
+    return config_.noise_gyrbias;
+  }
+  virtual double getParam_fuzzythres(){
+    return 0.1;
+  }
 
 };
 

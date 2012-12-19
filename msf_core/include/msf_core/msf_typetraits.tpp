@@ -7,12 +7,12 @@ All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-* Redistributions of source code must retain the above copyright
+ * Redistributions of source code must retain the above copyright
 notice, this list of conditions and the following disclaimer.
-* Redistributions in binary form must reproduce the above copyright
+ * Redistributions in binary form must reproduce the above copyright
 notice, this list of conditions and the following disclaimer in the
 documentation and/or other materials provided with the distribution.
-* Neither the name of ETHZ-ASL nor the
+ * Neither the name of ETHZ-ASL nor the
 names of its contributors may be used to endorse or promote products
 derived from this software without specific prior written permission.
 
@@ -27,7 +27,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-*/
+ */
 
 
 #ifndef MDF_TYPETRAITS_HPP_
@@ -42,161 +42,161 @@ template <typename T> struct SameType<T,T>{enum { value = true };};
 //strip qualifiers
 template<typename T>
 struct StripReference{
-	typedef T result_t;
+  typedef T result_t;
 };
 template<typename T>
 struct StripReference<T&>{
-	typedef T result_t;
+  typedef T result_t;
 };
 template<typename T>
 struct StripReference<const T>{
-	typedef const T result_t;
+  typedef const T result_t;
 };
 template<typename T>
 struct StripReference<const T&>{
-	typedef const T result_t;
+  typedef const T result_t;
 };
 
 template<typename T>
 struct StripConstReference{
-	typedef T result_t;
+  typedef T result_t;
 };
 template<typename T>
 struct StripConstReference<T&>{
-	typedef T result_t;
+  typedef T result_t;
 };
 template<typename T>
 struct StripConstReference<const T&>{
-	typedef T result_t;
+  typedef T result_t;
 };
 template<typename T>
 struct StripConstReference<const T>{
-	typedef T result_t;
+  typedef T result_t;
 };
 
 template<typename T>
 struct StripConstPtr{
-	typedef T result_t;
+  typedef T result_t;
 };
 template<typename T>
 struct StripConstPtr<T*>{
-	typedef T result_t;
+  typedef T result_t;
 };
 template<typename T>
 struct StripConstPtr<const T*>{
-	typedef T result_t;
+  typedef T result_t;
 };
 template<typename T>
 struct StripConstPtr<const T>{
-	typedef T result_t;
+  typedef T result_t;
 };
 
 //add qualifiers
 template<typename T>
 struct AddReference{
-	typedef T& result_t;
+  typedef T& result_t;
 };
 template<typename T>
 struct AddReference<T&>{
-	typedef T& result_t;
+  typedef T& result_t;
 };
 template<typename T>
 struct AddReference<const T>{
-	typedef const T& result_t;
+  typedef const T& result_t;
 };
 template<typename T>
 struct AddReference<const T&>{
-	typedef const T& result_t;
+  typedef const T& result_t;
 };
 
 template<typename T>
 struct AddConstReference{
-	typedef const T& result_t;
+  typedef const T& result_t;
 };
 template<typename T>
 struct AddConstReference<T&>{
-	typedef const T& result_t;
+  typedef const T& result_t;
 };
 template<typename T>
 struct AddConstReference<const T>{
-	typedef const T& result_t;
+  typedef const T& result_t;
 };
 template<typename T>
 struct AddConstReference<const T&>{
-	typedef const T& result_t;
+  typedef const T& result_t;
 };
 
 template<typename T>
 struct AddPtr{
-	typedef T* result_t;
+  typedef T* result_t;
 };
 template<typename T>
 struct AddPtr<T*>{
-	typedef T* result_t;
+  typedef T* result_t;
 };
 template<typename T>
 struct AddPtr<const T>{
-	typedef const T* result_t;
+  typedef const T* result_t;
 };
 template<typename T>
 struct AddPtr<const T*>{
-	typedef const T* result_t;
+  typedef const T* result_t;
 };
 
 template<typename T>
 struct AddConstPtr{
-	typedef const T* result_t;
+  typedef const T* result_t;
 };
 template<typename T>
 struct AddConstPtr<T*>{
-	typedef const T* result_t;
+  typedef const T* result_t;
 };
 template<typename T>
 struct AddConstPtr<const T>{
-	typedef const T* result_t;
+  typedef const T* result_t;
 };
 template<typename T>
 struct AddConstPtr<const T*>{
-	typedef const T* result_t;
+  typedef const T* result_t;
 };
 
 template<typename T>
 struct IsReferenceType{
-	enum{
-		value = false
-	};
+  enum{
+    value = false
+  };
 };
 template<typename T>
 struct IsReferenceType<T&>{
-	enum{
-		value = true
-	};
+  enum{
+    value = true
+  };
 };
 template<typename T>
 struct IsReferenceType<const T&>{
-	enum{
-		value = true
-	};
+  enum{
+    value = true
+  };
 };
 
 
 template<typename T>
 struct IsPointerType{
-	enum{
-		value = false
-	};
+  enum{
+    value = false
+  };
 };
 template<typename T>
 struct IsPointerType<T*>{
-	enum{
-		value = true
-	};
+  enum{
+    value = true
+  };
 };
 template<typename T>
 struct IsPointerType<const T*>{
-	enum{
-		value = true
-	};
+  enum{
+    value = true
+  };
 };
 
 }

@@ -52,12 +52,12 @@ namespace msf_core{
  */
 class StateVisitor{
 public:
-	/**
-	 * \brief the state is set to zero/identity, this method will be called to
-	 * give the user the possibility to change the reset values of some states
-	 */
-	virtual void resetState(msf_core::EKFState& state)=0;
-	virtual ~StateVisitor(){};
+  /**
+   * \brief the state is set to zero/identity, this method will be called to
+   * give the user the possibility to change the reset values of some states
+   */
+  virtual void resetState(msf_core::EKFState& state)=0;
+  virtual ~StateVisitor(){};
 };
 
 /**
@@ -65,26 +65,26 @@ public:
  */
 template<typename type_T, int name_T, int STATETYPE>
 struct StateVar_T{
-	typedef type_T value_t;
-	typedef const StateVar_T<type_T, name_T>& constRef_T;
-	typedef const StateVar_T<type_T, name_T>* constPtr_T;
-	typedef StateVar_T<type_T, name_T>& Ref_T;
-	typedef StateVar_T<type_T, name_T>* Ptr_T;
-	enum{
-		statetype_ = STATETYPE, ///<the type of this state. needed for computations of total state length
-		name_ = name_T, ///< the name of the state, needed to find it in the state type list
-		sizeInCorrection_ = msf_tmp::CorrectionStateLengthForType<const StateVar_T<type_T, name_T>&>::value, ///< the size of this state in the correction vector
-		sizeInState_ = msf_tmp::StateLengthForType<const StateVar_T<type_T, name_T>&>::value ///<the size of this state in the state vector
-	};
-	typedef Eigen::Matrix<double, sizeInCorrection_, sizeInCorrection_> Q_T;
-	Q_T Q_; ///< the noise covariance matrix block of this state
-	value_t state_; ///< the state variable of this state
-	bool hasResetValue; //<indicating that this statevariable has a reset value to be applied to the state on init
-	StateVar_T(){
-		hasResetValue = false;
-		Q_.setZero();
-	}
-	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  typedef type_T value_t;
+  typedef const StateVar_T<type_T, name_T>& constRef_T;
+  typedef const StateVar_T<type_T, name_T>* constPtr_T;
+  typedef StateVar_T<type_T, name_T>& Ref_T;
+  typedef StateVar_T<type_T, name_T>* Ptr_T;
+  enum{
+    statetype_ = STATETYPE, ///<the type of this state. needed for computations of total state length
+    name_ = name_T, ///< the name of the state, needed to find it in the state type list
+    sizeInCorrection_ = msf_tmp::CorrectionStateLengthForType<const StateVar_T<type_T, name_T>&>::value, ///< the size of this state in the correction vector
+    sizeInState_ = msf_tmp::StateLengthForType<const StateVar_T<type_T, name_T>&>::value ///<the size of this state in the state vector
+  };
+  typedef Eigen::Matrix<double, sizeInCorrection_, sizeInCorrection_> Q_T;
+  Q_T Q_; ///< the noise covariance matrix block of this state
+  value_t state_; ///< the state variable of this state
+  bool hasResetValue; //<indicating that this statevariable has a reset value to be applied to the state on init
+  StateVar_T(){
+    hasResetValue = false;
+    Q_.setZero();
+  }
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 
@@ -93,135 +93,135 @@ struct StateVar_T{
  */
 template<typename stateSequence_T>
 struct GenericState_T{
-	friend class msf_core::MSF_Core;
-	friend class msf_core::copyNonPropagationStates<GenericState_T>;
-	friend class msf_core::MSF_InitMeasurement;
+  friend class msf_core::MSF_Core;
+  friend class msf_core::copyNonPropagationStates<GenericState_T>;
+  friend class msf_core::MSF_InitMeasurement;
 public:
-	typedef stateSequence_T stateVector_T; ///<the state vector defining the state variables of this EKF
-	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-	enum{
-		nStateVarsAtCompileTime = boost::fusion::result_of::size<stateVector_T>::type::value, ///<n state vars
-		nErrorStatesAtCompileTime = msf_tmp::CountStates<stateVector_T, msf_tmp::CorrectionStateLengthForType>::value, ///<n error states
-		nStatesAtCompileTime = msf_tmp::CountStates<stateVector_T, msf_tmp::StateLengthForType>::value, ///<n total states
-		nCoreStatesAtCompileTime = msf_tmp::CountStates<stateVector_T, msf_tmp::CoreStateLengthForType>::value, ///<n total core states
-		nPropagatedCoreStatesAtCompileTime = msf_tmp::CountStates<stateVector_T, msf_tmp::PropagatedCoreStateLengthForType>::value, ///<n total core states with propagation
-		nPropagatedCoreErrorStatesAtCompileTime = msf_tmp::CountStates<stateVector_T, msf_tmp::PropagatedCoreErrorStateLengthForType>::value ///<n total error states with propagation
-	};
+  typedef stateSequence_T stateVector_T; ///<the state vector defining the state variables of this EKF
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  enum{
+    nStateVarsAtCompileTime = boost::fusion::result_of::size<stateVector_T>::type::value, ///<n state vars
+    nErrorStatesAtCompileTime = msf_tmp::CountStates<stateVector_T, msf_tmp::CorrectionStateLengthForType>::value, ///<n error states
+    nStatesAtCompileTime = msf_tmp::CountStates<stateVector_T, msf_tmp::StateLengthForType>::value, ///<n total states
+    nCoreStatesAtCompileTime = msf_tmp::CountStates<stateVector_T, msf_tmp::CoreStateLengthForType>::value, ///<n total core states
+    nPropagatedCoreStatesAtCompileTime = msf_tmp::CountStates<stateVector_T, msf_tmp::PropagatedCoreStateLengthForType>::value, ///<n total core states with propagation
+    nPropagatedCoreErrorStatesAtCompileTime = msf_tmp::CountStates<stateVector_T, msf_tmp::PropagatedCoreErrorStateLengthForType>::value ///<n total error states with propagation
+  };
 
 private:
 
-	/**
-	 * \brief returns the stateVar at position INDEX in the state list
-	 * non const version only for msf_core use. You must not make these functions public.
-	 * Instead const_cast the state object to const to use the overload
-	 */
-	template<int INDEX>
-	inline typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type
-	getStateVar();
+  /**
+   * \brief returns the stateVar at position INDEX in the state list
+   * non const version only for msf_core use. You must not make these functions public.
+   * Instead const_cast the state object to const to use the overload
+   */
+  template<int INDEX>
+  inline typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type
+  getStateVar();
 
-	/**
-	 * \brief returns the state at position INDEX in the state list, non const version
-	 * you must not make these functions public. Instead const_cast the state object to const to use the overload
-	 */
-	template<int INDEX>
-	inline typename msf_tmp::StripReference<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::result_t::value_t&
-	get();
+  /**
+   * \brief returns the state at position INDEX in the state list, non const version
+   * you must not make these functions public. Instead const_cast the state object to const to use the overload
+   */
+  template<int INDEX>
+  inline typename msf_tmp::StripReference<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::result_t::value_t&
+  get();
 
 public:
 
-	typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> P_type; ///< type of the error state covariance matrix
+  typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> P_type; ///< type of the error state covariance matrix
 
-	stateVector_T statevars_; ///< the actual state variables
+  stateVector_T statevars_; ///< the actual state variables
 
-	// system inputs
-	Eigen::Matrix<double,3,1> w_m_;         ///< angular velocity from IMU
-	Eigen::Matrix<double,3,1> a_m_;         ///< acceleration from IMU
-
-
-	double time_; 							///< time of this state estimate
-	P_type P_;								///< error state covariance
+  // system inputs
+  Eigen::Matrix<double,3,1> w_m_;         ///< angular velocity from IMU
+  Eigen::Matrix<double,3,1> a_m_;         ///< acceleration from IMU
 
 
-	GenericState_T(){
-		time_ = -1;
-		P_.setZero();
-	}
-
-	/**
-	 * \brief apply the correction vector to all state vars
-	 */
-	inline void correct(const Eigen::Matrix<double, nErrorStatesAtCompileTime, 1>& correction);
-
-	/**
-	 * \brief returns the Q-block of the state at position INDEX in the state list, not allowed for core states
-	 */
-	template<int INDEX>
-	inline typename msf_tmp::StripReference<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::result_t::Q_T&
-	getQBlock();
-
-	/**
-	 * \brief returns the Q-block of the state at position INDEX in the state list, also possible for core states, since const
-	 */
-	template<int INDEX>
-	inline const typename msf_tmp::StripReference<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::result_t::Q_T&
-	getQBlock() const;
-
-	/**
-	 * \brief reset the state
-	 * 3D vectors: 0; quaternion: unit quaternion; scale: 1; time:0; Error covariance: zeros
-	 */
-	void reset(msf_core::StateVisitor* usercalc);
-
-	/**
-	 * \brief write the covariance corresponding to position and attitude to cov
-	 */
-	void getPoseCovariance(geometry_msgs::PoseWithCovariance::_covariance_type & cov); //boost fusion unfortunately doesn't like this to be const
-
-	/**
-	 * \brief assembles a PoseWithCovarianceStamped message from the state
-	 * it does not set the header
-	 */
-	void toPoseMsg(geometry_msgs::PoseWithCovarianceStamped & pose);
-
-	/**
-	 * \brief assemble an ExtState message from the state
-	 * \note it does not set the header
-	 */
-	void toExtStateMsg(sensor_fusion_comm::ExtState & state);
-
-	/***
-	 * \brief assemble a DoubleArrayStamped message from the state
-	 * \note it does not set the header
-	 */
-	void toFullStateMsg(sensor_fusion_comm::DoubleArrayStamped & state);
-
-	/**
-	 * \brief assembles a DoubleArrayStamped message from the state
-	 * \note it does not set the header
-	 */
-	void toCoreStateMsg(sensor_fusion_comm::DoubleArrayStamped & state);
+  double time_; 							///< time of this state estimate
+  P_type P_;								///< error state covariance
 
 
-	/**
-	 * \brief returns the state at position INDEX in the state list, const version
-	 */
-	template<int INDEX>
-	inline const typename msf_tmp::StripReference<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::result_t::value_t&
-	get() const;
+  GenericState_T(){
+    time_ = -1;
+    P_.setZero();
+  }
 
-	/**
-	 * \brief returns the stateVar at position INDEX in the state list, const version
-	 */
-	template<int INDEX>
-	inline typename msf_tmp::AddConstReference<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::result_t
-	getStateVar() const;
+  /**
+   * \brief apply the correction vector to all state vars
+   */
+  inline void correct(const Eigen::Matrix<double, nErrorStatesAtCompileTime, 1>& correction);
 
-	/**
-	 * \brief sets state at position INDEX in the state list, fails for core states at compile time
-	 */
-	template<int INDEX>
-	inline void
-	set(const typename msf_tmp::StripConstReference<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::result_t::value_t& newvalue);
+  /**
+   * \brief returns the Q-block of the state at position INDEX in the state list, not allowed for core states
+   */
+  template<int INDEX>
+  inline typename msf_tmp::StripReference<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::result_t::Q_T&
+  getQBlock();
+
+  /**
+   * \brief returns the Q-block of the state at position INDEX in the state list, also possible for core states, since const
+   */
+  template<int INDEX>
+  inline const typename msf_tmp::StripReference<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::result_t::Q_T&
+  getQBlock() const;
+
+  /**
+   * \brief reset the state
+   * 3D vectors: 0; quaternion: unit quaternion; scale: 1; time:0; Error covariance: zeros
+   */
+  void reset(msf_core::StateVisitor* usercalc);
+
+  /**
+   * \brief write the covariance corresponding to position and attitude to cov
+   */
+  void getPoseCovariance(geometry_msgs::PoseWithCovariance::_covariance_type & cov); //boost fusion unfortunately doesn't like this to be const
+
+  /**
+   * \brief assembles a PoseWithCovarianceStamped message from the state
+   * it does not set the header
+   */
+  void toPoseMsg(geometry_msgs::PoseWithCovarianceStamped & pose);
+
+  /**
+   * \brief assemble an ExtState message from the state
+   * \note it does not set the header
+   */
+  void toExtStateMsg(sensor_fusion_comm::ExtState & state);
+
+  /***
+   * \brief assemble a DoubleArrayStamped message from the state
+   * \note it does not set the header
+   */
+  void toFullStateMsg(sensor_fusion_comm::DoubleArrayStamped & state);
+
+  /**
+   * \brief assembles a DoubleArrayStamped message from the state
+   * \note it does not set the header
+   */
+  void toCoreStateMsg(sensor_fusion_comm::DoubleArrayStamped & state);
+
+
+  /**
+   * \brief returns the state at position INDEX in the state list, const version
+   */
+  template<int INDEX>
+  inline const typename msf_tmp::StripReference<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::result_t::value_t&
+  get() const;
+
+  /**
+   * \brief returns the stateVar at position INDEX in the state list, const version
+   */
+  template<int INDEX>
+  inline typename msf_tmp::AddConstReference<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::result_t
+  getStateVar() const;
+
+  /**
+   * \brief sets state at position INDEX in the state list, fails for core states at compile time
+   */
+  template<int INDEX>
+  inline void
+  set(const typename msf_tmp::StripConstReference<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::result_t::value_t& newvalue);
 };
 
 /**
@@ -231,13 +231,13 @@ template<typename stateSequence_T>
 class sortStates
 {
 public:
-	/**
-	 * \brief implements the sorting by time
-	 */
-	bool operator() (const GenericState_T<stateSequence_T>& lhs, const GenericState_T<stateSequence_T>&rhs) const
-	{
-		return (lhs.time_<rhs.time_);
-	}
+  /**
+   * \brief implements the sorting by time
+   */
+  bool operator() (const GenericState_T<stateSequence_T>& lhs, const GenericState_T<stateSequence_T>&rhs) const
+  {
+    return (lhs.time_<rhs.time_);
+  }
 };
 
 }
