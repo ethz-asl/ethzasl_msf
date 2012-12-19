@@ -109,7 +109,6 @@ public:
 	 * provide a getter for these parameters, this is implemented for a given middleware or param file parser
 	 */
 	virtual bool getParam_fixed_bias() = 0;
-	virtual double getParam_delay() = 0;
 	virtual double getParam_noise_acc() = 0;
 	virtual double getParam_noise_accbias() = 0;
 	virtual double getParam_noise_gyr() = 0;

@@ -177,7 +177,6 @@ public:
     r_old(6, 0) = -2 * (q_err.w() * q_err.z() + q_err.x() * q_err.y())
                         / (1 - 2 * (q_err.y() * q_err.y() + q_err.z() * q_err.z()));
 
-
     // call update step in base class
     MSF_Measurement::calculateAndApplyCorrection(const_state, core, H_old, r_old, R_);
 

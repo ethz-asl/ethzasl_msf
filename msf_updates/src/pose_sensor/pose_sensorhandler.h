@@ -42,42 +42,44 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/PoseStamped.h>
 
+namespace msf_pose_sensor{
 class PoseSensorManager;
 
 class PoseSensorHandler : public msf_core::SensorHandler
 {
 private:
 
-	Eigen::Quaternion<double> z_q_; /// attitude measurement camera seen from world
-	Eigen::Matrix<double, 3, 1> z_p_; /// position measurement camera seen from world
-	double n_zp_, n_zq_; /// position and attitude measurement noise
+  Eigen::Quaternion<double> z_q_; ///< attitude measurement camera seen from world
+  Eigen::Matrix<double, 3, 1> z_p_; ///< position measurement camera seen from world
+  double n_zp_, n_zq_; ///< position and attitude measurement noise
+  double delay_;        ///< delay to be subtracted from the ros-timestamp of the measurement provided by this sensor
 
-	ros::Subscriber subPoseWithCovarianceStamped_;
-        ros::Subscriber subTransformStamped_;
-        ros::Subscriber subPoseStamped_;
+  ros::Subscriber subPoseWithCovarianceStamped_;
+  ros::Subscriber subTransformStamped_;
+  ros::Subscriber subPoseStamped_;
 
-	bool measurement_world_sensor_; ///< defines if the pose of the sensor is measured in world coordinates (true, default) or vice versa (false, e.g. PTAM)
-	bool use_fixed_covariance_; ///< use fixed covariance set by dynamic reconfigure
+  bool measurement_world_sensor_; ///< defines if the pose of the sensor is measured in world coordinates (true, default) or vice versa (false, e.g. PTAM)
+  bool use_fixed_covariance_; ///< use fixed covariance set by dynamic reconfigure
 
-	void subscribe();
-	void measurementCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg);
-	void measurementCallback(const geometry_msgs::PoseStampedConstPtr & msg);
-	void measurementCallback(const geometry_msgs::TransformStampedConstPtr & msg);
-	void noiseConfig(msf_core::MSF_CoreConfig& config, uint32_t level);
-	virtual void dynConfig(msf_core::MSF_CoreConfig &config, uint32_t level);
+  void measurementCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg);
+  void measurementCallback(const geometry_msgs::PoseStampedConstPtr & msg);
+  void measurementCallback(const geometry_msgs::TransformStampedConstPtr & msg);
 
 public:
-	PoseSensorHandler(msf_core::MSF_SensorManager& meas);
-	//used for the init
-	Eigen::Matrix<double, 3, 1> getPositionMeasurement(){
-		return z_p_;
-	}
-	Eigen::Quaterniond getAttitudeMeasurement(){
-		return z_q_;
-	}
+  PoseSensorHandler(msf_core::MSF_SensorManager& meas);
+  //used for the init
+  Eigen::Matrix<double, 3, 1> getPositionMeasurement(){
+    return z_p_;
+  }
+  Eigen::Quaterniond getAttitudeMeasurement(){
+    return z_q_;
+  }
+  //setters for configure values
+  void setNoises(double n_zp, double n_zq);
+  void setDelay(double delay);
 
 };
-
+}
 #include "pose_sensorhandler.hpp"
 
 #endif /* POSE_SENSOR_H */

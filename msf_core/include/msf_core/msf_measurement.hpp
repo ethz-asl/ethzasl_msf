@@ -101,6 +101,12 @@ public:
     if(R_.minCoeff() == 0.0 && R_.maxCoeff() == 0.0){//check whether the user has set R
       ROS_WARN_STREAM_THROTTLE(2,"The measurement covariance matrix seems to be not set for the current measurement. Please double check!");
     }
+
+    for(int i = 0;i<R_.RowsAtCompileTime;++i){
+      if(R_(i,i)==0.0){
+        ROS_WARN_STREAM_THROTTLE(2,"The measurement covariance matrix has some diagonal elements set to zero. Please double check!");
+      }
+    }
   }
   //apply is implemented by respective sensor measurement types
 };

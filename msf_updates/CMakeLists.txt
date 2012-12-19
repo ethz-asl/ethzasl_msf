@@ -15,7 +15,10 @@ rosbuild_init()
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 #set the default path for built libraries to the "lib" directory
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
-#gencfg()
+
+rosbuild_find_ros_package(dynamic_reconfigure)
+include(${dynamic_reconfigure_PACKAGE_PATH}/cmake/cfgbuild.cmake)
+gencfg()
 rosbuild_genmsg()
 
 add_definitions (-Wall -std=c++0x)
@@ -24,16 +27,4 @@ add_definitions (-Wall -std=c++0x)
 find_package(Eigen REQUIRED)
 include_directories(${Eigen_INCLUDE_DIRS})
 
-rosbuild_add_executable(pose_sensor src/main.cpp)
-set_property(TARGET pose_sensor PROPERTY COMPILE_DEFINITIONS POSE_MEAS)
-#rosbuild_add_compile_flags(pose_sensor "-O3")
-
-#rosbuild_add_executable(position_sensor src/main.cpp)
-#set_property(TARGET position_sensor PROPERTY COMPILE_DEFINITIONS POSITION_MEAS)
-#rosbuild_add_compile_flags(position_sensor "-O3")
-
-#rosbuild_add_executable(msf_viconpos_sensor src/main.cpp)
-#set_property(TARGET msf_viconpos_sensor PROPERTY COMPILE_DEFINITIONS VICONPOS_MEAS)
-##rosbuild_add_compile_flags(msf_viconpos_sensor "-O3")
-
-#rosbuild_add_executable(prototype src/prototyping.cc)
+add_subdirectory(src/pose_sensor)

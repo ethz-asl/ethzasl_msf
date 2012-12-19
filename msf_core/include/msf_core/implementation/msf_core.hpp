@@ -454,7 +454,7 @@ void MSF_Core::addMeasurement(boost::shared_ptr<MSF_MeasurementBase> measurement
 
 	for( ; it_meas != it_meas_end; ++it_meas){
 
-		boost::shared_ptr<EKFState> state = getClosestState(it_meas->second->time_, 0); //propagates covariance to state
+		boost::shared_ptr<EKFState> state = getClosestState(it_meas->second->time_); //propagates covariance to state
 
 		if(state->time_ <= 0){
 			ROS_ERROR_STREAM_THROTTLE(1,"getClosestState returned an invalid state");
@@ -539,14 +539,14 @@ void MSF_Core::addMeasurement(boost::shared_ptr<MSF_MeasurementBase> measurement
 	seq_m++;
 }
 
-boost::shared_ptr<EKFState> MSF_Core::getClosestState(double tstamp, double delay)
+boost::shared_ptr<EKFState> MSF_Core::getClosestState(double tstamp)
 {
 
 	//sweiss{
 	// we subtracted one too much before.... :)
 	//}
 
-	double timenow = tstamp - delay - usercalc_.getParam_delay();
+	double timenow = tstamp; // - delay - usercalc_.getParam_delay();
 
 	stateBufferT::iterator_T it = StateBuffer_.getIteratorClosest(timenow);
 

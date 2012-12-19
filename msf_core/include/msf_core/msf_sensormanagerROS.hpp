@@ -52,32 +52,26 @@ protected:
 private:
 
 	ReconfigureServer *reconfServer_; ///< dynamic reconfigure server
-	typedef boost::function<void(msf_core::MSF_CoreConfig& config, uint32_t level)> CallbackType;
-	std::vector<CallbackType> callbacks_; ///<callbacks where the core can register to retrieve parameter changes
 
 public:
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-	/**
-	 * \brief registers dynamic reconfigure callbacks
-	 */
-	template<class T>
-	void registerCallback(void(T::*cb_func)(msf_core::MSF_CoreConfig& config, uint32_t level), T* p_obj)
-	{
-		callbacks_.push_back(boost::bind(cb_func, p_obj, _1, _2));
-	}
-
-	MSF_SensorManagerROS(){
-		reconfServer_ = new ReconfigureServer(ros::NodeHandle("~"));
+	MSF_SensorManagerROS(ros::NodeHandle pnh = ros::NodeHandle("~core")){
+		reconfServer_ = new ReconfigureServer(pnh);
 		ReconfigureServer::CallbackType f = boost::bind(&MSF_SensorManagerROS::Config, this, _1, _2);
 		reconfServer_->setCallback(f);
-		//register dyn config list
-		registerCallback(&MSF_SensorManagerROS::DynConfig, this);
 	}
 
 	~MSF_SensorManagerROS(){
 		delete reconfServer_;
 	}
+
+        /**
+         * \brief gets called by the internal callback caller
+         */
+        virtual void coreConfig(msf_core::MSF_CoreConfig &config, uint32_t level){
+
+        }
 
 	/**
 	 * \brief gets called by dynamic reconfigure and calls all registered callbacks in callbacks_
@@ -85,19 +79,7 @@ public:
 	void Config(msf_core::MSF_CoreConfig &config, uint32_t level)
 	{
 		config_ = config;
-		for (std::vector<CallbackType>::iterator it = callbacks_.begin(); it != callbacks_.end(); it++)
-			(*it)(config, level);
-	}
-
-	/**
-	 * \brief gets called by the internal callback caller
-	 */
-	virtual void DynConfig(msf_core::MSF_CoreConfig &config, uint32_t level){
-		if(level & msf_core::MSF_Core_INIT_FILTER)
-		{
-			init(config.scale_init);
-			config.init_filter = false;
-		}
+		coreConfig(config, level);
 	}
 
 	//parameter getters

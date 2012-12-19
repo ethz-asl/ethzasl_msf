@@ -109,7 +109,7 @@ public:
 	 * \param tstamp the time stamp to find the closest state to
 	 * \param delay optional additional delay
 	 */
-	boost::shared_ptr<EKFState> getClosestState(double tstamp, double delay = 0.00);
+	boost::shared_ptr<EKFState> getClosestState(double tstamp);
 
 	/**
 	 * \brief delete very old states and measurements from the buffers to free memory
