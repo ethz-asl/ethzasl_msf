@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace msf_pose_sensor{
 PoseSensorHandler::PoseSensorHandler(msf_core::MSF_SensorManager& meas) :
-    SensorHandler(meas)
+    SensorHandler(meas), n_zp_(1e-6), n_zq_(1e-6), delay_(0)
 {
   ros::NodeHandle pnh("~");
   pnh.param("measurement_world_sensor", measurement_world_sensor_, true);
@@ -56,8 +56,8 @@ PoseSensorHandler::PoseSensorHandler(msf_core::MSF_SensorManager& meas) :
 
 void PoseSensorHandler::setNoises(double n_zp, double n_zq)
 {
-  this->n_zp_ = n_zp;
-  this->n_zq_ = n_zq;
+  n_zp_ = n_zp;
+  n_zq_ = n_zq;
 }
 
 void PoseSensorHandler::setDelay(double delay)
