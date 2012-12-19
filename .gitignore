@@ -4,12 +4,12 @@ msg_gen
 bin
 lib
 *~
-cfg/cpp/*
+*cfg/cpp/*
 .project
 .cproject
 .settings
 doc
-
+*.cfgc
 
 /msf_core/docs/MSF_CoreConfig.dox
 /msf_core/docs/MSF_CoreConfig-usage.dox
