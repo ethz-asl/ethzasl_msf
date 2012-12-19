@@ -51,13 +51,10 @@ SensorHandler(meas)
 
 void PoseSensorHandler::subscribe()
 {
-	ros::NodeHandle nh("msf_core");
-	subPoseWithCovarianceStamped_ = nh.subscribe<geometry_msgs::PoseWithCovarianceStamped>("pose_with_covariance", 1, &PoseSensorHandler::measurementCallback, this);
-	subTransformStamped_ = nh.subscribe<geometry_msgs::TransformStamped>("transform", 1, &PoseSensorHandler::measurementCallback, this);
-	subPoseStamped_ = nh.subscribe<geometry_msgs::PoseStamped>("pose", 1, &PoseSensorHandler::measurementCallback, this);
-
-	//TODO: we might need to implement that for initial testing
-	//measurements->msf_core_.registerCallback(&PoseSensorHandler::noiseConfig, this);
+	ros::NodeHandle nh("msf_updates");
+	subPoseWithCovarianceStamped_ = nh.subscribe<geometry_msgs::PoseWithCovarianceStamped>("pose_with_covariance_input", 1, &PoseSensorHandler::measurementCallback, this);
+	subTransformStamped_ = nh.subscribe<geometry_msgs::TransformStamped>("transform_input", 1, &PoseSensorHandler::measurementCallback, this);
+	subPoseStamped_ = nh.subscribe<geometry_msgs::PoseStamped>("pose_input", 1, &PoseSensorHandler::measurementCallback, this);
 
 	nh.param("meas_noise1", n_zp_, 0.01);	// default position noise is for ethzasl_ptam
 	nh.param("meas_noise2", n_zq_, 0.02);	// default attitude noise is for ethzasl_ptam
@@ -69,11 +66,8 @@ void PoseSensorHandler::subscribe()
 
 void PoseSensorHandler::noiseConfig(msf_core::MSF_CoreConfig& config, uint32_t level)
 {
-	//	if(level & msf_core::MSF_Core_MISC)
-	//	{
 	this->n_zp_ = config.meas_noise1;
 	this->n_zq_ = config.meas_noise2;
-	//	}
 }
 
 void PoseSensorHandler::dynConfig(msf_core::MSF_CoreConfig &config, uint32_t level){
@@ -120,8 +114,6 @@ void PoseSensorHandler::measurementCallback(const geometry_msgs::TransformStampe
 
         geometry_msgs::PoseWithCovarianceStampedPtr pose(new geometry_msgs::PoseWithCovarianceStamped());
 
-        Eigen::Matrix<double, pose_measurement::nMeasurements, pose_measurement::nMeasurements> R_;
-
         if (!use_fixed_covariance_)  // take covariance from sensor
         {
                 ROS_WARN_STREAM_THROTTLE(2,"Provided message type without covariance but set fixed_covariance=false at the same time. Discarding message.");
@@ -148,8 +140,6 @@ void PoseSensorHandler::measurementCallback(const geometry_msgs::PoseStampedCons
 {
 
         geometry_msgs::PoseWithCovarianceStampedPtr pose(new geometry_msgs::PoseWithCovarianceStamped());
-
-        Eigen::Matrix<double, pose_measurement::nMeasurements, pose_measurement::nMeasurements> R_;
 
         if (!use_fixed_covariance_)  // take covariance from sensor
         {

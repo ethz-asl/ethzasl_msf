@@ -55,48 +55,47 @@ private:
 
     Eigen::Matrix<double, nMeasurements, msf_core::MSF_Core::nErrorStatesAtCompileTime> H_old;
     Eigen::Matrix<double, nMeasurements, 1> r_old;
-    Eigen::Matrix<double, nMeasurements, nMeasurements> R;
 
     H_old.setZero();
-    R.setZero();
+    R_.setZero(); //TODO:remove later, already done in ctor of base
 
     // get measurements
     z_p_ = Eigen::Matrix<double, 3, 1>(msg->pose.pose.position.x, msg->pose.pose.position.y, msg->pose.pose.position.z);
     z_q_ = Eigen::Quaternion<double>(msg->pose.pose.orientation.w, msg->pose.pose.orientation.x,
                                      msg->pose.pose.orientation.y, msg->pose.pose.orientation.z);
 
-    // take covariance from sensor
-    R.block<6, 6>(0, 0) = Eigen::Matrix<double, 6, 6>(&msg->pose.covariance[0]);
-    //clear cross-correlations between q and p
-    R.block<3, 3>(0, 3) = Eigen::Matrix<double, 3, 3>::Zero();
-    R.block<3, 3>(3, 0) = Eigen::Matrix<double, 3, 3>::Zero();
-    R(6, 6) = 1e-6; // q_vw yaw-measurement noise
-
-    /*************************************************************************************/
-    // use this if your pose sensor is ethzasl_ptam (www.ros.org/wiki/ethzasl_ptam)
-    // ethzasl_ptam publishes the camera pose as the world seen from the camera
-    if (!measurement_world_sensor_)
+    if (fixed_covariance_)//  take fix covariance from reconfigure GUI
     {
-      Eigen::Matrix<double, 3, 3> C_zq = z_q_.toRotationMatrix();
-      z_q_ = z_q_.conjugate();
-      z_p_ = -C_zq.transpose() * z_p_;
 
-      Eigen::Matrix<double, 6, 6> C_cov(Eigen::Matrix<double, 6, 6>::Zero());
-      C_cov.block<3, 3>(0, 0) = C_zq;
-      C_cov.block<3, 3>(3, 3) = C_zq;
-
-      R.block<6, 6>(0, 0) = C_cov.transpose() * R.block<6, 6>(0, 0) * C_cov;
-    }
-    /*************************************************************************************/
-
-    //  alternatively take fix covariance from reconfigure GUI
-    if (fixed_covariance_)
-    {
       const double s_zp = n_zp_ * n_zp_;
       const double s_zq = n_zq_ * n_zq_;
-      R = (Eigen::Matrix<double, nMeasurements, 1>() << s_zp, s_zp, s_zp, s_zq, s_zq, s_zq, 1e-6).finished().asDiagonal();
-    }
+      R_ = (Eigen::Matrix<double, nMeasurements, 1>() << s_zp, s_zp, s_zp, s_zq, s_zq, s_zq, 1e-6).finished().asDiagonal();
 
+    }else{// take covariance from sensor
+
+      R_.block<6, 6>(0, 0) = Eigen::Matrix<double, 6, 6>(&msg->pose.covariance[0]);
+      //clear cross-correlations between q and p
+      R_.block<3, 3>(0, 3) = Eigen::Matrix<double, 3, 3>::Zero();
+      R_.block<3, 3>(3, 0) = Eigen::Matrix<double, 3, 3>::Zero();
+      R_(6, 6) = 1e-6; // q_vw yaw-measurement noise
+
+      /*************************************************************************************/
+      // use this if your pose sensor is ethzasl_ptam (www.ros.org/wiki/ethzasl_ptam)
+      // ethzasl_ptam publishes the camera pose as the world seen from the camera
+      if (!measurement_world_sensor_)
+      {
+        Eigen::Matrix<double, 3, 3> C_zq = z_q_.toRotationMatrix();
+        z_q_ = z_q_.conjugate();
+        z_p_ = -C_zq.transpose() * z_p_;
+
+        Eigen::Matrix<double, 6, 6> C_cov(Eigen::Matrix<double, 6, 6>::Zero());
+        C_cov.block<3, 3>(0, 0) = C_zq;
+        C_cov.block<3, 3>(3, 3) = C_zq;
+
+        R_.block<6, 6>(0, 0) = C_cov.transpose() * R_.block<6, 6>(0, 0) * C_cov;
+      }
+      /*************************************************************************************/
+    }
   }
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -154,7 +153,7 @@ public:
     H_old.block<3, 3>(0, 0) = C_wv.transpose() * state.get<msf_core::L_>()(0); // p
     H_old.block<3, 3>(0, 6) = -C_wv.transpose() * C_q.transpose() * pci_sk * state.get<msf_core::L_>()(0); // q
     H_old.block<3, 1>(0, 15) = C_wv.transpose() * C_q.transpose() * state.get<msf_core::p_ci_>()
-            + C_wv.transpose() * state.get<msf_core::p_>(); // L
+                        + C_wv.transpose() * state.get<msf_core::p_>(); // L
     H_old.block<3, 3>(0, 16) = -C_wv.transpose() * skewold; // q_wv
     H_old.block<3, 3>(0, 22) = C_wv.transpose() * C_q.transpose() * state.get<msf_core::L_>()(0); //p_ci
 
@@ -176,7 +175,8 @@ public:
     // vision world yaw drift
     q_err = state.get<msf_core::q_wv_>();
     r_old(6, 0) = -2 * (q_err.w() * q_err.z() + q_err.x() * q_err.y())
-            / (1 - 2 * (q_err.y() * q_err.y() + q_err.z() * q_err.z()));
+                        / (1 - 2 * (q_err.y() * q_err.y() + q_err.z() * q_err.z()));
+
 
     // call update step in base class
     MSF_Measurement::calculateAndApplyCorrection(const_state, core, H_old, r_old, R_);
