@@ -493,30 +493,41 @@ void MSF_Core::addMeasurement(boost::shared_ptr<MSF_MeasurementBase> measurement
 	msgCorrect_.linear_acceleration.x = 0;
 	msgCorrect_.linear_acceleration.y = 0;
 	msgCorrect_.linear_acceleration.z = 0;
-
 	boost::shared_ptr<EKFState>& latestState = StateBuffer_.getLast();
-	msgCorrect_.state[0] = latestState->get<msf_core::p_>()[0] - hl_state_buf_.state[0];
-	msgCorrect_.state[1] = latestState->get<msf_core::p_>()[1] - hl_state_buf_.state[1];
-	msgCorrect_.state[2] = latestState->get<msf_core::p_>()[2] - hl_state_buf_.state[2];
-	msgCorrect_.state[3] = latestState->get<msf_core::v_>()[0] - hl_state_buf_.state[3];
-	msgCorrect_.state[4] = latestState->get<msf_core::v_>()[1] - hl_state_buf_.state[4];
-	msgCorrect_.state[5] = latestState->get<msf_core::v_>()[2] - hl_state_buf_.state[5];
 
-	Eigen::Quaterniond hl_q(hl_state_buf_.state[6], hl_state_buf_.state[7], hl_state_buf_.state[8], hl_state_buf_.state[9]);
-	Eigen::Quaterniond qbuff_q = hl_q.inverse() * latestState->get<msf_core::q_>();
-	msgCorrect_.state[6] = qbuff_q.w();
-	msgCorrect_.state[7] = qbuff_q.x();
-	msgCorrect_.state[8] = qbuff_q.y();
-	msgCorrect_.state[9] = qbuff_q.z();
+	// prevent junk being sent to the external state propagation when data playback is (accidentally) on
+	if(data_playback_){
+	  for(int i=0; i<HLI_EKF_STATE_SIZE; ++i){
+	    msgCorrect_.state[i] = 0;
+	  }
+	  msgCorrect_.state[6] = 1;
+	  msgCorrect_.flag = sensor_fusion_comm::ExtEkf::initialization;
+	}
+	else{
+	  msgCorrect_.state[0] = latestState->get<msf_core::p_>()[0] - hl_state_buf_.state[0];
+	  msgCorrect_.state[1] = latestState->get<msf_core::p_>()[1] - hl_state_buf_.state[1];
+	  msgCorrect_.state[2] = latestState->get<msf_core::p_>()[2] - hl_state_buf_.state[2];
+	  msgCorrect_.state[3] = latestState->get<msf_core::v_>()[0] - hl_state_buf_.state[3];
+	  msgCorrect_.state[4] = latestState->get<msf_core::v_>()[1] - hl_state_buf_.state[4];
+	  msgCorrect_.state[5] = latestState->get<msf_core::v_>()[2] - hl_state_buf_.state[5];
 
-	msgCorrect_.state[10] = latestState->get<msf_core::b_w_>()[0] - hl_state_buf_.state[10];
-	msgCorrect_.state[11] = latestState->get<msf_core::b_w_>()[1] - hl_state_buf_.state[11];
-	msgCorrect_.state[12] = latestState->get<msf_core::b_w_>()[2] - hl_state_buf_.state[12];
-	msgCorrect_.state[13] = latestState->get<msf_core::b_a_>()[0] - hl_state_buf_.state[13];
-	msgCorrect_.state[14] = latestState->get<msf_core::b_a_>()[1] - hl_state_buf_.state[14];
-	msgCorrect_.state[15] = latestState->get<msf_core::b_a_>()[2] - hl_state_buf_.state[15];
+	  Eigen::Quaterniond hl_q(hl_state_buf_.state[6], hl_state_buf_.state[7], hl_state_buf_.state[8], hl_state_buf_.state[9]);
+	  Eigen::Quaterniond qbuff_q = hl_q.inverse() * latestState->get<msf_core::q_>();
+	  msgCorrect_.state[6] = qbuff_q.w();
+	  msgCorrect_.state[7] = qbuff_q.x();
+	  msgCorrect_.state[8] = qbuff_q.y();
+	  msgCorrect_.state[9] = qbuff_q.z();
 
-	msgCorrect_.flag = sensor_fusion_comm::ExtEkf::state_correction;
+	  msgCorrect_.state[10] = latestState->get<msf_core::b_w_>()[0] - hl_state_buf_.state[10];
+	  msgCorrect_.state[11] = latestState->get<msf_core::b_w_>()[1] - hl_state_buf_.state[11];
+	  msgCorrect_.state[12] = latestState->get<msf_core::b_w_>()[2] - hl_state_buf_.state[12];
+	  msgCorrect_.state[13] = latestState->get<msf_core::b_a_>()[0] - hl_state_buf_.state[13];
+	  msgCorrect_.state[14] = latestState->get<msf_core::b_a_>()[1] - hl_state_buf_.state[14];
+	  msgCorrect_.state[15] = latestState->get<msf_core::b_a_>()[2] - hl_state_buf_.state[15];
+
+	  msgCorrect_.flag = sensor_fusion_comm::ExtEkf::state_correction;
+	}
+
 	pubCorrect_.publish(msgCorrect_);
 
 	// publish state
