@@ -76,7 +76,8 @@ class MSF_Core
   bool initialized_; ///< is the filter initialized, so that we can propagate the state?
   bool predictionMade_; ///< is there a state prediction, so we can apply measurements?
 public:
-//  typedef msf_updates::EKFState EKFState_T;
+  typedef typename EKFState_T::StateDefinition_T StateDefinition_T;
+  typedef typename EKFState_T::StateSequence_T StateSequence_T;
   enum{
     nErrorStatesAtCompileTime = EKFState_T::nErrorStatesAtCompileTime,  ///< error state length
     nStatesAtCompileTime = EKFState_T::nStatesAtCompileTime ///< complete state length
@@ -180,10 +181,10 @@ private:
   /**
    * \brief get the index of the best state having no temporal drift at compile time
    */
-  enum{//TODO create a typedef in EKFState_T to make the list of types public, insert here but also in the lines below
-    indexOfStateWithoutTemporalDrift = msf_tmp::IndexOfBestNonTemporalDriftingState<msf_updates::fullState_T>::value
+  enum{
+    indexOfStateWithoutTemporalDrift = msf_tmp::IndexOfBestNonTemporalDriftingState<StateSequence_T>::value
   };
-  typedef typename msf_tmp::getEnumStateType<msf_updates::fullState_T, indexOfStateWithoutTemporalDrift>::value nonDriftingStateType; //returns void type for invalid types
+  typedef typename msf_tmp::getEnumStateType<StateSequence_T, indexOfStateWithoutTemporalDrift>::value nonDriftingStateType; //returns void type for invalid types
 
   const static int qbuffRowsAtCompiletime = msf_tmp::StateLengthForType<const typename msf_tmp::StripConstReference<nonDriftingStateType>::result_t&>::value;
 

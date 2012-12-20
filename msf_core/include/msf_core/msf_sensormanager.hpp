@@ -32,8 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SENSORMANAGER_H
 #define SENSORMANAGER_H
 
-#include <msf_core/msf_statedef.hpp>
-#include <msf_core/msf_state.hpp>
+#include <msf_core/msf_statevisitor.hpp>
 #include <Eigen/Dense>
 
 namespace msf_core{
@@ -50,7 +49,7 @@ class MSF_Core;
  * EKF core instance and handles the initialization of the filter
  */
 template<typename EKFState_T>
-class MSF_SensorManager:public StateVisitor
+class MSF_SensorManager:public StateVisitor<EKFState_T>
 {
 protected:
   typedef std::vector<boost::shared_ptr<SensorHandler<EKFState_T> > > Handlers;

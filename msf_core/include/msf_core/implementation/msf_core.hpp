@@ -101,7 +101,7 @@ void MSF_Core<EKFState_T>::initExternalPropagation(boost::shared_ptr<EKFState_T>
   msgCorrect_.state.resize(HLI_EKF_STATE_SIZE); //make sure this is correctly sized
   boost::fusion::for_each(
       state->statevars_,
-      msf_tmp::CoreStatetoDoubleArray<std::vector<float>, typename EKFState_T::stateVector_T >(msgCorrect_.state)
+      msf_tmp::CoreStatetoDoubleArray<std::vector<float>, StateSequence_T >(msgCorrect_.state)
   );
 
   msgCorrect_.flag = sensor_fusion_comm::ExtEkf::initialization;
@@ -230,14 +230,14 @@ void MSF_Core<EKFState_T>::stateCallback(const sensor_fusion_comm::ExtEkfConstPt
   if (flag == sensor_fusion_comm::ExtEkf::current_state)
     isnumeric = checkForNumeric(&msg->state[0], 10, "before prediction p,v,q");
 
-  isnumeric = checkForNumeric((double*)(&currentState-> template get<msf_updates::p_>()[0]), 3, "before prediction p");
+  isnumeric = checkForNumeric((double*)(&currentState-> template get<StateDefinition_T::p_>()[0]), 3, "before prediction p");
 
   if (flag == sensor_fusion_comm::ExtEkf::current_state && isnumeric) // state propagation is made externally, so we read the actual state
   {
-    currentState-> template get<msf_updates::p_>() = Eigen::Matrix<double, 3, 1>(msg->state[0], msg->state[1], msg->state[2]);
-    currentState-> template get<msf_updates::v_>() = Eigen::Matrix<double, 3, 1>(msg->state[3], msg->state[4], msg->state[5]);
-    currentState-> template get<msf_updates::q_>() = Eigen::Quaternion<double>(msg->state[6], msg->state[7], msg->state[8], msg->state[9]);
-    currentState-> template get<msf_updates::q_>().normalize();
+    currentState-> template get<StateDefinition_T::p_>() = Eigen::Matrix<double, 3, 1>(msg->state[0], msg->state[1], msg->state[2]);
+    currentState-> template get<StateDefinition_T::v_>() = Eigen::Matrix<double, 3, 1>(msg->state[3], msg->state[4], msg->state[5]);
+    currentState-> template get<StateDefinition_T::q_>() = Eigen::Quaternion<double>(msg->state[6], msg->state[7], msg->state[8], msg->state[9]);
+    currentState-> template get<StateDefinition_T::q_>().normalize();
 
     // zero props:
     //copy non propagation states from last state
@@ -254,7 +254,7 @@ void MSF_Core<EKFState_T>::stateCallback(const sensor_fusion_comm::ExtEkfConstPt
 
   propagatePOneStep();
 
-  isnumeric = checkForNumeric((double*)(&currentState-> template get<msf_updates::p_>()[0]), 3, "prediction p");
+  isnumeric = checkForNumeric((double*)(&currentState-> template get<StateDefinition_T::p_>()[0]), 3, "prediction p");
   isnumeric = checkForNumeric((double*)(&currentState->P_(0)), nErrorStatesAtCompileTime * nErrorStatesAtCompileTime, "prediction done P");
 
   predictionMade_ = true;
@@ -283,10 +283,10 @@ void MSF_Core<EKFState_T>::propagateState(boost::shared_ptr<EKFState_T>& state_o
   );
 
   Eigen::Matrix<double, 3, 1> dv;
-  ConstVector3 ew = state_new->w_m_ - state_new-> template get<msf_updates::b_w_>();
-  ConstVector3 ewold = state_old->w_m_ - state_old-> template get<msf_updates::b_w_>();
-  ConstVector3 ea = state_new->a_m_ - state_new-> template get<msf_updates::b_a_>();
-  ConstVector3 eaold = state_old->a_m_ - state_old-> template get<msf_updates::b_a_>();
+  ConstVector3 ew = state_new->w_m_ - state_new-> template get<StateDefinition_T::b_w_>();
+  ConstVector3 ewold = state_old->w_m_ - state_old-> template get<StateDefinition_T::b_w_>();
+  ConstVector3 ea = state_new->a_m_ - state_new-> template get<StateDefinition_T::b_a_>();
+  ConstVector3 eaold = state_old->a_m_ - state_old-> template get<StateDefinition_T::b_a_>();
   ConstMatrix4 Omega = omegaMatJPL(ew);
   ConstMatrix4 OmegaOld = omegaMatJPL(ewold);
   Matrix4 OmegaMean = omegaMatJPL((ew + ewold) / 2);
@@ -310,12 +310,12 @@ void MSF_Core<EKFState_T>::propagateState(boost::shared_ptr<EKFState_T>& state_o
   ConstMatrix4 quat_int = MatExp + 1.0 / 48.0 * (Omega * OmegaOld - OmegaOld * Omega) * dt * dt;
 
   // first oder quaternion integration
-  state_new-> template get<msf_updates::q_>().coeffs() = quat_int * state_old-> template get<msf_updates::q_>().coeffs();
-  state_new-> template get<msf_updates::q_>().normalize();
+  state_new-> template get<StateDefinition_T::q_>().coeffs() = quat_int * state_old-> template get<StateDefinition_T::q_>().coeffs();
+  state_new-> template get<StateDefinition_T::q_>().normalize();
 
-  dv = (state_new-> template get<msf_updates::q_>().toRotationMatrix() * ea + state_old-> template get<msf_updates::q_>().toRotationMatrix() * eaold) / 2;
-  state_new-> template get<msf_updates::v_>() = state_old-> template get<msf_updates::v_>() + (dv - g_) * dt;
-  state_new-> template get<msf_updates::p_>() = state_old-> template get<msf_updates::p_>() + ((state_new-> template get<msf_updates::v_>() + state_old-> template get<msf_updates::v_>()) / 2 * dt);
+  dv = (state_new-> template get<StateDefinition_T::q_>().toRotationMatrix() * ea + state_old-> template get<StateDefinition_T::q_>().toRotationMatrix() * eaold) / 2;
+  state_new-> template get<StateDefinition_T::v_>() = state_old-> template get<StateDefinition_T::v_>() + (dv - g_) * dt;
+  state_new-> template get<StateDefinition_T::p_>() = state_old-> template get<StateDefinition_T::p_>() + ((state_new-> template get<StateDefinition_T::v_>() + state_old-> template get<StateDefinition_T::v_>()) / 2 * dt);
 
 }
 
@@ -327,15 +327,13 @@ void MSF_Core<EKFState_T>::propagatePOneStep(){
   ++stateIteratorPLastPropagatedNext;
   if(stateIteratorPLastPropagatedNext != StateBuffer_.getIteratorEnd()){ //might happen if there is a measurement in the future
     predictProcessCovariance(stateIteratorPLastPropagated->second, stateIteratorPLastPropagatedNext->second);
-    checkForNumeric((double*)(&stateIteratorPLastPropagatedNext->second-> template get<msf_updates::p_>()(0)), 3, "prediction p");
+    checkForNumeric((double*)(&stateIteratorPLastPropagatedNext->second-> template get<StateDefinition_T::p_>()(0)), 3, "prediction p");
   }
 }
 
 template<typename EKFState_T>
 void MSF_Core<EKFState_T>::predictProcessCovariance(boost::shared_ptr<EKFState_T>& state_old, boost::shared_ptr<EKFState_T>& state_new)
 {
-
-  //TODO: later: find out whether we have to linearize around the current or the last state
 
   double dt = state_new->time_ - state_old->time_;
 
@@ -347,14 +345,14 @@ void MSF_Core<EKFState_T>::predictProcessCovariance(boost::shared_ptr<EKFState_T
   ConstVector3 nbwv = Vector3::Constant(usercalc_.getParam_noise_gyrbias() /* * sqrt(dt) */);
 
   // bias corrected IMU readings
-  ConstVector3 ew = state_new->w_m_ - state_new-> template get<msf_updates::b_w_>();
-  ConstVector3 ea = state_new->a_m_ - state_new-> template get<msf_updates::b_a_>();
+  ConstVector3 ew = state_new->w_m_ - state_new-> template get<StateDefinition_T::b_w_>();
+  ConstVector3 ea = state_new->a_m_ - state_new-> template get<StateDefinition_T::b_a_>();
 
   ConstMatrix3 a_sk = skew(ea);
   ConstMatrix3 w_sk = skew(ew);
   ConstMatrix3 eye3 = Eigen::Matrix<double, 3, 3>::Identity();
 
-  ConstMatrix3 C_eq = state_new-> template get<msf_updates::q_>().toRotationMatrix();
+  ConstMatrix3 C_eq = state_new-> template get<StateDefinition_T::q_>().toRotationMatrix();
 
   const double dt_p2_2 = dt * dt * 0.5; // dt^2 / 2
   const double dt_p3_6 = dt_p2_2 * dt / 3.0; // dt^3 / 6
@@ -386,7 +384,7 @@ void MSF_Core<EKFState_T>::predictProcessCovariance(boost::shared_ptr<EKFState_T
   Fd_. template block<3, 3> (6, 6) = E;
   Fd_. template block<3, 3> (6, 9) = F;
 
-  calc_QCore(dt, state_new-> template get<msf_updates::q_>(), ew, ea, nav, nbav, nwv, nbwv, Qd_);
+  calc_QCore(dt, state_new-> template get<StateDefinition_T::q_>(), ew, ea, nav, nbav, nwv, nbwv, Qd_);
 
   //call user Q calc to fill in the blocks of auxiliary states
   usercalc_.calculateQAuxiliaryStates(*state_new, dt);
@@ -394,7 +392,7 @@ void MSF_Core<EKFState_T>::predictProcessCovariance(boost::shared_ptr<EKFState_T
   //now copy the userdefined blocks to Qd
   boost::fusion::for_each(
       state_new->statevars_,
-      msf_tmp::copyQBlocksFromAuxiliaryStatesToQ<typename EKFState_T::stateVector_T>(Qd_)
+      msf_tmp::copyQBlocksFromAuxiliaryStatesToQ<StateSequence_T>(Qd_)
   );
 
   //TODO later: optimize here multiplication of F blockwise, using the fact that aux states have no entries outside their block
@@ -510,26 +508,26 @@ void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase<
     msgCorrect_.flag = sensor_fusion_comm::ExtEkf::initialization;
   }
   else{
-    msgCorrect_.state[0] = latestState-> template get<msf_updates::p_>()[0] - hl_state_buf_.state[0];
-    msgCorrect_.state[1] = latestState-> template get<msf_updates::p_>()[1] - hl_state_buf_.state[1];
-    msgCorrect_.state[2] = latestState-> template get<msf_updates::p_>()[2] - hl_state_buf_.state[2];
-    msgCorrect_.state[3] = latestState-> template get<msf_updates::v_>()[0] - hl_state_buf_.state[3];
-    msgCorrect_.state[4] = latestState-> template get<msf_updates::v_>()[1] - hl_state_buf_.state[4];
-    msgCorrect_.state[5] = latestState-> template get<msf_updates::v_>()[2] - hl_state_buf_.state[5];
+    msgCorrect_.state[0] = latestState-> template get<StateDefinition_T::p_>()[0] - hl_state_buf_.state[0];
+    msgCorrect_.state[1] = latestState-> template get<StateDefinition_T::p_>()[1] - hl_state_buf_.state[1];
+    msgCorrect_.state[2] = latestState-> template get<StateDefinition_T::p_>()[2] - hl_state_buf_.state[2];
+    msgCorrect_.state[3] = latestState-> template get<StateDefinition_T::v_>()[0] - hl_state_buf_.state[3];
+    msgCorrect_.state[4] = latestState-> template get<StateDefinition_T::v_>()[1] - hl_state_buf_.state[4];
+    msgCorrect_.state[5] = latestState-> template get<StateDefinition_T::v_>()[2] - hl_state_buf_.state[5];
 
     Eigen::Quaterniond hl_q(hl_state_buf_.state[6], hl_state_buf_.state[7], hl_state_buf_.state[8], hl_state_buf_.state[9]);
-    Eigen::Quaterniond qbuff_q = hl_q.inverse() * latestState-> template get<msf_updates::q_>();
+    Eigen::Quaterniond qbuff_q = hl_q.inverse() * latestState-> template get<StateDefinition_T::q_>();
     msgCorrect_.state[6] = qbuff_q.w();
     msgCorrect_.state[7] = qbuff_q.x();
     msgCorrect_.state[8] = qbuff_q.y();
     msgCorrect_.state[9] = qbuff_q.z();
 
-    msgCorrect_.state[10] = latestState-> template get<msf_updates::b_w_>()[0] - hl_state_buf_.state[10];
-    msgCorrect_.state[11] = latestState-> template get<msf_updates::b_w_>()[1] - hl_state_buf_.state[11];
-    msgCorrect_.state[12] = latestState-> template get<msf_updates::b_w_>()[2] - hl_state_buf_.state[12];
-    msgCorrect_.state[13] = latestState-> template get<msf_updates::b_a_>()[0] - hl_state_buf_.state[13];
-    msgCorrect_.state[14] = latestState-> template get<msf_updates::b_a_>()[1] - hl_state_buf_.state[14];
-    msgCorrect_.state[15] = latestState-> template get<msf_updates::b_a_>()[2] - hl_state_buf_.state[15];
+    msgCorrect_.state[10] = latestState-> template get<StateDefinition_T::b_w_>()[0] - hl_state_buf_.state[10];
+    msgCorrect_.state[11] = latestState-> template get<StateDefinition_T::b_w_>()[1] - hl_state_buf_.state[11];
+    msgCorrect_.state[12] = latestState-> template get<StateDefinition_T::b_w_>()[2] - hl_state_buf_.state[12];
+    msgCorrect_.state[13] = latestState-> template get<StateDefinition_T::b_a_>()[0] - hl_state_buf_.state[13];
+    msgCorrect_.state[14] = latestState-> template get<StateDefinition_T::b_a_>()[1] - hl_state_buf_.state[14];
+    msgCorrect_.state[15] = latestState-> template get<StateDefinition_T::b_a_>()[2] - hl_state_buf_.state[15];
 
     msgCorrect_.flag = sensor_fusion_comm::ExtEkf::state_correction;
   }
@@ -604,12 +602,12 @@ bool MSF_Core<EKFState_T>::applyCorrection(boost::shared_ptr<EKFState_T>& delays
   //now augment core states
   if (usercalc_.getParam_fixed_bias())
   {
-    typedef typename msf_tmp::getEnumStateType<typename EKFState_T::stateVector_T, msf_updates::b_a_>::value b_a_type;
-    typedef typename msf_tmp::getEnumStateType<typename EKFState_T::stateVector_T, msf_updates::b_w_>::value b_w_type;
+    typedef typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::b_a_>::value b_a_type;
+    typedef typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::b_w_>::value b_w_type;
 
     enum{
-      indexOfState_b_a = msf_tmp::getStartIndex<typename EKFState_T::stateVector_T, b_a_type, msf_tmp::CorrectionStateLengthForType>::value,
-      indexOfState_b_w = msf_tmp::getStartIndex<typename EKFState_T::stateVector_T, b_w_type, msf_tmp::CorrectionStateLengthForType>::value
+      indexOfState_b_a = msf_tmp::getStartIndex<StateSequence_T, b_a_type, msf_tmp::CorrectionStateLengthForType>::value,
+      indexOfState_b_w = msf_tmp::getStartIndex<StateSequence_T, b_w_type, msf_tmp::CorrectionStateLengthForType>::value
     };
 
     BOOST_STATIC_ASSERT_MSG(static_cast<int>(indexOfState_b_w)==9, "The index of the state b_w in the correction vector differs from the expected value");

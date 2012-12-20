@@ -53,7 +53,7 @@ template<typename type_T, int name_T, int STATETYPE = Auxiliary>
 struct StateVar_T;
 
 //the state
-template<typename stateVector_T>
+template<typename StateVector_T, typename StateDefinition_T>
 struct GenericState_T;
 
 template<typename EKFState_T>

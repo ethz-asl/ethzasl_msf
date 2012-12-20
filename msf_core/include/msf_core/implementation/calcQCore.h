@@ -56,21 +56,6 @@ template <class Derived, class DerivedQ> void calc_QCore(
 )
 {
 
-  //for now we have no make sure, the core states are in the correct order
-  //(calculation of observation noise cov has hardcoded order)
-  {
-    static const int idxstartcorr_p_ = msf_tmp::getStartIndex<msf_updates::fullState_T, msf_tmp::getEnumStateType<msf_updates::fullState_T, msf_updates::p_>::value, msf_tmp::CorrectionStateLengthForType>::value;
-    static const int idxstartcorr_v_ = msf_tmp::getStartIndex<msf_updates::fullState_T, msf_tmp::getEnumStateType<msf_updates::fullState_T, msf_updates::v_>::value, msf_tmp::CorrectionStateLengthForType>::value;
-    static const int idxstartcorr_q_ = msf_tmp::getStartIndex<msf_updates::fullState_T, msf_tmp::getEnumStateType<msf_updates::fullState_T, msf_updates::q_>::value, msf_tmp::CorrectionStateLengthForType>::value;
-    static const int idxstartcorr_b_w_ = msf_tmp::getStartIndex<msf_updates::fullState_T, msf_tmp::getEnumStateType<msf_updates::fullState_T, msf_updates::b_w_>::value, msf_tmp::CorrectionStateLengthForType>::value;
-    static const int idxstartcorr_b_a_ = msf_tmp::getStartIndex<msf_updates::fullState_T, msf_tmp::getEnumStateType<msf_updates::fullState_T, msf_updates::b_a_>::value, msf_tmp::CorrectionStateLengthForType>::value;
-
-    BOOST_STATIC_ASSERT_MSG(idxstartcorr_p_==0, "Indexing of core states has been altered, but this is currently not allowed");
-    BOOST_STATIC_ASSERT_MSG(idxstartcorr_v_==3, "Indexing of core states has been altered, but this is currently not allowed");
-    BOOST_STATIC_ASSERT_MSG(idxstartcorr_q_==6, "Indexing of core states has been altered, but this is currently not allowed");
-    BOOST_STATIC_ASSERT_MSG(idxstartcorr_b_w_==9, "Indexing of core states has been altered, but this is currently not allowed");
-    BOOST_STATIC_ASSERT_MSG(idxstartcorr_b_a_==12, "Indexing of core states has been altered, but this is currently not allowed");
-  }
 
   const double q1=q.w(), q2=q.x(), q3=q.y(), q4=q.z();
   const double ew1=ew(0), ew2=ew(1), ew3=ew(2);

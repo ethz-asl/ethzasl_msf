@@ -1,0 +1,107 @@
+/*
+
+Copyright (c) 2012, Simon Lynen, ASL, ETH Zurich, Switzerland
+You can contact the author at <slynen at ethz dot ch>
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+ * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+ * Neither the name of ETHZ-ASL nor the
+names of its contributors may be used to endorse or promote products
+derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL ETHZ-ASL BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+ */
+
+
+#ifndef MSF_STATEDEF_HPP_
+#define MSF_STATEDEF_HPP_
+
+#include <Eigen/Dense>
+#include <msf_core/msf_fwds.hpp>
+#include <boost/fusion/container.hpp>
+#include <boost/static_assert.hpp>
+
+namespace msf_updates{
+
+/*
+ * This file contains the state definition of the EKF as defined for a given set of sensors / states to estimate
+ */
+
+enum StateDefinition{ //must not manually set the enum values!
+  p_,
+  v_,
+  q_,
+  b_w_,
+  b_a_,
+  L_,
+  q_wv_,
+  q_ci_,
+  p_ci_/*,
+	q_int_*/
+};
+
+namespace{
+
+
+/***
+ * setup core state, then auxiliary state
+ */
+typedef boost::fusion::vector<
+    // states varying during propagation - must not change the ordering here for now, CalcQ has the ordering hardcoded
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_, msf_core::CoreStateWithPropagation>,                          ///< position (IMU centered)          (0-2 / 0-2)
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, v_, msf_core::CoreStateWithPropagation>,                          ///< velocity                         (3- 5 / 3- 5)
+    msf_core::StateVar_T<Eigen::Quaternion<double>, q_, msf_core::CoreStateWithPropagation>,                            ///< attitude                         (6- 9 / 6- 8)
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, b_w_, msf_core::CoreStateWithoutPropagation>,                     ///< gyro biases                      (10-12 / 9-11)
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, b_a_, msf_core::CoreStateWithoutPropagation>,                     ///< acceleration biases              (13-15 / 12-14)
+
+    // states not varying during propagation
+    msf_core::StateVar_T<Eigen::Matrix<double, 1, 1>, L_>,                                                              ///< visual scale                     (16 / 15)
+    msf_core::StateVar_T<Eigen::Quaternion<double>, q_wv_, msf_core::AuxiliaryNonTemporalDrifting>,                     ///< vision-world attitude drift      (17-20 / 16-18)
+    msf_core::StateVar_T<Eigen::Quaternion<double>, q_ci_>,                                                             ///< camera-imu attitude calibration  (21-24 / 19-21)
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_ci_>/*,                                                         ///< camera-imu position calibration  (25-27 / 22-24)
+		 msf_core::StateVar_T<Eigen::Quaternion<double>, q_int_>	*/									///< this is the integrated ang. vel. no corrections applied, to use for delta rot in external algos...
+
+> fullState_T;
+}
+
+typedef msf_core::GenericState_T<fullState_T, StateDefinition> EKFState; ///<the state we want to use in this EKF
+typedef boost::shared_ptr<EKFState> EKFStatePtr;
+typedef boost::shared_ptr<const EKFState> EKFStateConstPtr;
+
+
+
+
+//for now we have no make sure, the core states are in the correct order
+//(calculation of observation noise cov has hardcoded order) DO NOT REMOVE THIS!! UNLESS YOU ALSO FIXED CalcQCore!
+//{
+static const int idxstartcorr_p_ = msf_tmp::getStartIndex<msf_updates::fullState_T, msf_tmp::getEnumStateType<msf_updates::fullState_T, msf_updates::p_>::value, msf_tmp::CorrectionStateLengthForType>::value;
+static const int idxstartcorr_v_ = msf_tmp::getStartIndex<msf_updates::fullState_T, msf_tmp::getEnumStateType<msf_updates::fullState_T, msf_updates::v_>::value, msf_tmp::CorrectionStateLengthForType>::value;
+static const int idxstartcorr_q_ = msf_tmp::getStartIndex<msf_updates::fullState_T, msf_tmp::getEnumStateType<msf_updates::fullState_T, msf_updates::q_>::value, msf_tmp::CorrectionStateLengthForType>::value;
+static const int idxstartcorr_b_w_ = msf_tmp::getStartIndex<msf_updates::fullState_T, msf_tmp::getEnumStateType<msf_updates::fullState_T, msf_updates::b_w_>::value, msf_tmp::CorrectionStateLengthForType>::value;
+static const int idxstartcorr_b_a_ = msf_tmp::getStartIndex<msf_updates::fullState_T, msf_tmp::getEnumStateType<msf_updates::fullState_T, msf_updates::b_a_>::value, msf_tmp::CorrectionStateLengthForType>::value;
+
+BOOST_STATIC_ASSERT_MSG(idxstartcorr_p_==0, "Indexing of core states has been altered, but this is currently not allowed");
+BOOST_STATIC_ASSERT_MSG(idxstartcorr_v_==3, "Indexing of core states has been altered, but this is currently not allowed");
+BOOST_STATIC_ASSERT_MSG(idxstartcorr_q_==6, "Indexing of core states has been altered, but this is currently not allowed");
+BOOST_STATIC_ASSERT_MSG(idxstartcorr_b_w_==9, "Indexing of core states has been altered, but this is currently not allowed");
+BOOST_STATIC_ASSERT_MSG(idxstartcorr_b_a_==12, "Indexing of core states has been altered, but this is currently not allowed");
+//}
+}
+#endif /* MSF_STATEDEF_HPP_ */

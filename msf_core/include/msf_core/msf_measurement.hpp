@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <msf_core/msf_fwds.hpp>
 #include <Eigen/Dense>
-#include <msf_core/msf_statedef.hpp>
 
 namespace msf_core{
 
@@ -124,7 +123,7 @@ class MSF_InitMeasurement:public MSF_MeasurementBase<EKFState_T>{
 private:
   EKFState_T InitState; ///< values for initialization of the state
   bool ContainsInitialSensorReadings_; ///<flag whether this measurement contains initial sensor readings
-  typedef typename EKFState_T::stateVector_T stateVector_T;
+  typedef typename EKFState_T::StateSequence_T StateSequence_T;
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   MSF_InitMeasurement(bool ContainsInitialSensorReadings){
@@ -170,7 +169,7 @@ public:
    * \brief get the value stored in this object to initialize a state variable at index INDEX
    */
   template<int INDEX>
-  const typename msf_tmp::StripReference<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::result_t::value_t&
+  const typename msf_tmp::StripReference<typename boost::fusion::result_of::at_c<StateSequence_T, INDEX >::type>::result_t::value_t&
   getStateInitValue() const {
     return InitState.template get<INDEX>();
   }

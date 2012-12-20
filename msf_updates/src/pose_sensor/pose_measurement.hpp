@@ -38,6 +38,7 @@
 
 #include <msf_core/msf_measurement.hpp>
 #include <msf_core/msf_core.hpp>
+#include "msf_statedef.hpp"
 
 namespace pose_measurement{
 enum

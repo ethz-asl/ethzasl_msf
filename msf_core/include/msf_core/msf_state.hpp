@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <msf_core/msf_types.tpp>
 #include <msf_core/msf_tmp.hpp>
-#include <msf_core/msf_statedef.hpp>
+#include <msf_core/msf_statevisitor.hpp>
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 #include <vector>
@@ -47,18 +47,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace msf_core{
 
-/**
- * \brief visitor pattern to allow the user to set state init values
- */
-class StateVisitor{
-public:
-  /**
-   * \brief the state is set to zero/identity, this method will be called to
-   * give the user the possibility to change the reset values of some states
-   */
-  virtual void resetState(msf_updates::EKFState& state)=0;
-  virtual ~StateVisitor(){};
-};
 
 /**
  * \brief a state variable with a name as specified in the state name enum
@@ -77,6 +65,7 @@ struct StateVar_T{
     sizeInState_ = msf_tmp::StateLengthForType<const StateVar_T<type_T, name_T>&>::value ///<the size of this state in the state vector
   };
   typedef Eigen::Matrix<double, sizeInCorrection_, sizeInCorrection_> Q_T;
+
   Q_T Q_; ///< the noise covariance matrix block of this state
   value_t state_; ///< the state variable of this state
   bool hasResetValue; //<indicating that this statevariable has a reset value to be applied to the state on init
@@ -91,22 +80,24 @@ struct StateVar_T{
 /**
  * \brief the state vector containing all the state variables for this EKF configuration
  */
-template<typename stateSequence_T>
+template<typename StateSeq_T, typename StateDef_T>
 struct GenericState_T{
-
-  friend class msf_core::MSF_Core<GenericState_T<stateSequence_T> >;
-  friend class msf_core::copyNonPropagationStates<GenericState_T>;
-  friend class msf_core::MSF_InitMeasurement<GenericState_T<stateSequence_T> >;
 public:
-  typedef stateSequence_T stateVector_T; ///<the state vector defining the state variables of this EKF
+  typedef StateSeq_T StateSequence_T; ///<the state vector defining the state variables of this EKF
+  typedef StateDef_T StateDefinition_T; ///<the enums of the state variables
+
+  friend class msf_core::MSF_Core<GenericState_T<StateSequence_T, StateDefinition_T> >;
+  friend class msf_core::copyNonPropagationStates<GenericState_T>;
+  friend class msf_core::MSF_InitMeasurement<GenericState_T<StateSequence_T, StateDefinition_T> >;
+
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   enum{
-    nStateVarsAtCompileTime = boost::fusion::result_of::size<stateVector_T>::type::value, ///<n state vars
-    nErrorStatesAtCompileTime = msf_tmp::CountStates<stateVector_T, msf_tmp::CorrectionStateLengthForType>::value, ///<n error states
-    nStatesAtCompileTime = msf_tmp::CountStates<stateVector_T, msf_tmp::StateLengthForType>::value, ///<n total states
-    nCoreStatesAtCompileTime = msf_tmp::CountStates<stateVector_T, msf_tmp::CoreStateLengthForType>::value, ///<n total core states
-    nPropagatedCoreStatesAtCompileTime = msf_tmp::CountStates<stateVector_T, msf_tmp::PropagatedCoreStateLengthForType>::value, ///<n total core states with propagation
-    nPropagatedCoreErrorStatesAtCompileTime = msf_tmp::CountStates<stateVector_T, msf_tmp::PropagatedCoreErrorStateLengthForType>::value ///<n total error states with propagation
+    nStateVarsAtCompileTime = boost::fusion::result_of::size<StateSequence_T>::type::value, ///<n state vars
+    nErrorStatesAtCompileTime = msf_tmp::CountStates<StateSequence_T, msf_tmp::CorrectionStateLengthForType>::value, ///<n error states
+    nStatesAtCompileTime = msf_tmp::CountStates<StateSequence_T, msf_tmp::StateLengthForType>::value, ///<n total states
+    nCoreStatesAtCompileTime = msf_tmp::CountStates<StateSequence_T, msf_tmp::CoreStateLengthForType>::value, ///<n total core states
+    nPropagatedCoreStatesAtCompileTime = msf_tmp::CountStates<StateSequence_T, msf_tmp::PropagatedCoreStateLengthForType>::value, ///<n total core states with propagation
+    nPropagatedCoreErrorStatesAtCompileTime = msf_tmp::CountStates<StateSequence_T, msf_tmp::PropagatedCoreErrorStateLengthForType>::value ///<n total error states with propagation
   };
 
 private:
@@ -117,7 +108,7 @@ private:
    * Instead const_cast the state object to const to use the overload
    */
   template<int INDEX>
-  inline typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type
+  inline typename boost::fusion::result_of::at_c<StateSequence_T, INDEX >::type
   getStateVar();
 
   /**
@@ -125,14 +116,14 @@ private:
    * you must not make these functions public. Instead const_cast the state object to const to use the overload
    */
   template<int INDEX>
-  inline typename msf_tmp::StripReference<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::result_t::value_t&
+  inline typename msf_tmp::StripReference<typename boost::fusion::result_of::at_c<StateSequence_T, INDEX >::type>::result_t::value_t&
   get();
 
 public:
 
   typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> P_type; ///< type of the error state covariance matrix
 
-  stateVector_T statevars_; ///< the actual state variables
+  StateSequence_T statevars_; ///< the actual state variables
 
   // system inputs
   Eigen::Matrix<double,3,1> w_m_;         ///< angular velocity from IMU
@@ -157,21 +148,21 @@ public:
    * \brief returns the Q-block of the state at position INDEX in the state list, not allowed for core states
    */
   template<int INDEX>
-  inline typename msf_tmp::StripReference<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::result_t::Q_T&
+  inline typename msf_tmp::StripReference<typename boost::fusion::result_of::at_c<StateSequence_T, INDEX >::type>::result_t::Q_T&
   getQBlock();
 
   /**
    * \brief returns the Q-block of the state at position INDEX in the state list, also possible for core states, since const
    */
   template<int INDEX>
-  inline const typename msf_tmp::StripReference<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::result_t::Q_T&
+  inline const typename msf_tmp::StripReference<typename boost::fusion::result_of::at_c<StateSequence_T, INDEX >::type>::result_t::Q_T&
   getQBlock() const;
 
   /**
    * \brief reset the state
    * 3D vectors: 0; quaternion: unit quaternion; scale: 1; time:0; Error covariance: zeros
    */
-  void reset(msf_core::StateVisitor* usercalc);
+  void reset(msf_core::StateVisitor<GenericState_T<StateSequence_T, StateDefinition_T> >* usercalc);
 
   /**
    * \brief write the covariance corresponding to position and attitude to cov
@@ -207,14 +198,14 @@ public:
    * \brief returns the state at position INDEX in the state list, const version
    */
   template<int INDEX>
-  inline const typename msf_tmp::StripReference<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::result_t::value_t&
+  inline const typename msf_tmp::StripReference<typename boost::fusion::result_of::at_c<StateSequence_T, INDEX >::type>::result_t::value_t&
   get() const;
 
   /**
    * \brief returns the stateVar at position INDEX in the state list, const version
    */
   template<int INDEX>
-  inline typename msf_tmp::AddConstReference<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::result_t
+  inline typename msf_tmp::AddConstReference<typename boost::fusion::result_of::at_c<StateSequence_T, INDEX >::type>::result_t
   getStateVar() const;
 
   /**
@@ -222,20 +213,20 @@ public:
    */
   template<int INDEX>
   inline void
-  set(const typename msf_tmp::StripConstReference<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::result_t::value_t& newvalue);
+  set(const typename msf_tmp::StripConstReference<typename boost::fusion::result_of::at_c<StateSequence_T, INDEX >::type>::result_t::value_t& newvalue);
 };
 
 /**
  * \brief comparator for the state objects. sorts by time asc
  */
-template<typename stateSequence_T>
+template<typename stateSequence_T, typename stateDefinition_T>
 class sortStates
 {
 public:
   /**
    * \brief implements the sorting by time
    */
-  bool operator() (const GenericState_T<stateSequence_T>& lhs, const GenericState_T<stateSequence_T>&rhs) const
+  bool operator() (const GenericState_T<stateSequence_T, stateDefinition_T>& lhs, const GenericState_T<stateSequence_T, stateDefinition_T>&rhs) const
   {
     return (lhs.time_<rhs.time_);
   }

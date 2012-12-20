@@ -51,6 +51,9 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<msf_updates::EKF
   friend class PoseSensorHandler;
 public:
   typedef msf_updates::EKFState EKFState_T;
+  typedef EKFState_T::StateSequence_T StateSequence_T;
+  typedef EKFState_T::StateDefinition_T StateDefinition_T;
+
   PoseSensorManager(ros::NodeHandle pnh = ros::NodeHandle("~/pose_sensor"))
   {
     pose_handler_.reset(new PoseSensorHandler(*this));
@@ -217,8 +220,8 @@ private:
 
     if (this->config_.fixed_scale)
     {
-      typedef typename msf_tmp::getEnumStateType<EKFState_T::stateVector_T, msf_updates::L_>::value L_type;
-      const int L_indexInErrorState = msf_tmp::getStateIndexInErrorState<EKFState_T::stateVector_T, msf_updates::L_>::value;
+      typedef typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::L_>::value L_type;
+      const int L_indexInErrorState = msf_tmp::getStateIndexInErrorState<StateSequence_T, StateDefinition_T::L_>::value;
 
       for(int i = 0 ; i < msf_tmp::StripConstReference<L_type>::result_t::sizeInCorrection_ ; ++i){
         correction_(L_indexInErrorState + i) = 0; //scale
@@ -227,15 +230,15 @@ private:
 
     if (this->config_.fixed_calib)
     {
-      typedef typename msf_tmp::getEnumStateType<EKFState_T::stateVector_T, msf_updates::q_ci_>::value q_ci_type;
-      const int q_ci_indexInErrorState = msf_tmp::getStateIndexInErrorState<EKFState_T::stateVector_T, msf_updates::q_ci_>::value;
+      typedef typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::q_ci_>::value q_ci_type;
+      const int q_ci_indexInErrorState = msf_tmp::getStateIndexInErrorState<StateSequence_T, StateDefinition_T::q_ci_>::value;
 
       for(int i = 0 ; i < msf_tmp::StripConstReference<q_ci_type>::result_t::sizeInCorrection_ ; ++i){
         correction_(q_ci_indexInErrorState + i) = 0; //q_ic roll, pitch, yaw
       }
 
-      typedef typename msf_tmp::getEnumStateType<EKFState_T::stateVector_T, msf_updates::p_ci_>::value p_ci_type;
-      const int p_ci_indexInErrorState = msf_tmp::getStateIndexInErrorState<EKFState_T::stateVector_T, msf_updates::p_ci_>::value;
+      typedef typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::p_ci_>::value p_ci_type;
+      const int p_ci_indexInErrorState = msf_tmp::getStateIndexInErrorState<StateSequence_T, StateDefinition_T::p_ci_>::value;
 
       for(int i = 0 ; i < msf_tmp::StripConstReference<p_ci_type>::result_t::sizeInCorrection_ ; ++i){
         correction_(p_ci_indexInErrorState + i) = 0; //p_ci x,y,z
@@ -247,12 +250,12 @@ private:
                                      Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& correction_){
 
     const EKFState_T& state = delaystate;
-    if (state.get<msf_updates::L_>()(0) < 0)
+    if (state.get<StateDefinition_T::L_>()(0) < 0)
     {
-      ROS_WARN_STREAM_THROTTLE(1,"Negative scale detected: " << state.get<msf_updates::L_>()(0) << ". Correcting to 0.1");
+      ROS_WARN_STREAM_THROTTLE(1,"Negative scale detected: " << state.get<StateDefinition_T::L_>()(0) << ". Correcting to 0.1");
       Eigen::Matrix<double, 1, 1> L_;
       L_ << 0.1;
-      delaystate.set<msf_updates::L_>(L_);
+      delaystate.set<StateDefinition_T::L_>(L_);
     }
 
   }
