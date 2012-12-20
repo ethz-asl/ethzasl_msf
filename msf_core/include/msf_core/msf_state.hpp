@@ -56,7 +56,7 @@ public:
    * \brief the state is set to zero/identity, this method will be called to
    * give the user the possibility to change the reset values of some states
    */
-  virtual void resetState(msf_core::EKFState& state)=0;
+  virtual void resetState(msf_updates::EKFState& state)=0;
   virtual ~StateVisitor(){};
 };
 

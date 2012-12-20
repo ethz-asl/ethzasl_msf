@@ -50,6 +50,7 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS
 {
   friend class PoseSensorHandler;
 public:
+  typedef msf_updates::EKFState EKFState_T;
   PoseSensorManager(ros::NodeHandle pnh = ros::NodeHandle("~/pose_sensor"))
   {
     pose_handler_.reset(new PoseSensorHandler(*this));
@@ -127,16 +128,16 @@ private:
     //prepare init "measurement"
     boost::shared_ptr<msf_core::MSF_InitMeasurement> meas(new msf_core::MSF_InitMeasurement(true)); //hand over that we will also set the sensor readings
 
-    meas->setStateInitValue<msf_core::p_>(p);
-    meas->setStateInitValue<msf_core::v_>(v);
-    meas->setStateInitValue<msf_core::q_>(q);
-    meas->setStateInitValue<msf_core::b_w_>(b_w);
-    meas->setStateInitValue<msf_core::b_a_>(b_a);
-    meas->setStateInitValue<msf_core::L_>(Eigen::Matrix<double, 1, 1>::Constant(scale));
-    meas->setStateInitValue<msf_core::q_wv_>(q_wv);
-    meas->setStateInitValue<msf_core::q_wv_>(q_wv);
-    meas->setStateInitValue<msf_core::q_ci_>(q_ci);
-    meas->setStateInitValue<msf_core::p_ci_>(p_ci);
+    meas->setStateInitValue<msf_updates::p_>(p);
+    meas->setStateInitValue<msf_updates::v_>(v);
+    meas->setStateInitValue<msf_updates::q_>(q);
+    meas->setStateInitValue<msf_updates::b_w_>(b_w);
+    meas->setStateInitValue<msf_updates::b_a_>(b_a);
+    meas->setStateInitValue<msf_updates::L_>(Eigen::Matrix<double, 1, 1>::Constant(scale));
+    meas->setStateInitValue<msf_updates::q_wv_>(q_wv);
+    meas->setStateInitValue<msf_updates::q_wv_>(q_wv);
+    meas->setStateInitValue<msf_updates::q_ci_>(q_ci);
+    meas->setStateInitValue<msf_updates::p_ci_>(p_ci);
 
     setP(meas->get_P()); //call my set P function
     meas->get_w_m() = w_m;
@@ -155,19 +156,19 @@ private:
   }
 
   //prior to this call, all states are initialized to zero/identity
-  virtual void resetState(msf_core::EKFState& state){
+  virtual void resetState(EKFState_T& state){
     //set scale to 1
 
     Eigen::Matrix<double, 1, 1> scale;
     scale << 1.0;
-    state.set<msf_core::L_>(scale);
+    state.set<msf_updates::L_>(scale);
   }
-  virtual void initState(msf_core::EKFState& state){
+  virtual void initState(EKFState_T& state){
 
 
   }
 
-  virtual void calculateQAuxiliaryStates(msf_core::EKFState& state, double dt){
+  virtual void calculateQAuxiliaryStates(EKFState_T& state, double dt){
     msf_core::ConstVector3 nqwvv = Eigen::Vector3d::Constant(config_.noise_qwv);
     msf_core::ConstVector3 nqciv = Eigen::Vector3d::Constant(config_.noise_qci);
     msf_core::ConstVector3 npicv = Eigen::Vector3d::Constant(config_.noise_pci);
@@ -176,13 +177,13 @@ private:
 
     //compute the blockwise Q values and store them with the states,
     //these then get copied by the core to the correct places in Qd
-    state.getQBlock<msf_core::L_>() 	= (dt * n_L.cwiseProduct(n_L)).asDiagonal();
-    state.getQBlock<msf_core::q_wv_>() = (dt * nqwvv.cwiseProduct(nqwvv)).asDiagonal();
-    state.getQBlock<msf_core::q_ci_>() = (dt * nqciv.cwiseProduct(nqciv)).asDiagonal();
-    state.getQBlock<msf_core::p_ci_>() = (dt * npicv.cwiseProduct(npicv)).asDiagonal();
+    state.getQBlock<msf_updates::L_>() 	= (dt * n_L.cwiseProduct(n_L)).asDiagonal();
+    state.getQBlock<msf_updates::q_wv_>() = (dt * nqwvv.cwiseProduct(nqwvv)).asDiagonal();
+    state.getQBlock<msf_updates::q_ci_>() = (dt * nqciv.cwiseProduct(nqciv)).asDiagonal();
+    state.getQBlock<msf_updates::p_ci_>() = (dt * npicv.cwiseProduct(npicv)).asDiagonal();
   }
 
-  virtual void setP(Eigen::Matrix<double, msf_core::EKFState::nErrorStatesAtCompileTime, msf_core::EKFState::nErrorStatesAtCompileTime>& P){
+  virtual void setP(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, EKFState_T::nErrorStatesAtCompileTime>& P){
     //			P << 	0.016580786012789, 0.012199934386656, -0.001458808893504, 0.021111179657363, 0.007427567799788, 0.000037801439852, 0.001171469788518, -0.001169015812942, 0.000103349776558, -0.000003813309102, 0.000015542937454, -0.000004252270155, -0.000344432741256, -0.000188322508425, -0.000003798930056, 0.002878474013131, 0.000479648737527, 0.000160244196007, 0.000012449379372, -0.000025211583296, -0.000029240408089, -0.000001069329869, -0.001271299967766, -0.000133670678392, -0.003059838896447
     //					, 0.012906597122666, 0.050841902184280, -0.001973897835999, 0.017928487134657, 0.043154792703685, 0.000622902345606, 0.002031938336114, 0.000401913571459, -0.000231214341523, -0.000016591523613, 0.000011431341737, 0.000007932426867, 0.000311267088246, -0.000201092426841, 0.000004838759439, 0.008371265702599, -0.000186683528686, 0.000139783403254, 0.000070116051011, -0.000021128179249, -0.000028597234778, -0.000006006222525, -0.002966959059502, 0.000313165520973, 0.003179854597069
     //					, -0.001345477564898, -0.000886479514041, 0.014171550800995, -0.002720150074738, 0.005673098074032, 0.007935105430084, 0.000687618072508, 0.000684952051662, 0.000022000355078, -0.000008608300759, -0.000000799656033, 0.000001107610267, -0.000106383032603, -0.000356814673233, -0.000068763009837, -0.000051146093497, -0.000091362447823, 0.000293945574578, -0.000256092019589, 0.000042269002771, -0.000009567778418, -0.000017167287470, 0.004592386869817, -0.001581055638926, 0.000227387610329
@@ -212,12 +213,12 @@ private:
 
   }
 
-  virtual void augmentCorrectionVector(Eigen::Matrix<double, msf_core::EKFState::nErrorStatesAtCompileTime,1>& correction_){
+  virtual void augmentCorrectionVector(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& correction_){
 
     if (this->config_.fixed_scale)
     {
-      typedef typename msf_tmp::getEnumStateType<msf_core::EKFState::stateVector_T, msf_core::L_>::value L_type;
-      const int L_indexInErrorState = msf_tmp::getStateIndexInErrorState<msf_core::EKFState::stateVector_T, msf_core::L_>::value;
+      typedef typename msf_tmp::getEnumStateType<EKFState_T::stateVector_T, msf_updates::L_>::value L_type;
+      const int L_indexInErrorState = msf_tmp::getStateIndexInErrorState<EKFState_T::stateVector_T, msf_updates::L_>::value;
 
       for(int i = 0 ; i < msf_tmp::StripConstReference<L_type>::result_t::sizeInCorrection_ ; ++i){
         correction_(L_indexInErrorState + i) = 0; //scale
@@ -226,15 +227,15 @@ private:
 
     if (this->config_.fixed_calib)
     {
-      typedef typename msf_tmp::getEnumStateType<msf_core::EKFState::stateVector_T, msf_core::q_ci_>::value q_ci_type;
-      const int q_ci_indexInErrorState = msf_tmp::getStateIndexInErrorState<msf_core::EKFState::stateVector_T, msf_core::q_ci_>::value;
+      typedef typename msf_tmp::getEnumStateType<EKFState_T::stateVector_T, msf_updates::q_ci_>::value q_ci_type;
+      const int q_ci_indexInErrorState = msf_tmp::getStateIndexInErrorState<EKFState_T::stateVector_T, msf_updates::q_ci_>::value;
 
       for(int i = 0 ; i < msf_tmp::StripConstReference<q_ci_type>::result_t::sizeInCorrection_ ; ++i){
         correction_(q_ci_indexInErrorState + i) = 0; //q_ic roll, pitch, yaw
       }
 
-      typedef typename msf_tmp::getEnumStateType<msf_core::EKFState::stateVector_T, msf_core::p_ci_>::value p_ci_type;
-      const int p_ci_indexInErrorState = msf_tmp::getStateIndexInErrorState<msf_core::EKFState::stateVector_T, msf_core::p_ci_>::value;
+      typedef typename msf_tmp::getEnumStateType<EKFState_T::stateVector_T, msf_updates::p_ci_>::value p_ci_type;
+      const int p_ci_indexInErrorState = msf_tmp::getStateIndexInErrorState<EKFState_T::stateVector_T, msf_updates::p_ci_>::value;
 
       for(int i = 0 ; i < msf_tmp::StripConstReference<p_ci_type>::result_t::sizeInCorrection_ ; ++i){
         correction_(p_ci_indexInErrorState + i) = 0; //p_ci x,y,z
@@ -242,16 +243,16 @@ private:
     }
   }
 
-  virtual void sanityCheckCorrection(msf_core::EKFState& delaystate, const msf_core::EKFState& buffstate,
-                                     Eigen::Matrix<double, msf_core::EKFState::nErrorStatesAtCompileTime,1>& correction_){
+  virtual void sanityCheckCorrection(EKFState_T& delaystate, const EKFState_T& buffstate,
+                                     Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& correction_){
 
-    const msf_core::EKFState& state = delaystate;
-    if (state.get<msf_core::L_>()(0) < 0)
+    const EKFState_T& state = delaystate;
+    if (state.get<msf_updates::L_>()(0) < 0)
     {
-      ROS_WARN_STREAM_THROTTLE(1,"Negative scale detected: " << state.get<msf_core::L_>()(0) << ". Correcting to 0.1");
+      ROS_WARN_STREAM_THROTTLE(1,"Negative scale detected: " << state.get<msf_updates::L_>()(0) << ". Correcting to 0.1");
       Eigen::Matrix<double, 1, 1> L_;
       L_ << 0.1;
-      delaystate.set<msf_core::L_>(L_);
+      delaystate.set<msf_updates::L_>(L_);
     }
 
   }

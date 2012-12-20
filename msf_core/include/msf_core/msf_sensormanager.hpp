@@ -53,6 +53,7 @@ protected:
   Handlers handlers; ///<a list of sensor handlers which provide measurements
 
 public:
+  typedef msf_updates::EKFState EKFState_T;
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
   boost::shared_ptr<MSF_Core> msf_core_; ///< the ekf core instance
@@ -79,31 +80,31 @@ public:
   /***
    * this method will be called for the user to set the initial state
    */
-  virtual void initState(msf_core::EKFState& state) = 0;
+  virtual void initState(EKFState_T& state) = 0;
 
   /***
    * this method will be called for the user to set the Q block entries for Auxiliary states
    * only changes to blocks in Q belonging to the auxiliary states are allowed / evaluated
    */
-  virtual void calculateQAuxiliaryStates(msf_core::EKFState& state, double dt){};
+  virtual void calculateQAuxiliaryStates(EKFState_T& state, double dt){};
 
   /***
    * this method will be called for the user to set the initial P matrix
    */
-  virtual void setP(Eigen::Matrix<double, msf_core::EKFState::nErrorStatesAtCompileTime, msf_core::EKFState::nErrorStatesAtCompileTime>& P) = 0;
+  virtual void setP(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, EKFState_T::nErrorStatesAtCompileTime>& P) = 0;
 
   /***
    * this method will be called for the user to have the possibility to augment the correction vector
    */
-  virtual void augmentCorrectionVector(Eigen::Matrix<double, EKFState::nErrorStatesAtCompileTime,1>& correction){};
+  virtual void augmentCorrectionVector(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& correction){};
 
   /***
    * this method will be called for the user to check the correction after it has been applied to the state
    * delaystate is the state on which the correction has been applied
    * buffstate is the state before the correction was applied
    */
-  virtual void sanityCheckCorrection(msf_core::EKFState& delaystate, const msf_core::EKFState& buffstate,
-                                     Eigen::Matrix<double, EKFState::nErrorStatesAtCompileTime,1>& correction){};
+  virtual void sanityCheckCorrection(EKFState_T& delaystate, const EKFState_T& buffstate,
+                                     Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& correction){};
 
   /***
    * provide a getter for these parameters, this is implemented for a given middleware or param file parser

@@ -109,8 +109,8 @@ GenericState_T<stateVector_T>::getQBlock() const {
 /** it does not set the header */
 template<typename stateVector_T>
 void GenericState_T<stateVector_T>::toPoseMsg(geometry_msgs::PoseWithCovarianceStamped & pose){ //boost fusion unfortunately doesn't like this to be const
-  eigen_conversions::vector3dToPoint(get<msf_core::p_>(), pose.pose.pose.position);
-  eigen_conversions::quaternionToMsg(get<msf_core::q_>(), pose.pose.pose.orientation);
+  eigen_conversions::vector3dToPoint(get<msf_updates::p_>(), pose.pose.pose.position);
+  eigen_conversions::quaternionToMsg(get<msf_updates::q_>(), pose.pose.pose.orientation);
   getPoseCovariance(pose.pose.covariance);
 }
 
@@ -119,9 +119,9 @@ void GenericState_T<stateVector_T>::toPoseMsg(geometry_msgs::PoseWithCovarianceS
 /** it does not set the header */
 template<typename stateVector_T>
 void GenericState_T<stateVector_T>::toExtStateMsg(sensor_fusion_comm::ExtState & state) {
-  eigen_conversions::vector3dToPoint(get<msf_core::p_>(), state.pose.position);
-  eigen_conversions::quaternionToMsg(get<msf_core::q_>(), state.pose.orientation);
-  eigen_conversions::vector3dToPoint(get<msf_core::v_>(), state.velocity);
+  eigen_conversions::vector3dToPoint(get<msf_updates::p_>(), state.pose.position);
+  eigen_conversions::quaternionToMsg(get<msf_updates::q_>(), state.pose.orientation);
+  eigen_conversions::vector3dToPoint(get<msf_updates::v_>(), state.velocity);
 }
 
 
@@ -216,8 +216,8 @@ template<typename stateVector_T>
 void GenericState_T<stateVector_T>::getPoseCovariance(geometry_msgs::PoseWithCovariance::_covariance_type & cov){
   BOOST_STATIC_ASSERT(geometry_msgs::PoseWithCovariance::_covariance_type::static_size == 36);
 
-  typedef typename msf_tmp::getEnumStateType<stateVector_T, msf_core::p_>::value p_type;
-  typedef typename msf_tmp::getEnumStateType<stateVector_T, msf_core::q_>::value q_type;
+  typedef typename msf_tmp::getEnumStateType<stateVector_T, msf_updates::p_>::value p_type;
+  typedef typename msf_tmp::getEnumStateType<stateVector_T, msf_updates::q_>::value q_type;
 
   //get indices of position and attitude in the covariance matrix
   static const int idxstartcorr_p = msf_tmp::getStartIndex<stateVector_T, p_type, msf_tmp::CorrectionStateLengthForType>::value;

@@ -86,7 +86,7 @@ MSF_Core::~MSF_Core()
 {
 }
 
-void MSF_Core::initExternalPropagation(boost::shared_ptr<EKFState> state) {
+void MSF_Core::initExternalPropagation(boost::shared_ptr<EKFState_T> state) {
   // init external propagation
   msgCorrect_.header.stamp = ros::Time::now();
   msgCorrect_.header.seq = 0;
@@ -100,7 +100,7 @@ void MSF_Core::initExternalPropagation(boost::shared_ptr<EKFState> state) {
   msgCorrect_.state.resize(HLI_EKF_STATE_SIZE); //make sure this is correctly sized
   boost::fusion::for_each(
       state->statevars_,
-      msf_tmp::CoreStatetoDoubleArray<std::vector<float>, EKFState::stateVector_T >(msgCorrect_.state)
+      msf_tmp::CoreStatetoDoubleArray<std::vector<float>, EKFState_T::stateVector_T >(msgCorrect_.state)
   );
 
   msgCorrect_.flag = sensor_fusion_comm::ExtEkf::initialization;
@@ -112,7 +112,7 @@ void MSF_Core::imuCallback(const sensor_msgs::ImuConstPtr & msg)
   if(!initialized_)
     return;
 
-  boost::shared_ptr<EKFState> lastState = StateBuffer_.getClosestBefore(msg->header.stamp.toSec());
+  boost::shared_ptr<EKFState_T> lastState = StateBuffer_.getClosestBefore(msg->header.stamp.toSec());
 
   if(lastState->time_ == -1){
     ROS_WARN_STREAM_THROTTLE(2, "ImuCallback: closest state is invalid\n");
@@ -120,7 +120,7 @@ void MSF_Core::imuCallback(const sensor_msgs::ImuConstPtr & msg)
   }
 
 
-  boost::shared_ptr<msf_core::EKFState> currentState(new msf_core::EKFState);
+  boost::shared_ptr<EKFState_T> currentState(new EKFState_T);
 
   currentState->time_ = msg->header.stamp.toSec();
 
@@ -189,13 +189,13 @@ void MSF_Core::imuCallback(const sensor_msgs::ImuConstPtr & msg)
 void MSF_Core::stateCallback(const sensor_fusion_comm::ExtEkfConstPtr & msg)
 {
 
-  boost::shared_ptr<EKFState> lastState = StateBuffer_.getClosestBefore(msg->header.stamp.toSec());
+  boost::shared_ptr<EKFState_T> lastState = StateBuffer_.getClosestBefore(msg->header.stamp.toSec());
 
   if(lastState->time_ == -1)
     return; // // early abort // //
 
 
-  boost::shared_ptr<msf_core::EKFState> currentState(new msf_core::EKFState);
+  boost::shared_ptr<EKFState_T> currentState(new EKFState_T);
 
   currentState->time_ = msg->header.stamp.toSec();
 
@@ -228,20 +228,20 @@ void MSF_Core::stateCallback(const sensor_fusion_comm::ExtEkfConstPtr & msg)
   if (flag == sensor_fusion_comm::ExtEkf::current_state)
     isnumeric = checkForNumeric(&msg->state[0], 10, "before prediction p,v,q");
 
-  isnumeric = checkForNumeric((double*)(&currentState->get<msf_core::p_>()[0]), 3, "before prediction p");
+  isnumeric = checkForNumeric((double*)(&currentState->get<msf_updates::p_>()[0]), 3, "before prediction p");
 
   if (flag == sensor_fusion_comm::ExtEkf::current_state && isnumeric) // state propagation is made externally, so we read the actual state
   {
-    currentState->get<msf_core::p_>() = Eigen::Matrix<double, 3, 1>(msg->state[0], msg->state[1], msg->state[2]);
-    currentState->get<msf_core::v_>() = Eigen::Matrix<double, 3, 1>(msg->state[3], msg->state[4], msg->state[5]);
-    currentState->get<msf_core::q_>() = Eigen::Quaternion<double>(msg->state[6], msg->state[7], msg->state[8], msg->state[9]);
-    currentState->get<msf_core::q_>().normalize();
+    currentState->get<msf_updates::p_>() = Eigen::Matrix<double, 3, 1>(msg->state[0], msg->state[1], msg->state[2]);
+    currentState->get<msf_updates::v_>() = Eigen::Matrix<double, 3, 1>(msg->state[3], msg->state[4], msg->state[5]);
+    currentState->get<msf_updates::q_>() = Eigen::Quaternion<double>(msg->state[6], msg->state[7], msg->state[8], msg->state[9]);
+    currentState->get<msf_updates::q_>().normalize();
 
     // zero props:
     //copy non propagation states from last state
     boost::fusion::for_each(
         currentState->statevars_,
-        msf_tmp::copyNonPropagationStates<EKFState>(*lastState)
+        msf_tmp::copyNonPropagationStates<EKFState_T>(*lastState)
     );
 
     hl_state_buf_ = *msg;
@@ -252,7 +252,7 @@ void MSF_Core::stateCallback(const sensor_fusion_comm::ExtEkfConstPtr & msg)
 
   propagatePOneStep();
 
-  isnumeric = checkForNumeric((double*)(&currentState->get<msf_core::p_>()[0]), 3, "prediction p");
+  isnumeric = checkForNumeric((double*)(&currentState->get<msf_updates::p_>()[0]), 3, "prediction p");
   isnumeric = checkForNumeric((double*)(&currentState->P_(0)), nErrorStatesAtCompileTime * nErrorStatesAtCompileTime, "prediction done P");
 
   predictionMade_ = true;
@@ -262,7 +262,7 @@ void MSF_Core::stateCallback(const sensor_fusion_comm::ExtEkfConstPtr & msg)
 
 
 
-void MSF_Core::propagateState(boost::shared_ptr<EKFState>& state_old, boost::shared_ptr<EKFState>& state_new)
+void MSF_Core::propagateState(boost::shared_ptr<EKFState_T>& state_old, boost::shared_ptr<EKFState_T>& state_new)
 {
 
   double dt = state_new->time_ - state_old->time_;
@@ -277,14 +277,14 @@ void MSF_Core::propagateState(boost::shared_ptr<EKFState>& state_old, boost::sha
   // zero props: copy constant for non propagated states
   boost::fusion::for_each(
       state_new->statevars_,
-      msf_tmp::copyNonPropagationStates<EKFState>(*state_old)
+      msf_tmp::copyNonPropagationStates<EKFState_T>(*state_old)
   );
 
   Eigen::Matrix<double, 3, 1> dv;
-  ConstVector3 ew = state_new->w_m_ - state_new->get<msf_core::b_w_>();
-  ConstVector3 ewold = state_old->w_m_ - state_old->get<msf_core::b_w_>();
-  ConstVector3 ea = state_new->a_m_ - state_new->get<msf_core::b_a_>();
-  ConstVector3 eaold = state_old->a_m_ - state_old->get<msf_core::b_a_>();
+  ConstVector3 ew = state_new->w_m_ - state_new->get<msf_updates::b_w_>();
+  ConstVector3 ewold = state_old->w_m_ - state_old->get<msf_updates::b_w_>();
+  ConstVector3 ea = state_new->a_m_ - state_new->get<msf_updates::b_a_>();
+  ConstVector3 eaold = state_old->a_m_ - state_old->get<msf_updates::b_a_>();
   ConstMatrix4 Omega = omegaMatJPL(ew);
   ConstMatrix4 OmegaOld = omegaMatJPL(ewold);
   Matrix4 OmegaMean = omegaMatJPL((ew + ewold) / 2);
@@ -308,12 +308,12 @@ void MSF_Core::propagateState(boost::shared_ptr<EKFState>& state_old, boost::sha
   ConstMatrix4 quat_int = MatExp + 1.0 / 48.0 * (Omega * OmegaOld - OmegaOld * Omega) * dt * dt;
 
   // first oder quaternion integration
-  state_new->get<msf_core::q_>().coeffs() = quat_int * state_old->get<msf_core::q_>().coeffs();
-  state_new->get<msf_core::q_>().normalize();
+  state_new->get<msf_updates::q_>().coeffs() = quat_int * state_old->get<msf_updates::q_>().coeffs();
+  state_new->get<msf_updates::q_>().normalize();
 
-  dv = (state_new->get<msf_core::q_>().toRotationMatrix() * ea + state_old->get<msf_core::q_>().toRotationMatrix() * eaold) / 2;
-  state_new->get<msf_core::v_>() = state_old->get<msf_core::v_>() + (dv - g_) * dt;
-  state_new->get<msf_core::p_>() = state_old->get<msf_core::p_>() + ((state_new->get<msf_core::v_>() + state_old->get<msf_core::v_>()) / 2 * dt);
+  dv = (state_new->get<msf_updates::q_>().toRotationMatrix() * ea + state_old->get<msf_updates::q_>().toRotationMatrix() * eaold) / 2;
+  state_new->get<msf_updates::v_>() = state_old->get<msf_updates::v_>() + (dv - g_) * dt;
+  state_new->get<msf_updates::p_>() = state_old->get<msf_updates::p_>() + ((state_new->get<msf_updates::v_>() + state_old->get<msf_updates::v_>()) / 2 * dt);
 
 }
 
@@ -324,11 +324,11 @@ void  MSF_Core::propagatePOneStep(){
   ++stateIteratorPLastPropagatedNext;
   if(stateIteratorPLastPropagatedNext != StateBuffer_.getIteratorEnd()){ //might happen if there is a measurement in the future
     predictProcessCovariance(stateIteratorPLastPropagated->second, stateIteratorPLastPropagatedNext->second);
-    checkForNumeric((double*)(&stateIteratorPLastPropagatedNext->second->get<msf_core::p_>()(0)), 3, "prediction p");
+    checkForNumeric((double*)(&stateIteratorPLastPropagatedNext->second->get<msf_updates::p_>()(0)), 3, "prediction p");
   }
 }
 
-void MSF_Core::predictProcessCovariance(boost::shared_ptr<EKFState>& state_old, boost::shared_ptr<EKFState>& state_new)
+void MSF_Core::predictProcessCovariance(boost::shared_ptr<EKFState_T>& state_old, boost::shared_ptr<EKFState_T>& state_new)
 {
 
   //TODO: later: find out whether we have to linearize around the current or the last state
@@ -343,14 +343,14 @@ void MSF_Core::predictProcessCovariance(boost::shared_ptr<EKFState>& state_old, 
   ConstVector3 nbwv = Vector3::Constant(usercalc_.getParam_noise_gyrbias() /* * sqrt(dt) */);
 
   // bias corrected IMU readings
-  ConstVector3 ew = state_new->w_m_ - state_new->get<msf_core::b_w_>();
-  ConstVector3 ea = state_new->a_m_ - state_new->get<msf_core::b_a_>();
+  ConstVector3 ew = state_new->w_m_ - state_new->get<msf_updates::b_w_>();
+  ConstVector3 ea = state_new->a_m_ - state_new->get<msf_updates::b_a_>();
 
   ConstMatrix3 a_sk = skew(ea);
   ConstMatrix3 w_sk = skew(ew);
   ConstMatrix3 eye3 = Eigen::Matrix<double, 3, 3>::Identity();
 
-  ConstMatrix3 C_eq = state_new->get<msf_core::q_>().toRotationMatrix();
+  ConstMatrix3 C_eq = state_new->get<msf_updates::q_>().toRotationMatrix();
 
   const double dt_p2_2 = dt * dt * 0.5; // dt^2 / 2
   const double dt_p3_6 = dt_p2_2 * dt / 3.0; // dt^3 / 6
@@ -382,7 +382,7 @@ void MSF_Core::predictProcessCovariance(boost::shared_ptr<EKFState>& state_old, 
   Fd_.block<3, 3> (6, 6) = E;
   Fd_.block<3, 3> (6, 9) = F;
 
-  calc_QCore(dt, state_new->get<msf_core::q_>(), ew, ea, nav, nbav, nwv, nbwv, Qd_);
+  calc_QCore(dt, state_new->get<msf_updates::q_>(), ew, ea, nav, nbav, nwv, nbwv, Qd_);
 
   //call user Q calc to fill in the blocks of auxiliary states
   usercalc_.calculateQAuxiliaryStates(*state_new, dt);
@@ -390,7 +390,7 @@ void MSF_Core::predictProcessCovariance(boost::shared_ptr<EKFState>& state_old, 
   //now copy the userdefined blocks to Qd
   boost::fusion::for_each(
       state_new->statevars_,
-      msf_tmp::copyQBlocksFromAuxiliaryStatesToQ<EKFState::stateVector_T>(Qd_)
+      msf_tmp::copyQBlocksFromAuxiliaryStatesToQ<EKFState_T::stateVector_T>(Qd_)
   );
 
   //TODO later: optimize here multiplication of F blockwise, using the fact that aux states have no entries outside their block
@@ -406,7 +406,7 @@ void MSF_Core::init(boost::shared_ptr<MSF_MeasurementBase> measurement){
   StateBuffer_.clear();
 
   //push one state to the buffer to apply the init on
-  boost::shared_ptr<EKFState> state(new EKFState);
+  boost::shared_ptr<EKFState_T> state(new EKFState_T);
   state->time_ = 0;
 
   //reset new state to zero
@@ -441,7 +441,7 @@ void MSF_Core::addMeasurement(boost::shared_ptr<MSF_MeasurementBase> measurement
 
   for( ; it_meas != it_meas_end; ++it_meas){
 
-    boost::shared_ptr<EKFState> state = getClosestState(it_meas->second->time_); //propagates covariance to state
+    boost::shared_ptr<EKFState_T> state = getClosestState(it_meas->second->time_); //propagates covariance to state
 
     if(state->time_ <= 0){
       ROS_ERROR_STREAM_THROTTLE(1,"getClosestState returned an invalid state");
@@ -493,7 +493,7 @@ void MSF_Core::addMeasurement(boost::shared_ptr<MSF_MeasurementBase> measurement
   msgCorrect_.linear_acceleration.x = 0;
   msgCorrect_.linear_acceleration.y = 0;
   msgCorrect_.linear_acceleration.z = 0;
-  boost::shared_ptr<EKFState>& latestState = StateBuffer_.getLast();
+  boost::shared_ptr<EKFState_T>& latestState = StateBuffer_.getLast();
 
   // prevent junk being sent to the external state propagation when data playback is (accidentally) on
   if(data_playback_){
@@ -504,26 +504,26 @@ void MSF_Core::addMeasurement(boost::shared_ptr<MSF_MeasurementBase> measurement
     msgCorrect_.flag = sensor_fusion_comm::ExtEkf::initialization;
   }
   else{
-    msgCorrect_.state[0] = latestState->get<msf_core::p_>()[0] - hl_state_buf_.state[0];
-    msgCorrect_.state[1] = latestState->get<msf_core::p_>()[1] - hl_state_buf_.state[1];
-    msgCorrect_.state[2] = latestState->get<msf_core::p_>()[2] - hl_state_buf_.state[2];
-    msgCorrect_.state[3] = latestState->get<msf_core::v_>()[0] - hl_state_buf_.state[3];
-    msgCorrect_.state[4] = latestState->get<msf_core::v_>()[1] - hl_state_buf_.state[4];
-    msgCorrect_.state[5] = latestState->get<msf_core::v_>()[2] - hl_state_buf_.state[5];
+    msgCorrect_.state[0] = latestState->get<msf_updates::p_>()[0] - hl_state_buf_.state[0];
+    msgCorrect_.state[1] = latestState->get<msf_updates::p_>()[1] - hl_state_buf_.state[1];
+    msgCorrect_.state[2] = latestState->get<msf_updates::p_>()[2] - hl_state_buf_.state[2];
+    msgCorrect_.state[3] = latestState->get<msf_updates::v_>()[0] - hl_state_buf_.state[3];
+    msgCorrect_.state[4] = latestState->get<msf_updates::v_>()[1] - hl_state_buf_.state[4];
+    msgCorrect_.state[5] = latestState->get<msf_updates::v_>()[2] - hl_state_buf_.state[5];
 
     Eigen::Quaterniond hl_q(hl_state_buf_.state[6], hl_state_buf_.state[7], hl_state_buf_.state[8], hl_state_buf_.state[9]);
-    Eigen::Quaterniond qbuff_q = hl_q.inverse() * latestState->get<msf_core::q_>();
+    Eigen::Quaterniond qbuff_q = hl_q.inverse() * latestState->get<msf_updates::q_>();
     msgCorrect_.state[6] = qbuff_q.w();
     msgCorrect_.state[7] = qbuff_q.x();
     msgCorrect_.state[8] = qbuff_q.y();
     msgCorrect_.state[9] = qbuff_q.z();
 
-    msgCorrect_.state[10] = latestState->get<msf_core::b_w_>()[0] - hl_state_buf_.state[10];
-    msgCorrect_.state[11] = latestState->get<msf_core::b_w_>()[1] - hl_state_buf_.state[11];
-    msgCorrect_.state[12] = latestState->get<msf_core::b_w_>()[2] - hl_state_buf_.state[12];
-    msgCorrect_.state[13] = latestState->get<msf_core::b_a_>()[0] - hl_state_buf_.state[13];
-    msgCorrect_.state[14] = latestState->get<msf_core::b_a_>()[1] - hl_state_buf_.state[14];
-    msgCorrect_.state[15] = latestState->get<msf_core::b_a_>()[2] - hl_state_buf_.state[15];
+    msgCorrect_.state[10] = latestState->get<msf_updates::b_w_>()[0] - hl_state_buf_.state[10];
+    msgCorrect_.state[11] = latestState->get<msf_updates::b_w_>()[1] - hl_state_buf_.state[11];
+    msgCorrect_.state[12] = latestState->get<msf_updates::b_w_>()[2] - hl_state_buf_.state[12];
+    msgCorrect_.state[13] = latestState->get<msf_updates::b_a_>()[0] - hl_state_buf_.state[13];
+    msgCorrect_.state[14] = latestState->get<msf_updates::b_a_>()[1] - hl_state_buf_.state[14];
+    msgCorrect_.state[15] = latestState->get<msf_updates::b_a_>()[2] - hl_state_buf_.state[15];
 
     msgCorrect_.flag = sensor_fusion_comm::ExtEkf::state_correction;
   }
@@ -537,7 +537,7 @@ void MSF_Core::addMeasurement(boost::shared_ptr<MSF_MeasurementBase> measurement
   seq_m++;
 }
 
-boost::shared_ptr<EKFState> MSF_Core::getClosestState(double tstamp)
+boost::shared_ptr<MSF_Core::EKFState_T> MSF_Core::getClosestState(double tstamp)
 {
 
   //sweiss{
@@ -558,7 +558,7 @@ boost::shared_ptr<EKFState> MSF_Core::getClosestState(double tstamp)
   started = true;
   //}
 
-  boost::shared_ptr<EKFState>& closestState = it->second;
+  boost::shared_ptr<EKFState_T>& closestState = it->second;
 
   if (closestState->time_ == -1){
     ROS_WARN_STREAM("Requested closest state to "<<timenow<<" but there was no suitable state in the map");
@@ -572,7 +572,7 @@ boost::shared_ptr<EKFState> MSF_Core::getClosestState(double tstamp)
 }
 
 
-void MSF_Core::propPToState(boost::shared_ptr<EKFState>& state)
+void MSF_Core::propPToState(boost::shared_ptr<EKFState_T>& state)
 {
   // propagate cov matrix until the current states time
   typename stateBufferT::iterator_T it = StateBuffer_.getIteratorAtValue(time_P_propagated);
@@ -585,7 +585,7 @@ void MSF_Core::propPToState(boost::shared_ptr<EKFState>& state)
 }
 
 
-bool MSF_Core::applyCorrection(boost::shared_ptr<EKFState>& delaystate, ErrorState & correction, double fuzzythres)
+bool MSF_Core::applyCorrection(boost::shared_ptr<EKFState_T>& delaystate, ErrorState & correction, double fuzzythres)
 {
 
   if(!initialized_ || !predictionMade_)
@@ -597,12 +597,12 @@ bool MSF_Core::applyCorrection(boost::shared_ptr<EKFState>& delaystate, ErrorSta
   //now augment core states
   if (usercalc_.getParam_fixed_bias())
   {
-    typedef typename msf_tmp::getEnumStateType<msf_core::EKFState::stateVector_T, msf_core::b_a_>::value b_a_type;
-    typedef typename msf_tmp::getEnumStateType<msf_core::EKFState::stateVector_T, msf_core::b_w_>::value b_w_type;
+    typedef typename msf_tmp::getEnumStateType<EKFState_T::stateVector_T, msf_updates::b_a_>::value b_a_type;
+    typedef typename msf_tmp::getEnumStateType<EKFState_T::stateVector_T, msf_updates::b_w_>::value b_w_type;
 
     enum{
-      indexOfState_b_a = msf_tmp::getStartIndex<msf_core::EKFState::stateVector_T, b_a_type, msf_tmp::CorrectionStateLengthForType>::value,
-      indexOfState_b_w = msf_tmp::getStartIndex<msf_core::EKFState::stateVector_T, b_w_type, msf_tmp::CorrectionStateLengthForType>::value
+      indexOfState_b_a = msf_tmp::getStartIndex<EKFState_T::stateVector_T, b_a_type, msf_tmp::CorrectionStateLengthForType>::value,
+      indexOfState_b_w = msf_tmp::getStartIndex<EKFState_T::stateVector_T, b_w_type, msf_tmp::CorrectionStateLengthForType>::value
     };
 
     BOOST_STATIC_ASSERT_MSG(static_cast<int>(indexOfState_b_w)==9, "The index of the state b_w in the correction vector differs from the expected value");
@@ -619,7 +619,7 @@ bool MSF_Core::applyCorrection(boost::shared_ptr<EKFState>& delaystate, ErrorSta
   // state update:
   // TODO: sweiss what to do with attitude? augment measurement noise?
   // store old values in case of fuzzy tracking
-  EKFState buffstate = *delaystate;
+  EKFState_T buffstate = *delaystate;
 
   //call correction function for every state
   delaystate->correct(correction);
@@ -642,7 +642,7 @@ bool MSF_Core::applyCorrection(boost::shared_ptr<EKFState>& delaystate, ErrorSta
     if (nontemporaldrifting_inittimer_ > nBuff_)
     {
       // should be unit quaternion if no error
-      Eigen::Quaternion<double> errq = const_cast<const EKFState&>(*delaystate).get<indexOfStateWithoutTemporalDrift>().conjugate() *
+      Eigen::Quaternion<double> errq = const_cast<const EKFState_T&>(*delaystate).get<indexOfStateWithoutTemporalDrift>().conjugate() *
           Eigen::Quaternion<double>(
               getMedian(qbuff_.block<nBuff_, 1> (0, 3)),
               getMedian(qbuff_.block<nBuff_, 1> (0, 0)),
@@ -659,23 +659,23 @@ bool MSF_Core::applyCorrection(boost::shared_ptr<EKFState>& delaystate, ErrorSta
         //copy the non propagation states back from the buffer
         boost::fusion::for_each(
             delaystate->statevars_,
-            msf_tmp::copyNonPropagationStates<EKFState>(buffstate)
+            msf_tmp::copyNonPropagationStates<EKFState_T>(buffstate)
         );
 
-        BOOST_STATIC_ASSERT_MSG(static_cast<int>(EKFState::nPropagatedCoreErrorStatesAtCompileTime) == 9, "Assumed that nPropagatedCoreStates == 9, which is not the case");
-        BOOST_STATIC_ASSERT_MSG(static_cast<int>(EKFState::nErrorStatesAtCompileTime) -
-                                static_cast<int>(EKFState::nPropagatedCoreErrorStatesAtCompileTime) == 16, "Assumed that nErrorStatesAtCompileTime-nPropagatedCoreStates == 16, which is not the case");
+        BOOST_STATIC_ASSERT_MSG(static_cast<int>(EKFState_T::nPropagatedCoreErrorStatesAtCompileTime) == 9, "Assumed that nPropagatedCoreStates == 9, which is not the case");
+        BOOST_STATIC_ASSERT_MSG(static_cast<int>(EKFState_T::nErrorStatesAtCompileTime) -
+                                static_cast<int>(EKFState_T::nPropagatedCoreErrorStatesAtCompileTime) == 16, "Assumed that nErrorStatesAtCompileTime-nPropagatedCoreStates == 16, which is not the case");
 
       }
       else // if tracking ok: update mean and 3sigma of past N q_vw's
       {
-        qbuff_.block<1, 4> (nontemporaldrifting_inittimer_ - nBuff_ - 1, 0) = Eigen::Matrix<double, 1, 4>(const_cast<const EKFState&>(*delaystate).get<indexOfStateWithoutTemporalDrift>().coeffs());
+        qbuff_.block<1, 4> (nontemporaldrifting_inittimer_ - nBuff_ - 1, 0) = Eigen::Matrix<double, 1, 4>(const_cast<const EKFState_T&>(*delaystate).get<indexOfStateWithoutTemporalDrift>().coeffs());
         nontemporaldrifting_inittimer_ = (nontemporaldrifting_inittimer_) % nBuff_ + nBuff_ + 1;
       }
     }
     else // at beginning get mean and 3sigma of past N q_vw's
     {
-      qbuff_.block<1, 4> (nontemporaldrifting_inittimer_ - 1, 0) = Eigen::Matrix<double, 1, 4>(const_cast<const EKFState&>(*delaystate).get<indexOfStateWithoutTemporalDrift>().coeffs());
+      qbuff_.block<1, 4> (nontemporaldrifting_inittimer_ - 1, 0) = Eigen::Matrix<double, 1, 4>(const_cast<const EKFState_T&>(*delaystate).get<indexOfStateWithoutTemporalDrift>().coeffs());
       nontemporaldrifting_inittimer_++;
     }
   } //end fuzzy tracking

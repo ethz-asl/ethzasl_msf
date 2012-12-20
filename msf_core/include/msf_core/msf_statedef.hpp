@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <msf_core/msf_fwds.hpp>
 #include <boost/fusion/container.hpp>
 
-namespace msf_core{
+namespace msf_updates{
 
 /*
  * This file contains the state definition of the EKF
@@ -64,23 +64,23 @@ namespace{
  */
 typedef boost::fusion::vector<
     // states varying during propagation - must not change the ordering here for now, CalcQ has the ordering hardcoded
-    StateVar_T<Eigen::Matrix<double, 3, 1>, p_, CoreStateWithPropagation>,				///< position (IMU centered)          (0-2 / 0-2)
-    StateVar_T<Eigen::Matrix<double, 3, 1>, v_, CoreStateWithPropagation>,				///< velocity                         (3- 5 / 3- 5)
-    StateVar_T<Eigen::Quaternion<double>, q_, CoreStateWithPropagation>,				///< attitude                         (6- 9 / 6- 8)
-    StateVar_T<Eigen::Matrix<double, 3, 1>, b_w_, CoreStateWithoutPropagation>,			///< gyro biases                      (10-12 / 9-11)
-    StateVar_T<Eigen::Matrix<double, 3, 1>, b_a_, CoreStateWithoutPropagation>,			///< acceleration biases              (13-15 / 12-14)
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_, msf_core::CoreStateWithPropagation>,				///< position (IMU centered)          (0-2 / 0-2)
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, v_, msf_core::CoreStateWithPropagation>,				///< velocity                         (3- 5 / 3- 5)
+    msf_core::StateVar_T<Eigen::Quaternion<double>, q_, msf_core::CoreStateWithPropagation>,				///< attitude                         (6- 9 / 6- 8)
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, b_w_, msf_core::CoreStateWithoutPropagation>,			///< gyro biases                      (10-12 / 9-11)
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, b_a_, msf_core::CoreStateWithoutPropagation>,			///< acceleration biases              (13-15 / 12-14)
 
     // states not varying during propagation
-    StateVar_T<Eigen::Matrix<double, 1, 1>, L_>,										///< visual scale                     (16 / 15)
-    StateVar_T<Eigen::Quaternion<double>, q_wv_, AuxiliaryNonTemporalDrifting>,			///< vision-world attitude drift      (17-20 / 16-18)
-    StateVar_T<Eigen::Quaternion<double>, q_ci_>,										///< camera-imu attitude calibration  (21-24 / 19-21)
-    StateVar_T<Eigen::Matrix<double, 3, 1>, p_ci_>/*,									///< camera-imu position calibration  (25-27 / 22-24)
-		StateVar_T<Eigen::Quaternion<double>, q_int_>	*/									///< this is the integrated ang. vel. no corrections applied, to use for delta rot in external algos...
+    msf_core::StateVar_T<Eigen::Matrix<double, 1, 1>, L_>,										///< visual scale                     (16 / 15)
+    msf_core::StateVar_T<Eigen::Quaternion<double>, q_wv_, msf_core::AuxiliaryNonTemporalDrifting>,			///< vision-world attitude drift      (17-20 / 16-18)
+    msf_core::StateVar_T<Eigen::Quaternion<double>, q_ci_>,										///< camera-imu attitude calibration  (21-24 / 19-21)
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_ci_>/*,									///< camera-imu position calibration  (25-27 / 22-24)
+		 msf_core::StateVar_T<Eigen::Quaternion<double>, q_int_>	*/									///< this is the integrated ang. vel. no corrections applied, to use for delta rot in external algos...
 
 > fullState_T;
 }
 
-typedef GenericState_T<msf_core::fullState_T> EKFState; ///<the state we want to use in this EKF
+typedef msf_core::GenericState_T<fullState_T> EKFState; ///<the state we want to use in this EKF
 typedef boost::shared_ptr<EKFState> EKFStatePtr;
 typedef boost::shared_ptr<const EKFState> EKFStateConstPtr;
 

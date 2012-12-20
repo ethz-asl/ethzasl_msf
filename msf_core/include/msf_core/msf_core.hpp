@@ -74,14 +74,15 @@ class MSF_Core
   bool initialized_; ///< is the filter initialized, so that we can propagate the state?
   bool predictionMade_; ///< is there a state prediction, so we can apply measurements?
 public:
+  typedef msf_updates::EKFState EKFState_T;
   enum{
-    nErrorStatesAtCompileTime = msf_core::EKFState::nErrorStatesAtCompileTime,  ///< error state length
-    nStatesAtCompileTime = msf_core::EKFState::nStatesAtCompileTime ///< complete state length
+    nErrorStatesAtCompileTime = EKFState_T::nErrorStatesAtCompileTime,  ///< error state length
+    nStatesAtCompileTime = EKFState_T::nStatesAtCompileTime ///< complete state length
   };
   typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, 1> ErrorState; ///< the error state type
   typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> ErrorStateCov; ///<the error state covariance type
 
-  typedef msf_core::SortedContainer<msf_core::EKFState> stateBufferT; ///< the type of the state buffer containing all the states
+  typedef msf_core::SortedContainer<EKFState_T> stateBufferT; ///< the type of the state buffer containing all the states
   typedef msf_core::SortedContainer<msf_core::MSF_MeasurementBase, msf_core::MSF_InvalidMeasurement> measurementBufferT; ///< the type of the measurement buffer containing all the measurements
 
   /**
@@ -101,13 +102,13 @@ public:
    * \brief initialize the HLP based propagation
    * \param state the state to send to the HLP
    */
-  void initExternalPropagation(boost::shared_ptr<EKFState> state);
+  void initExternalPropagation(boost::shared_ptr<EKFState_T> state);
 
   /**
    * \brief finds the closest state to the requested time in the internal state
    * \param tstamp the time stamp to find the closest state to
    */
-  boost::shared_ptr<EKFState> getClosestState(double tstamp);
+  boost::shared_ptr<EKFState_T> getClosestState(double tstamp);
 
   /**
    * \brief delete very old states and measurements from the buffers to free memory
@@ -122,7 +123,7 @@ public:
    * \brief sets the covariance matrix of the core states to simulated values
    * \param P the error state covariance Matrix to fill
    */
-  void setPCore(Eigen::Matrix<double, msf_core::EKFState::nErrorStatesAtCompileTime, msf_core::EKFState::nErrorStatesAtCompileTime>& P){
+  void setPCore(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, EKFState_T::nErrorStatesAtCompileTime>& P){
     enum{
       coreErrorStates = 15 // we might want to calculate this, but on the other hand the values for the matrix later on are anyway hardcoded
     };
@@ -177,10 +178,10 @@ private:
   /**
    * \brief get the index of the best state having no temporal drift at compile time
    */
-  enum{
-    indexOfStateWithoutTemporalDrift = msf_tmp::IndexOfBestNonTemporalDriftingState<msf_core::fullState_T>::value
+  enum{//TODO create a typedef in EKFState_T to make the list of types public, insert here but also in the lines below
+    indexOfStateWithoutTemporalDrift = msf_tmp::IndexOfBestNonTemporalDriftingState<msf_updates::fullState_T>::value
   };
-  typedef typename msf_tmp::getEnumStateType<msf_core::fullState_T, indexOfStateWithoutTemporalDrift>::value nonDriftingStateType; //returns void type for invalid types
+  typedef typename msf_tmp::getEnumStateType<msf_updates::fullState_T, indexOfStateWithoutTemporalDrift>::value nonDriftingStateType; //returns void type for invalid types
 
   const static int qbuffRowsAtCompiletime = msf_tmp::StateLengthForType<const msf_tmp::StripConstReference<nonDriftingStateType>::result_t&>::value;
 
@@ -226,14 +227,14 @@ private:
    * \param state_old the state to propagate from
    * \param state_new the state to propagate to
    */
-  void propagateState(boost::shared_ptr<EKFState>& state_old, boost::shared_ptr<EKFState>& state_new);
+  void propagateState(boost::shared_ptr<EKFState_T>& state_old, boost::shared_ptr<EKFState_T>& state_new);
 
   /**
    * \brief propagates the error state covariance
    * \param state_old the state to propagate the covariance from
    * \param state_new the state to propagate the covariance to
    */
-  void predictProcessCovariance(boost::shared_ptr<EKFState>& state_old, boost::shared_ptr<EKFState>& state_new);
+  void predictProcessCovariance(boost::shared_ptr<EKFState_T>& state_old, boost::shared_ptr<EKFState_T>& state_new);
 
   /**
    * \brief applies the correction
@@ -241,13 +242,13 @@ private:
    * \param correction the correction vector
    * \param fuzzythres the error of the non temporal drifting state allowed before fuzzy tracking will be triggered
    */
-  bool applyCorrection(boost::shared_ptr<EKFState>& delaystate, ErrorState & correction, double fuzzythres = 0.1);
+  bool applyCorrection(boost::shared_ptr<EKFState_T>& delaystate, ErrorState & correction, double fuzzythres = 0.1);
 
   /**
    * \brief propagate covariance to a given state in time
    * \param state the state to propagate to from the last propagated time
    */
-  void propPToState(boost::shared_ptr<EKFState>& state);
+  void propPToState(boost::shared_ptr<EKFState_T>& state);
 
   //internal state propagation
   /**

@@ -45,19 +45,19 @@ namespace msf_core{
 class MSF_MeasurementBase{
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  typedef msf_core::EKFState state_T; ///<the EKF state type this measurement can be applied to
+  typedef msf_updates::EKFState EKFState_T; ///<the EKF state type this measurement can be applied to
   virtual ~MSF_MeasurementBase(){}
   /**
    * \brief the method called by the msf_core to apply the measurement represented by this object
    */
-  virtual void apply(boost::shared_ptr<EKFState> stateWithCovariance, MSF_Core& core) = 0;
+  virtual void apply(boost::shared_ptr<EKFState_T> stateWithCovariance, MSF_Core& core) = 0;
   double time_; ///<the time this measurement was taken
 protected:
   /**
    * main update routine called by a given sensor, will apply the measurement to the state inside the core
    */
   template<class H_type, class Res_type, class R_type>
-  void calculateAndApplyCorrection(boost::shared_ptr<EKFState> state, MSF_Core& core, const Eigen::MatrixBase<H_type>& H_delayed,
+  void calculateAndApplyCorrection(boost::shared_ptr<EKFState_T> state, MSF_Core& core, const Eigen::MatrixBase<H_type>& H_delayed,
                                    const Eigen::MatrixBase<Res_type> & res_delayed, const Eigen::MatrixBase<R_type>& R_delayed);
 };
 
@@ -67,7 +67,7 @@ protected:
 class MSF_InvalidMeasurement:public MSF_MeasurementBase{
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  virtual void apply(boost::shared_ptr<EKFState> stateWithCovariance, MSF_Core& core){
+  virtual void apply(boost::shared_ptr<EKFState_T> stateWithCovariance, MSF_Core& core){
     ROS_ERROR_STREAM("Called apply() on an MSF_InvalidMeasurement object. This should never happen.");
   }
 };
@@ -118,9 +118,9 @@ public:
  */
 class MSF_InitMeasurement:public MSF_MeasurementBase{
 private:
-  MSF_MeasurementBase::state_T InitState; ///< values for initialization of the state
+  MSF_MeasurementBase::EKFState_T InitState; ///< values for initialization of the state
   bool ContainsInitialSensorReadings_; ///<flag whether this measurement contains initial sensor readings
-  typedef MSF_MeasurementBase::state_T::stateVector_T stateVector_T;
+  typedef MSF_MeasurementBase::EKFState_T::stateVector_T stateVector_T;
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   MSF_InitMeasurement(bool ContainsInitialSensorReadings){
@@ -129,7 +129,7 @@ public:
   }
   virtual ~MSF_InitMeasurement(){};
 
-  MSF_MeasurementBase::state_T::P_type& get_P(){
+  MSF_MeasurementBase::EKFState_T::P_type& get_P(){
     return InitState.P_;
   }
   /**
@@ -171,7 +171,7 @@ public:
     return InitState.get<INDEX>();
   }
 
-  virtual void apply(boost::shared_ptr<EKFState> stateWithCovariance, MSF_Core& core);
+  virtual void apply(boost::shared_ptr<EKFState_T> stateWithCovariance, MSF_Core& core);
 };
 
 

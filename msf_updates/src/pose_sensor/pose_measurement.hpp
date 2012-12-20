@@ -109,7 +109,7 @@ public:
   bool measurement_world_sensor_;
   bool fixed_covariance_;
 
-  typedef msf_core::EKFState state_T;
+  typedef msf_updates::EKFState EKFState_T;
   virtual ~PoseMeasurement()
   {
   }
@@ -121,7 +121,7 @@ public:
   /**
    * the method called by the msf_core to apply the measurement represented by this object
    */
-  virtual void apply(boost::shared_ptr<state_T> const_state, msf_core::MSF_Core& core)
+  virtual void apply(boost::shared_ptr<EKFState_T> const_state, msf_core::MSF_Core& core)
   {
 
     // init variables
@@ -136,28 +136,28 @@ public:
       return;	// // early abort // //
     }
 
-    const state_T& state = *const_state;
+    const EKFState_T& state = *const_state;
 
     // get rotation matrices
-    Eigen::Matrix<double, 3, 3> C_wv = state.get<msf_core::q_wv_>().conjugate().toRotationMatrix();
-    Eigen::Matrix<double, 3, 3> C_q = state.get<msf_core::q_>().conjugate().toRotationMatrix();
-    Eigen::Matrix<double, 3, 3> C_ci = state.get<msf_core::q_ci_>().conjugate().toRotationMatrix();
+    Eigen::Matrix<double, 3, 3> C_wv = state.get<msf_updates::q_wv_>().conjugate().toRotationMatrix();
+    Eigen::Matrix<double, 3, 3> C_q = state.get<msf_updates::q_>().conjugate().toRotationMatrix();
+    Eigen::Matrix<double, 3, 3> C_ci = state.get<msf_updates::q_ci_>().conjugate().toRotationMatrix();
 
     // preprocess for elements in H matrix
     Eigen::Matrix<double, 3, 1> vecold;
-    vecold = (state.get<msf_core::p_>() + C_q.transpose() * state.get<msf_core::p_ci_>()) * state.get<msf_core::L_>();
+    vecold = (state.get<msf_updates::p_>() + C_q.transpose() * state.get<msf_updates::p_ci_>()) * state.get<msf_updates::L_>();
     Eigen::Matrix<double, 3, 3> skewold = skew(vecold);
 
-    Eigen::Matrix<double, 3, 3> pci_sk = skew(state.get<msf_core::p_ci_>());
+    Eigen::Matrix<double, 3, 3> pci_sk = skew(state.get<msf_updates::p_ci_>());
 
     // construct H matrix using H-blockx :-)
     // position:
-    H_old.block<3, 3>(0, 0) = C_wv.transpose() * state.get<msf_core::L_>()(0); // p
-    H_old.block<3, 3>(0, 6) = -C_wv.transpose() * C_q.transpose() * pci_sk * state.get<msf_core::L_>()(0); // q
-    H_old.block<3, 1>(0, 15) = C_wv.transpose() * C_q.transpose() * state.get<msf_core::p_ci_>()
-                            + C_wv.transpose() * state.get<msf_core::p_>(); // L
+    H_old.block<3, 3>(0, 0) = C_wv.transpose() * state.get<msf_updates::L_>()(0); // p
+    H_old.block<3, 3>(0, 6) = -C_wv.transpose() * C_q.transpose() * pci_sk * state.get<msf_updates::L_>()(0); // q
+    H_old.block<3, 1>(0, 15) = C_wv.transpose() * C_q.transpose() * state.get<msf_updates::p_ci_>()
+                            + C_wv.transpose() * state.get<msf_updates::p_>(); // L
     H_old.block<3, 3>(0, 16) = -C_wv.transpose() * skewold; // q_wv
-    H_old.block<3, 3>(0, 22) = C_wv.transpose() * C_q.transpose() * state.get<msf_core::L_>()(0); //p_ci
+    H_old.block<3, 3>(0, 22) = C_wv.transpose() * C_q.transpose() * state.get<msf_updates::L_>()(0); //p_ci
 
     // attitude
     H_old.block<3, 3>(3, 6) = C_ci; // q
@@ -168,14 +168,14 @@ public:
     // construct residuals
     // position
     r_old.block<3, 1>(0, 0) = z_p_
-        - C_wv.transpose() * (state.get<msf_core::p_>() + C_q.transpose() * state.get<msf_core::p_ci_>())
-        * state.get<msf_core::L_>();
+        - C_wv.transpose() * (state.get<msf_updates::p_>() + C_q.transpose() * state.get<msf_updates::p_ci_>())
+        * state.get<msf_updates::L_>();
     // attitude
     Eigen::Quaternion<double> q_err;
-    q_err = (state.get<msf_core::q_wv_>() * state.get<msf_core::q_>() * state.get<msf_core::q_ci_>()).conjugate() * z_q_;
+    q_err = (state.get<msf_updates::q_wv_>() * state.get<msf_updates::q_>() * state.get<msf_updates::q_ci_>()).conjugate() * z_q_;
     r_old.block<3, 1>(3, 0) = q_err.vec() / q_err.w() * 2;
     // vision world yaw drift
-    q_err = state.get<msf_core::q_wv_>();
+    q_err = state.get<msf_updates::q_wv_>();
     r_old(6, 0) = -2 * (q_err.w() * q_err.z() + q_err.x() * q_err.y())
                             / (1 - 2 * (q_err.y() * q_err.y() + q_err.z() * q_err.z()));
 
