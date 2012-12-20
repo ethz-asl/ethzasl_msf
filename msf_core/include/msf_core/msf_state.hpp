@@ -94,10 +94,9 @@ struct StateVar_T{
 template<typename stateSequence_T>
 struct GenericState_T{
 
-  template<typename EKFState_T>
-  friend class msf_core::MSF_Core;
+  friend class msf_core::MSF_Core<GenericState_T<stateSequence_T> >;
   friend class msf_core::copyNonPropagationStates<GenericState_T>;
-  friend class msf_core::MSF_InitMeasurement;
+  friend class msf_core::MSF_InitMeasurement<GenericState_T<stateSequence_T> >;
 public:
   typedef stateSequence_T stateVector_T; ///<the state vector defining the state variables of this EKF
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW

@@ -42,10 +42,11 @@ namespace msf_core{
  * \brief The base class for all measurement types.
  * These are the objects provided to the EKF core to be applied in correct order to the states
  */
+template<typename EKFState_T>
 class MSF_MeasurementBase{
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  typedef msf_updates::EKFState EKFState_T; ///<the EKF state type this measurement can be applied to
+//  typedef msf_updates::EKFState EKFState_T; ///<the EKF state type this measurement can be applied to
   virtual ~MSF_MeasurementBase(){}
   /**
    * \brief the method called by the msf_core to apply the measurement represented by this object
@@ -64,12 +65,14 @@ protected:
 /**
  * \brief An invalid measurement needed for the measurement container to report if something went wrong
  */
-class MSF_InvalidMeasurement:public MSF_MeasurementBase{
+template <typename EKFState_T>
+class MSF_InvalidMeasurement:public MSF_MeasurementBase<EKFState_T>{
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   virtual void apply(boost::shared_ptr<EKFState_T> stateWithCovariance, MSF_Core<EKFState_T>& core){
     ROS_ERROR_STREAM("Called apply() on an MSF_InvalidMeasurement object. This should never happen.");
   }
+  virtual ~MSF_InvalidMeasurement(){};
 };
 
 /**
@@ -78,8 +81,8 @@ public:
  * method of the EKF core
  * \note provides an abstract NVI to create measurements from sensor readings
  */
-template<typename T, int MEASUREMENTSIZE>
-class MSF_Measurement: public MSF_MeasurementBase{
+template<typename T, int MEASUREMENTSIZE, typename EKFState_T>
+class MSF_Measurement: public MSF_MeasurementBase<EKFState_T>{
 private:
   virtual void makeFromSensorReadingImpl(const boost::shared_ptr<T const> reading) = 0;
 protected:
@@ -94,7 +97,7 @@ public:
   }
   virtual ~MSF_Measurement(){};
   void makeFromSensorReading(const boost::shared_ptr<T const> reading, double timestamp){
-    time_ = timestamp;
+    this->time_ = timestamp;
 
     makeFromSensorReadingImpl(reading);
 
@@ -116,20 +119,21 @@ public:
  * this can especially be used to split the initialization of the EKF
  * between multiple sensors which init different parts of the state
  */
-class MSF_InitMeasurement:public MSF_MeasurementBase{
+template<typename EKFState_T>
+class MSF_InitMeasurement:public MSF_MeasurementBase<EKFState_T>{
 private:
-  MSF_MeasurementBase::EKFState_T InitState; ///< values for initialization of the state
+  EKFState_T InitState; ///< values for initialization of the state
   bool ContainsInitialSensorReadings_; ///<flag whether this measurement contains initial sensor readings
-  typedef MSF_MeasurementBase::EKFState_T::stateVector_T stateVector_T;
+  typedef typename EKFState_T::stateVector_T stateVector_T;
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   MSF_InitMeasurement(bool ContainsInitialSensorReadings){
     ContainsInitialSensorReadings_ = ContainsInitialSensorReadings;
-    time_ = ros::Time::now().toSec();
+    this->time_ = ros::Time::now().toSec();
   }
   virtual ~MSF_InitMeasurement(){};
 
-  MSF_MeasurementBase::EKFState_T::P_type& get_P(){
+  typename EKFState_T::P_type& get_P(){
     return InitState.P_;
   }
   /**
@@ -150,8 +154,8 @@ public:
    */
   template<int INDEX, typename T>
   void setStateInitValue(const T& initvalue){
-    InitState.getStateVar<INDEX>().state_ = initvalue;
-    InitState.getStateVar<INDEX>().hasResetValue = true;
+    InitState.template getStateVar<INDEX>().state_ = initvalue;
+    InitState.template getStateVar<INDEX>().hasResetValue = true;
   }
 
   /**
@@ -159,7 +163,7 @@ public:
    */
   template<int INDEX>
   void resetStateInitValue(){
-    InitState.get<INDEX>().hasResetValue = false;
+    InitState.template get<INDEX>().hasResetValue = false;
   }
 
   /**
@@ -168,7 +172,7 @@ public:
   template<int INDEX>
   const typename msf_tmp::StripReference<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::result_t::value_t&
   getStateInitValue() const {
-    return InitState.get<INDEX>();
+    return InitState.template get<INDEX>();
   }
 
   virtual void apply(boost::shared_ptr<EKFState_T> stateWithCovariance, MSF_Core<EKFState_T>& core);
@@ -178,14 +182,14 @@ public:
 /**
  * \brief A comparator to sort measurements by time
  */
-template<typename stateSequence_T>
+template<typename EKFState_T>
 class sortMeasurements
 {
 public:
   /**
    * implements the sorting by time
    */
-  bool operator() (const MSF_MeasurementBase& lhs, const MSF_MeasurementBase&rhs) const
+  bool operator() (const MSF_MeasurementBase<EKFState_T>& lhs, const MSF_MeasurementBase<EKFState_T>&rhs) const
   {
     return (lhs.time_<rhs.time_);
   }

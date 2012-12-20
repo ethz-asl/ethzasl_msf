@@ -406,7 +406,7 @@ void MSF_Core<EKFState_T>::predictProcessCovariance(boost::shared_ptr<EKFState_T
 }
 
 template<typename EKFState_T>
-void MSF_Core<EKFState_T>::init(boost::shared_ptr<MSF_MeasurementBase> measurement){
+void MSF_Core<EKFState_T>::init(boost::shared_ptr<MSF_MeasurementBase<EKFState_T> > measurement){
   MeasurementBuffer_.clear();
   StateBuffer_.clear();
 
@@ -434,7 +434,7 @@ void MSF_Core<EKFState_T>::init(boost::shared_ptr<MSF_MeasurementBase> measureme
 }
 
 template<typename EKFState_T>
-void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase> measurement){
+void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase<EKFState_T> > measurement){
 
   if(!initialized_ || !predictionMade_)
     return;

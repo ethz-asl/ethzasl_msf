@@ -72,7 +72,7 @@ class MSF_SensorManager;
 template<typename EKFState_T>
 class MSF_Core
 {
-  friend class MSF_MeasurementBase;
+  friend class MSF_MeasurementBase<EKFState_T>;
   bool initialized_; ///< is the filter initialized, so that we can propagate the state?
   bool predictionMade_; ///< is there a state prediction, so we can apply measurements?
 public:
@@ -85,20 +85,20 @@ public:
   typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> ErrorStateCov; ///<the error state covariance type
 
   typedef msf_core::SortedContainer<EKFState_T> stateBufferT; ///< the type of the state buffer containing all the states
-  typedef msf_core::SortedContainer<msf_core::MSF_MeasurementBase, msf_core::MSF_InvalidMeasurement> measurementBufferT; ///< the type of the measurement buffer containing all the measurements
+  typedef msf_core::SortedContainer<typename msf_core::MSF_MeasurementBase<EKFState_T>, typename msf_core::MSF_InvalidMeasurement<EKFState_T> > measurementBufferT; ///< the type of the measurement buffer containing all the measurements
 
   /**
    * \brief add a sensor measurement or an init measurement to the internal queue and apply it to the state
    * \param measurement the measurement to add to the internal measurement queue
    */
-  void addMeasurement(boost::shared_ptr<MSF_MeasurementBase> measurement);
+  void addMeasurement(boost::shared_ptr<MSF_MeasurementBase<EKFState_T> > measurement);
 
   /**
    * \brief initializes the filter with the values of the given measurement, other init values from other
    * sensors can be passed in as "measurement" using the initMeasurement structs
    * \param measurement a measurement containing initial values for the state
    */
-  void init(boost::shared_ptr<MSF_MeasurementBase> measurement);
+  void init(boost::shared_ptr<MSF_MeasurementBase<EKFState_T> > measurement);
 
   /**
    * \brief initialize the HLP based propagation
@@ -200,7 +200,7 @@ private:
    */
   bool data_playback_;
 
-  MSF_SensorManager<EKFState_T>& usercalc_; //a class which provides methods for customization of several calculations
+  MSF_SensorManager<EKFState_T>& usercalc_; ///< a class which provides methods for customization of several calculations
 
   enum
   {

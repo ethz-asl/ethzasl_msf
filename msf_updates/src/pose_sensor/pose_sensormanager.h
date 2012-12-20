@@ -126,7 +126,7 @@ private:
     p = q_wv.conjugate().toRotationMatrix() * p_vc / scale - q.toRotationMatrix() * p_ci;
 
     //prepare init "measurement"
-    boost::shared_ptr<msf_core::MSF_InitMeasurement> meas(new msf_core::MSF_InitMeasurement(true)); //hand over that we will also set the sensor readings
+    boost::shared_ptr<msf_core::MSF_InitMeasurement<EKFState_T> > meas(new msf_core::MSF_InitMeasurement<EKFState_T>(true)); //hand over that we will also set the sensor readings
 
     meas->setStateInitValue<msf_updates::p_>(p);
     meas->setStateInitValue<msf_updates::v_>(v);

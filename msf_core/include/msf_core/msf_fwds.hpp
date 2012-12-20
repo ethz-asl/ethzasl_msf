@@ -93,8 +93,14 @@ template<typename T, typename stateList_T>
 struct StatetoDoubleArray;
 
 class MeasurementHandler;
+
+template<typename EKFState_T>
 class MSF_InitMeasurement;
+
+template<typename EKFState_T>
 class MSF_MeasurementBase;
+
+template<typename EKFState_T>
 class MSF_InvalidMeasurement;
 
 template<typename EKFState_T>

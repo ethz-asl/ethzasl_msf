@@ -33,8 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace msf_core{
 
+template<typename EKFState_T>
 template<class H_type, class Res_type, class R_type>
-void MSF_MeasurementBase::calculateAndApplyCorrection(boost::shared_ptr<EKFState_T> state, MSF_Core<EKFState_T>& core, const Eigen::MatrixBase<H_type>& H_delayed,
+void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrection(boost::shared_ptr<EKFState_T> state, MSF_Core<EKFState_T>& core, const Eigen::MatrixBase<H_type>& H_delayed,
                                                       const Eigen::MatrixBase<Res_type> & res_delayed, const Eigen::MatrixBase<R_type>& R_delayed)
 {
 
@@ -48,13 +49,13 @@ void MSF_MeasurementBase::calculateAndApplyCorrection(boost::shared_ptr<EKFState
 
   R_type S;
   Eigen::Matrix<double, MSF_Core<EKFState_T>::nErrorStatesAtCompileTime, R_type::RowsAtCompileTime> K;
-  MSF_Core<EKFState_T>::ErrorStateCov & P = state->P_;
+  typename MSF_Core<EKFState_T>::ErrorStateCov & P = state->P_;
 
   S = H_delayed * P * H_delayed.transpose() + R_delayed;
   K = P * H_delayed.transpose() * S.inverse();
 
   correction_ = K * res_delayed;
-  const MSF_Core<EKFState_T>::ErrorStateCov KH = (MSF_Core<EKFState_T>::ErrorStateCov::Identity() - K * H_delayed);
+  const typename MSF_Core<EKFState_T>::ErrorStateCov KH = (MSF_Core<EKFState_T>::ErrorStateCov::Identity() - K * H_delayed);
   P = KH * P * KH.transpose() + K * R_delayed * K.transpose();
 
   // make sure P stays symmetric
@@ -62,8 +63,8 @@ void MSF_MeasurementBase::calculateAndApplyCorrection(boost::shared_ptr<EKFState
 
   core.applyCorrection(state, correction_);
 }
-
-void MSF_InitMeasurement::apply(boost::shared_ptr<EKFState_T> stateWithCovariance, MSF_Core<EKFState_T>& core){
+template<typename EKFState_T>
+void MSF_InitMeasurement<EKFState_T>::apply(boost::shared_ptr<EKFState_T> stateWithCovariance, MSF_Core<EKFState_T>& core){
 
 
   stateWithCovariance->time_ = ros::Time::now().toSec(); //makes this state a valid starting point

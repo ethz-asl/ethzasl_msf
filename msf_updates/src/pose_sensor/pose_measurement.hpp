@@ -47,10 +47,11 @@ enum
 /**
  * \brief a measurement as provided by a pose tracking algorithm
  */
-struct PoseMeasurement : public msf_core::MSF_Measurement<geometry_msgs::PoseWithCovarianceStamped, nMeasurements>
+struct PoseMeasurement : public msf_core::MSF_Measurement<geometry_msgs::PoseWithCovarianceStamped, nMeasurements, msf_updates::EKFState>
 {
 private:
-  typedef msf_core::MSF_Measurement<geometry_msgs::PoseWithCovarianceStamped, nMeasurements>::Measurement_ptr measptr_t;
+  typedef msf_core::MSF_Measurement<geometry_msgs::PoseWithCovarianceStamped, nMeasurements, msf_updates::EKFState> Measurement_t;
+  typedef Measurement_t::Measurement_ptr measptr_t;
 
   virtual void makeFromSensorReadingImpl(measptr_t msg)
   {
@@ -180,7 +181,7 @@ public:
                             / (1 - 2 * (q_err.y() * q_err.y() + q_err.z() * q_err.z()));
 
     // call update step in base class
-    MSF_Measurement::calculateAndApplyCorrection(const_state, core, H_old, r_old, R_);
+    this->calculateAndApplyCorrection(const_state, core, H_old, r_old, R_);
 
   }
 };
