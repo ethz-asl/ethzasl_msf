@@ -55,7 +55,7 @@ private:
   virtual void makeFromSensorReadingImpl(measptr_t msg)
   {
 
-    Eigen::Matrix<double, nMeasurements, msf_core::MSF_Core::nErrorStatesAtCompileTime> H_old;
+    Eigen::Matrix<double, nMeasurements, msf_core::MSF_Core<msf_updates::EKFState>::nErrorStatesAtCompileTime> H_old;
     Eigen::Matrix<double, nMeasurements, 1> r_old;
 
     H_old.setZero();
@@ -121,11 +121,11 @@ public:
   /**
    * the method called by the msf_core to apply the measurement represented by this object
    */
-  virtual void apply(boost::shared_ptr<EKFState_T> const_state, msf_core::MSF_Core& core)
+  virtual void apply(boost::shared_ptr<EKFState_T> const_state, msf_core::MSF_Core<EKFState_T>& core)
   {
 
     // init variables
-    Eigen::Matrix<double, nMeasurements, msf_core::MSF_Core::nErrorStatesAtCompileTime> H_old;
+    Eigen::Matrix<double, nMeasurements, msf_core::MSF_Core<EKFState_T>::nErrorStatesAtCompileTime> H_old;
     Eigen::Matrix<double, nMeasurements, 1> r_old;
 
     H_old.setZero();

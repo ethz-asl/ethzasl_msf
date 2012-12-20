@@ -38,7 +38,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace msf_core{
 
+template<typename EKFState_T>
 class SensorHandler;
+
+template<typename EKFState_T>
 class MSF_Core;
 
 /** \class MSF_SensorManager
@@ -46,17 +49,17 @@ class MSF_Core;
  * registered with this class as handlers of particular sensors. This class also owns the
  * EKF core instance and handles the initialization of the filter
  */
+template<typename EKFState_T>
 class MSF_SensorManager:public StateVisitor
 {
 protected:
-  typedef std::vector<boost::shared_ptr<SensorHandler> > Handlers;
+  typedef std::vector<boost::shared_ptr<SensorHandler<EKFState_T> > > Handlers;
   Handlers handlers; ///<a list of sensor handlers which provide measurements
 
 public:
-  typedef msf_updates::EKFState EKFState_T;
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  boost::shared_ptr<MSF_Core> msf_core_; ///< the ekf core instance
+  boost::shared_ptr<MSF_Core<EKFState_T> > msf_core_; ///< the ekf core instance
 
   MSF_SensorManager();
 
@@ -67,7 +70,7 @@ public:
    * add a new sensor handler to the list of handlers owned by this manager
    * a sensor handler is in turn owning the sensor (camera/vicon etc.)
    */
-  void addHandler(boost::shared_ptr<SensorHandler> handler)
+  void addHandler(boost::shared_ptr<SensorHandler<EKFState_T> > handler)
   {
     handlers.push_back(handler);
   }
@@ -122,13 +125,14 @@ public:
  * \class SensorHandler
  * \brief handles a sensor driver which provides the sensor readings
  */
+template<typename EKFState_T>
 class SensorHandler
 {
 protected:
-  MSF_SensorManager& manager_;
+  MSF_SensorManager<EKFState_T>& manager_;
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  SensorHandler(MSF_SensorManager& mng):manager_(mng){}
+  SensorHandler(MSF_SensorManager<EKFState_T>& mng):manager_(mng){}
   virtual ~SensorHandler() {}
 };
 

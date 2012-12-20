@@ -36,8 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <msf_core/eigen_utils.h>
 
 namespace msf_pose_sensor{
-PoseSensorHandler::PoseSensorHandler(msf_core::MSF_SensorManager& meas) :
-        SensorHandler(meas), n_zp_(1e-6), n_zq_(1e-6), delay_(0)
+PoseSensorHandler::PoseSensorHandler(msf_core::MSF_SensorManager<msf_updates::EKFState>& meas) :
+        SensorHandler<msf_updates::EKFState>(meas), n_zp_(1e-6), n_zq_(1e-6), delay_(0)
 {
   ros::NodeHandle pnh("~");
   pnh.param("measurement_world_sensor", measurement_world_sensor_, true);

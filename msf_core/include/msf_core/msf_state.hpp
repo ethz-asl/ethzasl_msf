@@ -93,6 +93,8 @@ struct StateVar_T{
  */
 template<typename stateSequence_T>
 struct GenericState_T{
+
+  template<typename EKFState_T>
   friend class msf_core::MSF_Core;
   friend class msf_core::copyNonPropagationStates<GenericState_T>;
   friend class msf_core::MSF_InitMeasurement;

@@ -50,14 +50,14 @@ public:
   /**
    * \brief the method called by the msf_core to apply the measurement represented by this object
    */
-  virtual void apply(boost::shared_ptr<EKFState_T> stateWithCovariance, MSF_Core& core) = 0;
+  virtual void apply(boost::shared_ptr<EKFState_T> stateWithCovariance, MSF_Core<EKFState_T>& core) = 0;
   double time_; ///<the time this measurement was taken
 protected:
   /**
    * main update routine called by a given sensor, will apply the measurement to the state inside the core
    */
   template<class H_type, class Res_type, class R_type>
-  void calculateAndApplyCorrection(boost::shared_ptr<EKFState_T> state, MSF_Core& core, const Eigen::MatrixBase<H_type>& H_delayed,
+  void calculateAndApplyCorrection(boost::shared_ptr<EKFState_T> state, MSF_Core<EKFState_T>& core, const Eigen::MatrixBase<H_type>& H_delayed,
                                    const Eigen::MatrixBase<Res_type> & res_delayed, const Eigen::MatrixBase<R_type>& R_delayed);
 };
 
@@ -67,7 +67,7 @@ protected:
 class MSF_InvalidMeasurement:public MSF_MeasurementBase{
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  virtual void apply(boost::shared_ptr<EKFState_T> stateWithCovariance, MSF_Core& core){
+  virtual void apply(boost::shared_ptr<EKFState_T> stateWithCovariance, MSF_Core<EKFState_T>& core){
     ROS_ERROR_STREAM("Called apply() on an MSF_InvalidMeasurement object. This should never happen.");
   }
 };
@@ -171,7 +171,7 @@ public:
     return InitState.get<INDEX>();
   }
 
-  virtual void apply(boost::shared_ptr<EKFState_T> stateWithCovariance, MSF_Core& core);
+  virtual void apply(boost::shared_ptr<EKFState_T> stateWithCovariance, MSF_Core<EKFState_T>& core);
 };
 
 

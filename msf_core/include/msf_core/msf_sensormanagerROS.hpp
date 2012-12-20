@@ -46,7 +46,8 @@ typedef dynamic_reconfigure::Server<msf_core::MSF_CoreConfig> ReconfigureServer;
 /** \class MSF_SensorManagerROS
  * \brief Abstract class defining user configurable calculations for the msf_core with ROS interfaces
  */
-struct MSF_SensorManagerROS:public msf_core::MSF_SensorManager{
+template<typename EKFState_T>
+struct MSF_SensorManagerROS:public msf_core::MSF_SensorManager<EKFState_T>{
 protected:
   msf_core::MSF_CoreConfig config_; ///< dynamic reconfigure config
 private:
@@ -62,7 +63,7 @@ public:
     reconfServer_->setCallback(f);
   }
 
-  ~MSF_SensorManagerROS(){
+  virtual ~MSF_SensorManagerROS(){
     delete reconfServer_;
   }
 

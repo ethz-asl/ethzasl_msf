@@ -32,9 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <msf_core/msf_core.hpp>
 
 namespace msf_core{
-MSF_SensorManager::MSF_SensorManager()
+template<typename EKFState_T>
+MSF_SensorManager<EKFState_T>::MSF_SensorManager()
 {
-  msf_core_.reset(new msf_core::MSF_Core(*this)); //TODO: make this a (better) design. This is so aweful.
+  msf_core_.reset(new msf_core::MSF_Core<EKFState_T>(*this)); //TODO: make this a (better) design. This is so aweful.
 }
 }
 

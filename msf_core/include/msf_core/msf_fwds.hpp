@@ -56,6 +56,7 @@ struct StateVar_T;
 template<typename stateVector_T>
 struct GenericState_T;
 
+template<typename EKFState_T>
 class MSF_Core;
 
 template<typename T> struct echoStateVarType;
@@ -95,6 +96,13 @@ class MeasurementHandler;
 class MSF_InitMeasurement;
 class MSF_MeasurementBase;
 class MSF_InvalidMeasurement;
+
+template<typename EKFState_T>
+class MSF_SensorHandler;
+
+template<typename EKFState_T>
+class MSF_SensorManager;
+
 
 }
 #endif /* MSF_FWD_HPP_ */

@@ -47,7 +47,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace msf_pose_sensor{
 class PoseSensorManager;
 
-class PoseSensorHandler : public msf_core::SensorHandler
+class PoseSensorHandler : public msf_core::SensorHandler<typename msf_updates::EKFState>
 {
 private:
 
@@ -68,7 +68,7 @@ private:
   void measurementCallback(const geometry_msgs::TransformStampedConstPtr & msg);
 
 public:
-  PoseSensorHandler(msf_core::MSF_SensorManager& meas);
+  PoseSensorHandler(msf_core::MSF_SensorManager<msf_updates::EKFState>& meas);
   //used for the init
   Eigen::Matrix<double, 3, 1> getPositionMeasurement(){
     return z_p_;

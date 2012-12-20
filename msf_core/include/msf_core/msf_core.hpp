@@ -59,6 +59,7 @@ enum{
   HLI_EKF_STATE_SIZE = 16 ///< number of states exchanged with external propagation. Here: p,v,q,bw,bw=16
 };
 
+template<typename EKFState_T>
 class MSF_SensorManager;
 
 /** \class MSF_Core
@@ -68,13 +69,14 @@ class MSF_SensorManager;
  * but also applying measurements and managing states and measurements
  * in lists sorted by time stamp
  */
+template<typename EKFState_T>
 class MSF_Core
 {
   friend class MSF_MeasurementBase;
   bool initialized_; ///< is the filter initialized, so that we can propagate the state?
   bool predictionMade_; ///< is there a state prediction, so we can apply measurements?
 public:
-  typedef msf_updates::EKFState EKFState_T;
+//  typedef msf_updates::EKFState EKFState_T;
   enum{
     nErrorStatesAtCompileTime = EKFState_T::nErrorStatesAtCompileTime,  ///< error state length
     nStatesAtCompileTime = EKFState_T::nStatesAtCompileTime ///< complete state length
@@ -147,14 +149,14 @@ public:
         -0.0003, 0.0003,-0.0001, 0.0003, 0.0003,-0.0003,-0.0000, 0.0001, 0.0000, 0.0000, 0.0000, 0.0000, 0.0010, 0.0000, 0.0000,
         -0.0002,-0.0002,-0.0004,-0.0001, 0.0003, 0.0001,-0.0001,-0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0010, 0.0000,
         -0.0000, 0.0000,-0.0001, 0.0000, 0.0000,-0.0001,-0.0000,-0.0000,-0.0000, 0.0000, 0.0000,-0.0000, 0.0000, 0.0000, 0.0001;
-    P.block<coreErrorStates, coreErrorStates>(0,0) = P_core;
+    P.template block<coreErrorStates, coreErrorStates>(0,0) = P_core;
   }
 
   /**
    * \brief ctor takes a pointer to an object which does the user defined calculations and provides interfaces for initialization etc.
    * \param usercalc the class providing the user defined calculations DO ABSOLUTELY NOT USE THIS REFERENCE INSIDE THIS CTOR!!
    */
-  MSF_Core(MSF_SensorManager& usercalc);
+  MSF_Core(MSF_SensorManager<EKFState_T>& usercalc);
   ~MSF_Core();
 
 
@@ -183,7 +185,7 @@ private:
   };
   typedef typename msf_tmp::getEnumStateType<msf_updates::fullState_T, indexOfStateWithoutTemporalDrift>::value nonDriftingStateType; //returns void type for invalid types
 
-  const static int qbuffRowsAtCompiletime = msf_tmp::StateLengthForType<const msf_tmp::StripConstReference<nonDriftingStateType>::result_t&>::value;
+  const static int qbuffRowsAtCompiletime = msf_tmp::StateLengthForType<const typename msf_tmp::StripConstReference<nonDriftingStateType>::result_t&>::value;
 
   const static int nBuff_ = 30; ///< buffer size for median q_vw
   int nontemporaldrifting_inittimer_; ///< a counter for fuzzy tracking detection
@@ -198,7 +200,7 @@ private:
    */
   bool data_playback_;
 
-  MSF_SensorManager& usercalc_; //a class which provides methods for customization of several calculations
+  MSF_SensorManager<EKFState_T>& usercalc_; //a class which provides methods for customization of several calculations
 
   enum
   {

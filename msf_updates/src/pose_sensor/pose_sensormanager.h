@@ -46,7 +46,7 @@ namespace msf_pose_sensor{
 typedef dynamic_reconfigure::Server<msf_updates::SinglePoseSensorConfig> ReconfigureServer;
 typedef boost::shared_ptr<ReconfigureServer> ReconfigureServerPtr;
 
-class PoseSensorManager : public msf_core::MSF_SensorManagerROS
+class PoseSensorManager : public msf_core::MSF_SensorManagerROS<msf_updates::EKFState>
 {
   friend class PoseSensorHandler;
 public:
@@ -84,7 +84,7 @@ private:
   {
     Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ci, p_vc;
     Eigen::Quaternion<double> q, q_wv, q_ci, q_cv;
-    msf_core::MSF_Core::ErrorStateCov P;
+    msf_core::MSF_Core<EKFState_T>::ErrorStateCov P;
 
     // init values
     g << 0, 0, 9.81;	/// gravity
