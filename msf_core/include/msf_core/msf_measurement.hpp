@@ -51,6 +51,7 @@ public:
    * \brief the method called by the msf_core to apply the measurement represented by this object
    */
   virtual void apply(boost::shared_ptr<EKFState_T> stateWithCovariance, MSF_Core<EKFState_T>& core) = 0;
+virtual std::string type() = 0;
   double time; ///<the time this measurement was taken
 protected:
   /**
@@ -70,6 +71,9 @@ public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   virtual void apply(boost::shared_ptr<EKFState_T> stateWithCovariance, MSF_Core<EKFState_T>& core){
     ROS_ERROR_STREAM("Called apply() on an MSF_InvalidMeasurement object. This should never happen.");
+  }
+virtual std::string type(){
+return "invalid";
   }
   virtual ~MSF_InvalidMeasurement(){};
 };
@@ -131,7 +135,9 @@ public:
     this->time = ros::Time::now().toSec();
   }
   virtual ~MSF_InitMeasurement(){};
-
+virtual std::string type(){
+return "init";
+  }
   typename EKFState_T::P_type& get_P(){
     return InitState.P;
   }

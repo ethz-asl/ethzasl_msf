@@ -59,7 +59,7 @@ private:
     R_.setZero(); //TODO:remove later, already done in ctor of base
 
     // get measurements
-    z_p_[0] = msg->differential_height;//Eigen::Matrix<double, 1, 1>(msg->differential_height);
+    z_p_ = Eigen::Matrix<double, 1, 1>::Constant(msg->height);
 
     const double s_zp = n_zp_ * n_zp_;
     R_ = (Eigen::Matrix<double, nMeasurements, 1>() << s_zp).finished().asDiagonal();
@@ -79,7 +79,9 @@ public:
     n_zp_(n_zp)
   {
   }
-  ;
+virtual std::string type(){
+return "pressure";
+  }
   /**
    * the method called by the msf_core to apply the measurement represented by this object
    */

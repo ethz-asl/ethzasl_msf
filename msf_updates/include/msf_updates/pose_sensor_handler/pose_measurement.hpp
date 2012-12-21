@@ -119,7 +119,9 @@ public:
     n_zp_(n_zp), n_zq_(n_zq), measurement_world_sensor_(measurement_world_sensor), fixed_covariance_(fixed_covariance)
   {
   }
-  ;
+  virtual std::string type(){
+return "pose";
+  }
   /**
    * the method called by the msf_core to apply the measurement represented by this object
    */

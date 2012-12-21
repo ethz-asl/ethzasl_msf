@@ -439,7 +439,7 @@ void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase<
 
   typename measurementBufferT::iterator_T it_meas = MeasurementBuffer_.insert(measurement);
   typename measurementBufferT::iterator_T it_meas_end = MeasurementBuffer_.getIteratorEnd();
-  typename stateBufferT::iterator_T it_curr;
+  typename stateBufferT::iterator_T it_curr = StateBuffer_.getIteratorEnd(); //no propagation if no update is applied
 
   bool appliedOne = false;
 
@@ -453,7 +453,6 @@ void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase<
     }
 
     it_meas->second->apply(state, *this); //calls back core::applyCorrection(), which sets time_P_propagated to meas time
-
     //make sure to propagate to next measurement or up to now if no more measurements
     it_curr = StateBuffer_.getIteratorAtValue(state); //propagate from current state
 
@@ -474,7 +473,7 @@ void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase<
     typename stateBufferT::iterator_T it_next = it_curr;
     ++it_next;
 
-    for( ; it_curr != it_end && it_next != it_end; ++it_curr, ++it_next){ //propagate to selected state
+    for( ; it_curr != it_end && it_next != it_end && it_curr->second->time != -1 && it_next->second->time != -1; ++it_curr, ++it_next){ //propagate to selected state
       propagateState(it_curr->second, it_next->second);
     }
 
