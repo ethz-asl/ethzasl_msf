@@ -59,7 +59,7 @@ private:
     R_.setZero(); //TODO:remove later, already done in ctor of base
 
     // get measurements
-    z_p_ = Eigen::Matrix<double, 1, 1>(msg->differential_height);
+    z_p_[0] = msg->differential_height;//Eigen::Matrix<double, 1, 1>(msg->differential_height);
 
     const double s_zp = n_zp_ * n_zp_;
     R_ = (Eigen::Matrix<double, nMeasurements, 1>() << s_zp).finished().asDiagonal();
@@ -112,11 +112,11 @@ public:
     // position:
     H_old.block<1, 1>(0, idx_p + 2)(0) = 1; // p_z
     //pressure bias
-    H_old.block<3, 1>(0, idx_b_p)(0) = 1; //p_b
+    H_old.block<1, 1>(0, idx_b_p)(0) = 1; //p_b
 
     // construct residuals
     // height
-    r_old.block<1, 1>(2, 0) = z_p_ - (state.get<StateDefinition_T::p>().block<1,1>(2, 0) - state.get<StateDefinition_T::b_p>());
+    r_old.block<1, 1>(0,0) = z_p_ - (state.get<StateDefinition_T::p>().block<1,1>(2, 0) - state.get<StateDefinition_T::b_p>());
 
 
     // call update step in base class
