@@ -45,15 +45,15 @@ namespace msf_updates{
  */
 
 enum StateDefinition{ //must not manually set the enum values!
-  p_,
-  v_,
-  q_,
-  b_w_,
-  b_a_,
-  L_,
-  q_wv_,
-  q_ci_,
-  p_ci_/*,
+  p,
+  v,
+  q,
+  b_w,
+  b_a,
+  L,
+  q_wv,
+  q_ci,
+  p_ci/*,
 	q_int_*/
 };
 
@@ -65,17 +65,17 @@ namespace{
  */
 typedef boost::fusion::vector<
     // states varying during propagation - must not change the ordering here for now, CalcQ has the ordering hardcoded
-    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_, msf_core::CoreStateWithPropagation>,                          ///< position (IMU centered)          (0-2 / 0-2)
-    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, v_, msf_core::CoreStateWithPropagation>,                          ///< velocity                         (3- 5 / 3- 5)
-    msf_core::StateVar_T<Eigen::Quaternion<double>, q_, msf_core::CoreStateWithPropagation>,                            ///< attitude                         (6- 9 / 6- 8)
-    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, b_w_, msf_core::CoreStateWithoutPropagation>,                     ///< gyro biases                      (10-12 / 9-11)
-    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, b_a_, msf_core::CoreStateWithoutPropagation>,                     ///< acceleration biases              (13-15 / 12-14)
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p, msf_core::CoreStateWithPropagation>,                          ///< position (IMU centered)          (0-2 / 0-2)
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, v, msf_core::CoreStateWithPropagation>,                          ///< velocity                         (3- 5 / 3- 5)
+    msf_core::StateVar_T<Eigen::Quaternion<double>, q, msf_core::CoreStateWithPropagation>,                            ///< attitude                         (6- 9 / 6- 8)
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, b_w, msf_core::CoreStateWithoutPropagation>,                     ///< gyro biases                      (10-12 / 9-11)
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, b_a, msf_core::CoreStateWithoutPropagation>,                     ///< acceleration biases              (13-15 / 12-14)
 
     // states not varying during propagation
-    msf_core::StateVar_T<Eigen::Matrix<double, 1, 1>, L_>,                                                              ///< visual scale                     (16 / 15)
-    msf_core::StateVar_T<Eigen::Quaternion<double>, q_wv_, msf_core::AuxiliaryNonTemporalDrifting>,                     ///< vision-world attitude drift      (17-20 / 16-18)
-    msf_core::StateVar_T<Eigen::Quaternion<double>, q_ci_>,                                                             ///< camera-imu attitude calibration  (21-24 / 19-21)
-    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_ci_>/*,                                                         ///< camera-imu position calibration  (25-27 / 22-24)
+    msf_core::StateVar_T<Eigen::Matrix<double, 1, 1>, L>,                                                              ///< visual scale                     (16 / 15)
+    msf_core::StateVar_T<Eigen::Quaternion<double>, q_wv, msf_core::AuxiliaryNonTemporalDrifting>,                     ///< vision-world attitude drift      (17-20 / 16-18)
+    msf_core::StateVar_T<Eigen::Quaternion<double>, q_ci>,                                                             ///< camera-imu attitude calibration  (21-24 / 19-21)
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_ci>/*,                                                         ///< camera-imu position calibration  (25-27 / 22-24)
 		 msf_core::StateVar_T<Eigen::Quaternion<double>, q_int_>	*/									///< this is the integrated ang. vel. no corrections applied, to use for delta rot in external algos...
 
 > fullState_T;

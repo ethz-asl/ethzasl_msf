@@ -49,7 +49,7 @@ void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrection(boost::shared_
 
   R_type S;
   Eigen::Matrix<double, MSF_Core<EKFState_T>::nErrorStatesAtCompileTime, R_type::RowsAtCompileTime> K;
-  typename MSF_Core<EKFState_T>::ErrorStateCov & P = state->P_;
+  typename MSF_Core<EKFState_T>::ErrorStateCov & P = state->P;
 
   S = H_delayed * P * H_delayed.transpose() + R_delayed;
   K = P * H_delayed.transpose() * S.inverse();
@@ -67,26 +67,26 @@ template<typename EKFState_T>
 void MSF_InitMeasurement<EKFState_T>::apply(boost::shared_ptr<EKFState_T> stateWithCovariance, MSF_Core<EKFState_T>& core){
 
 
-  stateWithCovariance->time_ = ros::Time::now().toSec(); //makes this state a valid starting point
+  stateWithCovariance->time = ros::Time::now().toSec(); //makes this state a valid starting point
 
   boost::fusion::for_each(
-      stateWithCovariance->statevars_,
+      stateWithCovariance->statevars,
       msf_tmp::copyInitStates<EKFState_T>(InitState)
   );
 
-  if(! (InitState.P_.minCoeff() == 0 && InitState.P_.maxCoeff() == 0)){
-    stateWithCovariance->P_ = InitState.P_;
+  if(! (InitState.P.minCoeff() == 0 && InitState.P.maxCoeff() == 0)){
+    stateWithCovariance->P = InitState.P;
     ROS_WARN_STREAM("Using user defined initial error state covariance");
   }else{
     ROS_WARN_STREAM("Using simulated core plus fixed diag initial error state covariance");
   }
 
   if(ContainsInitialSensorReadings_){
-    stateWithCovariance->a_m_ = InitState.a_m_;
-    stateWithCovariance->w_m_ = InitState.w_m_;
+    stateWithCovariance->a_m = InitState.a_m;
+    stateWithCovariance->w_m = InitState.w_m;
   }else{
-    stateWithCovariance->a_m_.setZero();
-    stateWithCovariance->w_m_.setZero();
+    stateWithCovariance->a_m.setZero();
+    stateWithCovariance->w_m.setZero();
   }
   core.initExternalPropagation(stateWithCovariance);
 

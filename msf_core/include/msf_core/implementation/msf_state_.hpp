@@ -52,7 +52,7 @@ GenericState_T<stateVector_T, StateDefinition_T>::getStateVar() {
   BOOST_STATIC_ASSERT_MSG((msf_tmp::IsReferenceType<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::value),
                           "Assumed that boost::fusion would return a reference type here, which is not the case");
 
-  return boost::fusion::at<boost::mpl::int_<INDEX> >(statevars_);
+  return boost::fusion::at<boost::mpl::int_<INDEX> >(statevars);
 }
 
 //returns the state at position INDEX in the state list, non const version
@@ -65,7 +65,7 @@ GenericState_T<stateVector_T, StateDefinition_T>::get() {
   BOOST_STATIC_ASSERT_MSG((msf_tmp::IsReferenceType<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::value),
                           "Assumed that boost::fusion would return a reference type here, which is not the case");
 
-  return boost::fusion::at<boost::mpl::int_<INDEX> >(statevars_).state_;
+  return boost::fusion::at<boost::mpl::int_<INDEX> >(statevars).state_;
 }
 
 
@@ -73,7 +73,7 @@ GenericState_T<stateVector_T, StateDefinition_T>::get() {
 template<typename stateVector_T, typename StateDefinition_T>
 inline void GenericState_T<stateVector_T, StateDefinition_T>::correct(const Eigen::Matrix<double, nErrorStatesAtCompileTime, 1>& correction) {
   boost::fusion::for_each(
-      statevars_,
+      statevars,
       msf_tmp::correctState<const Eigen::Matrix<double, nErrorStatesAtCompileTime, 1>, stateVector_T >(correction)
   );
 }
@@ -89,7 +89,7 @@ GenericState_T<stateVector_T, StateDefinition_T>::getQBlock(){
                           static_cast<int>(StateVar_T::statetype_) != static_cast<int>(msf_core::CoreStateWithoutPropagation), "You requested a non-const reference to a Q-Block for a"
                           "core state of the EKF, but this is not allowed! Use the const version to get Q-blocks for core states.");
 
-  return boost::fusion::at<boost::mpl::int_<INDEX> >(statevars_).Q_;
+  return boost::fusion::at<boost::mpl::int_<INDEX> >(statevars).Q;
 }
 
 
@@ -100,7 +100,7 @@ template<int INDEX>
 inline const typename msf_tmp::StripReference<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::result_t::Q_T&
 GenericState_T<stateVector_T, StateDefinition_T>::getQBlock() const {
   typedef typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type StateVar_T;
-  return boost::fusion::at<boost::mpl::int_<INDEX> >(statevars_).Q_;
+  return boost::fusion::at<boost::mpl::int_<INDEX> >(statevars).Q_;
 }
 
 
@@ -108,8 +108,8 @@ GenericState_T<stateVector_T, StateDefinition_T>::getQBlock() const {
 /** it does not set the header */
 template<typename stateVector_T, typename StateDefinition_T>
 void GenericState_T<stateVector_T, StateDefinition_T>::toPoseMsg(geometry_msgs::PoseWithCovarianceStamped & pose){ //boost fusion unfortunately doesn't like this to be const
-  eigen_conversions::vector3dToPoint(get<StateDefinition_T::p_>(), pose.pose.pose.position);
-  eigen_conversions::quaternionToMsg(get<StateDefinition_T::q_>(), pose.pose.pose.orientation);
+  eigen_conversions::vector3dToPoint(get<StateDefinition_T::p>(), pose.pose.pose.position);
+  eigen_conversions::quaternionToMsg(get<StateDefinition_T::q>(), pose.pose.pose.orientation);
   getPoseCovariance(pose.pose.covariance);
 }
 
@@ -118,9 +118,9 @@ void GenericState_T<stateVector_T, StateDefinition_T>::toPoseMsg(geometry_msgs::
 /** it does not set the header */
 template<typename stateVector_T, typename StateDefinition_T>
 void GenericState_T<stateVector_T, StateDefinition_T>::toExtStateMsg(sensor_fusion_comm::ExtState & state) {
-  eigen_conversions::vector3dToPoint(get<StateDefinition_T::p_>(), state.pose.position);
-  eigen_conversions::quaternionToMsg(get<StateDefinition_T::q_>(), state.pose.orientation);
-  eigen_conversions::vector3dToPoint(get<StateDefinition_T::v_>(), state.velocity);
+  eigen_conversions::vector3dToPoint(get<StateDefinition_T::p>(), state.pose.position);
+  eigen_conversions::quaternionToMsg(get<StateDefinition_T::q>(), state.pose.orientation);
+  eigen_conversions::vector3dToPoint(get<StateDefinition_T::v>(), state.velocity);
 }
 
 
@@ -130,7 +130,7 @@ template<typename stateVector_T, typename StateDefinition_T>
 void GenericState_T<stateVector_T, StateDefinition_T>::toFullStateMsg(sensor_fusion_comm::DoubleArrayStamped & state) { //boost fusion unfortunately doesn't like this to be const
   state.data.resize(nStatesAtCompileTime); //make sure this is correctly sized
   boost::fusion::for_each(
-      statevars_,
+      statevars,
       msf_tmp::FullStatetoDoubleArray<std::vector<double>, stateVector_T >(state.data)
   );
 }
@@ -142,7 +142,7 @@ template<typename stateVector_T, typename StateDefinition_T>
 void GenericState_T<stateVector_T, StateDefinition_T>::toCoreStateMsg(sensor_fusion_comm::DoubleArrayStamped & state) {//boost fusion unfortunately doesn't like this to be const
   state.data.resize(nCoreStatesAtCompileTime); //make sure this is correctly sized
   boost::fusion::for_each(
-      statevars_,
+      statevars,
       msf_tmp::CoreStatetoDoubleArray<std::vector<double>, stateVector_T >(state.data)
   );
 }
@@ -156,7 +156,7 @@ GenericState_T<stateVector_T, StateDefinition_T>::get() const {
   BOOST_STATIC_ASSERT_MSG((msf_tmp::IsReferenceType<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::value),
                           "Assumed that boost::fusion would return a reference type here, which is not the case");
 
-  return boost::fusion::at<boost::mpl::int_<INDEX> >(statevars_).state_;
+  return boost::fusion::at<boost::mpl::int_<INDEX> >(statevars).state_;
 }
 
 
@@ -168,7 +168,7 @@ GenericState_T<stateVector_T, StateDefinition_T>::getStateVar() const {
   BOOST_STATIC_ASSERT_MSG((msf_tmp::IsReferenceType<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::value),
                           "Assumed that boost::fusion would return a reference type here, which is not the case");
 
-  return boost::fusion::at<boost::mpl::int_<INDEX> >(statevars_);
+  return boost::fusion::at<boost::mpl::int_<INDEX> >(statevars);
 }
 
 
@@ -181,7 +181,7 @@ inline void GenericState_T<stateVector_T, StateDefinition_T>::set(const typename
                           static_cast<int>(StateVar_T::statetype_) != static_cast<int>(msf_core::CoreStateWithoutPropagation), "You requested to set a new value for a"
                           "core state of the EKF, but this is not allowed! This is an Error.");
 
-  boost::fusion::at<boost::mpl::int_<INDEX> >(statevars_).state_ = newvalue;
+  boost::fusion::at<boost::mpl::int_<INDEX> >(statevars).state_ = newvalue;
 }
 
 /// resets the state
@@ -193,16 +193,16 @@ void GenericState_T<stateVector_T, StateDefinition_T>::reset(msf_core::StateVisi
 
   // reset all states
   boost::fusion::for_each(
-      statevars_,
+      statevars,
       msf_tmp::resetState()
   );
 
   //reset system inputs
-  w_m_.setZero();
-  a_m_.setZero();
+  w_m.setZero();
+  a_m.setZero();
 
-  P_.setZero();
-  time_ = 0;
+  P.setZero();
+  time = 0;
 
   //now call the user provided function
   statevisitor->resetState(*this);
@@ -215,8 +215,8 @@ template<typename stateVector_T, typename StateDefinition_T>
 void GenericState_T<stateVector_T, StateDefinition_T>::getPoseCovariance(geometry_msgs::PoseWithCovariance::_covariance_type & cov){
   BOOST_STATIC_ASSERT(geometry_msgs::PoseWithCovariance::_covariance_type::static_size == 36);
 
-  typedef typename msf_tmp::getEnumStateType<stateVector_T, StateDefinition_T::p_>::value p_type;
-  typedef typename msf_tmp::getEnumStateType<stateVector_T, StateDefinition_T::q_>::value q_type;
+  typedef typename msf_tmp::getEnumStateType<stateVector_T, StateDefinition_T::p>::value p_type;
+  typedef typename msf_tmp::getEnumStateType<stateVector_T, StateDefinition_T::q>::value q_type;
 
   //get indices of position and attitude in the covariance matrix
   static const int idxstartcorr_p = msf_tmp::getStartIndex<stateVector_T, p_type, msf_tmp::CorrectionStateLengthForType>::value;
@@ -231,16 +231,16 @@ void GenericState_T<stateVector_T, StateDefinition_T>::getPoseCovariance(geometr
    */
 
   for (int i = 0; i < 9; i++)
-    cov[i / 3 * 6 + i % 3] = P_((i / 3 + idxstartcorr_p) * nErrorStatesAtCompileTime + i % 3);
+    cov[i / 3 * 6 + i % 3] = P((i / 3 + idxstartcorr_p) * nErrorStatesAtCompileTime + i % 3);
 
   for (int i = 0; i < 9; i++)
-    cov[i / 3 * 6 + (i % 3 + 3)] = P_((i / 3 + idxstartcorr_p) * nErrorStatesAtCompileTime + (i % 3 + 6));
+    cov[i / 3 * 6 + (i % 3 + 3)] = P((i / 3 + idxstartcorr_p) * nErrorStatesAtCompileTime + (i % 3 + 6));
 
   for (int i = 0; i < 9; i++)
-    cov[(i / 3 + 3) * 6 + i % 3] = P_((i / 3 + idxstartcorr_q) * nErrorStatesAtCompileTime + i % 3);
+    cov[(i / 3 + 3) * 6 + i % 3] = P((i / 3 + idxstartcorr_q) * nErrorStatesAtCompileTime + i % 3);
 
   for (int i = 0; i < 9; i++)
-    cov[(i / 3 + 3) * 6 + (i % 3 + 3)] = P_((i / 3 + idxstartcorr_q) * nErrorStatesAtCompileTime + (i % 3 + 6));
+    cov[(i / 3 + 3) * 6 + (i % 3 + 3)] = P((i / 3 + idxstartcorr_q) * nErrorStatesAtCompileTime + (i % 3 + 6));
 }
 
 

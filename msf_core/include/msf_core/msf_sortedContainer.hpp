@@ -52,7 +52,7 @@ public:
 
   SortedContainer(){
     invalid.reset(new PrototypeInvalidT());
-    invalid->time_ = -1;
+    invalid->time = -1;
   }
   /**
    * \brief to be called to signal that a request could not be satisfied
@@ -82,9 +82,9 @@ public:
    */
   inline typename ListT::iterator insert(const boost::shared_ptr<T>& value){
     std::pair<typename ListT::iterator,bool> itpr =
-        stateList.insert(std::pair<double, boost::shared_ptr<T> >(value->time_, value));
+        stateList.insert(std::pair<double, boost::shared_ptr<T> >(value->time, value));
     if(!itpr.second){
-      ROS_WARN_STREAM("Wanted to insert a value to the sorted container at time "<<value->time_<<" but the map already contained a value at this time. discarding.");
+      ROS_WARN_STREAM("Wanted to insert a value to the sorted container at time "<<value->time<<" but the map already contained a value at this time. discarding.");
     }
     return itpr.first;
   }
@@ -110,10 +110,10 @@ public:
    * \returns iterator
    */
   inline typename ListT::iterator getIteratorAtValue(const boost::shared_ptr<T>& value){
-    typename ListT::iterator it = stateList.find(value->time_);
+    typename ListT::iterator it = stateList.find(value->time);
     if(it==stateList.end()){ //there is no value in the map with this time
-      ROS_WARN_STREAM("getIteratorAtValue(state): Could not find value for time "<<value->time_<<"");
-      it = stateList.lower_bound(value->time_);
+      ROS_WARN_STREAM("getIteratorAtValue(state): Could not find value for time "<<value->time<<"");
+      it = stateList.lower_bound(value->time);
     }
     return it;
   }
@@ -170,7 +170,7 @@ public:
     if(tauPlus == it_end){
       return tauMinus;
     }
-    if(fabs(tauPlus->second->time_ - statetime) < fabs(tauMinus->second->time_ - statetime)){
+    if(fabs(tauPlus->second->time - statetime) < fabs(tauMinus->second->time - statetime)){
       return tauPlus;
     }else{
       return tauMinus;
@@ -233,13 +233,13 @@ public:
     boost::shared_ptr<T>& tauMinus = getClosestBefore(statetime);
     boost::shared_ptr<T>& tauPlus = getClosestAfter(statetime);
 
-    if(tauMinus->time_==-1){
+    if(tauMinus->time==-1){
       return tauPlus;
-    }else if(tauPlus->time_==-1){
+    }else if(tauPlus->time==-1){
       return tauMinus;
     }
 
-    if(fabs(tauPlus->time_ - statetime) < fabs(tauMinus->time_ - statetime)){
+    if(fabs(tauPlus->time - statetime) < fabs(tauMinus->time - statetime)){
       return tauPlus;
     }else{
       return tauMinus;
@@ -252,11 +252,11 @@ public:
    * \returns shared pointer of the object
    */
   inline void clearOlderThan(double age){
-    double newest = getLast()->time_;
+    double newest = getLast()->time;
     iterator_T it = getIteratorClosest(newest-age);
-    if(newest - it->second->time_ < age)
+    if(newest - it->second->time < age)
       return; //there is no state older than time
-    if(it->second->time_ > stateList.begin()->second->time_)
+    if(it->second->time > stateList.begin()->second->time)
       stateList.erase(stateList.begin(),it);
   }
 
@@ -300,7 +300,7 @@ public:
     }
     boost::shared_ptr<T> copy = it->second; //get the data from the map, we need to update, then reinsert
     stateList.erase(it->first);
-    copy->time_ = timeNew;
+    copy->time = timeNew;
     typename ListT::iterator inserted = insert(copy);
     return inserted->second;
   }
@@ -313,7 +313,7 @@ public:
     std::stringstream ss;
 
     for(typename ListT::iterator it = getIteratorBegin();it!=getIteratorEnd();++it){
-      ss<<msf_core::timehuman(it->second->time_)<<std::endl;
+      ss<<msf_core::timehuman(it->second->time)<<std::endl;
     }
     return ss.str();
 

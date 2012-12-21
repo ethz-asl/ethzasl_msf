@@ -51,7 +51,7 @@ public:
    * \brief the method called by the msf_core to apply the measurement represented by this object
    */
   virtual void apply(boost::shared_ptr<EKFState_T> stateWithCovariance, MSF_Core<EKFState_T>& core) = 0;
-  double time_; ///<the time this measurement was taken
+  double time; ///<the time this measurement was taken
 protected:
   /**
    * main update routine called by a given sensor, will apply the measurement to the state inside the core
@@ -96,7 +96,7 @@ public:
   }
   virtual ~MSF_Measurement(){};
   void makeFromSensorReading(const boost::shared_ptr<T const> reading, double timestamp){
-    this->time_ = timestamp;
+    this->time = timestamp;
 
     makeFromSensorReadingImpl(reading);
 
@@ -128,24 +128,24 @@ public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   MSF_InitMeasurement(bool ContainsInitialSensorReadings){
     ContainsInitialSensorReadings_ = ContainsInitialSensorReadings;
-    this->time_ = ros::Time::now().toSec();
+    this->time = ros::Time::now().toSec();
   }
   virtual ~MSF_InitMeasurement(){};
 
   typename EKFState_T::P_type& get_P(){
-    return InitState.P_;
+    return InitState.P;
   }
   /**
    * \brief get the gyro measurment
    */
   Eigen::Matrix<double, 3, 1>& get_w_m(){
-    return InitState.w_m_;
+    return InitState.w_m;
   }
   /**
    * \brief get the acceleration measurment
    */
   Eigen::Matrix<double, 3, 1>& get_a_m(){
-    return InitState.a_m_;
+    return InitState.a_m;
   }
 
   /**

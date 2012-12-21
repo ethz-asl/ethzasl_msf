@@ -1,7 +1,7 @@
 /*
 
-Copyright (c) 2010, Stephan Weiss, ASL, ETH Zurich, Switzerland
-You can contact the author at <stephan dot weiss at ieee dot org>
+Copyright (c) 2012, Simon Lynen, ASL, ETH Zurich, Switzerland
+You can contact the author at <slynen at ethz dot ch>
 
 All rights reserved.
 
@@ -29,52 +29,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
 
-#ifdef POSE_MEAS
-#include "pose_sensormanager.h"
-#endif
-#ifdef POSITION_MEAS
-#include "position_sensormanager.h"
-#endif
+#ifndef PRESSURE_SENSOR_H
+#define PRESSURE_SENSOR_H
 
-#ifdef VICONPOS_MEAS
-#include "viconpos_sensormanager.h"
-#endif
+#include <msf_core/msf_sensormanagerROS.hpp>
+#include <asctec_hl_comm/mav_imu.h>
+#include <msf_updates/pressure_sensor_handler/pressure_measurement.hpp>
 
+namespace msf_pressure_sensor{
 
-int main(int argc, char** argv)
+class PressureSensorHandler : public msf_core::SensorHandler<typename msf_updates::EKFState>
 {
-	ros::init(argc, argv, "msf_core");
-#ifdef POSE_MEAS
-	PoseSensorManager PoseMeas;
-	ROS_INFO_STREAM("Filter type: pose_sensor");
-#endif
+private:
 
-#ifdef POSITION_MEAS
-	PositionSensorManager PositionMeas;
-	ROS_INFO_STREAM("Filter type: position_sensor");
-#endif
+  Eigen::Matrix<double, 1, 1> z_p_; ///< pressure measurement
+  double n_zp_; ///< pressure measurement noise
 
-#ifdef VICONPOS_MEAS
-	ViconPositionSensorManager ViconPosMeas;
-	ROS_INFO_STREAM("Filter type: viconpos_sensor");
-#endif
+  ros::Subscriber subPressure_;
 
-	//  print published/subscribed topics
-	ros::V_string topics;
-	ros::this_node::getSubscribedTopics(topics);
-	std::string nodeName = ros::this_node::getName();
-	std::string topicsStr = nodeName + ":\n\tsubscribed to topics:\n";
-	for(unsigned int i=0; i<topics.size(); i++)
-		topicsStr+=("\t\t" + topics.at(i) + "\n");
+  void measurementCallback(const asctec_hl_comm::mav_imuConstPtr & msg);
 
-	topicsStr += "\tadvertised topics:\n";
-	ros::this_node::getAdvertisedTopics(topics);
-	for(unsigned int i=0; i<topics.size(); i++)
-		topicsStr+=("\t\t" + topics.at(i) + "\n");
+public:
+  PressureSensorHandler(msf_core::MSF_SensorManager<msf_updates::EKFState>& meas);
+  //used for the init
+  Eigen::Matrix<double, 1, 1> getPressureMeasurement(){
+    return z_p_;
+  }
+  //setters for configure values
+  void setNoises(double n_zp);
 
-	ROS_INFO_STREAM(""<< topicsStr);
-
-	ros::spin();
-
-	return 0;
+};
 }
+#include "pressure_sensorhandler.hpp"
+
+#endif /* POSE_SENSOR_H */

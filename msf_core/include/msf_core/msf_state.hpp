@@ -66,12 +66,12 @@ struct StateVar_T{
   };
   typedef Eigen::Matrix<double, sizeInCorrection_, sizeInCorrection_> Q_T;
 
-  Q_T Q_; ///< the noise covariance matrix block of this state
+  Q_T Q; ///< the noise covariance matrix block of this state
   value_t state_; ///< the state variable of this state
   bool hasResetValue; //<indicating that this statevariable has a reset value to be applied to the state on init
   StateVar_T(){
     hasResetValue = false;
-    Q_.setZero();
+    Q.setZero();
   }
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
@@ -123,20 +123,20 @@ public:
 
   typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> P_type; ///< type of the error state covariance matrix
 
-  StateSequence_T statevars_; ///< the actual state variables
+  StateSequence_T statevars; ///< the actual state variables
 
   // system inputs
-  Eigen::Matrix<double,3,1> w_m_;         ///< angular velocity from IMU
-  Eigen::Matrix<double,3,1> a_m_;         ///< acceleration from IMU
+  Eigen::Matrix<double,3,1> w_m;         ///< angular velocity from IMU
+  Eigen::Matrix<double,3,1> a_m;         ///< acceleration from IMU
 
 
-  double time_; 							///< time of this state estimate
-  P_type P_;								///< error state covariance
+  double time; 							///< time of this state estimate
+  P_type P;								///< error state covariance
 
 
   GenericState_T(){
-    time_ = -1;
-    P_.setZero();
+    time = -1;
+    P.setZero();
   }
 
   /**

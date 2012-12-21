@@ -52,23 +52,23 @@ template<typename EKFState_T>
     //{
     enum{
       idxstartcorr_p_ = msf_tmp::getStartIndex<StateSequence_T,
-        typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::p_>::value,
+        typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::p>::value,
         msf_tmp::CorrectionStateLengthForType>::value,
 
     idxstartcorr_v_ = msf_tmp::getStartIndex<StateSequence_T,
-        typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::v_>::value,
+        typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::v>::value,
         msf_tmp::CorrectionStateLengthForType>::value,
 
     idxstartcorr_q_ = msf_tmp::getStartIndex<StateSequence_T,
-        typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::q_>::value,
+        typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::q>::value,
         msf_tmp::CorrectionStateLengthForType>::value,
 
     idxstartcorr_b_w_ = msf_tmp::getStartIndex<StateSequence_T,
-        typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::b_w_>::value,
+        typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::b_w>::value,
         msf_tmp::CorrectionStateLengthForType>::value,
 
    idxstartcorr_b_a_ = msf_tmp::getStartIndex<StateSequence_T,
-        typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::b_a_>::value,
+        typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::b_a>::value,
         msf_tmp::CorrectionStateLengthForType>::value
     };
 

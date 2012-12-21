@@ -632,7 +632,7 @@ struct copyQBlocksFromAuxiliaryStatesToQ
                             "copyQBlocksFromAuxiliaryStatesToQ size of Matrix Q stored with the stateVar,"
                             "is not the same as the reported dimension in the correction vector");
 
-    Q_.template block<sizeInCorrection, sizeInCorrection>(startIdxInCorrection, startIdxInCorrection) = t.Q_;
+    Q_.template block<sizeInCorrection, sizeInCorrection>(startIdxInCorrection, startIdxInCorrection) = t.Q;
   }
   template<typename T, int NAME>
   void operator()(msf_core::StateVar_T<T, NAME, msf_core::CoreStateWithPropagation>& t) const {
