@@ -87,7 +87,6 @@ return "pressure";
    */
   virtual void apply(boost::shared_ptr<EKFState_T> non_const_state, msf_core::MSF_Core<EKFState_T>& core)
   {
-
     // init variables
     Eigen::Matrix<double, nMeasurements, msf_core::MSF_Core<EKFState_T>::nErrorStatesAtCompileTime> H_old;
     Eigen::Matrix<double, nMeasurements, 1> r_old;
@@ -107,9 +106,10 @@ return "pressure";
       typename msf_tmp::getEnumStateType<EKFState_T::StateSequence_T, StateDefinition_T::p>::value, msf_tmp::CorrectionStateLengthForType>::value,
 
       idx_b_p = msf_tmp::getStartIndex<EKFState_T::StateSequence_T,
-      typename msf_tmp::getEnumStateType<EKFState_T::StateSequence_T, StateDefinition_T::p>::value, msf_tmp::CorrectionStateLengthForType>::value
+      typename msf_tmp::getEnumStateType<EKFState_T::StateSequence_T, StateDefinition_T::b_p>::value, msf_tmp::CorrectionStateLengthForType>::value
     };
-
+std::cout<<"idx_p "<<idx_p<<" idx_b_p "<<idx_b_p<<" apply of a pressure measurement with value "<<z_p_<<" bias "<<state.get<StateDefinition_T::b_p>()<<" position: "<<state.get<StateDefinition_T::p>().block<1,1>(2, 0)<<std::endl;                 
+ 
     // construct H matrix using H-blockx :-)
     // position:
     H_old.block<1, 1>(0, idx_p + 2)(0) = 1; // p_z
@@ -118,7 +118,7 @@ return "pressure";
 
     // construct residuals
     // height
-    r_old.block<1, 1>(0,0) = z_p_ - (state.get<StateDefinition_T::p>().block<1,1>(2, 0) - state.get<StateDefinition_T::b_p>());
+    r_old.block<1, 1>(0,0) = z_p_ - state.get<StateDefinition_T::p>().block<1,1>(2, 0) - state.get<StateDefinition_T::b_p>();
 
 
     // call update step in base class
