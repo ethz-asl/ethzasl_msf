@@ -37,8 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace msf_pose_sensor{
 PoseSensorHandler::PoseSensorHandler(msf_core::MSF_SensorManager<msf_updates::EKFState>& meas) :
-        SensorHandler<msf_updates::EKFState>(meas), n_zp_(1e-6), n_zq_(1e-6), delay_(0)
-{
+            SensorHandler<msf_updates::EKFState>(meas), n_zp_(1e-6), n_zq_(1e-6), delay_(0)
+            {
   ros::NodeHandle pnh("~");
   pnh.param("measurement_world_sensor", measurement_world_sensor_, true);
   pnh.param("use_fixed_covariance", use_fixed_covariance_, false);
@@ -54,7 +54,7 @@ PoseSensorHandler::PoseSensorHandler(msf_core::MSF_SensorManager<msf_updates::EK
   subPoseWithCovarianceStamped_ = nh.subscribe<geometry_msgs::PoseWithCovarianceStamped>("pose_with_covariance_input", 1, &PoseSensorHandler::measurementCallback, this);
   subTransformStamped_ = nh.subscribe<geometry_msgs::TransformStamped>("transform_input", 1, &PoseSensorHandler::measurementCallback, this);
   subPoseStamped_ = nh.subscribe<geometry_msgs::PoseStamped>("pose_input", 1, &PoseSensorHandler::measurementCallback, this);
-}
+            }
 
 void PoseSensorHandler::setNoises(double n_zp, double n_zq)
 {

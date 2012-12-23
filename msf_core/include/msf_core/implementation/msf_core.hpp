@@ -437,6 +437,11 @@ void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase<
   if(!initialized_ || !predictionMade_)
     return;
 
+  if(measurement->time > StateBuffer_.getLast()->time){
+    ROS_WARN_STREAM("You tried to give me a measurement in the future. Are you sure your clocks are synced and delays compensated correctly? I will discard that sorry... [measurement: "<<timehuman(measurement->time)<<" (s) latest state: "<<timehuman(StateBuffer_.getLast()->time)<<" (s)]");
+    return;
+  }
+
   typename measurementBufferT::iterator_T it_meas = MeasurementBuffer_.insert(measurement);
   typename measurementBufferT::iterator_T it_meas_end = MeasurementBuffer_.getIteratorEnd();
   typename stateBufferT::iterator_T it_curr = StateBuffer_.getIteratorEnd(); //no propagation if no update is applied
@@ -453,6 +458,7 @@ void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase<
     }
 
     it_meas->second->apply(state, *this); //calls back core::applyCorrection(), which sets time_P_propagated to meas time
+
     //make sure to propagate to next measurement or up to now if no more measurements
     it_curr = StateBuffer_.getIteratorAtValue(state); //propagate from current state
 
@@ -463,17 +469,21 @@ void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase<
     if(it_nextmeas == it_meas_end){ //that was the last measurement, so propagate state to now
       it_end = StateBuffer_.getIteratorEnd();
     }else{
-      it_end = StateBuffer_.getIteratorClosest(it_nextmeas->second->time); //get state closest to next measurement TODO: do we want to also respect the delay here. Otherwise we might propagate a bit to much
-      if(it_end == StateBuffer_.getIteratorEnd()){
-        ROS_ERROR_STREAM("Wanted to get a state close to the next measurement, but got end of list");
-        --it_end;
+      it_end = StateBuffer_.getIteratorClosestAfter(it_nextmeas->second->time);
+      if(it_end != StateBuffer_.getIteratorEnd()){
+        ++it_end; //propagate to state closest after the measurement so we can interpolate
       }
     }
+
 
     typename stateBufferT::iterator_T it_next = it_curr;
     ++it_next;
 
     for( ; it_curr != it_end && it_next != it_end && it_curr->second->time != -1 && it_next->second->time != -1; ++it_curr, ++it_next){ //propagate to selected state
+      if(it_curr->second == it_next->second){
+        ROS_ERROR_STREAM("propagation : it_curr points to same state as it_next. This must not happen.");
+        continue;
+      }
       propagateState(it_curr->second, it_next->second);
     }
 
@@ -537,6 +547,7 @@ void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase<
   msgState_.header = msgCorrect_.header;
   latestState->toFullStateMsg(msgState_);
   pubState_.publish(msgState_);
+
   seq_m++;
 }
 
@@ -548,7 +559,7 @@ boost::shared_ptr<EKFState_T> MSF_Core<EKFState_T>::getClosestState(double tstam
   // we subtracted one too much before.... :)
   //}
 
-  double timenow = tstamp; // - delay - usercalc_.getParam_delay();
+  double timenow = tstamp; //delay compensated by sensor handler
 
   typename stateBufferT::iterator_T it = StateBuffer_.getIteratorClosest(timenow);
 
@@ -562,14 +573,14 @@ boost::shared_ptr<EKFState_T> MSF_Core<EKFState_T>::getClosestState(double tstam
   started = true;
   //}
 
-  boost::shared_ptr<EKFState_T>& closestState = it->second;
+  boost::shared_ptr<EKFState_T> closestState = it->second;
 
   if (closestState->time == -1 || fabs(closestState->time - timenow) > 0.1){ //check if the state really is close to the requested time. With the new buffer this might not be given.
     ROS_ERROR_STREAM("Requested closest state to "<<timenow<<" but there was no suitable state in the map");
     return StateBuffer_.getInvalid(); // // early abort // //  not enough predictions made yet to apply measurement (too far in past)
   }
 
-  //state interpolation if state is too far away from the measurement
+  //do state interpolation if state is too far away from the measurement
   double tdiff = fabs(closestState->time - timenow); //timediff to closest state
 
   if(tdiff > 0.001){ // if time diff too large, insert new state and do state interpolation
@@ -577,18 +588,17 @@ boost::shared_ptr<EKFState_T> MSF_Core<EKFState_T>::getClosestState(double tstam
     boost::shared_ptr<EKFState_T> nextState = StateBuffer_.getClosestAfter(timenow);
 
     if(lastState->time == -1){
-      ROS_ERROR_STREAM_THROTTLE(2, "State interpolation: closest state before is invalid\n");
+      ROS_ERROR_STREAM("State interpolation: closest state before is invalid\nmeas: "<<timehuman(tstamp)<<"buffer\n"<<StateBuffer_.echoBufferContentTimes());
       return StateBuffer_.getInvalid(); // // early abort // //
     }
     if(nextState->time == -1){
-         ROS_ERROR_STREAM_THROTTLE(2, "State interpolation: closest state after is invalid\n");
-         return StateBuffer_.getInvalid(); // // early abort // //
-       }
+      ROS_ERROR_STREAM("State interpolation: closest state after is invalid\nmeas: "<<timehuman(tstamp)<<"buffer\n"<<StateBuffer_.echoBufferContentTimes());
+      return StateBuffer_.getInvalid(); // // early abort // //
+    }
 
-    boost::shared_ptr<EKFState_T> currentState(new EKFState_T); //prepare a new state
-
+    //prepare a new state
+    boost::shared_ptr<EKFState_T> currentState(new EKFState_T);
     currentState->time = timenow; //set state time to measurement time
-
     //linearly interpolate imu readings
     currentState->a_m = lastState->a_m + (nextState->a_m - lastState->a_m) / (nextState->time - lastState->time) * (timenow - lastState->time);
     currentState->w_m = lastState->w_m + (nextState->w_m - lastState->w_m) / (nextState->time - lastState->time) * (timenow - lastState->time);

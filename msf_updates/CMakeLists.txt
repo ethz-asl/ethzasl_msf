@@ -27,5 +27,5 @@ add_definitions (-Wall -std=c++0x)
 find_package(Eigen REQUIRED)
 include_directories(${Eigen_INCLUDE_DIRS})
 
-#add_subdirectory(src/pose_msf)
+add_subdirectory(src/pose_msf)
 add_subdirectory(src/pose_pressure_msf)

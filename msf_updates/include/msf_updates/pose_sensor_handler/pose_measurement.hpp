@@ -120,7 +120,7 @@ public:
   {
   }
   virtual std::string type(){
-return "pose";
+    return "pose";
   }
   /**
    * the method called by the msf_core to apply the measurement represented by this object
@@ -159,7 +159,7 @@ return "pose";
     H_old.block<3, 3>(0, 0) = C_wv.transpose() * state.get<StateDefinition_T::L>()(0); // p
     H_old.block<3, 3>(0, 6) = -C_wv.transpose() * C_q.transpose() * pci_sk * state.get<StateDefinition_T::L>()(0); // q
     H_old.block<3, 1>(0, 15) = C_wv.transpose() * C_q.transpose() * state.get<StateDefinition_T::p_ci>()
-                            + C_wv.transpose() * state.get<StateDefinition_T::p>(); // L
+                                + C_wv.transpose() * state.get<StateDefinition_T::p>(); // L
     H_old.block<3, 3>(0, 16) = -C_wv.transpose() * skewold; // q_wv
     H_old.block<3, 3>(0, 22) = C_wv.transpose() * C_q.transpose() * state.get<StateDefinition_T::L>()(0); //p_ci
 
@@ -181,7 +181,7 @@ return "pose";
     // vision world yaw drift
     q_err = state.get<StateDefinition_T::q_wv>();
     r_old(6, 0) = -2 * (q_err.w() * q_err.z() + q_err.x() * q_err.y())
-                            / (1 - 2 * (q_err.y() * q_err.y() + q_err.z() * q_err.z()));
+                                / (1 - 2 * (q_err.y() * q_err.y() + q_err.z() * q_err.z()));
 
     // call update step in base class
     this->calculateAndApplyCorrection(const_state, core, H_old, r_old, R_);
