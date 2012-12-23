@@ -564,14 +564,53 @@ boost::shared_ptr<EKFState_T> MSF_Core<EKFState_T>::getClosestState(double tstam
 
   boost::shared_ptr<EKFState_T>& closestState = it->second;
 
-  if (closestState->time == -1){
-    ROS_WARN_STREAM("Requested closest state to "<<timenow<<" but there was no suitable state in the map");
+  if (closestState->time == -1 || fabs(closestState->time - timenow) > 0.1){ //check if the state really is close to the requested time. With the new buffer this might not be given.
+    ROS_ERROR_STREAM("Requested closest state to "<<timenow<<" but there was no suitable state in the map");
     return StateBuffer_.getInvalid(); // // early abort // //  not enough predictions made yet to apply measurement (too far in past)
   }
+
+  //state interpolation if state is too far away from the measurement
+  double tdiff = fabs(closestState->time - timenow); //timediff to closest state
+
+  if(tdiff > 0.001){ // if time diff too large, insert new state and do state interpolation
+    boost::shared_ptr<EKFState_T> lastState = StateBuffer_.getClosestBefore(timenow);
+    boost::shared_ptr<EKFState_T> nextState = StateBuffer_.getClosestAfter(timenow);
+
+    if(lastState->time == -1){
+      ROS_ERROR_STREAM_THROTTLE(2, "State interpolation: closest state before is invalid\n");
+      return StateBuffer_.getInvalid(); // // early abort // //
+    }
+    if(nextState->time == -1){
+         ROS_ERROR_STREAM_THROTTLE(2, "State interpolation: closest state after is invalid\n");
+         return StateBuffer_.getInvalid(); // // early abort // //
+       }
+
+    boost::shared_ptr<EKFState_T> currentState(new EKFState_T); //prepare a new state
+
+    currentState->time = timenow; //set state time to measurement time
+
+    //linearly interpolate imu readings
+    currentState->a_m = lastState->a_m + (nextState->a_m - lastState->a_m) / (nextState->time - lastState->time) * (timenow - lastState->time);
+    currentState->w_m = lastState->w_m + (nextState->w_m - lastState->w_m) / (nextState->time - lastState->time) * (timenow - lastState->time);
+
+    propagateState(lastState, currentState); //propagate with respective dt
+
+    StateBuffer_.insert(currentState);
+
+    if(time_P_propagated > lastState->time){ //make sure we propagate P correctly to the new state
+      time_P_propagated = lastState->time;
+    }
+
+    closestState = currentState;
+  }
+
   propPToState(closestState); // catch up with covariance propagation if necessary
 
-  CleanUpBuffers(); //remove very old states and measurements from the buffers
-
+  static int janitorRun = 0;
+  if(janitorRun++ > 100){
+    CleanUpBuffers(); //remove very old states and measurements from the buffers
+    janitorRun = 0;
+  }
   return closestState;
 }
 
@@ -632,6 +671,7 @@ bool MSF_Core<EKFState_T>::applyCorrection(boost::shared_ptr<EKFState_T>& delays
   usercalc_.sanityCheckCorrection(*delaystate, buffstate, correction);
 
   //TODO: move the whole fuzzy tracking to a templated function, which is specialized for void, Matrix, Quaternion
+  //TODO: allow multiple fuzzy tracking states at the same time
 
   if(indexOfStateWithoutTemporalDrift != -1){ //is there a state without temporal drift?
 
