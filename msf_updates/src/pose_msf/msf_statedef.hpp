@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MSF_STATEDEF_HPP_
 
 #include <Eigen/Dense>
-#include <msf_core/msf_fwds.hpp>
+#include <msf_core/msf_fwds.h>
 #include <boost/fusion/container.hpp>
 #include <boost/static_assert.hpp>
 
@@ -87,6 +87,6 @@ typedef boost::shared_ptr<const EKFState> EKFStateConstPtr;
 
 }
 
-#include <msf_updates/static_ordering_assertions.hpp> //DO NOT REMOVE THIS
+#include <msf_updates/static_ordering_assertions.h> //DO NOT REMOVE THIS
 
 #endif /* MSF_STATEDEF_HPP_ */

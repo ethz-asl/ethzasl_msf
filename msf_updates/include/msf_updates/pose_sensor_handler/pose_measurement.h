@@ -36,8 +36,8 @@
 #ifndef POSE_MEASUREMENT_HPP_
 #define POSE_MEASUREMENT_HPP_
 
-#include <msf_core/msf_measurement.hpp>
-#include <msf_core/msf_core.hpp>
+#include <msf_core/msf_measurement.h>
+#include <msf_core/msf_core.h>
 
 namespace pose_measurement{
 enum

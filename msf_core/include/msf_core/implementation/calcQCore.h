@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include <Eigen/Eigen>
-#include <msf_core/msf_core.hpp>
+#include <msf_core/msf_core.h>
 
 /**
  * \brief Calculate the observation covariance matrix for the core states.

@@ -29,7 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
 
-#include <msf_core/msf_core.hpp>
+#include <msf_core/msf_core.h>
 
 namespace msf_core{
 template<typename EKFState_T>

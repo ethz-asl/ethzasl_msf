@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MEASUREMENT_HPP_
 #define MEASUREMENT_HPP_
 
-#include <msf_core/msf_fwds.hpp>
+#include <msf_core/msf_fwds.h>
 #include <Eigen/Dense>
 
 namespace msf_core{

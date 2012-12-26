@@ -29,9 +29,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
 
-#include <msf_core/msf_fwds.hpp>
+#include <msf_core/msf_fwds.h>
 #include <msf_core/msf_types.tpp>
-#include <msf_core/msf_tmp.hpp>
+#include <msf_core/msf_tmp.h>
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 #include <vector>

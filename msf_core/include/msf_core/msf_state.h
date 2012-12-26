@@ -35,8 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MSF_STATE_HPP_
 
 #include <msf_core/msf_types.tpp>
-#include <msf_core/msf_tmp.hpp>
-#include <msf_core/msf_statevisitor.hpp>
+#include <msf_core/msf_tmp.h>
+#include <msf_core/msf_statevisitor.h>
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 #include <vector>

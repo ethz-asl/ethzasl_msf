@@ -36,9 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef POSE_SENSOR_H
 #define POSE_SENSOR_H
 
-#include <msf_core/msf_sensormanagerROS.hpp>
+#include <msf_core/msf_sensormanagerROS.h>
 #include <asctec_hl_comm/mav_imu.h>
-#include <msf_updates/pose_sensor_handler/pose_measurement.hpp>
+#include <msf_updates/pose_sensor_handler/pose_measurement.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/PoseStamped.h>
@@ -81,6 +81,6 @@ public:
 
 };
 }
-#include "pose_sensorhandler.hpp"
+#include "implementation/pose_sensorhandler.hpp"
 
 #endif /* POSE_SENSOR_H */

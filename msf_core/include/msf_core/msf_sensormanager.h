@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SENSORMANAGER_H
 #define SENSORMANAGER_H
 
-#include <msf_core/msf_statevisitor.hpp>
+#include <msf_core/msf_statevisitor.h>
 #include <Eigen/Dense>
 
 namespace msf_core{

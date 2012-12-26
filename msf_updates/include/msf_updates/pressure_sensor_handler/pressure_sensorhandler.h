@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef PRESSURE_SENSOR_H
 #define PRESSURE_SENSOR_H
 
-#include <msf_core/msf_sensormanagerROS.hpp>
+#include <msf_core/msf_sensormanagerROS.h>
 #include <asctec_hl_comm/mav_imu.h>
-#include <msf_updates/pressure_sensor_handler/pressure_measurement.hpp>
+#include <msf_updates/pressure_sensor_handler/pressure_measurement.h>
 
 namespace msf_pressure_sensor{
 
@@ -60,6 +60,6 @@ public:
 
 };
 }
-#include "pressure_sensorhandler.hpp"
+#include "implementation/pressure_sensorhandler.hpp"
 
 #endif /* POSE_SENSOR_H */

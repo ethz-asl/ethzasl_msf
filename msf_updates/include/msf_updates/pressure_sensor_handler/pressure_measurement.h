@@ -32,8 +32,8 @@
 #ifndef PRESSURE_MEASUREMENT_HPP_
 #define PRESSURE_MEASUREMENT_HPP_
 
-#include <msf_core/msf_measurement.hpp>
-#include <msf_core/msf_core.hpp>
+#include <msf_core/msf_measurement.h>
+#include <msf_core/msf_core.h>
 
 namespace pressure_measurement{
 enum

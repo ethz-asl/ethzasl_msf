@@ -33,9 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "calcQCore.h"
 #include <msf_core/eigen_utils.h>
-#include <msf_core/msf_sensormanager.hpp>
-#include <msf_core/msf_tools.hpp>
-#include <msf_core/msf_measurement.hpp>
+#include <msf_core/msf_sensormanager.h>
+#include <msf_core/msf_tools.h>
+#include <msf_core/msf_measurement.h>
 
 namespace msf_core
 {

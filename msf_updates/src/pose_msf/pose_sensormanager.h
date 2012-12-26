@@ -37,11 +37,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define POSE_MEASUREMENTMANAGER_H
 
 #include <ros/ros.h>
-#include <msf_core/msf_sensormanagerROS.hpp>
-#include <msf_core/msf_measurement.hpp>
-#include <msf_core/msf_core.hpp>
+#include <msf_core/msf_sensormanagerROS.h>
+#include <msf_core/msf_measurement.h>
+#include <msf_core/msf_core.h>
 #include "msf_statedef.hpp"
-#include <msf_updates/pose_sensor_handler/pose_measurement.hpp>
+#include <msf_updates/pose_sensor_handler/pose_measurement.h>
 #include <msf_updates/pose_sensor_handler/pose_sensorhandler.h>
 #include <msf_updates/SinglePoseSensorConfig.h>
 

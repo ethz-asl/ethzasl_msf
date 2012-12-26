@@ -43,7 +43,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MSF_TMP_HPP_
 
 
-#include <msf_core/msf_fwds.hpp>
+#include <msf_core/msf_fwds.h>
 #include <msf_core/msf_typetraits.tpp>
 #include <msf_core/eigen_utils.h>
 
@@ -659,13 +659,7 @@ struct correctState
     enum{
       startIdxInCorrection = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::CorrectionStateLengthForType>::value
     };
-    //		std::cout<<"called correction for state "<<NAME<<std::endl;
-    //		std::cout<<"initial value "<<t.state_<<std::endl;
-
     t.state_ = t.state_ + data_.template block<var_T::sizeInCorrection_, 1> (startIdxInCorrection, 0);
-
-    //		std::cout<<"after update "<<t.state_<<std::endl;
-
   }
   template<int NAME, int STATETYPE>
   void operator()(msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE>& t) const {
@@ -673,14 +667,10 @@ struct correctState
     enum{
       startIdxInCorrection = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::CorrectionStateLengthForType>::value
     };
-    //		std::cout<<"called correction for state "<<NAME<<std::endl;
-    //		std::cout<<"initial value "<<t.state_.w()<<" "<<t.state_.x()<<" "<<t.state_.y()<<" "<<t.state_.z()<<std::endl;
 
     Eigen::Quaternion<double> qbuff_q = quaternionFromSmallAngle(data_.template block<var_T::sizeInCorrection_, 1> (startIdxInCorrection, 0));
     t.state_ = t.state_ * qbuff_q;
     t.state_.normalize();
-
-    //		std::cout<<"after update "<<t.state_.w()<<" "<<t.state_.x()<<" "<<t.state_.y()<<" "<<t.state_.z()<<std::endl;
   }
 private:
   T& data_;

@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MSF_SORTEDCONTAINER_HPP_
 #define MSF_SORTEDCONTAINER_HPP_
 
-#include <msf_core/msf_tools.hpp>
+#include <msf_core/msf_tools.h>
 
 namespace msf_core{
 /**

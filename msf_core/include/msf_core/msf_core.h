@@ -46,9 +46,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <sensor_msgs/Imu.h>
 
-#include <msf_core/msf_sortedContainer.hpp>
+#include <msf_core/msf_sortedContainer.h>
 #include <vector>
-#include <msf_core/msf_state.hpp>
+#include <msf_core/msf_state.h>
 
 //good old days...
 //#define N_STATE_BUFFER 256	///< size of unsigned char, do not change!

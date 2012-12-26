@@ -33,7 +33,7 @@
 #define STATIC_ORDERING_ASSERTIONS_UPDATES_HPP_
 
 #include <boost/static_assert.hpp>
-#include <msf_core/static_ordering_assertions.hpp>
+#include <msf_core/static_ordering_assertions.h>
 
 namespace
 {
