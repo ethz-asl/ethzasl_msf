@@ -96,6 +96,18 @@ private:
       init(config.initial_scale);
       config.init_filter = false;
     }
+    if((level & msf_updates::SinglePoseSensor_SET_HEIGHT) && config.set_height == true){
+      Eigen::Matrix<double, 3, 1> p = pose_handler_->getPositionMeasurement();
+      if (p.norm() == 0){
+           ROS_WARN_STREAM("No measurements received yet to initialize position. Height init not allowed.");
+           return;
+      }
+      double scale =  p[2]/config.height;
+
+
+      init(scale);
+      config.init_filter = false;
+    }
     pose_handler_->setNoises(config.noise_position, config.noise_attitude);
 
     pressure_handler_->setNoises(config.noise_pressure);

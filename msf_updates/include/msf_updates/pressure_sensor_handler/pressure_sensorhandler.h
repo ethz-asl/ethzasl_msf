@@ -42,8 +42,13 @@ class PressureSensorHandler : public msf_core::SensorHandler<typename msf_update
 {
 private:
 
+  enum{
+    heightbuffsize = 10
+  };
   Eigen::Matrix<double, 1, 1> z_p_; ///< pressure measurement
   double n_zp_; ///< pressure measurement noise
+  Eigen::Matrix<double, 1, 1> z_average_p; ///<averaged pressure measurement
+  double heightbuff[heightbuffsize];
 
   ros::Subscriber subPressure_;
 
@@ -54,6 +59,9 @@ public:
   //used for the init
   Eigen::Matrix<double, 1, 1> getPressureMeasurement(){
     return z_p_;
+  }
+  Eigen::Matrix<double, 1, 1> getAveragedPressureMeasurement(){
+    return z_average_p;
   }
   //setters for configure values
   void setNoises(double n_zp);
