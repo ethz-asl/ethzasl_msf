@@ -114,7 +114,7 @@ std::cout<<"Apply of a pressure measurement with value "<<z_p_<<" bias "<<state.
     // position:
     H_old.block<1, 1>(0, idx_p + 2)(0) = 1; // p_z
     //pressure bias
-    H_old.block<1, 1>(0, idx_b_p)(0) = 1; //p_b
+    H_old.block<1, 1>(0, idx_b_p)(0) = -1; //p_b
 
     // construct residuals
     // height

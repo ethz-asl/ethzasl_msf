@@ -191,6 +191,9 @@ template<typename EKFState_T>
 void MSF_Core<EKFState_T>::stateCallback(const sensor_fusion_comm::ExtEkfConstPtr & msg)
 {
 
+  if(!initialized_)
+    return;
+
   boost::shared_ptr<EKFState_T> lastState = StateBuffer_.getClosestBefore(msg->header.stamp.toSec());
 
   if(lastState->time == -1)
