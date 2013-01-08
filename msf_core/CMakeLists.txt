@@ -42,3 +42,7 @@ include_directories(${Eigen_INCLUDE_DIRS})
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 #rosbuild_add_gtest(test_staticstatelist src/test_staticstatelist.cc)
 #rosbuild_link_boost(test_staticstatelist thread)
+
+rosbuild_add_library(similaritytransform src/similaritytransform.cpp)
+rosbuild_add_executable(test_similaritytransform src/test_similaritytransform.cpp)
+target_link_libraries(test_similaritytransform similaritytransform)
