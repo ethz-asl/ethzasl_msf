@@ -82,6 +82,28 @@ inline Eigen::Matrix<typename Derived::Scalar, 4, 4> omegaMatHamilton(const Eige
   ).finished();
 }
 
+/// returns a matrix to compute error quaternions
+/**
+ \param <q_vec> {4D vector containing the quaternion's coefficients in the order x y z w}
+ \return {4x3 matrix for error quaternion computation }
+ \verbatim
+ Xi = [ w*I + skew([x y z])]  ; dq = [ Xi q]^T * q
+      [     -[x y z]       ]
+ \endverbatim
+ */
+template<class Derived>
+  inline Eigen::Matrix<typename Derived::Scalar, 4, 3> xiMat(const Eigen::MatrixBase<Derived> & q_vec)
+  {
+    EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(Derived, 4, 1);
+
+    return (Eigen::Matrix<typename Derived::Scalar, 4, 3>()<<
+        // this is the Xi matrix ---
+        q_vec[3] * Eigen::Matrix<typename Derived::Scalar, 3, 3>::Identity() + skew(q_vec.template head<3>()),
+        -q_vec.template head<3>().transpose()
+        // ---
+    ).finished();
+  }
+
 /// computes a quaternion from the 3-element small angle approximation theta
 template<class Derived>
 Eigen::Quaternion<typename Derived::Scalar> quaternionFromSmallAngle(const Eigen::MatrixBase<Derived> & theta)
