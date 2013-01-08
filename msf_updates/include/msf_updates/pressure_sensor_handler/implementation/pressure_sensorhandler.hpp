@@ -33,8 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace msf_pressure_sensor{
 PressureSensorHandler::PressureSensorHandler(msf_core::MSF_SensorManager<msf_updates::EKFState>& meas) :
-                SensorHandler<msf_updates::EKFState>(meas), n_zp_(1e-6)
-                {
+                    SensorHandler<msf_updates::EKFState>(meas), n_zp_(1e-6)
+                    {
   ros::NodeHandle pnh("~");
 
   ros::NodeHandle nh("msf_updates");
@@ -42,7 +42,7 @@ PressureSensorHandler::PressureSensorHandler(msf_core::MSF_SensorManager<msf_upd
 
   memset(heightbuff, 0, sizeof(double)*heightbuffsize);
 
-                }
+                    }
 
 void PressureSensorHandler::setNoises(double n_zp)
 {
@@ -50,20 +50,24 @@ void PressureSensorHandler::setNoises(double n_zp)
 }
 
 
-void PressureSensorHandler::measurementCallback(const asctec_hl_comm::mav_imuConstPtr & msg)
+void PressureSensorHandler::measurementCallback(const asctec_hl_comm::mav_imuConstPtr & newmsg)
 {
-  static double lastCB = 0;
-  if(msg->header.stamp.toSec() - lastCB < 1. / 50){ //rate too high, take only every ith message
-    ROS_WARN_STREAM_THROTTLE(30, "Rate of measurements too high, taking only every ith measurement");
-    lastCB = msg->header.stamp.toSec();
-    if(msg->header.seq % 10 != 0){
-      return;
-    }
+
+  bool throttle = true;
+  if(throttle && newmsg->header.seq % 10 != 0){
+    return;
   }
 
+  //hack: delay the measurements by some time steps, because currently they arrive at the same time as the imu
+  delayqueue_.push(newmsg);
+  if(delayqueue_.size() < 1){
+    return;
+  }
+  asctec_hl_comm::mav_imuConstPtr msg = delayqueue_.front();
+  delayqueue_.pop();
 
   boost::shared_ptr<pressure_measurement::PressureMeasurement> meas( new pressure_measurement::PressureMeasurement(n_zp_));
-  meas->makeFromSensorReading(msg, msg->header.stamp.toSec() - 0.015); //added some delay to make the measurements arrive later than the state callback
+  meas->makeFromSensorReading(msg, msg->header.stamp.toSec()); //added some delay to make the measurements arrive later than the state callback
 
   z_p_ = meas->z_p_; //store this for the init procedure
 

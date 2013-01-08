@@ -84,7 +84,7 @@ public:
     std::pair<typename ListT::iterator,bool> itpr =
         stateList.insert(std::pair<double, boost::shared_ptr<T> >(value->time, value));
     if(!itpr.second){
-      ROS_WARN_STREAM("Wanted to insert a value to the sorted container at time "<<value->time<<" but the map already contained a value at this time. discarding.");
+      ROS_WARN_STREAM("Wanted to insert a value to the sorted container at time "<<timehuman(value->time)<<" but the map already contained a value at this time. discarding.");
     }
     return itpr.first;
   }
@@ -160,6 +160,14 @@ public:
    * \returns iterator
    */
   inline typename ListT::iterator getIteratorClosest(const double& statetime){
+
+    //first check if we have a value at this time in the buffer
+    typename ListT::iterator it_at = stateList.find(statetime);
+    if(it_at != stateList.end()){
+      return it_at;
+    }
+
+    //if not, find the closest one
     typename ListT::iterator tauMinus = getIteratorClosestBefore(statetime);
     typename ListT::iterator tauPlus = getIteratorClosestAfter(statetime);
 

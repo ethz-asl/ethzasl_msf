@@ -582,20 +582,21 @@ boost::shared_ptr<EKFState_T> MSF_Core<EKFState_T>::getClosestState(double tstam
 
   typename stateBufferT::iterator_T it = StateBuffer_.getIteratorClosest(timenow);
 
-  //TODO: remove this relict from the state_idx days or find out why we need it and document here.
+
+  //remove this relict from the state_idx days or find out why we need it and document here.
   //it seems this is needed when there was only one imu reading before the first measurement arrives{
-  typename stateBufferT::iterator_T itbeg = StateBuffer_.getIteratorBegin();
-  static bool started = false;
-  if (itbeg == it && !started){
-    ++it;
-  }
-  started = true;
+//  typename stateBufferT::iterator_T itbeg = StateBuffer_.getIteratorBegin();
+//  static bool started = false;
+//  if (itbeg == it && !started){
+//    ++it;
+//  }
+//  started = true;
   //}
 
   boost::shared_ptr<EKFState_T> closestState = it->second;
 
   if (closestState->time == -1 || fabs(closestState->time - timenow) > 0.1){ //check if the state really is close to the requested time. With the new buffer this might not be given.
-    ROS_ERROR_STREAM("Requested closest state to "<<timenow<<" but there was no suitable state in the map");
+    ROS_ERROR_STREAM("Requested closest state to "<<timehuman(timenow)<<" but there was no suitable state in the map");
     return StateBuffer_.getInvalid(); // // early abort // //  not enough predictions made yet to apply measurement (too far in past)
   }
 
