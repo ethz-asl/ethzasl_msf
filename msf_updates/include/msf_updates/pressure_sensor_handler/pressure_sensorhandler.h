@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <msf_core/msf_sensormanagerROS.h>
 #include <asctec_hl_comm/mav_imu.h>
 #include <msf_updates/pressure_sensor_handler/pressure_measurement.h>
+#include <queue>
 
 namespace msf_pressure_sensor{
 
@@ -51,6 +52,8 @@ private:
   double heightbuff[heightbuffsize];
 
   ros::Subscriber subPressure_;
+
+  std::queue<asctec_hl_comm::mav_imuConstPtr> delayqueue_;
 
   void measurementCallback(const asctec_hl_comm::mav_imuConstPtr & msg);
 
