@@ -123,7 +123,7 @@ private:
     msf_core::MSF_Core<EKFState_T>::ErrorStateCov P;
 
     // init values
-    g << 0, 0, 9.81;	/// gravity
+    g << 0, 0, 9.81;	        /// gravity
     b_w << 0,0,0;		/// bias gyroscopes
     b_a << 0,0,0;		/// bias accelerometer
 
@@ -131,14 +131,14 @@ private:
     w_m << 0,0,0;		/// initial angular velocity
     a_m =g;			/// initial acceleration
 
-    b_p << 0;                   /// pressure drift state
-
     q_wv.setIdentity(); // vision-world rotation drift
 
     P.setZero(); // error state covariance; if zero, a default initialization in msf_core is used
 
     p_vc = pose_handler_->getPositionMeasurement();
     q_cv = pose_handler_->getAttitudeMeasurement();
+
+    b_p << pose_handler_->getPositionMeasurement()(2) / scale - pressure_handler_->getPressureMeasurement()(0); /// pressure drift state
 
     // check if we have already input from the measurement sensor
     if (p_vc.norm() == 0)

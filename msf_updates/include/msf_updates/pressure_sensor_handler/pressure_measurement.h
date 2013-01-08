@@ -79,8 +79,8 @@ public:
     n_zp_(n_zp)
   {
   }
-virtual std::string type(){
-return "pressure";
+  virtual std::string type(){
+    return "pressure";
   }
   /**
    * the method called by the msf_core to apply the measurement represented by this object
@@ -95,7 +95,7 @@ return "pressure";
 
     if (non_const_state->time == -1)
     {
-      ROS_WARN_STREAM("apply pose update was called with an invalid state");
+      ROS_WARN_STREAM("apply pressure update was called with an invalid state");
       return;	// // early abort // //
     }
 
@@ -108,8 +108,8 @@ return "pressure";
       idx_b_p = msf_tmp::getStartIndex<EKFState_T::StateSequence_T,
       typename msf_tmp::getEnumStateType<EKFState_T::StateSequence_T, StateDefinition_T::b_p>::value, msf_tmp::CorrectionStateLengthForType>::value
     };
-std::cout<<"Apply of a pressure measurement with value "<<z_p_<<" bias "<<state.get<StateDefinition_T::b_p>()<<" position: "<<state.get<StateDefinition_T::p>().block<1,1>(2, 0)<<std::endl;
- 
+    ROS_INFO_STREAM("Press apply meas: "<<z_p_<<" bias "<<(state.get<StateDefinition_T::b_p>())<<" position: "<<(state.get<StateDefinition_T::p>().block<1,1>(2, 0)));
+
     // construct H matrix using H-blockx :-)
     // position:
     H_old.block<1, 1>(0, idx_p + 2)(0) = 1; // p_z

@@ -38,7 +38,7 @@ PressureSensorHandler::PressureSensorHandler(msf_core::MSF_SensorManager<msf_upd
   ros::NodeHandle pnh("~");
 
   ros::NodeHandle nh("msf_updates");
-  subPressure_ = nh.subscribe<asctec_hl_comm::mav_imu>("pressure_input", 1, &PressureSensorHandler::measurementCallback, this);
+  subPressure_ = nh.subscribe<asctec_hl_comm::mav_imu>("pressure_input", 5, &PressureSensorHandler::measurementCallback, this);
 
   memset(heightbuff, 0, sizeof(double)*heightbuffsize);
 
@@ -52,10 +52,18 @@ void PressureSensorHandler::setNoises(double n_zp)
 
 void PressureSensorHandler::measurementCallback(const asctec_hl_comm::mav_imuConstPtr & msg)
 {
+  static double lastCB = 0;
+  if(msg->header.stamp.toSec() - lastCB < 1. / 50){ //rate too high, take only every ith message
+    ROS_WARN_STREAM_THROTTLE(30, "Rate of measurements too high, taking only every ith measurement");
+    lastCB = msg->header.stamp.toSec();
+    if(msg->header.seq % 10 != 0){
+      return;
+    }
+  }
 
 
   boost::shared_ptr<pressure_measurement::PressureMeasurement> meas( new pressure_measurement::PressureMeasurement(n_zp_));
-  meas->makeFromSensorReading(msg, msg->header.stamp.toSec());
+  meas->makeFromSensorReading(msg, msg->header.stamp.toSec() - 0.015); //added some delay to make the measurements arrive later than the state callback
 
   z_p_ = meas->z_p_; //store this for the init procedure
 

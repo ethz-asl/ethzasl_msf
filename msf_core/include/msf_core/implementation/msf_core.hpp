@@ -591,11 +591,11 @@ boost::shared_ptr<EKFState_T> MSF_Core<EKFState_T>::getClosestState(double tstam
     boost::shared_ptr<EKFState_T> nextState = StateBuffer_.getClosestAfter(timenow);
 
     if(lastState->time == -1){
-      ROS_ERROR_STREAM("State interpolation: closest state before is invalid\nmeas: "<<timehuman(tstamp)<<"buffer\n"<<StateBuffer_.echoBufferContentTimes());
+      ROS_ERROR_STREAM("State interpolation: tdiff: "<<tdiff<<" closest state before is invalid\nmeas: "<<timehuman(tstamp)<<"buffer: \n"<<StateBuffer_.echoBufferContentTimes());
       return StateBuffer_.getInvalid(); // // early abort // //
     }
     if(nextState->time == -1){
-      ROS_ERROR_STREAM("State interpolation: closest state after is invalid\nmeas: "<<timehuman(tstamp)<<"buffer\n"<<StateBuffer_.echoBufferContentTimes());
+      ROS_ERROR_STREAM("State interpolation: tdiff: "<<tdiff<<" closest state after is invalid\nmeas: "<<timehuman(tstamp)<<"buffer: \n"<<StateBuffer_.echoBufferContentTimes());
       return StateBuffer_.getInvalid(); // // early abort // //
     }
 
