@@ -69,7 +69,6 @@ void PoseSensorHandler::setDelay(double delay)
 void PoseSensorHandler::measurementCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg)
 {
 
-
   boost::shared_ptr<pose_measurement::PoseMeasurement> meas( new pose_measurement::PoseMeasurement(n_zp_, n_zq_, measurement_world_sensor_, use_fixed_covariance_));
   meas->makeFromSensorReading(msg, msg->header.stamp.toSec() - delay_);
 

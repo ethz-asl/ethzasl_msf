@@ -61,8 +61,8 @@ MSF_Core<EKFState_T>::MSF_Core(MSF_SensorManager<EKFState_T>& usercalc):usercalc
   pubPoseCrtl_ = nh.advertise<sensor_fusion_comm::ExtState> ("ext_state", 1);
   msgState_.data.resize(nStatesAtCompileTime, 0);
 
-  subImu_ = nh.subscribe("imu_state_input", 1, &MSF_Core::imuCallback, this);
-  subState_ = nh.subscribe("hl_state_input", 1, &MSF_Core::stateCallback, this);
+  subImu_ = nh.subscribe("imu_state_input", 4, &MSF_Core::imuCallback, this);
+  subState_ = nh.subscribe("hl_state_input", 4, &MSF_Core::stateCallback, this);
 
   msgCorrect_.state.resize(HLI_EKF_STATE_SIZE, 0);
   hl_state_buf_.state.resize(HLI_EKF_STATE_SIZE, 0);
@@ -169,7 +169,8 @@ void MSF_Core<EKFState_T>::imuCallback(const sensor_msgs::ImuConstPtr & msg)
 
   propagatePOneStep();
 
-  predictionMade_ = true;
+  if(StateBuffer_.size() > 3)
+    predictionMade_ = true;
 
   msgPose_.header.stamp = msg->header.stamp;
   msgPose_.header.seq = msg->header.seq;
@@ -183,6 +184,7 @@ void MSF_Core<EKFState_T>::imuCallback(const sensor_msgs::ImuConstPtr & msg)
 
   StateBuffer_.insert(currentState);
 
+  handlePendingMeasurements(); //check if we can apply some pending measurement
 
   seq++;
 }
@@ -263,6 +265,17 @@ void MSF_Core<EKFState_T>::stateCallback(const sensor_fusion_comm::ExtEkfConstPt
   predictionMade_ = true;
 
   StateBuffer_.insert(currentState);
+  handlePendingMeasurements(); //check if we can apply some pending measurement
+}
+
+template<typename EKFState_T>
+void MSF_Core<EKFState_T>::handlePendingMeasurements()
+{
+  if(queueFutureMeasurements_.empty())
+    return;
+  boost::shared_ptr<MSF_MeasurementBase<EKFState_T> > meas = queueFutureMeasurements_.front();
+  queueFutureMeasurements_.pop();
+  addMeasurement(meas);
 }
 
 
@@ -410,6 +423,8 @@ template<typename EKFState_T>
 void MSF_Core<EKFState_T>::init(boost::shared_ptr<MSF_MeasurementBase<EKFState_T> > measurement){
   MeasurementBuffer_.clear();
   StateBuffer_.clear();
+  while(!queueFutureMeasurements_.empty())
+    queueFutureMeasurements_.pop();
 
   //push one state to the buffer to apply the init on
   boost::shared_ptr<EKFState_T> state(new EKFState_T);
@@ -441,7 +456,8 @@ void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase<
     return;
 
   if(measurement->time > StateBuffer_.getLast()->time){
-    ROS_WARN_STREAM("You tried to give me a measurement in the future. Are you sure your clocks are synced and delays compensated correctly? I will discard that sorry... [measurement: "<<timehuman(measurement->time)<<" (s) latest state: "<<timehuman(StateBuffer_.getLast()->time)<<" (s)]");
+    ROS_WARN_STREAM("You tried to give me a measurement in the future. Are you sure your clocks are synced and delays compensated correctly? I will store that and apply it next time... [measurement: "<<timehuman(measurement->time)<<" (s) latest state: "<<timehuman(StateBuffer_.getLast()->time)<<" (s)]");
+    queueFutureMeasurements_.push(measurement);
     return;
   }
 

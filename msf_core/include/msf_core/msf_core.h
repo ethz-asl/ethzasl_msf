@@ -48,6 +48,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <msf_core/msf_sortedContainer.h>
 #include <vector>
+#include <queue>
 #include <msf_core/msf_state.h>
 
 //good old days...
@@ -168,6 +169,8 @@ private:
   stateBufferT StateBuffer_; ///<EKF buffer containing pretty much all info needed at time t. sorted by t asc
   measurementBufferT MeasurementBuffer_; ///< EKF Measurements and init values sorted by t asc
 
+  std::queue<boost::shared_ptr<MSF_MeasurementBase<EKFState_T> > > queueFutureMeasurements_; ///< buffer for measurements to apply in future
+
   double time_P_propagated; ///< last time stamp where we have a valid propagation
 
   Eigen::Matrix<double, 3, 1> g_; ///< gravity vector
@@ -276,6 +279,8 @@ private:
   /// propagates P by one step to distribute processing load
   void propagatePOneStep();
 
+  ///checks the queue of measurements to be applied in the future
+  void handlePendingMeasurements();
 
 };
 
