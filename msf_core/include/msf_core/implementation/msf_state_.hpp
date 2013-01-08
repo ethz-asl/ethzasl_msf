@@ -147,6 +147,27 @@ void GenericState_T<stateVector_T, StateDefinition_T>::toCoreStateMsg(sensor_fus
   );
 }
 
+template<typename stateVector_T, typename StateDefinition_T>
+Eigen::Matrix<double, GenericState_T<stateVector_T, StateDefinition_T>::nCoreStatesAtCompileTime, 1> GenericState_T<stateVector_T, StateDefinition_T>::toEigenVector(){//boost fusion unfortunately doesn't like this to be const
+  Eigen::Matrix<double, GenericState_T<stateVector_T, StateDefinition_T>::nCoreStatesAtCompileTime, 1> data;
+  boost::fusion::for_each(
+      statevars,
+      msf_tmp::CoreStatetoDoubleArray<typename Eigen::Matrix<double, GenericState_T<stateVector_T, StateDefinition_T>::nCoreStatesAtCompileTime, 1>, stateVector_T >(data)
+  );
+  return data;
+}
+
+template<typename stateVector_T, typename StateDefinition_T>
+bool GenericState_T<stateVector_T, StateDefinition_T>::checkStateForNumeric(){//boost fusion unfortunately doesn't like this to be const
+  Eigen::Matrix<double, GenericState_T<stateVector_T, StateDefinition_T>::nCoreStatesAtCompileTime, 1> data;
+  boost::fusion::for_each(
+      statevars,
+      msf_tmp::CoreStatetoDoubleArray<typename Eigen::Matrix<double, GenericState_T<stateVector_T, StateDefinition_T>::nCoreStatesAtCompileTime, 1>, stateVector_T >(data)
+  );
+
+  return checkForNumeric((double*)&data, data.RowsAtCompileTime * data.ColsAtCompileTime, "state");
+}
+
 //returns the state at position INDEX in the state list, const version
 template<typename stateVector_T, typename StateDefinition_T>
 template<int INDEX>

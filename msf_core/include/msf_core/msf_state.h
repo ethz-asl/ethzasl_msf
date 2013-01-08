@@ -193,6 +193,15 @@ public:
    */
   void toCoreStateMsg(sensor_fusion_comm::DoubleArrayStamped & state);
 
+  /**
+   * \brief returns all values as an eigen vector
+   */
+  Eigen::Matrix<double, nCoreStatesAtCompileTime, 1> toEigenVector();
+
+  /**
+    * \brief returns all values as an eigen vector
+    */
+  bool checkStateForNumeric();
 
   /**
    * \brief returns the state at position INDEX in the state list, const version

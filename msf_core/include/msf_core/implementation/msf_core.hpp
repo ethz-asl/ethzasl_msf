@@ -244,8 +244,7 @@ void MSF_Core<EKFState_T>::stateCallback(const sensor_fusion_comm::ExtEkfConstPt
     currentState-> template get<StateDefinition_T::q>() = Eigen::Quaternion<double>(msg->state[6], msg->state[7], msg->state[8], msg->state[9]);
     currentState-> template get<StateDefinition_T::q>().normalize();
 
-    // zero props:
-    //copy non propagation states from last state
+    // zero props: copy non propagation states from last state
     boost::fusion::for_each(
         currentState->statevars,
         msf_tmp::copyNonPropagationStates<EKFState_T>(*lastState)

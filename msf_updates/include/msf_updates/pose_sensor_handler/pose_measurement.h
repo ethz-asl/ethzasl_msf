@@ -134,7 +134,7 @@ public:
 
     H_old.setZero();
 
-    if (const_state->time == -1)
+    if (const_state->time == -1 || !const_state->checkStateForNumeric())
     {
       ROS_WARN_STREAM("apply pose update was called with an invalid state");
       return;	// // early abort // //
@@ -159,7 +159,7 @@ public:
     H_old.block<3, 3>(0, 0) = C_wv.transpose() * state.get<StateDefinition_T::L>()(0); // p
     H_old.block<3, 3>(0, 6) = -C_wv.transpose() * C_q.transpose() * pci_sk * state.get<StateDefinition_T::L>()(0); // q
     H_old.block<3, 1>(0, 15) = C_wv.transpose() * C_q.transpose() * state.get<StateDefinition_T::p_ci>()
-                                + C_wv.transpose() * state.get<StateDefinition_T::p>(); // L
+                                    + C_wv.transpose() * state.get<StateDefinition_T::p>(); // L
     H_old.block<3, 3>(0, 16) = -C_wv.transpose() * skewold; // q_wv
     H_old.block<3, 3>(0, 22) = C_wv.transpose() * C_q.transpose() * state.get<StateDefinition_T::L>()(0); //p_ci
 
@@ -181,7 +181,20 @@ public:
     // vision world yaw drift
     q_err = state.get<StateDefinition_T::q_wv>();
     r_old(6, 0) = -2 * (q_err.w() * q_err.z() + q_err.x() * q_err.y())
-                                / (1 - 2 * (q_err.y() * q_err.y() + q_err.z() * q_err.z()));
+                                    / (1 - 2 * (q_err.y() * q_err.y() + q_err.z() * q_err.z()));
+
+    if(!checkForNumeric((double*)&r_old, nMeasurements, "r_old")){
+      ROS_ERROR_STREAM("r_old: "<<r_old);
+      ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
+    }
+    if(!checkForNumeric((double*)&H_old, H_old.RowsAtCompileTime * H_old.ColsAtCompileTime, "H_old")){
+      ROS_ERROR_STREAM("H_old: "<<H_old);
+      ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
+    }
+    if(!checkForNumeric((double*)&R_, R_.RowsAtCompileTime * R_.ColsAtCompileTime, "R_")){
+      ROS_ERROR_STREAM("R_: "<<R_);
+      ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
+    }
 
     // call update step in base class
     this->calculateAndApplyCorrection(const_state, core, H_old, r_old, R_);
