@@ -178,10 +178,10 @@ private:
   }
 
   virtual void calculateQAuxiliaryStates(EKFState_T& state, double dt){
-    msf_core::ConstVector3 nqwvv = Eigen::Vector3d::Constant(config_.noise_qwv);
-    msf_core::ConstVector3 nqciv = Eigen::Vector3d::Constant(config_.noise_qci);
-    msf_core::ConstVector3 npicv = Eigen::Vector3d::Constant(config_.noise_pci);
-    Eigen::Matrix<double, 1, 1> n_L = Eigen::Matrix<double, 1, 1>::Constant(config_.noise_scale);
+    const msf_core::Vector3 nqwvv = msf_core::Vector3::Constant(config_.noise_qwv);
+    const msf_core::Vector3 nqciv = msf_core::Vector3::Constant(config_.noise_qci);
+    const msf_core::Vector3 npicv = msf_core::Vector3::Constant(config_.noise_pci);
+    const msf_core::Vector1 n_L = msf_core::Vector1::Constant(config_.noise_scale);
 
     //compute the blockwise Q values and store them with the states,
     //these then get copied by the core to the correct places in Qd

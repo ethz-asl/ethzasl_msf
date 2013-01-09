@@ -298,12 +298,12 @@ void MSF_Core<EKFState_T>::propagateState(boost::shared_ptr<EKFState_T>& state_o
   );
 
   Eigen::Matrix<double, 3, 1> dv;
-  ConstVector3 ew = state_new->w_m - state_new-> template get<StateDefinition_T::b_w>();
-  ConstVector3 ewold = state_old->w_m - state_old-> template get<StateDefinition_T::b_w>();
-  ConstVector3 ea = state_new->a_m - state_new-> template get<StateDefinition_T::b_a>();
-  ConstVector3 eaold = state_old->a_m - state_old-> template get<StateDefinition_T::b_a>();
-  ConstMatrix4 Omega = omegaMatJPL(ew);
-  ConstMatrix4 OmegaOld = omegaMatJPL(ewold);
+  const Vector3 ew = state_new->w_m - state_new-> template get<StateDefinition_T::b_w>();
+  const Vector3 ewold = state_old->w_m - state_old-> template get<StateDefinition_T::b_w>();
+  const Vector3 ea = state_new->a_m - state_new-> template get<StateDefinition_T::b_a>();
+  const Vector3 eaold = state_old->a_m - state_old-> template get<StateDefinition_T::b_a>();
+  const Matrix4 Omega = omegaMatJPL(ew);
+  const Matrix4 OmegaOld = omegaMatJPL(ewold);
   Matrix4 OmegaMean = omegaMatJPL((ew + ewold) / 2);
 
   // zero order quaternion integration
@@ -322,7 +322,7 @@ void MSF_Core<EKFState_T>::propagateState(boost::shared_ptr<EKFState_T>& state_o
   }
 
   // first oder quat integration matrix
-  ConstMatrix4 quat_int = MatExp + 1.0 / 48.0 * (Omega * OmegaOld - OmegaOld * Omega) * dt * dt;
+  const Matrix4 quat_int = MatExp + 1.0 / 48.0 * (Omega * OmegaOld - OmegaOld * Omega) * dt * dt;
 
   // first oder quaternion integration
   state_new-> template get<StateDefinition_T::q>().coeffs() = quat_int * state_old-> template get<StateDefinition_T::q>().coeffs();
@@ -353,34 +353,34 @@ void MSF_Core<EKFState_T>::predictProcessCovariance(boost::shared_ptr<EKFState_T
   double dt = state_new->time - state_old->time;
 
   // noises
-  ConstVector3 nav = Vector3::Constant(usercalc_.getParam_noise_acc() /* / sqrt(dt) */);
-  ConstVector3 nbav = Vector3::Constant(usercalc_.getParam_noise_accbias() /* * sqrt(dt) */);
+  const Vector3 nav = Vector3::Constant(usercalc_.getParam_noise_acc() /* / sqrt(dt) */);
+  const Vector3 nbav = Vector3::Constant(usercalc_.getParam_noise_accbias() /* * sqrt(dt) */);
 
-  ConstVector3 nwv = Vector3::Constant(usercalc_.getParam_noise_gyr() /* / sqrt(dt) */);
-  ConstVector3 nbwv = Vector3::Constant(usercalc_.getParam_noise_gyrbias() /* * sqrt(dt) */);
+  const Vector3 nwv = Vector3::Constant(usercalc_.getParam_noise_gyr() /* / sqrt(dt) */);
+  const Vector3 nbwv = Vector3::Constant(usercalc_.getParam_noise_gyrbias() /* * sqrt(dt) */);
 
   // bias corrected IMU readings
-  ConstVector3 ew = state_new->w_m - state_new-> template get<StateDefinition_T::b_w>();
-  ConstVector3 ea = state_new->a_m - state_new-> template get<StateDefinition_T::b_a>();
+  const Vector3 ew = state_new->w_m - state_new-> template get<StateDefinition_T::b_w>();
+  const Vector3 ea = state_new->a_m - state_new-> template get<StateDefinition_T::b_a>();
 
-  ConstMatrix3 a_sk = skew(ea);
-  ConstMatrix3 w_sk = skew(ew);
-  ConstMatrix3 eye3 = Eigen::Matrix<double, 3, 3>::Identity();
+  const Matrix3 a_sk = skew(ea);
+  const Matrix3 w_sk = skew(ew);
+  const Matrix3 eye3 = Eigen::Matrix<double, 3, 3>::Identity();
 
-  ConstMatrix3 C_eq = state_new-> template get<StateDefinition_T::q>().toRotationMatrix();
+  const Matrix3 C_eq = state_new-> template get<StateDefinition_T::q>().toRotationMatrix();
 
   const double dt_p2_2 = dt * dt * 0.5; // dt^2 / 2
   const double dt_p3_6 = dt_p2_2 * dt / 3.0; // dt^3 / 6
   const double dt_p4_24 = dt_p3_6 * dt * 0.25; // dt^4 / 24
   const double dt_p5_120 = dt_p4_24 * dt * 0.2; // dt^5 / 120
 
-  ConstMatrix3 Ca3 = C_eq * a_sk;
-  ConstMatrix3 A = Ca3 * (-dt_p2_2 * eye3 + dt_p3_6 * w_sk - dt_p4_24 * w_sk * w_sk);
-  ConstMatrix3 B = Ca3 * (dt_p3_6 * eye3 - dt_p4_24 * w_sk + dt_p5_120 * w_sk * w_sk);
-  ConstMatrix3 D = -A;
-  ConstMatrix3 E = eye3 - dt * w_sk + dt_p2_2 * w_sk * w_sk;
-  ConstMatrix3 F = -dt * eye3 + dt_p2_2 * w_sk - dt_p3_6 * (w_sk * w_sk);
-  ConstMatrix3 C = Ca3 * F;
+  const Matrix3 Ca3 = C_eq * a_sk;
+  const Matrix3 A = Ca3 * (-dt_p2_2 * eye3 + dt_p3_6 * w_sk - dt_p4_24 * w_sk * w_sk);
+  const Matrix3 B = Ca3 * (dt_p3_6 * eye3 - dt_p4_24 * w_sk + dt_p5_120 * w_sk * w_sk);
+  const Matrix3 D = -A;
+  const Matrix3 E = eye3 - dt * w_sk + dt_p2_2 * w_sk * w_sk;
+  const Matrix3 F = -dt * eye3 + dt_p2_2 * w_sk - dt_p3_6 * (w_sk * w_sk);
+  const Matrix3 C = Ca3 * F;
 
   // discrete error state propagation Matrix Fd according to:
   // Stephan Weiss and Roland Siegwart.
