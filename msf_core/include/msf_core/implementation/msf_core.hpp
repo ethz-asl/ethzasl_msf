@@ -342,7 +342,12 @@ void MSF_Core<EKFState_T>::propagatePOneStep(){
   ++stateIteratorPLastPropagatedNext;
   if(stateIteratorPLastPropagatedNext != StateBuffer_.getIteratorEnd()){ //might happen if there is a measurement in the future
     predictProcessCovariance(stateIteratorPLastPropagated->second, stateIteratorPLastPropagatedNext->second);
-    checkForNumeric((double*)(&stateIteratorPLastPropagatedNext->second-> template get<StateDefinition_T::p>()(0)), 3, "prediction p");
+    if(!checkForNumeric((double*)(&stateIteratorPLastPropagatedNext->second-> template get<StateDefinition_T::p>()(0)), 3, "prediction p")){
+      ROS_WARN_STREAM("prop state from:\t"<<stateIteratorPLastPropagated->second->toEigenVector());
+      ROS_WARN_STREAM("prop state to:\t"<<stateIteratorPLastPropagatedNext->second->toEigenVector());
+      ROS_ERROR_STREAM("Resetting EKF");
+      predictionMade_ = initialized_ = false;
+    }
   }
 }
 
@@ -420,6 +425,10 @@ void MSF_Core<EKFState_T>::predictProcessCovariance(boost::shared_ptr<EKFState_T
 
 template<typename EKFState_T>
 void MSF_Core<EKFState_T>::init(boost::shared_ptr<MSF_MeasurementBase<EKFState_T> > measurement){
+
+  initialized_ = false;
+  predictionMade_ = false;
+
   MeasurementBuffer_.clear();
   StateBuffer_.clear();
   while(!queueFutureMeasurements_.empty())
@@ -445,7 +454,6 @@ void MSF_Core<EKFState_T>::init(boost::shared_ptr<MSF_MeasurementBase<EKFState_T
   time_P_propagated = 0; //will be set upon first IMU message
 
   initialized_ = true;
-  predictionMade_ = false;
 }
 
 template<typename EKFState_T>
@@ -584,12 +592,12 @@ boost::shared_ptr<EKFState_T> MSF_Core<EKFState_T>::getClosestState(double tstam
 
   //remove this relict from the state_idx days or find out why we need it and document here.
   //it seems this is needed when there was only one imu reading before the first measurement arrives{
-//  typename stateBufferT::iterator_T itbeg = StateBuffer_.getIteratorBegin();
-//  static bool started = false;
-//  if (itbeg == it && !started){
-//    ++it;
-//  }
-//  started = true;
+  //  typename stateBufferT::iterator_T itbeg = StateBuffer_.getIteratorBegin();
+  //  static bool started = false;
+  //  if (itbeg == it && !started){
+  //    ++it;
+  //  }
+  //  started = true;
   //}
 
   boost::shared_ptr<EKFState_T> closestState = it->second;
