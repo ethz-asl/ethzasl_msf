@@ -75,11 +75,11 @@ inline Eigen::Quaterniond geometry_msgsToEigen(const geometry_msgs::Quaternion &
  * \param start_col start column of the block; use \code{geometry_msgs::cov::p and geometry_msgs::cov::q}
  * \return 3x3 Eigen::Matrix covariance block
  */
-inline Eigen::Matrix<double, 3, 3> geometry_msgsCovBlockToEigen(
+inline Matrix3 geometry_msgsCovBlockToEigen(
     const geometry_msgs::PoseWithCovariance::_covariance_type & gcov , int start_row, int start_col)
 {
-  Eigen::Map<const Eigen::Matrix<double, 6, 6> > cov(gcov.data());
-  return Eigen::Matrix<double, 3, 3>(cov.block<3, 3>(start_row, start_col));
+  Eigen::Map<const Matrix6 > cov(gcov.data());
+  return Matrix3(cov.block<3, 3>(start_row, start_col));
 }
 
 /**
@@ -94,7 +94,7 @@ template<class Derived>
                                            const Eigen::MatrixBase<Derived> &ecov, int start_row, int start_col)
   {
     EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(Derived, 3, 3)
-    Eigen::Map<Eigen::Matrix<double, 6, 6> > _gcov(gcov.data());
+    Eigen::Map<Matrix6 > _gcov(gcov.data());
     _gcov.block<3, 3>(start_row, start_col) = ecov;
     if (start_row != start_col) // off diagonal entries --> we need to copy it to the opposite off-diagonal as well
       _gcov.block<3, 3>(start_col, start_row) = ecov.transpose();

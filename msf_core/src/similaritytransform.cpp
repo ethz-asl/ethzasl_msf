@@ -77,8 +77,8 @@ bool From6DoF::compute(Pose & pose, double *scale, double *cond, double eps)
     M += q.coeffs() * q.coeffs().transpose(); // order is x y z w here !!!
 
         //
-    const Eigen::Vector3d t1 = geometry_msgsToEigen(pp.first.pose.position);
-    const Eigen::Vector3d t2 = geometry_msgsToEigen(pp.second.pose.position);
+    const Vector3 t1 = geometry_msgsToEigen(pp.first.pose.position);
+    const Vector3 t2 = geometry_msgsToEigen(pp.second.pose.position);
 
     A.block<3, 3>(i * 3, 0) = Eigen::Matrix<double, 3, 3>::Identity() * -1;
     A.block<3, 1>(i * 3, 3) = q1.inverse() * t2;

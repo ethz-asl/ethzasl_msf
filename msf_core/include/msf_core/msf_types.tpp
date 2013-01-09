@@ -37,11 +37,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace msf_core{
 //typedefs
 typedef const Eigen::Matrix<double, 3, 3> ConstMatrix3;
-typedef Eigen::Matrix<double, 3, 3> Matrix3;
+//typedef Eigen::Matrix<double, 3, 3> Matrix3;
 typedef const Eigen::Matrix<double, 4, 4> ConstMatrix4;
-typedef Eigen::Matrix<double, 4, 4> Matrix4;
+//typedef Eigen::Matrix<double, 4, 4> Matrix4;
 typedef const Eigen::Matrix<double, 3, 1> ConstVector3;
-typedef Eigen::Vector3d Vector3;
+//typedef Eigen::Vector3d Vector3;
+
+#define MSF_MAKE_EIGEN_TYPES(DIMENSION) \
+    typedef Eigen::Matrix<double, DIMENSION, DIMENSION> Matrix##DIMENSION; \
+    typedef Eigen::Matrix<double, DIMENSION, 1> Vector##DIMENSION;
+  
+MSF_MAKE_EIGEN_TYPES(1)
+MSF_MAKE_EIGEN_TYPES(2)    
+MSF_MAKE_EIGEN_TYPES(3) 
+MSF_MAKE_EIGEN_TYPES(4)    
+MSF_MAKE_EIGEN_TYPES(5)    
+MSF_MAKE_EIGEN_TYPES(6)    
+MSF_MAKE_EIGEN_TYPES(7)    
+MSF_MAKE_EIGEN_TYPES(8)    
+MSF_MAKE_EIGEN_TYPES(9)  
 
 
 }

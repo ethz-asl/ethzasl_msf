@@ -43,7 +43,7 @@ int main(int argc, char** argv)
   const double s_q = 1e-2;
 
   // the pose we want to estimate
-  Eigen::Vector3d p(Eigen::Vector3d::Random());
+  Vector3 p(Vector3::Random());
   Eigen::Quaterniond q(Eigen::Matrix<double, 4, 1>::Random());
   q.normalize();
   double scale = 2;
@@ -53,14 +53,14 @@ int main(int argc, char** argv)
   // generate a set of measurements
   for (int i = 0; i < N; i++)
   {
-    Eigen::Vector3d p1;
-    p1 = p + Eigen::Vector3d::Random() * 0.1 + Eigen::Vector3d(3, 4, 5);
+    Vector3 p1;
+    p1 = p + Vector3::Random() * 0.1 + Vector3(3, 4, 5);
     Eigen::Quaterniond q1(Eigen::Matrix<double, 4, 1>::Random());
     q1.normalize();
 
-    Eigen::Vector3d p2 = (q1 * p + p1) / scale;
+    Vector3 p2 = (q1 * p + p1) / scale;
     Eigen::Quaterniond q2 = q1 * q;
-    p2 += (Eigen::Vector3d::Random() * s_p);
+    p2 += (Vector3::Random() * s_p);
     Eigen::Quaterniond q_noise(Eigen::Quaterniond::Identity());
     q_noise.coeffs() += Eigen::Matrix<double, 4, 1>::Random() * s_q;
     q_noise.normalize();
@@ -85,7 +85,7 @@ int main(int argc, char** argv)
   double _scale;
   T.compute(Pd, &_scale, &cond);
 
-  Eigen::Vector3d pr = geometry_msgsToEigen(Pd.pose.position);
+  Vector3 pr = geometry_msgsToEigen(Pd.pose.position);
   Eigen::Quaterniond qr = geometry_msgsToEigen(Pd.pose.orientation);
 
   std::cout << "\n#####\nResult:\tp:" << pr.transpose() << "\tq: " << qr.coeffs().transpose() << "\tscale: " << _scale
@@ -105,7 +105,7 @@ int main(int argc, char** argv)
   for (int r = 0; r < 6; r++)
     for (int c = 0; c < 6; c++)
       cov[r + c * 6] = r * c;
-  Eigen::Map<Eigen::Matrix<double, 6, 6> > covm(cov.data());
+  Eigen::Map<Matrix6 > covm(cov.data());
 
   std::cout<<"\n#####\ntest accessing blocks of cov: \n"<<covm<<
       "\np:\n"<<geometry_msgsCovBlockToEigen(cov, geometry_msgs::cov::p, geometry_msgs::cov::p)<<
@@ -115,9 +115,9 @@ int main(int argc, char** argv)
       std::endl;
 
   std::cout<<"\n#####\ntest writing blocks of cov: "<<std::endl;
-  Eigen::Matrix3d covp;
+  Matrix3 covp;
   covp << 31, 32, 33, 32, 34, 35, 33, 35, 36;
-  Eigen::Matrix3d covq;
+  Matrix3 covq;
   covq << 21, 22, 23, 22, 24, 25, 23, 25, 26;
   Eigen::Matrix<double, 4, 4> covpq;
   covpq << 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16; // just for fun a bigger one to test blocks
