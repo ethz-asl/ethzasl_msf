@@ -198,8 +198,10 @@ void MSF_Core<EKFState_T>::stateCallback(const sensor_fusion_comm::ExtEkfConstPt
 
   boost::shared_ptr<EKFState_T> lastState = StateBuffer_.getClosestBefore(msg->header.stamp.toSec());
 
-  if(lastState->time == -1)
-    return; // // early abort // //
+  if(lastState->time == -1){
+     ROS_WARN_STREAM_THROTTLE(2, "StateCallback: closest state is invalid\n");
+     return; // // early abort // //
+   }
 
 
   boost::shared_ptr<EKFState_T> currentState(new EKFState_T);
@@ -261,6 +263,17 @@ void MSF_Core<EKFState_T>::stateCallback(const sensor_fusion_comm::ExtEkfConstPt
   isnumeric = checkForNumeric((double*)(&currentState-> template get<StateDefinition_T::p>()[0]), 3, "prediction p");
   isnumeric = checkForNumeric((double*)(&currentState->P(0)), nErrorStatesAtCompileTime * nErrorStatesAtCompileTime, "prediction done P");
 
+  if(!predictionMade_){ //first prediction
+    ROS_WARN_STREAM("first prediction, buffer has "<<StateBuffer_.size()<<" states.");
+    if(StateBuffer_.size() != 0){
+      for(stateBufferT::iterator_T it = StateBuffer_.getIteratorBegin(); it!= StateBuffer_.getIteratorEnd(); ++it){
+        ROS_WARN_STREAM("state "<<(*it)->toEigenVector());
+      }
+      ROS_WARN_STREAM("current propagated state "<<currentState->toEigenVector());
+    }
+    StateBuffer_.clear();
+    queueFutureMeasurements_.clear();
+  }
   predictionMade_ = true;
 
   StateBuffer_.insert(currentState);
