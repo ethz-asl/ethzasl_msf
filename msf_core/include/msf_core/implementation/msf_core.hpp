@@ -199,9 +199,9 @@ void MSF_Core<EKFState_T>::stateCallback(const sensor_fusion_comm::ExtEkfConstPt
   boost::shared_ptr<EKFState_T> lastState = StateBuffer_.getClosestBefore(msg->header.stamp.toSec());
 
   if(lastState->time == -1){
-     ROS_WARN_STREAM_THROTTLE(2, "StateCallback: closest state is invalid\n");
-     return; // // early abort // //
-   }
+    ROS_WARN_STREAM_THROTTLE(2, "StateCallback: closest state is invalid\n");
+    return; // // early abort // //
+  }
 
 
   boost::shared_ptr<EKFState_T> currentState(new EKFState_T);
@@ -272,7 +272,8 @@ void MSF_Core<EKFState_T>::stateCallback(const sensor_fusion_comm::ExtEkfConstPt
       ROS_WARN_STREAM("current propagated state "<<currentState->toEigenVector());
     }
     StateBuffer_.clear();
-    queueFutureMeasurements_.clear();
+    while(!queueFutureMeasurements_.empty())
+      queueFutureMeasurements_.pop();
   }
   predictionMade_ = true;
 
