@@ -266,8 +266,8 @@ void MSF_Core<EKFState_T>::stateCallback(const sensor_fusion_comm::ExtEkfConstPt
   if(!predictionMade_){ //first prediction
     ROS_WARN_STREAM("first prediction, buffer has "<<StateBuffer_.size()<<" states.");
     if(StateBuffer_.size() != 0){
-      for(stateBufferT::iterator_T it = StateBuffer_.getIteratorBegin(); it!= StateBuffer_.getIteratorEnd(); ++it){
-        ROS_WARN_STREAM("state "<<(*it)->toEigenVector());
+      for(typename stateBufferT::iterator_T it = StateBuffer_.getIteratorBegin(); it!= StateBuffer_.getIteratorEnd(); ++it){
+        ROS_WARN_STREAM("state "<<it->second->toEigenVector());
       }
       ROS_WARN_STREAM("current propagated state "<<currentState->toEigenVector());
     }
