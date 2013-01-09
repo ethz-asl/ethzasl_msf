@@ -58,11 +58,13 @@ enum
 namespace msf_core
 {
 
-inline Eigen::Vector3d geometry_msgsToEigen(const geometry_msgs::Point & p)
+/// converts a geometry_msgs::Point to an Eigen Vector3d
+inline Vector3 geometry_msgsToEigen(const geometry_msgs::Point & p)
 {
-  return (Eigen::Vector3d() << p.x, p.y, p.z).finished();
+  return (Vector3() << p.x, p.y, p.z).finished();
 }
 
+/// converts a geometry_msgs::Quaternion to an Eigen::Quaterniond
 inline Eigen::Quaterniond geometry_msgsToEigen(const geometry_msgs::Quaternion & q)
 {
   return Eigen::Quaterniond(q.w, q.x, q.y, q.z);
@@ -100,6 +102,7 @@ template<class Derived>
       _gcov.block<3, 3>(start_col, start_row) = ecov.transpose();
   }
 
+/// converts any eigen vector with 3 elements to a geometry_msgs::Point
 template<class Derived>
   inline geometry_msgs::Point eigenToGeometry_msgs(const Eigen::MatrixBase<Derived> & p)
   {
@@ -113,6 +116,7 @@ template<class Derived>
     return _p;
   }
 
+/// converts an Eigen::Quaterniond to a geometry_msgs::Quaternion
 inline geometry_msgs::Quaternion eigenToGeometry_msgs(const Eigen::Quaterniond & q)
 {
   geometry_msgs::Quaternion _q;
@@ -124,19 +128,35 @@ inline geometry_msgs::Quaternion eigenToGeometry_msgs(const Eigen::Quaterniond &
 }
 
 
-
 namespace similarity_transform
 {
 
 typedef geometry_msgs::PoseWithCovariance Pose;
 typedef std::pair<Pose, Pose> PosePair;
 typedef std::vector<PosePair> PosePairVector;
+
+/** \class From6DoF
+ *
+ * \brief computes the average similarity transform (rotation, position, scale) between two sets of 6 DoF poses
+ */
 class From6DoF
 {
 public:
   From6DoF();
+  /// Adds a pair of measurements. No other computation is performed
   void addMeasurement(const PosePair & measurement);
+
+  /// Adds a pair of measurements. No other computation is performed
   void addMeasurement(const Pose & pose1, const Pose & pose2);
+
+  /***
+   * \brief computes the average similarity transform
+   * the transform is computed between the previously added sets of poses
+   * \param[out] pose resulting position / orientation
+   * \param[out] scale resulting scale: pos1 = pos2*scale
+   * \param[out] cond condition number of the problem to detect (non) sufficient number of measurements
+   * \param[in] eps in case of badly posed problems, eps can be set for the Moore-Penrose pseudo inverse
+   */
   bool compute(Pose & pose, double *scale = NULL, double *cond = NULL,
                double eps = std::numeric_limits<double>::epsilon() * 4 * 4);
 private:
