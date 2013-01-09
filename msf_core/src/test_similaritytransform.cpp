@@ -77,22 +77,59 @@ int main(int argc, char** argv)
     //std::cout<<"pose: \n\tp: "<<p1.transpose()<<"\tq: "<<q1.coeffs().transpose()<<std::endl;
 
     T.addMeasurement(P1, P2);
-
-    similarity_transform::Pose Pd;
-    double cond;
-    double _scale;
-    T.compute(Pd, &_scale, &cond);
-
-    Eigen::Vector3d pr = geometry_msgsToEigen(Pd.pose.position);
-    Eigen::Quaterniond qr = geometry_msgsToEigen(Pd.pose.orientation);
-
-    std::cout << "Result:\tp:" << pr.transpose() << "\tq: " << qr.coeffs().transpose() << "\tscale: " << _scale
-        << std::endl;
-    double p_err = (pr - p).norm();
-//  Eigen::Quaterniond q_err = qr.inverse()*q;
-    std::cout << "error\tp: " << p_err << "\tq: " << q.angularDistance(qr) * 180 / M_PI << "\tscale: "
-        << std::abs(1.0 - scale / _scale) * 100 << "%\tcond: " << cond << std::endl;
   }
+
+  // estimate pose
+  similarity_transform::Pose Pd;
+  double cond;
+  double _scale;
+  T.compute(Pd, &_scale, &cond);
+
+  Eigen::Vector3d pr = geometry_msgsToEigen(Pd.pose.position);
+  Eigen::Quaterniond qr = geometry_msgsToEigen(Pd.pose.orientation);
+
+  std::cout << "\n#####\nResult:\tp:" << pr.transpose() << "\tq: " << qr.coeffs().transpose() << "\tscale: " << _scale
+      << std::endl;
+  double p_err = (pr - p).norm();
+
+  std::cout << "error\tp: " << p_err << "\tq: " << q.angularDistance(qr) * 180 / M_PI << "\tscale: "
+      << std::abs(1.0 - scale / _scale) * 100 << "%\tcond: " << cond << std::endl;
+
+
+  // Xi matrix test
+  std::cout << "\n#####\ntest Xi: \n" << xiMat(q.coeffs()).transpose() * q.coeffs() << "\nshould be all 0" << std::endl;
+
+
+  // block writing test
+  similarity_transform::Pose::_covariance_type cov;
+  for (int r = 0; r < 6; r++)
+    for (int c = 0; c < 6; c++)
+      cov[r + c * 6] = r * c;
+  Eigen::Map<Eigen::Matrix<double, 6, 6> > covm(cov.data());
+
+  std::cout<<"\n#####\ntest accessing blocks of cov: \n"<<covm<<
+      "\np:\n"<<geometry_msgsCovBlockToEigen(cov, geometry_msgs::cov::p, geometry_msgs::cov::p)<<
+      "\nq:\n"<<geometry_msgsCovBlockToEigen(cov, geometry_msgs::cov::q, geometry_msgs::cov::q)<<
+      "\npq:\n"<<geometry_msgsCovBlockToEigen(cov, geometry_msgs::cov::p, geometry_msgs::cov::q)<<
+      "\nqp:\n"<<geometry_msgsCovBlockToEigen(cov, geometry_msgs::cov::q, geometry_msgs::cov::p)<<
+      std::endl;
+
+  std::cout<<"\n#####\ntest writing blocks of cov: "<<std::endl;
+  Eigen::Matrix3d covp;
+  covp << 31, 32, 33, 32, 34, 35, 33, 35, 36;
+  Eigen::Matrix3d covq;
+  covq << 21, 22, 23, 22, 24, 25, 23, 25, 26;
+  Eigen::Matrix<double, 4, 4> covpq;
+  covpq << 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16; // just for fun a bigger one to test blocks
+  std::cout<<
+      "\ncovp:\n"<<covp<<
+      "\ncovq:\n"<<covq<<
+      "\ncovpq (we will only take the block starting at 1,1):\n"<<covpq<<
+      std::endl;
+  eigenCovBlockToGeometry_msgs(cov, covp, geometry_msgs::cov::p, geometry_msgs::cov::p);
+  eigenCovBlockToGeometry_msgs(cov, covq, geometry_msgs::cov::q, geometry_msgs::cov::q);
+  eigenCovBlockToGeometry_msgs(cov, covpq.block<3, 3>(1, 1), geometry_msgs::cov::p, geometry_msgs::cov::q);
+  std::cout << "result: \n" << covm << std::endl;
 
   return 0;
 }

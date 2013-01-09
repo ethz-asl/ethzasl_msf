@@ -1,34 +1,33 @@
 /*
 
-Copyright (c) 2013, Markus Achtelik, ASL, ETH Zurich, Switzerland
-You can contact the author at <markus dot achtelik at mavt dot ethz dot ch>
+ Copyright (c) 2013, Markus Achtelik, ASL, ETH Zurich, Switzerland
+ You can contact the author at <markus dot achtelik at mavt dot ethz dot ch>
 
-All rights reserved.
+ All rights reserved.
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-* Redistributions of source code must retain the above copyright
-notice, this list of conditions and the following disclaimer.
-* Redistributions in binary form must reproduce the above copyright
-notice, this list of conditions and the following disclaimer in the
-documentation and/or other materials provided with the distribution.
-* Neither the name of ETHZ-ASL nor the
-names of its contributors may be used to endorse or promote products
-derived from this software without specific prior written permission.
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions are met:
+ * Redistributions of source code must retain the above copyright
+ notice, this list of conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright
+ notice, this list of conditions and the following disclaimer in the
+ documentation and/or other materials provided with the distribution.
+ * Neither the name of ETHZ-ASL nor the
+ names of its contributors may be used to endorse or promote products
+ derived from this software without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL ETHZ-ASL BE LIABLE FOR ANY
-DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ DISCLAIMED. IN NO EVENT SHALL ETHZ-ASL BE LIABLE FOR ANY
+ DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-*/
-
+ */
 
 #ifndef SIMILARITYTRANSFORM_H_
 #define SIMILARITYTRANSFORM_H_
@@ -40,9 +39,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Eigen/Geometry>
 #include <limits>
 
+#include <msf_core/msf_types.tpp>
+#include <msf_core/eigen_utils.h>
+
+/// defines the start row and col for the covariance entries in geometry_msgs::PoseWithCovariance
+namespace geometry_msgs
+{
+namespace cov
+{
+enum
+{
+  p = 0, q = 3
+};
+}
+}
+
+
 namespace msf_core
 {
-
 
 inline Eigen::Vector3d geometry_msgsToEigen(const geometry_msgs::Point & p)
 {
@@ -53,6 +67,38 @@ inline Eigen::Quaterniond geometry_msgsToEigen(const geometry_msgs::Quaternion &
 {
   return Eigen::Quaterniond(q.w, q.x, q.y, q.z);
 }
+
+/**
+ * \brief returns a 3x3 covariance block entry from a geometry_msgs::PoseWithCovariance::covariance array
+ * \param gcov the geometry_msgs::PoseWithCovariance::covariance array to get the block from
+ * \param start_row start row of the block; use \code{geometry_msgs::cov::p and geometry_msgs::cov::q}
+ * \param start_col start column of the block; use \code{geometry_msgs::cov::p and geometry_msgs::cov::q}
+ * \return 3x3 Eigen::Matrix covariance block
+ */
+inline Eigen::Matrix<double, 3, 3> geometry_msgsCovBlockToEigen(
+    const geometry_msgs::PoseWithCovariance::_covariance_type & gcov , int start_row, int start_col)
+{
+  Eigen::Map<const Eigen::Matrix<double, 6, 6> > cov(gcov.data());
+  return Eigen::Matrix<double, 3, 3>(cov.block<3, 3>(start_row, start_col));
+}
+
+/**
+ * \brief fills a 3x3 covariance block entry of a geometry_msgs::PoseWithCovariance::covariance array from an Eigen 3x3 matrix
+ * \param[out] gcov the geometry_msgs::PoseWithCovariance::covariance array to get the block from
+ * \param[in] start_row start row of the block; use \code{geometry_msgs::cov::p and geometry_msgs::cov::q}
+ * \param[in] start_col start column of the block; use \code{geometry_msgs::cov::p and geometry_msgs::cov::q}
+ * \param[in] 3x3 Eigen::Matrix covariance block
+ */
+template<class Derived>
+  inline void eigenCovBlockToGeometry_msgs(geometry_msgs::PoseWithCovariance::_covariance_type & gcov,
+                                           const Eigen::MatrixBase<Derived> &ecov, int start_row, int start_col)
+  {
+    EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(Derived, 3, 3)
+    Eigen::Map<Eigen::Matrix<double, 6, 6> > _gcov(gcov.data());
+    _gcov.block<3, 3>(start_row, start_col) = ecov;
+    if (start_row != start_col) // off diagonal entries --> we need to copy it to the opposite off-diagonal as well
+      _gcov.block<3, 3>(start_col, start_row) = ecov.transpose();
+  }
 
 template<class Derived>
   inline geometry_msgs::Point eigenToGeometry_msgs(const Eigen::MatrixBase<Derived> & p)
@@ -77,6 +123,8 @@ inline geometry_msgs::Quaternion eigenToGeometry_msgs(const Eigen::Quaterniond &
   return _q;
 }
 
+
+
 namespace similarity_transform
 {
 
@@ -89,7 +137,8 @@ public:
   From6DoF();
   void addMeasurement(const PosePair & measurement);
   void addMeasurement(const Pose & pose1, const Pose & pose2);
-  bool compute(Pose & pose, double *scale=NULL, double *cond=NULL, double eps=std::numeric_limits<double>::epsilon()*4*4);
+  bool compute(Pose & pose, double *scale = NULL, double *cond = NULL,
+               double eps = std::numeric_limits<double>::epsilon() * 4 * 4);
 private:
   PosePairVector measurements_;
 };
