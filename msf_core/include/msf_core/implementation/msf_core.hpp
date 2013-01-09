@@ -272,8 +272,6 @@ void MSF_Core<EKFState_T>::stateCallback(const sensor_fusion_comm::ExtEkfConstPt
       ROS_WARN_STREAM("current propagated state "<<currentState->toEigenVector());
     }
     StateBuffer_.clear();
-    while(!queueFutureMeasurements_.empty())
-      queueFutureMeasurements_.pop();
   }
   predictionMade_ = true;
 
