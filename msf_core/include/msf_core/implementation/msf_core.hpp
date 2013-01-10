@@ -443,6 +443,7 @@ void MSF_Core<EKFState_T>::init(boost::shared_ptr<MSF_MeasurementBase<EKFState_T
 
   MeasurementBuffer_.clear();
   StateBuffer_.clear();
+
   while(!queueFutureMeasurements_.empty())
     queueFutureMeasurements_.pop();
 
@@ -475,7 +476,7 @@ void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase<
     return;
 
   if(measurement->time > StateBuffer_.getLast()->time){
-    ROS_WARN_STREAM("You tried to give me a measurement in the future. Are you sure your clocks are synced and delays compensated correctly? I will store that and apply it next time... [measurement: "<<timehuman(measurement->time)<<" (s) latest state: "<<timehuman(StateBuffer_.getLast()->time)<<" (s)]");
+    //ROS_WARN_STREAM("You tried to give me a measurement in the future. Are you sure your clocks are synced and delays compensated correctly? I will store that and apply it next time... [measurement: "<<timehuman(measurement->time)<<" (s) latest state: "<<timehuman(StateBuffer_.getLast()->time)<<" (s)]");
     queueFutureMeasurements_.push(measurement);
     return;
   }
@@ -522,6 +523,8 @@ void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase<
         ROS_ERROR_STREAM("propagation : it_curr points to same state as it_next. This must not happen.");
         continue;
       }
+      if(!initialized_ || !predictionMade_) //break loop if EKF reset in the meantime
+        return;
       propagateState(it_curr->second, it_next->second);
     }
 
