@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <msf_core/msf_sensormanager.h>
 #include <msf_core/msf_tools.h>
 #include <msf_core/msf_measurement.h>
+#include <boost/thread.hpp>
 
 namespace msf_core
 {
@@ -169,7 +170,7 @@ void MSF_Core<EKFState_T>::imuCallback(const sensor_msgs::ImuConstPtr & msg)
 
   propagatePOneStep();
 
-  if(StateBuffer_.size() > 3)
+  if(StateBuffer_.size() > 3) //making sure the hl propagation has provided some data to apply measurements to
     predictionMade_ = true;
 
   msgPose_.header.stamp = msg->header.stamp;
@@ -184,8 +185,9 @@ void MSF_Core<EKFState_T>::imuCallback(const sensor_msgs::ImuConstPtr & msg)
 
   StateBuffer_.insert(currentState);
 
-  handlePendingMeasurements(); //check if we can apply some pending measurement
-
+  if(predictionMade_){
+    handlePendingMeasurements(); //check if we can apply some pending measurement
+  }
   seq++;
 }
 
@@ -444,6 +446,8 @@ void MSF_Core<EKFState_T>::init(boost::shared_ptr<MSF_MeasurementBase<EKFState_T
   MeasurementBuffer_.clear();
   StateBuffer_.clear();
 
+  boost::this_thread::sleep(boost::posix_time::milliseconds(10)); //hackish thread sync
+
   while(!queueFutureMeasurements_.empty())
     queueFutureMeasurements_.pop();
 
@@ -603,17 +607,6 @@ boost::shared_ptr<EKFState_T> MSF_Core<EKFState_T>::getClosestState(double tstam
   double timenow = tstamp; //delay compensated by sensor handler
 
   typename stateBufferT::iterator_T it = StateBuffer_.getIteratorClosest(timenow);
-
-
-  //remove this relict from the state_idx days or find out why we need it and document here.
-  //it seems this is needed when there was only one imu reading before the first measurement arrives{
-  //  typename stateBufferT::iterator_T itbeg = StateBuffer_.getIteratorBegin();
-  //  static bool started = false;
-  //  if (itbeg == it && !started){
-  //    ++it;
-  //  }
-  //  started = true;
-  //}
 
   boost::shared_ptr<EKFState_T> closestState = it->second;
 
