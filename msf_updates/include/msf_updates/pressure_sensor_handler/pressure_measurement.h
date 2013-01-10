@@ -108,7 +108,6 @@ public:
       idx_b_p = msf_tmp::getStartIndex<EKFState_T::StateSequence_T,
       typename msf_tmp::getEnumStateType<EKFState_T::StateSequence_T, StateDefinition_T::b_p>::value, msf_tmp::CorrectionStateLengthForType>::value
     };
-//    ROS_INFO_STREAM("Press apply meas: "<<z_p_<<" bias "<<(state.get<StateDefinition_T::b_p>())<<" position: "<<(state.get<StateDefinition_T::p>().block<1,1>(2, 0)));
 
     // construct H matrix using H-blockx :-)
     // position:

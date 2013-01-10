@@ -36,6 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <msf_core/msf_sensormanager.h>
 #include <msf_core/msf_tools.h>
 #include <msf_core/msf_measurement.h>
+#include <boost/thread.hpp>
 
 namespace msf_core
 {
@@ -169,7 +170,7 @@ void MSF_Core<EKFState_T>::imuCallback(const sensor_msgs::ImuConstPtr & msg)
 
   propagatePOneStep();
 
-  if(StateBuffer_.size() > 3)
+  if(StateBuffer_.size() > 3) //making sure the hl propagation has provided some data to apply measurements to
     predictionMade_ = true;
 
   msgPose_.header.stamp = msg->header.stamp;
@@ -184,8 +185,9 @@ void MSF_Core<EKFState_T>::imuCallback(const sensor_msgs::ImuConstPtr & msg)
 
   StateBuffer_.insert(currentState);
 
-  handlePendingMeasurements(); //check if we can apply some pending measurement
-
+  if(predictionMade_){
+    handlePendingMeasurements(); //check if we can apply some pending measurement
+  }
   seq++;
 }
 
@@ -198,8 +200,10 @@ void MSF_Core<EKFState_T>::stateCallback(const sensor_fusion_comm::ExtEkfConstPt
 
   boost::shared_ptr<EKFState_T> lastState = StateBuffer_.getClosestBefore(msg->header.stamp.toSec());
 
-  if(lastState->time == -1)
+  if(lastState->time == -1){
+    ROS_WARN_STREAM_THROTTLE(2, "StateCallback: closest state is invalid\n");
     return; // // early abort // //
+  }
 
 
   boost::shared_ptr<EKFState_T> currentState(new EKFState_T);
@@ -261,6 +265,16 @@ void MSF_Core<EKFState_T>::stateCallback(const sensor_fusion_comm::ExtEkfConstPt
   isnumeric = checkForNumeric((double*)(&currentState-> template get<StateDefinition_T::p>()[0]), 3, "prediction p");
   isnumeric = checkForNumeric((double*)(&currentState->P(0)), nErrorStatesAtCompileTime * nErrorStatesAtCompileTime, "prediction done P");
 
+  if(!predictionMade_){ //first prediction
+    ROS_WARN_STREAM("first prediction, buffer has "<<StateBuffer_.size()<<" states.");
+    if(StateBuffer_.size() != 0){
+      for(typename stateBufferT::iterator_T it = StateBuffer_.getIteratorBegin(); it!= StateBuffer_.getIteratorEnd(); ++it){
+        ROS_WARN_STREAM("state "<<it->second->toEigenVector());
+      }
+      ROS_WARN_STREAM("current propagated state "<<currentState->toEigenVector());
+    }
+    StateBuffer_.clear();
+  }
   predictionMade_ = true;
 
   StateBuffer_.insert(currentState);
@@ -342,7 +356,12 @@ void MSF_Core<EKFState_T>::propagatePOneStep(){
   ++stateIteratorPLastPropagatedNext;
   if(stateIteratorPLastPropagatedNext != StateBuffer_.getIteratorEnd()){ //might happen if there is a measurement in the future
     predictProcessCovariance(stateIteratorPLastPropagated->second, stateIteratorPLastPropagatedNext->second);
-    checkForNumeric((double*)(&stateIteratorPLastPropagatedNext->second-> template get<StateDefinition_T::p>()(0)), 3, "prediction p");
+    if(!checkForNumeric((double*)(&stateIteratorPLastPropagatedNext->second-> template get<StateDefinition_T::p>()(0)), 3, "prediction p")){
+      ROS_WARN_STREAM("prop state from:\t"<<stateIteratorPLastPropagated->second->toEigenVector());
+      ROS_WARN_STREAM("prop state to:\t"<<stateIteratorPLastPropagatedNext->second->toEigenVector());
+      ROS_ERROR_STREAM("Resetting EKF");
+      predictionMade_ = initialized_ = false;
+    }
   }
 }
 
@@ -420,8 +439,15 @@ void MSF_Core<EKFState_T>::predictProcessCovariance(boost::shared_ptr<EKFState_T
 
 template<typename EKFState_T>
 void MSF_Core<EKFState_T>::init(boost::shared_ptr<MSF_MeasurementBase<EKFState_T> > measurement){
+
+  initialized_ = false;
+  predictionMade_ = false;
+
   MeasurementBuffer_.clear();
   StateBuffer_.clear();
+
+  boost::this_thread::sleep(boost::posix_time::milliseconds(10)); //hackish thread sync
+
   while(!queueFutureMeasurements_.empty())
     queueFutureMeasurements_.pop();
 
@@ -445,7 +471,6 @@ void MSF_Core<EKFState_T>::init(boost::shared_ptr<MSF_MeasurementBase<EKFState_T
   time_P_propagated = 0; //will be set upon first IMU message
 
   initialized_ = true;
-  predictionMade_ = false;
 }
 
 template<typename EKFState_T>
@@ -455,7 +480,7 @@ void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase<
     return;
 
   if(measurement->time > StateBuffer_.getLast()->time){
-    ROS_WARN_STREAM("You tried to give me a measurement in the future. Are you sure your clocks are synced and delays compensated correctly? I will store that and apply it next time... [measurement: "<<timehuman(measurement->time)<<" (s) latest state: "<<timehuman(StateBuffer_.getLast()->time)<<" (s)]");
+    //ROS_WARN_STREAM("You tried to give me a measurement in the future. Are you sure your clocks are synced and delays compensated correctly? I will store that and apply it next time... [measurement: "<<timehuman(measurement->time)<<" (s) latest state: "<<timehuman(StateBuffer_.getLast()->time)<<" (s)]");
     queueFutureMeasurements_.push(measurement);
     return;
   }
@@ -502,6 +527,8 @@ void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase<
         ROS_ERROR_STREAM("propagation : it_curr points to same state as it_next. This must not happen.");
         continue;
       }
+      if(!initialized_ || !predictionMade_) //break loop if EKF reset in the meantime
+        return;
       propagateState(it_curr->second, it_next->second);
     }
 
@@ -580,17 +607,6 @@ boost::shared_ptr<EKFState_T> MSF_Core<EKFState_T>::getClosestState(double tstam
   double timenow = tstamp; //delay compensated by sensor handler
 
   typename stateBufferT::iterator_T it = StateBuffer_.getIteratorClosest(timenow);
-
-
-  //remove this relict from the state_idx days or find out why we need it and document here.
-  //it seems this is needed when there was only one imu reading before the first measurement arrives{
-//  typename stateBufferT::iterator_T itbeg = StateBuffer_.getIteratorBegin();
-//  static bool started = false;
-//  if (itbeg == it && !started){
-//    ++it;
-//  }
-//  started = true;
-  //}
 
   boost::shared_ptr<EKFState_T> closestState = it->second;
 
