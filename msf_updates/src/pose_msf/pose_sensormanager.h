@@ -111,6 +111,8 @@ private:
     p_vc = pose_handler_->getPositionMeasurement();
     q_cv = pose_handler_->getAttitudeMeasurement();
 
+    ROS_INFO_STREAM("initial measurement pos:["<<p_vc.transpose()<<"] orientation:["<<q_cv.w()<<", "<<q_cv.x()<<", "<<q_cv.y()<<", "<<q_cv.z()<<"]");
+
     // check if we have already input from the measurement sensor
     if (p_vc.norm() == 0)
       ROS_WARN_STREAM("No measurements received yet to initialize position - using [0 0 0]");

@@ -175,6 +175,7 @@ void MSF_Core<EKFState_T>::imuCallback(const sensor_msgs::ImuConstPtr & msg)
 
   msgPose_.header.stamp = msg->header.stamp;
   msgPose_.header.seq = msg->header.seq;
+  msgPose_.header.frame_id = "/world";
 
   currentState->toPoseMsg(msgPose_);
   pubPose_.publish(msgPose_);
