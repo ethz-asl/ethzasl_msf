@@ -77,6 +77,12 @@ private:
     }else{// take covariance from sensor
 
       R_.block<6, 6>(0, 0) = Eigen::Matrix<double, 6, 6>(&msg->pose.covariance[0]);
+
+      if(msg->header.seq % 100 == 0){ //only do this check from time to time
+        if(R_.block<6, 6>(0, 0).determinant()<=0)
+          ROS_ERROR_STREAM("The covariance matrix you provided is not positive definite");
+      }
+
       //clear cross-correlations between q and p
       R_.block<3, 3>(0, 3) = Eigen::Matrix<double, 3, 3>::Zero();
       R_.block<3, 3>(3, 0) = Eigen::Matrix<double, 3, 3>::Zero();
@@ -159,7 +165,7 @@ public:
     H_old.block<3, 3>(0, 0) = C_wv.transpose() * state.get<StateDefinition_T::L>()(0); // p
     H_old.block<3, 3>(0, 6) = -C_wv.transpose() * C_q.transpose() * pci_sk * state.get<StateDefinition_T::L>()(0); // q
     H_old.block<3, 1>(0, 15) = C_wv.transpose() * C_q.transpose() * state.get<StateDefinition_T::p_ci>()
-                                    + C_wv.transpose() * state.get<StateDefinition_T::p>(); // L
+                                        + C_wv.transpose() * state.get<StateDefinition_T::p>(); // L
     H_old.block<3, 3>(0, 16) = -C_wv.transpose() * skewold; // q_wv
     H_old.block<3, 3>(0, 22) = C_wv.transpose() * C_q.transpose() * state.get<StateDefinition_T::L>()(0); //p_ci
 
@@ -181,7 +187,7 @@ public:
     // vision world yaw drift
     q_err = state.get<StateDefinition_T::q_wv>();
     r_old(6, 0) = -2 * (q_err.w() * q_err.z() + q_err.x() * q_err.y())
-                                    / (1 - 2 * (q_err.y() * q_err.y() + q_err.z() * q_err.z()));
+                                        / (1 - 2 * (q_err.y() * q_err.y() + q_err.z() * q_err.z()));
 
     if(!checkForNumeric((double*)&r_old, nMeasurements, "r_old")){
       ROS_ERROR_STREAM("r_old: "<<r_old);

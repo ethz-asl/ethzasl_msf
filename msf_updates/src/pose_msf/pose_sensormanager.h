@@ -81,12 +81,12 @@ private:
    */
   virtual void config(Config_T &config, uint32_t level){
     config_ = config;
+    pose_handler_->setNoises(config.noise_position, config.noise_attitude);
+    pose_handler_->setDelay(config.delay);
     if((level & msf_updates::SinglePoseSensor_INIT_FILTER) && config.init_filter == true){
       init(config.initial_scale);
       config.init_filter = false;
     }
-    pose_handler_->setNoises(config.noise_position, config.noise_attitude);
-    pose_handler_->setDelay(config.delay);
   }
 
   void init(double scale)
