@@ -91,7 +91,7 @@ private:
 
   void init(double scale)
   {
-    Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ci, p_vc;
+    Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ci, p_vc, p_vw;
     Eigen::Quaternion<double> q, q_wv, q_ci, q_cv;
     msf_core::MSF_Core<EKFState_T>::ErrorStateCov P;
 
@@ -105,6 +105,7 @@ private:
     a_m =g;				/// initial acceleration
 
     q_wv.setIdentity(); // vision-world rotation drift
+    p_vw.setZero(); //vision-world position drift
 
     P.setZero(); // error state covariance; if zero, a default initialization in msf_core is used
 
@@ -146,7 +147,7 @@ private:
     meas->setStateInitValue<StateDefinition_T::b_a>(b_a);
     meas->setStateInitValue<StateDefinition_T::L>(Eigen::Matrix<double, 1, 1>::Constant(scale));
     meas->setStateInitValue<StateDefinition_T::q_wv>(q_wv);
-    meas->setStateInitValue<StateDefinition_T::q_wv>(q_wv);
+    meas->setStateInitValue<StateDefinition_T::p_vw>(p_vw);
     meas->setStateInitValue<StateDefinition_T::q_ci>(q_ci);
     meas->setStateInitValue<StateDefinition_T::p_ci>(p_ci);
 
@@ -181,6 +182,7 @@ private:
 
   virtual void calculateQAuxiliaryStates(EKFState_T& state, double dt){
     const msf_core::Vector3 nqwvv = msf_core::Vector3::Constant(config_.noise_qwv);
+    const msf_core::Vector3 npwvv = msf_core::Vector3::Constant(config_.noise_pvw);
     const msf_core::Vector3 nqciv = msf_core::Vector3::Constant(config_.noise_qci);
     const msf_core::Vector3 npicv = msf_core::Vector3::Constant(config_.noise_pci);
     const msf_core::Vector1 n_L = msf_core::Vector1::Constant(config_.noise_scale);
@@ -189,6 +191,7 @@ private:
     //these then get copied by the core to the correct places in Qd
     state.getQBlock<StateDefinition_T::L>() 	= (dt * n_L.cwiseProduct(n_L)).asDiagonal();
     state.getQBlock<StateDefinition_T::q_wv>() = (dt * nqwvv.cwiseProduct(nqwvv)).asDiagonal();
+    state.getQBlock<StateDefinition_T::p_vw>() = (dt * npwvv.cwiseProduct(npwvv)).asDiagonal();
     state.getQBlock<StateDefinition_T::q_ci>() = (dt * nqciv.cwiseProduct(nqciv)).asDiagonal();
     state.getQBlock<StateDefinition_T::p_ci>() = (dt * npicv.cwiseProduct(npicv)).asDiagonal();
   }

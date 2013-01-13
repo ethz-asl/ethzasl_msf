@@ -53,7 +53,8 @@ enum StateDefinition{ //must not manually set the enum values!
   L,
   q_wv,
   q_ci,
-  p_ci/*,
+  p_ci,
+  p_vw/*,
 	q_int_*/
 };
 
@@ -75,7 +76,8 @@ typedef boost::fusion::vector<
     msf_core::StateVar_T<Eigen::Matrix<double, 1, 1>, L>,                                                              ///< visual scale                     (16 / 15)
     msf_core::StateVar_T<Eigen::Quaternion<double>, q_wv, msf_core::AuxiliaryNonTemporalDrifting>,                     ///< vision-world attitude drift      (17-20 / 16-18)
     msf_core::StateVar_T<Eigen::Quaternion<double>, q_ci>,                                                             ///< camera-imu attitude calibration  (21-24 / 19-21)
-    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_ci>/*,                                                         ///< camera-imu position calibration  (25-27 / 22-24)
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_ci>,                                                            ///< camera-imu position calibration  (25-27 / 22-24)
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_vw>/*,                                                          ///< vision world position drift        (28-30 / 25-27)
 		 msf_core::StateVar_T<Eigen::Quaternion<double>, q_int_>	*/									///< this is the integrated ang. vel. no corrections applied, to use for delta rot in external algos...
 
 > fullState_T;

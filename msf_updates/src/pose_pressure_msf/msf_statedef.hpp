@@ -54,7 +54,8 @@ enum StateDefinition{ //must not manually set the enum values!
   q_wv,
   q_ci,
   p_ci,
-  b_p/*,
+  b_p,
+  p_vw/*,
 	q_int_*/
 };
 

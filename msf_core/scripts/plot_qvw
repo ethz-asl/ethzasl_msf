@@ -4,7 +4,7 @@ if [ -n "$1" ]
 then
 T=$1
 else
-T=20
+T=5
 fi
 
 echo " ### plotting vision-world drift qw qx qy qz [quat] ###"

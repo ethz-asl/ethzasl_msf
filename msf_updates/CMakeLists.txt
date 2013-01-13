@@ -28,4 +28,4 @@ find_package(Eigen REQUIRED)
 include_directories(${Eigen_INCLUDE_DIRS})
 
 add_subdirectory(src/pose_msf)
-add_subdirectory(src/pose_pressure_msf)
+#add_subdirectory(src/pose_pressure_msf)
