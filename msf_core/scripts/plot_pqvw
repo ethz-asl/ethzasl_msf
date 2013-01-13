@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if [ -n "$1" ]
+then
+T=$1
+else
+T=5
+fi
+
+echo " ### plotting vision-world drift px py pz [vector3] ###"
+echo " ### plotting vision-world drift qw qx qy qz [quat] ###"
+echo " ### buffer = " $T "sec"
+
+rxplot msf_core/state_out/data[28]:data[29]:data[30] msf_core/state_out/data[17]:data[18]:data[19]:data[20] -b $T -t "p_vw and q_vw" -l x,y,z,w,x,y,z 
+
