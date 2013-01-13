@@ -11,5 +11,5 @@ echo " ### plotting vision-world drift px py pz [vector3] ###"
 echo " ### plotting vision-world drift qw qx qy qz [quat] ###"
 echo " ### buffer = " $T "sec"
 
-rxplot msf_core/state_out/data[28]:data[29]:data[30] msf_core/state_out/data[17]:data[18]:data[19]:data[20] -b $T -t "p_vw and q_vw" -l x,y,z,w,x,y,z 
+rxplot msf_core/state_out/data[21]:data[22]:data[23] msf_core/state_out/data[17]:data[18]:data[19]:data[20] -b $T -t "p_vw and q_vw" -l x,y,z,w,x,y,z 
 
