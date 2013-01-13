@@ -117,6 +117,7 @@ public:
   bool fixed_covariance_;
 
   typedef msf_updates::EKFState EKFState_T;
+  typedef EKFState_T::StateSequence_T StateSequence_T;
   typedef EKFState_T::StateDefinition_T StateDefinition_T;
   virtual ~PoseMeasurement()
   {
@@ -160,23 +161,57 @@ public:
 
     Eigen::Matrix<double, 3, 3> pci_sk = skew(state.get<StateDefinition_T::p_ci>());
 
-    //only rotation drift vision world
+    //get indices of states in error vector
+    enum{
+      idxstartcorr_p_ = msf_tmp::getStartIndex<StateSequence_T,
+      typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::p>::value,
+      msf_tmp::CorrectionStateLengthForType>::value,
+
+      idxstartcorr_v_ = msf_tmp::getStartIndex<StateSequence_T,
+      typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::v>::value,
+      msf_tmp::CorrectionStateLengthForType>::value,
+
+      idxstartcorr_q_ = msf_tmp::getStartIndex<StateSequence_T,
+      typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::q>::value,
+      msf_tmp::CorrectionStateLengthForType>::value,
+
+      idxstartcorr_L_ = msf_tmp::getStartIndex<StateSequence_T,
+      typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::L>::value,
+      msf_tmp::CorrectionStateLengthForType>::value,
+
+      idxstartcorr_qwv_ = msf_tmp::getStartIndex<StateSequence_T,
+      typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::q_wv>::value,
+      msf_tmp::CorrectionStateLengthForType>::value,
+
+      idxstartcorr_pvw_ = msf_tmp::getStartIndex<StateSequence_T,
+      typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::p_vw>::value,
+      msf_tmp::CorrectionStateLengthForType>::value,
+
+      idxstartcorr_qci_ = msf_tmp::getStartIndex<StateSequence_T,
+      typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::q_ci>::value,
+      msf_tmp::CorrectionStateLengthForType>::value,
+
+      idxstartcorr_pci_ = msf_tmp::getStartIndex<StateSequence_T,
+      typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::p_ci>::value,
+      msf_tmp::CorrectionStateLengthForType>::value,
+    };
+
     // construct H matrix using H-blockx :-)
     // position:
-    H_old.block<3, 3>(0, 0) = C_wv.transpose() * state.get<StateDefinition_T::L>()(0); // p
-    H_old.block<3, 3>(0, 6) = -C_wv.transpose() * C_q.transpose() * pci_sk * state.get<StateDefinition_T::L>()(0); // q
+    H_old.block<3, 3>(0, idxstartcorr_p_) = C_wv.transpose() * state.get<StateDefinition_T::L>()(0); // p
+    H_old.block<3, 3>(0, idxstartcorr_q_) = -C_wv.transpose() * C_q.transpose() * pci_sk * state.get<StateDefinition_T::L>()(0); // q
 
-    H_old.block<3, 1>(0, 15) = C_wv.transpose() * C_q.transpose() * state.get<StateDefinition_T::p_ci>()
-                                            + C_wv.transpose() * state.get<StateDefinition_T::p>() + state.get<StateDefinition_T::p_vw>() ; // L
+    H_old.block<3, 1>(0, idxstartcorr_L_) = C_wv.transpose() * C_q.transpose() * state.get<StateDefinition_T::p_ci>()
+                                                + C_wv.transpose() * state.get<StateDefinition_T::p>() + state.get<StateDefinition_T::p_vw>() ; // L
 
-    H_old.block<3, 3>(0, 16) = -C_wv.transpose() * skewold; // q_wv
-    H_old.block<3, 3>(0, 22) = C_wv.transpose() * C_q.transpose() * state.get<StateDefinition_T::L>()(0); //p_ci
-    H_old.block<3, 3>(0, 25) = Eigen::Matrix<double,3,3>::Identity() * state.get<StateDefinition_T::L>()(0); //p_vw
+    H_old.block<3, 3>(0, idxstartcorr_qwv_) = -C_wv.transpose() * skewold; // q_wv
+    H_old.block<3, 3>(0, idxstartcorr_pci_) = C_wv.transpose() * C_q.transpose() * state.get<StateDefinition_T::L>()(0); //p_ci
+    H_old.block<3, 3>(0, idxstartcorr_pvw_) = Eigen::Matrix<double,3,3>::Identity() * state.get<StateDefinition_T::L>()(0); //p_vw
 
     // attitude
-    H_old.block<3, 3>(3, 6) = C_ci; // q
-    H_old.block<3, 3>(3, 16) = C_ci * C_q; // q_wv
-    H_old.block<3, 3>(3, 19) = Eigen::Matrix<double, 3, 3>::Identity(); //q_ci
+    H_old.block<3, 3>(3, idxstartcorr_q_) = C_ci; // q
+    H_old.block<3, 3>(3, idxstartcorr_qwv_) = C_ci * C_q; // q_wv
+    H_old.block<3, 3>(3, idxstartcorr_qci_) = Eigen::Matrix<double, 3, 3>::Identity(); //q_ci
     H_old(6, 18) = 1.0; // fix vision world yaw drift because unobservable otherwise (see PhD Thesis)
 
     // construct residuals
@@ -192,27 +227,7 @@ public:
     // vision world yaw drift
     q_err = state.get<StateDefinition_T::q_wv>();
     r_old(6, 0) = -2 * (q_err.w() * q_err.z() + q_err.x() * q_err.y())
-                                            / (1 - 2 * (q_err.y() * q_err.y() + q_err.z() * q_err.z()));
-
-    //end only
-    //position visionworld drift
-
-    //OK H_old.block(0,0,3,3) = C_wv.transpose()*state_old.L_;
-    //OK H_old.block(0,6,3,3) = -C_wv.transpose()*C_q.transpose()*pic_sk*state_old.L_;
-    //OK H_old.block(0,15,3,1) = C_wv.transpose()*C_q.transpose()*state_old.p_ic_ + C_wv.transpose()*state_old.p_+state_old.p_vw_;
-    //OK H_old.block(0,16,3,3) = -C_wv.transpose()*skewold;
-    //OK H_old.block(0,22,3,3) = C_wv.transpose()*C_q.transpose()*state_old.L_;
-    //H_old.block(0,31,3,3) = Eigen::Matrix<double,3,3>::Identity()*state_old.L_;
-    //OK H_old.block(3,6,3,3) = C_ci;
-    //OK H_old.block(3,16,3,3) = C_ci*C_q;
-    //OK H_old.block(3,19,3,3) = Eigen::Matrix<double,3,3>::Identity();
-
-    //Eigen::Quaternion<double> q_err;
-    //OK q_err = (state_old.q_wv_*state_old.q_*state_old.q_ci_).conjugate()*z_q_.conjugate();
-    //OK r_old.block(0,0,3,1) = z_p_ - (state_old.p_vw_+C_wv.transpose()*(state_old.p_ + C_q.transpose()*state_old.p_ic_))*state_old.L_;
-    //OK r_old.block(3,0,3,1) = q_err.vec()/q_err.w()*2;
-
-    //end position visionworld drift
+                                                / (1 - 2 * (q_err.y() * q_err.y() + q_err.z() * q_err.z()));
 
     if(!checkForNumeric((double*)&r_old, nMeasurements, "r_old")){
       ROS_ERROR_STREAM("r_old: "<<r_old);
