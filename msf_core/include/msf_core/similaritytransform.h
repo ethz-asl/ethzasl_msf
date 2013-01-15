@@ -73,8 +73,8 @@ inline Eigen::Quaterniond geometry_msgsToEigen(const geometry_msgs::Quaternion &
 /**
  * \brief returns a 3x3 covariance block entry from a geometry_msgs::PoseWithCovariance::covariance array
  * \param gcov the geometry_msgs::PoseWithCovariance::covariance array to get the block from
- * \param start_row start row of the block; use \code{geometry_msgs::cov::p and geometry_msgs::cov::q}
- * \param start_col start column of the block; use \code{geometry_msgs::cov::p and geometry_msgs::cov::q}
+ * \param start_row start row of the block; use \code geometry_msgs::cov::p and geometry_msgs::cov::q \endcode
+ * \param start_col start column of the block; use \code geometry_msgs::cov::p and geometry_msgs::cov::q \endcode
  * \return 3x3 Eigen::Matrix covariance block
  */
 inline Matrix3 geometry_msgsCovBlockToEigen(
@@ -87,9 +87,9 @@ inline Matrix3 geometry_msgsCovBlockToEigen(
 /**
  * \brief fills a 3x3 covariance block entry of a geometry_msgs::PoseWithCovariance::covariance array from an Eigen 3x3 matrix
  * \param[out] gcov the geometry_msgs::PoseWithCovariance::covariance array to get the block from
- * \param[in] start_row start row of the block; use \code{geometry_msgs::cov::p and geometry_msgs::cov::q}
- * \param[in] start_col start column of the block; use \code{geometry_msgs::cov::p and geometry_msgs::cov::q}
- * \param[in] 3x3 Eigen::Matrix covariance block
+ * \param[in] ecov 3x3 Eigen::Matrix covariance block
+ * \param[in] start_row start row of the block; use \code geometry_msgs::cov::p and geometry_msgs::cov::q \endcode
+ * \param[in] start_col start column of the block; use \code geometry_msgs::cov::p and geometry_msgs::cov::q \endcode
  */
 template<class Derived>
   inline void eigenCovBlockToGeometry_msgs(geometry_msgs::PoseWithCovariance::_covariance_type & gcov,
@@ -149,7 +149,7 @@ public:
   /// Adds a pair of measurements. No other computation is performed
   void addMeasurement(const Pose & pose1, const Pose & pose2);
 
-  /***
+  /**
    * \brief computes the average similarity transform
    * the transform is computed between the previously added sets of poses
    * \param[out] pose resulting position / orientation

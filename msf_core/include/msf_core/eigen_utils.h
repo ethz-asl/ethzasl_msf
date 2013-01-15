@@ -44,11 +44,11 @@ inline Eigen::Matrix<typename Derived::Scalar, 3, 3> skew(const Eigen::MatrixBas
   return (Eigen::Matrix<typename Derived::Scalar, 3, 3>() << 0.0, -vec[2], vec[1], vec[2], 0.0, -vec[0], -vec[1], vec[0], 0.0).finished();
 }
 
-/// returns a matrix with angular velocities used for quaternion derivatives/integration with the JPL notation
+/// Returns a matrix with angular velocities used for quaternion derivatives/integration with the JPL notation
 /**
  The quaternion to be multiplied with this matrix has to be in the order x y z w !!!
- \param <vec> {3D vector with angular velocities}
- \return {4x4 matrix for multiplication with the quaternion}
+ \param vec 3D vector with angular velocities
+ \return 4x4 matrix for multiplication with the quaternion
  */
 template<class Derived>
 inline Eigen::Matrix<typename Derived::Scalar, 4, 4> omegaMatJPL(const Eigen::MatrixBase<Derived> & vec)
@@ -66,8 +66,8 @@ inline Eigen::Matrix<typename Derived::Scalar, 4, 4> omegaMatJPL(const Eigen::Ma
 /// returns a matrix with angular velocities used for quaternion derivatives/integration with the Hamilton notation
 /**
  The quaternion to be multiplied with this matrix has to be in the order x y z w !!!
- \param <vec> {3D vector with angular velocities}
- \return {4x4 matrix for multiplication with the quaternion}
+ \param vec 3D vector with angular velocities
+ \return 4x4 matrix for multiplication with the quaternion
  */
 template<class Derived>
 inline Eigen::Matrix<typename Derived::Scalar, 4, 4> omegaMatHamilton(const Eigen::MatrixBase<Derived> & vec)
@@ -84,8 +84,8 @@ inline Eigen::Matrix<typename Derived::Scalar, 4, 4> omegaMatHamilton(const Eige
 
 /// returns a matrix to compute error quaternions
 /**
- \param <q_vec> {4D vector containing the quaternion's coefficients in the order x y z w}
- \return {4x3 matrix for error quaternion computation }
+ \param q_vec 4D vector containing the quaternion's coefficients in the order x y z w
+ \return 4x3 matrix for error quaternion computation
  \verbatim
  Xi = [ w*I + skew([x y z])]  ; dq = [ Xi q]^T * q
       [     -[x y z]       ]
