@@ -53,8 +53,6 @@ private:
 
   ros::Subscriber subPressure_;
 
-  std::queue<asctec_hl_comm::mav_imuConstPtr> delayqueue_;
-
   void measurementCallback(const asctec_hl_comm::mav_imuConstPtr & msg);
 
 public:

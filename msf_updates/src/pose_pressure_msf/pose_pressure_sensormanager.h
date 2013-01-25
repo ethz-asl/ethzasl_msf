@@ -173,7 +173,6 @@ private:
     meas->setStateInitValue<StateDefinition_T::b_a>(b_a);
     meas->setStateInitValue<StateDefinition_T::L>(Eigen::Matrix<double, 1, 1>::Constant(scale));
     meas->setStateInitValue<StateDefinition_T::q_wv>(q_wv);
-    meas->setStateInitValue<StateDefinition_T::q_wv>(q_wv);
     meas->setStateInitValue<StateDefinition_T::q_ci>(q_ci);
     meas->setStateInitValue<StateDefinition_T::p_ci>(p_ci);
     meas->setStateInitValue<StateDefinition_T::b_p>(b_p);

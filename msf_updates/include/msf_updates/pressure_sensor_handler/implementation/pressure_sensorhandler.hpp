@@ -50,21 +50,13 @@ void PressureSensorHandler::setNoises(double n_zp)
 }
 
 
-void PressureSensorHandler::measurementCallback(const asctec_hl_comm::mav_imuConstPtr & newmsg)
+void PressureSensorHandler::measurementCallback(const asctec_hl_comm::mav_imuConstPtr & msg)
 {
 
   bool throttle = true;
-  if(throttle && newmsg->header.seq % 10 != 0){
+  if(throttle && msg->header.seq % 10 != 0){
     return;
   }
-
-  //hack: delay the measurements by some time steps, because currently they arrive at the same time as the imu
-  delayqueue_.push(newmsg);
-  if(delayqueue_.size() < 1){
-    return;
-  }
-  asctec_hl_comm::mav_imuConstPtr msg = delayqueue_.front();
-  delayqueue_.pop();
 
   boost::shared_ptr<pressure_measurement::PressureMeasurement> meas( new pressure_measurement::PressureMeasurement(n_zp_));
   meas->makeFromSensorReading(msg, msg->header.stamp.toSec()); //added some delay to make the measurements arrive later than the state callback
