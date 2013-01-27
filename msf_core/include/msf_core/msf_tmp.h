@@ -541,6 +541,21 @@ struct getStartIndex{
 };
 
 /**
+ * \brief compute start indices in the correction vector of a given type
+ */
+template<typename Sequence, int StateEnum>
+struct getStartIndexInCorrection{
+  typedef typename boost::fusion::result_of::begin<Sequence const>::type First;
+  typedef typename boost::fusion::result_of::end<Sequence const>::type Last;
+  typedef typename  boost::fusion::result_of::deref<First>::type currentType;
+  enum{
+    value = msf_tmp::getStartIndex<Sequence,
+    typename msf_tmp::getEnumStateType<Sequence, StateEnum>::value,
+    msf_tmp::CorrectionStateLengthForType>::value
+  };
+};
+
+/**
  * \brief reset the EKF state in a boost fusion unrolled call
  */
 struct resetState

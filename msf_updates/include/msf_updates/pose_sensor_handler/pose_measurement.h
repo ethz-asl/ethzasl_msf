@@ -163,37 +163,21 @@ public:
 
     //get indices of states in error vector
     enum{
-      idxstartcorr_p_ = msf_tmp::getStartIndex<StateSequence_T,
-      typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::p>::value,
-      msf_tmp::CorrectionStateLengthForType>::value,
+      idxstartcorr_p_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::p>::value,
 
-      idxstartcorr_v_ = msf_tmp::getStartIndex<StateSequence_T,
-      typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::v>::value,
-      msf_tmp::CorrectionStateLengthForType>::value,
+      idxstartcorr_v_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::v>::value,
 
-      idxstartcorr_q_ = msf_tmp::getStartIndex<StateSequence_T,
-      typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::q>::value,
-      msf_tmp::CorrectionStateLengthForType>::value,
+      idxstartcorr_q_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::q>::value,
 
-      idxstartcorr_L_ = msf_tmp::getStartIndex<StateSequence_T,
-      typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::L>::value,
-      msf_tmp::CorrectionStateLengthForType>::value,
+      idxstartcorr_L_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::L>::value,
 
-      idxstartcorr_qwv_ = msf_tmp::getStartIndex<StateSequence_T,
-      typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::q_wv>::value,
-      msf_tmp::CorrectionStateLengthForType>::value,
+      idxstartcorr_qwv_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::q_wv>::value,
 
-      idxstartcorr_pvw_ = msf_tmp::getStartIndex<StateSequence_T,
-      typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::p_vw>::value,
-      msf_tmp::CorrectionStateLengthForType>::value,
+      idxstartcorr_pvw_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::p_vw>::value,
 
-      idxstartcorr_qci_ = msf_tmp::getStartIndex<StateSequence_T,
-      typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::q_ci>::value,
-      msf_tmp::CorrectionStateLengthForType>::value,
+      idxstartcorr_qci_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::q_ci>::value,
 
-      idxstartcorr_pci_ = msf_tmp::getStartIndex<StateSequence_T,
-      typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::p_ci>::value,
-      msf_tmp::CorrectionStateLengthForType>::value,
+      idxstartcorr_pci_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::p_ci>::value,
     };
 
     // construct H matrix using H-blockx :-)
