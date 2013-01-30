@@ -79,8 +79,8 @@ private:
       R_.block<6, 6>(0, 0) = Eigen::Matrix<double, 6, 6>(&msg->pose.covariance[0]);
 
       if(msg->header.seq % 100 == 0){ //only do this check from time to time
-        if(R_.block<6, 6>(0, 0).determinant()<=0)
-          ROS_ERROR_STREAM("The covariance matrix you provided is not positive definite");
+        if(R_.block<6, 6>(0, 0).determinant() < 0)
+          ROS_WARN_STREAM_THROTTLE(5,"The covariance matrix you provided is not positive definite");
       }
 
       //clear cross-correlations between q and p

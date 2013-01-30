@@ -84,7 +84,7 @@ public:
     std::pair<typename ListT::iterator,bool> itpr =
         stateList.insert(std::pair<double, boost::shared_ptr<T> >(value->time, value));
     if(!itpr.second){
-      ROS_WARN_STREAM("Wanted to insert a value to the sorted container at time "<<timehuman(value->time)<<" but the map already contained a value at this time. discarding.");
+      ROS_WARN_STREAM("Wanted to insert a value to the sorted container at time "<<std::fixed<<std::setprecision(9)<<value->time<<" but the map already contained a value at this time. discarding.");
     }
     return itpr.first;
   }
@@ -109,10 +109,11 @@ public:
    * \param value the value to get the iterator for
    * \returns iterator
    */
-  inline typename ListT::iterator getIteratorAtValue(const boost::shared_ptr<T>& value){
+  inline typename ListT::iterator getIteratorAtValue(const boost::shared_ptr<T>& value, bool warnIfNotExistant = true){
     typename ListT::iterator it = stateList.find(value->time);
     if(it==stateList.end()){ //there is no value in the map with this time
-      ROS_WARN_STREAM("getIteratorAtValue(state): Could not find value for time "<<value->time<<"");
+      if(warnIfNotExistant)
+        ROS_WARN_STREAM("getIteratorAtValue(state): Could not find value for time "<<std::fixed<<std::setprecision(9)<<value->time<<"");
       it = stateList.lower_bound(value->time);
     }
     return it;
@@ -125,10 +126,11 @@ public:
    * \param time the time where we want to get an iterator at
    * \returns iterator
    */
-  inline typename ListT::iterator getIteratorAtValue(const double& time){
+  inline typename ListT::iterator getIteratorAtValue(const double& time, bool warnIfNotExistant = true){
     typename ListT::iterator it = stateList.find(time);
     if(it==stateList.end()){ //there is no value in the map with this time
-      ROS_WARN_STREAM("getIteratorAtValue(double): Could not find value for time "<<time<<"");
+      if(warnIfNotExistant)
+        ROS_WARN_STREAM("getIteratorAtValue(double): Could not find value for time "<<std::fixed<<std::setprecision(9)<<time<<"");
       it = stateList.lower_bound(time);
     }
     return it;
@@ -296,7 +298,7 @@ public:
     if(it == stateList.end()){
       std::stringstream ss;
       ss<<"Wanted to update a states/measurements time, but could not find the old state, "
-          "for which the time was asked to be updated. time "<<msf_core::timehuman(timeOld)<<std::endl;
+          "for which the time was asked to be updated. time "<<std::fixed<<std::setprecision(9)<<timeOld<<std::endl;
 
       ss<<"Map: "<<std::endl;
       for(typename ListT::iterator it2 = stateList.begin(); it2!= stateList.end(); ++it2){
@@ -321,7 +323,7 @@ public:
     std::stringstream ss;
 
     for(typename ListT::iterator it = getIteratorBegin();it!=getIteratorEnd();++it){
-      ss<<msf_core::timehuman(it->second->time)<<std::endl;
+      ss<<std::fixed<<std::setprecision(9)<<it->second->time<<std::endl;
     }
     return ss.str();
 

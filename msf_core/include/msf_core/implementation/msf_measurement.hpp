@@ -64,8 +64,8 @@ void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrection(boost::shared_
   core.applyCorrection(state, correction_);
 }
 template<typename EKFState_T>
-void MSF_InitMeasurement<EKFState_T>::apply(boost::shared_ptr<EKFState_T> stateWithCovariance, MSF_Core<EKFState_T>& core){
-
+void MSF_InitMeasurement<EKFState_T>::apply(boost::shared_ptr<EKFState_T> stateWithCovariance, MSF_Core<EKFState_T>& core)
+{
 
   stateWithCovariance->time = ros::Time::now().toSec(); //makes this state a valid starting point
 
@@ -88,6 +88,7 @@ void MSF_InitMeasurement<EKFState_T>::apply(boost::shared_ptr<EKFState_T> stateW
     stateWithCovariance->a_m.setZero();
     stateWithCovariance->w_m.setZero();
   }
+
   core.initExternalPropagation(stateWithCovariance);
 
 }
