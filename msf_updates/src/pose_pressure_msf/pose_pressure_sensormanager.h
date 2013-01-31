@@ -92,10 +92,12 @@ private:
    */
   virtual void config(Config_T &config, uint32_t level){
     config_ = config;
+    //Init call with "init filter" checkbox
     if((level & msf_updates::SinglePoseSensor_INIT_FILTER) && config.init_filter == true){
       init(config.initial_scale);
       config.init_filter = false;
     }
+    //Init call with "set height" checkbox
     if((level & msf_updates::SinglePoseSensor_SET_HEIGHT) && config.set_height == true){
       Eigen::Matrix<double, 3, 1> p = pose_handler_->getPositionMeasurement();
       if (p.norm() == 0){

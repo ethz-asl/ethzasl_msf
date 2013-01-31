@@ -80,7 +80,7 @@ private:
 
       if(msg->header.seq % 100 == 0){ //only do this check from time to time
         if(R_.block<6, 6>(0, 0).determinant() < 0)
-          ROS_WARN_STREAM_THROTTLE(5,"The covariance matrix you provided is not positive definite");
+          ROS_WARN_STREAM_THROTTLE(60,"The covariance matrix you provided for the pose sensor is not positive definite");
       }
 
       //clear cross-correlations between q and p
@@ -164,19 +164,12 @@ public:
     //get indices of states in error vector
     enum{
       idxstartcorr_p_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::p>::value,
-
       idxstartcorr_v_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::v>::value,
-
       idxstartcorr_q_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::q>::value,
-
       idxstartcorr_L_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::L>::value,
-
       idxstartcorr_qwv_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::q_wv>::value,
-
       idxstartcorr_pvw_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::p_vw>::value,
-
       idxstartcorr_qci_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::q_ci>::value,
-
       idxstartcorr_pci_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::p_ci>::value,
     };
 
@@ -186,7 +179,7 @@ public:
     H_old.block<3, 3>(0, idxstartcorr_q_) = -C_wv.transpose() * C_q.transpose() * pci_sk * state.get<StateDefinition_T::L>()(0); // q
 
     H_old.block<3, 1>(0, idxstartcorr_L_) = C_wv.transpose() * C_q.transpose() * state.get<StateDefinition_T::p_ci>()
-                                                + C_wv.transpose() * state.get<StateDefinition_T::p>() + state.get<StateDefinition_T::p_vw>() ; // L
+                                                + C_wv.transpose() * state.get<StateDefinition_T::p>() + state.get<StateDefinition_T::p_vw>(); // L
 
     H_old.block<3, 3>(0, idxstartcorr_qwv_) = -C_wv.transpose() * skewold; // q_wv
     H_old.block<3, 3>(0, idxstartcorr_pci_) = C_wv.transpose() * C_q.transpose() * state.get<StateDefinition_T::L>()(0); //p_ci

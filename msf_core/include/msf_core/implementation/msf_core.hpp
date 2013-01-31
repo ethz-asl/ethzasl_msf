@@ -166,7 +166,7 @@ void MSF_Core<EKFState_T>::imuCallback(const sensor_msgs::ImuConstPtr & msg)
   propagateState(lastState, currentState);
   propagatePOneStep();
 
-  if(StateBuffer_.size() > 3) //making sure the hl propagation has provided some data to apply measurements to
+  if(StateBuffer_.size() > 3) //making sure we have sufficient states to apply measurements to
     predictionMade_ = true;
 
   msgPose_.header.stamp = msg->header.stamp;
@@ -260,7 +260,11 @@ void MSF_Core<EKFState_T>::stateCallback(const sensor_fusion_comm::ExtEkfConstPt
   isnumeric = checkForNumeric((double*)(&currentState-> template get<StateDefinition_T::p>()[0]), 3, "prediction p");
   isnumeric = checkForNumeric((double*)(&currentState->P(0)), nErrorStatesAtCompileTime * nErrorStatesAtCompileTime, "prediction done P");
 
-  if(!predictionMade_){ //we do another clean reset of state and measurement buffer, before we start propagation
+  if(!predictionMade_){ //clean reset of state and measurement buffer, before we start propagation
+
+    currentState->P = StateBuffer_.getLast()->P;//make sure we keep the covariance for the first state
+    time_P_propagated = currentState->time;
+
     StateBuffer_.clear();
     MeasurementBuffer_.clear();
     while(!queueFutureMeasurements_.empty()){
@@ -475,7 +479,7 @@ void MSF_Core<EKFState_T>::init(boost::shared_ptr<MSF_MeasurementBase<EKFState_T
                   "\tnoise_gyr:\t"<<usercalc_.getParam_noise_gyr()<<std::endl<<
                   "\tnoise_gyrbias:\t"<<usercalc_.getParam_noise_gyrbias()<<std::endl);
 
-//  ROS_INFO_STREAM("Initial state: \n"<<state->toEigenVector());
+  //  ROS_INFO_STREAM("Initial state: \n"<<state->toEigenVector());
   initialized_ = true;
 }
 
@@ -627,35 +631,33 @@ boost::shared_ptr<EKFState_T> MSF_Core<EKFState_T>::getClosestState(double tstam
   //do state interpolation if state is too far away from the measurement
   double tdiff = fabs(closestState->time - timenow); //timediff to closest state
 
-  if(tdiff > 0.001 && false){ // if time diff too large, insert new state and do state interpolation
+  if(tdiff > 0.001){ // if time diff too large, insert new state and do state interpolation
     boost::shared_ptr<EKFState_T> lastState = StateBuffer_.getClosestBefore(timenow);
     boost::shared_ptr<EKFState_T> nextState = StateBuffer_.getClosestAfter(timenow);
 
-    if(lastState->time == -1){
-      ROS_ERROR_STREAM("State interpolation: tdiff: "<<tdiff<<" closest state before is invalid\nmeas: "<<timehuman(tstamp)<<"buffer: \n"<<StateBuffer_.echoBufferContentTimes());
-      return StateBuffer_.getInvalid(); // // early abort // //
+    bool statevalid = lastState->time != -1 && nextState->time != -1;
+    bool statenotnan = lastState->checkStateForNumeric() && nextState->checkStateForNumeric();
+    bool statesnotsame = lastState->time != nextState->time;
+
+    if(statevalid && statenotnan && statesnotsame){ //if one of the states is invalid, we don't do interpolation, but just take closest
+
+      //prepare a new state
+      boost::shared_ptr<EKFState_T> currentState(new EKFState_T);
+      currentState->time = timenow; //set state time to measurement time
+      //linearly interpolate imu readings
+      currentState->a_m = lastState->a_m + (nextState->a_m - lastState->a_m) / (nextState->time - lastState->time) * (timenow - lastState->time);
+      currentState->w_m = lastState->w_m + (nextState->w_m - lastState->w_m) / (nextState->time - lastState->time) * (timenow - lastState->time);
+
+      propagateState(lastState, currentState); //propagate with respective dt
+
+      StateBuffer_.insert(currentState);
+
+      if(time_P_propagated > lastState->time){ //make sure we propagate P correctly to the new state
+        time_P_propagated = lastState->time;
+      }
+
+      closestState = currentState;
     }
-    if(nextState->time == -1){
-      ROS_ERROR_STREAM("State interpolation: tdiff: "<<tdiff<<" closest state after is invalid\nmeas: "<<timehuman(tstamp)<<"buffer: \n"<<StateBuffer_.echoBufferContentTimes());
-      return StateBuffer_.getInvalid(); // // early abort // //
-    }
-
-    //prepare a new state
-    boost::shared_ptr<EKFState_T> currentState(new EKFState_T);
-    currentState->time = timenow; //set state time to measurement time
-    //linearly interpolate imu readings
-    currentState->a_m = lastState->a_m + (nextState->a_m - lastState->a_m) / (nextState->time - lastState->time) * (timenow - lastState->time);
-    currentState->w_m = lastState->w_m + (nextState->w_m - lastState->w_m) / (nextState->time - lastState->time) * (timenow - lastState->time);
-
-    propagateState(lastState, currentState); //propagate with respective dt
-
-    StateBuffer_.insert(currentState);
-
-    if(time_P_propagated > lastState->time){ //make sure we propagate P correctly to the new state
-      time_P_propagated = lastState->time;
-    }
-
-    closestState = currentState;
   }
 
   propPToState(closestState); // catch up with covariance propagation if necessary
