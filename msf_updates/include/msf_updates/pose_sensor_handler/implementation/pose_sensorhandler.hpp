@@ -82,6 +82,7 @@ void PoseSensorHandler::measurementCallback(const geometry_msgs::TransformStampe
 {
 
   if(msg->header.seq%5!=0){ //slow down vicon
+    ROS_WARN_STREAM_THROTTLE(30, "Measurement throttling is on, dropping every but the 5th message");
     return;
   }
 

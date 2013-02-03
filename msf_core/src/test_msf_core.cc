@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <ros/ros.h>
-#include <msf_core/msf_core.hpp>
+#include <msf_core/msf_core.h>
 int main(int argc, char** argv)
 {
 //just to instantiate all templates, no production code
