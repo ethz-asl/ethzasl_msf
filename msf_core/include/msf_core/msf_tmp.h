@@ -386,6 +386,14 @@ struct getEnumStateType{
 };
 
 /**
+ * \brief return void type if index is -1
+ */
+template<typename TypeList>
+struct getEnumStateType<TypeList, -1>{
+  typedef mpl_::void_ value;
+};
+
+/**
  * \brief helper for getStartIndex{
  */
 template <typename Sequence, typename StateVarT, template<typename> class OffsetCalculator,
