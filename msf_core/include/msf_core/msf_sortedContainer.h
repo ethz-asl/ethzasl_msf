@@ -49,6 +49,7 @@ private:
   boost::shared_ptr<T> invalid; ///< a object to signal requests which cannot be satisfied
 public:
   typedef typename ListT::iterator iterator_T;
+  typedef boost::shared_ptr<T> Ptr_T;
 
   SortedContainer(){
     invalid.reset(new PrototypeInvalidT());

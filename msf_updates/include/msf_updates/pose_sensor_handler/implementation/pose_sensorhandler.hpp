@@ -54,6 +54,9 @@ PoseSensorHandler::PoseSensorHandler(msf_core::MSF_SensorManager<msf_updates::EK
   subPoseWithCovarianceStamped_ = nh.subscribe<geometry_msgs::PoseWithCovarianceStamped>("pose_with_covariance_input", 1, &PoseSensorHandler::measurementCallback, this);
   subTransformStamped_ = nh.subscribe<geometry_msgs::TransformStamped>("transform_input", 1, &PoseSensorHandler::measurementCallback, this);
   subPoseStamped_ = nh.subscribe<geometry_msgs::PoseStamped>("pose_input", 1, &PoseSensorHandler::measurementCallback, this);
+
+  z_p_.setZero();
+  z_q_.setIdentity();
             }
 
 void PoseSensorHandler::setNoises(double n_zp, double n_zq)

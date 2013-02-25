@@ -220,8 +220,8 @@ void MSF_Core<EKFState_T>::stateCallback(const sensor_fusion_comm::ExtEkfConstPt
   {
     if (fabs(currentState->time - lastState->time) > 5)
     {
-      ROS_WARN_STREAM_THROTTLE(2, "large time-gap re-initializing to last state\n");
-      StateBuffer_.updateTime(lastState->time, currentState->time);
+      typename stateBufferT::Ptr_T tmp = StateBuffer_.updateTime(lastState->time, currentState->time);
+      ROS_WARN_STREAM_THROTTLE(2, "large time-gap re-initializing to last state: "<<msf_core::timehuman(tmp->time));
       return; // // early abort // // (if timegap too big)
     }
   }
@@ -349,9 +349,12 @@ void MSF_Core<EKFState_T>::propagatePOneStep(){
   //also propagate the covariance one step further, to distribute the processing load over time
   typename stateBufferT::iterator_T stateIteratorPLastPropagated = StateBuffer_.getIteratorAtValue(time_P_propagated, false);
   typename stateBufferT::iterator_T stateIteratorPLastPropagatedNext = stateIteratorPLastPropagated;
+
   ++stateIteratorPLastPropagatedNext;
   if(stateIteratorPLastPropagatedNext != StateBuffer_.getIteratorEnd()){ //might happen if there is a measurement in the future
+
     predictProcessCovariance(stateIteratorPLastPropagated->second, stateIteratorPLastPropagatedNext->second);
+
     if(!checkForNumeric((double*)(&stateIteratorPLastPropagatedNext->second-> template get<StateDefinition_T::p>()(0)), 3, "prediction p")){
       ROS_WARN_STREAM("prop state from:\t"<<stateIteratorPLastPropagated->second->toEigenVector());
       ROS_WARN_STREAM("prop state to:\t"<<stateIteratorPLastPropagatedNext->second->toEigenVector());
@@ -417,6 +420,7 @@ void MSF_Core<EKFState_T>::predictProcessCovariance(boost::shared_ptr<EKFState_T
   calc_QCore(dt, state_new-> template get<StateDefinition_T::q>(), ew, ea, nav, nbav, nwv, nbwv, Qd_);
 
   //call user Q calc to fill in the blocks of auxiliary states
+  //TODO optim: make state Q-blocks map respective parts of Q using Eigen Map, avoids copy
   usercalc_.calculateQAuxiliaryStates(*state_new, dt);
 
   //now copy the userdefined blocks to Qd
@@ -425,7 +429,7 @@ void MSF_Core<EKFState_T>::predictProcessCovariance(boost::shared_ptr<EKFState_T
       msf_tmp::copyQBlocksFromAuxiliaryStatesToQ<StateSequence_T>(Qd_)
   );
 
-  //TODO later: optimize here multiplication of F blockwise, using the fact that aux states have no entries outside their block
+  //TODO optim: multiplication of F blockwise, using the fact that aux states have no entries outside their block
   state_new->P = Fd_ * state_old->P * Fd_.transpose() + Qd_;
 
   //set time for best cov prop to now
