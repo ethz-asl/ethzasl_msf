@@ -35,13 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Eigen/Dense>
 
 namespace msf_core{
-//typedefs
-//typedef const Eigen::Matrix<double, 3, 3> ConstMatrix3;
-//typedef Eigen::Matrix<double, 3, 3> Matrix3;
-//typedef const Eigen::Matrix<double, 4, 4> ConstMatrix4;
-//typedef Eigen::Matrix<double, 4, 4> Matrix4;
-//typedef const Eigen::Matrix<double, 3, 1> ConstVector3;
-//typedef Eigen::Vector3d Vector3;
+
+typedef Eigen::Quaternion<double> Quaternion;
 
 #define MSF_MAKE_EIGEN_TYPES(DIMENSION) \
     typedef Eigen::Matrix<double, DIMENSION, DIMENSION> Matrix##DIMENSION; \
