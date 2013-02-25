@@ -163,9 +163,6 @@ public:
 
 
 private:
-  Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> Fd_; ///< discrete state propagation matrix
-  Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> Qd_; ///< discrete propagation noise matrix
-
   stateBufferT StateBuffer_; ///<EKF buffer containing pretty much all info needed at time t. sorted by t asc
   measurementBufferT MeasurementBuffer_; ///< EKF Measurements and init values sorted by t asc
 

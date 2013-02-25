@@ -45,8 +45,6 @@ template<typename EKFState_T>
 MSF_Core<EKFState_T>::MSF_Core(MSF_SensorManager<EKFState_T>& usercalc):usercalc_(usercalc)  //the interface for the user to customize EKF interna, DO ABSOLUTELY NOT USE THIS POINTER INSIDE THIS CTOR!!
 {
 
-  Qd_.setZero();
-
   initialized_ = false;
   predictionMade_ = false;
 
@@ -370,6 +368,8 @@ void MSF_Core<EKFState_T>::predictProcessCovariance(boost::shared_ptr<EKFState_T
 
   double dt = state_new->time - state_old->time;
 
+  Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> Fd(Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime>::Identity()); ///< discrete state propagation matrix
+
   // noises
   const Vector3 nav = Vector3::Constant(usercalc_.getParam_noise_acc() /* / sqrt(dt) */);
   const Vector3 nbav = Vector3::Constant(usercalc_.getParam_noise_accbias() /* * sqrt(dt) */);
@@ -404,20 +404,22 @@ void MSF_Core<EKFState_T>::predictProcessCovariance(boost::shared_ptr<EKFState_T
   // Stephan Weiss and Roland Siegwart.
   // Real-Time Metric State Estimation for Modular Vision-Inertial Systems.
   // IEEE International Conference on Robotics and Automation. Shanghai, China, 2011
-  Fd_.setIdentity();
-  Fd_. template block<3, 3> (0, 3) = dt * eye3;
-  Fd_. template block<3, 3> (0, 6) = A;
-  Fd_. template block<3, 3> (0, 9) = B;
-  Fd_. template block<3, 3> (0, 12) = -C_eq * dt_p2_2;
+  Fd.setIdentity();
+  Fd. template block<3, 3> (0, 3) = dt * eye3;
+  Fd. template block<3, 3> (0, 6) = A;
+  Fd. template block<3, 3> (0, 9) = B;
+  Fd. template block<3, 3> (0, 12) = -C_eq * dt_p2_2;
 
-  Fd_. template block<3, 3> (3, 6) = C;
-  Fd_. template block<3, 3> (3, 9) = D;
-  Fd_. template block<3, 3> (3, 12) = -C_eq * dt;
+  Fd. template block<3, 3> (3, 6) = C;
+  Fd. template block<3, 3> (3, 9) = D;
+  Fd. template block<3, 3> (3, 12) = -C_eq * dt;
 
-  Fd_. template block<3, 3> (6, 6) = E;
-  Fd_. template block<3, 3> (6, 9) = F;
+  Fd. template block<3, 3> (6, 6) = E;
+  Fd. template block<3, 3> (6, 9) = F;
 
-  calc_QCore(dt, state_new-> template get<StateDefinition_T::q>(), ew, ea, nav, nbav, nwv, nbwv, Qd_);
+
+  Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> Qd(Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime>::Zero()); ///< discrete propagation noise matrix
+  calc_QCore(dt, state_new-> template get<StateDefinition_T::q>(), ew, ea, nav, nbav, nwv, nbwv, Qd);
 
   //call user Q calc to fill in the blocks of auxiliary states
   //TODO optim: make state Q-blocks map respective parts of Q using Eigen Map, avoids copy
@@ -426,11 +428,11 @@ void MSF_Core<EKFState_T>::predictProcessCovariance(boost::shared_ptr<EKFState_T
   //now copy the userdefined blocks to Qd
   boost::fusion::for_each(
       state_new->statevars,
-      msf_tmp::copyQBlocksFromAuxiliaryStatesToQ<StateSequence_T>(Qd_)
+      msf_tmp::copyQBlocksFromAuxiliaryStatesToQ<StateSequence_T>(Qd)
   );
 
   //TODO optim: multiplication of F blockwise, using the fact that aux states have no entries outside their block
-  state_new->P = Fd_ * state_old->P * Fd_.transpose() + Qd_;
+  state_new->P = Fd * state_old->P * Fd.transpose() + Qd;
 
   //set time for best cov prop to now
   time_P_propagated = state_new->time;
