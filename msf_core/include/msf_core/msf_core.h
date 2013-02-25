@@ -115,6 +115,13 @@ public:
   boost::shared_ptr<EKFState_T> getClosestState(double tstamp);
 
   /**
+   * \brief propagates the error state covariance
+   * \param state_old the state to propagate the covariance from
+   * \param state_new the state to propagate the covariance to
+   */
+  void predictProcessCovariance(boost::shared_ptr<EKFState_T>& state_old, boost::shared_ptr<EKFState_T>& state_new);
+
+  /**
    * \brief delete very old states and measurements from the buffers to free memory
    */
   void CleanUpBuffers(){
@@ -231,13 +238,6 @@ private:
    * \param state_new the state to propagate to
    */
   void propagateState(boost::shared_ptr<EKFState_T>& state_old, boost::shared_ptr<EKFState_T>& state_new);
-
-  /**
-   * \brief propagates the error state covariance
-   * \param state_old the state to propagate the covariance from
-   * \param state_new the state to propagate the covariance to
-   */
-  void predictProcessCovariance(boost::shared_ptr<EKFState_T>& state_old, boost::shared_ptr<EKFState_T>& state_new);
 
   /**
    * \brief applies the correction

@@ -404,7 +404,7 @@ void MSF_Core<EKFState_T>::predictProcessCovariance(boost::shared_ptr<EKFState_T
   // Stephan Weiss and Roland Siegwart.
   // Real-Time Metric State Estimation for Modular Vision-Inertial Systems.
   // IEEE International Conference on Robotics and Automation. Shanghai, China, 2011
-  Fd.setIdentity();
+
   Fd. template block<3, 3> (0, 3) = dt * eye3;
   Fd. template block<3, 3> (0, 6) = A;
   Fd. template block<3, 3> (0, 9) = B;
