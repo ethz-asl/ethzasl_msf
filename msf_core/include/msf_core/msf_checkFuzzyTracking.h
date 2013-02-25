@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2012, Simon Lynen, ASL, ETH Zurich, Switzerland
+Copyright (c) 2013, Simon Lynen, ASL, ETH Zurich, Switzerland
 You can contact the author at <slynen at ethz dot ch>
 
 All rights reserved.
@@ -118,7 +118,9 @@ public:
 
 template<typename EKFState_T>
 class CheckFuzzyTracking<EKFState_T, mpl_::void_>{
+public:
   void check(boost::shared_ptr<EKFState_T> delaystate, EKFState_T& buffstate, double fuzzythres){}
+  void reset();
 };
 
 }
