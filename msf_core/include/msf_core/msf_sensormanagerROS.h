@@ -35,8 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ros/ros.h>
 #include <msf_core/MSF_CoreConfig.h>
 #include <msf_core/msf_sensormanager.h>
-
-#include <ros/ros.h>
 #include <dynamic_reconfigure/server.h>
 
 namespace msf_core{
