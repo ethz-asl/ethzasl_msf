@@ -50,6 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 #include <queue>
 #include <msf_core/msf_state.h>
+#include <msf_core/msf_checkFuzzyTracking.h>
 
 //good old days...
 //#define N_STATE_BUFFER 256	///< size of unsigned char, do not change!
@@ -183,6 +184,7 @@ private:
   Eigen::Matrix<double, 3, 3> R_CI_; ///< Rot Camera->IMU
   Eigen::Matrix<double, 3, 3> R_WV_; ///< Rot World->Vision
 
+
   /// vision-world drift watch dog to determine fuzzy tracking
 
   /**
@@ -193,12 +195,7 @@ private:
   };
   typedef typename msf_tmp::getEnumStateType<StateSequence_T, indexOfStateWithoutTemporalDrift>::value nonDriftingStateType; //returns void type for invalid types
 
-  const static int qbuffRowsAtCompiletime = msf_tmp::StateLengthForType<const typename msf_tmp::StripConstReference<nonDriftingStateType>::result_t&>::value;
-
-  const static int nBuff_ = 30; ///< buffer size for median q_vw
-  int nontemporaldrifting_inittimer_; ///< a counter for fuzzy tracking detection
-  Eigen::Matrix<double, nBuff_, qbuffRowsAtCompiletime> qbuff_; //if there is no non temporal drifting state this matrix will have zero rows, to make use of it illegal
-
+  CheckFuzzyTracking<EKFState_T, nonDriftingStateType> fuzzyTracker_;
 
   /// enables internal state predictions for log replay
   /**

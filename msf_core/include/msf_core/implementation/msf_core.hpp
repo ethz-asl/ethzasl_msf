@@ -69,13 +69,6 @@ MSF_Core<EKFState_T>::MSF_Core(MSF_SensorManager<EKFState_T>& usercalc):usercalc
 
   pnh.param("data_playback", data_playback_, false);
 
-
-  // buffer for vision failure check
-  if(indexOfStateWithoutTemporalDrift != -1){
-    nontemporaldrifting_inittimer_ = 1;
-
-    qbuff_ = Eigen::Matrix<double, nBuff_, qbuffRowsAtCompiletime>::Constant(0);
-  }
   time_P_propagated = 0;
 
 }
@@ -737,57 +730,8 @@ bool MSF_Core<EKFState_T>::applyCorrection(boost::shared_ptr<EKFState_T>& delays
   //allow the user to sanity check the new state
   usercalc_.sanityCheckCorrection(*delaystate, buffstate, correction);
 
-  //TODO: move the whole fuzzy tracking to a templated function, which is specialized for void, Matrix, Quaternion
   //TODO: allow multiple fuzzy tracking states at the same time
-
-  if(indexOfStateWithoutTemporalDrift != -1){ //is there a state without temporal drift?
-
-    //for now make sure the non drifting state is a quaternion.
-
-    const bool isquaternion = msf_tmp::isQuaternionType<typename msf_tmp::StripConstReference<nonDriftingStateType>::result_t >::value;
-    BOOST_STATIC_ASSERT_MSG(isquaternion, "Assumed that the non drifting state is a Quaternion, "
-                            "which is not the case for the currently defined state vector. If you want to use an euclidean state, please first adapt qbuff and the error detection routines");
-
-
-    // update qbuff_ and check for fuzzy tracking
-    if (nontemporaldrifting_inittimer_ > nBuff_)
-    {
-      // should be unit quaternion if no error
-      Eigen::Quaternion<double> errq = const_cast<const EKFState_T&>(*delaystate). template get<indexOfStateWithoutTemporalDrift>().conjugate() *
-          Eigen::Quaternion<double>(
-              getMedian(qbuff_. template block<nBuff_, 1> (0, 3)),
-              getMedian(qbuff_. template block<nBuff_, 1> (0, 0)),
-              getMedian(qbuff_. template block<nBuff_, 1> (0, 1)),
-              getMedian(qbuff_. template block<nBuff_, 1> (0, 2))
-          );
-
-      double fuzzythres = usercalc_.getParam_fuzzythres();
-
-      if (std::max(errq.vec().maxCoeff(), -errq.vec().minCoeff()) / fabs(errq.w()) * 2 > fuzzythres) // fuzzy tracking (small angle approx)
-      {
-        ROS_WARN_STREAM_THROTTLE(1,"fuzzy tracking triggered: " << std::max(errq.vec().maxCoeff(), -errq.vec().minCoeff())/fabs(errq.w())*2 << " limit: " << fuzzythres <<"\n");
-
-        //copy the non propagation states back from the buffer
-        boost::fusion::for_each(
-            delaystate->statevars,
-            msf_tmp::copyNonPropagationStates<EKFState_T>(buffstate)
-        );
-
-        BOOST_STATIC_ASSERT_MSG(static_cast<int>(EKFState_T::nPropagatedCoreErrorStatesAtCompileTime) == 9, "Assumed that nPropagatedCoreStates == 9, which is not the case");
-
-      }
-      else // if tracking ok: update mean and 3sigma of past N q_vw's
-      {
-        qbuff_. template block<1, 4> (nontemporaldrifting_inittimer_ - nBuff_ - 1, 0) = Eigen::Matrix<double, 1, 4>(const_cast<const EKFState_T&>(*delaystate). template get<indexOfStateWithoutTemporalDrift>().coeffs());
-        nontemporaldrifting_inittimer_ = (nontemporaldrifting_inittimer_) % nBuff_ + nBuff_ + 1;
-      }
-    }
-    else // at beginning get mean and 3sigma of past N q_vw's
-    {
-      qbuff_. template block<1, 4> (nontemporaldrifting_inittimer_ - 1, 0) = Eigen::Matrix<double, 1, 4>(const_cast<const EKFState_T&>(*delaystate). template get<indexOfStateWithoutTemporalDrift>().coeffs());
-      nontemporaldrifting_inittimer_++;
-    }
-  } //end fuzzy tracking
+  fuzzyTracker_.check(delaystate, buffstate, fuzzythres);
 
   //no publishing and propagation here, because this might not be the last update we have to apply
 
