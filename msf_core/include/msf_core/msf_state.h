@@ -162,7 +162,7 @@ public:
    * \brief reset the state
    * 3D vectors: 0; quaternion: unit quaternion; scale: 1; time:0; Error covariance: zeros
    */
-  void reset(msf_core::StateVisitor<GenericState_T<StateSequence_T, StateDefinition_T> >* usercalc);
+  void reset(msf_core::StateVisitor<GenericState_T<StateSequence_T, StateDefinition_T> >* usercalc = 0);
 
   /**
    * \brief write the covariance corresponding to position and attitude to cov

@@ -226,7 +226,8 @@ void GenericState_T<stateVector_T, StateDefinition_T>::reset(msf_core::StateVisi
   time = 0;
 
   //now call the user provided function
-  statevisitor->resetState(*this);
+  if(statevisitor)
+    statevisitor->resetState(*this);
 }
 
 
