@@ -157,13 +157,6 @@ private:
 
     // call initialization in core
     msf_core_->init(meas);
-
-    ROS_INFO_STREAM("filter initialized to: \n" <<
-                    "position: [" << p[0] << ", " << p[1] << ", " << p[2] << "]" << std::endl <<
-                    "scale:" << scale << std::endl <<
-                    "attitude (w,x,y,z): [" << q.w() << ", " << q.x() << ", " << q.y() << ", " << q.z() << std::endl <<
-                    "p_ci: [" << p_ci[0] << ", " << p_ci[1] << ", " << p_ci[2] << std::endl <<
-                    "q_ci: (w,x,y,z): [" << q_ci.w() << ", " << q_ci.x() << ", " << q_ci.y() << ", " << q_ci.z() << "]");
   }
 
   //prior to this call, all states are initialized to zero/identity

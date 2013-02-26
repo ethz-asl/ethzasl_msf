@@ -496,8 +496,6 @@ void MSF_Core<EKFState_T>::init(boost::shared_ptr<MSF_MeasurementBase<EKFState_T
   //apply init measurement, where the user can provide additional values for P
   measurement->apply(state, *this);
 
-  ROS_WARN_STREAM("core init with state:"<<std::endl<<state->print());
-
   std::this_thread::sleep_for(std::chrono::milliseconds(100)); //wait for the external propagation to get the init message
 
   assert(state->time != 0);
@@ -514,7 +512,8 @@ void MSF_Core<EKFState_T>::init(boost::shared_ptr<MSF_MeasurementBase<EKFState_T
                   "\tnoise_gyr:\t"<<usercalc_.getParam_noise_gyr()<<std::endl<<
                   "\tnoise_gyrbias:\t"<<usercalc_.getParam_noise_gyrbias()<<std::endl);
 
-  //  ROS_INFO_STREAM("Initial state: \n"<<state->toEigenVector());
+
+  ROS_INFO_STREAM("core init with state:"<<std::endl<<state->print());
   initialized_ = true;
 }
 
