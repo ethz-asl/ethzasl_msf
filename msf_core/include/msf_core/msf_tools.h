@@ -36,21 +36,18 @@ namespace msf_core{
 /***
  * computes the median of a given vector
  */
-template<typename T>
-double getMedian(const T & data)
+template<typename D>
+typename Eigen::MatrixBase<D>::Scalar getMedian(const Eigen::MatrixBase<D> & data)
 {
-  BOOST_STATIC_ASSERT_MSG(T::ColsAtCompileTime == 1, "getMedian only takes Eigen column vectors as arguments");
-  std::vector<double> mediandistvec;
-  mediandistvec.reserve(T::RowsAtCompileTime);
-  for (int i = 0; i < T::RowsAtCompileTime; ++i)
-    mediandistvec.push_back(data(i));
+  BOOST_STATIC_ASSERT_MSG((Eigen::MatrixBase<D>::ColsAtCompileTime == 1), "getMedian only takes Eigen column vectors as arguments");
+  Eigen::Matrix<typename Eigen::MatrixBase<D>::Scalar, Eigen::MatrixBase<D>::RowsAtCompileTime, Eigen::MatrixBase<D>::ColsAtCompileTime> m = data; //cpy so we don't sort the original vector
 
-  if (mediandistvec.size() > 0)
+  if (Eigen::MatrixBase<D>::SizeAtCompileTime)
   {
-    std::vector<double>::iterator first = mediandistvec.begin();
-    std::vector<double>::iterator last = mediandistvec.end();
-    std::vector<double>::iterator middle = first + std::floor((last - first) / 2);
-    std::nth_element(first, middle, last); // can specify comparator as optional 4th arg
+    double * begin = m.data();
+    double * end   = m.data() + m.SizeAtCompileTime;
+    double * middle = begin + static_cast<int>(std::floor((end - begin) / 2));
+    std::nth_element(begin, middle, end);
     return *middle;
   }
   else
@@ -60,8 +57,13 @@ double getMedian(const T & data)
 /***
  * output the time in seconds in a human readable format for debugging
  */
-double timehuman(double val){
-  return val - floor(val/1000.)*1000;
+template<typename T>
+T timehuman(T val){
+  return val - floor(val/1000.)*1000.;
+}
+template<>
+float timehuman(float val){
+  return val - floorf(val/1000.f)*1000.f;
 }
 
 }
