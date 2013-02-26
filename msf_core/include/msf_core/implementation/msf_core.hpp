@@ -496,6 +496,8 @@ void MSF_Core<EKFState_T>::init(boost::shared_ptr<MSF_MeasurementBase<EKFState_T
   //apply init measurement, where the user can provide additional values for P
   measurement->apply(state, *this);
 
+  ROS_WARN_STREAM("core init with state:"<<std::endl<<state->print());
+
   std::this_thread::sleep_for(std::chrono::milliseconds(100)); //wait for the external propagation to get the init message
 
   assert(state->time != 0);

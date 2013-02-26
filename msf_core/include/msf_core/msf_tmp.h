@@ -777,6 +777,32 @@ struct getStateIndexInErrorState{
   };
 };
 
+/**
+ * \brief copies the values of the single state vars to the string provided
+ */
+template<typename STREAM, typename stateList_T>
+struct FullStatetoString
+{
+  FullStatetoString(STREAM& data):data_(data){}
+  template<int NAME, int N, int STATETYPE>
+  void operator()(msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE>& t) const {
+    typedef msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE> var_T;
+    enum{
+      startIdxInState = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::StateLengthForType>::value //index of the data in the state vector
+    };
+    data_ << NAME << " : ["<<startIdxInState<<"-"<<startIdxInState + N <<"]\t : Matrix<" << N << ", 1> : [" << t.state_.transpose() <<"]" << std::endl;
+  }
+  template<int NAME, int STATETYPE>
+  void operator()(msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE>& t) const {
+    typedef msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE> var_T;
+    enum{
+      startIdxInState = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::StateLengthForType>::value //index of the data in the state vector
+    };
+    data_ << NAME << " : ["<<startIdxInState<<"-"<<startIdxInState + 4 <<"]\t : Quaternion (w,x,y,z) : [" << t.state_.w() << ", " << t.state_.x() << ", " << t.state_.y() << ", " << t.state_.z() << "]" << std::endl;
+  }
+private:
+  STREAM& data_;
+};
 
 /**
  * \brief copies the values of the single state vars to the double array provided

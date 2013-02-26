@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sensor_fusion_comm/ExtState.h>
 #include <sensor_fusion_comm/DoubleArrayStamped.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <boost/lexical_cast.hpp>
 
 namespace msf_core{
 
@@ -155,6 +156,18 @@ Eigen::Matrix<double, GenericState_T<stateVector_T, StateDefinition_T>::nCoreSta
       msf_tmp::CoreStatetoDoubleArray<typename Eigen::Matrix<double, GenericState_T<stateVector_T, StateDefinition_T>::nCoreStatesAtCompileTime, 1>, stateVector_T >(data)
   );
   return data;
+}
+
+template<typename stateVector_T, typename StateDefinition_T>
+std::string GenericState_T<stateVector_T, StateDefinition_T>::print(){//boost fusion unfortunately doesn't like this to be const
+  std::stringstream ss;
+  ss<<"--------- State at time " << msf_core::timehuman(time) << "s: ---------" << std::endl;
+  boost::fusion::for_each(
+      statevars,
+      msf_tmp::FullStatetoString<std::stringstream, stateVector_T>(ss)
+  );
+  ss << "-------------------------------------------------------";
+  return ss.str();
 }
 
 template<typename stateVector_T, typename StateDefinition_T>

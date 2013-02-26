@@ -200,6 +200,11 @@ public:
   Eigen::Matrix<double, nCoreStatesAtCompileTime, 1> toEigenVector();
 
   /**
+   * \brief returns a string describing the state
+   */
+  std::string print();
+
+  /**
     * \brief returns all values as an eigen vector
     */
   bool checkStateForNumeric();
