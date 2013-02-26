@@ -36,19 +36,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <msf_core/eigen_utils.h>
 
 namespace msf_pose_sensor{
-PoseSensorHandler::PoseSensorHandler(msf_core::MSF_SensorManager<msf_updates::EKFState>& meas) :
-            SensorHandler<msf_updates::EKFState>(meas), n_zp_(1e-6), n_zq_(1e-6), delay_(0)
+PoseSensorHandler::PoseSensorHandler(msf_core::MSF_SensorManager<msf_updates::EKFState>& meas, bool provides_absolute_measurements) :
+            SensorHandler<msf_updates::EKFState>(meas), n_zp_(1e-6), n_zq_(1e-6), delay_(0), provides_absolute_measurements_(provides_absolute_measurements)
             {
   ros::NodeHandle pnh("~");
   pnh.param("measurement_world_sensor", measurement_world_sensor_, true);
   pnh.param("use_fixed_covariance", use_fixed_covariance_, false);
 
-  ROS_INFO_COND(measurement_world_sensor_, "interpreting measurement as sensor w.r.t. world");
-  ROS_INFO_COND(!measurement_world_sensor_, "interpreting measurement as world w.r.t. sensor (e.g. ethzasl_ptam)");
+  ROS_INFO_COND(measurement_world_sensor_, "Pose sensor is interpreting measurement as sensor w.r.t. world");
+  ROS_INFO_COND(!measurement_world_sensor_, "Pose sensor is interpreting measurement as world w.r.t. sensor (e.g. ethzasl_ptam)");
 
-  ROS_INFO_COND(use_fixed_covariance_, "using fixed covariance");
-  ROS_INFO_COND(!use_fixed_covariance_, "using covariance from sensor");
+  ROS_INFO_COND(use_fixed_covariance_, "Pose sensor is using fixed covariance");
+  ROS_INFO_COND(!use_fixed_covariance_, "Pose sensor is using covariance from sensor");
 
+  ROS_INFO_COND(provides_absolute_measurements, "Pose sensor is handling measurements as absolute values");
+  ROS_INFO_COND(!provides_absolute_measurements, "Pose sensor is handling measurements as relative values");
 
   ros::NodeHandle nh("msf_updates");
   subPoseWithCovarianceStamped_ = nh.subscribe<geometry_msgs::PoseWithCovarianceStamped>("pose_with_covariance_input", 1, &PoseSensorHandler::measurementCallback, this);
@@ -72,7 +74,7 @@ void PoseSensorHandler::setDelay(double delay)
 void PoseSensorHandler::measurementCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg)
 {
 
-  boost::shared_ptr<pose_measurement::PoseMeasurement> meas( new pose_measurement::PoseMeasurement(n_zp_, n_zq_, measurement_world_sensor_, use_fixed_covariance_));
+  boost::shared_ptr<pose_measurement::PoseMeasurement> meas( new pose_measurement::PoseMeasurement(n_zp_, n_zq_, measurement_world_sensor_, use_fixed_covariance_, provides_absolute_measurements_, this->sensorID));
   meas->makeFromSensorReading(msg, msg->header.stamp.toSec() - delay_);
 
   z_p_ = meas->z_p_; //store this for the init procedure

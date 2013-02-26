@@ -47,7 +47,8 @@ enum
 /**
  * \brief a measurement as provided by a pose tracking algorithm
  */
-struct PoseMeasurement : public msf_core::MSF_Measurement<geometry_msgs::PoseWithCovarianceStamped, nMeasurements, msf_updates::EKFState>
+typedef msf_core::MSF_Measurement<geometry_msgs::PoseWithCovarianceStamped, nMeasurements, msf_updates::EKFState> PoseMeasurementBase;
+struct PoseMeasurement : public PoseMeasurementBase
 {
 private:
   typedef msf_core::MSF_Measurement<geometry_msgs::PoseWithCovarianceStamped, nMeasurements, msf_updates::EKFState> Measurement_t;
@@ -122,7 +123,8 @@ public:
   virtual ~PoseMeasurement()
   {
   }
-  PoseMeasurement(double n_zp, double n_zq, bool measurement_world_sensor, bool fixed_covariance) :
+  PoseMeasurement(double n_zp, double n_zq, bool measurement_world_sensor, bool fixed_covariance, bool isabsoluteMeasurement, int sensorID) :
+    PoseMeasurementBase(isabsoluteMeasurement, sensorID),
     n_zp_(n_zp), n_zq_(n_zq), measurement_world_sensor_(measurement_world_sensor), fixed_covariance_(fixed_covariance)
   {
   }

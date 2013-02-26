@@ -60,13 +60,14 @@ private:
 
   bool measurement_world_sensor_; ///< defines if the pose of the sensor is measured in world coordinates (true, default) or vice versa (false, e.g. PTAM)
   bool use_fixed_covariance_; ///< use fixed covariance set by dynamic reconfigure
+  bool provides_absolute_measurements_; ///<does this sensor measure relative or absolute values
 
   void measurementCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg);
   void measurementCallback(const geometry_msgs::PoseStampedConstPtr & msg);
   void measurementCallback(const geometry_msgs::TransformStampedConstPtr & msg);
 
 public:
-  PoseSensorHandler(msf_core::MSF_SensorManager<msf_updates::EKFState>& meas);
+  PoseSensorHandler(msf_core::MSF_SensorManager<msf_updates::EKFState>& meas, bool provides_absolute_measurements);
   //used for the init
   Eigen::Matrix<double, 3, 1> getPositionMeasurement(){
     return z_p_;

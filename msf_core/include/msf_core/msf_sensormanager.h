@@ -51,6 +51,8 @@ class MSF_Core;
 template<typename EKFState_T>
 class MSF_SensorManager:public StateVisitor<EKFState_T>
 {
+private:
+  int sensorID_;
 protected:
   typedef std::vector<boost::shared_ptr<SensorHandler<EKFState_T> > > Handlers;
   Handlers handlers; ///<a list of sensor handlers which provide measurements
@@ -71,6 +73,7 @@ public:
    */
   void addHandler(boost::shared_ptr<SensorHandler<EKFState_T> > handler)
   {
+    handler->setSensorID(sensorID_++);
     handlers.push_back(handler);
   }
 
@@ -127,11 +130,14 @@ public:
 template<typename EKFState_T>
 class SensorHandler
 {
+  friend class MSF_SensorManager<EKFState_T>;
 protected:
   MSF_SensorManager<EKFState_T>& manager_;
+  int sensorID;
+  void setSensorID(int ID){sensorID = ID;}
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  SensorHandler(MSF_SensorManager<EKFState_T>& mng):manager_(mng){}
+  SensorHandler(MSF_SensorManager<EKFState_T>& mng):manager_(mng), sensorID(-1){}
   virtual ~SensorHandler() {}
 };
 

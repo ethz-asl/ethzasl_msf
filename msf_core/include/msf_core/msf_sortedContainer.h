@@ -100,6 +100,14 @@ public:
   }
 
   /**
+   * \brief returns the iterator before the beginning of the internal container
+   */
+  inline typename ListT::iterator getIteratorBeforeBegin(){
+    typename ListT::iterator it =  stateList.begin();
+    return --it;
+  }
+
+  /**
    * \brief returns the iterator at the end of the internal container
    */
   inline typename ListT::iterator getIteratorEnd(){

@@ -116,6 +116,22 @@ public:
   boost::shared_ptr<EKFState_T> getClosestState(double tstamp);
 
   /**
+   * \brief returns the accumulated dynamic matrix between two states
+   */
+  void getAccumF_SC(const boost::shared_ptr<EKFState_T>& state_old, const boost::shared_ptr<EKFState_T>& state_new,
+                    Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime>& F);
+  /**
+   * \brief returns previous measurement of the same type
+   */
+  boost::shared_ptr<msf_core::MSF_MeasurementBase<EKFState_T> > getPreviousMeasurement(double time, int sensorID);
+
+  /**
+   * \brief finds the state at the requested time in the internal state
+   * \param tstamp the time stamp to find the state to
+   */
+  boost::shared_ptr<EKFState_T> getStateAtTime(double tstamp);
+
+  /**
    * \brief propagates the error state covariance
    * \param state_old the state to propagate the covariance from
    * \param state_new the state to propagate the covariance to

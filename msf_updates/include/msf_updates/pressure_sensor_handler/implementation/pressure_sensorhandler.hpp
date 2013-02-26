@@ -58,7 +58,7 @@ void PressureSensorHandler::measurementCallback(const asctec_hl_comm::mav_imuCon
     return;
   }
 
-  boost::shared_ptr<pressure_measurement::PressureMeasurement> meas( new pressure_measurement::PressureMeasurement(n_zp_));
+  boost::shared_ptr<pressure_measurement::PressureMeasurement> meas( new pressure_measurement::PressureMeasurement(n_zp_, true, this->sensorID));
   meas->makeFromSensorReading(msg, msg->header.stamp.toSec()); //added some delay to make the measurements arrive later than the state callback
 
   z_p_ = meas->z_p_; //store this for the init procedure

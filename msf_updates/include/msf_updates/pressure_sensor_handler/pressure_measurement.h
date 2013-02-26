@@ -43,7 +43,8 @@ enum
 /**
  * \brief a measurement as provided by a pressure sensor
  */
-struct PressureMeasurement : public msf_core::MSF_Measurement<asctec_hl_comm::mav_imu, nMeasurements, msf_updates::EKFState>
+typedef msf_core::MSF_Measurement<asctec_hl_comm::mav_imu, nMeasurements, msf_updates::EKFState> PressureMeasurementBase;
+struct PressureMeasurement : public PressureMeasurementBase
 {
 private:
   typedef msf_core::MSF_Measurement<asctec_hl_comm::mav_imu, nMeasurements, msf_updates::EKFState> Measurement_t;
@@ -75,7 +76,8 @@ public:
   virtual ~PressureMeasurement()
   {
   }
-  PressureMeasurement(double n_zp) :
+  PressureMeasurement(double n_zp, bool isabsoluteMeasurement, int sensorID) :
+    PressureMeasurementBase(isabsoluteMeasurement, sensorID),
     n_zp_(n_zp)
   {
   }

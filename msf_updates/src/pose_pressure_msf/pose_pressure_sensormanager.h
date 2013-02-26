@@ -61,7 +61,8 @@ public:
 
   PosePressureSensorManager(ros::NodeHandle pnh = ros::NodeHandle("~/pose_pressure_sensor"))
   {
-    pose_handler_.reset(new msf_pose_sensor::PoseSensorHandler(*this));
+    bool poseabsolute = true; ///<does the pose sensor provides absolute measurements
+    pose_handler_.reset(new msf_pose_sensor::PoseSensorHandler(*this, poseabsolute));
     addHandler(pose_handler_);
 
     pressure_handler_.reset(new msf_pressure_sensor::PressureSensorHandler(*this));

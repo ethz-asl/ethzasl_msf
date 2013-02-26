@@ -32,6 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <msf_core/msf_core.h>
 
 namespace msf_core{
+template<typename EKFState_T>
+MSF_MeasurementBase<EKFState_T>::MSF_MeasurementBase(bool isabsoluteMeasurement, int sensorID):sensorID_(sensorID), isabsolute_(isabsoluteMeasurement), time(0){
+
+}
 
 template<typename EKFState_T>
 template<class H_type, class Res_type, class R_type>

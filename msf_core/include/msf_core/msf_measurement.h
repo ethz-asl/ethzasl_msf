@@ -45,14 +45,16 @@ template<typename EKFState_T>
 class MSF_MeasurementBase{
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-//  typedef msf_updates::EKFState EKFState_T; ///<the EKF state type this measurement can be applied to
+  MSF_MeasurementBase(bool isabsoluteMeasurement, int sensorID);
   virtual ~MSF_MeasurementBase(){}
   /**
    * \brief the method called by the msf_core to apply the measurement represented by this object
    */
   virtual void apply(boost::shared_ptr<EKFState_T> stateWithCovariance, MSF_Core<EKFState_T>& core) = 0;
-virtual std::string type() = 0;
-  double time; ///<the time this measurement was taken
+  virtual std::string type() = 0;
+  int sensorID_;
+  bool isabsolute_;
+  double time; ///<the time_ this measurement was taken
 protected:
   /**
    * main update routine called by a given sensor, will apply the measurement to the state inside the core
@@ -72,9 +74,10 @@ public:
   virtual void apply(boost::shared_ptr<EKFState_T> stateWithCovariance, MSF_Core<EKFState_T>& core){
     ROS_ERROR_STREAM("Called apply() on an MSF_InvalidMeasurement object. This should never happen.");
   }
-virtual std::string type(){
-return "invalid";
+  virtual std::string type(){
+    return "invalid";
   }
+  MSF_InvalidMeasurement():MSF_MeasurementBase<EKFState_T>(true, -1){}
   virtual ~MSF_InvalidMeasurement(){};
 };
 
@@ -89,32 +92,32 @@ class MSF_Measurement: public MSF_MeasurementBase<EKFState_T>{
 private:
   virtual void makeFromSensorReadingImpl(const boost::shared_ptr<T const> reading) = 0;
 protected:
-  Eigen::Matrix<double, MEASUREMENTSIZE, MEASUREMENTSIZE> R_;
+Eigen::Matrix<double, MEASUREMENTSIZE, MEASUREMENTSIZE> R_;
 public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  typedef T Measurement_type;
-  typedef boost::shared_ptr<T const> Measurement_ptr;
+EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+typedef T Measurement_type;
+typedef boost::shared_ptr<T const> Measurement_ptr;
 
-  MSF_Measurement(){
-    R_.setZero();
+MSF_Measurement(bool isAbsoluteMeasurement, int sensorID):MSF_MeasurementBase<EKFState_T>(isAbsoluteMeasurement, sensorID){
+  R_.setZero();
+}
+virtual ~MSF_Measurement(){};
+void makeFromSensorReading(const boost::shared_ptr<T const> reading, double timestamp){
+  this->time = timestamp;
+
+  makeFromSensorReadingImpl(reading);
+
+  if(R_.minCoeff() == 0.0 && R_.maxCoeff() == 0.0){//check whether the user has set R
+    ROS_WARN_STREAM_THROTTLE(2,"The measurement covariance matrix seems to be not set for the current measurement. Please double check!");
   }
-  virtual ~MSF_Measurement(){};
-  void makeFromSensorReading(const boost::shared_ptr<T const> reading, double timestamp){
-    this->time = timestamp;
 
-    makeFromSensorReadingImpl(reading);
-
-    if(R_.minCoeff() == 0.0 && R_.maxCoeff() == 0.0){//check whether the user has set R
-      ROS_WARN_STREAM_THROTTLE(2,"The measurement covariance matrix seems to be not set for the current measurement. Please double check!");
-    }
-
-    for(int i = 0;i<R_.RowsAtCompileTime;++i){
-      if(R_(i,i)==0.0){
-        ROS_WARN_STREAM_THROTTLE(2,"The measurement covariance matrix has some diagonal elements set to zero. Please double check!");
-      }
+  for(int i = 0;i<R_.RowsAtCompileTime;++i){
+    if(R_(i,i)==0.0){
+      ROS_WARN_STREAM_THROTTLE(2,"The measurement covariance matrix has some diagonal elements set to zero. Please double check!");
     }
   }
-  //apply is implemented by respective sensor measurement types
+}
+//apply is implemented by respective sensor measurement types
 };
 
 /**
@@ -130,13 +133,13 @@ private:
   typedef typename EKFState_T::StateSequence_T StateSequence_T;
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  MSF_InitMeasurement(bool ContainsInitialSensorReadings){
+  MSF_InitMeasurement(bool ContainsInitialSensorReadings):MSF_MeasurementBase<EKFState_T>(true, -1){
     ContainsInitialSensorReadings_ = ContainsInitialSensorReadings;
     this->time = ros::Time::now().toSec();
   }
   virtual ~MSF_InitMeasurement(){};
-virtual std::string type(){
-return "init";
+  virtual std::string type(){
+    return "init";
   }
   typename EKFState_T::P_type& get_P(){
     return InitState.P;

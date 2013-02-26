@@ -58,14 +58,9 @@ typename Eigen::MatrixBase<D>::Scalar getMedian(const Eigen::MatrixBase<D> & dat
  * output the time in seconds in a human readable format for debugging
  */
 template<typename T>
-T timehuman(T val){
+inline T timehuman(T val){
   return val - floor(val/1000.)*1000.;
 }
-template<>
-float timehuman(float val){
-  return val - floorf(val/1000.f)*1000.f;
-}
-
 }
 
 #endif /* MSF_TOOLS_HPP_ */

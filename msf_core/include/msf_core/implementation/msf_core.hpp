@@ -385,6 +385,18 @@ void MSF_Core<EKFState_T>::propagatePOneStep(){
 }
 
 template<typename EKFState_T>
+void MSF_Core<EKFState_T>::getAccumF_SC(const boost::shared_ptr<EKFState_T>& state_old, const boost::shared_ptr<EKFState_T>& state_new, Eigen::Matrix<double,
+                                        MSF_Core<EKFState_T>::nErrorStatesAtCompileTime, MSF_Core<EKFState_T>::nErrorStatesAtCompileTime>& F){
+  typename stateBufferT::iterator_T it = StateBuffer_.getIteratorAtValue(state_old);
+  typename stateBufferT::iterator_T itend = StateBuffer_.getIteratorAtValue(state_new);
+  typedef Eigen::Matrix<double, MSF_Core<EKFState_T>::nErrorStatesAtCompileTime, MSF_Core<EKFState_T>::nErrorStatesAtCompileTime> F_type;
+  F = F_type::Identity();
+  for(; it != itend; ++it){
+    F = F * it->second->Fd;
+  }
+}
+
+template<typename EKFState_T>
 void MSF_Core<EKFState_T>::predictProcessCovariance(boost::shared_ptr<EKFState_T>& state_old, boost::shared_ptr<EKFState_T>& state_new)
 {
 
@@ -641,6 +653,30 @@ void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase<
   pubState_.publish(msgState_);
 
   seq_m++;
+}
+
+template<typename EKFState_T>
+boost::shared_ptr<msf_core::MSF_MeasurementBase<EKFState_T> > MSF_Core<EKFState_T>::getPreviousMeasurement(double time, int sensorID) {
+  typename measurementBufferT::iterator_T it = MeasurementBuffer_.getIteratorAtValue(time);
+  if(it->second->time != time){
+    ROS_WARN_STREAM("getPreviousMeasurement: Error invalid iterator at value");
+    return MeasurementBuffer_.getInvalid();
+  }
+  --it;
+  typename measurementBufferT::iterator_T itbeforebegin = MeasurementBuffer_.getIteratorBeforeBegin();
+  while(it != itbeforebegin && (it->second->time != time && it->second->sensorID_ != sensorID)){
+    --it;
+  }
+  if(it == itbeforebegin){
+    ROS_WARN_STREAM("getPreviousMeasurement: Error hit before begin");
+    return MeasurementBuffer_.getInvalid();
+  }
+  return it->second;
+}
+
+template<typename EKFState_T>
+boost::shared_ptr<EKFState_T> MSF_Core<EKFState_T>::getStateAtTime(double tstamp){
+  return StateBuffer_.getValueAt(tstamp);
 }
 
 template<typename EKFState_T>
