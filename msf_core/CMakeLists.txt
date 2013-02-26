@@ -29,6 +29,8 @@ add_definitions (-Wall -std=c++0x)
 find_package(Eigen REQUIRED)
 include_directories(${Eigen_INCLUDE_DIRS})
 
+add_subdirectory(src/lib)
+
 #common commands for building c++ executables and libraries
 #rosbuild_add_library(msf_core src/MSF_Core.cpp src/measurement.cpp src/state.cpp)
 #rosbuild_add_compile_flags(msf_core "-O3")
