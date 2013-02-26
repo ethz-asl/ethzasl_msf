@@ -87,7 +87,7 @@ public:
   typedef StateDef_T StateDefinition_T; ///<the enums of the state variables
 
   friend class msf_core::MSF_Core<GenericState_T<StateSequence_T, StateDefinition_T> >;
-  friend class msf_core::copyNonPropagationStates<GenericState_T>;
+  friend struct msf_core::copyNonPropagationStates<GenericState_T>;
   friend class msf_core::MSF_InitMeasurement<GenericState_T<StateSequence_T, StateDefinition_T> >;
 
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW

@@ -142,7 +142,7 @@ void MSF_Core<EKFState_T>::imuCallback(const sensor_msgs::ImuConstPtr & msg)
     if (fabs(currentState->time - lastState->time) > 5)
     {
       ROS_WARN_STREAM_THROTTLE(2, "large time-gap re-initializing to last state\n");
-      StateBuffer_.updateTime(lastState->time, currentState->time);
+      typename stateBufferT::Ptr_T tmp = StateBuffer_.updateTime(lastState->time, currentState->time);
       time_P_propagated = currentState->time;
       return; // // early abort // // (if timegap too big)
     }
@@ -360,6 +360,11 @@ void MSF_Core<EKFState_T>::predictProcessCovariance(boost::shared_ptr<EKFState_T
 {
 
   double dt = state_new->time - state_old->time;
+
+  if(dt <= 0){
+    ROS_WARN_STREAM_THROTTLE(1,"Requested cov prop between two states that where "<<dt<<" seconds apart. Rejecting");
+    return;
+  }
 
   Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> Fd(Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime>::Identity()); ///< discrete state propagation matrix
 

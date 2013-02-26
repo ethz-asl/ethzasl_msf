@@ -43,13 +43,15 @@ namespace msf_core{
 template<typename T, typename PrototypeInvalidT = T>
 class SortedContainer{
 
+public:
+  typedef boost::shared_ptr<T> Ptr_T;
+
 private:
-  typedef std::map<double, boost::shared_ptr<T> > ListT; ///< the container type in which to store the data
+  typedef std::map<double, Ptr_T > ListT; ///< the container type in which to store the data
   ListT stateList; ///< the container in which all the data is stored
-  boost::shared_ptr<T> invalid; ///< a object to signal requests which cannot be satisfied
+  Ptr_T invalid; ///< a object to signal requests which cannot be satisfied
 public:
   typedef typename ListT::iterator iterator_T;
-  typedef boost::shared_ptr<T> Ptr_T;
 
   SortedContainer(){
     invalid.reset(new PrototypeInvalidT());
