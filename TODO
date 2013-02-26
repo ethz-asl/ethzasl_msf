@@ -1,0 +1,8 @@
+
+Multiple fuzzy tracking states
+extern templates c++11
+cleanup rotations
+Eigen::Map wrap Q-blocks (if possible)
+Multiplication of F blockwise
+Obs-constrainted EKF prediction
+
