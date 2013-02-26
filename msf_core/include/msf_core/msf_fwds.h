@@ -33,10 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MSF_FWD_HPP_
 #define MSF_FWD_HPP_
 
-namespace msf_core{
-
 #include <boost/shared_ptr.hpp>
 #include <iostream>
+
+namespace msf_core{
 
 //state types used to identify propagated/core/auxiliary states
 enum{
