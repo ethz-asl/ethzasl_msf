@@ -137,6 +137,7 @@ public:
   GenericState_T(){
     time = -1;
     P.setZero();
+    reset();
   }
 
   /**
