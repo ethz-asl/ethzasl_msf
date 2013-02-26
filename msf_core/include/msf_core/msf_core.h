@@ -123,6 +123,13 @@ public:
   void predictProcessCovariance(boost::shared_ptr<EKFState_T>& state_old, boost::shared_ptr<EKFState_T>& state_new);
 
   /**
+   * \brief propagates the state with given dt
+   * \param state_old the state to propagate from
+   * \param state_new the state to propagate to
+   */
+  void propagateState(boost::shared_ptr<EKFState_T>& state_old, boost::shared_ptr<EKFState_T>& state_new);
+
+  /**
    * \brief delete very old states and measurements from the buffers to free memory
    */
   void CleanUpBuffers(){
@@ -228,13 +235,6 @@ private:
   ros::Subscriber subImu_; ///< subscriber to IMU readings
 
   sensor_fusion_comm::ExtEkf hl_state_buf_; ///< buffer to store external propagation data
-
-  /**
-   * \brief propagates the state with given dt
-   * \param state_old the state to propagate from
-   * \param state_new the state to propagate to
-   */
-  void propagateState(boost::shared_ptr<EKFState_T>& state_old, boost::shared_ptr<EKFState_T>& state_new);
 
   /**
    * \brief applies the correction
