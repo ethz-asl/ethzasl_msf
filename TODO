@@ -5,4 +5,8 @@ cleanup rotations
 Eigen::Map wrap Q-blocks (if possible)
 Multiplication of F blockwise
 Obs-constrainted EKF prediction
+evaluate "short" covariance update formula
 
+symm P: EV decompose P, set EVs<eps to zero and rebuild (profile this to know the cost!)
+
+check copy ctor of state objects. Is the statelist really copied? 

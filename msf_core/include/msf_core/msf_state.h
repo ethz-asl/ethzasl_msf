@@ -122,6 +122,8 @@ private:
 public:
 
   typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> P_type; ///< type of the error state covariance matrix
+  typedef P_type F_type;
+  typedef P_type Q_type;
 
   StateSequence_T statevars; ///< the actual state variables
 
@@ -130,13 +132,17 @@ public:
   Eigen::Matrix<double,3,1> a_m;         ///< acceleration from IMU
 
 
-  double time; 							///< time of this state estimate
-  P_type P;								///< error state covariance
+  double time; 	///< time of this state estimate
+  P_type P;	///< error state covariance
+  F_type Fd;   ///< discrete state propagation matrix
+  Q_type Qd;   ///< discrete propagation noise matrix
 
 
   GenericState_T(){
     time = -1;
     P.setZero();
+    Qd.setZero();
+    Fd.setIdentity();
     reset();
   }
 

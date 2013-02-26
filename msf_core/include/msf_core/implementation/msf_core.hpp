@@ -450,7 +450,7 @@ void MSF_Core<EKFState_T>::predictProcessCovariance(boost::shared_ptr<EKFState_T
     return;
   }
 
-  Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> Fd(Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime>::Identity()); ///< discrete state propagation matrix
+  //Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> Fd(Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime>::Identity()); ///< discrete state propagation matrix
 
   // noises
   const Vector3 nav = Vector3::Constant(usercalc_.getParam_noise_acc() /* / sqrt(dt) */);
@@ -486,6 +486,7 @@ void MSF_Core<EKFState_T>::predictProcessCovariance(boost::shared_ptr<EKFState_T
   // Stephan Weiss and Roland Siegwart.
   // Real-Time Metric State Estimation for Modular Vision-Inertial Systems.
   // IEEE International Conference on Robotics and Automation. Shanghai, China, 2011
+  typename EKFState_T::F_type& Fd = state_old->Fd;
 
   Fd. template block<3, 3> (0, 3) = dt * eye3;
   Fd. template block<3, 3> (0, 6) = A;
@@ -499,8 +500,9 @@ void MSF_Core<EKFState_T>::predictProcessCovariance(boost::shared_ptr<EKFState_T
   Fd. template block<3, 3> (6, 6) = E;
   Fd. template block<3, 3> (6, 9) = F;
 
+  typename EKFState_T::Q_type& Qd = state_old->Qd;
 
-  Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> Qd(Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime>::Zero()); ///< discrete propagation noise matrix
+  //Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> Qd(Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime>::Zero()); ///< discrete propagation noise matrix
   calc_QCore(dt, state_new-> template get<StateDefinition_T::q>(), ew, ea, nav, nbav, nwv, nbwv, Qd);
 
   //call user Q calc to fill in the blocks of auxiliary states

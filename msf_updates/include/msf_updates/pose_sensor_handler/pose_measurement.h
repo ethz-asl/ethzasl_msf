@@ -131,25 +131,11 @@ public:
   virtual std::string type(){
     return "pose";
   }
-  /**
-   * the method called by the msf_core to apply the measurement represented by this object
-   */
-  virtual void apply(boost::shared_ptr<EKFState_T> const_state, msf_core::MSF_Core<EKFState_T>& core)
-  {
 
-    // init variables
-    Eigen::Matrix<double, nMeasurements, msf_core::MSF_Core<EKFState_T>::nErrorStatesAtCompileTime> H_old;
-    Eigen::Matrix<double, nMeasurements, 1> r_old;
+  virtual void calculateH(boost::shared_ptr<EKFState_T> state_in, Eigen::Matrix<double, nMeasurements, msf_core::MSF_Core<EKFState_T>::nErrorStatesAtCompileTime>& H){
+    const EKFState_T& state = *state_in; //get a const ref, so we can read core states
 
-    H_old.setZero();
-
-    if (const_state->time == -1 || !const_state->checkStateForNumeric())
-    {
-      ROS_WARN_STREAM("apply pose update was called with an invalid state");
-      return;	// // early abort // //
-    }
-
-    const EKFState_T& state = *const_state;
+    H.setZero();
 
     // get rotation matrices
     Eigen::Matrix<double, 3, 3> C_wv = state.get<StateDefinition_T::q_wv>().conjugate().toRotationMatrix();
@@ -177,53 +163,165 @@ public:
 
     // construct H matrix using H-blockx :-)
     // position:
-    H_old.block<3, 3>(0, idxstartcorr_p_) = C_wv.transpose() * state.get<StateDefinition_T::L>()(0); // p
-    H_old.block<3, 3>(0, idxstartcorr_q_) = -C_wv.transpose() * C_q.transpose() * pci_sk * state.get<StateDefinition_T::L>()(0); // q
+    H.block<3, 3>(0, idxstartcorr_p_) = C_wv.transpose() * state.get<StateDefinition_T::L>()(0); // p
+    H.block<3, 3>(0, idxstartcorr_q_) = -C_wv.transpose() * C_q.transpose() * pci_sk * state.get<StateDefinition_T::L>()(0); // q
 
-    H_old.block<3, 1>(0, idxstartcorr_L_) = C_wv.transpose() * C_q.transpose() * state.get<StateDefinition_T::p_ci>()
-                                                + C_wv.transpose() * state.get<StateDefinition_T::p>() + state.get<StateDefinition_T::p_vw>(); // L
+    H.block<3, 1>(0, idxstartcorr_L_) = C_wv.transpose() * C_q.transpose() * state.get<StateDefinition_T::p_ci>()
+                                                                                                         + C_wv.transpose() * state.get<StateDefinition_T::p>() + state.get<StateDefinition_T::p_vw>(); // L
 
-    H_old.block<3, 3>(0, idxstartcorr_qwv_) = -C_wv.transpose() * skewold; // q_wv
-    H_old.block<3, 3>(0, idxstartcorr_pci_) = C_wv.transpose() * C_q.transpose() * state.get<StateDefinition_T::L>()(0); //p_ci
-    H_old.block<3, 3>(0, idxstartcorr_pvw_) = Eigen::Matrix<double,3,3>::Identity() * state.get<StateDefinition_T::L>()(0); //p_vw
-
-    // attitude
-    H_old.block<3, 3>(3, idxstartcorr_q_) = C_ci; // q
-    H_old.block<3, 3>(3, idxstartcorr_qwv_) = C_ci * C_q; // q_wv
-    H_old.block<3, 3>(3, idxstartcorr_qci_) = Eigen::Matrix<double, 3, 3>::Identity(); //q_ci
-    H_old(6, 18) = 1.0; // fix vision world yaw drift because unobservable otherwise (see PhD Thesis)
-
-    // construct residuals
-    // position
-    r_old.block<3, 1>(0, 0) = z_p_
-        - (state.get<StateDefinition_T::p_vw>() + C_wv.transpose() * (state.get<StateDefinition_T::p>() + C_q.transpose() * state.get<StateDefinition_T::p_ci>()))
-        * state.get<StateDefinition_T::L>();
+    H.block<3, 3>(0, idxstartcorr_qwv_) = -C_wv.transpose() * skewold; // q_wv
+    H.block<3, 3>(0, idxstartcorr_pci_) = C_wv.transpose() * C_q.transpose() * state.get<StateDefinition_T::L>()(0); //p_ci
+    H.block<3, 3>(0, idxstartcorr_pvw_) = Eigen::Matrix<double,3,3>::Identity() * state.get<StateDefinition_T::L>()(0); //p_vw
 
     // attitude
-    Eigen::Quaternion<double> q_err;
-    q_err = (state.get<StateDefinition_T::q_wv>() * state.get<StateDefinition_T::q>() * state.get<StateDefinition_T::q_ci>()).conjugate() * z_q_;
-    r_old.block<3, 1>(3, 0) = q_err.vec() / q_err.w() * 2;
-    // vision world yaw drift
-    q_err = state.get<StateDefinition_T::q_wv>();
-    r_old(6, 0) = -2 * (q_err.w() * q_err.z() + q_err.x() * q_err.y())
-                                                / (1 - 2 * (q_err.y() * q_err.y() + q_err.z() * q_err.z()));
+    H.block<3, 3>(3, idxstartcorr_q_) = C_ci; // q
+    H.block<3, 3>(3, idxstartcorr_qwv_) = C_ci * C_q; // q_wv
+    H.block<3, 3>(3, idxstartcorr_qci_) = Eigen::Matrix<double, 3, 3>::Identity(); //q_ci
+    //TODO: do we still want this?
+    H(6, 18) = 1.0; // fix vision world yaw drift because unobservable otherwise (see PhD Thesis)
 
-    if(!checkForNumeric((double*)&r_old, nMeasurements, "r_old")){
-      ROS_ERROR_STREAM("r_old: "<<r_old);
-      ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
-    }
-    if(!checkForNumeric((double*)&H_old, H_old.RowsAtCompileTime * H_old.ColsAtCompileTime, "H_old")){
-      ROS_ERROR_STREAM("H_old: "<<H_old);
-      ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
-    }
-    if(!checkForNumeric((double*)&R_, R_.RowsAtCompileTime * R_.ColsAtCompileTime, "R_")){
-      ROS_ERROR_STREAM("R_: "<<R_);
-      ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
-    }
+  }
 
-    // call update step in base class
-    this->calculateAndApplyCorrection(const_state, core, H_old, r_old, R_);
+  /**
+   * the method called by the msf_core to apply the measurement represented by this object
+   */
+  virtual void apply(boost::shared_ptr<EKFState_T> state_nonconst_new, msf_core::MSF_Core<EKFState_T>& core)
+  {
 
+    if(isabsolute_){//does this measurement refer to an absolute measurement, or is is just relative to the last measurement
+      const EKFState_T& state = *state_nonconst_new; //get a const ref, so we can read core states
+      // init variables
+      Eigen::Matrix<double, nMeasurements, msf_core::MSF_Core<EKFState_T>::nErrorStatesAtCompileTime> H_new;
+      Eigen::Matrix<double, nMeasurements, 1> r_old;
+
+      calculateH(state_nonconst_new, H_new);
+
+      // get rotation matrices
+      Eigen::Matrix<double, 3, 3> C_wv = state.get<StateDefinition_T::q_wv>().conjugate().toRotationMatrix();
+      Eigen::Matrix<double, 3, 3> C_q = state.get<StateDefinition_T::q>().conjugate().toRotationMatrix();
+
+      // construct residuals
+      // position
+      r_old.block<3, 1>(0, 0) = z_p_
+          - (state.get<StateDefinition_T::p_vw>() + C_wv.transpose() *
+              (state.get<StateDefinition_T::p>() + C_q.transpose() * state.get<StateDefinition_T::p_ci>()))
+              * state.get<StateDefinition_T::L>();
+
+      // attitude
+      Eigen::Quaternion<double> q_err;
+      q_err = (state.get<StateDefinition_T::q_wv>() * state.get<StateDefinition_T::q>() * state.get<StateDefinition_T::q_ci>()).conjugate() * z_q_;
+      r_old.block<3, 1>(3, 0) = q_err.vec() / q_err.w() * 2;
+      // vision world yaw drift
+      q_err = state.get<StateDefinition_T::q_wv>();
+      r_old(6, 0) = -2 * (q_err.w() * q_err.z() + q_err.x() * q_err.y()) / (1 - 2 * (q_err.y() * q_err.y() + q_err.z() * q_err.z()));
+
+      if(!checkForNumeric((double*)&r_old, nMeasurements, "r_old")){
+        ROS_ERROR_STREAM("r_old: "<<r_old);
+        ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
+      }
+      if(!checkForNumeric((double*)&H_new, H_new.RowsAtCompileTime * H_new.ColsAtCompileTime, "H_old")){
+        ROS_ERROR_STREAM("H_old: "<<H_new);
+        ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
+      }
+      if(!checkForNumeric((double*)&R_, R_.RowsAtCompileTime * R_.ColsAtCompileTime, "R_")){
+        ROS_ERROR_STREAM("R_: "<<R_);
+        ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
+      }
+
+      // call update step in base class
+      this->calculateAndApplyCorrection(state_nonconst_new, core, H_new, r_old, R_);
+
+    }else{
+
+      // init variables
+      //get previous measurement
+      boost::shared_ptr<msf_core::MSF_MeasurementBase<EKFState_T> > prevmeas_base = core.getPreviousMeasurement(this->time, this->sensorID_);
+
+      if(prevmeas_base->time == -1){
+        ROS_WARN_STREAM("The previous measurement is invalid. Could not apply measurement");
+        return;
+      }
+      //try to make this a pose measurement
+      boost::shared_ptr<PoseMeasurement> prevmeas = boost::shared_dynamic_cast<PoseMeasurement>(prevmeas_base);
+      if(!prevmeas){
+        ROS_WARN_STREAM("The dynamic cast of the previous measurement has failed. Could not apply measurement");
+        return;
+      }
+      ROS_WARN_STREAM("dt to last measurement "<<this->time - prevmeas->time);
+
+      //get state at previous measurement
+      boost::shared_ptr<EKFState_T> state_nonconst_old = core.getStateAtTime(prevmeas->time);
+
+      if(state_nonconst_old->time == -1){
+        ROS_WARN_STREAM("The state at the previous measurement is invalid. Could not apply measurement");
+        return;
+      }
+
+      const EKFState_T& state_new = *state_nonconst_new; //get a const ref, so we can read core states
+      const EKFState_T& state_old = *state_nonconst_old; //get a const ref, so we can read core states
+
+      Eigen::Matrix<double, nMeasurements, msf_core::MSF_Core<EKFState_T>::nErrorStatesAtCompileTime> H_new, H_old;
+      Eigen::Matrix<double, nMeasurements, 1> r_new, r_old;
+
+      calculateH(state_nonconst_old, H_old);
+
+      H_old *= -1;
+
+      calculateH(state_nonconst_new, H_new);
+
+      Eigen::Matrix<double, 3, 3> C_wv_old, C_wv_new;
+      Eigen::Matrix<double, 3, 3> C_q_old, C_q_new;
+
+      C_wv_new = state_new.get<StateDefinition_T::q_wv>().conjugate().toRotationMatrix();
+      C_q_new = state_new.get<StateDefinition_T::q>().conjugate().toRotationMatrix();
+      C_wv_old = state_old.get<StateDefinition_T::q_wv>().conjugate().toRotationMatrix();
+      C_q_old = state_old.get<StateDefinition_T::q>().conjugate().toRotationMatrix();
+
+      // construct residuals
+      // position
+      Eigen::Matrix<double, 3, 1> diffprobpos = (/*state_new.get<StateDefinition_T::p_vw>() + */C_wv_new.transpose() * (state_new.get<StateDefinition_T::p>() + C_q_new.transpose() * state_new.get<StateDefinition_T::p_ci>()))
+                                         * state_new.get<StateDefinition_T::L>() -
+                                         (/*state_old.get<StateDefinition_T::p_vw>() + */C_wv_old.transpose() * (state_old.get<StateDefinition_T::p>() + C_q_old.transpose() * state_old.get<StateDefinition_T::p_ci>()))
+                                         * state_old.get<StateDefinition_T::L>();
+
+      Eigen::Matrix<double, 3, 1> diffmeaspos = z_p_ - prevmeas->z_p_;
+
+      r_new.block<3, 1>(0, 0) = diffmeaspos - diffprobpos;
+
+      ROS_WARN_STREAM("Diff prob pose: "<<diffprobpos.transpose()<<" meas diff "<<
+                      diffmeaspos.transpose()<<" res block "<<(r_new.block<3, 1>(0, 0)).transpose());
+
+
+      // attitude
+      Eigen::Quaternion<double> diffprobatt = (state_new.get<StateDefinition_T::q_wv>() * state_new.get<StateDefinition_T::q>() * state_new.get<StateDefinition_T::q_ci>()).conjugate() * (state_old.get<StateDefinition_T::q_wv>() * state_old.get<StateDefinition_T::q>() * state_old.get<StateDefinition_T::q_ci>());
+      Eigen::Quaternion<double> diffmeasatt = z_q_.conjugate() * prevmeas->z_q_;
+
+      Eigen::Quaternion<double> q_err;
+      q_err = diffprobatt.conjugate() * diffmeasatt;
+
+      r_new.block<3, 1>(3, 0) = q_err.vec() / q_err.w() * 2;
+      // vision world yaw drift
+      q_err = state_new.get<StateDefinition_T::q_wv>();
+      r_new(6, 0) = -2 * (q_err.w() * q_err.z() + q_err.x() * q_err.y()) / (1 - 2 * (q_err.y() * q_err.y() + q_err.z() * q_err.z()));
+
+
+      if(!checkForNumeric((double*)&r_old, nMeasurements, "r_old")){
+        ROS_ERROR_STREAM("r_old: "<<r_old);
+        ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state_new).toEigenVector().transpose());
+      }
+      if(!checkForNumeric((double*)&H_new, H_new.RowsAtCompileTime * H_new.ColsAtCompileTime, "H_old")){
+        ROS_ERROR_STREAM("H_old: "<<H_new);
+        ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state_new).toEigenVector().transpose());
+      }
+      if(!checkForNumeric((double*)&R_, R_.RowsAtCompileTime * R_.ColsAtCompileTime, "R_")){
+        ROS_ERROR_STREAM("R_: "<<R_);
+        ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state_new).toEigenVector().transpose());
+      }
+
+      // call update step in base class
+      this->calculateAndApplyCorrectionRelative(state_nonconst_old, state_nonconst_new, core, H_old, H_new, r_new, R_);
+
+    }
   }
 };
 
