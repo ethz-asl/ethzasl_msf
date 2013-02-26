@@ -790,7 +790,7 @@ struct FullStatetoString
     enum{
       startIdxInState = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::StateLengthForType>::value //index of the data in the state vector
     };
-    data_ << NAME << " : ["<<startIdxInState<<"-"<<startIdxInState + N <<"]\t : Matrix<" << N << ", 1>         : [" << t.state_.transpose() <<"]" << std::endl;
+    data_ << NAME << " : ["<<startIdxInState<<"-"<<startIdxInState + N - 1 <<"]\t : Matrix<" << N << ", 1>         : [" << t.state_.transpose() <<"]" << std::endl;
   }
   template<int NAME, int STATETYPE>
   void operator()(msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE>& t) const {
@@ -798,7 +798,7 @@ struct FullStatetoString
     enum{
       startIdxInState = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::StateLengthForType>::value //index of the data in the state vector
     };
-    data_ << NAME << " : ["<<startIdxInState<<"-"<<startIdxInState + 4 <<"]\t : Quaternion (w,x,y,z) : [" << t.state_.w() << ", " << t.state_.x() << ", " << t.state_.y() << ", " << t.state_.z() << "]" << std::endl;
+    data_ << NAME << " : ["<<startIdxInState<<"-"<<startIdxInState + 3 <<"]\t : Quaternion (w,x,y,z) : [" << t.state_.w() << ", " << t.state_.x() << ", " << t.state_.y() << ", " << t.state_.z() << "]" << std::endl;
   }
 private:
   STREAM& data_;
