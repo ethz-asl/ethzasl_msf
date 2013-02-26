@@ -29,40 +29,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
 
-#ifndef MSF_TOOLS_HPP_
-#define MSF_TOOLS_HPP_
-
-#include <Eigen/Dense>
-#include <algorithm>
+#include <msf_core/msf_tools.h>
 
 namespace msf_core{
-/***
- * computes the median of a given vector
- */
-template<typename D>
-typename Eigen::MatrixBase<D>::Scalar getMedian(const Eigen::MatrixBase<D> & data)
+
+double timehuman(double val)
 {
-  BOOST_STATIC_ASSERT_MSG((Eigen::MatrixBase<D>::ColsAtCompileTime == 1), "getMedian only takes Eigen column vectors as arguments");
-  Eigen::Matrix<typename Eigen::MatrixBase<D>::Scalar, Eigen::MatrixBase<D>::RowsAtCompileTime, Eigen::MatrixBase<D>::ColsAtCompileTime> m = data; //cpy so we don't sort the original vector
-
-  if (Eigen::MatrixBase<D>::SizeAtCompileTime)
-  {
-    double * begin = m.data();
-    double * end   = m.data() + m.SizeAtCompileTime;
-    double * middle = begin + static_cast<int>(std::floor((end - begin) / 2));
-    std::nth_element(begin, middle, end);
-    return *middle;
-  }
-  else
-    return 0;
+  return val - floor(val / 1000.) * 1000.;
 }
-
-/***
- * outputs the time in seconds in a human readable format for debugging
- */
-double timehuman(double val);
 
 
 }
 
-#endif /* MSF_TOOLS_HPP_ */
+
+
