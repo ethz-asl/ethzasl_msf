@@ -16,7 +16,7 @@
   <rosdep name="eigen"/>
 
   <export>
-    <cpp cflags="`pkg-config --cflags eigen3` -I${prefix}/include -I${prefix}/cfg/cpp" lflags="-L${prefix}/lib" />
+    <cpp cflags="`pkg-config --cflags eigen3 ` -std=c++0x -I${prefix}/include -I${prefix}/cfg/cpp" lflags="-L${prefix}/lib" />
   </export>
 </package>
 
