@@ -38,7 +38,9 @@
 
 #include <msf_core/msf_measurement.h>
 #include <msf_core/msf_core.h>
+#include <msf_updates/PoseDistorter.h>
 
+namespace msf_updates{
 namespace pose_measurement{
 enum
 {
@@ -67,6 +69,15 @@ private:
     z_p_ = Eigen::Matrix<double, 3, 1>(msg->pose.pose.position.x, msg->pose.pose.position.y, msg->pose.pose.position.z);
     z_q_ = Eigen::Quaternion<double>(msg->pose.pose.orientation.w, msg->pose.pose.orientation.x,
                                      msg->pose.pose.orientation.y, msg->pose.pose.orientation.z);
+
+    if(distorter_){
+      static double tlast = 0;
+      if(tlast != 0){
+        double dt = time - tlast;
+        distorter_->distort(z_p_, z_q_, dt);
+      }
+      tlast = time;
+    }
 
     if (fixed_covariance_)//  take fix covariance from reconfigure GUI
     {
@@ -116,6 +127,7 @@ public:
 
   bool measurement_world_sensor_;
   bool fixed_covariance_;
+  msf_updates::PoseDistorter::Ptr distorter_;
 
   typedef msf_updates::EKFState EKFState_T;
   typedef EKFState_T::StateSequence_T StateSequence_T;
@@ -123,9 +135,9 @@ public:
   virtual ~PoseMeasurement()
   {
   }
-  PoseMeasurement(double n_zp, double n_zq, bool measurement_world_sensor, bool fixed_covariance, bool isabsoluteMeasurement, int sensorID) :
+  PoseMeasurement(double n_zp, double n_zq, bool measurement_world_sensor, bool fixed_covariance, bool isabsoluteMeasurement, int sensorID, msf_updates::PoseDistorter::Ptr distorter = msf_updates::PoseDistorter::Ptr()) :
     PoseMeasurementBase(isabsoluteMeasurement, sensorID),
-    n_zp_(n_zp), n_zq_(n_zq), measurement_world_sensor_(measurement_world_sensor), fixed_covariance_(fixed_covariance)
+    n_zp_(n_zp), n_zq_(n_zq), measurement_world_sensor_(measurement_world_sensor), fixed_covariance_(fixed_covariance), distorter_(distorter)
   {
   }
   virtual std::string type(){
@@ -167,7 +179,7 @@ public:
     H.block<3, 3>(0, idxstartcorr_q_) = -C_wv.transpose() * C_q.transpose() * pci_sk * state.get<StateDefinition_T::L>()(0); // q
 
     H.block<3, 1>(0, idxstartcorr_L_) = C_wv.transpose() * C_q.transpose() * state.get<StateDefinition_T::p_ci>()
-                                                                                                         + C_wv.transpose() * state.get<StateDefinition_T::p>() + state.get<StateDefinition_T::p_vw>(); // L
+                                                                                                             + C_wv.transpose() * state.get<StateDefinition_T::p>() + state.get<StateDefinition_T::p_vw>(); // L
 
     H.block<3, 3>(0, idxstartcorr_qwv_) = -C_wv.transpose() * skewold; // q_wv
     H.block<3, 3>(0, idxstartcorr_pci_) = C_wv.transpose() * C_q.transpose() * state.get<StateDefinition_T::L>()(0); //p_ci
@@ -279,9 +291,9 @@ public:
       // construct residuals
       // position
       Eigen::Matrix<double, 3, 1> diffprobpos = (/*state_new.get<StateDefinition_T::p_vw>() + */C_wv_new.transpose() * (state_new.get<StateDefinition_T::p>() + C_q_new.transpose() * state_new.get<StateDefinition_T::p_ci>()))
-                                         * state_new.get<StateDefinition_T::L>() -
-                                         (/*state_old.get<StateDefinition_T::p_vw>() + */C_wv_old.transpose() * (state_old.get<StateDefinition_T::p>() + C_q_old.transpose() * state_old.get<StateDefinition_T::p_ci>()))
-                                         * state_old.get<StateDefinition_T::L>();
+                                             * state_new.get<StateDefinition_T::L>() -
+                                             (/*state_old.get<StateDefinition_T::p_vw>() + */C_wv_old.transpose() * (state_old.get<StateDefinition_T::p>() + C_q_old.transpose() * state_old.get<StateDefinition_T::p_ci>()))
+                                             * state_old.get<StateDefinition_T::L>();
 
       Eigen::Matrix<double, 3, 1> diffmeaspos = z_p_ - prevmeas->z_p_;
 
@@ -321,5 +333,5 @@ public:
 };
 
 }
-
+}
 #endif /* POSE_MEASUREMENT_HPP_ */

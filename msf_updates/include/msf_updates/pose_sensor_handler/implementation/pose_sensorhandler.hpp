@@ -36,7 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <msf_core/eigen_utils.h>
 
 namespace msf_pose_sensor{
-PoseSensorHandler::PoseSensorHandler(msf_core::MSF_SensorManager<msf_updates::EKFState>& meas, bool provides_absolute_measurements) :
+template<typename MEASUREMENT_TYPE>
+PoseSensorHandler<MEASUREMENT_TYPE>::PoseSensorHandler(msf_core::MSF_SensorManager<msf_updates::EKFState>& meas, bool provides_absolute_measurements, bool distortmeas) :
             SensorHandler<msf_updates::EKFState>(meas), n_zp_(1e-6), n_zq_(1e-6), delay_(0), provides_absolute_measurements_(provides_absolute_measurements)
             {
   ros::NodeHandle pnh("~");
@@ -59,22 +60,54 @@ PoseSensorHandler::PoseSensorHandler(msf_core::MSF_SensorManager<msf_updates::EK
 
   z_p_.setZero();
   z_q_.setIdentity();
+
+  if(distortmeas){
+    Eigen::Vector3d meanpos;
+    double distortpos_mean;
+    pnh.param("distortpos_mean", distortpos_mean, 0.0);
+    meanpos.setConstant(distortpos_mean);
+
+    Eigen::Vector3d stddevpos;
+    double distortpos_stddev;
+    pnh.param("distortpos_stddev", distortpos_stddev, 0.0);
+    stddevpos.setConstant(distortpos_stddev);
+
+    Eigen::Vector3d meanatt;
+    double distortatt_mean;
+    pnh.param("distortatt_mean", distortatt_mean, 0.0);
+    meanatt.setConstant(distortatt_mean);
+
+    Eigen::Vector3d stddevatt;
+    double distortatt_stddev;
+    pnh.param("distortatt_stddev", distortatt_stddev, 0.0);
+    stddevatt.setConstant(distortatt_stddev);
+
+    double distortscale_mean;
+    pnh.param("distortscale_mean", distortscale_mean, 0.0);
+    double distortscale_stddev;
+    pnh.param("distortscale_stddev", distortscale_stddev, 0.0);
+
+    distorter_.reset(new msf_updates::PoseDistorter(meanpos, stddevpos, meanatt, stddevatt, distortscale_mean, distortscale_stddev));
+  }
             }
 
-void PoseSensorHandler::setNoises(double n_zp, double n_zq)
+template<typename MEASUREMENT_TYPE>
+void PoseSensorHandler<MEASUREMENT_TYPE>::setNoises(double n_zp, double n_zq)
 {
   n_zp_ = n_zp;
   n_zq_ = n_zq;
 }
 
-void PoseSensorHandler::setDelay(double delay)
+template<typename MEASUREMENT_TYPE>
+void PoseSensorHandler<MEASUREMENT_TYPE>::setDelay(double delay)
 {
   delay_ = delay;
 }
-void PoseSensorHandler::measurementCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg)
+template<typename MEASUREMENT_TYPE>
+void PoseSensorHandler<MEASUREMENT_TYPE>::measurementCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg)
 {
 
-  boost::shared_ptr<pose_measurement::PoseMeasurement> meas( new pose_measurement::PoseMeasurement(n_zp_, n_zq_, measurement_world_sensor_, use_fixed_covariance_, provides_absolute_measurements_, this->sensorID));
+  boost::shared_ptr<MEASUREMENT_TYPE> meas( new MEASUREMENT_TYPE(n_zp_, n_zq_, measurement_world_sensor_, use_fixed_covariance_, provides_absolute_measurements_, this->sensorID, distorter_));
   meas->makeFromSensorReading(msg, msg->header.stamp.toSec() - delay_);
 
   z_p_ = meas->z_p_; //store this for the init procedure
@@ -83,7 +116,8 @@ void PoseSensorHandler::measurementCallback(const geometry_msgs::PoseWithCovaria
   this->manager_.msf_core_->addMeasurement(meas);
 }
 
-void PoseSensorHandler::measurementCallback(const geometry_msgs::TransformStampedConstPtr & msg)
+template<typename MEASUREMENT_TYPE>
+void PoseSensorHandler<MEASUREMENT_TYPE>::measurementCallback(const geometry_msgs::TransformStampedConstPtr & msg)
 {
 
   if(msg->header.seq%5!=0){ //slow down vicon
@@ -115,7 +149,8 @@ void PoseSensorHandler::measurementCallback(const geometry_msgs::TransformStampe
   measurementCallback(pose);
 }
 
-void PoseSensorHandler::measurementCallback(const geometry_msgs::PoseStampedConstPtr & msg)
+template<typename MEASUREMENT_TYPE>
+void PoseSensorHandler<MEASUREMENT_TYPE>::measurementCallback(const geometry_msgs::PoseStampedConstPtr & msg)
 {
 
   geometry_msgs::PoseWithCovarianceStampedPtr pose(new geometry_msgs::PoseWithCovarianceStamped());

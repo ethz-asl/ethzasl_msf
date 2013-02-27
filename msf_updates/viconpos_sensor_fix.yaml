@@ -27,3 +27,10 @@ init/p_ci/z: 0.0
 
 use_fixed_covariance: true
 measurement_world_sensor: true  # selects if sensor measures its position w.r.t. world (true, e.g. Vicon) or the position of the world coordinate system w.r.t. the sensor (false, e.g. ethzasl_ptam)
+
+distortpos_mean: 0.0
+distortpos_stddev: 0.0
+distortatt_mean: 0.0
+distortatt_stddev: 0.0
+distortscale_mean: 0.001
+distortscale_stddev: 0.0001

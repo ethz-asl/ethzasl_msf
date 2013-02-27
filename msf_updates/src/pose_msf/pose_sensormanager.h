@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <msf_core/msf_sensormanagerROS.h>
 #include "msf_statedef.hpp"
 #include <msf_updates/pose_sensor_handler/pose_sensorhandler.h>
+#include <msf_updates/pose_sensor_handler/pose_measurement.h>
 #include <msf_updates/SinglePoseSensorConfig.h>
 
 namespace msf_pose_sensor{
@@ -52,7 +53,8 @@ typedef boost::shared_ptr<ReconfigureServer> ReconfigureServerPtr;
 
 class PoseSensorManager : public msf_core::MSF_SensorManagerROS<msf_updates::EKFState>
 {
-  friend class PoseSensorHandler;
+  typedef PoseSensorHandler<msf_updates::pose_measurement::PoseMeasurement> PoseSensorHandler_T;
+  friend PoseSensorHandler_T;
 public:
   typedef msf_updates::EKFState EKFState_T;
   typedef EKFState_T::StateSequence_T StateSequence_T;
@@ -60,9 +62,10 @@ public:
 
   PoseSensorManager(ros::NodeHandle pnh = ros::NodeHandle("~/pose_sensor"))
   {
-    bool poseabsolute = false; ///<does the pose sensor provides absolute measurements : TODO read from parameters which are specific to this sensor
+    bool poseabsolute = true; ///<does the pose sensor provides absolute measurements : TODO read from parameters which are specific to this sensor
+    bool distortmeas = true; ///<distort the pose measurements TODO make param
 
-      pose_handler_.reset(new PoseSensorHandler(*this, poseabsolute));
+    pose_handler_.reset(new PoseSensorHandler_T(*this, poseabsolute, distortmeas));
     addHandler(pose_handler_);
 
     reconf_server_.reset(new ReconfigureServer(pnh));
@@ -72,7 +75,7 @@ public:
   virtual ~PoseSensorManager(){}
 
 private:
-  boost::shared_ptr<PoseSensorHandler> pose_handler_;
+  boost::shared_ptr<PoseSensorHandler_T> pose_handler_;
 
   Config_T config_;
   ReconfigureServerPtr reconf_server_; ///< dynamic reconfigure server

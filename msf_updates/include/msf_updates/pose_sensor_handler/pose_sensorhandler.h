@@ -37,14 +37,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define POSE_SENSOR_H
 
 #include <msf_core/msf_sensormanagerROS.h>
-#include <msf_updates/pose_sensor_handler/pose_measurement.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <msf_updates/PoseDistorter.h>
 
 namespace msf_pose_sensor{
 class PoseSensorManager;
 
+template<typename MEASUREMENT_TYPE>
 class PoseSensorHandler : public msf_core::SensorHandler<typename msf_updates::EKFState>
 {
 private:
@@ -62,12 +63,15 @@ private:
   bool use_fixed_covariance_; ///< use fixed covariance set by dynamic reconfigure
   bool provides_absolute_measurements_; ///<does this sensor measure relative or absolute values
 
+  msf_updates::PoseDistorter::Ptr distorter_;
+
   void measurementCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg);
   void measurementCallback(const geometry_msgs::PoseStampedConstPtr & msg);
   void measurementCallback(const geometry_msgs::TransformStampedConstPtr & msg);
 
 public:
-  PoseSensorHandler(msf_core::MSF_SensorManager<msf_updates::EKFState>& meas, bool provides_absolute_measurements);
+  typedef MEASUREMENT_TYPE measurement_t;
+  PoseSensorHandler(msf_core::MSF_SensorManager<msf_updates::EKFState>& meas, bool provides_absolute_measurements, bool distortmeas);
   //used for the init
   Eigen::Matrix<double, 3, 1> getPositionMeasurement(){
     return z_p_;

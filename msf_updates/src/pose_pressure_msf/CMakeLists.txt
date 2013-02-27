@@ -1,3 +1,4 @@
 rosbuild_add_executable(pose_pressure_sensor main.cpp)
 rosbuild_add_compile_flags(pose_pressure_sensor "-O2")
 
+target_link_libraries(pose_pressure_sensor pose_distorter)

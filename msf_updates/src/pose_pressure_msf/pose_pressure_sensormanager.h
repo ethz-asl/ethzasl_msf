@@ -42,6 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "msf_statedef.hpp"
 #include <msf_updates/pose_sensor_handler/pose_sensorhandler.h>
 #include <msf_updates/pressure_sensor_handler/pressure_sensorhandler.h>
+#include <msf_updates/pose_sensor_handler/pose_measurement.h>
 #include <msf_updates/PosePressureSensorConfig.h>
 #include <msf_updates/SinglePoseSensorConfig.h>
 
@@ -53,7 +54,8 @@ typedef boost::shared_ptr<ReconfigureServer> ReconfigureServerPtr;
 
 class PosePressureSensorManager : public msf_core::MSF_SensorManagerROS<msf_updates::EKFState>
 {
-  friend class PoseSensorHandler;
+  typedef msf_pose_sensor::PoseSensorHandler<msf_updates::pose_measurement::PoseMeasurement> PoseSensorHandler_T;
+  friend PoseSensorHandler_T;
 public:
   typedef msf_updates::EKFState EKFState_T;
   typedef EKFState_T::StateSequence_T StateSequence_T;
@@ -62,7 +64,8 @@ public:
   PosePressureSensorManager(ros::NodeHandle pnh = ros::NodeHandle("~/pose_pressure_sensor"))
   {
     bool poseabsolute = true; ///<does the pose sensor provides absolute measurements
-    pose_handler_.reset(new msf_pose_sensor::PoseSensorHandler(*this, poseabsolute));
+    bool distortmeasurement = true;
+    pose_handler_.reset(new PoseSensorHandler_T(*this, poseabsolute, distortmeasurement));
     addHandler(pose_handler_);
 
     pressure_handler_.reset(new msf_pressure_sensor::PressureSensorHandler(*this));
@@ -76,7 +79,7 @@ public:
   virtual ~PosePressureSensorManager(){}
 
 private:
-  boost::shared_ptr<msf_pose_sensor::PoseSensorHandler> pose_handler_;
+  boost::shared_ptr<PoseSensorHandler_T> pose_handler_;
   boost::shared_ptr<msf_pressure_sensor::PressureSensorHandler> pressure_handler_;
 
   Config_T config_;

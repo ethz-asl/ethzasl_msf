@@ -11,6 +11,7 @@
 #include <Eigen/Dense>
 #include <random>
 #include <cmath>
+#include <boost/shared_ptr.hpp>
 
 namespace msf_updates
 {
@@ -19,19 +20,20 @@ class PoseDistorter
 {
 public:
   typedef std::normal_distribution<> distribution_t;
+  typedef boost::shared_ptr<PoseDistorter> Ptr;
 private:
-  Eigen::Vector3d meanposdrift_;
-  Eigen::Vector3d stddevposdrift_;
-  Eigen::Vector3d meanattdrift_;
-  Eigen::Vector3d sigmaattdrift_;
   Eigen::Vector3d posdrift_;
   Eigen::Quaterniond attdrift_;
+  double scaledrift_;
+
   std::random_device rd_;
   std::mt19937 gen_;
+
   distribution_t d_pos_[3];
   distribution_t d_att_[3];
+  distribution_t d_scale;
 public:
-  PoseDistorter(const Eigen::Vector3d& meanposdrift, const Eigen::Vector3d& stddevposdrift, const Eigen::Vector3d& meanattdrift, const Eigen::Vector3d& stddevattdrift);
+  PoseDistorter(const Eigen::Vector3d& meanposdrift, const Eigen::Vector3d& stddevposdrift, const Eigen::Vector3d& meanattdrift, const Eigen::Vector3d& stddevattdrift, const double meanscaledrift, const double stddevscaledrift);
   void distort(Eigen::Vector3d& pos, Eigen::Quaterniond& att, double dt);
   void distort(Eigen::Vector3d& pos, double dt);
   void distort(Eigen::Quaterniond& att, double dt);
