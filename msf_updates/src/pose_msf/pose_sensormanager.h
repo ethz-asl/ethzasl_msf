@@ -53,7 +53,7 @@ typedef boost::shared_ptr<ReconfigureServer> ReconfigureServerPtr;
 
 class PoseSensorManager : public msf_core::MSF_SensorManagerROS<msf_updates::EKFState>
 {
-  typedef PoseSensorHandler<msf_updates::pose_measurement::PoseMeasurement> PoseSensorHandler_T;
+  typedef PoseSensorHandler<msf_updates::pose_measurement::PoseMeasurement, PoseSensorManager> PoseSensorHandler_T;
   friend PoseSensorHandler_T;
 public:
   typedef msf_updates::EKFState EKFState_T;
@@ -73,6 +73,10 @@ public:
     reconf_server_->setCallback(f);
   }
   virtual ~PoseSensorManager(){}
+
+  virtual const Config_T& getcfg(){
+    return config_;
+  }
 
 private:
   boost::shared_ptr<PoseSensorHandler_T> pose_handler_;
@@ -201,32 +205,6 @@ private:
 
   virtual void augmentCorrectionVector(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& correction_){
 
-    if (this->config_.fixed_scale)
-    {
-      typedef typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::L>::value L_type;
-      const int L_indexInErrorState = msf_tmp::getStateIndexInErrorState<StateSequence_T, StateDefinition_T::L>::value;
-
-      for(int i = 0 ; i < msf_tmp::StripConstReference<L_type>::result_t::sizeInCorrection_ ; ++i){
-        correction_(L_indexInErrorState + i) = 0; //scale
-      }
-    }
-
-    if (this->config_.fixed_calib)
-    {
-      typedef typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::q_ci>::value q_ci_type;
-      const int q_ci_indexInErrorState = msf_tmp::getStateIndexInErrorState<StateSequence_T, StateDefinition_T::q_ci>::value;
-
-      for(int i = 0 ; i < msf_tmp::StripConstReference<q_ci_type>::result_t::sizeInCorrection_ ; ++i){
-        correction_(q_ci_indexInErrorState + i) = 0; //q_ic roll, pitch, yaw
-      }
-
-      typedef typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::p_ci>::value p_ci_type;
-      const int p_ci_indexInErrorState = msf_tmp::getStateIndexInErrorState<StateSequence_T, StateDefinition_T::p_ci>::value;
-
-      for(int i = 0 ; i < msf_tmp::StripConstReference<p_ci_type>::result_t::sizeInCorrection_ ; ++i){
-        correction_(p_ci_indexInErrorState + i) = 0; //p_ci x,y,z
-      }
-    }
   }
 
   virtual void sanityCheckCorrection(EKFState_T& delaystate, const EKFState_T& buffstate,

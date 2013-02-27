@@ -30,7 +30,6 @@ include_directories(${Eigen_INCLUDE_DIRS})
 rosbuild_add_library(pose_distorter src/msf_distort/PoseDistorter.cc)
 
 add_subdirectory(src/pose_msf)
-add_subdirectory(src/viconpose_msf)
 add_subdirectory(src/pose_pressure_msf)
 add_subdirectory(src/position_msf)
 

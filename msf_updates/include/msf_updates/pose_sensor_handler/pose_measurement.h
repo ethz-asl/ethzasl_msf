@@ -128,6 +128,7 @@ public:
   bool measurement_world_sensor_;
   bool fixed_covariance_;
   msf_updates::PoseDistorter::Ptr distorter_;
+  int fixedstates_;
 
   typedef msf_updates::EKFState EKFState_T;
   typedef EKFState_T::StateSequence_T StateSequence_T;
@@ -135,9 +136,9 @@ public:
   virtual ~PoseMeasurement()
   {
   }
-  PoseMeasurement(double n_zp, double n_zq, bool measurement_world_sensor, bool fixed_covariance, bool isabsoluteMeasurement, int sensorID, msf_updates::PoseDistorter::Ptr distorter = msf_updates::PoseDistorter::Ptr()) :
+  PoseMeasurement(double n_zp, double n_zq, bool measurement_world_sensor, bool fixed_covariance, bool isabsoluteMeasurement, int sensorID, int fixedstates, msf_updates::PoseDistorter::Ptr distorter = msf_updates::PoseDistorter::Ptr()) :
     PoseMeasurementBase(isabsoluteMeasurement, sensorID),
-    n_zp_(n_zp), n_zq_(n_zq), measurement_world_sensor_(measurement_world_sensor), fixed_covariance_(fixed_covariance), distorter_(distorter)
+    n_zp_(n_zp), n_zq_(n_zq), measurement_world_sensor_(measurement_world_sensor), fixed_covariance_(fixed_covariance), distorter_(distorter), fixedstates_(fixedstates)
   {
   }
   virtual std::string type(){
@@ -173,22 +174,43 @@ public:
       idxstartcorr_pci_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::p_ci>::value,
     };
 
+    bool scalefix = (fixedstates_ & 1 << StateDefinition_T::L);
+    bool calibposfix = (fixedstates_ & 1 << StateDefinition_T::q_ci);
+    bool calibattfix = (fixedstates_ & 1 << StateDefinition_T::p_ci);
+
     // construct H matrix using H-blockx :-)
     // position:
-    H.block<3, 3>(0, idxstartcorr_p_) = C_wv.transpose() * state.get<StateDefinition_T::L>()(0); // p
-    H.block<3, 3>(0, idxstartcorr_q_) = -C_wv.transpose() * C_q.transpose() * pci_sk * state.get<StateDefinition_T::L>()(0); // q
+    H.block<3, 3>(0, idxstartcorr_p_) = C_wv.transpose()
+        * (scalefix ? 1 : state.get<StateDefinition_T::L>()(0)); // p
 
-    H.block<3, 1>(0, idxstartcorr_L_) = C_wv.transpose() * C_q.transpose() * state.get<StateDefinition_T::p_ci>()
-                                                                                                             + C_wv.transpose() * state.get<StateDefinition_T::p>() + state.get<StateDefinition_T::p_vw>(); // L
+    H.block<3, 3>(0, idxstartcorr_q_) = -C_wv.transpose() * C_q.transpose() * pci_sk
+        * (scalefix ? 1 : state.get<StateDefinition_T::L>()(0)); // q
+
+     Eigen::Matrix<double, 3, 1> dxdLnSc = Eigen::Matrix<double, 3, 1>::Constant(0);
+     Eigen::Matrix<double, 3, 1> dxdLSc = (C_wv.transpose() * C_q.transpose()
+                              * (calibposfix ? Eigen::Matrix<double, 3, 1>::Constant(1) : state.get<StateDefinition_T::p_ci>())
+                              + C_wv.transpose() * state.get<StateDefinition_T::p>() + state.get<StateDefinition_T::p_vw>()); // L
+
+
+    H.block<3, 1>(0, idxstartcorr_L_) = scalefix ? dxdLSc : dxdLnSc;
 
     H.block<3, 3>(0, idxstartcorr_qwv_) = -C_wv.transpose() * skewold; // q_wv
-    H.block<3, 3>(0, idxstartcorr_pci_) = C_wv.transpose() * C_q.transpose() * state.get<StateDefinition_T::L>()(0); //p_ci
-    H.block<3, 3>(0, idxstartcorr_pvw_) = Eigen::Matrix<double,3,3>::Identity() * state.get<StateDefinition_T::L>()(0); //p_vw
+
+    Eigen::Matrix<double, 3, 3> dxdncpi = Eigen::Matrix<double, 3, 3>::Constant(0);
+    Eigen::Matrix<double, 3, 3> dxdcpi = (C_wv.transpose() * C_q.transpose() * (scalefix ? 1 : state.get<StateDefinition_T::L>()(0)));
+    H.block<3, 3>(0, idxstartcorr_pci_) = calibposfix ? dxdcpi : dxdncpi; //p_ci
+
+    H.block<3, 3>(0, idxstartcorr_pvw_) = Eigen::Matrix<double, 3, 3>::Identity() * (scalefix ? 1 : state.get<StateDefinition_T::L>()(0)); //p_vw
 
     // attitude
     H.block<3, 3>(3, idxstartcorr_q_) = C_ci; // q
+
     H.block<3, 3>(3, idxstartcorr_qwv_) = C_ci * C_q; // q_wv
-    H.block<3, 3>(3, idxstartcorr_qci_) = Eigen::Matrix<double, 3, 3>::Identity(); //q_ci
+
+    Eigen::Matrix<double, 3, 3> dxdnqci = Eigen::Matrix<double, 3, 3>::Constant(0);
+    Eigen::Matrix<double, 3, 3> dxdqci = Eigen::Matrix<double, 3, 3>::Identity();
+    H.block<3, 3>(3, idxstartcorr_qci_) = calibattfix ? dxdqci : dxdnqci; //q_ci
+
     //TODO: do we still want this?
     H(6, 18) = 1.0; // fix vision world yaw drift because unobservable otherwise (see PhD Thesis)
 
@@ -280,6 +302,8 @@ public:
 
       calculateH(state_nonconst_new, H_new);
 
+      //TODO check that both measurements have the same states fixed!
+
       Eigen::Matrix<double, 3, 3> C_wv_old, C_wv_new;
       Eigen::Matrix<double, 3, 3> C_q_old, C_q_new;
 
@@ -290,10 +314,11 @@ public:
 
       // construct residuals
       // position
+      //TODO reenable p_vw
       Eigen::Matrix<double, 3, 1> diffprobpos = (/*state_new.get<StateDefinition_T::p_vw>() + */C_wv_new.transpose() * (state_new.get<StateDefinition_T::p>() + C_q_new.transpose() * state_new.get<StateDefinition_T::p_ci>()))
-                                             * state_new.get<StateDefinition_T::L>() -
-                                             (/*state_old.get<StateDefinition_T::p_vw>() + */C_wv_old.transpose() * (state_old.get<StateDefinition_T::p>() + C_q_old.transpose() * state_old.get<StateDefinition_T::p_ci>()))
-                                             * state_old.get<StateDefinition_T::L>();
+                                                     * state_new.get<StateDefinition_T::L>() -
+                                                     (/*state_old.get<StateDefinition_T::p_vw>() + */C_wv_old.transpose() * (state_old.get<StateDefinition_T::p>() + C_q_old.transpose() * state_old.get<StateDefinition_T::p_ci>()))
+                                                     * state_old.get<StateDefinition_T::L>();
 
       Eigen::Matrix<double, 3, 1> diffmeaspos = z_p_ - prevmeas->z_p_;
 

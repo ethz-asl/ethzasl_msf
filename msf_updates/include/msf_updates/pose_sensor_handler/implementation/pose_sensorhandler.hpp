@@ -36,10 +36,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <msf_core/eigen_utils.h>
 
 namespace msf_pose_sensor{
-template<typename MEASUREMENT_TYPE>
-PoseSensorHandler<MEASUREMENT_TYPE>::PoseSensorHandler(msf_core::MSF_SensorManager<msf_updates::EKFState>& meas, bool provides_absolute_measurements, bool distortmeas) :
-            SensorHandler<msf_updates::EKFState>(meas), n_zp_(1e-6), n_zq_(1e-6), delay_(0), provides_absolute_measurements_(provides_absolute_measurements)
-            {
+template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
+PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PoseSensorHandler(MANAGER_TYPE& meas, bool provides_absolute_measurements, bool distortmeas) :
+SensorHandler<msf_updates::EKFState>(meas), n_zp_(1e-6), n_zq_(1e-6), delay_(0), provides_absolute_measurements_(provides_absolute_measurements)
+{
   ros::NodeHandle pnh("~");
   pnh.param("measurement_world_sensor", measurement_world_sensor_, true);
   pnh.param("use_fixed_covariance", use_fixed_covariance_, false);
@@ -89,25 +89,44 @@ PoseSensorHandler<MEASUREMENT_TYPE>::PoseSensorHandler(msf_core::MSF_SensorManag
 
     distorter_.reset(new msf_updates::PoseDistorter(meanpos, stddevpos, meanatt, stddevatt, distortscale_mean, distortscale_stddev));
   }
-            }
+}
 
-template<typename MEASUREMENT_TYPE>
-void PoseSensorHandler<MEASUREMENT_TYPE>::setNoises(double n_zp, double n_zq)
+template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
+void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::setNoises(double n_zp, double n_zq)
 {
   n_zp_ = n_zp;
   n_zq_ = n_zq;
 }
 
-template<typename MEASUREMENT_TYPE>
-void PoseSensorHandler<MEASUREMENT_TYPE>::setDelay(double delay)
+template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
+void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::setDelay(double delay)
 {
   delay_ = delay;
 }
-template<typename MEASUREMENT_TYPE>
-void PoseSensorHandler<MEASUREMENT_TYPE>::measurementCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg)
+template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
+void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg)
 {
 
-  boost::shared_ptr<MEASUREMENT_TYPE> meas( new MEASUREMENT_TYPE(n_zp_, n_zq_, measurement_world_sensor_, use_fixed_covariance_, provides_absolute_measurements_, this->sensorID, distorter_));
+  //get the fixed states
+  int fixedstates = 0;
+  BOOST_STATIC_ASSERT_MSG(msf_updates::EKFState::nStateVarsAtCompileTime < 32, "Your state has more than 32 variables, so check that the fix-states does not overflow"); //do not exceed the 32 bits of int
+
+  MANAGER_TYPE* mngr = dynamic_cast<MANAGER_TYPE*>(&manager_);
+
+  if(mngr){
+    if (mngr->getcfg().fixed_scale){
+      fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::L;
+    }
+    if (mngr->getcfg().fixed_calib_pos){
+      fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::p_ci;
+    }
+    if (mngr->getcfg().fixed_calib_att){
+      fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::q_ci;
+    }
+  }
+
+  boost::shared_ptr<MEASUREMENT_TYPE> meas( new MEASUREMENT_TYPE(n_zp_, n_zq_, measurement_world_sensor_, use_fixed_covariance_, provides_absolute_measurements_, this->sensorID, fixedstates, distorter_));
+
   meas->makeFromSensorReading(msg, msg->header.stamp.toSec() - delay_);
 
   z_p_ = meas->z_p_; //store this for the init procedure
@@ -116,8 +135,8 @@ void PoseSensorHandler<MEASUREMENT_TYPE>::measurementCallback(const geometry_msg
   this->manager_.msf_core_->addMeasurement(meas);
 }
 
-template<typename MEASUREMENT_TYPE>
-void PoseSensorHandler<MEASUREMENT_TYPE>::measurementCallback(const geometry_msgs::TransformStampedConstPtr & msg)
+template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
+void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(const geometry_msgs::TransformStampedConstPtr & msg)
 {
 
   if(msg->header.seq%5!=0){ //slow down vicon
@@ -149,8 +168,8 @@ void PoseSensorHandler<MEASUREMENT_TYPE>::measurementCallback(const geometry_msg
   measurementCallback(pose);
 }
 
-template<typename MEASUREMENT_TYPE>
-void PoseSensorHandler<MEASUREMENT_TYPE>::measurementCallback(const geometry_msgs::PoseStampedConstPtr & msg)
+template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
+void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(const geometry_msgs::PoseStampedConstPtr & msg)
 {
 
   geometry_msgs::PoseWithCovarianceStampedPtr pose(new geometry_msgs::PoseWithCovarianceStamped());

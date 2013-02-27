@@ -43,9 +43,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <msf_updates/PoseDistorter.h>
 
 namespace msf_pose_sensor{
-class PoseSensorManager;
 
-template<typename MEASUREMENT_TYPE>
+template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 class PoseSensorHandler : public msf_core::SensorHandler<typename msf_updates::EKFState>
 {
 private:
@@ -71,7 +70,7 @@ private:
 
 public:
   typedef MEASUREMENT_TYPE measurement_t;
-  PoseSensorHandler(msf_core::MSF_SensorManager<msf_updates::EKFState>& meas, bool provides_absolute_measurements, bool distortmeas);
+  PoseSensorHandler(MANAGER_TYPE& meas, bool provides_absolute_measurements, bool distortmeas);
   //used for the init
   Eigen::Matrix<double, 3, 1> getPositionMeasurement(){
     return z_p_;
