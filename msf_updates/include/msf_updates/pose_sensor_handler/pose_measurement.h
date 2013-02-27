@@ -247,7 +247,6 @@ public:
         ROS_WARN_STREAM("The dynamic cast of the previous measurement has failed. Could not apply measurement");
         return;
       }
-      ROS_WARN_STREAM("dt to last measurement "<<this->time - prevmeas->time);
 
       //get state at previous measurement
       boost::shared_ptr<EKFState_T> state_nonconst_old = core.getStateAtTime(prevmeas->time);
@@ -287,10 +286,6 @@ public:
       Eigen::Matrix<double, 3, 1> diffmeaspos = z_p_ - prevmeas->z_p_;
 
       r_new.block<3, 1>(0, 0) = diffmeaspos - diffprobpos;
-
-      ROS_WARN_STREAM("Diff prob pose: "<<diffprobpos.transpose()<<" meas diff "<<
-                      diffmeaspos.transpose()<<" res block "<<(r_new.block<3, 1>(0, 0)).transpose());
-
 
       // attitude
       Eigen::Quaternion<double> diffprobatt = (state_new.get<StateDefinition_T::q_wv>() * state_new.get<StateDefinition_T::q>() * state_new.get<StateDefinition_T::q_ci>()).conjugate() * (state_old.get<StateDefinition_T::q_wv>() * state_old.get<StateDefinition_T::q>() * state_old.get<StateDefinition_T::q_ci>());
