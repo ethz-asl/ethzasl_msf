@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <chrono>
 #include <thread>
 #include <sm/timing/Timer.hpp>
+#include <deque>
+#include <numeric>
 #include <sensor_msgs/image_encodings.h>
 #include <msf_core/falsecolor.h>
 
@@ -128,8 +130,24 @@ void MSF_Core<EKFState_T>::publishCovImage(boost::shared_ptr<EKFState_T> statept
   std::vector<std::tuple<int, int, int> > enumsandindices;
   stateptr->calculateIndicesInErrorState(enumsandindices);
 
-  double max = state.P.maxCoeff();
-  double min = state.P.minCoeff();
+  //smooth min max values of P
+  static struct smoothP{
+    std::deque<double> dmin;
+    std::deque<double> dmax;
+  } smoother;
+
+  smoother.dmin.push_back(state.P.minCoeff());
+  smoother.dmax.push_back(state.P.maxCoeff());
+
+  size_t filtsize = 50;
+  if(smoother.dmin.size() > filtsize)
+    smoother.dmin.pop_front();
+
+  if(smoother.dmax.size() > filtsize)
+    smoother.dmax.pop_front();
+
+  double min = std::accumulate(smoother.dmin.begin(), smoother.dmin.end(), 0.0) / smoother.dmin.size();
+  double max = std::accumulate(smoother.dmax.begin(), smoother.dmax.end(), 0.0) / smoother.dmax.size();
 
   palette pal = GetPalette(palette::False_color_palette4);
 
@@ -148,6 +166,7 @@ void MSF_Core<EKFState_T>::publishCovImage(boost::shared_ptr<EKFState_T> statept
           double value = state.P(std::get<1>(enumsandindices.at(i)) + rowidx, std::get<1>(enumsandindices.at(j)) + colidx);
 
           int brightness = (value - min) / (max - min) * 255.;
+          brightness = brightness > 255 ? 255 : brightness < 0 ? 0 : brightness; //clamp
 
           cv::rectangle(colorimg, cv::Point(startrow, startcol),cv::Point(startrow + blocksize, startcol + blocksize),
                         CV_RGB(pal.colors[brightness].rgbRed, pal.colors[brightness].rgbGreen, pal.colors[brightness].rgbBlue), CV_FILLED);
@@ -179,6 +198,8 @@ void MSF_Core<EKFState_T>::publishCovImage(boost::shared_ptr<EKFState_T> statept
   memcpy(&msgimg_->data[0],&colorimg.data[0],sizeof(char)*msgimg_->data.size());
 
   pubCov_.publish(msgimg_);
+
+  ROS_WARN_STREAM("P=["<<state.P<<"];");
 
 }
 

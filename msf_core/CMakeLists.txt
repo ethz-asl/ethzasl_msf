@@ -31,10 +31,6 @@ include_directories(${Eigen_INCLUDE_DIRS})
 
 add_subdirectory(src/lib)
 
-#common commands for building c++ executables and libraries
-#rosbuild_add_library(msf_core src/MSF_Core.cpp src/measurement.cpp src/state.cpp)
-#rosbuild_add_compile_flags(msf_core "-O3")
-
 #rosbuild_add_executable(staticstatelist src/test_staticstatelist.cc)
 #rosbuild_add_gtest_build_flags(staticstatelist)
 
@@ -45,6 +41,6 @@ add_subdirectory(src/lib)
 #rosbuild_add_gtest(test_staticstatelist src/test_staticstatelist.cc)
 #rosbuild_link_boost(test_staticstatelist thread)
 
-rosbuild_add_library(similaritytransform src/similaritytransform.cpp)
-rosbuild_add_executable(test_similaritytransform src/test_similaritytransform.cpp)
+rosbuild_add_library(similaritytransform src/similaritytransform.cc)
+rosbuild_add_executable(test_similaritytransform src/test_similaritytransform.cc)
 target_link_libraries(test_similaritytransform similaritytransform)
