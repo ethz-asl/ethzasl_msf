@@ -227,6 +227,24 @@ inline void GenericState_T<stateVector_T, StateDefinition_T>::set(const typename
   boost::fusion::at<boost::mpl::int_<INDEX> >(statevars).state_ = newvalue;
 }
 
+
+template<typename stateVector_T, typename StateDefinition_T>
+template<int INDEX>
+inline void GenericState_T<stateVector_T, StateDefinition_T>::clearCrossCov() {
+  typedef typename msf_tmp::StripReference<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::result_t StateVar_T;
+
+  enum{
+    startIdxInState = msf_tmp::getStartIndex<StateSequence_T, StateVar_T, msf_tmp::CorrectionStateLengthForType>::value, //index of the data in the correction vector
+    lengthInState = StateVar_T::sizeInCorrection_
+  };
+
+  Eigen::Matrix<double, lengthInState, lengthInState> cov = P.template block<lengthInState, lengthInState>(startIdxInState, startIdxInState); //save covariance block
+  P.template block<lengthInState, nErrorStatesAtCompileTime>(startIdxInState, 0).setZero();
+  P.template block<nErrorStatesAtCompileTime, lengthInState>(0, startIdxInState).setZero();
+  P.template block<lengthInState, lengthInState>(startIdxInState,startIdxInState) = cov; //write back cov block
+
+}
+
 /// resets the state
 /**
  * 3D vectors: 0; quaternion: unit quaternion; scale: 1; time:0; Error covariance: zeros

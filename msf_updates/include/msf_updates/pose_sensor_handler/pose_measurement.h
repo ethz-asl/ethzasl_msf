@@ -179,6 +179,11 @@ public:
     bool calibposfix = (fixedstates_ & 1 << StateDefinition_T::p_ci);
     bool calibattfix = (fixedstates_ & 1 << StateDefinition_T::q_ci);
 
+    //set crosscov to zero
+    if(scalefix) state_in->clearCrossCov<StateDefinition_T::L>();
+    if(calibposfix) state_in->clearCrossCov<StateDefinition_T::p_ci>();
+    if(calibattfix) state_in->clearCrossCov<StateDefinition_T::q_ci>();
+
     // construct H matrix using H-blockx :-)
     // position:
     H.block<3, 3>(0, idxstartcorr_p_) = C_wv.transpose() * state.get<StateDefinition_T::L>()(0); // p

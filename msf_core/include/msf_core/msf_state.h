@@ -241,6 +241,14 @@ public:
   template<int INDEX>
   inline void
   set(const typename msf_tmp::StripConstReference<typename boost::fusion::result_of::at_c<StateSequence_T, INDEX >::type>::result_t::value_t& newvalue);
+
+  /*
+   * Clears the crosscovariance entries of a given state in P
+   */
+  template<int INDEX>
+  inline void
+  clearCrossCov();
+
 };
 
 /**
