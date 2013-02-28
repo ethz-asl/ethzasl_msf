@@ -131,7 +131,7 @@ void MSF_Core<EKFState_T>::publishCovImage(boost::shared_ptr<EKFState_T> statept
   double max = state.P.maxCoeff();
   double min = state.P.minCoeff();
 
-  palette pal = GetPalette(palette::False_color_palette3);
+  palette pal = GetPalette(palette::False_color_palette4);
 
   //draw the blocks for covs of the state variables
   for(size_t i = 0; i < enumsandindices.size() ; ++i){

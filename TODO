@@ -9,5 +9,8 @@ evaluate "short" covariance update formula
 
 symm P: EV decompose P, set EVs<eps to zero and rebuild (profile this to know the cost!)
 
-checkForNumeric to Eigen-style function
+make sensor_manager provide interface to add measurement to core, so that 
+measurements dont need to include the core, but just the base manager class. 
+
+use more polymorphism to reduce compilation time and break up dependencies
 
