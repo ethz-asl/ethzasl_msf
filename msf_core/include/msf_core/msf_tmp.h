@@ -756,6 +756,28 @@ private:
 };
 
 /**
+ * \brief copies pairs of statename and index in correction vector to STL container of pairs or tuples
+ */
+template<typename T, typename stateList_T>
+struct GetIndicesInErrorState
+{
+  GetIndicesInErrorState(T& val):data_(val){}
+  template<typename VALUET, int NAME, int STATETYPE>
+  void operator()(msf_core::StateVar_T<VALUET, NAME, STATETYPE>& t) const {
+    typedef msf_core::StateVar_T<VALUET, NAME, STATETYPE> var_T;
+    enum{
+      startIdxInState = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::CorrectionStateLengthForType>::value, //index of the data in the correction vector
+      lengthInState = var_T::sizeInCorrection_
+    };
+    data_.push_back(typename T::value_type(NAME, startIdxInState, lengthInState));
+  }
+private:
+  T& data_;
+};
+
+
+
+/**
  * \brief return the index of a given state variable number in the state matrices
  */
 template<typename stateVector_T, int INDEX>

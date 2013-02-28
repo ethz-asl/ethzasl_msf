@@ -47,6 +47,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sensor_msgs/Imu.h>
 #include <asctec_hl_comm/mav_imu.h>
 
+#include <image_transport/image_transport.h>
+#include <opencv/cvwimage.h>
+#include <opencv/highgui.h>
+
 #include <msf_core/msf_sortedContainer.h>
 #include <vector>
 #include <queue>
@@ -224,6 +228,8 @@ private:
   ros::Publisher pubCorrect_; ///< publishes corrections for external state propagation
   sensor_fusion_comm::ExtEkf msgCorrect_;
 
+  ros::Publisher pubCov_; ///< publishes the state covariance as image
+
   ros::Subscriber subState_; ///< subscriber to external state propagation
   ros::Subscriber subImu_; ///< subscriber to IMU readings
   ros::Subscriber subImuCustom_; ///< subscriber to IMU readings for asctec custom
@@ -272,6 +278,9 @@ private:
 
   ///checks the queue of measurements to be applied in the future
   void handlePendingMeasurements();
+
+  ///publish the state cov as image
+  void publishCovImage(boost::shared_ptr<EKFState_T> state) const;
 
 };
 

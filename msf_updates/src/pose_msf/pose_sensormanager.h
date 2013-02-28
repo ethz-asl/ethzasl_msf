@@ -63,7 +63,7 @@ public:
   PoseSensorManager(ros::NodeHandle pnh = ros::NodeHandle("~/pose_sensor"))
   {
     bool poseabsolute = true; ///<does the pose sensor provides absolute measurements : TODO read from parameters which are specific to this sensor
-    bool distortmeas = true; ///<distort the pose measurements TODO make param
+    bool distortmeas = false; ///<distort the pose measurements TODO make param
 
     pose_handler_.reset(new PoseSensorHandler_T(*this, poseabsolute, distortmeas));
     addHandler(pose_handler_);

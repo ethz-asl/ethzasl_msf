@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 #include <vector>
+#include <utility>
 #include <msf_core/eigen_conversions.h>
 #include <sensor_fusion_comm/ExtState.h>
 #include <sensor_fusion_comm/DoubleArrayStamped.h>
@@ -204,6 +205,11 @@ public:
    * \brief returns all values as an eigen vector
    */
   Eigen::Matrix<double, nCoreStatesAtCompileTime, 1> toEigenVector();
+
+  /**
+   * returns a vector of int pairs with enum index in errorstate and numblocks
+   */
+  void calculateIndicesInErrorState(std::vector<std::tuple<int, int, int> >& vec);
 
   /**
    * \brief returns a string describing the state

@@ -111,19 +111,20 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(cons
   int fixedstates = 0;
   BOOST_STATIC_ASSERT_MSG(msf_updates::EKFState::nStateVarsAtCompileTime < 32, "Your state has more than 32 variables, so check that the fix-states does not overflow"); //do not exceed the 32 bits of int
 
-//  MANAGER_TYPE* mngr = dynamic_cast<MANAGER_TYPE*>(&manager_);
-//
-//  if(mngr){
-//    if (mngr->getcfg().fixed_scale){
-//      fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::L;
-//    }
-//    if (mngr->getcfg().fixed_calib_pos){
-//      fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::p_ci;
-//    }
-//    if (mngr->getcfg().fixed_calib_att){
-//      fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::q_ci;
-//    }
-//  }
+  //get all the fixed states and set flag bits
+  MANAGER_TYPE* mngr = dynamic_cast<MANAGER_TYPE*>(&manager_);
+
+  if(mngr){
+    if (mngr->getcfg().fixed_scale){
+      fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::L;
+    }
+    if (mngr->getcfg().fixed_calib_pos){
+      fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::p_ci;
+    }
+    if (mngr->getcfg().fixed_calib_att){
+      fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::q_ci;
+    }
+  }
 
   boost::shared_ptr<MEASUREMENT_TYPE> meas( new MEASUREMENT_TYPE(n_zp_, n_zq_, measurement_world_sensor_, use_fixed_covariance_, provides_absolute_measurements_, this->sensorID, fixedstates, distorter_));
 

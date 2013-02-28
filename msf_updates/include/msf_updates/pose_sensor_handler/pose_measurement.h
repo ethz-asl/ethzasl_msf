@@ -174,42 +174,34 @@ public:
       idxstartcorr_pci_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::p_ci>::value,
     };
 
+    //read the fixed states flags
     bool scalefix = (fixedstates_ & 1 << StateDefinition_T::L);
-    bool calibposfix = (fixedstates_ & 1 << StateDefinition_T::q_ci);
-    bool calibattfix = (fixedstates_ & 1 << StateDefinition_T::p_ci);
+    bool calibposfix = (fixedstates_ & 1 << StateDefinition_T::p_ci);
+    bool calibattfix = (fixedstates_ & 1 << StateDefinition_T::q_ci);
 
     // construct H matrix using H-blockx :-)
     // position:
-    H.block<3, 3>(0, idxstartcorr_p_) = C_wv.transpose()
-        * (scalefix ? 1 : state.get<StateDefinition_T::L>()(0)); // p
+    H.block<3, 3>(0, idxstartcorr_p_) = C_wv.transpose() * state.get<StateDefinition_T::L>()(0); // p
 
-    H.block<3, 3>(0, idxstartcorr_q_) = -C_wv.transpose() * C_q.transpose() * pci_sk
-        * (scalefix ? 1 : state.get<StateDefinition_T::L>()(0)); // q
+    H.block<3, 3>(0, idxstartcorr_q_) = -C_wv.transpose() * C_q.transpose() * pci_sk * state.get<StateDefinition_T::L>()(0); // q
 
-     Eigen::Matrix<double, 3, 1> dxdLnSc = Eigen::Matrix<double, 3, 1>::Constant(0);
-     Eigen::Matrix<double, 3, 1> dxdLSc = (C_wv.transpose() * C_q.transpose()
-                              * (calibposfix ? Eigen::Matrix<double, 3, 1>::Constant(1) : state.get<StateDefinition_T::p_ci>())
-                              + C_wv.transpose() * state.get<StateDefinition_T::p>() + state.get<StateDefinition_T::p_vw>()); // L
-
-
-    H.block<3, 1>(0, idxstartcorr_L_) = scalefix ? dxdLSc : dxdLnSc;
+    H.block<3, 1>(0, idxstartcorr_L_) = scalefix ? Eigen::Matrix<double, 3, 1>::Constant(0) :
+        (C_wv.transpose() * C_q.transpose() * state.get<StateDefinition_T::p_ci>()
+        + C_wv.transpose() * state.get<StateDefinition_T::p>() + state.get<StateDefinition_T::p_vw>()).eval(); // L
 
     H.block<3, 3>(0, idxstartcorr_qwv_) = -C_wv.transpose() * skewold; // q_wv
 
-    Eigen::Matrix<double, 3, 3> dxdncpi = Eigen::Matrix<double, 3, 3>::Constant(0);
-    Eigen::Matrix<double, 3, 3> dxdcpi = (C_wv.transpose() * C_q.transpose() * (scalefix ? 1 : state.get<StateDefinition_T::L>()(0)));
-    H.block<3, 3>(0, idxstartcorr_pci_) = calibposfix ? dxdcpi : dxdncpi; //p_ci
+    H.block<3, 3>(0, idxstartcorr_pci_) = calibposfix ? Eigen::Matrix<double, 3, 3>::Constant(0) :
+        (C_wv.transpose() * C_q.transpose() * state.get<StateDefinition_T::L>()(0)).eval(); //p_ci
 
-    H.block<3, 3>(0, idxstartcorr_pvw_) = Eigen::Matrix<double, 3, 3>::Identity() * (scalefix ? 1 : state.get<StateDefinition_T::L>()(0)); //p_vw
+    H.block<3, 3>(0, idxstartcorr_pvw_) = Eigen::Matrix<double, 3, 3>::Identity() * state.get<StateDefinition_T::L>()(0); //p_vw
 
     // attitude
     H.block<3, 3>(3, idxstartcorr_q_) = C_ci; // q
 
     H.block<3, 3>(3, idxstartcorr_qwv_) = C_ci * C_q; // q_wv
 
-    Eigen::Matrix<double, 3, 3> dxdnqci = Eigen::Matrix<double, 3, 3>::Constant(0);
-    Eigen::Matrix<double, 3, 3> dxdqci = Eigen::Matrix<double, 3, 3>::Identity();
-    H.block<3, 3>(3, idxstartcorr_qci_) = calibattfix ? dxdqci : dxdnqci; //q_ci
+    H.block<3, 3>(3, idxstartcorr_qci_) = calibattfix ? Eigen::Matrix<double, 3, 3>::Constant(0) : Eigen::Matrix<double, 3, 3>::Identity().eval(); //q_ci
 
     //TODO: do we still want this?
     H(6, 18) = 1.0; // fix vision world yaw drift because unobservable otherwise (see PhD Thesis)
@@ -249,15 +241,15 @@ public:
       q_err = state.get<StateDefinition_T::q_wv>();
       r_old(6, 0) = -2 * (q_err.w() * q_err.z() + q_err.x() * q_err.y()) / (1 - 2 * (q_err.y() * q_err.y() + q_err.z() * q_err.z()));
 
-      if(!checkForNumeric((double*)&r_old, nMeasurements, "r_old")){
+      if(!checkForNumeric(r_old, "r_old")){
         ROS_ERROR_STREAM("r_old: "<<r_old);
         ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
       }
-      if(!checkForNumeric((double*)&H_new, H_new.RowsAtCompileTime * H_new.ColsAtCompileTime, "H_old")){
+      if(!checkForNumeric(H_new, "H_old")){
         ROS_ERROR_STREAM("H_old: "<<H_new);
         ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
       }
-      if(!checkForNumeric((double*)&R_, R_.RowsAtCompileTime * R_.ColsAtCompileTime, "R_")){
+      if(!checkForNumeric(R_, "R_")){
         ROS_ERROR_STREAM("R_: "<<R_);
         ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
       }
@@ -337,15 +329,15 @@ public:
       r_new(6, 0) = -2 * (q_err.w() * q_err.z() + q_err.x() * q_err.y()) / (1 - 2 * (q_err.y() * q_err.y() + q_err.z() * q_err.z()));
 
 
-      if(!checkForNumeric((double*)&r_old, nMeasurements, "r_old")){
+      if(!checkForNumeric(r_old, "r_old")){
         ROS_ERROR_STREAM("r_old: "<<r_old);
         ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state_new).toEigenVector().transpose());
       }
-      if(!checkForNumeric((double*)&H_new, H_new.RowsAtCompileTime * H_new.ColsAtCompileTime, "H_old")){
+      if(!checkForNumeric(H_new, "H_old")){
         ROS_ERROR_STREAM("H_old: "<<H_new);
         ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state_new).toEigenVector().transpose());
       }
-      if(!checkForNumeric((double*)&R_, R_.RowsAtCompileTime * R_.ColsAtCompileTime, "R_")){
+      if(!checkForNumeric(R_, "R_")){
         ROS_ERROR_STREAM("R_: "<<R_);
         ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state_new).toEigenVector().transpose());
       }

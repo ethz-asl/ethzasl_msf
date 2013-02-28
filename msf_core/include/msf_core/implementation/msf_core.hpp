@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <chrono>
 #include <thread>
 #include <sm/timing/Timer.hpp>
+#include <sensor_msgs/image_encodings.h>
+#include <msf_core/falsecolor.h>
 
 namespace msf_core
 {
@@ -61,6 +63,8 @@ MSF_Core<EKFState_T>::MSF_Core(MSF_SensorManager<EKFState_T>& usercalc):usercalc
   pubPose_ = nh.advertise<geometry_msgs::PoseWithCovarianceStamped> ("pose", 1);
   pubPoseCrtl_ = nh.advertise<sensor_fusion_comm::ExtState> ("ext_state", 1);
   msgState_.data.resize(nStatesAtCompileTime, 0);
+
+  pubCov_ = nh.advertise<sensor_msgs::Image>("covariance_img", 1);
 
   subImu_ = nh.subscribe("imu_state_input", 4, &MSF_Core::imuCallback, this);
   subImuCustom_ = nh.subscribe("imu_state_input_asctec", 4, &MSF_Core::imuCallback_asctec, this);
@@ -104,33 +108,108 @@ void MSF_Core<EKFState_T>::initExternalPropagation(boost::shared_ptr<EKFState_T>
 }
 
 template<typename EKFState_T>
-void MSF_Core<EKFState_T>::setPCore(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, EKFState_T::nErrorStatesAtCompileTime>& P){
-    enum{
-      coreErrorStates = 15 // we might want to calculate this, but on the other hand the values for the matrix later on are anyway hardcoded
-    };
-    P.setIdentity();
-    P *= 0.0001; //set diagonal small covariance for all states
+void MSF_Core<EKFState_T>::publishCovImage(boost::shared_ptr<EKFState_T> stateptr) const {
 
-    //now set the core state covariance to the simulated values
-    Eigen::Matrix<double, coreErrorStates, coreErrorStates> P_core;
-    P_core<<  0.0166, 0.0122,-0.0015, 0.0211, 0.0074, 0.0000, 0.0012,-0.0012, 0.0001,-0.0000, 0.0000,-0.0000,-0.0003,-0.0002,-0.0000,
-        0.0129, 0.0508,-0.0020, 0.0179, 0.0432, 0.0006, 0.0020, 0.0004,-0.0002,-0.0000, 0.0000, 0.0000, 0.0003,-0.0002, 0.0000,
-        -0.0013,-0.0009, 0.0142,-0.0027, 0.0057, 0.0079, 0.0007, 0.0007, 0.0000,-0.0000,-0.0000, 0.0000,-0.0001,-0.0004,-0.0001,
-        0.0210, 0.0162,-0.0026, 0.0437, 0.0083,-0.0017, 0.0016,-0.0021,-0.0014,-0.0000, 0.0000, 0.0000, 0.0003,-0.0001, 0.0000,
-        0.0093, 0.0461, 0.0036, 0.0153, 0.0650,-0.0016, 0.0025, 0.0013,-0.0000,-0.0000, 0.0000, 0.0000, 0.0003, 0.0002, 0.0000,
-        -0.0000, 0.0005, 0.0080,-0.0019,-0.0021, 0.0130, 0.0001, 0.0001, 0.0000,-0.0000, 0.0000,-0.0000,-0.0003, 0.0001,-0.0001,
-        0.0012, 0.0024, 0.0006, 0.0017, 0.0037, 0.0001, 0.0005, 0.0000, 0.0001,-0.0000, 0.0000,-0.0000,-0.0000,-0.0001,-0.0000,
-        -0.0011, 0.0008, 0.0007,-0.0023, 0.0019, 0.0001, 0.0000, 0.0005,-0.0001,-0.0000,-0.0000, 0.0000, 0.0001,-0.0001,-0.0000,
-        0.0001,-0.0002,-0.0000,-0.0014, 0.0001, 0.0000, 0.0000,-0.0001, 0.0006,-0.0000,-0.0000,-0.0000, 0.0000, 0.0000,-0.0000,
-        -0.0000,-0.0000,-0.0000,-0.0000,-0.0000,-0.0000,-0.0000,-0.0000,-0.0000, 0.0000,-0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
-        0.0000, 0.0000,-0.0000, 0.0000, 0.0000, 0.0000, 0.0000,-0.0000,-0.0000,-0.0000, 0.0000,-0.0000, 0.0000, 0.0000, 0.0000,
-        -0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,-0.0000, 0.0000,-0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,-0.0000,
-        -0.0003, 0.0003,-0.0001, 0.0003, 0.0003,-0.0003,-0.0000, 0.0001, 0.0000, 0.0000, 0.0000, 0.0000, 0.0010, 0.0000, 0.0000,
-        -0.0002,-0.0002,-0.0004,-0.0001, 0.0003, 0.0001,-0.0001,-0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0010, 0.0000,
-        -0.0000, 0.0000,-0.0001, 0.0000, 0.0000,-0.0001,-0.0000,-0.0000,-0.0000, 0.0000, 0.0000,-0.0000, 0.0000, 0.0000, 0.0001;
-    P_core = 0.5 * (P_core + P_core.transpose());
-    P.template block<coreErrorStates, coreErrorStates>(0,0) = P_core;
+  if(!pubCov_.getNumSubscribers())
+    return;
+
+  const EKFState_T& state = *stateptr;
+
+  static int imgseq = 0;
+
+  enum{
+    blocksize = 10, //size of cov blocks in pixels
+    imgrows = EKFState_T::nErrorStatesAtCompileTime * blocksize + EKFState_T::nStateVarsAtCompileTime - 1
+  };
+
+  cv::Mat colorimg(imgrows, imgrows, CV_8UC3);
+  colorimg.setTo(0);
+
+  std::vector<std::tuple<int, int, int> > enumsandindices;
+  stateptr->calculateIndicesInErrorState(enumsandindices);
+
+  double max = state.P.maxCoeff();
+  double min = state.P.minCoeff();
+
+  palette pal = GetPalette(palette::False_color_palette3);
+
+  //draw the blocks for covs of the state variables
+  for(size_t i = 0; i < enumsandindices.size() ; ++i){
+    for(size_t j = 0; j < enumsandindices.size() ; ++j){
+      int lengthincorrectionrows = std::get<2>(enumsandindices.at(i));
+      int lengthincorrectioncols = std::get<2>(enumsandindices.at(j));
+      //print all entries for this state combination
+      for(int rowidx = 0;rowidx<lengthincorrectionrows;++rowidx){
+        for(int colidx = 0;colidx<lengthincorrectioncols;++colidx){
+
+          int startrow = std::get<0>(enumsandindices.at(i)) + (std::get<1>(enumsandindices.at(i)) + rowidx) * blocksize;
+          int startcol = std::get<0>(enumsandindices.at(j)) + (std::get<1>(enumsandindices.at(j)) + colidx) * blocksize;
+
+          double value = state.P(std::get<1>(enumsandindices.at(i)) + rowidx, std::get<1>(enumsandindices.at(j)) + colidx);
+
+          int brightness = (value - min) / (max - min) * 255.;
+
+          cv::rectangle(colorimg, cv::Point(startrow, startcol),cv::Point(startrow + blocksize, startcol + blocksize),
+                        CV_RGB(pal.colors[brightness].rgbRed, pal.colors[brightness].rgbGreen, pal.colors[brightness].rgbBlue), CV_FILLED);
+
+        }
+      }
+    }
   }
+
+  //draw the lines between the state variables
+  for(size_t i = 1; i < enumsandindices.size() ; ++i){
+
+    int startrow = std::get<0>(enumsandindices.at(i)) + std::get<1>(enumsandindices.at(i)) * blocksize;
+
+    cv::line(colorimg,cv::Point(startrow, 0),cv::Point(startrow, imgrows),CV_RGB(227,176,55));
+    cv::line(colorimg,cv::Point(0, startrow),cv::Point(imgrows, startrow),CV_RGB(227,176,55));
+
+  }
+
+  sensor_msgs::ImagePtr msgimg_(new sensor_msgs::Image);
+  msgimg_->data.resize(colorimg.cols*colorimg.rows*3);
+  msgimg_->header.stamp = ros::Time(state.time);
+  msgimg_->header.seq = ++imgseq;
+  msgimg_->width = colorimg.cols;
+  msgimg_->height = colorimg.rows;
+  msgimg_->encoding = sensor_msgs::image_encodings::BGR8;
+  msgimg_->step =colorimg.cols*3;
+  msgimg_->is_bigendian = 0;
+  memcpy(&msgimg_->data[0],&colorimg.data[0],sizeof(char)*msgimg_->data.size());
+
+  pubCov_.publish(msgimg_);
+
+}
+
+template<typename EKFState_T>
+void MSF_Core<EKFState_T>::setPCore(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, EKFState_T::nErrorStatesAtCompileTime>& P){
+  enum{
+    coreErrorStates = 15 // we might want to calculate this, but on the other hand the values for the matrix later on are anyway hardcoded
+  };
+  P.setIdentity();
+  P *= 0.0001; //set diagonal small covariance for all states
+
+  //now set the core state covariance to the simulated values
+  Eigen::Matrix<double, coreErrorStates, coreErrorStates> P_core;
+  P_core<<  0.0166, 0.0122,-0.0015, 0.0211, 0.0074, 0.0000, 0.0012,-0.0012, 0.0001,-0.0000, 0.0000,-0.0000,-0.0003,-0.0002,-0.0000,
+      0.0129, 0.0508,-0.0020, 0.0179, 0.0432, 0.0006, 0.0020, 0.0004,-0.0002,-0.0000, 0.0000, 0.0000, 0.0003,-0.0002, 0.0000,
+      -0.0013,-0.0009, 0.0142,-0.0027, 0.0057, 0.0079, 0.0007, 0.0007, 0.0000,-0.0000,-0.0000, 0.0000,-0.0001,-0.0004,-0.0001,
+      0.0210, 0.0162,-0.0026, 0.0437, 0.0083,-0.0017, 0.0016,-0.0021,-0.0014,-0.0000, 0.0000, 0.0000, 0.0003,-0.0001, 0.0000,
+      0.0093, 0.0461, 0.0036, 0.0153, 0.0650,-0.0016, 0.0025, 0.0013,-0.0000,-0.0000, 0.0000, 0.0000, 0.0003, 0.0002, 0.0000,
+      -0.0000, 0.0005, 0.0080,-0.0019,-0.0021, 0.0130, 0.0001, 0.0001, 0.0000,-0.0000, 0.0000,-0.0000,-0.0003, 0.0001,-0.0001,
+      0.0012, 0.0024, 0.0006, 0.0017, 0.0037, 0.0001, 0.0005, 0.0000, 0.0001,-0.0000, 0.0000,-0.0000,-0.0000,-0.0001,-0.0000,
+      -0.0011, 0.0008, 0.0007,-0.0023, 0.0019, 0.0001, 0.0000, 0.0005,-0.0001,-0.0000,-0.0000, 0.0000, 0.0001,-0.0001,-0.0000,
+      0.0001,-0.0002,-0.0000,-0.0014, 0.0001, 0.0000, 0.0000,-0.0001, 0.0006,-0.0000,-0.0000,-0.0000, 0.0000, 0.0000,-0.0000,
+      -0.0000,-0.0000,-0.0000,-0.0000,-0.0000,-0.0000,-0.0000,-0.0000,-0.0000, 0.0000,-0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+      0.0000, 0.0000,-0.0000, 0.0000, 0.0000, 0.0000, 0.0000,-0.0000,-0.0000,-0.0000, 0.0000,-0.0000, 0.0000, 0.0000, 0.0000,
+      -0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,-0.0000, 0.0000,-0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,-0.0000,
+      -0.0003, 0.0003,-0.0001, 0.0003, 0.0003,-0.0003,-0.0000, 0.0001, 0.0000, 0.0000, 0.0000, 0.0000, 0.0010, 0.0000, 0.0000,
+      -0.0002,-0.0002,-0.0004,-0.0001, 0.0003, 0.0001,-0.0001,-0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0010, 0.0000,
+      -0.0000, 0.0000,-0.0001, 0.0000, 0.0000,-0.0001,-0.0000,-0.0000,-0.0000, 0.0000, 0.0000,-0.0000, 0.0000, 0.0000, 0.0001;
+  P_core = 0.5 * (P_core + P_core.transpose());
+  P.template block<coreErrorStates, coreErrorStates>(0,0) = P_core;
+}
 
 template<typename EKFState_T>
 void MSF_Core<EKFState_T>::imuCallback_asctec(const  asctec_hl_comm::mav_imuConstPtr & msg)
@@ -295,9 +374,9 @@ void MSF_Core<EKFState_T>::stateCallback(const sensor_fusion_comm::ExtEkfConstPt
 
   bool isnumeric = true;
   if (flag == sensor_fusion_comm::ExtEkf::current_state)
-    isnumeric = checkForNumeric(&msg->state[0], 10, "before prediction p,v,q");
+    isnumeric = checkForNumeric(Eigen::Map<const Eigen::Matrix<float, 10, 1> >(msg->state.data()), "before prediction p,v,q");
 
-  isnumeric = checkForNumeric((double*)(&currentState-> template get<StateDefinition_T::p>()[0]), 3, "before prediction p");
+  isnumeric = checkForNumeric(currentState-> template get<StateDefinition_T::p>(), "before prediction p");
 
   if (flag == sensor_fusion_comm::ExtEkf::current_state && isnumeric) // state propagation is made externally, so we read the actual state
   {
@@ -320,8 +399,8 @@ void MSF_Core<EKFState_T>::stateCallback(const sensor_fusion_comm::ExtEkfConstPt
 
   propagatePOneStep();
 
-  isnumeric = checkForNumeric((double*)(&currentState-> template get<StateDefinition_T::p>()[0]), 3, "prediction p");
-  isnumeric = checkForNumeric((double*)(&currentState->P(0)), nErrorStatesAtCompileTime * nErrorStatesAtCompileTime, "prediction done P");
+  isnumeric = checkForNumeric(currentState-> template get<StateDefinition_T::p>(), "prediction p");
+  isnumeric = checkForNumeric(currentState->P, "prediction done P");
 
   if(!predictionMade_){ //clean reset of state and measurement buffer, before we start propagation
 
@@ -418,7 +497,7 @@ void MSF_Core<EKFState_T>::propagatePOneStep(){
 
     predictProcessCovariance(stateIteratorPLastPropagated->second, stateIteratorPLastPropagatedNext->second);
 
-    if(!checkForNumeric((double*)(&stateIteratorPLastPropagatedNext->second-> template get<StateDefinition_T::p>()(0)), 3, "prediction p")){
+    if(!checkForNumeric(stateIteratorPLastPropagatedNext->second-> template get<StateDefinition_T::p>(), "prediction p")){
       ROS_WARN_STREAM("prop state from:\t"<<stateIteratorPLastPropagated->second->toEigenVector());
       ROS_WARN_STREAM("prop state to:\t"<<stateIteratorPLastPropagatedNext->second->toEigenVector());
       ROS_ERROR_STREAM("Resetting EKF");
@@ -868,9 +947,11 @@ bool MSF_Core<EKFState_T>::applyCorrection(boost::shared_ptr<EKFState_T>& delays
 
   //no publishing and propagation here, because this might not be the last update we have to apply
 
-  checkForNumeric(&correction[0], HLI_EKF_STATE_SIZE, "update");
+  checkForNumeric(correction, "update");
 
   time_P_propagated = delaystate->time; //set time latest propagated, we need to repropagate at least from here
+
+  publishCovImage(delaystate); //publish cov image
 
   return 1;
 }

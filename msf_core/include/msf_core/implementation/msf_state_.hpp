@@ -157,6 +157,15 @@ Eigen::Matrix<double, GenericState_T<stateVector_T, StateDefinition_T>::nCoreSta
   );
   return data;
 }
+//TODO template to container
+template<typename stateVector_T, typename StateDefinition_T>
+void GenericState_T<stateVector_T, StateDefinition_T>::calculateIndicesInErrorState(std::vector<std::tuple<int, int, int> >& vec) {//boost fusion unfortunately doesn't like this to be const
+
+  boost::fusion::for_each(
+      statevars,
+      msf_tmp::GetIndicesInErrorState<std::vector<std::tuple<int, int, int> >, stateVector_T >(vec)
+  );
+}
 
 template<typename stateVector_T, typename StateDefinition_T>
 std::string GenericState_T<stateVector_T, StateDefinition_T>::print(){//boost fusion unfortunately doesn't like this to be const
@@ -178,7 +187,7 @@ bool GenericState_T<stateVector_T, StateDefinition_T>::checkStateForNumeric(){//
       msf_tmp::CoreStatetoDoubleArray<typename Eigen::Matrix<double, GenericState_T<stateVector_T, StateDefinition_T>::nCoreStatesAtCompileTime, 1>, stateVector_T >(data)
   );
 
-  return checkForNumeric((double*)&data, data.RowsAtCompileTime * data.ColsAtCompileTime, "state");
+  return checkForNumeric(data, "checkStateForNumeric");
 }
 
 //returns the state at position INDEX in the state list, const version

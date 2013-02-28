@@ -92,17 +92,17 @@ inline Eigen::Matrix<typename Derived::Scalar, 4, 4> omegaMatHamilton(const Eige
  \endverbatim
  */
 template<class Derived>
-  inline Eigen::Matrix<typename Derived::Scalar, 4, 3> xiMat(const Eigen::MatrixBase<Derived> & q_vec)
-  {
-    EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(Derived, 4, 1);
+inline Eigen::Matrix<typename Derived::Scalar, 4, 3> xiMat(const Eigen::MatrixBase<Derived> & q_vec)
+{
+  EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(Derived, 4, 1);
 
-    return (Eigen::Matrix<typename Derived::Scalar, 4, 3>()<<
-        // this is the Xi matrix ---
-        q_vec[3] * Eigen::Matrix<typename Derived::Scalar, 3, 3>::Identity() + skew(q_vec.template head<3>()),
-        -q_vec.template head<3>().transpose()
-        // ---
-    ).finished();
-  }
+  return (Eigen::Matrix<typename Derived::Scalar, 4, 3>()<<
+      // this is the Xi matrix ---
+      q_vec[3] * Eigen::Matrix<typename Derived::Scalar, 3, 3>::Identity() + skew(q_vec.template head<3>()),
+      -q_vec.template head<3>().transpose()
+      // ---
+  ).finished();
+}
 
 /// computes a quaternion from the 3-element small angle approximation theta
 template<class Derived>
@@ -126,23 +126,50 @@ Eigen::Quaternion<typename Derived::Scalar> quaternionFromSmallAngle(const Eigen
 }
 
 /// debug output to check misbehavior of Eigen
-template<class T>
-bool checkForNumeric(const T & vec, int size, const std::string & info)
+template<class D>
+bool checkForNumeric(const Eigen::MatrixBase<D> & mat, const std::string & info)
 {
-  for (int i = 0; i < size; i++)
+  enum{
+    rows = Eigen::MatrixBase<D>::RowsAtCompileTime,
+    cols = Eigen::MatrixBase<D>::ColsAtCompileTime
+  };
+
+  for (int i = 0; i < rows; ++i)
   {
-    if (isnan(vec[i]))
-    {
-      std::cerr << "=== ERROR ===  " << info << ": NAN at index " << i << std::endl;
-      return false;
-    }
-    if (isinf(vec[i]))
-    {
-      std::cerr << "=== ERROR ===  " << info << ": INF at index " << i << std::endl;
-      return false;
+    for(int j = 0; j < cols ; ++j){
+      if (isnan(mat(i,j)))
+      {
+        std::cerr << "=== ERROR ===  " << info << ": NAN at index [" << i << "," << j << "]" << std::endl;
+        return false;
+      }
+      if (isinf(mat(i,j)))
+      {
+        std::cerr << "=== ERROR ===  " << info << ": INF at index [" << i << "," << j << "]" << std::endl;
+        return false;
+      }
     }
   }
   return true;
 }
+
+///// debug output to check misbehavior of Eigen
+//template<class T>
+//bool checkForNumeric(const T & vec, int size, const std::string & info)
+//{
+//  for (int i = 0; i < size; i++)
+//  {
+//    if (isnan(vec[i]))
+//    {
+//      std::cerr << "=== ERROR ===  " << info << ": NAN at index " << i << std::endl;
+//      return false;
+//    }
+//    if (isinf(vec[i]))
+//    {
+//      std::cerr << "=== ERROR ===  " << info << ": INF at index " << i << std::endl;
+//      return false;
+//    }
+//  }
+//  return true;
+//}
 
 #endif /* EIGEN_UTILS_H_ */

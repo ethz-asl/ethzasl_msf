@@ -9,6 +9,5 @@ evaluate "short" covariance update formula
 
 symm P: EV decompose P, set EVs<eps to zero and rebuild (profile this to know the cost!)
 
-check copy ctor of state objects. Is the statelist really copied? 
-
 checkForNumeric to Eigen-style function
+
