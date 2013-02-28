@@ -21,7 +21,7 @@ include(${dynamic_reconfigure_PACKAGE_PATH}/cmake/cfgbuild.cmake)
 gencfg()
 rosbuild_genmsg()
 
-add_definitions (-Wall -std=c++0x -Wno-string-compare)
+add_definitions (-Wall -std=c++0x)
 
 # get eigen
 find_package(Eigen REQUIRED)
