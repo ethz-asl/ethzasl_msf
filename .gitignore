@@ -1,8 +1,14 @@
-build
+/build
 CMakeCache.txt
 msg_gen
-bin
-lib
+/bin
+/lib
+msf_core/lib
+msf_updates/lib
+msf_core/bin
+msf_updates/bin
+msf_core/build
+msf_updates/build
 *~
 *cfg/cpp/*
 .project
