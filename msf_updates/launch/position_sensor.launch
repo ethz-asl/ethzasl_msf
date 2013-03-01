@@ -1,10 +1,11 @@
 <launch>
-    <node name="position_sensor" pkg="msf_updates" type="position_sensor" clear_params="true" output="screen">
-	    <remap from="ssf_core/hl_state_input" to="/mav1/fcu/ekf_state_out" />
-	    <remap from="ssf_core/correction" to="/mav1/fcu/ekf_state_in" />
+    <node name="leica_filter" pkg="msf_updates" type="position_sensor" clear_params="true" output="screen">
+<remap from="msf_core/hl_state_input" to="/bluebird/fcu/ekf_state_out" />
+            <remap from="msf_core/correction" to="/bluebird/fcu/ekf_state_in"/>
 
-	    <remap from="ssf_core/position_measurement" to="/totalstation/position" />
+	    <remap from="msf_core/position_input" to="/leica/position" />
 
-	    <rosparam file="$(find ssf_updates)/position_sensor_fix.yaml"/>
+            <rosparam file="$(find pose_filter_updates)/leica_filter_fix.yaml"/>
     </node>
 </launch>
+
