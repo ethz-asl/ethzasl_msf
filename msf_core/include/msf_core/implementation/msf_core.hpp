@@ -149,7 +149,7 @@ void MSF_Core<EKFState_T>::publishCovImage(boost::shared_ptr<EKFState_T> statept
   double min = std::accumulate(smoother.dmin.begin(), smoother.dmin.end(), 0.0) / smoother.dmin.size();
   double max = std::accumulate(smoother.dmax.begin(), smoother.dmax.end(), 0.0) / smoother.dmax.size();
 
-  palette pal = GetPalette(palette::False_color_palette4);
+  static palette pal = GetPalette(palette::False_color_palette4);
 
   //draw the blocks for covs of the state variables
   for(size_t i = 0; i < enumsandindices.size() ; ++i){
@@ -199,7 +199,7 @@ void MSF_Core<EKFState_T>::publishCovImage(boost::shared_ptr<EKFState_T> statept
 
   pubCov_.publish(msgimg_);
 
-  ROS_WARN_STREAM("P=["<<state.P<<"];");
+//  ROS_WARN_STREAM("P=["<<state.P<<"];");
 
 }
 
