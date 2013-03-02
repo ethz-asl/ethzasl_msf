@@ -52,6 +52,8 @@ SensorHandler<msf_updates::EKFState>(meas), n_zp_(1e-6), delay_(0), provides_abs
   ros::NodeHandle nh("msf_updates");
 
   subPointStamped_ = nh.subscribe<geometry_msgs::PointStamped>("position_input", 1, &PositionSensorHandler::measurementCallback, this);
+  subTransformStamped_ = nh.subscribe<geometry_msgs::TransformStamped>("transform_input", 1, &PositionSensorHandler::measurementCallback, this);
+
   //TODO impl pointwithcov callback
 
   z_p_.setZero();
@@ -83,5 +85,32 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(
   this->manager_.msf_core_->addMeasurement(meas);
 }
 
+template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
+void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(const geometry_msgs::TransformStampedConstPtr & msg)
+{
+
+  if(msg->header.seq%5!=0){ //slow down vicon
+    ROS_WARN_STREAM_THROTTLE(30, "Measurement throttling is on, dropping every but the 5th message");
+    return;
+  }
+
+  geometry_msgs::PointStampedPtr point(new geometry_msgs::PointStamped());
+
+  if (!use_fixed_covariance_)  // take covariance from sensor
+  {
+    ROS_WARN_STREAM_THROTTLE(2,"Provided message type without covariance but set fixed_covariance=false at the same time. Discarding message.");
+    return;
+  }
+
+  //fixed covariance will be set in measurement class -> makeFromSensorReadingImpl
+
+  point->header = msg->header;
+
+  point->point.x = msg->transform.translation.x;
+  point->point.y = msg->transform.translation.y;
+  point->point.z = msg->transform.translation.z;
+
+  measurementCallback(point);
+}
 
 }

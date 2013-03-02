@@ -38,7 +38,7 @@
 
 #include <msf_core/msf_measurement.h>
 #include <msf_core/msf_core.h>
-#include <msf_updates/PoseDistorter.h>
+#include <msf_core/eigen_utils.h>
 
 namespace msf_updates{
 namespace position_measurement{
@@ -134,9 +134,6 @@ public:
     H.block<3, 3>(0, idxstartcorr_q_) = - C_q.transpose() * p_prism_imu_sk; // q
 
     H.block<3, 3>(0, idxstartcorr_p_prism_imu_) = C_q.transpose(); //p_ci
-
-    // attitude
-    H.block<3, 3>(3, idxstartcorr_q_) = Eigen::Matrix<double, 3, 3>::Identity(); // q
   }
 
   /**
@@ -160,23 +157,24 @@ public:
       // position
       r_old.block<3, 1>(0, 0) = z_p_ - (state.get<StateDefinition_T::p>() + C_q.transpose() * state.get<StateDefinition_T::p_prism_imu>());
 
-      if(!checkForNumeric(r_old, "r_old")){
-        ROS_ERROR_STREAM("r_old: "<<r_old);
-        ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
-      }
-      if(!checkForNumeric(H_new, "H_old")){
-        ROS_ERROR_STREAM("H_old: "<<H_new);
-        ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
-      }
-      if(!checkForNumeric(R_, "R_")){
-        ROS_ERROR_STREAM("R_: "<<R_);
-        ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
-      }
+      //TODO reenable on merge with SC branch
+//      if(!checkForNumeric(r_old, "r_old")){
+//        ROS_ERROR_STREAM("r_old: "<<r_old);
+//        ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
+//      }
+//      if(!checkForNumeric(H_new, "H_old")){
+//        ROS_ERROR_STREAM("H_old: "<<H_new);
+//        ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
+//      }
+//      if(!checkForNumeric(R_, "R_")){
+//        ROS_ERROR_STREAM("R_: "<<R_);
+//        ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
+//      }
 
       // call update step in base class
       this->calculateAndApplyCorrection(state_nonconst_new, core, H_new, r_old, R_);
 
-    }else{
+    }/*else{
 
       // init variables
       //get previous measurement
@@ -249,7 +247,7 @@ public:
       // call update step in base class
       this->calculateAndApplyCorrectionRelative(state_nonconst_old, state_nonconst_new, core, H_old, H_new, r_new, R_);
 
-    }
+    }*/
   }
 };
 

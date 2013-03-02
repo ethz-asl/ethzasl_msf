@@ -98,9 +98,15 @@ private:
 
   void init(double scale)
   {
+    if(scale < 0.001){
+      ROS_WARN_STREAM("init scale is "<<scale<<" correcting to 1");
+      scale = 1;
+    }
+
     Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_prism_imu, p_vc;
     Eigen::Quaternion<double> q, q_cv;
     msf_core::MSF_Core<EKFState_T>::ErrorStateCov P;
+
 
     // init values
     g << 0, 0, 9.81;	        /// gravity
@@ -110,6 +116,9 @@ private:
     v << 0,0,0;			/// robot velocity (IMU centered)
     w_m << 0,0,0;		/// initial angular velocity
     a_m = g;			/// initial acceleration
+
+    q.setIdentity();
+    q_cv.setIdentity();
 
     P.setZero(); // error state covariance; if zero, a default initialization in msf_core is used
 

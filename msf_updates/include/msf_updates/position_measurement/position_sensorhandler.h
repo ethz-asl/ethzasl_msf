@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <msf_core/msf_sensormanagerROS.h>
 #include <geometry_msgs/PointStamped.h>
+#include <geometry_msgs/TransformStamped.h>
 
 namespace msf_position_sensor{
 
@@ -51,11 +52,13 @@ private:
   double delay_;        ///< delay to be subtracted from the ros-timestamp of the measurement provided by this sensor
 
   ros::Subscriber subPointStamped_;
+  ros::Subscriber subTransformStamped_;
 
   bool use_fixed_covariance_; ///< use fixed covariance set by dynamic reconfigure
   bool provides_absolute_measurements_; ///<does this sensor measure relative or absolute values
 
   void measurementCallback(const geometry_msgs::PointStampedConstPtr & msg);
+  void measurementCallback(const geometry_msgs::TransformStampedConstPtr & msg);
 
 public:
   typedef MEASUREMENT_TYPE measurement_t;
