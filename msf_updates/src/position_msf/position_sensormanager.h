@@ -54,7 +54,7 @@ typedef boost::shared_ptr<ReconfigureServer> ReconfigureServerPtr;
 class PositionSensorManager : public msf_core::MSF_SensorManagerROS<msf_updates::EKFState>
 {
   typedef PositionSensorHandler<msf_updates::position_measurement::PositionMeasurement, PositionSensorManager> PositionSensorHandler_T;
-  friend PositionSensorHandler_T;
+  friend PositionSensorHandler<msf_updates::position_measurement::PositionMeasurement, PositionSensorManager>;
 public:
   typedef msf_updates::EKFState EKFState_T;
   typedef EKFState_T::StateSequence_T StateSequence_T;
