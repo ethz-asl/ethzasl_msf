@@ -202,6 +202,7 @@ private:
    * for log replay, when the external prediction is not available.
    */
   bool data_playback_;
+  bool isfuzzyState_;
 
   MSF_SensorManager<EKFState_T>& usercalc_; ///< a class which provides methods for customization of several calculations
 

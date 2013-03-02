@@ -61,8 +61,10 @@ public:
     reset();
   }
 
-  void check(boost::shared_ptr<EKFState_T> delaystate, EKFState_T& buffstate, double fuzzythres){
+  bool check(boost::shared_ptr<EKFState_T> delaystate, EKFState_T& buffstate, double fuzzythres){
     //for now make sure the non drifting state is a quaternion.
+
+    bool isfuzzy = false;
 
     const bool isquaternion = msf_tmp::isQuaternionType<typename msf_tmp::StripConstReference<NONTEMPORALDRIFTINGTYPE>::result_t >::value;
     BOOST_STATIC_ASSERT_MSG(isquaternion, "Assumed that the non drifting state is a Quaternion, "
@@ -100,7 +102,7 @@ public:
         );
 
         BOOST_STATIC_ASSERT_MSG(static_cast<int>(EKFState_T::nPropagatedCoreErrorStatesAtCompileTime) == 9, "Assumed that nPropagatedCoreStates == 9, which is not the case");
-
+        isfuzzy = true;
       }
       else // if tracking ok: update mean and 3sigma of past N q_vw's
       {
@@ -113,6 +115,7 @@ public:
       qbuff_. template block<1, 4> (nontemporaldrifting_inittimer_ - 1, 0) = Eigen::Matrix<double, 1, 4>(const_cast<const EKFState_T&>(*delaystate). template get<indexOfStateWithoutTemporalDrift>().coeffs());
       nontemporaldrifting_inittimer_++;
     }
+    return isfuzzy;
   }
 };
 

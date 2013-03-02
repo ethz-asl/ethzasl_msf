@@ -205,7 +205,7 @@ public:
   std::string print();
 
   /**
-    * \brief returns all values as an eigen vector
+    * \brief returns whether the state is sane. No NaN no inf
     */
   bool checkStateForNumeric();
 

@@ -47,6 +47,7 @@ MSF_Core<EKFState_T>::MSF_Core(MSF_SensorManager<EKFState_T>& usercalc):usercalc
 
   initialized_ = false;
   predictionMade_ = false;
+  isfuzzyState_ = false;
 
   g_ << 0, 0, 9.81;
 
@@ -600,7 +601,6 @@ void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase<
   //now publish the best current estimate
   static int seq_m = 0;
 
-
   // publish correction for external propagation
   msgCorrect_.header.stamp = ros::Time::now();
   msgCorrect_.header.seq = seq_m;
@@ -645,7 +645,9 @@ void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase<
     msgCorrect_.flag = sensor_fusion_comm::ExtEkf::state_correction;
   }
 
-  pubCorrect_.publish(msgCorrect_);
+  if(!isfuzzyState_ && !latestState->checkStateForNumeric()){ //if not fuzzy and not NaN
+    pubCorrect_.publish(msgCorrect_);
+  }
 
   // publish state
   msgState_.header = msgCorrect_.header;
@@ -802,7 +804,7 @@ bool MSF_Core<EKFState_T>::applyCorrection(boost::shared_ptr<EKFState_T>& delays
   usercalc_.sanityCheckCorrection(*delaystate, buffstate, correction);
 
   //TODO: allow multiple fuzzy tracking states at the same time
-  fuzzyTracker_.check(delaystate, buffstate, fuzzythres);
+  isfuzzyState_ = fuzzyTracker_.check(delaystate, buffstate, fuzzythres);
 
   //no publishing and propagation here, because this might not be the last update we have to apply
 
