@@ -122,7 +122,7 @@ public:
 template<typename EKFState_T>
 class CheckFuzzyTracking<EKFState_T, mpl_::void_>{
 public:
-  void check(boost::shared_ptr<EKFState_T> delaystate, EKFState_T& buffstate, double fuzzythres){}
+  bool check(boost::shared_ptr<EKFState_T> delaystate, EKFState_T& buffstate, double fuzzythres){}
   void reset();
 };
 
