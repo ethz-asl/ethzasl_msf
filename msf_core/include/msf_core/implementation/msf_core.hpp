@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <msf_core/msf_measurement.h>
 #include <chrono>
 #include <thread>
+#include <sm/timing/Timer.hpp>
 
 namespace msf_core
 {
@@ -136,8 +137,11 @@ void MSF_Core<EKFState_T>::imuCallback(const sensor_msgs::ImuConstPtr & msg)
   if(!initialized_)
     return;
 
+  sm::timing::Timer timer_PropgetClosestState("PropgetClosestState");
   boost::shared_ptr<EKFState_T> lastState = StateBuffer_.getClosestBefore(msg->header.stamp.toSec());
+  timer_PropgetClosestState.stop();
 
+  sm::timing::Timer timer_PropPrepare("PropPrepare");
   if(lastState->time == -1){
     ROS_WARN_STREAM_THROTTLE(2, "ImuCallback: closest state is invalid\n");
     return; // // early abort // //
@@ -182,10 +186,15 @@ void MSF_Core<EKFState_T>::imuCallback(const sensor_msgs::ImuConstPtr & msg)
     ROS_WARN_STREAM("Wanted to propagate state, but no valid prior state could be found in the buffer");
     return;
   }
+  timer_PropPrepare.stop();
 
+  sm::timing::Timer timer_PropState("PropState");
   //propagate state and covariance
   propagateState(lastState, currentState);
+  timer_PropState.stop();
+  sm::timing::Timer timer_PropCov("PropCov");
   propagatePOneStep();
+  timer_PropCov.stop();
 
   if(StateBuffer_.size() > 3) //making sure we have sufficient states to apply measurements to
     predictionMade_ = true;
@@ -201,7 +210,9 @@ void MSF_Core<EKFState_T>::imuCallback(const sensor_msgs::ImuConstPtr & msg)
   currentState->toExtStateMsg(msgPoseCtrl_);
   pubPoseCrtl_.publish(msgPoseCtrl_);
 
+  sm::timing::Timer timer_PropInsertState("PropInsertState");
   StateBuffer_.insert(currentState);
+  timer_PropInsertState.stop();
 
   if(predictionMade_){
     handlePendingMeasurements(); //check if we can apply some pending measurement
@@ -528,6 +539,8 @@ void MSF_Core<EKFState_T>::init(boost::shared_ptr<MSF_MeasurementBase<EKFState_T
 
   ROS_INFO_STREAM("core init with state:"<<std::endl<<state->print());
   initialized_ = true;
+
+  sm::timing::Timing::print(std::cout);
 }
 
 template<typename EKFState_T>
@@ -540,6 +553,10 @@ void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase<
     //ROS_WARN_STREAM("You tried to give me a measurement in the future. Are you sure your clocks are synced and delays compensated correctly? I will store that and apply it next time... [measurement: "<<timehuman(measurement->time)<<" (s) latest state: "<<timehuman(StateBuffer_.getLast()->time)<<" (s)]");
     queueFutureMeasurements_.push(measurement);
     return;
+  }
+  if(measurement->time < StateBuffer_.getFirst()->time){
+    ROS_WARN_STREAM("You tried to give me a measurement which is too far in the past. Are you sure your clocks are synced and delays compensated correctly? [measurement: "<<timehuman(measurement->time)<<" (s) first state in buffer: "<<timehuman(StateBuffer_.getFirst()->time)<<" (s)]");
+    return; //reject measurements too far in the past
   }
 
   typename measurementBufferT::iterator_T it_meas = MeasurementBuffer_.insert(measurement);

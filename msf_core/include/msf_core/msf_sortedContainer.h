@@ -296,6 +296,20 @@ public:
   }
 
   /**
+   * \brief returns a pointer to the first object in the container
+   * or an invalid object if the container is empty
+   * \returns shared pointer of the object
+   */
+  inline boost::shared_ptr<T>& getFirst(){
+    if(stateList.empty()){
+      ROS_ERROR_STREAM("requested the first object in the sorted container, but the container is empty");
+      return getInvalid();
+    }
+    typename ListT::iterator start = stateList.begin();
+    return start->second;
+  }
+
+  /**
    * \brief This function updates the time of an object in the container
    * this function effectively changes the map ordering, so the previous iterators are invalidated
    * the attribute unused can be eliminated for non gcc compilers, its just a little more verbose
