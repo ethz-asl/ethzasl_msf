@@ -619,6 +619,12 @@ void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase<
     }
     msgCorrect_.state[6] = 1;
     msgCorrect_.flag = sensor_fusion_comm::ExtEkf::initialization;
+
+
+    if(pubCorrect_.getNumSubscribers() > 0){
+      ROS_ERROR_STREAM_THROTTLE(1, "You have connected the external propagation topic but at the same time data_playback is on.");
+    }
+
   }
   else{
     msgCorrect_.state[0] = latestState-> template get<StateDefinition_T::p>()[0] - hl_state_buf_.state[0];
