@@ -5,25 +5,15 @@ noise_acc: 0.083
 noise_accbias: 0.0083
 noise_gyr: 0.0013
 noise_gyrbias: 0.00013
-noise_scale: 0.0
-noise_qwv: 0.0
-noise_qci: 0.0
-noise_pic: 0.0
-delay: 0.02
-meas_noise1: 0.005
-meas_noise2: 0.0
+noise_p_prism_imu: 0.0
+delay: 0.2
+meas_noise1: 0.001
 
-data_playback: False
+data_playback: True
 
-# initialization of camera w.r.t. IMU
-init/q_ci/w: 1.0
-init/q_ci/x: 0.0    
-init/q_ci/y: 0.0
-init/q_ci/z: 0.0
-
+#init position offset prism imu
 init/p_ci/x: 0.0    
 init/p_ci/y: 0.0
 init/p_ci/z: 0.0
 
 use_fixed_covariance: true
-measurement_world_sensor: true  # selects if sensor measures its position w.r.t. world (true, e.g. Vicon) or the position of the world coordinate system w.r.t. the sensor (false, e.g. ethzasl_ptam)
