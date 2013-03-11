@@ -45,6 +45,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sensor_fusion_comm/ExtEkf.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <sensor_msgs/Imu.h>
+#include <asctec_hl_comm/mav_imu.h>
 
 #include <msf_core/msf_sortedContainer.h>
 #include <vector>
@@ -225,6 +226,7 @@ private:
 
   ros::Subscriber subState_; ///< subscriber to external state propagation
   ros::Subscriber subImu_; ///< subscriber to IMU readings
+  ros::Subscriber subImuCustom_; ///< subscriber to IMU readings for asctec custom
 
   sensor_fusion_comm::ExtEkf hl_state_buf_; ///< buffer to store external propagation data
 
@@ -251,6 +253,9 @@ private:
    * \sa{stateCallback}
    */
   void imuCallback(const sensor_msgs::ImuConstPtr & msg);
+  void imuCallback_asctec(const asctec_hl_comm::mav_imuConstPtr & msg);
+  void process_imu(const msf_core::Vector3&linear_acceleration,
+                   const msf_core::Vector3&angular_velocity, const ros::Time& msg_stamp, size_t msg_seq);
 
   /// external state propagation
   /**
