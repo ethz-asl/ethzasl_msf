@@ -405,6 +405,14 @@ void MSF_Core<EKFState_T>::propagateState(boost::shared_ptr<EKFState_T>& state_o
   state_new-> template get<StateDefinition_T::v>() = state_old-> template get<StateDefinition_T::v>() + (dv - g_) * dt;
   state_new-> template get<StateDefinition_T::p>() = state_old-> template get<StateDefinition_T::p>() + ((state_new-> template get<StateDefinition_T::v>() + state_old-> template get<StateDefinition_T::v>()) / 2 * dt);
 
+  tf::Transform transform;
+   Eigen::Matrix<double, 3, 1>& pos = state_new-> template get<StateDefinition_T::p>();
+   Eigen::Quaterniond& ori = state_new-> template get<StateDefinition_T::q>();
+   transform.setOrigin( tf::Vector3(pos[0], pos[1], pos[2]) );
+   transform.setRotation( tf::Quaternion(ori.x(), ori.y(), ori.z(), ori.w()) );
+   tf_broadcaster_.sendTransform(tf::StampedTransform(transform, ros::Time::now() /*ros::Time(latestState->time_)*/, "world", "state"));
+
+
 }
 
 template<typename EKFState_T>
@@ -711,6 +719,8 @@ void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase<
   msgState_.header = msgCorrect_.header;
   latestState->toFullStateMsg(msgState_);
   pubState_.publish(msgState_);
+
+
 
   seq_m++;
 }

@@ -81,7 +81,7 @@ private:
 
       if(msg->header.seq % 100 == 0){ //only do this check from time to time
         if(R_.block<6, 6>(0, 0).determinant() < 0)
-          ROS_WARN_STREAM_THROTTLE(60,"The covariance matrix you provided for the pose sensor is not positive definite");
+          ROS_WARN_STREAM_THROTTLE(60,"The covariance matrix you provided for the pose sensor is not positive definite: "<<(R_.block<6, 6>(0, 0)));
       }
 
       //clear cross-correlations between q and p
