@@ -269,9 +269,10 @@ public:
       boost::shared_ptr<msf_core::MSF_MeasurementBase<EKFState_T> > prevmeas_base = core.getPreviousMeasurement(this->time, this->sensorID_);
 
       if(prevmeas_base->time == -1){
-        ROS_WARN_STREAM("The previous measurement is invalid. Could not apply measurement");
+        ROS_WARN_STREAM("The previous measurement is invalid. Could not apply measurement! time:"<<this->time<<" sensorID: "<<this->sensorID_);
         return;
       }
+
       //try to make this a pose measurement
       boost::shared_ptr<PoseMeasurement> prevmeas = boost::shared_dynamic_cast<PoseMeasurement>(prevmeas_base);
       if(!prevmeas){
@@ -280,7 +281,7 @@ public:
       }
 
       //get state at previous measurement
-      boost::shared_ptr<EKFState_T> state_nonconst_old = core.getStateAtTime(prevmeas->time);
+      boost::shared_ptr<EKFState_T> state_nonconst_old = core.getClosestState(prevmeas->time);
 
       if(state_nonconst_old->time == -1){
         ROS_WARN_STREAM("The state at the previous measurement is invalid. Could not apply measurement");

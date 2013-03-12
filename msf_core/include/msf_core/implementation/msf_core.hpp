@@ -756,8 +756,10 @@ void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase<
     appliedOne = true;
   }
 
-  if(!appliedOne)
+  if(!appliedOne){
+    ROS_WARN_STREAM("no measurement was applied, this should not happen");
     return;
+  }
 
   //now publish the best current estimate
   static int seq_m = 0;
