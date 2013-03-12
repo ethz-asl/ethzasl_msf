@@ -1,13 +1,14 @@
 scale_init: 1
 fixed_scale: 0
 core/fixed_bias: 0
+
 #########IMU PARAMETERS#######
-#bluebird
+####### bluebird
 #core/noise_acc: 0.083
 #core/noise_accbias: 0.0083
 #core/noise_gyr: 0.0013
 #core/noise_gyrbias: 0.00013
-#ADIS
+####### ADIS
 core/noise_acc: 0.002
 core/noise_accbias: 8e-5
 core/noise_gyr: 0.0004
@@ -42,5 +43,6 @@ init/p_ci/x: 0.0745374
 init/p_ci/y: -0.086751
 init/p_ci/z: 0.0123919
 
+pose_sensor/absolute_measurements: false
 use_fixed_covariance: false
 measurement_world_sensor: false  # selects if sensor measures its position w.r.t. world (true, e.g. Vicon) or the position of the world coordinate system w.r.t. the sensor (false, e.g. ethzasl_ptam)

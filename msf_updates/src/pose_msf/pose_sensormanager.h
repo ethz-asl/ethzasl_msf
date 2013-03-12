@@ -60,9 +60,11 @@ public:
 
   PoseSensorManager(ros::NodeHandle pnh = ros::NodeHandle("~/pose_sensor"))
   {
-    bool poseabsolute = true; ///<does the pose sensor provides absolute measurements : TODO read from parameters which are specific to this sensor
+    bool poseabsolute; ///<does the pose sensor provides absolute measurements
 
-      pose_handler_.reset(new PoseSensorHandler(*this, poseabsolute));
+    pnh.param("absolute_measurements", poseabsolute, true);
+
+    pose_handler_.reset(new PoseSensorHandler(*this, poseabsolute));
     addHandler(pose_handler_);
 
     reconf_server_.reset(new ReconfigureServer(pnh));

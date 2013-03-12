@@ -218,8 +218,9 @@ private:
   sensor_fusion_comm::DoubleArrayStamped msgState_;
 
   ros::Publisher pubPose_; ///< publishes 6DoF pose output
-  geometry_msgs::PoseWithCovarianceStamped msgPose_;
+  ros::Publisher pubPoseAfterUpdate_; ///< publishes 6DoF pose output after the update has been applied
 
+  geometry_msgs::PoseWithCovarianceStamped msgPose_;
 
   ros::Publisher pubPoseCrtl_; ///< publishes 6DoF pose including velocity output
   sensor_fusion_comm::ExtState msgPoseCtrl_;

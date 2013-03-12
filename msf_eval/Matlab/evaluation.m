@@ -22,18 +22,18 @@ close all
 binSize=10.0; % [m]
 
 % get the data
-msf_abs_vicon; 
+SLAM_sensor_vicon_msf_abs_01_4KF_cov; 
 data_EVAL{3} = data; %method A
 
-vslam_vicon;
+SLAM_sensor_vicon_msf_rel_01_4KF_cov;
 data_EVAL{2} = data; %method B
 
-msf_abs_vicon;
+SLAM_sensor_vicon_msf_abs_01_4KF_cov;
 data_EVAL{1} = data; %method C
 
-nameMethodA = 'SSF';
-nameMethodB = 'PTAM';
-nameMethodC = 'MethodC';
+nameMethodA = 'A';
+nameMethodB = 'B';
+nameMethodC = 'C';
 
 mk{3}='x';
 mk{2}='o';
