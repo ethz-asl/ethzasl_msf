@@ -25,14 +25,14 @@ binSize=10.0; % [m]
 msf_abs_vicon; 
 data_EVAL{3} = data; %method A
 
-msf_abs_vicon;
+vslam_vicon;
 data_EVAL{2} = data; %method B
 
 msf_abs_vicon;
 data_EVAL{1} = data; %method C
 
-nameMethodA = 'MethodA';
-nameMethodB = 'MethodB';
+nameMethodA = 'SSF';
+nameMethodB = 'PTAM';
 nameMethodC = 'MethodC';
 
 mk{3}='x';

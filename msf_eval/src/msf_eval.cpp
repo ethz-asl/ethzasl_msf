@@ -67,13 +67,13 @@ int main(int argc, char **argv)
 
   if (argc != 4)
   {
-    ROS_ERROR_STREAM("usage: ./"<<argv[0]<<" bagfile EKF_topic GT_topic");
+    ROS_ERROR_STREAM("usage: ./"<<argv[0]<<" bagfile EVAL_topic GT_topic");
     return -1;
   }
 
   enum argIndices{
     bagfile = 1,
-    EKF_topic = 2,
+    EVAL_topic = 2,
     GT_topic = 3
   };
 
@@ -88,25 +88,25 @@ int main(int argc, char **argv)
 
   std::ofstream outfile(matlab_fname.str().c_str());
 
-  std::stringstream poses_EKF;
+  std::stringstream poses_EVAL;
   std::stringstream poses_GT;
 
   assert(outfile.good());
 
   outfile << "data=[" << std::endl;
 
-  // consts - TODO: get this from calibration or so
+  //calibration of sensor to vicon
   Eigen::Matrix4d T_BaBg_mat;
 
-  //this is the Vicon one - Jörn
+  //this is the Vicon one - SLAM sensor V0
   ///////////////////////////////////////////////////////////////////////////////////////////
   T_BaBg_mat << 0.999706627053000, -0.022330158354000, 0.005123243528000, -0.060614697387000, 0.022650462142000, 0.997389634278000, -0.068267398302000, 0.035557942651000, -0.003589706237000, 0.068397960288000, 0.997617159323000, -0.042589657349000, 0, 0, 0, 1.000000000000000;
   ////////////////////////////////////////////////////////////////////////////////////////////
 
   ros::Duration dt(0.0039);
   const double timeSyncThreshold = 0.005;
-  const double timeDiscretization = 10.0;
-  const double trajectoryTimeDiscretization = 0.049;
+  const double timeDiscretization = 10.0; //discretization step for different starting points into the dataset
+  const double trajectoryTimeDiscretization = 0.049; //discretization of evaluation points (vision framerate for fair comparison)
   const double startTimeOffset = 0.0;
   ros::Duration startOffset(startTimeOffset);
 
@@ -116,13 +116,13 @@ int main(int argc, char **argv)
   rosbag::Bag bag(argv[bagfile], rosbag::bagmode::Read);
 
   // views on topics
-  rosbag::View view_EVAL(bag, rosbag::TopicQuery(argv[EKF_topic]));
+  rosbag::View view_EVAL(bag, rosbag::TopicQuery(argv[EVAL_topic]));
   rosbag::View view_GT(bag, rosbag::TopicQuery(argv[GT_topic]));
 
   //check topics
   if (view_EVAL.size() == 0)
   {
-    ROS_ERROR_STREAM("The bag you provided does not contain messages for topic "<<argv[EKF_topic]);
+    ROS_ERROR_STREAM("The bag you provided does not contain messages for topic "<<argv[EVAL_topic]);
     return -1;
   }
   if (view_GT.size() == 0)
@@ -133,8 +133,17 @@ int main(int argc, char **argv)
 
   //litter console with number of messages
   ROS_INFO_STREAM("Reading from "<<argv[bagfile]);
-  ROS_INFO_STREAM("Topic "<<argv[EKF_topic]<<", size: "<<view_EVAL.size());
+  ROS_INFO_STREAM("Topic "<<argv[EVAL_topic]<<", size: "<<view_EVAL.size());
   ROS_INFO_STREAM("Topic "<<argv[GT_topic]<<", size: "<<view_GT.size());
+
+  //get times of first messages
+  GT_TYPE::ConstPtr GT_begin = view_GT.begin()->instantiate<GT_TYPE>();
+  assert(GT_begin);
+  EVAL_TYPE::ConstPtr POSE_begin = view_EVAL.begin()->instantiate<EVAL_TYPE>();
+  assert(POSE_begin);
+
+  ROS_INFO_STREAM("First GT data at "<<GT_begin->header.stamp);
+  ROS_INFO_STREAM("First EVAL data at "<<POSE_begin->header.stamp);
 
   while (true) // start eval from different starting points
   {
@@ -144,15 +153,6 @@ int main(int argc, char **argv)
 
     // read ground truth
     ros::Time start;
-
-    //get times of first messages
-    GT_TYPE::ConstPtr GT_begin = it_GT->instantiate<GT_TYPE>();
-    assert(GT_begin);
-    EVAL_TYPE::ConstPtr POSE_begin = it_EVAL->instantiate<EVAL_TYPE>();
-    assert(POSE_begin);
-
-    ROS_INFO_STREAM("First GT data at "<<GT_begin->header.stamp);
-    ROS_INFO_STREAM("First EVAL data at "<<POSE_begin->header.stamp);
 
     // Find start time alignment: set the GT iterater to point to a time larger than the aslam time
     while (true)
@@ -288,26 +288,22 @@ int main(int argc, char **argv)
         Eigen::Vector3d e_z_Wg(0, 0, 1);
         Eigen::Vector3d e_z_Wa = dT.C() * e_z_Wg;
         double dalpha_e_z = acos(std::min(1.0, e_z_Wg.dot(e_z_Wa)));
-        //ROS_ERROR_STREAM("dalpha_e_z="<<dalpha_e_z<<"; 2*acos(std::min(1.0,fabs(dT.q()[3])))="<<2*acos(std::min(1.0,fabs(dT.q()[3]))));
-        //assert(dalpha_e_z<=2*acos(std::min(1.0,fabs(dT.q()[3]))));
-        //ROS_ERROR_STREAM((time_GT-time_aslam).toSec());
+
         if (fabs((time_GT - time_EKF).toSec()) < timeSyncThreshold
             && (time_EKF - lastTime).toSec() > trajectoryTimeDiscretization)
         {
           if (startOffset.toSec() == startTimeOffset)
           {
-            poses_EKF << T_WaBa.t().transpose() << ";" << std::endl;
+            poses_EVAL << T_WaBa.t().transpose() << ";" << std::endl;
             poses_GT << T_WgBg.t().transpose() << ";" << std::endl;
           }
+
           outfile << (time_GT - start).toSec() << " " << ds << " " << (T_WaBa.t() - T_WaBa_gt.t()).norm() << " "
               << 2 * acos(std::min(1.0, fabs(dT.q()[3]))) << " " << dalpha_e_z << ";" << std::endl;
 
-          //          ROS_WARN_STREAM(
-          //              (time_GT-time_EKF).toSec()<<" "<<(time_GT-start).toSec()<<" "<<ds<<" "<<(T_WaBa.t()-T_WaBa_gt.t()).norm()<<" "<<2*acos(std::min(1.0,fabs(dT.q()[3])))<<" "<<dalpha_e_z<<" time="<<time_GT);
 
           lastTime = time_EKF; // remember
         }
-        //ROS_INFO_STREAM((time_GT-time_aslam).toSec()<<" "<<(time_GT-start).toSec()<<" "<<ds<<" "<<dT.t().norm()<<" "<<" "<<2*acos(std::min(1.0,fabs(dT.q()[3]))));
 
         // count comparisons
         ctr++;
@@ -331,7 +327,7 @@ int main(int argc, char **argv)
   bag.close();
 
   outfile << "];";
-  outfile << "poses = [" << poses_EKF.str() << "];" << std::endl;
+  outfile << "poses = [" << poses_EVAL.str() << "];" << std::endl;
   outfile << "poses_GT = [" << poses_GT.str() << "];" << std::endl;
   outfile.close();
 
