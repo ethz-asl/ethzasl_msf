@@ -13,6 +13,7 @@
   <depend package="dynamic_reconfigure"/>
   <depend package="sensor_fusion_comm"/>
   <depend package="sm_timing"/>
+  <depend package="tf"/>
 
   <rosdep name="eigen"/>
   <depend package="opencv2"/>

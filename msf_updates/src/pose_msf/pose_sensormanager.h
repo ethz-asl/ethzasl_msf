@@ -65,7 +65,11 @@ public:
     bool poseabsolute = true; ///<does the pose sensor provides absolute measurements : TODO read from parameters which are specific to this sensor
     bool distortmeas = false; ///<distort the pose measurements TODO make param
 
+    pnh.param("absolute_measurements", poseabsolute, true);
+
     pose_handler_.reset(new PoseSensorHandler_T(*this, poseabsolute, distortmeas));
+
+
     addHandler(pose_handler_);
 
     reconf_server_.reset(new ReconfigureServer(pnh));
@@ -94,6 +98,17 @@ private:
     if((level & msf_updates::SinglePoseSensor_INIT_FILTER) && config.init_filter == true){
       init(config.initial_scale);
       config.init_filter = false;
+    }
+    //Init call with "set height" checkbox
+    if((level & msf_updates::SinglePoseSensor_SET_HEIGHT) && config.set_height == true){
+      Eigen::Matrix<double, 3, 1> p = pose_handler_->getPositionMeasurement();
+      if (p.norm() == 0){
+           ROS_WARN_STREAM("No measurements received yet to initialize position. Height init not allowed.");
+           return;
+      }
+      double scale =  p[2]/config.height;
+      init(scale);
+      config.set_height = false;
     }
   }
 

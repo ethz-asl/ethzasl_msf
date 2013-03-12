@@ -56,6 +56,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <queue>
 #include <msf_core/msf_state.h>
 #include <msf_core/msf_checkFuzzyTracking.h>
+#include <tf/transform_broadcaster.h>
 
 //good old days...
 //#define N_STATE_BUFFER 256	///< size of unsigned char, do not change!
@@ -176,6 +177,7 @@ public:
 private:
   stateBufferT StateBuffer_; ///<EKF buffer containing pretty much all info needed at time t. sorted by t asc
   measurementBufferT MeasurementBuffer_; ///< EKF Measurements and init values sorted by t asc
+  tf::TransformBroadcaster tf_broadcaster_;
 
   std::queue<boost::shared_ptr<MSF_MeasurementBase<EKFState_T> > > queueFutureMeasurements_; ///< buffer for measurements to apply in future
 
@@ -220,6 +222,8 @@ private:
   sensor_fusion_comm::DoubleArrayStamped msgState_;
 
   ros::Publisher pubPose_; ///< publishes 6DoF pose output
+  ros::Publisher pubPoseAfterUpdate_; ///< publishes 6DoF pose output after the update has been applied
+
   geometry_msgs::PoseWithCovarianceStamped msgPose_;
 
   ros::Publisher pubPoseCrtl_; ///< publishes 6DoF pose including velocity output

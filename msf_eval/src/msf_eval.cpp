@@ -60,22 +60,55 @@ Eigen::Quaterniond getOrientation(geometry_msgs::PoseWithCovarianceStampedConstP
   return orientation;
 }
 
+Eigen::Matrix<double, 6, 6> getCovariance(geometry_msgs::PoseWithCovarianceStampedConstPtr ps){
+  return Eigen::Matrix<double, 6, 6>(&ps->pose.covariance[0]);
+}
+
+
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "msf_eval");
   ros::Time::init();
 
-  if (argc != 4)
-  {
-    ROS_ERROR_STREAM("usage: ./"<<argv[0]<<" bagfile EVAL_topic GT_topic");
-    return -1;
-  }
 
   enum argIndices{
     bagfile = 1,
     EVAL_topic = 2,
-    GT_topic = 3
+    GT_topic = 3,
+    singleRunOnly = 4
   };
+
+  //calibration of sensor to vicon
+  Eigen::Matrix4d T_BaBg_mat;
+
+  //this is the Vicon one - SLAM sensor V0
+  ///////////////////////////////////////////////////////////////////////////////////////////
+  T_BaBg_mat << 0.999706627053000, -0.022330158354000, 0.005123243528000, -0.060614697387000, 0.022650462142000, 0.997389634278000, -0.068267398302000, 0.035557942651000, -0.003589706237000, 0.068397960288000, 0.997617159323000, -0.042589657349000, 0, 0, 0, 1.000000000000000;
+  ////////////////////////////////////////////////////////////////////////////////////////////
+
+  ros::Duration dt(0.0039);
+  const double timeSyncThreshold = 0.005;
+  const double timeDiscretization = 10.0; //discretization step for different starting points into the dataset
+  const double trajectoryTimeDiscretization = 0.049; //discretization of evaluation points (vision framerate for fair comparison)
+  const double startTimeOffset = 0.0;
+
+
+  if (argc < 4)
+  {
+    ROS_ERROR_STREAM("usage: ./"<<argv[0]<<" bagfile EVAL_topic GT_topic [singleRunOnly]");
+    return -1;
+  }
+  bool singleRun = false;
+  if (argc == 5)
+  {
+    singleRun = atoi(argv[singleRunOnly]);
+  }
+
+  if(singleRun){
+    ROS_WARN_STREAM("Doing only a single run.");
+  }else{
+    ROS_WARN_STREAM("Will process the dataset from different starting points.");
+  }
 
   typedef geometry_msgs::TransformStamped GT_TYPE;
   typedef geometry_msgs::PoseWithCovarianceStamped EVAL_TYPE;
@@ -95,19 +128,6 @@ int main(int argc, char **argv)
 
   outfile << "data=[" << std::endl;
 
-  //calibration of sensor to vicon
-  Eigen::Matrix4d T_BaBg_mat;
-
-  //this is the Vicon one - SLAM sensor V0
-  ///////////////////////////////////////////////////////////////////////////////////////////
-  T_BaBg_mat << 0.999706627053000, -0.022330158354000, 0.005123243528000, -0.060614697387000, 0.022650462142000, 0.997389634278000, -0.068267398302000, 0.035557942651000, -0.003589706237000, 0.068397960288000, 0.997617159323000, -0.042589657349000, 0, 0, 0, 1.000000000000000;
-  ////////////////////////////////////////////////////////////////////////////////////////////
-
-  ros::Duration dt(0.0039);
-  const double timeSyncThreshold = 0.005;
-  const double timeDiscretization = 10.0; //discretization step for different starting points into the dataset
-  const double trajectoryTimeDiscretization = 0.049; //discretization of evaluation points (vision framerate for fair comparison)
-  const double startTimeOffset = 0.0;
   ros::Duration startOffset(startTimeOffset);
 
   sm::kinematics::Transformation T_BaBg(T_BaBg_mat); //body aslam to body Ground Truth
@@ -297,10 +317,13 @@ int main(int argc, char **argv)
             poses_EVAL << T_WaBa.t().transpose() << ";" << std::endl;
             poses_GT << T_WgBg.t().transpose() << ";" << std::endl;
           }
-
-          outfile << (time_GT - start).toSec() << " " << ds << " " << (T_WaBa.t() - T_WaBa_gt.t()).norm() << " "
-              << 2 * acos(std::min(1.0, fabs(dT.q()[3]))) << " " << dalpha_e_z << ";" << std::endl;
-
+          Eigen::Matrix<double, 6, 6> cov = getCovariance(pose);
+          outfile << (time_GT - start).toSec() << " "
+              << ds << " " << (T_WaBa.t() - T_WaBa_gt.t()).norm() << " " //translation
+              << 2 * acos(std::min(1.0, fabs(dT.q()[3]))) << " " << dalpha_e_z << " " //orientation
+              <<cov(0, 0)<<" "<<cov(1, 1)<<" "<<cov(2, 2)<<" " //position covariances
+              <<cov(3, 3)<<" "<<cov(4, 4)<<" "<<cov(5, 5)<<";" //orientation covariances
+              << std::endl;
 
           lastTime = time_EKF; // remember
         }
@@ -317,7 +340,7 @@ int main(int argc, char **argv)
     startOffset += ros::Duration(timeDiscretization);
 
 
-    if (ctr == 0) //any new measurements this run?
+    if (ctr == 0 || singleRun) //any new measurements this run?
     {
       break;
     }

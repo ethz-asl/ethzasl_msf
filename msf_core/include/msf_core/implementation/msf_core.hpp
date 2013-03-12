@@ -63,6 +63,7 @@ MSF_Core<EKFState_T>::MSF_Core(MSF_SensorManager<EKFState_T>& usercalc):usercalc
   pubState_ = nh.advertise<sensor_fusion_comm::DoubleArrayStamped> ("state_out", 1);
   pubCorrect_ = nh.advertise<sensor_fusion_comm::ExtEkf> ("correction", 1);
   pubPose_ = nh.advertise<geometry_msgs::PoseWithCovarianceStamped> ("pose", 1);
+  pubPoseAfterUpdate_ = nh.advertise<geometry_msgs::PoseWithCovarianceStamped> ("pose_after_update", 1);
   pubPoseCrtl_ = nh.advertise<sensor_fusion_comm::ExtState> ("ext_state", 1);
   msgState_.data.resize(nStatesAtCompileTime, 0);
 
@@ -505,6 +506,14 @@ void MSF_Core<EKFState_T>::propagateState(boost::shared_ptr<EKFState_T>& state_o
   state_new-> template get<StateDefinition_T::v>() = state_old-> template get<StateDefinition_T::v>() + (dv - g_) * dt;
   state_new-> template get<StateDefinition_T::p>() = state_old-> template get<StateDefinition_T::p>() + ((state_new-> template get<StateDefinition_T::v>() + state_old-> template get<StateDefinition_T::v>()) / 2 * dt);
 
+  tf::Transform transform;
+   Eigen::Matrix<double, 3, 1>& pos = state_new-> template get<StateDefinition_T::p>();
+   Eigen::Quaterniond& ori = state_new-> template get<StateDefinition_T::q>();
+   transform.setOrigin( tf::Vector3(pos[0], pos[1], pos[2]) );
+   transform.setRotation( tf::Quaternion(ori.x(), ori.y(), ori.z(), ori.w()) );
+   tf_broadcaster_.sendTransform(tf::StampedTransform(transform, ros::Time::now() /*ros::Time(latestState->time_)*/, "world", "state"));
+
+
 }
 
 template<typename EKFState_T>
@@ -813,6 +822,16 @@ void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase<
   msgState_.header = msgCorrect_.header;
   latestState->toFullStateMsg(msgState_);
   pubState_.publish(msgState_);
+
+  //publish pose after correction
+  propPToState(latestState); //get the covar
+
+  msgPose_.header.stamp = ros::Time(latestState->time);
+  msgPose_.header.seq = seq_m;
+  msgPose_.header.frame_id = "/world";
+
+  latestState->toPoseMsg(msgPose_);
+  pubPoseAfterUpdate_.publish(msgPose_);
 
   seq_m++;
 }
