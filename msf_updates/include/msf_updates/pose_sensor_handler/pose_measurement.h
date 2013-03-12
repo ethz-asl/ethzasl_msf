@@ -178,11 +178,15 @@ public:
     bool scalefix = (fixedstates_ & 1 << StateDefinition_T::L);
     bool calibposfix = (fixedstates_ & 1 << StateDefinition_T::p_ci);
     bool calibattfix = (fixedstates_ & 1 << StateDefinition_T::q_ci);
+    bool driftvwattfix = (fixedstates_ & 1 << StateDefinition_T::q_wv);
+    bool driftvwposfix = (fixedstates_ & 1 << StateDefinition_T::p_vw);
 
     //set crosscov to zero
     if(scalefix) state_in->clearCrossCov<StateDefinition_T::L>();
     if(calibposfix) state_in->clearCrossCov<StateDefinition_T::p_ci>();
     if(calibattfix) state_in->clearCrossCov<StateDefinition_T::q_ci>();
+    if(driftvwattfix) state_in->clearCrossCov<StateDefinition_T::q_wv>();
+    if(driftvwposfix) state_in->clearCrossCov<StateDefinition_T::p_vw>();
 
     // construct H matrix using H-blockx :-)
     // position:
@@ -192,9 +196,11 @@ public:
 
     H.block<3, 1>(0, idxstartcorr_L_) = scalefix ? Eigen::Matrix<double, 3, 1>::Constant(0) :
         (C_wv.transpose() * C_q.transpose() * state.get<StateDefinition_T::p_ci>()
-        + C_wv.transpose() * state.get<StateDefinition_T::p>() + state.get<StateDefinition_T::p_vw>()).eval(); // L
+        + C_wv.transpose() * state.get<StateDefinition_T::p>() + (driftvwposfix ? Eigen::Matrix<double, 3, 1>::Constant(0) :
+            state.get<StateDefinition_T::p_vw>()).eval()).eval(); // L
 
-    H.block<3, 3>(0, idxstartcorr_qwv_) = -C_wv.transpose() * skewold; // q_wv
+    H.block<3, 3>(0, idxstartcorr_qwv_) = driftvwposfix ? Eigen::Matrix<double, 3, 3>::Constant(0) :
+        (-C_wv.transpose() * skewold).eval(); // q_wv
 
     H.block<3, 3>(0, idxstartcorr_pci_) = calibposfix ? Eigen::Matrix<double, 3, 3>::Constant(0) :
         (C_wv.transpose() * C_q.transpose() * state.get<StateDefinition_T::L>()(0)).eval(); //p_ci
@@ -204,12 +210,12 @@ public:
     // attitude
     H.block<3, 3>(3, idxstartcorr_q_) = C_ci; // q
 
-    H.block<3, 3>(3, idxstartcorr_qwv_) = C_ci * C_q; // q_wv
+    H.block<3, 3>(3, idxstartcorr_qwv_) = driftvwattfix ? Eigen::Matrix<double, 3, 3>::Constant(0) : (C_ci * C_q).eval(); // q_wv
 
     H.block<3, 3>(3, idxstartcorr_qci_) = calibattfix ? Eigen::Matrix<double, 3, 3>::Constant(0) : Eigen::Matrix<double, 3, 3>::Identity().eval(); //q_ci
 
     //TODO: do we still want this?
-    H(6, 18) = 1.0; // fix vision world yaw drift because unobservable otherwise (see PhD Thesis)
+    H(6, 18) = driftvwattfix ? 0 : 1.0; // fix vision world yaw drift because unobservable otherwise (see PhD Thesis)
 
   }
 

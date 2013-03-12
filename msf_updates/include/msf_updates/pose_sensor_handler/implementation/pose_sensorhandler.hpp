@@ -109,7 +109,8 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(cons
 
   //get the fixed states
   int fixedstates = 0;
-  BOOST_STATIC_ASSERT_MSG(msf_updates::EKFState::nStateVarsAtCompileTime < 32, "Your state has more than 32 variables, so check that the fix-states does not overflow"); //do not exceed the 32 bits of int
+  BOOST_STATIC_ASSERT_MSG(msf_updates::EKFState::nStateVarsAtCompileTime < 32, "Your state has more than 32 variables. "
+      "The code needs to be changed here to have a larger variable to mark the fixed_states"); //do not exceed the 32 bits of int
 
   //get all the fixed states and set flag bits
   MANAGER_TYPE* mngr = dynamic_cast<MANAGER_TYPE*>(&manager_);
@@ -123,6 +124,15 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(cons
     }
     if (mngr->getcfg().fixed_calib_att){
       fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::q_ci;
+    }
+    if (mngr->getcfg().fixed_calib_att){
+      fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::q_ci;
+    }
+    if (mngr->getcfg().fixed_att_drift_vw){
+      fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::q_wv;
+    }
+    if (mngr->getcfg().fixed_pos_drift_vw){
+      fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::p_vw;
     }
   }
 
