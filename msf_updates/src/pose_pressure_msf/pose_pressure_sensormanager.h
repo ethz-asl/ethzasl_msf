@@ -55,7 +55,7 @@ typedef boost::shared_ptr<ReconfigureServer> ReconfigureServerPtr;
 class PosePressureSensorManager : public msf_core::MSF_SensorManagerROS<msf_updates::EKFState>
 {
   typedef msf_pose_sensor::PoseSensorHandler<msf_updates::pose_measurement::PoseMeasurement, PosePressureSensorManager> PoseSensorHandler_T;
-  friend PoseSensorHandler_T;
+  friend class msf_pose_sensor::PoseSensorHandler<msf_updates::pose_measurement::PoseMeasurement, PosePressureSensorManager>;
 public:
   typedef msf_updates::EKFState EKFState_T;
   typedef EKFState_T::StateSequence_T StateSequence_T;
