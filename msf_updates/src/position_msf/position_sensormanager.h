@@ -41,8 +41,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <msf_core/msf_core.h>
 #include <msf_core/msf_sensormanagerROS.h>
 #include "msf_statedef.hpp"
-#include <msf_updates/position_measurement/position_sensorhandler.h>
-#include <msf_updates/position_measurement/position_measurement.h>
+#include <msf_updates/position_sensor_handler/position_sensorhandler.h>
+#include <msf_updates/position_sensor_handler/position_measurement.h>
 #include <msf_updates/SinglePositionSensorConfig.h>
 
 namespace msf_position_sensor{
@@ -62,7 +62,7 @@ public:
 
   PositionSensorManager(ros::NodeHandle pnh = ros::NodeHandle("~/position_sensor"))
   {
-    bool positionabsolute = true; ///<does the position sensor provides absolute measurements : TODO read from parameters which are specific to this sensor
+    bool positionabsolute = true; ///<does the position sensor provides absolute measurements
 
     position_handler_.reset(new PositionSensorHandler_T(*this, positionabsolute));
     addHandler(position_handler_);
@@ -150,7 +150,7 @@ private:
     meas->setStateInitValue<StateDefinition_T::q>(q);
     meas->setStateInitValue<StateDefinition_T::b_w>(b_w);
     meas->setStateInitValue<StateDefinition_T::b_a>(b_a);
-    meas->setStateInitValue<StateDefinition_T::p_prism_imu>(p_prism_imu);
+    meas->setStateInitValue<StateDefinition_T::p_pos_imu>(p_prism_imu);
 
     setP(meas->get_P()); //call my set P function
     meas->get_w_m() = w_m;
@@ -174,7 +174,7 @@ private:
 
     //compute the blockwise Q values and store them with the states,
     //these then get copied by the core to the correct places in Qd
-    state.getQBlock<StateDefinition_T::p_prism_imu>() = (dt * npicv.cwiseProduct(npicv)).asDiagonal();
+    state.getQBlock<StateDefinition_T::p_pos_imu>() = (dt * npicv.cwiseProduct(npicv)).asDiagonal();
   }
 
   virtual void setP(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, EKFState_T::nErrorStatesAtCompileTime>& P){

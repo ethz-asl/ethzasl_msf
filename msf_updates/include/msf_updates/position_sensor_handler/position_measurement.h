@@ -117,14 +117,14 @@ public:
 
     // preprocess for elements in H matrix
 
-    Eigen::Matrix<double, 3, 3> p_prism_imu_sk = skew(state.get<StateDefinition_T::p_prism_imu>());
+    Eigen::Matrix<double, 3, 3> p_prism_imu_sk = skew(state.get<StateDefinition_T::p_pos_imu>());
 
     //get indices of states in error vector
     enum{
       idxstartcorr_p_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::p>::value,
       idxstartcorr_v_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::v>::value,
       idxstartcorr_q_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::q>::value,
-      idxstartcorr_p_prism_imu_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::p_prism_imu>::value,
+      idxstartcorr_p_pos_imu_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::p_pos_imu>::value,
     };
 
     // construct H matrix using H-blockx :-)
@@ -133,7 +133,7 @@ public:
 
     H.block<3, 3>(0, idxstartcorr_q_) = - C_q.transpose() * p_prism_imu_sk; // q
 
-    H.block<3, 3>(0, idxstartcorr_p_prism_imu_) = C_q.transpose(); //p_ci
+    H.block<3, 3>(0, idxstartcorr_p_pos_imu_) = C_q.transpose(); //p_ci
   }
 
   /**
@@ -155,7 +155,7 @@ public:
 
       // construct residuals
       // position
-      r_old.block<3, 1>(0, 0) = z_p_ - (state.get<StateDefinition_T::p>() + C_q.transpose() * state.get<StateDefinition_T::p_prism_imu>());
+      r_old.block<3, 1>(0, 0) = z_p_ - (state.get<StateDefinition_T::p>() + C_q.transpose() * state.get<StateDefinition_T::p_pos_imu>());
 
       //TODO reenable on merge with SC branch
 //      if(!checkForNumeric(r_old, "r_old")){

@@ -5,15 +5,14 @@ noise_acc: 0.083
 noise_accbias: 0.0083
 noise_gyr: 0.0013
 noise_gyrbias: 0.00013
-noise_p_prism_imu: 0.0
 delay: 0.2
 meas_noise1: 0.001
 
 data_playback: True
 
 #init position offset prism imu
-init/p_ci/x: 0.0    
-init/p_ci/y: 0.0
-init/p_ci/z: 0.0
+init/p_prism_imu/x: 0.0    
+init/p_prism_imu/y: 0.0
+init/p_prism_imu/z: 0.0
 
 use_fixed_covariance: true

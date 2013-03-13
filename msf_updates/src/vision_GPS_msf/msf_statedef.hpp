@@ -50,6 +50,11 @@ enum StateDefinition{ //must not manually set the enum values!
   q,
   b_w,
   b_a,
+  L,
+  q_wv,
+  p_vw,
+  q_ci,
+  p_ci,
   p_pos_imu
 };
 
@@ -68,7 +73,12 @@ typedef boost::fusion::vector<
     msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, b_a, msf_core::CoreStateWithoutPropagation>,                     ///< acceleration biases              (13-15 / 12-14)
 
     // states not varying during propagation
-    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_pos_imu>                                                            ///< prism-imu position calibration
+    msf_core::StateVar_T<Eigen::Matrix<double, 1, 1>, L>,                                                              ///< visual scale                     (16 / 15)
+    msf_core::StateVar_T<Eigen::Quaternion<double>, q_wv, msf_core::AuxiliaryNonTemporalDrifting>,                     ///< vision-world attitude drift      (17-20 / 16-18)
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_vw>,                                                          ///< vision world position drift        (21-23 / 19-22)
+    msf_core::StateVar_T<Eigen::Quaternion<double>, q_ci>,                                                             ///< camera-imu attitude calibration  (24-27 / 23-25)
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_ci>,                                                            ///< camera-imu position calibration  (28-30 / 26-28)
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_pos_imu>
 > fullState_T;
 }
 
