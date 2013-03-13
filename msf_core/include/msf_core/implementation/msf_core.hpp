@@ -113,6 +113,7 @@ void MSF_Core<EKFState_T>::initExternalPropagation(boost::shared_ptr<EKFState_T>
 template<typename EKFState_T>
 void MSF_Core<EKFState_T>::publishCovImage(boost::shared_ptr<EKFState_T> stateptr) const {
 
+#ifdef  WITHCOVIMAGE
   if(!pubCov_.getNumSubscribers())
     return;
 
@@ -201,6 +202,9 @@ void MSF_Core<EKFState_T>::publishCovImage(boost::shared_ptr<EKFState_T> statept
   pubCov_.publish(msgimg_);
 
 //  ROS_WARN_STREAM("P=["<<state.P<<"];");
+#else
+  ROS_WARN_STREAM_ONCE("The function to publish a covariance image was called, but the function is disabled at compile time.");
+#endif
 
 }
 

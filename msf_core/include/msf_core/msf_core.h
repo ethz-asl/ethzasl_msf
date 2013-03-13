@@ -47,7 +47,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sensor_msgs/Imu.h>
 #include <asctec_hl_comm/mav_imu.h>
 
+#ifdef WITHCOVIMAGE
 #include <image_transport/image_transport.h>
+#endif
+
 #include <opencv/cvwimage.h>
 #include <opencv/highgui.h>
 
