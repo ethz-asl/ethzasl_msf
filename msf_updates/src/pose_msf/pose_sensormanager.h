@@ -110,6 +110,12 @@ private:
       init(scale);
       config.set_height = false;
     }
+    ROS_INFO_STREAM("fixed_bias: "<<config_.fixed_bias);
+    ROS_INFO_STREAM("fixed_scale: "<<config_.fixed_scale);
+    ROS_INFO_STREAM("fixed_pos_drift_vw: "<<config_.fixed_pos_drift_vw);
+    ROS_INFO_STREAM("fixed_att_drift_vw: "<<config_.fixed_att_drift_vw);
+    ROS_INFO_STREAM("fixed_calib_att: "<<config_.fixed_calib_att);
+    ROS_INFO_STREAM("fixed_calib_pos: "<<config_.fixed_calib_pos);
   }
 
   void init(double scale)

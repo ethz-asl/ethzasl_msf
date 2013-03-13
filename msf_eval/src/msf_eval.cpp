@@ -90,8 +90,7 @@ int main(int argc, char **argv)
   const double timeSyncThreshold = 0.005;
   const double timeDiscretization = 10.0; //discretization step for different starting points into the dataset
   const double trajectoryTimeDiscretization = 0.049; //discretization of evaluation points (vision framerate for fair comparison)
-  const double startTimeOffset = 0.0;
-
+  const double startTimeOffset = 10.0;
 
   if (argc < 4)
   {
@@ -217,6 +216,7 @@ int main(int argc, char **argv)
     ros::Time lastTime(0.0);
 
     ROS_INFO_STREAM("Processing measurements... Current start point: "<<startOffset<<"s into the bag.");
+
     for (; it_GT != view_GT.end(); ++it_GT)
     {
       GT_TYPE::ConstPtr trafo = it_GT->instantiate<GT_TYPE>();

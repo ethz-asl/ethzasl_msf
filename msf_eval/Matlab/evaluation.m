@@ -22,26 +22,27 @@ close all
 binSize=10.0; % [m]
 
 % get the data
-SLAM_sensor_vicon_msf_abs_01_4KF_cov; 
-data_EVAL{3} = data; %method A
 
-SLAM_sensor_vicon_msf_rel_01_4KF_cov;
+SLAM_sensor_vicon_msf_abs_noscale;
+data_EVAL{1} = data; %method A
+
+SLAM_sensor_vicon_msf_rel_noscale;
 data_EVAL{2} = data; %method B
 
-SLAM_sensor_vicon_msf_abs_01_4KF_cov;
-data_EVAL{1} = data; %method C
+SLAM_sensor_vicon_msf_rel_4KF; 
+data_EVAL{3} = data; %method C
 
 nameMethodA = 'A';
 nameMethodB = 'B';
 nameMethodC = 'C';
 
-mk{3}='x';
-mk{2}='o';
 mk{1}='.';
+mk{2}='o';
+mk{3}='x';
 
-clr{3}=[0,0,1];
-clr{2}=[0.0,0.75,0];
 clr{1}=[1,0,0];
+clr{2}=[0.0,0.75,0];
+clr{3}=[0,0,1];
 
 scales=[1.25,.4,.7];
 
