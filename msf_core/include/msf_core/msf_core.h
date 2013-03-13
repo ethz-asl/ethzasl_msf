@@ -235,7 +235,9 @@ private:
   ros::Publisher pubCorrect_; ///< publishes corrections for external state propagation
   sensor_fusion_comm::ExtEkf msgCorrect_;
 
+#ifdef  WITHCOVIMAGE
   ros::Publisher pubCov_; ///< publishes the state covariance as image
+#endif
 
   ros::Subscriber subState_; ///< subscriber to external state propagation
   ros::Subscriber subImu_; ///< subscriber to IMU readings

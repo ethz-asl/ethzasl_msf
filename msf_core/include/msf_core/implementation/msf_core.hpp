@@ -67,7 +67,9 @@ MSF_Core<EKFState_T>::MSF_Core(MSF_SensorManager<EKFState_T>& usercalc):usercalc
   pubPoseCrtl_ = nh.advertise<sensor_fusion_comm::ExtState> ("ext_state", 1);
   msgState_.data.resize(nStatesAtCompileTime, 0);
 
+#ifdef  WITHCOVIMAGE
   pubCov_ = nh.advertise<sensor_msgs::Image>("covariance_img", 1);
+#endif
 
   subImu_ = nh.subscribe("imu_state_input", 4, &MSF_Core::imuCallback, this);
   subImuCustom_ = nh.subscribe("imu_state_input_asctec", 4, &MSF_Core::imuCallback_asctec, this);
