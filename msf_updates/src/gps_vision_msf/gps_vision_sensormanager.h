@@ -56,9 +56,9 @@ typedef boost::shared_ptr<ReconfigureServer> ReconfigureServerPtr;
 class GPSVisionSensorManager : public msf_core::MSF_SensorManagerROS<msf_updates::EKFState>
 {
   typedef msf_pose_sensor::PoseSensorHandler<msf_updates::pose_measurement::PoseMeasurement, GPSVisionSensorManager> PoseSensorHandler_T;
-  friend PoseSensorHandler_T;
+  friend class msf_pose_sensor::PoseSensorHandler<msf_updates::pose_measurement::PoseMeasurement, GPSVisionSensorManager>;
   typedef msf_position_sensor::PositionSensorHandler<msf_updates::position_measurement::PositionMeasurement, GPSVisionSensorManager> PositionSensorHandler_T;
-  friend PositionSensorHandler_T;
+  friend class msf_position_sensor::PositionSensorHandler<msf_updates::position_measurement::PositionMeasurement, GPSVisionSensorManager>;
 public:
   typedef msf_updates::EKFState EKFState_T;
   typedef EKFState_T::StateSequence_T StateSequence_T;
