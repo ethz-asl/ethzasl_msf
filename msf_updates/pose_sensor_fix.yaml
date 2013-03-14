@@ -1,7 +1,7 @@
-core_scale_init: 1
+
 data_playback: true
 
-core/core_fixed_bias: 1
+core/core_fixed_bias: false
 
 #########IMU PARAMETERS#######
 ####### bluebird
@@ -15,15 +15,16 @@ core/core_noise_gyrbias: 0.00013
 #core/core_noise_gyr: 0.0004
 #core/core_noise_gyrbias: 3e-6
 
-pose_sensor/pose_fixed_scale: 1
+pose_sensor/pose_fixed_scale: false
 pose_sensor/pose_noise_scale: 0.0
+pose_sensor/pose_noise_pvw: 0.0
 pose_sensor/pose_noise_qwv: 0.0
 pose_sensor/pose_noise_qci: 0.0
-pose_sensor/pose_noise_pic: 0.0
+pose_sensor/pose_noise_pci: 0.0
 pose_sensor/pose_delay: 0.02
 pose_sensor/pose_noise_meas_p: 0.01
 pose_sensor/pose_noise_meas_q: 0.02
-
+pose_sensor/pose_initial_scale: 1
 
 # initialization of camera w.r.t. IMU
 #bluebird

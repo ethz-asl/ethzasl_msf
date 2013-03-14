@@ -109,7 +109,7 @@ private:
     }
     ROS_INFO_STREAM("pose_fixed_scale: "<<config_.pose_fixed_scale);
     ROS_INFO_STREAM("pose_fixed_p_vw: "<<config_.pose_fixed_p_vw);
-    ROS_INFO_STREAM("pose_fixed_q_vw: "<<config_.pose_fixed_q_vw);
+    ROS_INFO_STREAM("pose_fixed_q_vw: "<<config_.pose_fixed_q_wv);
     ROS_INFO_STREAM("pose_fixed_q_ci: "<<config_.pose_fixed_q_ci);
     ROS_INFO_STREAM("pose_fixed_p_ci: "<<config_.pose_fixed_p_ci);
   }
@@ -202,7 +202,7 @@ private:
     const msf_core::Vector3 nqwvv = msf_core::Vector3::Constant(config_.pose_noise_qwv);
     const msf_core::Vector3 npwvv = msf_core::Vector3::Constant(config_.pose_noise_pvw);
     const msf_core::Vector3 nqciv = msf_core::Vector3::Constant(config_.pose_noise_qci);
-    const msf_core::Vector3 npicv = msf_core::Vector3::Constant(config_.pose_noise_pci);
+    const msf_core::Vector3 npicv = msf_core::Vector3::Constant(config_.pose_noise_pic);
     const msf_core::Vector1 n_L = msf_core::Vector1::Constant(config_.pose_noise_scale);
 
     //compute the blockwise Q values and store them with the states,

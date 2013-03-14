@@ -130,7 +130,7 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(cons
     if (mngr->getcfg().pose_fixed_p_vw){
       fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::p_vw;
     }
-    if (mngr->getcfg().pose_fixed_q_vw){
+    if (mngr->getcfg().pose_fixed_q_wv){
       fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::q_wv;
     }
   }

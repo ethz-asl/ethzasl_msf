@@ -45,11 +45,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <msf_updates/pose_sensor_handler/pose_measurement.h>
 #include <msf_updates/position_sensor_handler/position_sensorhandler.h>
 #include <msf_updates/position_sensor_handler/position_measurement.h>
-#include <msf_updates/PositionVisionSensorConfig.h>
+#include <msf_updates/PositionPoseSensorConfig.h>
 
 namespace msf_updates{
 
-typedef msf_updates::PositionVisionSensorConfig Config_T;
+typedef msf_updates::PositionPoseSensorConfig Config_T;
 typedef dynamic_reconfigure::Server<Config_T> ReconfigureServer;
 typedef boost::shared_ptr<ReconfigureServer> ReconfigureServerPtr;
 
@@ -101,13 +101,13 @@ private:
     pose_handler_->setDelay(config.position_delay);
     position_handler_->setNoises(config.position_noise_meas);
 
-    if((level & msf_updates::PositionVisionSensor_INIT_FILTER) && config.core_init_filter == true){
+    if((level & msf_updates::PositionPoseSensor_INIT_FILTER) && config.core_init_filter == true){
       init(config.pose_initial_scale);
       config.core_init_filter = false;
     }
 
     //Init call with "set height" checkbox
-    if((level & msf_updates::PositionVisionSensor_SET_HEIGHT) && config.core_set_height == true){
+    if((level & msf_updates::PositionPoseSensor_SET_HEIGHT) && config.core_set_height == true){
       Eigen::Matrix<double, 3, 1> p = pose_handler_->getPositionMeasurement();
       if (p.norm() == 0){
            ROS_WARN_STREAM("No measurements received yet to initialize position. Height init not allowed.");
@@ -120,7 +120,7 @@ private:
 
     ROS_INFO_STREAM("pose_sensor/fixed_scale: "<<config_.pose_fixed_scale);
     ROS_INFO_STREAM("pose_sensor/fixed_p_vw: "<<config_.pose_fixed_p_vw);
-    ROS_INFO_STREAM("pose_sensor/fixed_q_vw: "<<config_.pose_fixed_q_vw);
+    ROS_INFO_STREAM("pose_sensor/fixed_q_vw: "<<config_.pose_fixed_q_wv);
     ROS_INFO_STREAM("pose_sensor/fixed_p_ci: "<<config_.pose_fixed_p_ci);
     ROS_INFO_STREAM("pose_sensor/fixed_q_ci: "<<config_.pose_fixed_q_ci);
   }
