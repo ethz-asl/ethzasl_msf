@@ -194,25 +194,25 @@ public:
 
     H.block<3, 3>(0, idxstartcorr_q_) = -C_wv.transpose() * C_q.transpose() * pci_sk * state.get<StateDefinition_T::L>()(0); // q
 
-    H.block<3, 1>(0, idxstartcorr_L_) = scalefix ? Eigen::Matrix<double, 3, 1>::Constant(0) :
+    H.block<3, 1>(0, idxstartcorr_L_) = scalefix ? Eigen::Matrix<double, 3, 1>::Zero() :
         (C_wv.transpose() * C_q.transpose() * state.get<StateDefinition_T::p_ci>()
         + C_wv.transpose() * state.get<StateDefinition_T::p>() + state.get<StateDefinition_T::p_vw>()).eval(); // L
 
-    H.block<3, 3>(0, idxstartcorr_qwv_) = driftvwattfix ? Eigen::Matrix<double, 3, 3>::Constant(0) :
+    H.block<3, 3>(0, idxstartcorr_qwv_) = driftvwattfix ? Eigen::Matrix<double, 3, 3>::Zero() :
         (-C_wv.transpose() * skewold).eval(); // q_wv
 
-    H.block<3, 3>(0, idxstartcorr_pci_) = calibposfix ? Eigen::Matrix<double, 3, 3>::Constant(0) :
+    H.block<3, 3>(0, idxstartcorr_pci_) = calibposfix ? Eigen::Matrix<double, 3, 3>::Zero() :
         (C_wv.transpose() * C_q.transpose() * state.get<StateDefinition_T::L>()(0)).eval(); //p_ci
 
-    H.block<3, 3>(0, idxstartcorr_pvw_) = driftvwposfix ? Eigen::Matrix<double, 3, 3>::Constant(0) :
+    H.block<3, 3>(0, idxstartcorr_pvw_) = driftvwposfix ? Eigen::Matrix<double, 3, 3>::Zero() :
         (Eigen::Matrix<double, 3, 3>::Identity() * state.get<StateDefinition_T::L>()(0)).eval(); //p_vw
 
     // attitude
     H.block<3, 3>(3, idxstartcorr_q_) = C_ci; // q
 
-    H.block<3, 3>(3, idxstartcorr_qwv_) = driftvwattfix ? Eigen::Matrix<double, 3, 3>::Constant(0) : (C_ci * C_q).eval(); // q_wv
+    H.block<3, 3>(3, idxstartcorr_qwv_) = driftvwattfix ? Eigen::Matrix<double, 3, 3>::Zero() : (C_ci * C_q).eval(); // q_wv
 
-    H.block<3, 3>(3, idxstartcorr_qci_) = calibattfix ? Eigen::Matrix<double, 3, 3>::Constant(0) : Eigen::Matrix<double, 3, 3>::Identity().eval(); //q_ci
+    H.block<3, 3>(3, idxstartcorr_qci_) = calibattfix ? Eigen::Matrix<double, 3, 3>::Zero() : Eigen::Matrix<double, 3, 3>::Identity().eval(); //q_ci
 
     //TODO: do we still want this?
     H(6, 18) = driftvwattfix ? 0 : 1.0; // fix vision world yaw drift because unobservable otherwise (see PhD Thesis)

@@ -1,7 +1,7 @@
 <launch>
     <node launch-prefix="gdb -ex run --args" name="msf_position_filter" pkg="msf_updates" type="position_sensor" clear_params="true" output="screen">
-            <remap from="msf_core/hl_state_input" to="/bluebird/fcu/ekf_state_out" />
-            <remap from="msf_core/correction" to="/bluebird/fcu/ekf_state_in"/>
+            <remap from="msf_core/hl_state_input" to="/auk/fcu/ekf_state_out" />
+            <remap from="msf_core/correction" to="/auk/fcu/ekf_state_in"/>
 
 	    <remap from="msf_updates/position_input" to="/leica/position" />
 	    	

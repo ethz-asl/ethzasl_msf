@@ -1,18 +1,21 @@
 scale_init: 1
 fixed_scale: 0
 fixed_bias: 0
-noise_acc: 0.083
-noise_accbias: 0.0083
-noise_gyr: 0.0013
-noise_gyrbias: 0.00013
+core/noise_acc: 0.083
+core/noise_accbias: 0.0083
+core/noise_gyr: 0.0013
+core/noise_gyrbias: 0.00013
+
 delay: 0.2
 meas_noise1: 0.001
 
-data_playback: True
+data_playback: false
 
 #init position offset prism imu
-init/p_prism_imu/x: 0.0    
-init/p_prism_imu/y: 0.0
-init/p_prism_imu/z: 0.0
+init/p_prism_imu/x: 0.02    
+init/p_prism_imu/y: -0.05
+init/p_prism_imu/z: 0.05
+
+position_sensor/fixed_p_pos_imu: true
 
 use_fixed_covariance: true

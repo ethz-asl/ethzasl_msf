@@ -74,9 +74,28 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::setDelay(double dela
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(const geometry_msgs::PointStampedConstPtr & msg)
 {
-  BOOST_STATIC_ASSERT_MSG(msf_updates::EKFState::nStateVarsAtCompileTime < 32, "Your state has more than 32 variables, so check that the fix-states does not overflow"); //do not exceed the 32 bits of int
+  //get the fixed states
+  int fixedstates = 0;
+  BOOST_STATIC_ASSERT_MSG(msf_updates::EKFState::nStateVarsAtCompileTime < 32, "Your state has more than 32 variables. "
+                          "The code needs to be changed here to have a larger variable to mark the fixed_states"); //do not exceed the 32 bits of int
 
-  boost::shared_ptr<MEASUREMENT_TYPE> meas( new MEASUREMENT_TYPE(n_zp_, use_fixed_covariance_, provides_absolute_measurements_, this->sensorID));
+
+  if (!use_fixed_covariance_)  // take covariance from sensor
+  {
+    ROS_WARN_STREAM_THROTTLE(2,"Provided message type without covariance but set fixed_covariance=false at the same time. Discarding message.");
+    return;
+  }
+
+  //get all the fixed states and set flag bits
+  MANAGER_TYPE* mngr = dynamic_cast<MANAGER_TYPE*>(&manager_);
+
+  if(mngr){
+    if (mngr->getcfg().fixed_p_pos_imu){
+      fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::p_pos_imu;
+    }
+  }
+
+  boost::shared_ptr<MEASUREMENT_TYPE> meas( new MEASUREMENT_TYPE(n_zp_, use_fixed_covariance_, provides_absolute_measurements_, this->sensorID, fixedstates));
 
   meas->makeFromSensorReading(msg, msg->header.stamp.toSec() - delay_);
 
@@ -90,7 +109,7 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(
 {
 
   if(msg->header.seq%5!=0){ //slow down vicon
-    ROS_WARN_STREAM_THROTTLE(30, "Measurement throttling is on, dropping every but the 5th message");
+    ROS_WARN_STREAM_ONCE("Measurement throttling is on, dropping every but the 5th message");
     return;
   }
 

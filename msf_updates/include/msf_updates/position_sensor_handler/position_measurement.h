@@ -68,21 +68,21 @@ private:
     // get measurement
     z_p_ = Eigen::Matrix<double, 3, 1>(msg->point.x, msg->point.y, msg->point.z);
 
-//    if (fixed_covariance_)//  take fix covariance from reconfigure GUI
-//    {
+    //    if (fixed_covariance_)//  take fix covariance from reconfigure GUI
+    //    {
 
-      const double s_zp = n_zp_ * n_zp_;
-      R_ = (Eigen::Matrix<double, nMeasurements, 1>() << s_zp, s_zp, s_zp).finished().asDiagonal();
+    const double s_zp = n_zp_ * n_zp_;
+    R_ = (Eigen::Matrix<double, nMeasurements, 1>() << s_zp, s_zp, s_zp).finished().asDiagonal();
 
-//    }else{// take covariance from sensor
-//
-//      R_.block<3, 3>(0, 0) = Eigen::Matrix<double, 3, 3>(&msg->covariance[0]);
-//
-//      if(msg->header.seq % 100 == 0){ //only do this check from time to time
-//        if(R_.block<3, 3>(0, 0).determinant() < 0)
-//          ROS_WARN_STREAM_THROTTLE(60,"The covariance matrix you provided for the position sensor is not positive definite");
-//      }
-//    }
+    //    }else{// take covariance from sensor
+    //
+    //      R_.block<3, 3>(0, 0) = Eigen::Matrix<double, 3, 3>(&msg->covariance[0]);
+    //
+    //      if(msg->header.seq % 100 == 0){ //only do this check from time to time
+    //        if(R_.block<3, 3>(0, 0).determinant() < 0)
+    //          ROS_WARN_STREAM_THROTTLE(60,"The covariance matrix you provided for the position sensor is not positive definite");
+    //      }
+    //    }
   }
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -91,6 +91,7 @@ public:
   double n_zp_; /// position measurement noise
 
   bool fixed_covariance_;
+  int fixedstates_;
 
   typedef msf_updates::EKFState EKFState_T;
   typedef EKFState_T::StateSequence_T StateSequence_T;
@@ -98,9 +99,9 @@ public:
   virtual ~PositionMeasurement()
   {
   }
-  PositionMeasurement(double n_zp, bool fixed_covariance, bool isabsoluteMeasurement, int sensorID) :
+  PositionMeasurement(double n_zp, bool fixed_covariance, bool isabsoluteMeasurement, int sensorID, int fixedstates) :
     PositionMeasurementBase(isabsoluteMeasurement, sensorID),
-    n_zp_(n_zp), fixed_covariance_(fixed_covariance)
+    n_zp_(n_zp), fixed_covariance_(fixed_covariance), fixedstates_(fixedstates)
   {
   }
   virtual std::string type(){
@@ -127,13 +128,19 @@ public:
       idxstartcorr_p_pos_imu_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::p_pos_imu>::value,
     };
 
+    bool fixed_p_pos_imu = (fixedstates_ & 1 << StateDefinition_T::p_pos_imu);
+
+    //clear crosscorrelations
+    if(fixed_p_pos_imu) state_in->clearCrossCov<StateDefinition_T::p_pos_imu>();
+
     // construct H matrix using H-blockx :-)
     // position:
     H.block<3, 3>(0, idxstartcorr_p_) = Eigen::Matrix<double, 3, 3>::Identity(); // p
 
     H.block<3, 3>(0, idxstartcorr_q_) = - C_q.transpose() * p_prism_imu_sk; // q
 
-    H.block<3, 3>(0, idxstartcorr_p_pos_imu_) = C_q.transpose(); //p_ci
+    H.block<3, 3>(0, idxstartcorr_p_pos_imu_) = fixed_p_pos_imu ? Eigen::Matrix<double, 3, 3>::Zero() : (C_q.transpose()).eval(); //p_pos_imu_
+
   }
 
   /**
@@ -157,97 +164,25 @@ public:
       // position
       r_old.block<3, 1>(0, 0) = z_p_ - (state.get<StateDefinition_T::p>() + C_q.transpose() * state.get<StateDefinition_T::p_pos_imu>());
 
-      //TODO reenable on merge with SC branch
-//      if(!checkForNumeric(r_old, "r_old")){
-//        ROS_ERROR_STREAM("r_old: "<<r_old);
-//        ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
-//      }
-//      if(!checkForNumeric(H_new, "H_old")){
-//        ROS_ERROR_STREAM("H_old: "<<H_new);
-//        ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
-//      }
-//      if(!checkForNumeric(R_, "R_")){
-//        ROS_ERROR_STREAM("R_: "<<R_);
-//        ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
-//      }
+      if(!checkForNumeric(r_old, "r_old")){
+        ROS_ERROR_STREAM("r_old: "<<r_old);
+        ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
+      }
+      if(!checkForNumeric(H_new, "H_old")){
+        ROS_ERROR_STREAM("H_old: "<<H_new);
+        ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
+      }
+      if(!checkForNumeric(R_, "R_")){
+        ROS_ERROR_STREAM("R_: "<<R_);
+        ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
+      }
 
       // call update step in base class
       this->calculateAndApplyCorrection(state_nonconst_new, core, H_new, r_old, R_);
 
-    }/*else{
-
-      // init variables
-      //get previous measurement
-      boost::shared_ptr<msf_core::MSF_MeasurementBase<EKFState_T> > prevmeas_base = core.getPreviousMeasurement(this->time, this->sensorID_);
-
-      if(prevmeas_base->time == -1){
-        ROS_WARN_STREAM("The previous measurement is invalid. Could not apply measurement");
-        return;
-      }
-      //try to make this a pose measurement
-      boost::shared_ptr<PositionMeasurement> prevmeas = boost::shared_dynamic_cast<PositionMeasurement>(prevmeas_base);
-      if(!prevmeas){
-        ROS_WARN_STREAM("The dynamic cast of the previous measurement has failed. Could not apply measurement");
-        return;
-      }
-
-      //get state at previous measurement
-      boost::shared_ptr<EKFState_T> state_nonconst_old = core.getStateAtTime(prevmeas->time);
-
-      if(state_nonconst_old->time == -1){
-        ROS_WARN_STREAM("The state at the previous measurement is invalid. Could not apply measurement");
-        return;
-      }
-
-      const EKFState_T& state_new = *state_nonconst_new; //get a const ref, so we can read core states
-      const EKFState_T& state_old = *state_nonconst_old; //get a const ref, so we can read core states
-
-      Eigen::Matrix<double, nMeasurements, msf_core::MSF_Core<EKFState_T>::nErrorStatesAtCompileTime> H_new, H_old;
-      Eigen::Matrix<double, nMeasurements, 1> r_new, r_old;
-
-      calculateH(state_nonconst_old, H_old);
-
-      H_old *= -1;
-
-      calculateH(state_nonconst_new, H_new);
-
-      //TODO check that both measurements have the same states fixed!
-
-      Eigen::Matrix<double, 3, 3> C_wv_old, C_wv_new;
-      Eigen::Matrix<double, 3, 3> C_q_old, C_q_new;
-
-      C_q_new = state_new.get<StateDefinition_T::q>().conjugate().toRotationMatrix();
-      C_q_old = state_old.get<StateDefinition_T::q>().conjugate().toRotationMatrix();
-
-      // construct residuals
-      // position
-      //TODO reenable p_vw
-      Eigen::Matrix<double, 3, 1> diffprobpos = (state_new.get<StateDefinition_T::p>()
-          + C_q_new.transpose() * state_new.get<StateDefinition_T::p_prism_imu>())
-          - (state_old.get<StateDefinition_T::p>()
-              + C_q_old.transpose() * state_old.get<StateDefinition_T::p_prism_imu>());
-
-      Eigen::Matrix<double, 3, 1> diffmeaspos = z_p_ - prevmeas->z_p_;
-
-      r_new.block<3, 1>(0, 0) = diffmeaspos - diffprobpos;
-
-      if(!checkForNumeric(r_old, "r_old")){
-        ROS_ERROR_STREAM("r_old: "<<r_old);
-        ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state_new).toEigenVector().transpose());
-      }
-      if(!checkForNumeric(H_new, "H_old")){
-        ROS_ERROR_STREAM("H_old: "<<H_new);
-        ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state_new).toEigenVector().transpose());
-      }
-      if(!checkForNumeric(R_, "R_")){
-        ROS_ERROR_STREAM("R_: "<<R_);
-        ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state_new).toEigenVector().transpose());
-      }
-
-      // call update step in base class
-      this->calculateAndApplyCorrectionRelative(state_nonconst_old, state_nonconst_new, core, H_old, H_new, r_new, R_);
-
-    }*/
+    }else{
+      ROS_ERROR_STREAM_THROTTLE(1, "You chose to apply the position measurement as a relative quantitiy, which is currently not implemented.");
+    }
   }
 };
 

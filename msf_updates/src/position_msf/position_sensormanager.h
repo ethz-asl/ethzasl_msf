@@ -104,7 +104,7 @@ private:
     }
 
     Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_prism_imu, p_vc;
-    Eigen::Quaternion<double> q, q_cv;
+    Eigen::Quaternion<double> q;
     msf_core::MSF_Core<EKFState_T>::ErrorStateCov P;
 
 
@@ -118,19 +118,16 @@ private:
     a_m = g;			/// initial acceleration
 
     q.setIdentity();
-    q_cv.setIdentity();
 
     P.setZero(); // error state covariance; if zero, a default initialization in msf_core is used
 
     p_vc = position_handler_->getPositionMeasurement();
 
-    ROS_INFO_STREAM("initial measurement pos:["<<p_vc.transpose()<<"] orientation:["<<q_cv.w()<<", "<<q_cv.x()<<", "<<q_cv.y()<<", "<<q_cv.z()<<"]");
+    ROS_INFO_STREAM("initial measurement pos:["<<p_vc.transpose()<<"] orientation:["<<q.w()<<", "<<q.x()<<", "<<q.y()<<", "<<q.z()<<"]");
 
     // check if we have already input from the measurement sensor
     if (p_vc.norm() == 0)
       ROS_WARN_STREAM("No measurements received yet to initialize position - using [0 0 0]");
-    if ((p_vc.norm() == 1) & (q_cv.w() == 1))
-      ROS_WARN_STREAM("No measurements received yet to initialize attitude - using [1 0 0 0]");
 
     ros::NodeHandle pnh("~");
     pnh.param("init/p_prism_imu/x", p_prism_imu[0], 0.0);
@@ -138,8 +135,6 @@ private:
     pnh.param("init/p_prism_imu/z", p_prism_imu[2], 0.0);
 
     // calculate initial attitude and position based on sensor measurements
-    q = q_cv;
-    q.normalize();
     p = p_vc - q.toRotationMatrix() * p_prism_imu;
 
     //prepare init "measurement"
