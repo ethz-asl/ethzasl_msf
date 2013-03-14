@@ -70,7 +70,7 @@ private:
 
 public:
   typedef MEASUREMENT_TYPE measurement_t;
-  PoseSensorHandler(MANAGER_TYPE& meas, bool provides_absolute_measurements, bool distortmeas);
+  PoseSensorHandler(MANAGER_TYPE& meas, std::string topic_namespace, std::string parameternamespace, bool distortmeas);
   //used for the init
   Eigen::Matrix<double, 3, 1> getPositionMeasurement(){
     return z_p_;

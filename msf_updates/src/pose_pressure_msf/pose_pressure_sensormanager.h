@@ -63,12 +63,11 @@ public:
 
   PosePressureSensorManager(ros::NodeHandle pnh = ros::NodeHandle("~/pose_pressure_sensor"))
   {
-    bool poseabsolute = true; ///<does the pose sensor provides absolute measurements
     bool distortmeasurement = true;
-    pose_handler_.reset(new PoseSensorHandler_T(*this, poseabsolute, distortmeasurement));
+    pose_handler_.reset(new PoseSensorHandler_T(*this, "", "pose_sensor", distortmeasurement));
     addHandler(pose_handler_);
 
-    pressure_handler_.reset(new msf_pressure_sensor::PressureSensorHandler(*this));
+    pressure_handler_.reset(new msf_pressure_sensor::PressureSensorHandler(*this, "", "pressure_sensor"));
     addHandler(pressure_handler_);
 
     reconf_server_.reset(new ReconfigureServer(pnh));
@@ -95,25 +94,25 @@ private:
   virtual void config(Config_T &config, uint32_t level){
     config_ = config;
     //Init call with "init filter" checkbox
-    if((level & msf_updates::SinglePoseSensor_INIT_FILTER) && config.init_filter == true){
-      init(config.initial_scale);
-      config.init_filter = false;
+    if((level & msf_updates::SinglePoseSensor_INIT_FILTER) && config.core_init_filter == true){
+      init(config.pose_initial_scale);
+      config.core_init_filter = false;
     }
     //Init call with "set height" checkbox
-    if((level & msf_updates::SinglePoseSensor_SET_HEIGHT) && config.set_height == true){
+    if((level & msf_updates::SinglePoseSensor_SET_HEIGHT) && config.core_set_height == true){
       Eigen::Matrix<double, 3, 1> p = pose_handler_->getPositionMeasurement();
       if (p.norm() == 0){
            ROS_WARN_STREAM("No measurements received yet to initialize position. Height init not allowed.");
            return;
       }
-      double scale =  p[2]/config.height;
+      double scale =  p[2]/config.core_height;
       init(scale);
-      config.set_height = false;
+      config.core_set_height = false;
     }
 
     //pass the noise values to the sensor handlers
-    pose_handler_->setNoises(config.noise_position, config.noise_attitude);
-    pressure_handler_->setNoises(config.noise_pressure);
+    pose_handler_->setNoises(config.pose_noise_meas_p, config.pose_noise_meas_q);
+    pressure_handler_->setNoises(config.press_noise_meas_p);
 
   }
 
@@ -150,14 +149,14 @@ private:
       ROS_WARN_STREAM("No measurements received yet to initialize attitude - using [1 0 0 0]");
 
     ros::NodeHandle pnh("~");
-    pnh.param("init/p_ci/x", p_ci[0], 0.0);
-    pnh.param("init/p_ci/y", p_ci[1], 0.0);
-    pnh.param("init/p_ci/z", p_ci[2], 0.0);
+    pnh.param("pose_sensor/init/p_ci/x", p_ci[0], 0.0);
+    pnh.param("pose_sensor/init/p_ci/y", p_ci[1], 0.0);
+    pnh.param("pose_sensor/init/p_ci/z", p_ci[2], 0.0);
 
-    pnh.param("init/q_ci/w", q_ci.w(), 1.0);
-    pnh.param("init/q_ci/x", q_ci.x(), 0.0);
-    pnh.param("init/q_ci/y", q_ci.y(), 0.0);
-    pnh.param("init/q_ci/z", q_ci.z(), 0.0);
+    pnh.param("pose_sensor/init/q_ci/w", q_ci.w(), 1.0);
+    pnh.param("pose_sensor/init/q_ci/x", q_ci.x(), 0.0);
+    pnh.param("pose_sensor/init/q_ci/y", q_ci.y(), 0.0);
+    pnh.param("pose_sensor/init/q_ci/z", q_ci.z(), 0.0);
     q_ci.normalize();
 
 
@@ -210,11 +209,11 @@ private:
   }
 
   virtual void calculateQAuxiliaryStates(EKFState_T& state, double dt){
-    const msf_core::Vector3 nqwvv = msf_core::Vector3::Constant(config_.noise_qwv);
-    const msf_core::Vector3 nqciv = msf_core::Vector3::Constant(config_.noise_qci);
-    const msf_core::Vector3 npicv = msf_core::Vector3::Constant(config_.noise_pci);
-    const msf_core::Vector1 nb_p = msf_core::Vector1::Constant(config_.noise_bias_pressure);
-    const msf_core::Vector1 n_L = msf_core::Vector1::Constant(config_.noise_scale);
+    const msf_core::Vector3 nqwvv = msf_core::Vector3::Constant(config_.pose_noise_qwv);
+    const msf_core::Vector3 nqciv = msf_core::Vector3::Constant(config_.pose_noise_qci);
+    const msf_core::Vector3 npicv = msf_core::Vector3::Constant(config_.pose_noise_pci);
+    const msf_core::Vector1 n_L = msf_core::Vector1::Constant(config_.pose_noise_scale);
+    const msf_core::Vector1 nb_p = msf_core::Vector1::Constant(config_.press_noise_bias_p);
 
     //compute the blockwise Q values and store them with the states,
     //these then get copied by the core to the correct places in Qd

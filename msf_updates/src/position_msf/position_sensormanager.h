@@ -62,9 +62,7 @@ public:
 
   PositionSensorManager(ros::NodeHandle pnh = ros::NodeHandle("~/position_sensor"))
   {
-    bool positionabsolute = true; ///<does the position sensor provides absolute measurements
-
-    position_handler_.reset(new PositionSensorHandler_T(*this, positionabsolute));
+    position_handler_.reset(new PositionSensorHandler_T(*this, "", "position_sensor"));
     addHandler(position_handler_);
 
     reconf_server_.reset(new ReconfigureServer(pnh));
@@ -88,11 +86,11 @@ private:
    */
   virtual void config(Config_T &config, uint32_t level){
     config_ = config;
-    position_handler_->setNoises(config.noise_position);
-    position_handler_->setDelay(config.delay);
-    if((level & msf_updates::SinglePositionSensor_INIT_FILTER) && config.init_filter == true){
+    position_handler_->setNoises(config.position_noise_meas);
+    position_handler_->setDelay(config.position_delay);
+    if((level & msf_updates::SinglePositionSensor_INIT_FILTER) && config.core_init_filter == true){
       init(1.0);
-      config.init_filter = false;
+      config.core_init_filter = false;
     }
   }
 
@@ -103,7 +101,7 @@ private:
       scale = 1;
     }
 
-    Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_prism_imu, p_vc;
+    Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_pi, p_vc;
     Eigen::Quaternion<double> q;
     msf_core::MSF_Core<EKFState_T>::ErrorStateCov P;
 
@@ -130,12 +128,12 @@ private:
       ROS_WARN_STREAM("No measurements received yet to initialize position - using [0 0 0]");
 
     ros::NodeHandle pnh("~");
-    pnh.param("init/p_prism_imu/x", p_prism_imu[0], 0.0);
-    pnh.param("init/p_prism_imu/y", p_prism_imu[1], 0.0);
-    pnh.param("init/p_prism_imu/z", p_prism_imu[2], 0.0);
+    pnh.param("position_sensor/init/p_pi/x", p_pi[0], 0.0);
+    pnh.param("position_sensor/init/p_pi/y", p_pi[1], 0.0);
+    pnh.param("position_sensor/init/p_pi/z", p_pi[2], 0.0);
 
     // calculate initial attitude and position based on sensor measurements
-    p = p_vc - q.toRotationMatrix() * p_prism_imu;
+    p = p_vc - q.toRotationMatrix() * p_pi;
 
     //prepare init "measurement"
     boost::shared_ptr<msf_core::MSF_InitMeasurement<EKFState_T> > meas(new msf_core::MSF_InitMeasurement<EKFState_T>(true)); //hand over that we will also set the sensor readings
@@ -145,7 +143,7 @@ private:
     meas->setStateInitValue<StateDefinition_T::q>(q);
     meas->setStateInitValue<StateDefinition_T::b_w>(b_w);
     meas->setStateInitValue<StateDefinition_T::b_a>(b_a);
-    meas->setStateInitValue<StateDefinition_T::p_pos_imu>(p_prism_imu);
+    meas->setStateInitValue<StateDefinition_T::p_pi>(p_pi);
 
     setP(meas->get_P()); //call my set P function
     meas->get_w_m() = w_m;
@@ -165,11 +163,11 @@ private:
   }
 
   virtual void calculateQAuxiliaryStates(EKFState_T& state, double dt){
-    const msf_core::Vector3 npicv = msf_core::Vector3::Constant(config_.noise_p_prism_imu);
+    const msf_core::Vector3 npicv = msf_core::Vector3::Constant(config_.position_noise_ppi);
 
     //compute the blockwise Q values and store them with the states,
     //these then get copied by the core to the correct places in Qd
-    state.getQBlock<StateDefinition_T::p_pos_imu>() = (dt * npicv.cwiseProduct(npicv)).asDiagonal();
+    state.getQBlock<StateDefinition_T::p_pi>() = (dt * npicv.cwiseProduct(npicv)).asDiagonal();
   }
 
   virtual void setP(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, EKFState_T::nErrorStatesAtCompileTime>& P){

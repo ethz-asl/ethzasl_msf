@@ -29,13 +29,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
 
-#include "gps_vision_sensormanager.h"
+#include "position_vision_sensormanager.h"
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "msf_vision_gps_sensor");
+  ros::init(argc, argv, "msf_position_vision_sensor");
 
-  msf_updates::GPSVisionSensorManager manager;
+  msf_updates::PositionVisionSensorManager manager;
 
   ros::spin();
 

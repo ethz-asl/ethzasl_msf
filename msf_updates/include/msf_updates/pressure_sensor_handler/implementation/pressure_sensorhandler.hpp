@@ -31,18 +31,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <msf_core/eigen_utils.h>
 
-namespace msf_pressure_sensor{
-PressureSensorHandler::PressureSensorHandler(msf_core::MSF_SensorManager<msf_updates::EKFState>& meas) :
-                    SensorHandler<msf_updates::EKFState>(meas), n_zp_(1e-6)
-                    {
-  ros::NodeHandle pnh("~");
-
+namespace msf_pressure_sensor
+{
+PressureSensorHandler::PressureSensorHandler(msf_core::MSF_SensorManager<msf_updates::EKFState>& meas,
+                                             std::string topic_namespace, std::string parameternamespace) :
+    SensorHandler<msf_updates::EKFState>(meas, topic_namespace, parameternamespace), n_zp_(1e-6)
+{
+  ros::NodeHandle pnh("~/pressure_sensor");
   ros::NodeHandle nh("msf_updates");
   subPressure_ = nh.subscribe<asctec_hl_comm::mav_imu>("pressure_input", 5, &PressureSensorHandler::measurementCallback, this);
 
-  memset(heightbuff, 0, sizeof(double)*heightbuffsize);
+  memset(heightbuff, 0, sizeof(double) * heightbuffsize);
 
-                    }
+}
 
 void PressureSensorHandler::setNoises(double n_zp)
 {

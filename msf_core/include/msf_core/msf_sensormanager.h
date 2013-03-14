@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <msf_core/msf_statevisitor.h>
 #include <Eigen/Dense>
+#include <string.h>
 
 namespace msf_core{
 
@@ -134,10 +135,13 @@ class SensorHandler
 protected:
   MSF_SensorManager<EKFState_T>& manager_;
   int sensorID;
+  std::string topic_namespace_;
+  std::string parameternamespace_;
   void setSensorID(int ID){sensorID = ID;}
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  SensorHandler(MSF_SensorManager<EKFState_T>& mng):manager_(mng), sensorID(-1){}
+  SensorHandler(MSF_SensorManager<EKFState_T>& mng, std::string& topic_namespace, std::string& parameternamespace):
+  manager_(mng), sensorID(-1), topic_namespace_(topic_namespace), parameternamespace_(parameternamespace){}
   virtual ~SensorHandler() {}
 };
 

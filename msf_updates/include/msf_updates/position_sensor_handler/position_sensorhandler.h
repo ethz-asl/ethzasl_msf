@@ -62,7 +62,7 @@ private:
 
 public:
   typedef MEASUREMENT_TYPE measurement_t;
-  PositionSensorHandler(MANAGER_TYPE& meas, bool provides_absolute_measurements);
+  PositionSensorHandler(MANAGER_TYPE& meas, std::string topic_namespace, std::string parameternamespace);
   //used for the init
   Eigen::Matrix<double, 3, 1> getPositionMeasurement(){
     return z_p_;

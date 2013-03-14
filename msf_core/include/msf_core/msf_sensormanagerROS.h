@@ -84,19 +84,19 @@ public:
 
   //parameter getters
   virtual bool getParam_fixed_bias(){
-    return config_.fixed_bias;
+    return config_.core_fixed_bias;
   }
   virtual double getParam_noise_acc(){
-    return config_.noise_acc;
+    return config_.core_noise_acc;
   }
   virtual double getParam_noise_accbias(){
-    return config_.noise_accbias;
+    return config_.core_noise_accbias;
   }
   virtual double getParam_noise_gyr(){
-    return config_.noise_gyr;
+    return config_.core_noise_gyr;
   }
   virtual double getParam_noise_gyrbias(){
-    return config_.noise_gyrbias;
+    return config_.core_noise_gyrbias;
   }
   virtual double getParam_fuzzythres(){
     return 0.1;

@@ -56,7 +56,8 @@ private:
   void measurementCallback(const asctec_hl_comm::mav_imuConstPtr & msg);
 
 public:
-  PressureSensorHandler(msf_core::MSF_SensorManager<msf_updates::EKFState>& meas);
+  PressureSensorHandler(msf_core::MSF_SensorManager<msf_updates::EKFState>& meas,
+                        std::string topic_namespace, std::string parameternamespace);
   //used for the init
   Eigen::Matrix<double, 1, 1> getPressureMeasurement(){
     return z_p_;

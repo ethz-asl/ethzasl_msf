@@ -37,17 +37,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace msf_position_sensor{
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
-PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PositionSensorHandler(MANAGER_TYPE& meas, bool provides_absolute_measurements) :
-SensorHandler<msf_updates::EKFState>(meas), n_zp_(1e-6), delay_(0), provides_absolute_measurements_(provides_absolute_measurements)
+PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PositionSensorHandler(MANAGER_TYPE& meas, std::string topic_namespace, std::string parameternamespace) :
+SensorHandler<msf_updates::EKFState>(meas, topic_namespace, parameternamespace), n_zp_(1e-6), delay_(0)
 {
-  ros::NodeHandle pnh("~");
-  pnh.param("use_fixed_covariance", use_fixed_covariance_, false);
+  ros::NodeHandle pnh("~/position_sensor");
+  pnh.param("position_use_fixed_covariance", use_fixed_covariance_, false);
+  pnh.param("position_absolute_measurements", provides_absolute_measurements_, false);
 
   ROS_INFO_COND(use_fixed_covariance_, "Position sensor is using fixed covariance");
   ROS_INFO_COND(!use_fixed_covariance_, "Position sensor is using covariance from sensor");
 
-  ROS_INFO_COND(provides_absolute_measurements, "Position sensor is handling measurements as absolute values");
-  ROS_INFO_COND(!provides_absolute_measurements, "Position sensor is handling measurements as relative values");
+  ROS_INFO_COND(provides_absolute_measurements_, "Position sensor is handling measurements as absolute values");
+  ROS_INFO_COND(!provides_absolute_measurements_, "Position sensor is handling measurements as relative values");
 
   ros::NodeHandle nh("msf_updates");
 
@@ -90,8 +91,8 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(
   MANAGER_TYPE* mngr = dynamic_cast<MANAGER_TYPE*>(&manager_);
 
   if(mngr){
-    if (mngr->getcfg().fixed_p_pos_imu){
-      fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::p_pos_imu;
+    if (mngr->getcfg().position_fixed_ppi){
+      fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::p_pi;
     }
   }
 

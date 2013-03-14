@@ -1,4 +1,0 @@
-rosbuild_add_executable(vision_gps_sensor main.cpp)
-rosbuild_add_compile_flags(vision_gps_sensor "-O2")
-
-target_link_libraries(vision_gps_sensor pose_distorter)

@@ -37,12 +37,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace msf_pose_sensor{
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
-PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PoseSensorHandler(MANAGER_TYPE& meas, bool provides_absolute_measurements, bool distortmeas) :
-SensorHandler<msf_updates::EKFState>(meas), n_zp_(1e-6), n_zq_(1e-6), delay_(0), provides_absolute_measurements_(provides_absolute_measurements)
+PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PoseSensorHandler(MANAGER_TYPE& meas, std::string topic_namespace, std::string parameternamespace, bool distortmeas) :
+SensorHandler<msf_updates::EKFState>(meas, topic_namespace, parameternamespace), n_zp_(1e-6), n_zq_(1e-6), delay_(0)
 {
-  ros::NodeHandle pnh("~");
-  pnh.param("measurement_world_sensor", measurement_world_sensor_, true);
-  pnh.param("use_fixed_covariance", use_fixed_covariance_, false);
+  ros::NodeHandle pnh("~/"+parameternamespace);
+
+  pnh.param("pose_absolute_measurements", provides_absolute_measurements_, true);
+  pnh.param("pose_measurement_world_sensor", measurement_world_sensor_, true);
+  pnh.param("pose_use_fixed_covariance", use_fixed_covariance_, false);
 
   ROS_INFO_COND(measurement_world_sensor_, "Pose sensor is interpreting measurement as sensor w.r.t. world");
   ROS_INFO_COND(!measurement_world_sensor_, "Pose sensor is interpreting measurement as world w.r.t. sensor (e.g. ethzasl_ptam)");
@@ -50,10 +52,10 @@ SensorHandler<msf_updates::EKFState>(meas), n_zp_(1e-6), n_zq_(1e-6), delay_(0),
   ROS_INFO_COND(use_fixed_covariance_, "Pose sensor is using fixed covariance");
   ROS_INFO_COND(!use_fixed_covariance_, "Pose sensor is using covariance from sensor");
 
-  ROS_INFO_COND(provides_absolute_measurements, "Pose sensor is handling measurements as absolute values");
-  ROS_INFO_COND(!provides_absolute_measurements, "Pose sensor is handling measurements as relative values");
+  ROS_INFO_COND(provides_absolute_measurements_, "Pose sensor is handling measurements as absolute values");
+  ROS_INFO_COND(!provides_absolute_measurements_, "Pose sensor is handling measurements as relative values");
 
-  ros::NodeHandle nh("msf_updates");
+  ros::NodeHandle nh("msf_updates/" + topic_namespace);
   subPoseWithCovarianceStamped_ = nh.subscribe<geometry_msgs::PoseWithCovarianceStamped>("pose_with_covariance_input", 1, &PoseSensorHandler::measurementCallback, this);
   subTransformStamped_ = nh.subscribe<geometry_msgs::TransformStamped>("transform_input", 1, &PoseSensorHandler::measurementCallback, this);
   subPoseStamped_ = nh.subscribe<geometry_msgs::PoseStamped>("pose_input", 1, &PoseSensorHandler::measurementCallback, this);
@@ -116,23 +118,20 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(cons
   MANAGER_TYPE* mngr = dynamic_cast<MANAGER_TYPE*>(&manager_);
 
   if(mngr){
-    if (mngr->getcfg().fixed_scale){
+    if (mngr->getcfg().pose_fixed_scale){
       fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::L;
     }
-    if (mngr->getcfg().fixed_calib_pos){
+    if (mngr->getcfg().pose_fixed_p_ci){
       fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::p_ci;
     }
-    if (mngr->getcfg().fixed_calib_att){
+    if (mngr->getcfg().pose_fixed_q_ci){
       fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::q_ci;
     }
-    if (mngr->getcfg().fixed_calib_att){
-      fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::q_ci;
-    }
-    if (mngr->getcfg().fixed_att_drift_vw){
-      fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::q_wv;
-    }
-    if (mngr->getcfg().fixed_pos_drift_vw){
+    if (mngr->getcfg().pose_fixed_p_vw){
       fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::p_vw;
+    }
+    if (mngr->getcfg().pose_fixed_q_vw){
+      fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::q_wv;
     }
   }
 

@@ -33,8 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
 
-#ifndef POSE_MEASUREMENTMANAGER_H
-#define POSE_MEASUREMENTMANAGER_H
+#ifndef POSITION_VISION_SENSOR_MANAGER_H
+#define POSITION_VISION_SENSOR_MANAGER_H
 
 #include <ros/ros.h>
 
@@ -45,51 +45,41 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <msf_updates/pose_sensor_handler/pose_measurement.h>
 #include <msf_updates/position_sensor_handler/position_sensorhandler.h>
 #include <msf_updates/position_sensor_handler/position_measurement.h>
-#include <msf_updates/GPSVisionSensorConfig.h>
+#include <msf_updates/PositionVisionSensorConfig.h>
 
 namespace msf_updates{
 
-typedef msf_updates::GPSVisionSensorConfig Config_T;
+typedef msf_updates::PositionVisionSensorConfig Config_T;
 typedef dynamic_reconfigure::Server<Config_T> ReconfigureServer;
 typedef boost::shared_ptr<ReconfigureServer> ReconfigureServerPtr;
 
-class GPSVisionSensorManager : public msf_core::MSF_SensorManagerROS<msf_updates::EKFState>
+class PositionVisionSensorManager : public msf_core::MSF_SensorManagerROS<msf_updates::EKFState>
 {
-  typedef msf_pose_sensor::PoseSensorHandler<msf_updates::pose_measurement::PoseMeasurement, GPSVisionSensorManager> PoseSensorHandler_T;
-  friend class msf_pose_sensor::PoseSensorHandler<msf_updates::pose_measurement::PoseMeasurement, GPSVisionSensorManager>;
-  typedef msf_position_sensor::PositionSensorHandler<msf_updates::position_measurement::PositionMeasurement, GPSVisionSensorManager> PositionSensorHandler_T;
-  friend class msf_position_sensor::PositionSensorHandler<msf_updates::position_measurement::PositionMeasurement, GPSVisionSensorManager>;
+  typedef PositionVisionSensorManager this_T;
+  typedef msf_pose_sensor::PoseSensorHandler<msf_updates::pose_measurement::PoseMeasurement, this_T> PoseSensorHandler_T;
+  friend class msf_pose_sensor::PoseSensorHandler<msf_updates::pose_measurement::PoseMeasurement, this_T>;
+  typedef msf_position_sensor::PositionSensorHandler<msf_updates::position_measurement::PositionMeasurement, this_T> PositionSensorHandler_T;
+  friend class msf_position_sensor::PositionSensorHandler<msf_updates::position_measurement::PositionMeasurement, this_T>;
 public:
   typedef msf_updates::EKFState EKFState_T;
   typedef EKFState_T::StateSequence_T StateSequence_T;
   typedef EKFState_T::StateDefinition_T StateDefinition_T;
 
-  GPSVisionSensorManager(ros::NodeHandle pnh = ros::NodeHandle("~"))
+  PositionVisionSensorManager(ros::NodeHandle pnh = ros::NodeHandle("~"))
   {
-    bool poseabsolute = true; ///<does the pose sensor provides absolute measurements
     bool distortmeas = false; ///<distort the pose measurements TODO make param
 
-    pnh.param("pose_sensor/absolute_pose_measurements", poseabsolute, true);
-
-    if(poseabsolute){
-      ROS_ERROR_STREAM("You defined that your pose sensor has global updates, but at the same time you are using GPS.");
-      poseabsolute = false;
-    }
-
-    pose_handler_.reset(new PoseSensorHandler_T(*this, poseabsolute, distortmeas));
+    pose_handler_.reset(new PoseSensorHandler_T(*this, "", "pose_sensor", distortmeas));
     addHandler(pose_handler_);
 
-    bool positionabsolute = true;
-    pnh.param("position_sensor/absolute_position_measurements", positionabsolute, true);
-
-    position_handler_.reset(new PositionSensorHandler_T(*this, positionabsolute));
+    position_handler_.reset(new PositionSensorHandler_T(*this, "", "position_sensor"));
     addHandler(position_handler_);
 
     reconf_server_.reset(new ReconfigureServer(pnh));
-    ReconfigureServer::CallbackType f = boost::bind(&GPSVisionSensorManager::config, this, _1, _2);
+    ReconfigureServer::CallbackType f = boost::bind(&this_T::config, this, _1, _2);
     reconf_server_->setCallback(f);
   }
-  virtual ~GPSVisionSensorManager(){}
+  virtual ~PositionVisionSensorManager(){}
 
   virtual const Config_T& getcfg(){
     return config_;
@@ -107,35 +97,37 @@ private:
    */
   virtual void config(Config_T &config, uint32_t level){
     config_ = config;
-    pose_handler_->setNoises(config.vision_noise_position, config.vision_noise_attitude);
-    pose_handler_->setDelay(config.delay);
-    position_handler_->setNoises(config.gps_noise_position);
-    if((level & msf_updates::GPSVisionSensor_INIT_FILTER) && config.init_filter == true){
-      init(config.initial_scale);
-      config.init_filter = false;
+    pose_handler_->setNoises(config.pose_noise_meas_p, config.pose_noise_meas_q);
+    pose_handler_->setDelay(config.position_delay);
+    position_handler_->setNoises(config.position_noise_meas);
+
+    if((level & msf_updates::PositionVisionSensor_INIT_FILTER) && config.core_init_filter == true){
+      init(config.pose_initial_scale);
+      config.core_init_filter = false;
     }
+
     //Init call with "set height" checkbox
-    if((level & msf_updates::GPSVisionSensor_SET_HEIGHT) && config.set_height == true){
+    if((level & msf_updates::PositionVisionSensor_SET_HEIGHT) && config.core_set_height == true){
       Eigen::Matrix<double, 3, 1> p = pose_handler_->getPositionMeasurement();
       if (p.norm() == 0){
            ROS_WARN_STREAM("No measurements received yet to initialize position. Height init not allowed.");
            return;
       }
-      double scale =  p[2]/config.height;
+      double scale =  p[2]/config.core_height;
       init(scale);
-      config.set_height = false;
+      config.core_set_height = false;
     }
-    ROS_INFO_STREAM("fixed_bias: "<<config_.fixed_bias);
-    ROS_INFO_STREAM("fixed_scale: "<<config_.fixed_scale);
-    ROS_INFO_STREAM("fixed_pos_drift_vw: "<<config_.fixed_pos_drift_vw);
-    ROS_INFO_STREAM("fixed_att_drift_vw: "<<config_.fixed_att_drift_vw);
-    ROS_INFO_STREAM("fixed_calib_att: "<<config_.fixed_calib_att);
-    ROS_INFO_STREAM("fixed_calib_pos: "<<config_.fixed_calib_pos);
+
+    ROS_INFO_STREAM("pose_sensor/fixed_scale: "<<config_.pose_fixed_scale);
+    ROS_INFO_STREAM("pose_sensor/fixed_p_vw: "<<config_.pose_fixed_p_vw);
+    ROS_INFO_STREAM("pose_sensor/fixed_q_vw: "<<config_.pose_fixed_q_vw);
+    ROS_INFO_STREAM("pose_sensor/fixed_p_ci: "<<config_.pose_fixed_p_ci);
+    ROS_INFO_STREAM("pose_sensor/fixed_q_ci: "<<config_.pose_fixed_q_ci);
   }
 
   void init(double scale)
   {
-    Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ci, p_vc, p_vw, p_gps;
+    Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ci, p_vc, p_vw, p_pi, p_pos;
     Eigen::Quaternion<double> q, q_wv, q_ci, q_cv;
     msf_core::MSF_Core<EKFState_T>::ErrorStateCov P;
 
@@ -153,32 +145,37 @@ private:
 
     P.setZero(); // error state covariance; if zero, a default initialization in msf_core is used
 
-    p_gps = position_handler_->getPositionMeasurement();
+    p_pos = position_handler_->getPositionMeasurement();
 
     p_vc = pose_handler_->getPositionMeasurement();
     q_cv = pose_handler_->getAttitudeMeasurement();
 
     ROS_INFO_STREAM("initial measurement vision: pos:["<<p_vc.transpose()<<"] orientation:["<<q_cv.w()<<", "<<q_cv.x()<<", "<<q_cv.y()<<", "<<q_cv.z()<<"]");
-    ROS_INFO_STREAM("initial measurement gps: pos:["<<p_gps.transpose()<<"]");
+    ROS_INFO_STREAM("initial measurement position: pos:["<<p_pos.transpose()<<"]");
 
     // check if we have already input from the measurement sensor
     if (p_vc.norm() == 0)
       ROS_WARN_STREAM("No measurements received yet to initialize vision position - using [0 0 0]");
-    if (p_gps.norm() == 0)
-      ROS_WARN_STREAM("No measurements received yet to initialize gps position - using [0 0 0]");
+    if (p_pos.norm() == 0)
+      ROS_WARN_STREAM("No measurements received yet to initialize absolute position - using [0 0 0]");
     if ((p_vc.norm() == 1) & (q_cv.w() == 1))
       ROS_WARN_STREAM("No measurements received yet to initialize attitude - using [1 0 0 0]");
 
     ros::NodeHandle pnh("~");
-    pnh.param("init/p_ci/x", p_ci[0], 0.0);
-    pnh.param("init/p_ci/y", p_ci[1], 0.0);
-    pnh.param("init/p_ci/z", p_ci[2], 0.0);
+    pnh.param("pose_sensor/init/p_ci/x", p_ci[0], 0.0);
+    pnh.param("pose_sensor/init/p_ci/y", p_ci[1], 0.0);
+    pnh.param("pose_sensor/init/p_ci/z", p_ci[2], 0.0);
 
-    pnh.param("init/q_ci/w", q_ci.w(), 1.0);
-    pnh.param("init/q_ci/x", q_ci.x(), 0.0);
-    pnh.param("init/q_ci/y", q_ci.y(), 0.0);
-    pnh.param("init/q_ci/z", q_ci.z(), 0.0);
+    pnh.param("pose_sensor/init/q_ci/w", q_ci.w(), 1.0);
+    pnh.param("pose_sensor/init/q_ci/x", q_ci.x(), 0.0);
+    pnh.param("pose_sensor/init/q_ci/y", q_ci.y(), 0.0);
+    pnh.param("pose_sensor/init/q_ci/z", q_ci.z(), 0.0);
     q_ci.normalize();
+
+
+    pnh.param("position_sensor/init/p_pi/x", p_pi[0], 0.0);
+    pnh.param("position_sensor/init/p_pi/y", p_pi[1], 0.0);
+    pnh.param("position_sensor/init/p_pi/z", p_pi[2], 0.0);
 
 
     // calculate initial attitude and position based on sensor measurements
@@ -187,7 +184,7 @@ private:
 
     Eigen::Matrix<double, 3, 1> p_vision = q_wv.conjugate().toRotationMatrix() * p_vc / scale - q.toRotationMatrix() * p_ci;
 
-    p = p_gps;
+    p = p_pos;
     p_vw = p_vision - p;
 
     //prepare init "measurement"
@@ -203,6 +200,7 @@ private:
     meas->setStateInitValue<StateDefinition_T::p_vw>(p_vw);
     meas->setStateInitValue<StateDefinition_T::q_ci>(q_ci);
     meas->setStateInitValue<StateDefinition_T::p_ci>(p_ci);
+    meas->setStateInitValue<StateDefinition_T::p_pi>(p_pi);
 
     setP(meas->get_P()); //call my set P function
     meas->get_w_m() = w_m;
@@ -227,11 +225,11 @@ private:
   }
 
   virtual void calculateQAuxiliaryStates(EKFState_T& state, double dt){
-    const msf_core::Vector3 nqwvv = msf_core::Vector3::Constant(config_.noise_qwv);
-    const msf_core::Vector3 npwvv = msf_core::Vector3::Constant(config_.noise_pvw);
-    const msf_core::Vector3 nqciv = msf_core::Vector3::Constant(config_.noise_qci);
-    const msf_core::Vector3 npicv = msf_core::Vector3::Constant(config_.noise_pci);
-    const msf_core::Vector1 n_L = msf_core::Vector1::Constant(config_.noise_scale);
+    const msf_core::Vector3 nqwvv = msf_core::Vector3::Constant(config_.pose_noise_qwv);
+    const msf_core::Vector3 npwvv = msf_core::Vector3::Constant(config_.pose_noise_pvw);
+    const msf_core::Vector3 nqciv = msf_core::Vector3::Constant(config_.pose_noise_qci);
+    const msf_core::Vector3 npicv = msf_core::Vector3::Constant(config_.pose_noise_pci);
+    const msf_core::Vector1 n_L = msf_core::Vector1::Constant(config_.pose_noise_scale);
 
     //compute the blockwise Q values and store them with the states,
     //these then get copied by the core to the correct places in Qd
@@ -269,4 +267,4 @@ private:
 };
 
 }
-#endif /* POSE_MEASUREMENTMANAGER_H */
+#endif /* POSITION_VISION_SENSOR_MANAGER_H */

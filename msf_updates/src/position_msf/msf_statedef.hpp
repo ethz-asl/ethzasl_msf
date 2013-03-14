@@ -50,7 +50,7 @@ enum StateDefinition{ //must not manually set the enum values!
   q,
   b_w,
   b_a,
-  p_pos_imu
+  p_pi
 };
 
 namespace{
@@ -68,7 +68,7 @@ typedef boost::fusion::vector<
     msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, b_a, msf_core::CoreStateWithoutPropagation>,                     ///< acceleration biases              (13-15 / 12-14)
 
     // states not varying during propagation
-    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_pos_imu>                                                            ///< prism-imu position calibration
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_pi>                                                            ///< prism-imu position calibration
 > fullState_T;
 }
 

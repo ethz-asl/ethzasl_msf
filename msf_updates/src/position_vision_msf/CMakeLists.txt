@@ -1,0 +1,4 @@
+rosbuild_add_executable(position_vision_sensor main.cpp)
+rosbuild_add_compile_flags(position_vision_sensor "-O2")
+
+target_link_libraries(position_vision_sensor pose_distorter)

@@ -55,7 +55,7 @@ enum StateDefinition{ //must not manually set the enum values!
   p_vw,
   q_ci,
   p_ci,
-  p_pos_imu
+  p_pi
 };
 
 namespace{
@@ -78,7 +78,7 @@ typedef boost::fusion::vector<
     msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_vw>,                                                          ///< vision world position drift        (21-23 / 19-22)
     msf_core::StateVar_T<Eigen::Quaternion<double>, q_ci>,                                                             ///< camera-imu attitude calibration  (24-27 / 23-25)
     msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_ci>,                                                            ///< camera-imu position calibration  (28-30 / 26-28)
-    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_pos_imu>
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_pi>
 > fullState_T;
 }
 

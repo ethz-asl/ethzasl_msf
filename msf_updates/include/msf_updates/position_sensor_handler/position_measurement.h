@@ -118,20 +118,20 @@ public:
 
     // preprocess for elements in H matrix
 
-    Eigen::Matrix<double, 3, 3> p_prism_imu_sk = skew(state.get<StateDefinition_T::p_pos_imu>());
+    Eigen::Matrix<double, 3, 3> p_prism_imu_sk = skew(state.get<StateDefinition_T::p_pi>());
 
     //get indices of states in error vector
     enum{
       idxstartcorr_p_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::p>::value,
       idxstartcorr_v_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::v>::value,
       idxstartcorr_q_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::q>::value,
-      idxstartcorr_p_pos_imu_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::p_pos_imu>::value,
+      idxstartcorr_p_pi_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::p_pi>::value,
     };
 
-    bool fixed_p_pos_imu = (fixedstates_ & 1 << StateDefinition_T::p_pos_imu);
+    bool fixed_p_pos_imu = (fixedstates_ & 1 << StateDefinition_T::p_pi);
 
     //clear crosscorrelations
-    if(fixed_p_pos_imu) state_in->clearCrossCov<StateDefinition_T::p_pos_imu>();
+    if(fixed_p_pos_imu) state_in->clearCrossCov<StateDefinition_T::p_pi>();
 
     // construct H matrix using H-blockx :-)
     // position:
@@ -139,7 +139,7 @@ public:
 
     H.block<3, 3>(0, idxstartcorr_q_) = - C_q.transpose() * p_prism_imu_sk; // q
 
-    H.block<3, 3>(0, idxstartcorr_p_pos_imu_) = fixed_p_pos_imu ? Eigen::Matrix<double, 3, 3>::Zero() : (C_q.transpose()).eval(); //p_pos_imu_
+    H.block<3, 3>(0, idxstartcorr_p_pi_) = fixed_p_pos_imu ? Eigen::Matrix<double, 3, 3>::Zero() : (C_q.transpose()).eval(); //p_pos_imu_
 
   }
 
@@ -162,7 +162,7 @@ public:
 
       // construct residuals
       // position
-      r_old.block<3, 1>(0, 0) = z_p_ - (state.get<StateDefinition_T::p>() + C_q.transpose() * state.get<StateDefinition_T::p_pos_imu>());
+      r_old.block<3, 1>(0, 0) = z_p_ - (state.get<StateDefinition_T::p>() + C_q.transpose() * state.get<StateDefinition_T::p_pi>());
 
       if(!checkForNumeric(r_old, "r_old")){
         ROS_ERROR_STREAM("r_old: "<<r_old);

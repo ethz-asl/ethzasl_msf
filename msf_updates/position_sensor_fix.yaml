@@ -1,21 +1,28 @@
 scale_init: 1
-fixed_scale: 0
-fixed_bias: 0
-core/noise_acc: 0.083
-core/noise_accbias: 0.0083
-core/noise_gyr: 0.0013
-core/noise_gyrbias: 0.00013
+data_playback: true
 
-delay: 0.2
-meas_noise1: 0.001
+core/core_fixed_bias: 0
 
-data_playback: false
+#########IMU PARAMETERS#######
+####### bluebird
+#core/core_noise_acc: 0.083
+#core/core_noise_accbias: 0.0083
+#core/core_noise_gyr: 0.0013
+#core/core_noise_gyrbias: 0.00013
+####### ADIS
+core/core_noise_acc: 0.002
+core/core_noise_accbias: 8e-5
+core/core_noise_gyr: 0.0004
+core/core_noise_gyrbias: 3e-6
+
+position_sensor/position_noise_meas: 0.01
+position_sensor/position_fixed_ppi: true
 
 #init position offset prism imu
-init/p_prism_imu/x: 0.02    
-init/p_prism_imu/y: -0.05
-init/p_prism_imu/z: 0.05
+position_sensor/init/p_pi/x: 0.02    
+position_sensor/init/p_pi/y: -0.05
+position_sensor/init/p_pi/z: 0.05
 
-position_sensor/fixed_p_pos_imu: true
-
-use_fixed_covariance: true
+position_sensor/position_absolute_measurements: true
+position_sensor/position_use_fixed_covariance: true
+position_sensor/position_measurement_world_sensor: true  # selects if sensor measures its position w.r.t. world (true, e.g. Vicon) or the position of the world coordinate system w.r.t. the sensor (false, e.g. ethzasl_ptam)
