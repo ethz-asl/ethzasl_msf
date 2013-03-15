@@ -1,11 +1,7 @@
 /*
 
-Copyright (c) 2010, Stephan Weiss, ASL, ETH Zurich, Switzerland
-You can contact the author at <stephan dot weiss at ieee dot org>
-Copyright (c) 2012, Simon Lynen, ASL, ETH Zurich, Switzerland
+Copyright (c) 2013, Simon Lynen, ASL, ETH Zurich, Switzerland
 You can contact the author at <slynen at ethz dot ch>
- Copyright (c) 2012, Markus Achtelik, ASL, ETH Zurich, Switzerland
- You can contact the author at <acmarkus at ethz dot ch>
 
 All rights reserved.
 
@@ -33,8 +29,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
 
-#ifndef POSITION_VISION_SENSOR_MANAGER_H
-#define POSITION_VISION_SENSOR_MANAGER_H
+#ifndef POSITION_POSE_SENSOR_MANAGER_H
+#define POSITION_POSE_SENSOR_MANAGER_H
 
 #include <ros/ros.h>
 
@@ -53,9 +49,9 @@ typedef msf_updates::PositionPoseSensorConfig Config_T;
 typedef dynamic_reconfigure::Server<Config_T> ReconfigureServer;
 typedef boost::shared_ptr<ReconfigureServer> ReconfigureServerPtr;
 
-class PositionVisionSensorManager : public msf_core::MSF_SensorManagerROS<msf_updates::EKFState>
+class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<msf_updates::EKFState>
 {
-  typedef PositionVisionSensorManager this_T;
+  typedef PositionPoseSensorManager this_T;
   typedef msf_pose_sensor::PoseSensorHandler<msf_updates::pose_measurement::PoseMeasurement, this_T> PoseSensorHandler_T;
   friend class msf_pose_sensor::PoseSensorHandler<msf_updates::pose_measurement::PoseMeasurement, this_T>;
   typedef msf_position_sensor::PositionSensorHandler<msf_updates::position_measurement::PositionMeasurement, this_T> PositionSensorHandler_T;
@@ -65,7 +61,7 @@ public:
   typedef EKFState_T::StateSequence_T StateSequence_T;
   typedef EKFState_T::StateDefinition_T StateDefinition_T;
 
-  PositionVisionSensorManager(ros::NodeHandle pnh = ros::NodeHandle("~"))
+  PositionPoseSensorManager(ros::NodeHandle pnh = ros::NodeHandle("~"))
   {
     bool distortmeas = false; ///<distort the pose measurements TODO make param
 
@@ -79,7 +75,7 @@ public:
     ReconfigureServer::CallbackType f = boost::bind(&this_T::config, this, _1, _2);
     reconf_server_->setCallback(f);
   }
-  virtual ~PositionVisionSensorManager(){}
+  virtual ~PositionPoseSensorManager(){}
 
   virtual const Config_T& getcfg(){
     return config_;
@@ -267,4 +263,4 @@ private:
 };
 
 }
-#endif /* POSITION_VISION_SENSOR_MANAGER_H */
+#endif /* POSITION_POSE_SENSOR_MANAGER_H */

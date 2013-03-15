@@ -29,13 +29,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
 
-#include "position_vision_sensormanager.h"
+#include "position_pose_sensormanager.h"
 
 int main(int argc, char** argv)
 {
-  ros::init(argc, argv, "msf_position_vision_sensor");
+  ros::init(argc, argv, "msf_position_pose_sensor");
 
-  msf_updates::PositionVisionSensorManager manager;
+  msf_updates::PositionPoseSensorManager manager;
 
   ros::spin();
 
