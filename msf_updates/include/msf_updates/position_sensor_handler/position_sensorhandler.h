@@ -57,6 +57,7 @@ private:
   bool use_fixed_covariance_; ///< use fixed covariance set by dynamic reconfigure
   bool provides_absolute_measurements_; ///<does this sensor measure relative or absolute values
 
+  void processPositionMeasurement(const geometry_msgs::PointStampedConstPtr & msg);
   void measurementCallback(const geometry_msgs::PointStampedConstPtr & msg);
   void measurementCallback(const geometry_msgs::TransformStampedConstPtr & msg);
 

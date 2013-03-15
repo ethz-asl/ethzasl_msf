@@ -72,8 +72,10 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::setDelay(double dela
 {
   delay_ = delay;
 }
+
+
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
-void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(const geometry_msgs::PointStampedConstPtr & msg)
+void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::processPositionMeasurement(const geometry_msgs::PointStampedConstPtr & msg)
 {
   //get the fixed states
   int fixedstates = 0;
@@ -106,8 +108,16 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(
 }
 
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
+void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(const geometry_msgs::PointStampedConstPtr & msg)
+{
+  ROS_INFO_STREAM_ONCE("*** position sensor got first measurement from topic "<<this->topic_namespace_<<"/"<<subPointStamped_.getTopic()<<" ***");
+  processPositionMeasurement(msg);
+}
+
+template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(const geometry_msgs::TransformStampedConstPtr & msg)
 {
+  ROS_INFO_STREAM_ONCE("*** position sensor got first measurement from topic "<<this->topic_namespace_<<"/"<<subTransformStamped_.getTopic()<<" ***");
 
   if(msg->header.seq%5!=0){ //slow down vicon
     ROS_WARN_STREAM_ONCE("Measurement throttling is on, dropping every but the 5th message");
@@ -130,7 +140,7 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(
   point->point.y = msg->transform.translation.y;
   point->point.z = msg->transform.translation.z;
 
-  measurementCallback(point);
+  processPositionMeasurement(point);
 }
 
 }

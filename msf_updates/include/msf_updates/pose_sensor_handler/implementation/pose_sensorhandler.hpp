@@ -105,49 +105,59 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::setDelay(double delay)
 {
   delay_ = delay;
 }
+
+
+template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
+void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg)
+{
+  //get the fixed states
+   int fixedstates = 0;
+   BOOST_STATIC_ASSERT_MSG(msf_updates::EKFState::nStateVarsAtCompileTime < 32, "Your state has more than 32 variables. "
+       "The code needs to be changed here to have a larger variable to mark the fixed_states"); //do not exceed the 32 bits of int
+
+   //get all the fixed states and set flag bits
+   MANAGER_TYPE* mngr = dynamic_cast<MANAGER_TYPE*>(&manager_);
+
+   if(mngr){
+     if (mngr->getcfg().pose_fixed_scale){
+       fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::L;
+     }
+     if (mngr->getcfg().pose_fixed_p_ci){
+       fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::p_ci;
+     }
+     if (mngr->getcfg().pose_fixed_q_ci){
+       fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::q_ci;
+     }
+     if (mngr->getcfg().pose_fixed_p_vw){
+       fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::p_vw;
+     }
+     if (mngr->getcfg().pose_fixed_q_wv){
+       fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::q_wv;
+     }
+   }
+
+   boost::shared_ptr<MEASUREMENT_TYPE> meas( new MEASUREMENT_TYPE(n_zp_, n_zq_, measurement_world_sensor_, use_fixed_covariance_, provides_absolute_measurements_, this->sensorID, fixedstates, distorter_));
+
+   meas->makeFromSensorReading(msg, msg->header.stamp.toSec() - delay_);
+
+   z_p_ = meas->z_p_; //store this for the init procedure
+   z_q_ = meas->z_q_;
+
+   this->manager_.msf_core_->addMeasurement(meas);
+}
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg)
 {
 
-  //get the fixed states
-  int fixedstates = 0;
-  BOOST_STATIC_ASSERT_MSG(msf_updates::EKFState::nStateVarsAtCompileTime < 32, "Your state has more than 32 variables. "
-      "The code needs to be changed here to have a larger variable to mark the fixed_states"); //do not exceed the 32 bits of int
+  ROS_INFO_STREAM_ONCE("*** pose sensor got first measurement from topic "<<this->topic_namespace_<<"/"<<subPoseWithCovarianceStamped_.getTopic()<<" ***");
+  ProcessPoseMeasurement(msg);
 
-  //get all the fixed states and set flag bits
-  MANAGER_TYPE* mngr = dynamic_cast<MANAGER_TYPE*>(&manager_);
-
-  if(mngr){
-    if (mngr->getcfg().pose_fixed_scale){
-      fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::L;
-    }
-    if (mngr->getcfg().pose_fixed_p_ci){
-      fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::p_ci;
-    }
-    if (mngr->getcfg().pose_fixed_q_ci){
-      fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::q_ci;
-    }
-    if (mngr->getcfg().pose_fixed_p_vw){
-      fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::p_vw;
-    }
-    if (mngr->getcfg().pose_fixed_q_wv){
-      fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::q_wv;
-    }
-  }
-
-  boost::shared_ptr<MEASUREMENT_TYPE> meas( new MEASUREMENT_TYPE(n_zp_, n_zq_, measurement_world_sensor_, use_fixed_covariance_, provides_absolute_measurements_, this->sensorID, fixedstates, distorter_));
-
-  meas->makeFromSensorReading(msg, msg->header.stamp.toSec() - delay_);
-
-  z_p_ = meas->z_p_; //store this for the init procedure
-  z_q_ = meas->z_q_;
-
-  this->manager_.msf_core_->addMeasurement(meas);
 }
 
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(const geometry_msgs::TransformStampedConstPtr & msg)
 {
+  ROS_INFO_STREAM_ONCE("*** pose sensor got first measurement from topic "<<this->topic_namespace_<<"/"<<subTransformStamped_.getTopic()<<" ***");
 
   if(msg->header.seq%5!=0){ //slow down vicon
     ROS_WARN_STREAM_THROTTLE(30, "Measurement throttling is on, dropping every but the 5th message");
@@ -175,12 +185,13 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(cons
   pose->pose.pose.orientation.y = msg->transform.rotation.y;
   pose->pose.pose.orientation.z = msg->transform.rotation.z;
 
-  measurementCallback(pose);
+  ProcessPoseMeasurement(pose);
 }
 
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(const geometry_msgs::PoseStampedConstPtr & msg)
 {
+  ROS_INFO_STREAM_ONCE("*** pose sensor got first measurement from topic "<<this->topic_namespace_<<"/"<<subPoseStamped_.getTopic()<<" ***");
 
   geometry_msgs::PoseWithCovarianceStampedPtr pose(new geometry_msgs::PoseWithCovarianceStamped());
 
@@ -196,7 +207,7 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(cons
 
   pose->pose.pose = msg->pose;
 
-  measurementCallback(pose);
+  ProcessPoseMeasurement(pose);
 }
 
 }

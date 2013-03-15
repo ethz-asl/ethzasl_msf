@@ -1,12 +1,10 @@
 <launch>
     <node launch-prefix="gdb -ex run --args" name="msf_position_pose_filter" pkg="msf_updates" type="position_pose_sensor" clear_params="true" output="screen">
-            <remap from="msf_core/hl_state_input" to="/auk/fcu/ekf_state_out" /> <!--AUK-->
-            <remap from="msf_core/correction" to="/auk/fcu/ekf_state_in"/>
+            <!--remap from="msf_core/hl_state_input" to="/auk/fcu/ekf_state_out" /--> <!--HL STATE-->
+            <!--remap from="msf_core/correction" to="/auk/fcu/ekf_state_in"/-->
   			
-  			<!--remap from="msf_core/imu_state_input" to="/imu0" /--> <!--SLAM SENSOR-->
-  			
-            <!--remap from="msf_core/imu_state_input" to="/bluebird/fcu/imu" /--> <!--BLUEBIRD-->
-            <!--remap from="msf_core/imu_state_input" to="/mav1/fcu/imu" /-->
+  			<!--remap from="msf_core/imu_state_input" to="/imu0" /--> <!--SLAM SENSOR IMU-->
+  			<remap from="msf_core/imu_state_input" to="/auk/fcu/imu" /> <!--IMU-->
 
 	    	<remap from="msf_updates/position_input" to="/leica/position" /> <!--LEICA-->
 	    	

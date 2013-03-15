@@ -58,5 +58,6 @@ position_sensor/init/p_pi/z: 0.05
 
 position_sensor/position_fixed_ppi: true
 position_sensor/position_use_fixed_covariance: true
+position_sensor/position_absolute_measurements: true
 
 

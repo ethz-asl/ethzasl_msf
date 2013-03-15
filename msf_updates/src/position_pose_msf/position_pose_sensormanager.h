@@ -175,13 +175,28 @@ private:
 
 
     // calculate initial attitude and position based on sensor measurements
+    //here we take the attitude from the pose sensor and augment it with global yaw init
+    double yawinit = config_.position_yaw_init / 180 * M_PI;
+    Eigen::Quaterniond yawq(cos(yawinit / 2),0 ,0 , sin(yawinit / 2));
+    yawq.normalize();
+
+    //the initial vision-world rotation is global yaw rotation
+    q_wv = yawq.conjugate();
+
     q = (q_ci * q_cv.conjugate() * q_wv).conjugate();
     q.normalize();
 
     Eigen::Matrix<double, 3, 1> p_vision = q_wv.conjugate().toRotationMatrix() * p_vc / scale - q.toRotationMatrix() * p_ci;
 
-    p = p_pos;
-    p_vw = p_vision - p;
+
+    p = p_pos - q.toRotationMatrix() * p_pi;
+    p_vw = p - p_vision;
+
+    ROS_INFO_STREAM("p_pi: "<<p_pi.transpose());
+    ROS_INFO_STREAM("p_pos: "<<p_pos.transpose());
+    ROS_INFO_STREAM("p_vision: "<<p_vision.transpose());
+    ROS_INFO_STREAM("p: "<<p.transpose());
+
 
     //prepare init "measurement"
     boost::shared_ptr<msf_core::MSF_InitMeasurement<EKFState_T> > meas(new msf_core::MSF_InitMeasurement<EKFState_T>(true)); //hand over that we will also set the sensor readings

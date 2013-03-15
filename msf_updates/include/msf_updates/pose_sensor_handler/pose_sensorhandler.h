@@ -64,6 +64,7 @@ private:
 
   msf_updates::PoseDistorter::Ptr distorter_;
 
+  void ProcessPoseMeasurement(const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg);
   void measurementCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg);
   void measurementCallback(const geometry_msgs::PoseStampedConstPtr & msg);
   void measurementCallback(const geometry_msgs::TransformStampedConstPtr & msg);
