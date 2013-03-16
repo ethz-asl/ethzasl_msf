@@ -644,10 +644,10 @@ void MSF_Core<EKFState_T>::init(boost::shared_ptr<MSF_MeasurementBase<EKFState_T
   initialized_ = false;
   predictionMade_ = false;
 
+  std::this_thread::sleep_for(std::chrono::milliseconds(100)); //hackish thread sync
+
   MeasurementBuffer_.clear();
   StateBuffer_.clear();
-
-  std::this_thread::sleep_for(std::chrono::milliseconds(10)); //hackish thread sync
 
   while(!queueFutureMeasurements_.empty())
     queueFutureMeasurements_.pop();
