@@ -5,8 +5,8 @@
 
 	    <remap from="msf_updates/position_input" to="/leica/position" />
 	    	
-	    <!--remap from="msf_core/imu_state_input" to="/auk/fcu/imu" /--> <!--DEBUGGING WITH VICON DATA-->
-            <!--remap from="msf_updates/transform_input" to="vicon/auk/auk" /--> <!--DEBUGGING WITH VICON DATA-->
+	    <remap from="msf_core/imu_state_input" to="/auk/fcu/imu" />
+            <!--remap from="msf_updates/transform_input" to="vicon/auk/auk" /--> 
 
             <rosparam file="$(find msf_updates)/position_sensor_fix.yaml"/>
     </node>
