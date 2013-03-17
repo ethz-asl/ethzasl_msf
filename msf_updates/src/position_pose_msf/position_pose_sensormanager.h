@@ -190,17 +190,10 @@ private:
 
     Eigen::Matrix<double, 3, 1> p_vision = q_wv.conjugate().toRotationMatrix() * p_vc / scale - q.toRotationMatrix() * p_ic;
 
-
-//    p = p_pos - q.toRotationMatrix() * p_pi;
-//    p_wv = p - p_vision;
-    p_wv << 1.0,0,0; //TODO remove
-    p = p_vision + p_wv;
-
-    ROS_INFO_STREAM("p_ip: "<<p_ip.transpose());
-    ROS_INFO_STREAM("p_pos: "<<p_pos.transpose());
-    ROS_INFO_STREAM("p_vision: "<<p_vision.transpose());
-    ROS_INFO_STREAM("p: "<<p.transpose());
-
+    //TODO what if there is no initial position measurement? Then we have to shift vision-world later on, before
+    //applying the first position measurement
+    p = p_pos - q.toRotationMatrix() * p_ip;
+    p_wv = p - p_vision; //shift the vision frame so that it fits the position measurement
 
     //prepare init "measurement"
     boost::shared_ptr<msf_core::MSF_InitMeasurement<EKFState_T> > meas(new msf_core::MSF_InitMeasurement<EKFState_T>(true)); //hand over that we will also set the sensor readings
