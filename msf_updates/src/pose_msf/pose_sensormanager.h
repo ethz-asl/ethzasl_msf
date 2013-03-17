@@ -196,8 +196,7 @@ private:
     state.set<StateDefinition_T::L>(scale);
   }
   virtual void initState(EKFState_T& state){
-
-
+    UNUSED(state);
   }
 
   virtual void calculateQAuxiliaryStates(EKFState_T& state, double dt){
@@ -217,17 +216,18 @@ private:
   }
 
   virtual void setP(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, EKFState_T::nErrorStatesAtCompileTime>& P){
-
+    UNUSED(P);
     //nothing, we only use the simulated cov for the core plus diagonal for the rest
-
   }
 
-  virtual void augmentCorrectionVector(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& correction_){
-
+  virtual void augmentCorrectionVector(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& correction){
+    UNUSED(correction);
   }
 
   virtual void sanityCheckCorrection(EKFState_T& delaystate, const EKFState_T& buffstate,
-                                     Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& correction_){
+                                     Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& correction){
+    UNUSED(buffstate);
+    UNUSED(correction);
 
     const EKFState_T& state = delaystate;
     if (state.get<StateDefinition_T::L>()(0) < 0)

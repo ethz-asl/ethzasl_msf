@@ -22,8 +22,11 @@ gencfg()
 rosbuild_genmsg()
 
 add_definitions (-Wall -std=c++0x -march=native)
+set(ROS_COMPILE_FLAGS "-W -Wall -Wextra -pedantic")
 
-# get eigen
+add_definitions (-DDEBUGPUBLISH) #publish the state after each propagation step for full rate plotting
+
+#FIND EIGEN
 find_package(Eigen REQUIRED)
 include_directories(${Eigen_INCLUDE_DIRS})
 

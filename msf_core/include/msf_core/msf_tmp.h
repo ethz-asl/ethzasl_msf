@@ -72,6 +72,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/mpl/bool.hpp>
 #include <boost/fusion/include/at_key.hpp>
 
+
 //this namespace contains some metaprogramming tools
 namespace msf_tmp{
 
@@ -98,8 +99,8 @@ template<typename T> struct echoStateVarType;
 /**
  * \brief runtime output of stateVariable types for const ref eigen matrices
  */
-template<int NAME, int N, int STATETYPE>
-struct echoStateVarType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE>&>{
+template<int NAME, int N, int STATE_T>
+struct echoStateVarType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATE_T>&>{
   static std::string value(){
     return "const ref Eigen::Matrix<double, "+boost::lexical_cast<std::string>(N)+", 1>";
   }
@@ -107,8 +108,8 @@ struct echoStateVarType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, 
 /**
  * \brief runtime output of stateVariable types for const ref eigen quaternions
  */
-template<int NAME, int STATETYPE>
-struct echoStateVarType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE>&>{
+template<int NAME, int STATE_T>
+struct echoStateVarType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATE_T>&>{
   static std::string value(){
     return "const ref Eigen::Quaterniond";
   }
@@ -116,8 +117,8 @@ struct echoStateVarType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, STA
 /**
  * \brief runtime output of stateVariable types for eigen matrices
  */
-template<int NAME, int N, int STATETYPE>
-struct echoStateVarType<msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE> >{
+template<int NAME, int N, int STATE_T>
+struct echoStateVarType<msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATE_T> >{
   static std::string value(){
     return "Eigen::Matrix<double, "+boost::lexical_cast<std::string>(N)+", 1>";
   }
@@ -125,8 +126,8 @@ struct echoStateVarType<msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, 
 /**
  * \brief runtime output of stateVariable types for eigen matrices
  */
-template<int NAME, int STATETYPE>
-struct echoStateVarType<msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE> >{
+template<int NAME, int STATE_T>
+struct echoStateVarType<msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATE_T> >{
   static std::string value(){
     return "Eigen::Quaterniond";
   }
@@ -137,12 +138,12 @@ namespace{ //for internal use only
 //the number of entries in the correction vector for a given state var
 template<typename T>
 struct CorrectionStateLengthForType;
-template<int NAME, int N, int STATETYPE>
-struct CorrectionStateLengthForType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE>& >{
+template<int NAME, int N, int STATE_T>
+struct CorrectionStateLengthForType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATE_T>& >{
   enum{value = N};
 };
-template<int NAME, int STATETYPE>
-struct CorrectionStateLengthForType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE>& >{
+template<int NAME, int STATE_T>
+struct CorrectionStateLengthForType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATE_T>& >{
   enum{value = 3};
 };
 template<>
@@ -153,12 +154,12 @@ struct CorrectionStateLengthForType<const mpl_::void_&>{
 //the number of entries in the state for a given state var
 template<typename T>
 struct StateLengthForType;
-template<int NAME, int N, int STATETYPE>
-struct StateLengthForType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE>& >{
+template<int NAME, int N, int STATE_T>
+struct StateLengthForType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATE_T>& >{
   enum{value = N};
 };
-template<int NAME, int STATETYPE>
-struct StateLengthForType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE>& >{
+template<int NAME, int STATE_T>
+struct StateLengthForType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATE_T>& >{
   enum{value = 4};
 };
 template<>
@@ -170,12 +171,12 @@ struct StateLengthForType<const mpl_::void_&>{
 //the number of entries in the state for a given state var if it is core state
 template<typename T>
 struct CoreStateLengthForType;
-template<int NAME, int N, int STATETYPE>
-struct CoreStateLengthForType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE>& >{
+template<int NAME, int N, int STATE_T>
+struct CoreStateLengthForType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATE_T>& >{
   enum{value = 0}; //not a core state, so length is zero
 };
-template<int NAME, int STATETYPE>
-struct CoreStateLengthForType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE>& >{
+template<int NAME, int STATE_T>
+struct CoreStateLengthForType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATE_T>& >{
   enum{value = 0}; //not a core state, so length is zero
 };
 template<int NAME, int N>
@@ -202,12 +203,12 @@ struct CoreStateLengthForType<const mpl_::void_&>{
 //the number of entries in the state for a given state var if it is core state with propagation
 template<typename T>
 struct PropagatedCoreStateLengthForType;
-template<int NAME, int N, int STATETYPE>
-struct PropagatedCoreStateLengthForType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE>& >{
+template<int NAME, int N, int STATE_T>
+struct PropagatedCoreStateLengthForType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATE_T>& >{
   enum{value = 0}; //not a core state, so length is zero
 };
-template<int NAME, int STATETYPE>
-struct PropagatedCoreStateLengthForType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE>& >{
+template<int NAME, int STATE_T>
+struct PropagatedCoreStateLengthForType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATE_T>& >{
   enum{value = 0}; //not a core state, so length is zero
 };
 template<int NAME, int N>
@@ -227,12 +228,12 @@ struct PropagatedCoreStateLengthForType<const mpl_::void_&>{
 //the number of entries in the error state for a given state var if it is core state with propagation
 template<typename T>
 struct PropagatedCoreErrorStateLengthForType;
-template<int NAME, int N, int STATETYPE>
-struct PropagatedCoreErrorStateLengthForType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE>& >{
+template<int NAME, int N, int STATE_T>
+struct PropagatedCoreErrorStateLengthForType<const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATE_T>& >{
   enum{value = 0}; //not a core state, so length is zero
 };
-template<int NAME, int STATETYPE>
-struct PropagatedCoreErrorStateLengthForType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE>& >{
+template<int NAME, int STATE_T>
+struct PropagatedCoreErrorStateLengthForType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATE_T>& >{
   enum{value = 0}; //not a core state, so length is zero
 };
 template<int NAME, int N>
@@ -253,12 +254,12 @@ struct PropagatedCoreErrorStateLengthForType<const mpl_::void_&>{
 //return the number a state has in the enum
 template<typename T>
 struct getEnumStateName;
-template<typename U,int NAME, int STATETYPE>
-struct getEnumStateName<const msf_core::StateVar_T<U, NAME, STATETYPE>& >{
+template<typename U,int NAME, int STATE_T>
+struct getEnumStateName<const msf_core::StateVar_T<U, NAME, STATE_T>& >{
   enum{value = NAME};
 };
-template<typename U,int NAME, int STATETYPE>
-struct getEnumStateName<msf_core::StateVar_T<U, NAME, STATETYPE> >{
+template<typename U,int NAME, int STATE_T>
+struct getEnumStateName<msf_core::StateVar_T<U, NAME, STATE_T> >{
   enum{value = NAME};
 };
 template<> struct getEnumStateName<const mpl_::void_&>{
@@ -271,20 +272,20 @@ template<> struct getEnumStateName<mpl_::void_>{
 
 template<typename T>
 struct isQuaternionType;
-template<int NAME, int STATETYPE, int M, int N>
-struct isQuaternionType<const msf_core::StateVar_T<Eigen::Matrix<double, M, N>, NAME, STATETYPE>& >{
+template<int NAME, int STATE_T, int M, int N>
+struct isQuaternionType<const msf_core::StateVar_T<Eigen::Matrix<double, M, N>, NAME, STATE_T>& >{
   enum{value = false};
 };
-template<int NAME, int STATETYPE, int M, int N>
-struct isQuaternionType<msf_core::StateVar_T<Eigen::Matrix<double, M, N>, NAME, STATETYPE> >{
+template<int NAME, int STATE_T, int M, int N>
+struct isQuaternionType<msf_core::StateVar_T<Eigen::Matrix<double, M, N>, NAME, STATE_T> >{
   enum{value = false};
 };
-template<int NAME, int STATETYPE>
-struct isQuaternionType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE>& >{
+template<int NAME, int STATE_T>
+struct isQuaternionType<const msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATE_T>& >{
   enum{value = true};
 };
-template<int NAME, int STATETYPE>
-struct isQuaternionType<msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE> >{
+template<int NAME, int STATE_T>
+struct isQuaternionType<msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATE_T> >{
   enum{value = true};
 };
 template<>
@@ -301,14 +302,14 @@ struct isQuaternionType<mpl_::void_>{
  */
 template<typename T>
 struct getStateIsNonTemporalDrifting;
-template<typename U,int NAME, int STATETYPE>
-struct getStateIsNonTemporalDrifting<const msf_core::StateVar_T<U, NAME, STATETYPE>& >{
-  enum{value = static_cast<int>(msf_core::StateVar_T<U, NAME, STATETYPE>::statetype_) ==
+template<typename U,int NAME, int STATE_T>
+struct getStateIsNonTemporalDrifting<const msf_core::StateVar_T<U, NAME, STATE_T>& >{
+  enum{value = static_cast<int>(msf_core::StateVar_T<U, NAME, STATE_T>::statetype_) ==
       static_cast<int>(msf_core::AuxiliaryNonTemporalDrifting)};
 };
-template<typename U,int NAME, int STATETYPE>
-struct getStateIsNonTemporalDrifting<msf_core::StateVar_T<U, NAME, STATETYPE> >{
-  enum{value = static_cast<int>(msf_core::StateVar_T<U, NAME, STATETYPE>::statetype_) ==
+template<typename U,int NAME, int STATE_T>
+struct getStateIsNonTemporalDrifting<msf_core::StateVar_T<U, NAME, STATE_T> >{
+  enum{value = static_cast<int>(msf_core::StateVar_T<U, NAME, STATE_T>::statetype_) ==
       static_cast<int>(msf_core::AuxiliaryNonTemporalDrifting)};
 };
 template<> struct getStateIsNonTemporalDrifting<const mpl_::void_&>{
@@ -568,14 +569,14 @@ struct getStartIndexInCorrection{
  */
 struct resetState
 {
-  template<int NAME, int N, int STATETYPE>
-  void operator()(msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE>& t) const {
-    typedef msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE> var_T;
+  template<int NAME, int N, int STATE_T>
+  void operator()(msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATE_T>& t) const {
+    typedef msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATE_T> var_T;
     t.state_.setZero();
   }
-  template<int NAME, int STATETYPE>
-  void operator()(msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE>& t) const {
-    typedef msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE> var_T;
+  template<int NAME, int STATE_T>
+  void operator()(msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATE_T>& t) const {
+    typedef msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATE_T> var_T;
     t.state_.setIdentity();
   }
 };
@@ -588,8 +589,8 @@ template<typename stateT>
 struct copyInitStates
 {
   copyInitStates(const stateT& oldstate):oldstate_(oldstate){	}
-  template<typename T, int NAME, int STATETYPE>
-  void operator()(msf_core::StateVar_T<T, NAME, STATETYPE>& t) const {
+  template<typename T, int NAME, int STATE_T>
+  void operator()(msf_core::StateVar_T<T, NAME, STATE_T>& t) const {
     if(oldstate_.template getStateVar<NAME>().hasResetValue){
       t = oldstate_.template getStateVar<NAME>(); //copy value from old state to new state var
     }
@@ -608,16 +609,16 @@ struct copyNonPropagationStates
 {
   copyNonPropagationStates(const stateT& oldstate):oldstate_(oldstate){	}
   template<typename T, int NAME>
-  void operator()(msf_core::StateVar_T<T, NAME, msf_core::CoreStateWithPropagation>& t) const {
+  void operator()(msf_core::StateVar_T<T, NAME, msf_core::CoreStateWithPropagation>& UNUSEDPARAM(t)) const {
     //nothing to do for the states, which have propagation
   }
-  template<typename T, int NAME, int STATETYPE>
-  void operator()(msf_core::StateVar_T<T, NAME, STATETYPE>& t) const {
+  template<typename T, int NAME, int STATE_T>
+  void operator()(msf_core::StateVar_T<T, NAME, STATE_T>& t) const {
 
-    BOOST_STATIC_ASSERT_MSG((msf_tmp::IsPointerType<typename msf_core::StateVar_T<T, NAME, STATETYPE> >::value == false),
+    BOOST_STATIC_ASSERT_MSG((msf_tmp::IsPointerType<typename msf_core::StateVar_T<T, NAME, STATE_T> >::value == false),
                             "The state variable is of pointer type, but this method assumes we can copy without dereferencing");
 
-    BOOST_STATIC_ASSERT_MSG(STATETYPE !=  msf_core::CoreStateWithPropagation,
+    BOOST_STATIC_ASSERT_MSG(STATE_T !=  msf_core::CoreStateWithPropagation,
                             "copyNonPropagationStates was instantiated for a core state. This is an error.");
 
     t = oldstate_.template getStateVar<NAME>(); //copy value from old state to new state var
@@ -638,9 +639,9 @@ struct copyQBlocksFromAuxiliaryStatesToQ
   };
   typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> Q_T;
   copyQBlocksFromAuxiliaryStatesToQ(Q_T& Q):Q_(Q){	}
-  template<typename T, int NAME, int STATETYPE>
-  void operator()(msf_core::StateVar_T<T, NAME, STATETYPE>& t) const {
-    typedef msf_core::StateVar_T<T, NAME, STATETYPE> var_T;
+  template<typename T, int NAME, int STATE_T>
+  void operator()(msf_core::StateVar_T<T, NAME, STATE_T>& t) const {
+    typedef msf_core::StateVar_T<T, NAME, STATE_T> var_T;
     enum{
       startIdxInCorrection = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::CorrectionStateLengthForType>::value,
       sizeInCorrection = var_T::sizeInCorrection_
@@ -658,11 +659,11 @@ struct copyQBlocksFromAuxiliaryStatesToQ
     Q_.template block<sizeInCorrection, sizeInCorrection>(startIdxInCorrection, startIdxInCorrection) = t.Q;
   }
   template<typename T, int NAME>
-  void operator()(msf_core::StateVar_T<T, NAME, msf_core::CoreStateWithPropagation>& t) const {
+  void operator()(msf_core::StateVar_T<T, NAME, msf_core::CoreStateWithPropagation>& UNUSEDPARAM(t)) const {
     //nothing to do for the states, which have propagation, because Q calculation is done in msf_core
   }
   template<typename T, int NAME>
-  void operator()(msf_core::StateVar_T<T, NAME, msf_core::CoreStateWithoutPropagation>& t) const {
+  void operator()(msf_core::StateVar_T<T, NAME, msf_core::CoreStateWithoutPropagation>& UNUSEDPARAM(t)) const {
     //nothing to do for the states, which have propagation, because Q calculation is done in msf_core
   }
 private:
@@ -676,17 +677,17 @@ template<typename T, typename stateList_T>
 struct correctState
 {
   correctState(T& correction):data_(correction){	}
-  template<int NAME, int N, int STATETYPE>
-  void operator()(msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE>& t) const {
-    typedef msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE> var_T;
+  template<int NAME, int N, int STATE_T>
+  void operator()(msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATE_T>& t) const {
+    typedef msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATE_T> var_T;
     enum{
       startIdxInCorrection = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::CorrectionStateLengthForType>::value
     };
     t.state_ = t.state_ + data_.template block<var_T::sizeInCorrection_, 1> (startIdxInCorrection, 0);
   }
-  template<int NAME, int STATETYPE>
-  void operator()(msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE>& t) const {
-    typedef msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE> var_T;
+  template<int NAME, int STATE_T>
+  void operator()(msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATE_T>& t) const {
+    typedef msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATE_T> var_T;
     enum{
       startIdxInCorrection = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::CorrectionStateLengthForType>::value
     };
@@ -706,9 +707,9 @@ template<typename T, typename stateList_T>
 struct CoreStatetoDoubleArray
 {
   CoreStatetoDoubleArray(T& statearray):data_(statearray){}
-  template<int NAME, int N, int STATETYPE>
-  void operator()(msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE>& t) const {
-    typedef msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE> var_T;
+  template<int NAME, int N, int STATE_T>
+  void operator()(msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATE_T>& t) const {
+    typedef msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATE_T> var_T;
     enum{
       startIdxInState = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::StateLengthForType>::value //index of the data in the state vector
     };
@@ -719,9 +720,9 @@ struct CoreStatetoDoubleArray
       data_[startIdxInState + i] = t.state_[i];
     }
   }
-  template<int NAME, int STATETYPE>
-  void operator()(msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE>& t) const {
-    typedef msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE> var_T;
+  template<int NAME, int STATE_T>
+  void operator()(msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATE_T>& t) const {
+    typedef msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATE_T> var_T;
     enum{
       startIdxInState = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::StateLengthForType>::value //index of the data in the state vector
     };
@@ -735,20 +736,20 @@ struct CoreStatetoDoubleArray
     data_[startIdxInState + 3] = t.state_.z();
   }
   template<int NAME, int N>
-  void operator()(msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, msf_core::Auxiliary>& t) const {
+  void operator()(msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, msf_core::Auxiliary>& UNUSEDPARAM(t)) const {
     //don't copy aux states
   }
   template<int NAME>
-  void operator()(msf_core::StateVar_T<Eigen::Quaterniond, NAME, msf_core::Auxiliary>& t) const {
+  void operator()(msf_core::StateVar_T<Eigen::Quaterniond, NAME, msf_core::Auxiliary>& UNUSEDPARAM(t)) const {
     //don't copy aux states
   }
 
   template<int NAME, int N>
-  void operator()(msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, msf_core::AuxiliaryNonTemporalDrifting>& t) const {
+  void operator()(msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, msf_core::AuxiliaryNonTemporalDrifting>& UNUSEDPARAM(t)) const {
     //don't copy aux states
   }
   template<int NAME>
-  void operator()(msf_core::StateVar_T<Eigen::Quaterniond, NAME, msf_core::AuxiliaryNonTemporalDrifting>& t) const {
+  void operator()(msf_core::StateVar_T<Eigen::Quaterniond, NAME, msf_core::AuxiliaryNonTemporalDrifting>& UNUSEDPARAM(t)) const {
     //don't copy aux states
   }
 private:
@@ -762,9 +763,9 @@ template<typename T, typename stateList_T>
 struct GetIndicesInErrorState
 {
   GetIndicesInErrorState(T& val):data_(val){}
-  template<typename VALUET, int NAME, int STATETYPE>
-  void operator()(msf_core::StateVar_T<VALUET, NAME, STATETYPE>& t) const {
-    typedef msf_core::StateVar_T<VALUET, NAME, STATETYPE> var_T;
+  template<typename VALUE_T, int NAME, int STATE_T>
+  void operator()(msf_core::StateVar_T<VALUE_T, NAME, STATE_T>& UNUSEDPARAM(t)) const {
+    typedef msf_core::StateVar_T<VALUE_T, NAME, STATE_T> var_T;
     enum{
       startIdxInState = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::CorrectionStateLengthForType>::value, //index of the data in the correction vector
       lengthInState = var_T::sizeInCorrection_
@@ -806,17 +807,17 @@ template<typename STREAM, typename stateList_T>
 struct FullStatetoString
 {
   FullStatetoString(STREAM& data):data_(data){}
-  template<int NAME, int N, int STATETYPE>
-  void operator()(msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE>& t) const {
-    typedef msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE> var_T;
+  template<int NAME, int N, int STATE_T>
+  void operator()(msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATE_T>& t) const {
+    typedef msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATE_T> var_T;
     enum{
       startIdxInState = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::StateLengthForType>::value //index of the data in the state vector
     };
     data_ << NAME << " : ["<<startIdxInState<<"-"<<startIdxInState + N - 1 <<"]\t : Matrix<" << N << ", 1>         : [" << t.state_.transpose() <<"]" << std::endl;
   }
-  template<int NAME, int STATETYPE>
-  void operator()(msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE>& t) const {
-    typedef msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE> var_T;
+  template<int NAME, int STATE_T>
+  void operator()(msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATE_T>& t) const {
+    typedef msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATE_T> var_T;
     enum{
       startIdxInState = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::StateLengthForType>::value //index of the data in the state vector
     };
@@ -833,9 +834,9 @@ template<typename T, typename stateList_T>
 struct FullStatetoDoubleArray
 {
   FullStatetoDoubleArray(T& statearray):data_(statearray){}
-  template<int NAME, int N, int STATETYPE>
-  void operator()(msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE>& t) const {
-    typedef msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATETYPE> var_T;
+  template<int NAME, int N, int STATE_T>
+  void operator()(msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATE_T>& t) const {
+    typedef msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATE_T> var_T;
     enum{
       startIdxInState = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::StateLengthForType>::value //index of the data in the state vector
     };
@@ -843,9 +844,9 @@ struct FullStatetoDoubleArray
       data_[startIdxInState + i] = t.state_[i];
     }
   }
-  template<int NAME, int STATETYPE>
-  void operator()(msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE>& t) const {
-    typedef msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATETYPE> var_T;
+  template<int NAME, int STATE_T>
+  void operator()(msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATE_T>& t) const {
+    typedef msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATE_T> var_T;
     enum{
       startIdxInState = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::StateLengthForType>::value //index of the data in the state vector
     };

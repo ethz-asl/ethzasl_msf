@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define SENSORMANAGER_H
 
 #include <msf_core/msf_statevisitor.h>
+#include <msf_core/msf_macros.h>
 #include <Eigen/Dense>
 #include <string.h>
 
@@ -92,7 +93,7 @@ public:
    * this method will be called for the user to set the Q block entries for Auxiliary states
    * only changes to blocks in Q belonging to the auxiliary states are allowed / evaluated
    */
-  virtual void calculateQAuxiliaryStates(EKFState_T& state, double dt){};
+  virtual void calculateQAuxiliaryStates(EKFState_T& UNUSEDPARAM(state), double UNUSEDPARAM(dt)){};
 
   /***
    * this method will be called for the user to set the initial P matrix
@@ -102,15 +103,15 @@ public:
   /***
    * this method will be called for the user to have the possibility to augment the correction vector
    */
-  virtual void augmentCorrectionVector(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& correction){};
+  virtual void augmentCorrectionVector(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& UNUSEDPARAM(correction)){};
 
   /***
    * this method will be called for the user to check the correction after it has been applied to the state
    * delaystate is the state on which the correction has been applied
    * buffstate is the state before the correction was applied
    */
-  virtual void sanityCheckCorrection(EKFState_T& delaystate, const EKFState_T& buffstate,
-                                     Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& correction){};
+  virtual void sanityCheckCorrection(EKFState_T& UNUSEDPARAM(delaystate), const EKFState_T& UNUSEDPARAM(buffstate),
+                                     Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& UNUSEDPARAM(correction)){};
 
   /***
    * provide a getter for these parameters, this is implemented for a given middleware or param file parser

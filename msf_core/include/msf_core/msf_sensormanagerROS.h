@@ -70,7 +70,8 @@ public:
    * \brief gets called by the internal callback caller
    */
   virtual void coreConfig(msf_core::MSF_CoreConfig &config, uint32_t level){
-
+    UNUSED(config);
+    UNUSED(level);
   }
 
   /**

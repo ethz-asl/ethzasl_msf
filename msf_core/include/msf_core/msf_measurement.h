@@ -77,7 +77,7 @@ template <typename EKFState_T>
 class MSF_InvalidMeasurement:public MSF_MeasurementBase<EKFState_T>{
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  virtual void apply(boost::shared_ptr<EKFState_T> stateWithCovariance, MSF_Core<EKFState_T>& core){
+  virtual void apply(boost::shared_ptr<EKFState_T> UNUSEDPARAM(stateWithCovariance), MSF_Core<EKFState_T>& UNUSEDPARAM(core)){
     ROS_ERROR_STREAM("Called apply() on an MSF_InvalidMeasurement object. This should never happen.");
   }
   virtual std::string type(){

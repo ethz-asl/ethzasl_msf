@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MSF_FWD_HPP_
 
 #include <boost/shared_ptr.hpp>
-#include <iostream>
+#include <msf_core/msf_macros.h>
 
 namespace msf_core{
 

@@ -203,9 +203,10 @@ void MSF_Core<EKFState_T>::publishCovImage(boost::shared_ptr<EKFState_T> statept
 
   pubCov_.publish(msgimg_);
 
-//  ROS_WARN_STREAM("P=["<<state.P<<"];");
+  //  ROS_WARN_STREAM("P=["<<state.P<<"];");
 #else
   ROS_WARN_STREAM_ONCE("The function to publish a covariance image was called, but the function is disabled at compile time.");
+  UNUSED(stateptr)
 #endif
 
 }
@@ -267,105 +268,105 @@ void MSF_Core<EKFState_T>::imuCallback(const sensor_msgs::ImuConstPtr & msg)
 template<typename EKFState_T>
 void MSF_Core<EKFState_T>::process_imu(const msf_core::Vector3& linear_acceleration, const msf_core::Vector3& angular_velocity,
                                        const ros::Time& msg_stamp, size_t msg_seq)
-{
+                                       {
 
   if(!initialized_)
-      return;
+    return;
 
-    sm::timing::Timer timer_PropgetClosestState("PropgetClosestState");
-    boost::shared_ptr<EKFState_T> lastState = StateBuffer_.getClosestBefore(msg_stamp.toSec());
-    timer_PropgetClosestState.stop();
+  sm::timing::Timer timer_PropgetClosestState("PropgetClosestState");
+  boost::shared_ptr<EKFState_T> lastState = StateBuffer_.getClosestBefore(msg_stamp.toSec());
+  timer_PropgetClosestState.stop();
 
-    sm::timing::Timer timer_PropPrepare("PropPrepare");
+  sm::timing::Timer timer_PropPrepare("PropPrepare");
+  if(lastState->time == -1){
+    ROS_WARN_STREAM_THROTTLE(2, "ImuCallback: closest state is invalid\n");
+    return; // // early abort // //
+  }
+
+  boost::shared_ptr<EKFState_T> currentState(new EKFState_T);
+  currentState->time = msg_stamp.toSec();
+
+  //check if this IMU message is really after the last one (caused by restarting a bag file)
+  if (currentState->time - lastState->time < -0.01 && predictionMade_){
+    initialized_ = false;
+    predictionMade_ = false;
+    ROS_ERROR_STREAM("latest IMU message was out of order by a too large amount, resetting EKF: "
+        "last-state-time: "<<msf_core::timehuman(lastState->time)<<" "<<
+        "current-imu-time: "<<msf_core::timehuman(currentState->time));
+    return;
+  }
+
+  static int seq = 0;
+  // get inputs
+  currentState->a_m = linear_acceleration;
+  currentState->w_m = angular_velocity;
+
+  // remove acc spikes (TODO: find a cleaner way to do this)
+  static Eigen::Matrix<double, 3, 1> last_am = Eigen::Matrix<double, 3, 1>(0, 0, 0);
+  if (currentState->a_m.norm() > 50)
+    currentState->a_m = last_am;
+  else{
+    //try to get the state before the current time
     if(lastState->time == -1){
-      ROS_WARN_STREAM_THROTTLE(2, "ImuCallback: closest state is invalid\n");
-      return; // // early abort // //
-    }
-
-    boost::shared_ptr<EKFState_T> currentState(new EKFState_T);
-    currentState->time = msg_stamp.toSec();
-
-    //check if this IMU message is really after the last one (caused by restarting a bag file)
-    if (currentState->time - lastState->time < -0.01 && predictionMade_){
-      initialized_ = false;
-      predictionMade_ = false;
-      ROS_ERROR_STREAM("latest IMU message was out of order by a too large amount, resetting EKF: "
-          "last-state-time: "<<msf_core::timehuman(lastState->time)<<" "<<
-          "current-imu-time: "<<msf_core::timehuman(currentState->time));
+      ROS_WARN_STREAM("Accelerometer readings had a spike, but no prior state was in the buffer to take cleaner measurements from");
       return;
     }
-
-    static int seq = 0;
-    // get inputs
-    currentState->a_m = linear_acceleration;
-    currentState->w_m = angular_velocity;
-
-    // remove acc spikes (TODO: find a cleaner way to do this)
-    static Eigen::Matrix<double, 3, 1> last_am = Eigen::Matrix<double, 3, 1>(0, 0, 0);
-    if (currentState->a_m.norm() > 50)
-      currentState->a_m = last_am;
-    else{
-      //try to get the state before the current time
-      if(lastState->time == -1){
-        ROS_WARN_STREAM("Accelerometer readings had a spike, but no prior state was in the buffer to take cleaner measurements from");
-        return;
-      }
-      last_am = lastState->a_m;
+    last_am = lastState->a_m;
+  }
+  if (!predictionMade_)
+  {
+    if(lastState->time == -1){
+      ROS_WARN_STREAM("Wanted to compare prediction time offset to last state, but no prior state was in the buffer to take cleaner measurements from");
+      return;
     }
-    if (!predictionMade_)
+    if (fabs(currentState->time - lastState->time) > 0.1)
     {
-      if(lastState->time == -1){
-        ROS_WARN_STREAM("Wanted to compare prediction time offset to last state, but no prior state was in the buffer to take cleaner measurements from");
-        return;
-      }
-      if (fabs(currentState->time - lastState->time) > 0.1)
-      {
-        ROS_WARN_STREAM_THROTTLE(2, "large time-gap re-initializing to last state\n");
-        typename stateBufferT::Ptr_T tmp = StateBuffer_.updateTime(lastState->time, currentState->time);
-        time_P_propagated = currentState->time;
-        return; // // early abort // // (if timegap too big)
-      }
+      ROS_WARN_STREAM_THROTTLE(2, "large time-gap re-initializing to last state\n");
+      typename stateBufferT::Ptr_T tmp = StateBuffer_.updateTime(lastState->time, currentState->time);
+      time_P_propagated = currentState->time;
+      return; // // early abort // // (if timegap too big)
     }
+  }
 
-    if(lastState->time == -1){
-      ROS_WARN_STREAM("Wanted to propagate state, but no valid prior state could be found in the buffer");
-      return;
-    }
-    timer_PropPrepare.stop();
+  if(lastState->time == -1){
+    ROS_WARN_STREAM("Wanted to propagate state, but no valid prior state could be found in the buffer");
+    return;
+  }
+  timer_PropPrepare.stop();
 
-    sm::timing::Timer timer_PropState("PropState");
-    //propagate state and covariance
-    propagateState(lastState, currentState);
-    timer_PropState.stop();
-    sm::timing::Timer timer_PropCov("PropCov");
-    propagatePOneStep();
-    timer_PropCov.stop();
+  sm::timing::Timer timer_PropState("PropState");
+  //propagate state and covariance
+  propagateState(lastState, currentState);
+  timer_PropState.stop();
+  sm::timing::Timer timer_PropCov("PropCov");
+  propagatePOneStep();
+  timer_PropCov.stop();
 
-    if(StateBuffer_.size() > 3) //making sure we have sufficient states to apply measurements to
-      predictionMade_ = true;
+  if(StateBuffer_.size() > 3) //making sure we have sufficient states to apply measurements to
+    predictionMade_ = true;
 
-    msgPose_.header.stamp = msg_stamp;
-    msgPose_.header.seq = msg_seq;
-    msgPose_.header.frame_id = "/world";
+  msgPose_.header.stamp = msg_stamp;
+  msgPose_.header.seq = msg_seq;
+  msgPose_.header.frame_id = "/world";
 
-    currentState->toPoseMsg(msgPose_);
-    pubPose_.publish(msgPose_);
+  currentState->toPoseMsg(msgPose_);
+  pubPose_.publish(msgPose_);
 
-    msgPoseCtrl_.header = msgPose_.header;
-    currentState->toExtStateMsg(msgPoseCtrl_);
-    pubPoseCrtl_.publish(msgPoseCtrl_);
+  msgPoseCtrl_.header = msgPose_.header;
+  currentState->toExtStateMsg(msgPoseCtrl_);
+  pubPoseCrtl_.publish(msgPoseCtrl_);
 
-    sm::timing::Timer timer_PropInsertState("PropInsertState");
-    StateBuffer_.insert(currentState);
-    timer_PropInsertState.stop();
+  sm::timing::Timer timer_PropInsertState("PropInsertState");
+  StateBuffer_.insert(currentState);
+  timer_PropInsertState.stop();
 
-    if(predictionMade_){
-      handlePendingMeasurements(); //check if we can apply some pending measurement
-    }
-    seq++;
+  if(predictionMade_){
+    handlePendingMeasurements(); //check if we can apply some pending measurement
+  }
+  seq++;
 
 
-}
+                                       }
 
 
 template<typename EKFState_T>
@@ -523,13 +524,19 @@ void MSF_Core<EKFState_T>::propagateState(boost::shared_ptr<EKFState_T>& state_o
   state_new-> template get<StateDefinition_T::p>() = state_old-> template get<StateDefinition_T::p>() + ((state_new-> template get<StateDefinition_T::v>() + state_old-> template get<StateDefinition_T::v>()) / 2 * dt);
 
   tf::Transform transform;
-   Eigen::Matrix<double, 3, 1>& pos = state_new-> template get<StateDefinition_T::p>();
-   Eigen::Quaterniond& ori = state_new-> template get<StateDefinition_T::q>();
-   transform.setOrigin( tf::Vector3(pos[0], pos[1], pos[2]) );
-   transform.setRotation( tf::Quaternion(ori.x(), ori.y(), ori.z(), ori.w()) );
-   tf_broadcaster_.sendTransform(tf::StampedTransform(transform, ros::Time::now() /*ros::Time(latestState->time_)*/, "world", "state"));
+  Eigen::Matrix<double, 3, 1>& pos = state_new-> template get<StateDefinition_T::p>();
+  Eigen::Quaterniond& ori = state_new-> template get<StateDefinition_T::q>();
+  transform.setOrigin( tf::Vector3(pos[0], pos[1], pos[2]) );
+  transform.setRotation( tf::Quaternion(ori.x(), ori.y(), ori.z(), ori.w()) );
+  tf_broadcaster_.sendTransform(tf::StampedTransform(transform, ros::Time::now() /*ros::Time(latestState->time_)*/, "world", "state"));
 
-
+#ifdef DEBUGPUBLISH
+  static int seq = 0;
+  msgState_.header.seq = seq++;
+  msgState_.header.stamp = ros::Time(state_new->time);
+  state_new->toFullStateMsg(msgState_);
+  pubState_.publish(msgState_);
+#endif
 }
 
 template<typename EKFState_T>
@@ -842,16 +849,17 @@ void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase<
   latestState->toFullStateMsg(msgState_);
   pubState_.publish(msgState_);
 
-  //publish pose after correction
-  propPToState(latestState); //get the covar
+  if(pubPoseAfterUpdate_.getNumSubscribers()){
+    //publish pose after correction with covariance
+    propPToState(latestState); //get the covar
 
-  msgPose_.header.stamp = ros::Time(latestState->time);
-  msgPose_.header.seq = seq_m;
-  msgPose_.header.frame_id = "/world";
+    msgPose_.header.stamp = ros::Time(latestState->time);
+    msgPose_.header.seq = seq_m;
+    msgPose_.header.frame_id = "/world";
 
-  latestState->toPoseMsg(msgPose_);
-  pubPoseAfterUpdate_.publish(msgPose_);
-
+    latestState->toPoseMsg(msgPose_);
+    pubPoseAfterUpdate_.publish(msgPose_);
+  }
   seq_m++;
 }
 

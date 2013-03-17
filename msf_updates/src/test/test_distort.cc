@@ -8,7 +8,7 @@
 #include <msf_updates/PoseDistorter.h>
 #include <iostream>
 
-int main(int argc, char** argv){
+int main(){
 
   Eigen::Vector3d meanpos;
   meanpos.setConstant(0.01);

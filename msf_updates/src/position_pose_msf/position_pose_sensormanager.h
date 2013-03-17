@@ -108,8 +108,8 @@ private:
     if((level & msf_updates::PositionPoseSensor_SET_HEIGHT) && config.core_set_height == true){
       Eigen::Matrix<double, 3, 1> p = pose_handler_->getPositionMeasurement();
       if (p.norm() == 0){
-           ROS_WARN_STREAM("No measurements received yet to initialize position. Height init not allowed.");
-           return;
+        ROS_WARN_STREAM("No measurements received yet to initialize position. Height init not allowed.");
+        return;
       }
       double scale =  p[2]/config.core_height;
       init(scale);
@@ -228,8 +228,7 @@ private:
     state.set<StateDefinition_T::L>(scale);
   }
   virtual void initState(EKFState_T& state){
-
-
+    UNUSED(state);
   }
 
   virtual void calculateQAuxiliaryStates(EKFState_T& state, double dt){
@@ -249,17 +248,19 @@ private:
   }
 
   virtual void setP(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, EKFState_T::nErrorStatesAtCompileTime>& P){
-
+    UNUSED(P);
     //nothing, we only use the simulated cov for the core plus diagonal for the rest
-
   }
 
-  virtual void augmentCorrectionVector(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& correction_){
-
+  virtual void augmentCorrectionVector(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& correction){
+    UNUSED(correction);
   }
 
   virtual void sanityCheckCorrection(EKFState_T& delaystate, const EKFState_T& buffstate,
-                                     Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& correction_){
+                                     Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& correction){
+
+    UNUSED(buffstate);
+    UNUSED(correction);
 
     const EKFState_T& state = delaystate;
     if (state.get<StateDefinition_T::L>()(0) < 0)

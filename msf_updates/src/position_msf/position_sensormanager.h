@@ -115,7 +115,12 @@ private:
     w_m << 0,0,0;		/// initial angular velocity
     a_m = g;			/// initial acceleration
 
-    q.setIdentity();
+    //set the initial yaw alignment of body to world (the frame in which the position sensor measures)
+    double yawinit = config_.position_yaw_init / 180 * M_PI;
+    Eigen::Quaterniond yawq(cos(yawinit / 2),0 ,0 , sin(yawinit / 2));
+    yawq.normalize();
+
+    q = yawq;
 
     P.setZero(); // error state covariance; if zero, a default initialization in msf_core is used
 
@@ -156,10 +161,10 @@ private:
 
   //prior to this call, all states are initialized to zero/identity
   virtual void resetState(EKFState_T& state){
-
+    UNUSED(state);
   }
   virtual void initState(EKFState_T& state){
-
+    UNUSED(state);
   }
 
   virtual void calculateQAuxiliaryStates(EKFState_T& state, double dt){
@@ -171,19 +176,19 @@ private:
   }
 
   virtual void setP(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, EKFState_T::nErrorStatesAtCompileTime>& P){
-
+    UNUSED(P);
     //nothing, we only use the simulated cov for the core plus diagonal for the rest
-
   }
 
-  virtual void augmentCorrectionVector(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& correction_){
-
+  virtual void augmentCorrectionVector(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& correction){
+    UNUSED(correction);
   }
 
   virtual void sanityCheckCorrection(EKFState_T& delaystate, const EKFState_T& buffstate,
-                                     Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& correction_){
-
-
+                                     Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& correction){
+    UNUSED(delaystate);
+    UNUSED(buffstate);
+    UNUSED(correction);
   }
 
 };
