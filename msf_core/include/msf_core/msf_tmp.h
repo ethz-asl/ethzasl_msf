@@ -60,7 +60,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/static_assert.hpp>
 #include <boost/preprocessor/punctuation/comma.hpp>
 #include <boost/fusion/include/vector.hpp>
-#include <boost/fusion/include/vector_fwd.hpp>
 #include <boost/fusion/include/size.hpp>
 #include <boost/fusion/include/at_c.hpp>
 #include <boost/fusion/include/at.hpp>
@@ -821,7 +820,7 @@ struct FullStatetoString
     enum{
       startIdxInState = msf_tmp::getStartIndex<stateList_T, var_T, msf_tmp::StateLengthForType>::value //index of the data in the state vector
     };
-    data_ << NAME << " : ["<<startIdxInState<<"-"<<startIdxInState + 3 <<"]\t : Quaternion (w,x,y,z) : [" << t.state_.w() << ", " << t.state_.x() << ", " << t.state_.y() << ", " << t.state_.z() << "]" << std::endl;
+    data_ << NAME << " : ["<<startIdxInState<<"-"<<startIdxInState + 3 <<"]\t : Quaternion (w,x,y,z) : " << STREAMQUAT(t.state_)<< std::endl;
   }
 private:
   STREAM& data_;

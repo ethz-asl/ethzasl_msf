@@ -132,7 +132,7 @@ private:
     w_m << 0,0,0;		/// initial angular velocity
     a_m = g;			/// initial acceleration
 
-    q_wv.setIdentity(); // vision-world rotation drift
+    q_wv.setIdentity(); // world-vision rotation drift
     p_wv.setZero(); //world-vision position drift
 
     P.setZero(); // error state covariance; if zero, a default initialization in msf_core is used
@@ -142,7 +142,7 @@ private:
     p_vc = pose_handler_->getPositionMeasurement();
     q_vc = pose_handler_->getAttitudeMeasurement();
 
-    ROS_INFO_STREAM("initial measurement vision: pos:["<<p_vc.transpose()<<"] orientation:["<<q_vc.w()<<", "<<q_vc.x()<<", "<<q_vc.y()<<", "<<q_vc.z()<<"]");
+    ROS_INFO_STREAM("initial measurement vision: pos:["<<p_vc.transpose()<<"] orientation: "<<STREAMQUAT(q_vc));
     ROS_INFO_STREAM("initial measurement position: pos:["<<p_pos.transpose()<<"]");
 
     // check if we have already input from the measurement sensor
@@ -165,7 +165,7 @@ private:
     q_ic.normalize();
 
     ROS_INFO_STREAM("p_ic: "<<p_ic.transpose());
-    ROS_INFO_STREAM("q_ic: ["<<q_ic.w()<<", "<<q_ic.x()<<", "<<q_ic.y()<<", "<<q_ic.z()<<"]");
+    ROS_INFO_STREAM("q_ic: "<<STREAMQUAT(q_ic));
 
     pnh.param("position_sensor/init/p_ip/x", p_ip[0], 0.0);
     pnh.param("position_sensor/init/p_ip/y", p_ip[1], 0.0);
@@ -178,15 +178,11 @@ private:
     Eigen::Quaterniond yawq(cos(yawinit / 2),0 ,0 , sin(yawinit / 2));
     yawq.normalize();
 
-    //the initial vision-world rotation is global yaw rotation
-    q_wv = yawq;
+    q = yawq;
+    q_wv = (q * q_ic * q_vc.conjugate()).conjugate();
 
-    if (q_vc.w() == 1){ //if there is no pose measurement, only apply q_wv
-      q = q_wv;
-    }else{ //if there is a pose measurement, apply q_ic and q_wv to get initial attitude
-      q = (q_ic * q_vc.conjugate() * q_wv).conjugate();
-    }
-    q.normalize();
+    ROS_WARN_STREAM("q "<<STREAMQUAT(q));
+    ROS_WARN_STREAM("q_wv "<<STREAMQUAT(q_wv));
 
     Eigen::Matrix<double, 3, 1> p_vision = q_wv.conjugate().toRotationMatrix() * p_vc / scale - q.toRotationMatrix() * p_ic;
 

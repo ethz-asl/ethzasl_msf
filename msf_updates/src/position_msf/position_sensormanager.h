@@ -126,7 +126,7 @@ private:
 
     p_vc = position_handler_->getPositionMeasurement();
 
-    ROS_INFO_STREAM("initial measurement pos:["<<p_vc.transpose()<<"] orientation:["<<q.w()<<", "<<q.x()<<", "<<q.y()<<", "<<q.z()<<"]");
+    ROS_INFO_STREAM("initial measurement pos:["<<p_vc.transpose()<<"] orientation: "<<STREAMQUAT(q));
 
     // check if we have already input from the measurement sensor
     if (p_vc.norm() == 0)

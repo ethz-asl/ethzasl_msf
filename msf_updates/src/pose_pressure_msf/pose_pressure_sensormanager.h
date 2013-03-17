@@ -98,8 +98,8 @@ private:
     if((level & msf_updates::SinglePoseSensor_SET_HEIGHT) && config.core_set_height == true){
       Eigen::Matrix<double, 3, 1> p = pose_handler_->getPositionMeasurement();
       if (p.norm() == 0){
-           ROS_WARN_STREAM("No measurements received yet to initialize position. Height init not allowed.");
-           return;
+        ROS_WARN_STREAM("No measurements received yet to initialize position. Height init not allowed.");
+        return;
       }
       double scale =  p[2]/config.core_height;
       init(scale);
@@ -187,12 +187,6 @@ private:
     // call initialization in core
     msf_core_->init(meas);
 
-    ROS_INFO_STREAM("filter initialized to: \n" <<
-                    "position: [" << p[0] << ", " << p[1] << ", " << p[2] << "]" << std::endl <<
-                    "scale:" << scale << std::endl <<
-                    "attitude (w,x,y,z): [" << q.w() << ", " << q.x() << ", " << q.y() << ", " << q.z() << std::endl <<
-                    "p_ic: [" << p_ic[0] << ", " << p_ic[1] << ", " << p_ic[2] << std::endl <<
-                    "q_ic: (w,x,y,z): [" << q_ic.w() << ", " << q_ic.x() << ", " << q_ic.y() << ", " << q_ic.z() << "]");
   }
 
   //prior to this call, all states are initialized to zero/identity

@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MSF_MACROS_H_
 #define MSF_MACROS_H_
 
+#define NUMERIC_PREC 4 //number of decimal places
 
 #ifdef UNUSEDPARAM
 #elif defined(__GNUC__)
@@ -46,5 +47,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # define UNUSED(x) (void)x;
 #endif
 
+#ifdef STREAMQUAT
+#else
+#define STREAMQUAT(q) "["<<std::setprecision(3)<<(q).w()<<", "<<(q).x()<<", "<<(q).y()<<", "<<(q).z()<<std::setprecision(NUMERIC_PREC)<<"]"
+#endif
 
 #endif /* MSF_MACROS_H_ */

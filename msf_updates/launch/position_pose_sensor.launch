@@ -11,7 +11,7 @@
             <!--remap from="msf_updates/transform_input" to="vicon/auk/auk" /--> <!--VICON-->
             
             <!--remap from="msf_updates/pose_with_covariance_input" to="/bluebird/down/vslam/pose" /-->  <!--BLUEBIRD-->
-            <!--remap from="msf_updates/pose_with_covariance_input" to="/auk/down/vslam/pose" /--> <!--AUK-->
+            <remap from="msf_updates/pose_with_covariance_input" to="/auk/down/vslam/pose" /> <!--AUK-->
             <!--remap from="msf_updates/pose_with_covariance_input" to="vslam/pose" /-->
 
             <rosparam file="$(find msf_updates)/position_pose_sensor_fix.yaml"/>

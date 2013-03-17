@@ -49,6 +49,7 @@ namespace msf_core
 template<typename EKFState_T>
 MSF_Core<EKFState_T>::MSF_Core(MSF_SensorManager<EKFState_T>& usercalc):usercalc_(usercalc)  //the interface for the user to customize EKF interna, DO ABSOLUTELY NOT USE THIS POINTER INSIDE THIS CTOR!!
 {
+  std::setprecision(NUMERIC_PREC); //set the output precision for numeric values
 
   initialized_ = false;
   predictionMade_ = false;
@@ -533,7 +534,7 @@ void MSF_Core<EKFState_T>::propagateState(boost::shared_ptr<EKFState_T>& state_o
 #ifdef DEBUGPUBLISH
   static int seq = 0;
   msgState_.header.seq = seq++;
-  msgState_.header.stamp = ros::Time(state_new->time);
+  msgState_.header.stamp = ros::Time::now();
   state_new->toFullStateMsg(msgState_);
   pubState_.publish(msgState_);
 #endif

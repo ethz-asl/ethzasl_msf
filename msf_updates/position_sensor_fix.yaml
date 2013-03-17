@@ -17,6 +17,7 @@ core/core_noise_gyrbias: 0.00013
 
 position_sensor/position_noise_meas: 0.01
 position_sensor/position_fixed_ppi: true
+position_sensor/position_delay: 0.2
 
 #init position offset prism imu
 position_sensor/init/p_ip/x: 0.02    
