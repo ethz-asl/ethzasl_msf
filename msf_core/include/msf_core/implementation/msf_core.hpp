@@ -648,6 +648,7 @@ void MSF_Core<EKFState_T>::init(boost::shared_ptr<MSF_MeasurementBase<EKFState_T
 
   MeasurementBuffer_.clear();
   StateBuffer_.clear();
+  fuzzyTracker_.reset();
 
   while(!queueFutureMeasurements_.empty())
     queueFutureMeasurements_.pop();
