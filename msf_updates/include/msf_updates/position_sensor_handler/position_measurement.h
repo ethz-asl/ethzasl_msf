@@ -118,20 +118,20 @@ public:
 
     // preprocess for elements in H matrix
 
-    Eigen::Matrix<double, 3, 3> p_prism_imu_sk = skew(state.get<StateDefinition_T::p_pi>());
+    Eigen::Matrix<double, 3, 3> p_prism_imu_sk = skew(state.get<StateDefinition_T::p_ip>());
 
     //get indices of states in error vector
     enum{
       idxstartcorr_p_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::p>::value,
       idxstartcorr_v_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::v>::value,
       idxstartcorr_q_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::q>::value,
-      idxstartcorr_p_pi_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::p_pi>::value,
+      idxstartcorr_p_pi_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::p_ip>::value,
     };
 
-    bool fixed_p_pos_imu = (fixedstates_ & 1 << StateDefinition_T::p_pi);
+    bool fixed_p_pos_imu = (fixedstates_ & 1 << StateDefinition_T::p_ip);
 
     //clear crosscorrelations
-    if(fixed_p_pos_imu) state_in->clearCrossCov<StateDefinition_T::p_pi>();
+    if(fixed_p_pos_imu) state_in->clearCrossCov<StateDefinition_T::p_ip>();
 
     // construct H matrix using H-blockx :-)
     // position:
@@ -162,7 +162,7 @@ public:
 
       // construct residuals
       // position
-      r_old.block<3, 1>(0, 0) = z_p_ - (state.get<StateDefinition_T::p>() + C_q.transpose() * state.get<StateDefinition_T::p_pi>());
+      r_old.block<3, 1>(0, 0) = z_p_ - (state.get<StateDefinition_T::p>() + C_q.transpose() * state.get<StateDefinition_T::p_ip>());
 
       if(!checkForNumeric(r_old, "r_old")){
         ROS_ERROR_STREAM("r_old: "<<r_old);

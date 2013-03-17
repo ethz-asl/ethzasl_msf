@@ -119,8 +119,8 @@ private:
 
   void init(double scale)
   {
-    Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ci, p_vc, p_wv, p_pi, p_pos;
-    Eigen::Quaternion<double> q, q_wv, q_ci, q_cv;
+    Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ic, p_vc, p_wv, p_ip, p_pos;
+    Eigen::Quaternion<double> q, q_wv, q_ic, q_vc;
     msf_core::MSF_Core<EKFState_T>::ErrorStateCov P;
 
     // init values
@@ -140,9 +140,9 @@ private:
     p_pos = position_handler_->getPositionMeasurement();
 
     p_vc = pose_handler_->getPositionMeasurement();
-    q_cv = pose_handler_->getAttitudeMeasurement();
+    q_vc = pose_handler_->getAttitudeMeasurement();
 
-    ROS_INFO_STREAM("initial measurement vision: pos:["<<p_vc.transpose()<<"] orientation:["<<q_cv.w()<<", "<<q_cv.x()<<", "<<q_cv.y()<<", "<<q_cv.z()<<"]");
+    ROS_INFO_STREAM("initial measurement vision: pos:["<<p_vc.transpose()<<"] orientation:["<<q_vc.w()<<", "<<q_vc.x()<<", "<<q_vc.y()<<", "<<q_vc.z()<<"]");
     ROS_INFO_STREAM("initial measurement position: pos:["<<p_pos.transpose()<<"]");
 
     // check if we have already input from the measurement sensor
@@ -150,26 +150,26 @@ private:
       ROS_WARN_STREAM("No measurements received yet to initialize vision position - using [0 0 0]");
     if (p_pos.norm() == 0)
       ROS_WARN_STREAM("No measurements received yet to initialize absolute position - using [0 0 0]");
-    if (q_cv.w() == 1)
+    if (q_vc.w() == 1)
       ROS_WARN_STREAM("No measurements received yet to initialize attitude - using [1 0 0 0]");
 
     ros::NodeHandle pnh("~");
-    pnh.param("pose_sensor/init/p_ci/x", p_ci[0], 0.0);
-    pnh.param("pose_sensor/init/p_ci/y", p_ci[1], 0.0);
-    pnh.param("pose_sensor/init/p_ci/z", p_ci[2], 0.0);
+    pnh.param("pose_sensor/init/p_ic/x", p_ic[0], 0.0);
+    pnh.param("pose_sensor/init/p_ic/y", p_ic[1], 0.0);
+    pnh.param("pose_sensor/init/p_ic/z", p_ic[2], 0.0);
 
-    pnh.param("pose_sensor/init/q_ci/w", q_ci.w(), 1.0);
-    pnh.param("pose_sensor/init/q_ci/x", q_ci.x(), 0.0);
-    pnh.param("pose_sensor/init/q_ci/y", q_ci.y(), 0.0);
-    pnh.param("pose_sensor/init/q_ci/z", q_ci.z(), 0.0);
-    q_ci.normalize();
+    pnh.param("pose_sensor/init/q_ic/w", q_ic.w(), 1.0);
+    pnh.param("pose_sensor/init/q_ic/x", q_ic.x(), 0.0);
+    pnh.param("pose_sensor/init/q_ic/y", q_ic.y(), 0.0);
+    pnh.param("pose_sensor/init/q_ic/z", q_ic.z(), 0.0);
+    q_ic.normalize();
 
-    ROS_INFO_STREAM("p_ci: "<<p_ci.transpose());
-    ROS_INFO_STREAM("q_ci: ["<<q_ci.w()<<", "<<q_ci.x()<<", "<<q_ci.y()<<", "<<q_ci.z()<<"]");
+    ROS_INFO_STREAM("p_ic: "<<p_ic.transpose());
+    ROS_INFO_STREAM("q_ic: ["<<q_ic.w()<<", "<<q_ic.x()<<", "<<q_ic.y()<<", "<<q_ic.z()<<"]");
 
-    pnh.param("position_sensor/init/p_pi/x", p_pi[0], 0.0);
-    pnh.param("position_sensor/init/p_pi/y", p_pi[1], 0.0);
-    pnh.param("position_sensor/init/p_pi/z", p_pi[2], 0.0);
+    pnh.param("position_sensor/init/p_ip/x", p_ip[0], 0.0);
+    pnh.param("position_sensor/init/p_ip/y", p_ip[1], 0.0);
+    pnh.param("position_sensor/init/p_ip/z", p_ip[2], 0.0);
 
 
     // calculate initial attitude and position based on sensor measurements
@@ -181,22 +181,22 @@ private:
     //the initial vision-world rotation is global yaw rotation
     q_wv = yawq;
 
-    if (q_cv.w() == 1){ //if there is no pose measurement, only apply q_vw
+    if (q_vc.w() == 1){ //if there is no pose measurement, only apply q_wv
       q = q_wv;
-    }else{ //if there is a pose measurement, apply q_ci and q_vw to get initial attitude
-      q = (q_ci * q_cv.conjugate() * q_wv).conjugate();
+    }else{ //if there is a pose measurement, apply q_ic and q_wv to get initial attitude
+      q = (q_ic * q_vc.conjugate() * q_wv).conjugate();
     }
     q.normalize();
 
-    Eigen::Matrix<double, 3, 1> p_vision = q_wv.conjugate().toRotationMatrix() * p_vc / scale - q.toRotationMatrix() * p_ci;
+    Eigen::Matrix<double, 3, 1> p_vision = q_wv.conjugate().toRotationMatrix() * p_vc / scale - q.toRotationMatrix() * p_ic;
 
 
 //    p = p_pos - q.toRotationMatrix() * p_pi;
-//    p_vw = p - p_vision;
+//    p_wv = p - p_vision;
     p_wv << 1.0,0,0; //TODO remove
     p = p_vision + p_wv;
 
-    ROS_INFO_STREAM("p_pi: "<<p_pi.transpose());
+    ROS_INFO_STREAM("p_ip: "<<p_ip.transpose());
     ROS_INFO_STREAM("p_pos: "<<p_pos.transpose());
     ROS_INFO_STREAM("p_vision: "<<p_vision.transpose());
     ROS_INFO_STREAM("p: "<<p.transpose());
@@ -213,9 +213,9 @@ private:
     meas->setStateInitValue<StateDefinition_T::L>(Eigen::Matrix<double, 1, 1>::Constant(scale));
     meas->setStateInitValue<StateDefinition_T::q_wv>(q_wv);
     meas->setStateInitValue<StateDefinition_T::p_wv>(p_wv);
-    meas->setStateInitValue<StateDefinition_T::q_ci>(q_ci);
-    meas->setStateInitValue<StateDefinition_T::p_ci>(p_ci);
-    meas->setStateInitValue<StateDefinition_T::p_pi>(p_pi);
+    meas->setStateInitValue<StateDefinition_T::q_ic>(q_ic);
+    meas->setStateInitValue<StateDefinition_T::p_ic>(p_ic);
+    meas->setStateInitValue<StateDefinition_T::p_ip>(p_ip);
 
     setP(meas->get_P()); //call my set P function
     meas->get_w_m() = w_m;
@@ -242,8 +242,8 @@ private:
   virtual void calculateQAuxiliaryStates(EKFState_T& state, double dt){
     const msf_core::Vector3 nqwvv = msf_core::Vector3::Constant(config_.pose_noise_q_wv);
     const msf_core::Vector3 npwvv = msf_core::Vector3::Constant(config_.pose_noise_p_wv);
-    const msf_core::Vector3 nqciv = msf_core::Vector3::Constant(config_.pose_noise_q_ci);
-    const msf_core::Vector3 npicv = msf_core::Vector3::Constant(config_.pose_noise_p_ci);
+    const msf_core::Vector3 nqicv = msf_core::Vector3::Constant(config_.pose_noise_q_ic);
+    const msf_core::Vector3 npicv = msf_core::Vector3::Constant(config_.pose_noise_p_ic);
     const msf_core::Vector1 n_L = msf_core::Vector1::Constant(config_.pose_noise_scale);
 
     //compute the blockwise Q values and store them with the states,
@@ -251,8 +251,8 @@ private:
     state.getQBlock<StateDefinition_T::L>() 	= (dt * n_L.cwiseProduct(n_L)).asDiagonal();
     state.getQBlock<StateDefinition_T::q_wv>() = (dt * nqwvv.cwiseProduct(nqwvv)).asDiagonal();
     state.getQBlock<StateDefinition_T::p_wv>() = (dt * npwvv.cwiseProduct(npwvv)).asDiagonal();
-    state.getQBlock<StateDefinition_T::q_ci>() = (dt * nqciv.cwiseProduct(nqciv)).asDiagonal();
-    state.getQBlock<StateDefinition_T::p_ci>() = (dt * npicv.cwiseProduct(npicv)).asDiagonal();
+    state.getQBlock<StateDefinition_T::q_ic>() = (dt * nqicv.cwiseProduct(nqicv)).asDiagonal();
+    state.getQBlock<StateDefinition_T::p_ic>() = (dt * npicv.cwiseProduct(npicv)).asDiagonal();
   }
 
   virtual void setP(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, EKFState_T::nErrorStatesAtCompileTime>& P){

@@ -43,7 +43,7 @@ private:
 
   enum{
     qbuffRowsAtCompiletime = msf_tmp::StateLengthForType<const typename msf_tmp::StripConstReference<NONTEMPORALDRIFTINGTYPE>::result_t&>::value,
-    nBuff_ = 30 ///< buffer size for median q_vw
+    nBuff_ = 30 ///< buffer size for median non drifting state values
   };
 
   int nontemporaldrifting_inittimer_; ///< a counter for fuzzy tracking detection
@@ -104,13 +104,13 @@ public:
         BOOST_STATIC_ASSERT_MSG(static_cast<int>(EKFState_T::nPropagatedCoreErrorStatesAtCompileTime) == 9, "Assumed that nPropagatedCoreStates == 9, which is not the case");
         isfuzzy = true;
       }
-      else // if tracking ok: update mean and 3sigma of past N q_vw's
+      else // if tracking ok: update mean and 3sigma of past N non drifting state values
       {
         qbuff_. template block<1, 4> (nontemporaldrifting_inittimer_ - nBuff_ - 1, 0) = Eigen::Matrix<double, 1, 4>(const_cast<const EKFState_T&>(*delaystate). template get<indexOfStateWithoutTemporalDrift>().coeffs());
         nontemporaldrifting_inittimer_ = (nontemporaldrifting_inittimer_) % nBuff_ + nBuff_ + 1;
       }
     }
-    else // at beginning get mean and 3sigma of past N q_vw's
+    else // at beginning get mean and 3sigma of past N non drifting state values
     {
       qbuff_. template block<1, 4> (nontemporaldrifting_inittimer_ - 1, 0) = Eigen::Matrix<double, 1, 4>(const_cast<const EKFState_T&>(*delaystate). template get<indexOfStateWithoutTemporalDrift>().coeffs());
       nontemporaldrifting_inittimer_++;

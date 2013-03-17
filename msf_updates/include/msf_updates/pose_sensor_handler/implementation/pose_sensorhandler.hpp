@@ -122,11 +122,11 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(c
      if (mngr->getcfg().pose_fixed_scale){
        fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::L;
      }
-     if (mngr->getcfg().pose_fixed_p_ci){
-       fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::p_ci;
+     if (mngr->getcfg().pose_fixed_p_ic){
+       fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::p_ic;
      }
-     if (mngr->getcfg().pose_fixed_q_ci){
-       fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::q_ci;
+     if (mngr->getcfg().pose_fixed_q_ic){
+       fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::q_ic;
      }
      if (mngr->getcfg().pose_fixed_p_wv){
        fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::p_wv;

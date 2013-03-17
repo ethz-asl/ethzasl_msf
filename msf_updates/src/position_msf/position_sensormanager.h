@@ -101,7 +101,7 @@ private:
       scale = 1;
     }
 
-    Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_pi, p_vc;
+    Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ip, p_vc;
     Eigen::Quaternion<double> q;
     msf_core::MSF_Core<EKFState_T>::ErrorStateCov P;
 
@@ -128,12 +128,12 @@ private:
       ROS_WARN_STREAM("No measurements received yet to initialize position - using [0 0 0]");
 
     ros::NodeHandle pnh("~");
-    pnh.param("position_sensor/init/p_pi/x", p_pi[0], 0.0);
-    pnh.param("position_sensor/init/p_pi/y", p_pi[1], 0.0);
-    pnh.param("position_sensor/init/p_pi/z", p_pi[2], 0.0);
+    pnh.param("position_sensor/init/p_ip/x", p_ip[0], 0.0);
+    pnh.param("position_sensor/init/p_ip/y", p_ip[1], 0.0);
+    pnh.param("position_sensor/init/p_ip/z", p_ip[2], 0.0);
 
     // calculate initial attitude and position based on sensor measurements
-    p = p_vc - q.toRotationMatrix() * p_pi;
+    p = p_vc - q.toRotationMatrix() * p_ip;
 
     //prepare init "measurement"
     boost::shared_ptr<msf_core::MSF_InitMeasurement<EKFState_T> > meas(new msf_core::MSF_InitMeasurement<EKFState_T>(true)); //hand over that we will also set the sensor readings
@@ -143,7 +143,7 @@ private:
     meas->setStateInitValue<StateDefinition_T::q>(q);
     meas->setStateInitValue<StateDefinition_T::b_w>(b_w);
     meas->setStateInitValue<StateDefinition_T::b_a>(b_a);
-    meas->setStateInitValue<StateDefinition_T::p_pi>(p_pi);
+    meas->setStateInitValue<StateDefinition_T::p_ip>(p_ip);
 
     setP(meas->get_P()); //call my set P function
     meas->get_w_m() = w_m;
@@ -163,11 +163,11 @@ private:
   }
 
   virtual void calculateQAuxiliaryStates(EKFState_T& state, double dt){
-    const msf_core::Vector3 npicv = msf_core::Vector3::Constant(config_.position_noise_ppi);
+    const msf_core::Vector3 npipv = msf_core::Vector3::Constant(config_.position_noise_p_ip);
 
     //compute the blockwise Q values and store them with the states,
     //these then get copied by the core to the correct places in Qd
-    state.getQBlock<StateDefinition_T::p_pi>() = (dt * npicv.cwiseProduct(npicv)).asDiagonal();
+    state.getQBlock<StateDefinition_T::p_ip>() = (dt * npipv.cwiseProduct(npipv)).asDiagonal();
   }
 
   virtual void setP(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, EKFState_T::nErrorStatesAtCompileTime>& P){

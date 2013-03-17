@@ -17,10 +17,10 @@ core/core_noise_gyrbias: 0.00013
 
 pose_sensor/pose_fixed_scale: false
 pose_sensor/pose_noise_scale: 0.0
-pose_sensor/pose_noise_pvw: 0.0
-pose_sensor/pose_noise_qwv: 0.0
-pose_sensor/pose_noise_qci: 0.0
-pose_sensor/pose_noise_pci: 0.0
+pose_sensor/pose_noise_p_wv: 0.0
+pose_sensor/pose_noise_q_wv: 0.0
+pose_sensor/pose_noise_q_ic: 0.0
+pose_sensor/pose_noise_p_ic: 0.0
 pose_sensor/pose_delay: 0.02
 pose_sensor/pose_noise_meas_p: 0.01
 pose_sensor/pose_noise_meas_q: 0.02
@@ -28,23 +28,23 @@ pose_sensor/pose_initial_scale: 1
 
 # initialization of camera w.r.t. IMU
 #bluebird
-pose_sensor/init/q_ci/w: 0.0
-pose_sensor/init/q_ci/x: 1
-pose_sensor/init/q_ci/y: -1
-pose_sensor/init/q_ci/z: 0
-pose_sensor/init/p_ci/x: 0.0   
-pose_sensor/init/p_ci/y: 0.0
-pose_sensor/init/p_ci/z: 0.0
+pose_sensor/init/q_ic/w: 0.0
+pose_sensor/init/q_ic/x: 1
+pose_sensor/init/q_ic/y: -1
+pose_sensor/init/q_ic/z: 0
+pose_sensor/init/p_ic/x: 0.0   
+pose_sensor/init/p_ic/y: 0.0
+pose_sensor/init/p_ic/z: 0.0
  
 ###SLAM sensor 
-#pose_sensor/init/q_ci/w: 0
-#pose_sensor/init/q_ci/x: 0
-#pose_sensor/init/q_ci/y: 0
-#pose_sensor/init/q_ci/z: 1
-#pose_sensor/init/p_ci/x: 0.0745374   
-#pose_sensor/init/p_ci/y: -0.086751
-#pose_sensor/init/p_ci/z: 0.0123919
+#pose_sensor/init/q_ic/w: 0
+#pose_sensor/init/q_ic/x: 0
+#pose_sensor/init/q_ic/y: 0
+#pose_sensor/init/q_ic/z: 1
+#pose_sensor/init/p_ic/x: 0.0745374   
+#pose_sensor/init/p_ic/y: -0.086751
+#pose_sensor/init/p_ic/z: 0.0123919
 
 pose_sensor/pose_absolute_measurements: true
 pose_sensor/pose_use_fixed_covariance: false
-pose_sensor/pose_measurement_world_sensor: false  # selects if sensor measures its position w.r.t. world (true, e.g. Vicon) or the position of the world coordinate system w.r.t. the sensor (false, e.g. ethzasl_ptam)
+pose_sensor/pose_measurement_world_sensor: false  # selects if sensor measures its position w.r.t. world (true, e.g. Vicon) or the position of the world coordinate system w.r.t. the sensor (false, e.g. ethzasl_ptam

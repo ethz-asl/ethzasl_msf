@@ -98,7 +98,7 @@ private:
       //clear cross-correlations between q and p
       R_.block<3, 3>(0, 3) = Eigen::Matrix<double, 3, 3>::Zero();
       R_.block<3, 3>(3, 0) = Eigen::Matrix<double, 3, 3>::Zero();
-      R_(6, 6) = 1e-6; // q_vw yaw-measurement noise
+      R_(6, 6) = 1e-6; // q_wv yaw-measurement noise //TODO: WHY???
 
       /*************************************************************************************/
       // use this if your pose sensor is ethzasl_ptam (www.ros.org/wiki/ethzasl_ptam)
@@ -151,16 +151,16 @@ public:
     H.setZero();
 
     // get rotation matrices
-    Eigen::Matrix<double, 3, 3> C_wv = state.get<StateDefinition_T::q_wv>().conjugate().toRotationMatrix();
+    Eigen::Matrix<double, 3, 3> C_wv = state.get<StateDefinition_T::q_wv>().toRotationMatrix();
     Eigen::Matrix<double, 3, 3> C_q = state.get<StateDefinition_T::q>().conjugate().toRotationMatrix();
-    Eigen::Matrix<double, 3, 3> C_ci = state.get<StateDefinition_T::q_ci>().conjugate().toRotationMatrix();
+    Eigen::Matrix<double, 3, 3> C_ci = state.get<StateDefinition_T::q_ic>().conjugate().toRotationMatrix();
 
     // preprocess for elements in H matrix
     Eigen::Matrix<double, 3, 1> vecold;
-    vecold = (state.get<StateDefinition_T::p>() + C_q.transpose() * state.get<StateDefinition_T::p_ci>()) * state.get<StateDefinition_T::L>();
+    vecold = (state.get<StateDefinition_T::p>() + C_q.transpose() * state.get<StateDefinition_T::p_ic>()) * state.get<StateDefinition_T::L>();
     Eigen::Matrix<double, 3, 3> skewold = skew(vecold);
 
-    Eigen::Matrix<double, 3, 3> pci_sk = skew(state.get<StateDefinition_T::p_ci>());
+    Eigen::Matrix<double, 3, 3> pci_sk = skew(state.get<StateDefinition_T::p_ic>());
 
     //get indices of states in error vector
     enum{
@@ -170,52 +170,52 @@ public:
       idxstartcorr_L_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::L>::value,
       idxstartcorr_qwv_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::q_wv>::value,
       idxstartcorr_pwv_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::p_wv>::value,
-      idxstartcorr_qci_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::q_ci>::value,
-      idxstartcorr_pci_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::p_ci>::value,
+      idxstartcorr_qic_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::q_ic>::value,
+      idxstartcorr_pic_ = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::p_ic>::value,
     };
 
     //read the fixed states flags
     bool scalefix = (fixedstates_ & 1 << StateDefinition_T::L);
-    bool calibposfix = (fixedstates_ & 1 << StateDefinition_T::p_ci);
-    bool calibattfix = (fixedstates_ & 1 << StateDefinition_T::q_ci);
-    bool driftvwattfix = (fixedstates_ & 1 << StateDefinition_T::q_wv);
-    bool driftvwposfix = (fixedstates_ & 1 << StateDefinition_T::p_wv);
+    bool calibposfix = (fixedstates_ & 1 << StateDefinition_T::p_ic);
+    bool calibattfix = (fixedstates_ & 1 << StateDefinition_T::q_ic);
+    bool driftwvattfix = (fixedstates_ & 1 << StateDefinition_T::q_wv);
+    bool driftwvposfix = (fixedstates_ & 1 << StateDefinition_T::p_wv);
 
     //set crosscov to zero for fixed states
     if(scalefix) state_in->clearCrossCov<StateDefinition_T::L>();
-    if(calibposfix) state_in->clearCrossCov<StateDefinition_T::p_ci>();
-    if(calibattfix) state_in->clearCrossCov<StateDefinition_T::q_ci>();
-    if(driftvwattfix) state_in->clearCrossCov<StateDefinition_T::q_wv>();
-    if(driftvwposfix) state_in->clearCrossCov<StateDefinition_T::p_wv>();
+    if(calibposfix) state_in->clearCrossCov<StateDefinition_T::p_ic>();
+    if(calibattfix) state_in->clearCrossCov<StateDefinition_T::q_ic>();
+    if(driftwvattfix) state_in->clearCrossCov<StateDefinition_T::q_wv>();
+    if(driftwvposfix) state_in->clearCrossCov<StateDefinition_T::p_wv>();
 
     // construct H matrix using H-blockx :-)
     // position:
-    H.block<3, 3>(0, idxstartcorr_p_) = C_wv.transpose() * state.get<StateDefinition_T::L>()(0); // p
+    H.block<3, 3>(0, idxstartcorr_p_) = C_wv * state.get<StateDefinition_T::L>()(0); // p
 
-    H.block<3, 3>(0, idxstartcorr_q_) = -C_wv.transpose() * C_q.transpose() * pci_sk * state.get<StateDefinition_T::L>()(0); // q
+    H.block<3, 3>(0, idxstartcorr_q_) = -C_wv * C_q.transpose() * pci_sk * state.get<StateDefinition_T::L>()(0); // q
 
     H.block<3, 1>(0, idxstartcorr_L_) = scalefix ? Eigen::Matrix<double, 3, 1>::Zero() :
-        (C_wv.transpose() * C_q.transpose() * state.get<StateDefinition_T::p_ci>()
-        + C_wv.transpose() * ( - state.get<StateDefinition_T::p_wv>() + state.get<StateDefinition_T::p>())).eval(); // L
+        (C_wv * C_q.transpose() * state.get<StateDefinition_T::p_ic>()
+        + C_wv * ( - state.get<StateDefinition_T::p_wv>() + state.get<StateDefinition_T::p>())).eval(); // L
 
-    H.block<3, 3>(0, idxstartcorr_qwv_) = driftvwattfix ? Eigen::Matrix<double, 3, 3>::Zero() :
-        (-C_wv.transpose() * skewold).eval(); // q_wv
+    H.block<3, 3>(0, idxstartcorr_qwv_) = driftwvattfix ? Eigen::Matrix<double, 3, 3>::Zero() :
+        (-C_wv * skewold).eval(); // q_wv
 
-    H.block<3, 3>(0, idxstartcorr_pci_) = calibposfix ? Eigen::Matrix<double, 3, 3>::Zero() :
-        (C_wv.transpose() * C_q.transpose() * state.get<StateDefinition_T::L>()(0)).eval(); //p_ci
+    H.block<3, 3>(0, idxstartcorr_pic_) = calibposfix ? Eigen::Matrix<double, 3, 3>::Zero() :
+        (C_wv * C_q.transpose() * state.get<StateDefinition_T::L>()(0)).eval(); //p_ic
 
-    H.block<3, 3>(0, idxstartcorr_pwv_) = driftvwposfix ? Eigen::Matrix<double, 3, 3>::Zero() :
-        ( - Eigen::Matrix<double, 3, 3>::Identity()/* * state.get<StateDefinition_T::L>()(0)*/).eval(); //p_vw
+    H.block<3, 3>(0, idxstartcorr_pwv_) = driftwvposfix ? Eigen::Matrix<double, 3, 3>::Zero() :
+        ( - Eigen::Matrix<double, 3, 3>::Identity()/* * state.get<StateDefinition_T::L>()(0)*/).eval(); //p_wv
 
     // attitude
     H.block<3, 3>(3, idxstartcorr_q_) = C_ci; // q
 
-    H.block<3, 3>(3, idxstartcorr_qwv_) = driftvwattfix ? Eigen::Matrix<double, 3, 3>::Zero() : (C_ci * C_q).eval(); // q_wv
+    H.block<3, 3>(3, idxstartcorr_qwv_) = driftwvattfix ? Eigen::Matrix<double, 3, 3>::Zero() : (C_ci * C_q).eval(); // q_wv
 
-    H.block<3, 3>(3, idxstartcorr_qci_) = calibattfix ? Eigen::Matrix<double, 3, 3>::Zero() : Eigen::Matrix<double, 3, 3>::Identity().eval(); //q_ci
+    H.block<3, 3>(3, idxstartcorr_qic_) = calibattfix ? Eigen::Matrix<double, 3, 3>::Zero() : Eigen::Matrix<double, 3, 3>::Identity().eval(); //q_ic
 
     //This line breaks the filter if a position sensor in the global frame is there or if we want to set a global yaw rotation.
-    //H.block<1, 1>(6, idxstartcorr_qwv_ + 2) = Eigen::Matrix<double, 1, 1>::Constant(driftvwattfix ? 0.0 : 1.0); // fix vision world yaw drift because unobservable otherwise (see PhD Thesis)
+    //H.block<1, 1>(6, idxstartcorr_qwv_ + 2) = Eigen::Matrix<double, 1, 1>::Constant(driftwvattfix ? 0.0 : 1.0); // fix vision world yaw drift because unobservable otherwise (see PhD Thesis)
 
 
   }
@@ -242,12 +242,12 @@ public:
       // position
       r_old.block<3, 1>(0, 0) = z_p_
           - (C_wv.transpose() *
-              ( - state.get<StateDefinition_T::p_wv>() + state.get<StateDefinition_T::p>() + C_q.transpose() * state.get<StateDefinition_T::p_ci>()))
+              ( - state.get<StateDefinition_T::p_wv>() + state.get<StateDefinition_T::p>() + C_q.transpose() * state.get<StateDefinition_T::p_ic>()))
               * state.get<StateDefinition_T::L>();
 
       // attitude
       Eigen::Quaternion<double> q_err;
-      q_err = (state.get<StateDefinition_T::q_wv>() * state.get<StateDefinition_T::q>() * state.get<StateDefinition_T::q_ci>()).conjugate() * z_q_;
+      q_err = (state.get<StateDefinition_T::q_wv>() * state.get<StateDefinition_T::q>() * state.get<StateDefinition_T::q_ic>()).conjugate() * z_q_;
       r_old.block<3, 1>(3, 0) = q_err.vec() / q_err.w() * 2;
       // vision world yaw drift
       q_err = state.get<StateDefinition_T::q_wv>();
@@ -319,10 +319,9 @@ public:
 
       // construct residuals
       // position
-      //TODO reenable p_vw
-      Eigen::Matrix<double, 3, 1> diffprobpos = (C_wv_new.transpose() * ( - state_new.get<StateDefinition_T::p_wv>() + state_new.get<StateDefinition_T::p>() + C_q_new.transpose() * state_new.get<StateDefinition_T::p_ci>()))
+      Eigen::Matrix<double, 3, 1> diffprobpos = (C_wv_new.transpose() * ( - state_new.get<StateDefinition_T::p_wv>() + state_new.get<StateDefinition_T::p>() + C_q_new.transpose() * state_new.get<StateDefinition_T::p_ic>()))
                                                      * state_new.get<StateDefinition_T::L>() -
-                                                     (C_wv_old.transpose() * ( - state_old.get<StateDefinition_T::p_wv>() + state_old.get<StateDefinition_T::p>() + C_q_old.transpose() * state_old.get<StateDefinition_T::p_ci>()))
+                                                     (C_wv_old.transpose() * ( - state_old.get<StateDefinition_T::p_wv>() + state_old.get<StateDefinition_T::p>() + C_q_old.transpose() * state_old.get<StateDefinition_T::p_ic>()))
                                                      * state_old.get<StateDefinition_T::L>();
 
       Eigen::Matrix<double, 3, 1> diffmeaspos = z_p_ - prevmeas->z_p_;
@@ -330,7 +329,7 @@ public:
       r_new.block<3, 1>(0, 0) = diffmeaspos - diffprobpos;
 
       // attitude
-      Eigen::Quaternion<double> diffprobatt = (state_new.get<StateDefinition_T::q_wv>() * state_new.get<StateDefinition_T::q>() * state_new.get<StateDefinition_T::q_ci>()).conjugate() * (state_old.get<StateDefinition_T::q_wv>() * state_old.get<StateDefinition_T::q>() * state_old.get<StateDefinition_T::q_ci>());
+      Eigen::Quaternion<double> diffprobatt = (state_new.get<StateDefinition_T::q_wv>() * state_new.get<StateDefinition_T::q>() * state_new.get<StateDefinition_T::q_ic>()).conjugate() * (state_old.get<StateDefinition_T::q_wv>() * state_old.get<StateDefinition_T::q>() * state_old.get<StateDefinition_T::q_ic>());
       Eigen::Quaternion<double> diffmeasatt = z_q_.conjugate() * prevmeas->z_q_;
 
       Eigen::Quaternion<double> q_err;

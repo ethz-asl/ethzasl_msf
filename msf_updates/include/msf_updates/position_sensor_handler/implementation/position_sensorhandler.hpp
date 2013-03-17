@@ -93,8 +93,8 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::processPositionMeasu
   MANAGER_TYPE* mngr = dynamic_cast<MANAGER_TYPE*>(&manager_);
 
   if(mngr){
-    if (mngr->getcfg().position_fixed_ppi){
-      fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::p_pi;
+    if (mngr->getcfg().position_fixed_p_ip){
+      fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::p_ip;
     }
   }
 

@@ -1,0 +1,13 @@
+#!/bin/bash
+
+if [ -n "$1" ]
+then
+T=$1
+else
+T=5
+fi
+
+echo " ### plotting world-vision drift qw qx qy qz [quat] ###"
+echo " ### buffer = " $T "sec"
+
+rxplot msf_core/state_out/data[17]:data[18]:data[19]:data[20] -b $T -t "q_wv" -l w,x,y,z 

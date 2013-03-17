@@ -188,13 +188,6 @@ private:
 
   Eigen::Matrix<double, 3, 1> g_; ///< gravity vector
 
-  Eigen::Matrix<double, 3, 3> R_IW_; ///< Rot IMU->World
-  Eigen::Matrix<double, 3, 3> R_CI_; ///< Rot Camera->IMU
-  Eigen::Matrix<double, 3, 3> R_WV_; ///< Rot World->Vision
-
-
-  /// vision-world drift watch dog to determine fuzzy tracking
-
   /**
    * \brief get the index of the best state having no temporal drift at compile time
    */
@@ -203,7 +196,7 @@ private:
   };
   typedef typename msf_tmp::getEnumStateType<StateSequence_T, indexOfStateWithoutTemporalDrift>::value nonDriftingStateType; //returns void type for invalid types
 
-  CheckFuzzyTracking<EKFState_T, nonDriftingStateType> fuzzyTracker_;
+  CheckFuzzyTracking<EKFState_T, nonDriftingStateType> fuzzyTracker_;  ///< watch dog to determine fuzzy tracking by observing non temporal drifting states
 
   /// enables internal state predictions for log replay
   /**
@@ -212,7 +205,7 @@ private:
    * for log replay, when the external prediction is not available.
    */
   bool data_playback_;
-  bool isfuzzyState_;
+  bool isfuzzyState_; ///< was the filter pushed to fuzzy state by a measurement?
 
   MSF_SensorManager<EKFState_T>& usercalc_; ///< a class which provides methods for customization of several calculations
 
