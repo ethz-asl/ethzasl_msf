@@ -152,12 +152,12 @@ public:
 
     // get rotation matrices
     Eigen::Matrix<double, 3, 3> C_wv = state.get<StateDefinition_T::q_wv>().toRotationMatrix();
-    Eigen::Matrix<double, 3, 3> C_q = state.get<StateDefinition_T::q>().conjugate().toRotationMatrix();
+    Eigen::Matrix<double, 3, 3> C_q = state.get<StateDefinition_T::q>().toRotationMatrix();
     Eigen::Matrix<double, 3, 3> C_ci = state.get<StateDefinition_T::q_ic>().conjugate().toRotationMatrix();
 
     // preprocess for elements in H matrix
     Eigen::Matrix<double, 3, 1> vecold;
-    vecold = (state.get<StateDefinition_T::p>() + C_q.transpose() * state.get<StateDefinition_T::p_ic>()) * state.get<StateDefinition_T::L>();
+    vecold = (state.get<StateDefinition_T::p>() + C_q * state.get<StateDefinition_T::p_ic>()) * state.get<StateDefinition_T::L>();
     Eigen::Matrix<double, 3, 3> skewold = skew(vecold);
 
     Eigen::Matrix<double, 3, 3> pci_sk = skew(state.get<StateDefinition_T::p_ic>());
@@ -192,17 +192,17 @@ public:
     // position:
     H.block<3, 3>(0, idxstartcorr_p_) = C_wv * state.get<StateDefinition_T::L>()(0); // p
 
-    H.block<3, 3>(0, idxstartcorr_q_) = -C_wv * C_q.transpose() * pci_sk * state.get<StateDefinition_T::L>()(0); // q
+    H.block<3, 3>(0, idxstartcorr_q_) = -C_wv * C_q * pci_sk * state.get<StateDefinition_T::L>()(0); // q
 
     H.block<3, 1>(0, idxstartcorr_L_) = scalefix ? Eigen::Matrix<double, 3, 1>::Zero() :
-        (C_wv * C_q.transpose() * state.get<StateDefinition_T::p_ic>()
+        (C_wv * C_q * state.get<StateDefinition_T::p_ic>()
         + C_wv * ( - state.get<StateDefinition_T::p_wv>() + state.get<StateDefinition_T::p>())).eval(); // L
 
     H.block<3, 3>(0, idxstartcorr_qwv_) = driftwvattfix ? Eigen::Matrix<double, 3, 3>::Zero() :
         (-C_wv * skewold).eval(); // q_wv
 
     H.block<3, 3>(0, idxstartcorr_pic_) = calibposfix ? Eigen::Matrix<double, 3, 3>::Zero() :
-        (C_wv * C_q.transpose() * state.get<StateDefinition_T::L>()(0)).eval(); //p_ic
+        (C_wv * C_q * state.get<StateDefinition_T::L>()(0)).eval(); //p_ic
 
     H.block<3, 3>(0, idxstartcorr_pwv_) = driftwvposfix ? Eigen::Matrix<double, 3, 3>::Zero() :
         ( - Eigen::Matrix<double, 3, 3>::Identity()/* * state.get<StateDefinition_T::L>()(0)*/).eval(); //p_wv
@@ -210,7 +210,7 @@ public:
     // attitude
     H.block<3, 3>(3, idxstartcorr_q_) = C_ci; // q
 
-    H.block<3, 3>(3, idxstartcorr_qwv_) = driftwvattfix ? Eigen::Matrix<double, 3, 3>::Zero() : (C_ci * C_q).eval(); // q_wv
+    H.block<3, 3>(3, idxstartcorr_qwv_) = driftwvattfix ? Eigen::Matrix<double, 3, 3>::Zero() : (C_ci * C_q.transpose()).eval(); // q_wv
 
     H.block<3, 3>(3, idxstartcorr_qic_) = calibattfix ? Eigen::Matrix<double, 3, 3>::Zero() : Eigen::Matrix<double, 3, 3>::Identity().eval(); //q_ic
 
