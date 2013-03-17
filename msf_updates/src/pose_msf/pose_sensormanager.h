@@ -130,6 +130,8 @@ private:
     a_m = g;			/// initial acceleration
 
     q_wv.setIdentity(); // vision-world rotation drift
+    q_wv = Eigen::Quaterniond(cos(90. / 180. * M_PI / 2.),0 ,0 , sin(90. / 180. * M_PI / 2.));
+    q_wv.normalize();
     p_vw.setZero(); //vision-world position drift
 
     P.setZero(); // error state covariance; if zero, a default initialization in msf_core is used
@@ -142,7 +144,7 @@ private:
     // check if we have already input from the measurement sensor
     if (p_vc.norm() == 0)
       ROS_WARN_STREAM("No measurements received yet to initialize position - using [0 0 0]");
-    if ((p_vc.norm() == 1) & (q_cv.w() == 1))
+    if (q_cv.w() == 1)
       ROS_WARN_STREAM("No measurements received yet to initialize attitude - using [1 0 0 0]");
 
     ros::NodeHandle pnh("~");
@@ -158,7 +160,12 @@ private:
 
 
     // calculate initial attitude and position based on sensor measurements
-    q = (q_ci * q_cv.conjugate() * q_wv).conjugate();
+    if (q_cv.w() == 1){ //if there is no pose measurement, only apply q_vw
+      q = q_wv;
+    }else{ //if there is a pose measurement, apply q_ci and q_vw to get initial attitude
+      q = (q_ci * q_cv.conjugate() * q_wv).conjugate();
+    }
+
     q.normalize();
     p = q_wv.conjugate().toRotationMatrix() * p_vc / scale - q.toRotationMatrix() * p_ci;
 

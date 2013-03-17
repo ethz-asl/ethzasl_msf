@@ -28,22 +28,22 @@ pose_sensor/pose_initial_scale: 1
 
 # initialization of camera w.r.t. IMU
 #bluebird
-#pose_sensor/init/q_ci/w: 0.0
-#pose_sensor/init/q_ci/x: 1
-#pose_sensor/init/q_ci/y: -1
-#pose_sensor/init/q_ci/z: 0
-#pose_sensor/init/p_ci/x: 0.0   
-#pose_sensor/init/p_ci/y: 0.0
-#pose_sensor/init/p_ci/z: 0.0
+pose_sensor/init/q_ci/w: 0.0
+pose_sensor/init/q_ci/x: 1
+pose_sensor/init/q_ci/y: -1
+pose_sensor/init/q_ci/z: 0.0
+pose_sensor/init/p_ci/x: 0.065   
+pose_sensor/init/p_ci/y: 0.06
+pose_sensor/init/p_ci/z: -0.10
  
 ###SLAM sensor 
-pose_sensor/init/q_ci/w: 0
-pose_sensor/init/q_ci/x: 0
-pose_sensor/init/q_ci/y: 0
-pose_sensor/init/q_ci/z: 1
-pose_sensor/init/p_ci/x: 0.0745374   
-pose_sensor/init/p_ci/y: -0.086751
-pose_sensor/init/p_ci/z: 0.0123919
+#pose_sensor/init/q_ci/w: 0
+#pose_sensor/init/q_ci/x: 0
+#pose_sensor/init/q_ci/y: 0
+#pose_sensor/init/q_ci/z: 1
+#pose_sensor/init/p_ci/x: 0.0745374   
+#pose_sensor/init/p_ci/y: -0.086751
+#pose_sensor/init/p_ci/z: 0.0123919
 
 pose_sensor/pose_absolute_measurements: true
 pose_sensor/pose_use_fixed_covariance: false

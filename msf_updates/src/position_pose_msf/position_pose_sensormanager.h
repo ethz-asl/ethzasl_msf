@@ -61,7 +61,7 @@ public:
   typedef EKFState_T::StateSequence_T StateSequence_T;
   typedef EKFState_T::StateDefinition_T StateDefinition_T;
 
-  PositionPoseSensorManager(ros::NodeHandle pnh = ros::NodeHandle("~"))
+  PositionPoseSensorManager(ros::NodeHandle pnh = ros::NodeHandle("~/position_pose_sensor"))
   {
     bool distortmeas = false; ///<distort the pose measurements TODO make param
 
@@ -154,7 +154,7 @@ private:
       ROS_WARN_STREAM("No measurements received yet to initialize vision position - using [0 0 0]");
     if (p_pos.norm() == 0)
       ROS_WARN_STREAM("No measurements received yet to initialize absolute position - using [0 0 0]");
-    if ((p_vc.norm() == 1) & (q_cv.w() == 1))
+    if (q_cv.w() == 1)
       ROS_WARN_STREAM("No measurements received yet to initialize attitude - using [1 0 0 0]");
 
     ros::NodeHandle pnh("~");
@@ -168,6 +168,8 @@ private:
     pnh.param("pose_sensor/init/q_ci/z", q_ci.z(), 0.0);
     q_ci.normalize();
 
+    ROS_INFO_STREAM("p_ci: "<<p_ci.transpose());
+    ROS_INFO_STREAM("q_ci: ["<<q_ci.w()<<", "<<q_ci.x()<<", "<<q_ci.y()<<", "<<q_ci.z()<<"]");
 
     pnh.param("position_sensor/init/p_pi/x", p_pi[0], 0.0);
     pnh.param("position_sensor/init/p_pi/y", p_pi[1], 0.0);
@@ -181,16 +183,21 @@ private:
     yawq.normalize();
 
     //the initial vision-world rotation is global yaw rotation
-    q_wv = yawq.conjugate();
+    q_wv = yawq;
 
-    q = (q_ci * q_cv.conjugate() * q_wv).conjugate();
+    if (q_cv.w() == 1){ //if there is no pose measurement, only apply q_vw
+      q = q_wv;
+    }else{ //if there is a pose measurement, apply q_ci and q_vw to get initial attitude
+      q = (q_ci * q_cv.conjugate() * q_wv).conjugate();
+    }
     q.normalize();
 
     Eigen::Matrix<double, 3, 1> p_vision = q_wv.conjugate().toRotationMatrix() * p_vc / scale - q.toRotationMatrix() * p_ci;
 
 
-    p = p_pos - q.toRotationMatrix() * p_pi;
-    p_vw = p - p_vision;
+//    p = p_pos - q.toRotationMatrix() * p_pi;
+//    p_vw = p - p_vision;
+    p = p_vision;
 
     ROS_INFO_STREAM("p_pi: "<<p_pi.transpose());
     ROS_INFO_STREAM("p_pos: "<<p_pos.transpose());

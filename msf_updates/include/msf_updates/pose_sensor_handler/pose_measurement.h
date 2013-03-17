@@ -181,7 +181,7 @@ public:
     bool driftvwattfix = (fixedstates_ & 1 << StateDefinition_T::q_wv);
     bool driftvwposfix = (fixedstates_ & 1 << StateDefinition_T::p_vw);
 
-    //set crosscov to zero
+    //set crosscov to zero for fixed states
     if(scalefix) state_in->clearCrossCov<StateDefinition_T::L>();
     if(calibposfix) state_in->clearCrossCov<StateDefinition_T::p_ci>();
     if(calibattfix) state_in->clearCrossCov<StateDefinition_T::q_ci>();
@@ -214,8 +214,9 @@ public:
 
     H.block<3, 3>(3, idxstartcorr_qci_) = calibattfix ? Eigen::Matrix<double, 3, 3>::Zero() : Eigen::Matrix<double, 3, 3>::Identity().eval(); //q_ci
 
-    //TODO: do we still want this?
-    H(6, 18) = driftvwattfix ? 0 : 1.0; // fix vision world yaw drift because unobservable otherwise (see PhD Thesis)
+    //This line breaks the filter if a position sensor in the global frame is there or if we want to set a global yaw rotation.
+    //H.block<1, 1>(6, idxstartcorr_qwv_ + 2) = Eigen::Matrix<double, 1, 1>::Constant(driftvwattfix ? 0.0 : 1.0); // fix vision world yaw drift because unobservable otherwise (see PhD Thesis)
+
 
   }
 
