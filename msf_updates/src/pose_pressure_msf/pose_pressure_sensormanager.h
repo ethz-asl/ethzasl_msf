@@ -1,11 +1,7 @@
 /*
 
-Copyright (c) 2010, Stephan Weiss, ASL, ETH Zurich, Switzerland
-You can contact the author at <stephan dot weiss at ieee dot org>
-Copyright (c) 2012, Simon Lynen, ASL, ETH Zurich, Switzerland
+Copyright (c) 2013, Simon Lynen, ASL, ETH Zurich, Switzerland
 You can contact the author at <slynen at ethz dot ch>
- Copyright (c) 2012, Markus Achtelik, ASL, ETH Zurich, Switzerland
- You can contact the author at <acmarkus at ethz dot ch>
 
 All rights reserved.
 
@@ -213,9 +209,9 @@ private:
   }
 
   virtual void calculateQAuxiliaryStates(EKFState_T& state, double dt){
-    const msf_core::Vector3 nqwvv = msf_core::Vector3::Constant(config_.pose_noise_qwv);
-    const msf_core::Vector3 nqciv = msf_core::Vector3::Constant(config_.pose_noise_qci);
-    const msf_core::Vector3 npicv = msf_core::Vector3::Constant(config_.pose_noise_pci);
+    const msf_core::Vector3 nqwvv = msf_core::Vector3::Constant(config_.pose_noise_q_wv);
+    const msf_core::Vector3 nqciv = msf_core::Vector3::Constant(config_.pose_noise_q_ci);
+    const msf_core::Vector3 npicv = msf_core::Vector3::Constant(config_.pose_noise_p_ci);
     const msf_core::Vector1 n_L = msf_core::Vector1::Constant(config_.pose_noise_scale);
     const msf_core::Vector1 nb_p = msf_core::Vector1::Constant(config_.press_noise_bias_p);
 

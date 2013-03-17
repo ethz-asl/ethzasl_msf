@@ -94,8 +94,10 @@ private:
   virtual void config(Config_T &config, uint32_t level){
     config_ = config;
     pose_handler_->setNoises(config.pose_noise_meas_p, config.pose_noise_meas_q);
-    pose_handler_->setDelay(config.position_delay);
+    pose_handler_->setDelay(config.pose_delay);
+
     position_handler_->setNoises(config.position_noise_meas);
+    position_handler_->setDelay(config.position_delay);
 
     if((level & msf_updates::PositionPoseSensor_INIT_FILTER) && config.core_init_filter == true){
       init(config.pose_initial_scale);
@@ -113,17 +115,11 @@ private:
       init(scale);
       config.core_set_height = false;
     }
-
-    ROS_INFO_STREAM("pose_sensor/fixed_scale: "<<config_.pose_fixed_scale);
-    ROS_INFO_STREAM("pose_sensor/fixed_p_vw: "<<config_.pose_fixed_p_vw);
-    ROS_INFO_STREAM("pose_sensor/fixed_q_vw: "<<config_.pose_fixed_q_wv);
-    ROS_INFO_STREAM("pose_sensor/fixed_p_ci: "<<config_.pose_fixed_p_ci);
-    ROS_INFO_STREAM("pose_sensor/fixed_q_ci: "<<config_.pose_fixed_q_ci);
   }
 
   void init(double scale)
   {
-    Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ci, p_vc, p_vw, p_pi, p_pos;
+    Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ci, p_vc, p_wv, p_pi, p_pos;
     Eigen::Quaternion<double> q, q_wv, q_ci, q_cv;
     msf_core::MSF_Core<EKFState_T>::ErrorStateCov P;
 
@@ -137,7 +133,7 @@ private:
     a_m = g;			/// initial acceleration
 
     q_wv.setIdentity(); // vision-world rotation drift
-    p_vw.setZero(); //vision-world position drift
+    p_wv.setZero(); //world-vision position drift
 
     P.setZero(); // error state covariance; if zero, a default initialization in msf_core is used
 
@@ -197,7 +193,8 @@ private:
 
 //    p = p_pos - q.toRotationMatrix() * p_pi;
 //    p_vw = p - p_vision;
-    p = p_vision;
+    p_wv << 1.0,0,0; //TODO remove
+    p = p_vision + p_wv;
 
     ROS_INFO_STREAM("p_pi: "<<p_pi.transpose());
     ROS_INFO_STREAM("p_pos: "<<p_pos.transpose());
@@ -215,7 +212,7 @@ private:
     meas->setStateInitValue<StateDefinition_T::b_a>(b_a);
     meas->setStateInitValue<StateDefinition_T::L>(Eigen::Matrix<double, 1, 1>::Constant(scale));
     meas->setStateInitValue<StateDefinition_T::q_wv>(q_wv);
-    meas->setStateInitValue<StateDefinition_T::p_vw>(p_vw);
+    meas->setStateInitValue<StateDefinition_T::p_wv>(p_wv);
     meas->setStateInitValue<StateDefinition_T::q_ci>(q_ci);
     meas->setStateInitValue<StateDefinition_T::p_ci>(p_ci);
     meas->setStateInitValue<StateDefinition_T::p_pi>(p_pi);
@@ -243,17 +240,17 @@ private:
   }
 
   virtual void calculateQAuxiliaryStates(EKFState_T& state, double dt){
-    const msf_core::Vector3 nqwvv = msf_core::Vector3::Constant(config_.pose_noise_qwv);
-    const msf_core::Vector3 npwvv = msf_core::Vector3::Constant(config_.pose_noise_pvw);
-    const msf_core::Vector3 nqciv = msf_core::Vector3::Constant(config_.pose_noise_qci);
-    const msf_core::Vector3 npicv = msf_core::Vector3::Constant(config_.pose_noise_pci);
+    const msf_core::Vector3 nqwvv = msf_core::Vector3::Constant(config_.pose_noise_q_wv);
+    const msf_core::Vector3 npwvv = msf_core::Vector3::Constant(config_.pose_noise_p_wv);
+    const msf_core::Vector3 nqciv = msf_core::Vector3::Constant(config_.pose_noise_q_ci);
+    const msf_core::Vector3 npicv = msf_core::Vector3::Constant(config_.pose_noise_p_ci);
     const msf_core::Vector1 n_L = msf_core::Vector1::Constant(config_.pose_noise_scale);
 
     //compute the blockwise Q values and store them with the states,
     //these then get copied by the core to the correct places in Qd
     state.getQBlock<StateDefinition_T::L>() 	= (dt * n_L.cwiseProduct(n_L)).asDiagonal();
     state.getQBlock<StateDefinition_T::q_wv>() = (dt * nqwvv.cwiseProduct(nqwvv)).asDiagonal();
-    state.getQBlock<StateDefinition_T::p_vw>() = (dt * npwvv.cwiseProduct(npwvv)).asDiagonal();
+    state.getQBlock<StateDefinition_T::p_wv>() = (dt * npwvv.cwiseProduct(npwvv)).asDiagonal();
     state.getQBlock<StateDefinition_T::q_ci>() = (dt * nqciv.cwiseProduct(nqciv)).asDiagonal();
     state.getQBlock<StateDefinition_T::p_ci>() = (dt * npicv.cwiseProduct(npicv)).asDiagonal();
   }
