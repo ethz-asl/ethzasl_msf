@@ -94,7 +94,7 @@ MSF_Core<EKFState_T>::~MSF_Core()
 template<typename EKFState_T>
 void MSF_Core<EKFState_T>::initExternalPropagation(boost::shared_ptr<EKFState_T> state) {
   // init external propagation
-  msgCorrect_.header.stamp = ros::Time::now();
+  msgCorrect_.header.stamp = ros::Time(state->time);
   msgCorrect_.header.seq = 0;
   msgCorrect_.angular_velocity.x = 0;
   msgCorrect_.angular_velocity.y = 0;
@@ -534,7 +534,7 @@ void MSF_Core<EKFState_T>::propagateState(boost::shared_ptr<EKFState_T>& state_o
 #ifdef DEBUGPUBLISH
   static int seq = 0;
   msgState_.header.seq = seq++;
-  msgState_.header.stamp = ros::Time::now();
+  msgState_.header.stamp = ros::Time(state_new->time);
   state_new->toFullStateMsg(msgState_);
   pubState_.publish(msgState_);
 #endif
@@ -790,7 +790,8 @@ void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase<
   static int seq_m = 0;
 
   // publish correction for external propagation
-  msgCorrect_.header.stamp = ros::Time::now();
+  boost::shared_ptr<EKFState_T>& latestState = StateBuffer_.getLast();
+  msgCorrect_.header.stamp = ros::Time(latestState->time);
   msgCorrect_.header.seq = seq_m;
   msgCorrect_.angular_velocity.x = 0;
   msgCorrect_.angular_velocity.y = 0;
@@ -798,7 +799,6 @@ void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase<
   msgCorrect_.linear_acceleration.x = 0;
   msgCorrect_.linear_acceleration.y = 0;
   msgCorrect_.linear_acceleration.z = 0;
-  boost::shared_ptr<EKFState_T>& latestState = StateBuffer_.getLast();
 
   // prevent junk being sent to the external state propagation when data playback is (accidentally) on
   if(data_playback_){
