@@ -91,7 +91,7 @@ private:
       R_.block<6, 6>(0, 0) = Eigen::Matrix<double, 6, 6>(&msg->pose.covariance[0]);
 
       if(msg->header.seq % 100 == 0){ //only do this check from time to time
-        if(R_.block<6, 6>(0, 0).determinant() < 0)
+        if(R_.block<6, 6>(0, 0).determinant() < -0.001)
           ROS_WARN_STREAM_THROTTLE(60,"The covariance matrix you provided for the pose sensor is not positive definite: "<<(R_.block<6, 6>(0, 0)));
       }
 

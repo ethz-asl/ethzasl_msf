@@ -73,11 +73,11 @@ typedef boost::fusion::vector<
     msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, b_a, msf_core::CoreStateWithoutPropagation>,                     ///< acceleration biases              (13-15 / 12-14)
 
     // states not varying during propagation
-    msf_core::StateVar_T<Eigen::Matrix<double, 1, 1>, L>,                                                              ///< visual scale                     (16 / 15)
-    msf_core::StateVar_T<Eigen::Quaternion<double>, q_wv, msf_core::AuxiliaryNonTemporalDrifting>,                     ///< vision-world attitude drift      (17-20 / 16-18)
-    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_wv>,                                                          ///< vision world position drift        (21-23 / 19-22)
-    msf_core::StateVar_T<Eigen::Quaternion<double>, q_ic>,                                                             ///< camera-imu attitude calibration  (24-27 / 23-25)
-    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_ic>,                                                            ///< camera-imu position calibration  (28-30 / 26-28)
+    msf_core::StateVar_T<Eigen::Matrix<double, 1, 1>, L>,                                                              ///< visual scale
+    msf_core::StateVar_T<Eigen::Quaternion<double>, q_wv, msf_core::AuxiliaryNonTemporalDrifting>,                     ///< vision-world attitude drift
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_wv>,                                                           ///< vision world position drift
+    msf_core::StateVar_T<Eigen::Quaternion<double>, q_ic>,                                                             ///< camera-imu attitude calibration
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_ic>,                                                           ///< camera-imu position calibration
     msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_ip>
 > fullState_T;
 }
