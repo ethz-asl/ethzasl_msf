@@ -7,7 +7,7 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 #  Release        : w/o debug symbols, w/ optimization
 #  RelWithDebInfo : w/ debug symbols, w/ optimization
 #  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
-set(ROS_BUILD_TYPE Debug)
+set(ROS_BUILD_TYPE RelWithDebInfo)
 
 rosbuild_init()
 
@@ -21,10 +21,10 @@ include(${dynamic_reconfigure_PACKAGE_PATH}/cmake/cfgbuild.cmake)
 gencfg()
 rosbuild_genmsg()
 
-add_definitions (-Wall -std=c++0x -march=native)
+add_definitions (-std=c++0x -march=native)
 set(ROS_COMPILE_FLAGS "-W -Wall -Wextra -pedantic")
 
-add_definitions (-DDEBUGPUBLISH) #publish the state after each propagation step for full rate plotting
+#add_definitions (-DDEBUGPUBLISH) #publish the state after each propagation step for full rate plotting
 
 #FIND EIGEN
 find_package(Eigen REQUIRED)
