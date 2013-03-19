@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include <msf_core/eigen_utils.h>
+#include <msf_core/gps_conversion.h>
 
 namespace msf_position_sensor{
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
@@ -54,6 +55,7 @@ SensorHandler<msf_updates::EKFState>(meas, topic_namespace, parameternamespace),
 
   subPointStamped_ = nh.subscribe<geometry_msgs::PointStamped>("position_input", 1, &PositionSensorHandler::measurementCallback, this);
   subTransformStamped_ = nh.subscribe<geometry_msgs::TransformStamped>("transform_input", 1, &PositionSensorHandler::measurementCallback, this);
+  subNavSatFix_ = nh.subscribe<sensor_msgs::NavSatFix>("navsatfix", 1, &PositionSensorHandler::measurementCallback, this);
 
   //TODO impl pointwithcov callback
 
@@ -75,15 +77,14 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::setDelay(double dela
 
 
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
-void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::processPositionMeasurement(const geometry_msgs::PointStampedConstPtr & msg)
-{
+void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::processPositionMeasurement(const msf_updates::PointWithCovarianceStampedConstPtr& msg){
   //get the fixed states
   int fixedstates = 0;
   BOOST_STATIC_ASSERT_MSG(msf_updates::EKFState::nStateVarsAtCompileTime < 32, "Your state has more than 32 variables. "
                           "The code needs to be changed here to have a larger variable to mark the fixed_states"); //do not exceed the 32 bits of int
 
 
-  if (!use_fixed_covariance_)  // take covariance from sensor
+  if (!use_fixed_covariance_ && msg->covariance[0] == 0)  // take covariance from sensor
   {
     ROS_WARN_STREAM_THROTTLE(2,"Provided message type without covariance but set fixed_covariance=false at the same time. Discarding message.");
     return;
@@ -98,20 +99,24 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::processPositionMeasu
     }
   }
 
-  boost::shared_ptr<MEASUREMENT_TYPE> meas( new MEASUREMENT_TYPE(n_zp_, use_fixed_covariance_, provides_absolute_measurements_, this->sensorID, fixedstates));
+  typename boost::shared_ptr<MEASUREMENT_TYPE> meas( new MEASUREMENT_TYPE(n_zp_, use_fixed_covariance_, provides_absolute_measurements_, this->sensorID, fixedstates));
 
   meas->makeFromSensorReading(msg, msg->header.stamp.toSec() - delay_);
 
   z_p_ = meas->z_p_; //store this for the init procedure
 
   this->manager_.msf_core_->addMeasurement(meas);
-}
+                                                                                       }
 
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(const geometry_msgs::PointStampedConstPtr & msg)
 {
   ROS_INFO_STREAM_ONCE("*** position sensor got first measurement from topic "<<this->topic_namespace_<<"/"<<subPointStamped_.getTopic()<<" ***");
-  processPositionMeasurement(msg);
+
+  msf_updates::PointWithCovarianceStampedPtr pointwCov(new msf_updates::PointWithCovarianceStamped);
+  pointwCov->point = msg->point;
+
+  processPositionMeasurement(pointwCov);
 }
 
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
@@ -124,23 +129,53 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(
     return;
   }
 
-  geometry_msgs::PointStampedPtr point(new geometry_msgs::PointStamped());
-
-  if (!use_fixed_covariance_)  // take covariance from sensor
-  {
-    ROS_WARN_STREAM_THROTTLE(2,"Provided message type without covariance but set fixed_covariance=false at the same time. Discarding message.");
-    return;
-  }
+  msf_updates::PointWithCovarianceStampedPtr pointwCov(new msf_updates::PointWithCovarianceStamped);
 
   //fixed covariance will be set in measurement class -> makeFromSensorReadingImpl
 
-  point->header = msg->header;
+  pointwCov->header = msg->header;
 
-  point->point.x = msg->transform.translation.x;
-  point->point.y = msg->transform.translation.y;
-  point->point.z = msg->transform.translation.z;
+  pointwCov->point.x = msg->transform.translation.x;
+  pointwCov->point.y = msg->transform.translation.y;
+  pointwCov->point.z = msg->transform.translation.z;
 
-  processPositionMeasurement(point);
+  processPositionMeasurement(pointwCov);
+}
+
+
+template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
+void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(const sensor_msgs::NavSatFixConstPtr& msg)
+{
+  ROS_INFO_STREAM_ONCE("*** position sensor got first measurement from topic "<<this->topic_namespace_<<"/"<<subNavSatFix_.getTopic()<<" ***");
+
+
+  //fixed covariance will be set in measurement class -> makeFromSensorReadingImpl
+
+  static bool referenceinit = false; //TODO dynreconf reset ref
+  if(!referenceinit){
+    gpsConversion_.initReference(msg->latitude, msg->longitude, msg->altitude);
+    ROS_WARN_STREAM("Initialized GPS reference of topic: "<<this->topic_namespace_<<"/"<<subNavSatFix_.getTopic());
+  }
+
+  msf_core::Vector3 ecef = gpsConversion_.wgs84ToEcef(msg->latitude, msg->longitude, msg->altitude);
+  msf_core::Vector3 enu = gpsConversion_.ecefToEnu(ecef);
+
+  msf_updates::PointWithCovarianceStampedPtr pointwCov(new msf_updates::PointWithCovarianceStamped);
+  //store the ENU data in the position fields
+  pointwCov->point.x = enu[0];
+  pointwCov->point.y = enu[1];
+  pointwCov->point.z = enu[2];
+
+  //get the covariance TODO: should we handle the cases differently?
+  if(msg->position_covariance_type == sensor_msgs::NavSatFix::COVARIANCE_TYPE_KNOWN){
+    pointwCov->covariance = msg->position_covariance;
+  }else if(msg->position_covariance_type == sensor_msgs::NavSatFix::COVARIANCE_TYPE_DIAGONAL_KNOWN){
+    pointwCov->covariance = msg->position_covariance;
+  }else if(msg->position_covariance_type == sensor_msgs::NavSatFix::COVARIANCE_TYPE_APPROXIMATED){ //from DOP
+    pointwCov->covariance = msg->position_covariance;
+  }
+
+  processPositionMeasurement(pointwCov);
 }
 
 }

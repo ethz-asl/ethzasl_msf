@@ -39,6 +39,7 @@
 #include <msf_core/msf_measurement.h>
 #include <msf_core/msf_core.h>
 #include <msf_core/eigen_utils.h>
+#include <msf_updates/PointWithCovarianceStamped.h>
 
 namespace msf_updates{
 namespace position_measurement{
@@ -46,10 +47,12 @@ enum
 {
   nMeasurements = 3
 };
+
+
 /**
  * \brief a measurement as provided by a pose tracking algorithm
  */
-typedef msf_core::MSF_Measurement<geometry_msgs::PointStamped, nMeasurements, msf_updates::EKFState> PositionMeasurementBase;
+typedef msf_core::MSF_Measurement<PointWithCovarianceStamped, nMeasurements, msf_updates::EKFState> PositionMeasurementBase;
 struct PositionMeasurement : public PositionMeasurementBase
 {
 private:
@@ -68,21 +71,21 @@ private:
     // get measurement
     z_p_ = Eigen::Matrix<double, 3, 1>(msg->point.x, msg->point.y, msg->point.z);
 
-    //    if (fixed_covariance_)//  take fix covariance from reconfigure GUI
-    //    {
+    if (fixed_covariance_)//  take fix covariance from reconfigure GUI
+    {
 
-    const double s_zp = n_zp_ * n_zp_;
-    R_ = (Eigen::Matrix<double, nMeasurements, 1>() << s_zp, s_zp, s_zp).finished().asDiagonal();
+      const double s_zp = n_zp_ * n_zp_;
+      R_ = (Eigen::Matrix<double, nMeasurements, 1>() << s_zp, s_zp, s_zp).finished().asDiagonal();
 
-    //    }else{// take covariance from sensor
-    //
-    //      R_.block<3, 3>(0, 0) = Eigen::Matrix<double, 3, 3>(&msg->covariance[0]);
-    //
-    //      if(msg->header.seq % 100 == 0){ //only do this check from time to time
-    //        if(R_.block<3, 3>(0, 0).determinant() < 0)
-    //          ROS_WARN_STREAM_THROTTLE(60,"The covariance matrix you provided for the position sensor is not positive definite");
-    //      }
-    //    }
+    }else{// take covariance from sensor
+
+      R_.block<3, 3>(0, 0) = msf_core::Matrix3(&msg->covariance[0]);
+
+      if(msg->header.seq % 100 == 0){ //only do this check from time to time
+        if(R_.block<3, 3>(0, 0).determinant() < -0.01)
+          ROS_WARN_STREAM_THROTTLE(60,"The covariance matrix you provided for the position sensor is not positive definite");
+      }
+    }
   }
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW

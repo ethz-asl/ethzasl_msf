@@ -39,6 +39,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <msf_core/msf_sensormanagerROS.h>
 #include <geometry_msgs/PointStamped.h>
 #include <geometry_msgs/TransformStamped.h>
+#include <sensor_msgs/NavSatFix.h>
+#include <msf_core/gps_conversion.h>
+#include <msf_updates/PointWithCovarianceStamped.h>
 
 namespace msf_position_sensor{
 
@@ -53,13 +56,16 @@ private:
 
   ros::Subscriber subPointStamped_;
   ros::Subscriber subTransformStamped_;
+  ros::Subscriber subNavSatFix_;
+  msf_core::GPSConversion gpsConversion_;
 
   bool use_fixed_covariance_; ///< use fixed covariance set by dynamic reconfigure
   bool provides_absolute_measurements_; ///<does this sensor measure relative or absolute values
 
-  void processPositionMeasurement(const geometry_msgs::PointStampedConstPtr & msg);
+  void processPositionMeasurement(const msf_updates::PointWithCovarianceStampedConstPtr& msg);
   void measurementCallback(const geometry_msgs::PointStampedConstPtr & msg);
   void measurementCallback(const geometry_msgs::TransformStampedConstPtr & msg);
+  void measurementCallback(const sensor_msgs::NavSatFixConstPtr& msg);
 
 public:
   typedef MEASUREMENT_TYPE measurement_t;

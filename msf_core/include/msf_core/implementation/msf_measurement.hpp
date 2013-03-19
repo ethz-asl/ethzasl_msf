@@ -135,7 +135,7 @@ template<typename EKFState_T>
 void MSF_InitMeasurement<EKFState_T>::apply(boost::shared_ptr<EKFState_T> stateWithCovariance, MSF_Core<EKFState_T>& core)
 {
 
-  stateWithCovariance->time = ros::Time::now().toSec(); //makes this state a valid starting point
+  stateWithCovariance->time = this->time; //makes this state a valid starting point
 
   boost::fusion::for_each(
       stateWithCovariance->statevars,

@@ -1,5 +1,7 @@
 /*
 
+Copyright (c) 2013, Markus Achtelik, ASL, ETH Zurich, Switzerland
+You can contact the author at <acmarkus at ethz dot ch>
 Copyright (c) 2013, Simon Lynen, ASL, ETH Zurich, Switzerland
 You can contact the author at <slynen at ethz dot ch>
 
@@ -28,32 +30,26 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
-#ifndef MSF_MACROS_H_
-#define MSF_MACROS_H_
 
-#ifndef NUMERIC_PREC
-#define NUMERIC_PREC 4 //number of decimal places
-#endif
 
-#ifdef UNUSEDPARAM
-#elif defined(__GNUC__)
-# define UNUSEDPARAM(x) UNUSED_ ## x __attribute__((unused))
-#elif defined(__LCLINT__)
-# define UNUSEDPARAM(x) /*@unused@*/ x
-#else
-# define UNUSEDPARAM(x) x
-#endif
+#ifndef GPS_CONVERSION_H_
+#define GPS_CONVERSION_H_
 
-#ifndef UNUSED
-# define UNUSED(x) (void)x;
-#endif
+#include <Eigen/Dense>
+#include <msf_core/msf_types.tpp>
 
-#ifndef STREAMQUAT
-#define STREAMQUAT(q) "["<<std::setprecision(3)<<(q).w()<<", "<<(q).x()<<", "<<(q).y()<<", "<<(q).z()<<std::setprecision(NUMERIC_PREC)<<"]"
-#endif
+namespace msf_core{
 
-#ifndef DEG2RAD
-#define DEG2RAD (M_PI/180.0)
-#endif
+class GPSConversion{
+private:
+  msf_core::Quaternion ecef_ref_orientation_;
+  msf_core::Vector3 ecef_ref_point_;
+public:
+  GPSConversion();
+  void initReference(const double & latitude, const double & longitude, const double & altitude);
+  msf_core::Vector3 wgs84ToEcef(const double & latitude, const double & longitude, const double & altitude) const;
+  msf_core::Vector3 ecefToEnu(const msf_core::Vector3 & ecef) const;
+};
 
-#endif /* MSF_MACROS_H_ */
+}
+#endif /* GPS_CONVERSION_H_ */
