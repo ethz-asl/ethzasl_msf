@@ -133,16 +133,23 @@ template<typename EKFState_T>
 class SensorHandler
 {
   friend class MSF_SensorManager<EKFState_T>;
+  int lastseq_;
 protected:
   MSF_SensorManager<EKFState_T>& manager_;
   int sensorID;
   std::string topic_namespace_;
   std::string parameternamespace_;
   void setSensorID(int ID){sensorID = ID;}
+  void sequenceWatchDog(size_t seq, const std::string& topic){
+    if((int)seq != lastseq_ + 1 && lastseq_ != 0){
+        ROS_WARN_STREAM(topic<<": message drop curr seq:"<<seq<<" expected: "<<lastseq_ + 1);
+    }
+    lastseq_ = seq;
+  }
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   SensorHandler(MSF_SensorManager<EKFState_T>& mng, std::string& topic_namespace, std::string& parameternamespace):
-  manager_(mng), sensorID(-1), topic_namespace_(topic_namespace), parameternamespace_(parameternamespace){}
+  lastseq_(0), manager_(mng), sensorID(-1), topic_namespace_(topic_namespace), parameternamespace_(parameternamespace){}
   virtual ~SensorHandler() {}
 };
 

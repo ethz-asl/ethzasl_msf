@@ -39,7 +39,7 @@ PressureSensorHandler::PressureSensorHandler(msf_core::MSF_SensorManager<msf_upd
 {
   ros::NodeHandle pnh("~/pressure_sensor");
   ros::NodeHandle nh("msf_updates");
-  subPressure_ = nh.subscribe<asctec_hl_comm::mav_imu>("pressure_input", 5, &PressureSensorHandler::measurementCallback, this);
+  subPressure_ = nh.subscribe<asctec_hl_comm::mav_imu>("pressure_input", 20, &PressureSensorHandler::measurementCallback, this);
 
   memset(heightbuff, 0, sizeof(double) * heightbuffsize);
 
@@ -53,6 +53,7 @@ void PressureSensorHandler::setNoises(double n_zp)
 
 void PressureSensorHandler::measurementCallback(const asctec_hl_comm::mav_imuConstPtr & msg)
 {
+  this->sequenceWatchDog(msg->header.seq, subPressure_.getTopic());
   ROS_INFO_STREAM_ONCE("*** pressure sensor got first measurement from topic "<<this->topic_namespace_<<"/"<<subPressure_.getTopic()<<" ***");
 
   bool throttle = true;

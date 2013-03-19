@@ -4,6 +4,7 @@
             <remap from="msf_core/correction" to="/auk/fcu/ekf_state_in"/>
 
 	    <remap from="msf_updates/position_input" to="/leica/position" />
+	    <remap from="msf_updates/navsatfix_input" to="/auk/fcu/gps" />
 	    	
 	    <remap from="msf_core/imu_state_input" to="/auk/fcu/imu" />
             <!--remap from="msf_updates/transform_input" to="vicon/auk/auk" /--> 

@@ -53,11 +53,9 @@ SensorHandler<msf_updates::EKFState>(meas, topic_namespace, parameternamespace),
 
   ros::NodeHandle nh("msf_updates");
 
-  subPointStamped_ = nh.subscribe<geometry_msgs::PointStamped>("position_input", 1, &PositionSensorHandler::measurementCallback, this);
-  subTransformStamped_ = nh.subscribe<geometry_msgs::TransformStamped>("transform_input", 1, &PositionSensorHandler::measurementCallback, this);
-  subNavSatFix_ = nh.subscribe<sensor_msgs::NavSatFix>("navsatfix", 1, &PositionSensorHandler::measurementCallback, this);
-
-  //TODO impl pointwithcov callback
+  subPointStamped_ = nh.subscribe<geometry_msgs::PointStamped>("position_input", 20, &PositionSensorHandler::measurementCallback, this);
+  subTransformStamped_ = nh.subscribe<geometry_msgs::TransformStamped>("transform_input", 20, &PositionSensorHandler::measurementCallback, this);
+  subNavSatFix_ = nh.subscribe<sensor_msgs::NavSatFix>("navsatfix_input", 20, &PositionSensorHandler::measurementCallback, this);
 
   z_p_.setZero();
 
@@ -111,9 +109,12 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::processPositionMeasu
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(const geometry_msgs::PointStampedConstPtr & msg)
 {
+  this->sequenceWatchDog(msg->header.seq, subPointStamped_.getTopic());
+
   ROS_INFO_STREAM_ONCE("*** position sensor got first measurement from topic "<<this->topic_namespace_<<"/"<<subPointStamped_.getTopic()<<" ***");
 
   msf_updates::PointWithCovarianceStampedPtr pointwCov(new msf_updates::PointWithCovarianceStamped);
+  pointwCov->header = msg->header;
   pointwCov->point = msg->point;
 
   processPositionMeasurement(pointwCov);
@@ -122,6 +123,8 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(const geometry_msgs::TransformStampedConstPtr & msg)
 {
+  this->sequenceWatchDog(msg->header.seq, subTransformStamped_.getTopic());
+
   ROS_INFO_STREAM_ONCE("*** position sensor got first measurement from topic "<<this->topic_namespace_<<"/"<<subTransformStamped_.getTopic()<<" ***");
 
   if(msg->header.seq%5!=0){ //slow down vicon
@@ -130,10 +133,9 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(
   }
 
   msf_updates::PointWithCovarianceStampedPtr pointwCov(new msf_updates::PointWithCovarianceStamped);
+  pointwCov->header = msg->header;
 
   //fixed covariance will be set in measurement class -> makeFromSensorReadingImpl
-
-  pointwCov->header = msg->header;
 
   pointwCov->point.x = msg->transform.translation.x;
   pointwCov->point.y = msg->transform.translation.y;
@@ -146,21 +148,26 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(const sensor_msgs::NavSatFixConstPtr& msg)
 {
-  ROS_INFO_STREAM_ONCE("*** position sensor got first measurement from topic "<<this->topic_namespace_<<"/"<<subNavSatFix_.getTopic()<<" ***");
+  this->sequenceWatchDog(msg->header.seq, subNavSatFix_.getTopic());
 
+  ROS_INFO_STREAM_ONCE("*** position sensor got first measurement from topic "<<this->topic_namespace_<<"/"<<subNavSatFix_.getTopic()<<" ***");
 
   //fixed covariance will be set in measurement class -> makeFromSensorReadingImpl
 
   static bool referenceinit = false; //TODO dynreconf reset ref
   if(!referenceinit){
     gpsConversion_.initReference(msg->latitude, msg->longitude, msg->altitude);
-    ROS_WARN_STREAM("Initialized GPS reference of topic: "<<this->topic_namespace_<<"/"<<subNavSatFix_.getTopic());
+    ROS_WARN_STREAM("Initialized GPS reference of topic: "<<this->topic_namespace_<<"/"<<subNavSatFix_.getTopic()<<
+                    " to lat/lon/alt: ["<<msg->latitude<<", "<<msg->longitude<<", "<<msg->altitude<<"]");
+    referenceinit = true;
   }
 
   msf_core::Vector3 ecef = gpsConversion_.wgs84ToEcef(msg->latitude, msg->longitude, msg->altitude);
   msf_core::Vector3 enu = gpsConversion_.ecefToEnu(ecef);
 
   msf_updates::PointWithCovarianceStampedPtr pointwCov(new msf_updates::PointWithCovarianceStamped);
+  pointwCov->header = msg->header;
+
   //store the ENU data in the position fields
   pointwCov->point.x = enu[0];
   pointwCov->point.y = enu[1];

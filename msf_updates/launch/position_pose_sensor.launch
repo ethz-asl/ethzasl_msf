@@ -7,7 +7,7 @@
   			<remap from="msf_core/imu_state_input" to="/auk/fcu/imu" /> <!--IMU-->
 
 	    	<remap from="msf_updates/position_input" to="/leica/position" /> <!--LEICA-->
-	    	<remap from="msf_updates/position_input" to="/leica/position" /> <!--LEICA-->
+	    <remap from="msf_updates/navsatfix_input" to="/auk/fcu/gps" />  <!--GPS-->
 	    	
             <!--remap from="msf_updates/transform_input" to="vicon/auk/auk" /--> <!--VICON-->
             

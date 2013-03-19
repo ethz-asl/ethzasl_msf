@@ -160,5 +160,4 @@ void MSF_InitMeasurement<EKFState_T>::apply(boost::shared_ptr<EKFState_T> stateW
   core.initExternalPropagation(stateWithCovariance);
 
 }
-
 }

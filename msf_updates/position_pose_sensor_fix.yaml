@@ -49,16 +49,19 @@ pose_sensor/pose_absolute_measurements: true
 pose_sensor/pose_use_fixed_covariance: false
 pose_sensor/pose_measurement_world_sensor: false  # selects if sensor measures its position w.r.t. world (true, e.g. Vicon) or the position of the world coordinate system w.r.t. the sensor (false, e.g. ethzasl_ptam)
 
-position_sensor/position_delay: 0.2
-position_sensor/meas_noise_position: 0.001
+position_pose_sensor/position_delay: 0.001
+position_pose_sensor/position_noise_meas: 0.1
 
 #init position offset prism imu
-position_sensor/init/p_ip/x: -0.02    
-position_sensor/init/p_ip/y: 0.05
+position_sensor/init/p_ip/x: 0#-0.02    
+position_sensor/init/p_ip/y: 0#0.05
 position_sensor/init/p_ip/z: 0.05
 
-position_sensor/position_fixed_ppi: true
-position_sensor/position_use_fixed_covariance: true
+position_pose_sensor/core_height: 1.8
+position_pose_sensor/position_yaw_init: -128.0
+
+position_pose_sensor/position_fixed_p_ip: true
+position_sensor/position_use_fixed_covariance: false
 position_sensor/position_absolute_measurements: true
 
 

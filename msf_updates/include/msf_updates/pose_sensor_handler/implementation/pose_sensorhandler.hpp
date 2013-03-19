@@ -56,9 +56,9 @@ SensorHandler<msf_updates::EKFState>(meas, topic_namespace, parameternamespace),
   ROS_INFO_COND(!provides_absolute_measurements_, "Pose sensor is handling measurements as relative values");
 
   ros::NodeHandle nh("msf_updates/" + topic_namespace);
-  subPoseWithCovarianceStamped_ = nh.subscribe<geometry_msgs::PoseWithCovarianceStamped>("pose_with_covariance_input", 1, &PoseSensorHandler::measurementCallback, this);
-  subTransformStamped_ = nh.subscribe<geometry_msgs::TransformStamped>("transform_input", 1, &PoseSensorHandler::measurementCallback, this);
-  subPoseStamped_ = nh.subscribe<geometry_msgs::PoseStamped>("pose_input", 1, &PoseSensorHandler::measurementCallback, this);
+  subPoseWithCovarianceStamped_ = nh.subscribe<geometry_msgs::PoseWithCovarianceStamped>("pose_with_covariance_input", 20, &PoseSensorHandler::measurementCallback, this);
+  subTransformStamped_ = nh.subscribe<geometry_msgs::TransformStamped>("transform_input", 20, &PoseSensorHandler::measurementCallback, this);
+  subPoseStamped_ = nh.subscribe<geometry_msgs::PoseStamped>("pose_input", 20, &PoseSensorHandler::measurementCallback, this);
 
   z_p_.setZero();
   z_q_.setIdentity();
@@ -110,45 +110,47 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::setDelay(double delay)
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg)
 {
+
   //get the fixed states
-   int fixedstates = 0;
-   BOOST_STATIC_ASSERT_MSG(msf_updates::EKFState::nStateVarsAtCompileTime < 32, "Your state has more than 32 variables. "
-       "The code needs to be changed here to have a larger variable to mark the fixed_states"); //do not exceed the 32 bits of int
+  int fixedstates = 0;
+  BOOST_STATIC_ASSERT_MSG(msf_updates::EKFState::nStateVarsAtCompileTime < 32, "Your state has more than 32 variables. "
+                          "The code needs to be changed here to have a larger variable to mark the fixed_states"); //do not exceed the 32 bits of int
 
-   //get all the fixed states and set flag bits
-   MANAGER_TYPE* mngr = dynamic_cast<MANAGER_TYPE*>(&manager_);
+  //get all the fixed states and set flag bits
+  MANAGER_TYPE* mngr = dynamic_cast<MANAGER_TYPE*>(&manager_);
 
-   if(mngr){
-     if (mngr->getcfg().pose_fixed_scale){
-       fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::L;
-     }
-     if (mngr->getcfg().pose_fixed_p_ic){
-       fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::p_ic;
-     }
-     if (mngr->getcfg().pose_fixed_q_ic){
-       fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::q_ic;
-     }
-     if (mngr->getcfg().pose_fixed_p_wv){
-       fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::p_wv;
-     }
-     if (mngr->getcfg().pose_fixed_q_wv){
-       fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::q_wv;
-     }
-   }
+  if(mngr){
+    if (mngr->getcfg().pose_fixed_scale){
+      fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::L;
+    }
+    if (mngr->getcfg().pose_fixed_p_ic){
+      fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::p_ic;
+    }
+    if (mngr->getcfg().pose_fixed_q_ic){
+      fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::q_ic;
+    }
+    if (mngr->getcfg().pose_fixed_p_wv){
+      fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::p_wv;
+    }
+    if (mngr->getcfg().pose_fixed_q_wv){
+      fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::q_wv;
+    }
+  }
 
-   boost::shared_ptr<MEASUREMENT_TYPE> meas( new MEASUREMENT_TYPE(n_zp_, n_zq_, measurement_world_sensor_, use_fixed_covariance_, provides_absolute_measurements_, this->sensorID, fixedstates, distorter_));
+  boost::shared_ptr<MEASUREMENT_TYPE> meas( new MEASUREMENT_TYPE(n_zp_, n_zq_, measurement_world_sensor_, use_fixed_covariance_, provides_absolute_measurements_, this->sensorID, fixedstates, distorter_));
 
-   meas->makeFromSensorReading(msg, msg->header.stamp.toSec() - delay_);
+  meas->makeFromSensorReading(msg, msg->header.stamp.toSec() - delay_);
 
-   z_p_ = meas->z_p_; //store this for the init procedure
-   z_q_ = meas->z_q_;
+  z_p_ = meas->z_p_; //store this for the init procedure
+  z_q_ = meas->z_q_;
 
-   this->manager_.msf_core_->addMeasurement(meas);
+  this->manager_.msf_core_->addMeasurement(meas);
 }
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg)
 {
 
+  this->sequenceWatchDog(msg->header.seq, subPoseWithCovarianceStamped_.getTopic());
   ROS_INFO_STREAM_ONCE("*** pose sensor got first measurement from topic "<<this->topic_namespace_<<"/"<<subPoseWithCovarianceStamped_.getTopic()<<" ***");
   ProcessPoseMeasurement(msg);
 
@@ -157,6 +159,7 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(cons
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(const geometry_msgs::TransformStampedConstPtr & msg)
 {
+  this->sequenceWatchDog(msg->header.seq, subTransformStamped_.getTopic());
   ROS_INFO_STREAM_ONCE("*** pose sensor got first measurement from topic "<<this->topic_namespace_<<"/"<<subTransformStamped_.getTopic()<<" ***");
 
   if(msg->header.seq%5!=0){ //slow down vicon
@@ -191,6 +194,7 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(cons
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(const geometry_msgs::PoseStampedConstPtr & msg)
 {
+  this->sequenceWatchDog(msg->header.seq, subPoseStamped_.getTopic());
   ROS_INFO_STREAM_ONCE("*** pose sensor got first measurement from topic "<<this->topic_namespace_<<"/"<<subPoseStamped_.getTopic()<<" ***");
 
   geometry_msgs::PoseWithCovarianceStampedPtr pose(new geometry_msgs::PoseWithCovarianceStamped());

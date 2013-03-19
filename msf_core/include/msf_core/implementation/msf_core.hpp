@@ -55,16 +55,16 @@ MSF_Core<EKFState_T>::MSF_Core(MSF_SensorManager<EKFState_T>& usercalc):usercalc
   predictionMade_ = false;
   isfuzzyState_ = false;
 
-  g_ << 0, 0, 9.81;
+  g_ << 0, 0, 9.80834; //at 47.37 lat
 
   //TODO later: move all this to the external file and derive from this class. We could by this allow compilation on platforms withour ROS
   ros::NodeHandle nh("msf_core");
   ros::NodeHandle pnh("~");
 
-  pubState_ = nh.advertise<sensor_fusion_comm::DoubleArrayStamped> ("state_out", 1);
+  pubState_ = nh.advertise<sensor_fusion_comm::DoubleArrayStamped> ("state_out", 100);
   pubCorrect_ = nh.advertise<sensor_fusion_comm::ExtEkf> ("correction", 1);
-  pubPose_ = nh.advertise<geometry_msgs::PoseWithCovarianceStamped> ("pose", 1);
-  pubPoseAfterUpdate_ = nh.advertise<geometry_msgs::PoseWithCovarianceStamped> ("pose_after_update", 1);
+  pubPose_ = nh.advertise<geometry_msgs::PoseWithCovarianceStamped> ("pose", 100);
+  pubPoseAfterUpdate_ = nh.advertise<geometry_msgs::PoseWithCovarianceStamped> ("pose_after_update", 100);
   pubPoseCrtl_ = nh.advertise<sensor_fusion_comm::ExtState> ("ext_state", 1);
   msgState_.data.resize(nStatesAtCompileTime, 0);
 
@@ -72,9 +72,9 @@ MSF_Core<EKFState_T>::MSF_Core(MSF_SensorManager<EKFState_T>& usercalc):usercalc
   pubCov_ = nh.advertise<sensor_msgs::Image>("covariance_img", 1);
 #endif
 
-  subImu_ = nh.subscribe("imu_state_input", 4, &MSF_Core::imuCallback, this);
-  subImuCustom_ = nh.subscribe("imu_state_input_asctec", 4, &MSF_Core::imuCallback_asctec, this);
-  subState_ = nh.subscribe("hl_state_input", 4, &MSF_Core::stateCallback, this);
+  subImu_ = nh.subscribe("imu_state_input", 10, &MSF_Core::imuCallback, this);
+  subImuCustom_ = nh.subscribe("imu_state_input_asctec", 10, &MSF_Core::imuCallback_asctec, this);
+  subState_ = nh.subscribe("hl_state_input", 10, &MSF_Core::stateCallback, this);
 
   msgCorrect_.state.resize(HLI_EKF_STATE_SIZE, 0);
   hl_state_buf_.state.resize(HLI_EKF_STATE_SIZE, 0);
@@ -206,7 +206,7 @@ void MSF_Core<EKFState_T>::publishCovImage(boost::shared_ptr<EKFState_T> statept
 
   //  ROS_WARN_STREAM("P=["<<state.P<<"];");
 #else
-  ROS_WARN_STREAM_ONCE("The function to publish a covariance image was called, but the function is disabled at compile time.");
+  ROS_INFO_STREAM_ONCE("The function to publish a covariance image was called, but the function is disabled at compile time.");
   UNUSED(stateptr)
 #endif
 
@@ -257,6 +257,12 @@ void MSF_Core<EKFState_T>::imuCallback_asctec(const  asctec_hl_comm::mav_imuCons
 template<typename EKFState_T>
 void MSF_Core<EKFState_T>::imuCallback(const sensor_msgs::ImuConstPtr & msg)
 {
+  static int lastseq = -1;
+  if((int)msg->header.seq != lastseq + 1 && lastseq != -1){
+      ROS_WARN_STREAM("msf_core: imu message drop curr seq:"<<msg->header.seq<<" expected: "<<lastseq + 1);
+  }
+  lastseq = msg->header.seq;
+
   msf_core::Vector3 linacc;
   linacc << msg->linear_acceleration.x, msg->linear_acceleration.y, msg->linear_acceleration.z;
 
