@@ -423,7 +423,7 @@ MSF_DistortConfig::GroupDescription<MSF_DistortConfig::DEFAULT, MSF_DistortConfi
 //#line 259 "/home/slynen/Documents/projects/ros/dynamic_reconfigure/src/dynamic_reconfigure/parameter_generator.py"
       __max__.publish_pose = 1;
 //#line 259 "/home/slynen/Documents/projects/ros/dynamic_reconfigure/src/dynamic_reconfigure/parameter_generator.py"
-      __default__.publish_pose = 0;
+      __default__.publish_pose = 1;
 //#line 259 "/home/slynen/Documents/projects/ros/dynamic_reconfigure/src/dynamic_reconfigure/parameter_generator.py"
       Default.abstract_parameters.push_back(MSF_DistortConfig::AbstractParamDescriptionConstPtr(new MSF_DistortConfig::ParamDescription<bool>("publish_pose", "bool", 1, "enable pose republishing", "", &MSF_DistortConfig::publish_pose)));
 //#line 259 "/home/slynen/Documents/projects/ros/dynamic_reconfigure/src/dynamic_reconfigure/parameter_generator.py"
@@ -433,7 +433,7 @@ MSF_DistortConfig::GroupDescription<MSF_DistortConfig::DEFAULT, MSF_DistortConfi
 //#line 259 "/home/slynen/Documents/projects/ros/dynamic_reconfigure/src/dynamic_reconfigure/parameter_generator.py"
       __max__.publish_position = 1;
 //#line 259 "/home/slynen/Documents/projects/ros/dynamic_reconfigure/src/dynamic_reconfigure/parameter_generator.py"
-      __default__.publish_position = 0;
+      __default__.publish_position = 1;
 //#line 259 "/home/slynen/Documents/projects/ros/dynamic_reconfigure/src/dynamic_reconfigure/parameter_generator.py"
       Default.abstract_parameters.push_back(MSF_DistortConfig::AbstractParamDescriptionConstPtr(new MSF_DistortConfig::ParamDescription<bool>("publish_position", "bool", 1, "enable position republishing", "", &MSF_DistortConfig::publish_position)));
 //#line 259 "/home/slynen/Documents/projects/ros/dynamic_reconfigure/src/dynamic_reconfigure/parameter_generator.py"
