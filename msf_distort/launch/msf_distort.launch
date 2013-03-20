@@ -1,0 +1,8 @@
+<launch>
+    <node  launch-prefix="gdb -ex run --args" name="msf_distort" pkg="msf_distort" type="msf_distort" clear_params="true" output="screen">
+  			<remap from="msf_distort/position_input" to="/leica/position" /> 					<!--LEICA-->
+	    	<remap from="msf_distort/navsatfix_input" to="/auk/fcu/gps" />  					<!--GPS-->	    	
+            <remap from="msf_distort/transform_input" to="vicon/auk/auk" /> 					<!--VICON-->            
+            <remap from="msf_distort/pose_with_covariance_input" to="/auk/down/vslam/pose" /> 	<!--PTAM-->
+    </node>
+</launch>
