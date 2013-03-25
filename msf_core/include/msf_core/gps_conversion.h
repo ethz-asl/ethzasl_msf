@@ -49,6 +49,7 @@ public:
   void initReference(const double & latitude, const double & longitude, const double & altitude);
   msf_core::Vector3 wgs84ToEcef(const double & latitude, const double & longitude, const double & altitude) const;
   msf_core::Vector3 ecefToEnu(const msf_core::Vector3 & ecef) const;
+  void adjustReference(double z_corr);
 };
 
 }

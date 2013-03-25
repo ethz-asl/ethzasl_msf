@@ -52,7 +52,7 @@ namespace msf_core{
 /**
  * \brief a state variable with a name as specified in the state name enum
  */
-template<typename type_T, int name_T, int STATETYPE>
+template<typename type_T, int name_T, int STATETYPE, int OPTIONS>
 struct StateVar_T{
   typedef type_T value_t;
   typedef const StateVar_T<type_T, name_T>& constRef_T;
@@ -61,6 +61,7 @@ struct StateVar_T{
   typedef StateVar_T<type_T, name_T>* Ptr_T;
   enum{
     statetype_ = STATETYPE, ///<the type of this state. needed for computations of total state length
+    options_ = OPTIONS, ///<option flags for this state variable
     name_ = name_T, ///< the name of the state, needed to find it in the state type list
     sizeInCorrection_ = msf_tmp::CorrectionStateLengthForType<const StateVar_T<type_T, name_T>&>::value, ///< the size of this state in the correction vector
     sizeInState_ = msf_tmp::StateLengthForType<const StateVar_T<type_T, name_T>&>::value ///<the size of this state in the state vector

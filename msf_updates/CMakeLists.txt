@@ -22,7 +22,7 @@ gencfg()
 rosbuild_genmsg()
 
 add_definitions (-std=c++0x -march=native)
-set(ROS_COMPILE_FLAGS "-W -Wall -Wextra -pedantic")
+set(ROS_COMPILE_FLAGS "-W -Wall")# -Wextra -pedantic")
 
 #add_definitions (-DDEBUGPUBLISH) #publish the state after each propagation step for full rate plotting
 
@@ -39,3 +39,6 @@ add_subdirectory(src/position_pose_msf)
 
 rosbuild_add_executable(test_distort src/test/test_distort.cc)
 target_link_libraries(test_distort pose_distorter)
+
+#rosbuild_add_executable(test_tmp src/test/tmp_devel.cc)
+

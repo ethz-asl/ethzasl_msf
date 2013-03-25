@@ -77,6 +77,7 @@ public:
   //setters for configure values
   void setNoises(double n_zp);
   void setDelay(double delay);
+  void adjustGPSZReference(double current_z);
 
 };
 }

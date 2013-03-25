@@ -744,16 +744,17 @@ void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase<
 
     if(it_meas->second->time <= 0) //valid?
       continue;
-
+sm::timing::Timer timer_meas_get_state("Get state for measurement");
     boost::shared_ptr<EKFState_T> state = getClosestState(it_meas->second->time); //propagates covariance to state
-
+    timer_meas_get_state.stop();
     if(state->time <= 0){
       ROS_ERROR_STREAM_THROTTLE(1,"getClosestState returned an invalid state");
       continue;
     }
 
+    sm::timing::Timer timer_meas_apply("Apply measurement");
     it_meas->second->apply(state, *this); //calls back core::applyCorrection(), which sets time_P_propagated to meas time
-
+    timer_meas_apply.stop();
     //make sure to propagate to next measurement or up to now if no more measurements
     it_curr = StateBuffer_.getIteratorAtValue(state); //propagate from current state
 
@@ -774,6 +775,7 @@ void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase<
     typename stateBufferT::iterator_T it_next = it_curr;
     ++it_next;
 
+    sm::timing::Timer timer_prop_state_after_meas("Repropagate state to now");
     for( ; it_curr != it_end && it_next != it_end && it_curr->second->time != -1 && it_next->second->time != -1; ++it_curr, ++it_next){ //propagate to selected state
       if(it_curr->second == it_next->second){
         ROS_ERROR_STREAM("propagation : it_curr points to same state as it_next. This must not happen.");
@@ -783,7 +785,7 @@ void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase<
         return;
       propagateState(it_curr->second, it_next->second);
     }
-
+    timer_prop_state_after_meas.stop();
     appliedOne = true;
   }
 

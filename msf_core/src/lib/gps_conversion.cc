@@ -94,4 +94,10 @@ msf_core::Vector3 GPSConversion::ecefToEnu(const msf_core::Vector3 & ecef) const
   return ecef_ref_orientation_ * (ecef - ecef_ref_point_);
 }
 
+void GPSConversion::adjustReference(double z_corr){
+  ROS_WARN_STREAM("z-ref old: "<<ecef_ref_point_(2));
+  ecef_ref_point_(2) += z_corr;
+  ROS_WARN_STREAM("z-ref new: "<<ecef_ref_point_(2));
+}
+
 }

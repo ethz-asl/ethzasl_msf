@@ -73,6 +73,11 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::setDelay(double dela
   delay_ = delay;
 }
 
+template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
+void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::adjustGPSZReference(double current_z)
+{
+  gpsConversion_.adjustReference(z_p_(2) - current_z);
+}
 
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::processPositionMeasurement(const msf_updates::PointWithCovarianceStampedConstPtr& msg){

@@ -191,6 +191,11 @@ private:
     p = p_pos - q.toRotationMatrix() * p_ip;
     p_wv = p - p_vision; //shift the vision frame so that it fits the position measurement
 
+    //we want z from vision (we did scale init), so:
+//    p(2) = p_vision(2);
+//    p_wv(2) = 0;
+//    position_handler_->adjustGPSZReference(p(2));
+
     //prepare init "measurement"
     boost::shared_ptr<msf_core::MSF_InitMeasurement<EKFState_T> > meas(new msf_core::MSF_InitMeasurement<EKFState_T>(true)); //hand over that we will also set the sensor readings
 

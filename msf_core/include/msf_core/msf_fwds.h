@@ -46,10 +46,14 @@ enum{
   AuxiliaryNonTemporalDrifting
 };
 
+enum{ //set power 2 flags here
+  correctionMultiplicative = 0x1
+};
+
 //forwards
 
 //state variable
-template<typename type_T, int name_T, int STATETYPE = Auxiliary>
+template<typename type_T, int name_T, int STATETYPE = Auxiliary, int OPTIONS = 0x0>
 struct StateVar_T;
 
 //the state
