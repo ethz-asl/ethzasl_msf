@@ -13,6 +13,7 @@
   <depend package="geometry_msgs"/>
   
   <depend package="asctec_hl_comm"/>
+  <depend package="ptam_com"/>
   
   <export>
     <cpp cflags=" -I${prefix}/include -I${prefix}/cfg/cpp" />

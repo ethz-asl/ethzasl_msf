@@ -1,0 +1,4 @@
+rosbuild_add_executable(kf_pose_sensor main.cpp)
+rosbuild_add_compile_flags(kf_pose_sensor)
+
+target_link_libraries(kf_pose_sensor pose_distorter)
