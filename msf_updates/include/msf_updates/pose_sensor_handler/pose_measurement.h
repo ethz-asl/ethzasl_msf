@@ -281,7 +281,7 @@ public:
       }
 
       //try to make this a pose measurement
-      boost::shared_ptr<PoseMeasurement> prevmeas = boost::shared_dynamic_cast<PoseMeasurement>(prevmeas_base);
+      boost::shared_ptr<PoseMeasurement> prevmeas = boost::dynamic_pointer_cast<PoseMeasurement>(prevmeas_base);
       if(!prevmeas){
         ROS_WARN_STREAM("The dynamic cast of the previous measurement has failed. Could not apply measurement");
         return;
