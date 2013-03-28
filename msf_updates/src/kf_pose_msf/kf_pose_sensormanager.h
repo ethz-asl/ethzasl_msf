@@ -49,8 +49,8 @@ typedef boost::shared_ptr<ReconfigureServer> ReconfigureServerPtr;
 
 class KFPoseSensorManager : public msf_core::MSF_SensorManagerROS<msf_updates::EKFState>
 {
-  typedef KFPoseSensorHandler<msf_updates::kf_pose_measurement::PoseMeasurement, KFPoseSensorManager> PoseSensorHandler_T;
-  friend class KFPoseSensorHandler<msf_updates::kf_pose_measurement::PoseMeasurement, KFPoseSensorManager>;
+  typedef KFPoseSensorHandler<msf_updates::kf_pose_measurement::KFPoseMeasurement, KFPoseSensorManager> PoseSensorHandler_T;
+  friend class KFPoseSensorHandler<msf_updates::kf_pose_measurement::KFPoseMeasurement, KFPoseSensorManager>;
 public:
   typedef msf_updates::EKFState EKFState_T;
   typedef EKFState_T::StateSequence_T StateSequence_T;

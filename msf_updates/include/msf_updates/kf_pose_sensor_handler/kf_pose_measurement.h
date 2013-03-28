@@ -45,11 +45,11 @@ enum
 /**
  * \brief a measurement as provided by a pose tracking algorithm
  */
-typedef msf_core::MSF_Measurement<ptam_com::RelativePoseMeasurement, nMeasurements, msf_updates::EKFState> PoseMeasurementBase;
-struct PoseMeasurement : public PoseMeasurementBase
+typedef msf_core::MSF_Measurement<ptam_com::RelativePoseMeasurement, nMeasurements, msf_updates::EKFState> KFPoseMeasurementBase;
+struct KFPoseMeasurement : public KFPoseMeasurementBase
 {
 private:
-  typedef msf_core::MSF_Measurement<ptam_com::RelativePoseMeasurement, nMeasurements, msf_updates::EKFState> Measurement_t;
+  typedef KFPoseMeasurementBase Measurement_t;
   typedef Measurement_t::Measurement_ptr measptr_t;
 
   virtual void makeFromSensorReadingImpl(measptr_t msg)
@@ -61,16 +61,26 @@ private:
     H_old.setZero();
     R_.setZero(); //TODO:remove later, already done in ctor of base
 
+    Eigen::Matrix<double, 3, 1> pos_parent(msg->parentPose.pose.pose.position.x,
+                                               msg->parentPose.pose.pose.position.y, msg->parentPose.pose.pose.position.z);
+    Eigen::Quaternion<double> ori_parent(msg->parentPose.pose.pose.orientation.w,msg->parentPose.pose.pose.orientation.x,
+                                         msg->parentPose.pose.pose.orientation.y, msg->parentPose.pose.pose.orientation.z);
+
+    //make absolute measurements for KF init
+    z_p_init_ = Eigen::Matrix<double, 3, 1>(msg->relativePoseToParent.pose.pose.position.x,
+                                           msg->relativePoseToParent.pose.pose.position.y, msg->relativePoseToParent.pose.pose.position.z);
+
     // get measurements
-    z_p_ = Eigen::Matrix<double, 3, 1>(msg->pose.pose.position.x, msg->pose.pose.position.y, msg->pose.pose.position.z);
-    z_q_ = Eigen::Quaternion<double>(msg->pose.pose.orientation.w, msg->pose.pose.orientation.x,
-                                     msg->pose.pose.orientation.y, msg->pose.pose.orientation.z);
+    z_p_rel_ = Eigen::Matrix<double, 3, 1>(msg->relativePoseToParent.pose.pose.position.x,
+                                       msg->relativePoseToParent.pose.pose.position.y, msg->relativePoseToParent.pose.pose.position.z);
+    z_q_rel_ = Eigen::Quaternion<double>(msg->relativePoseToParent.pose.pose.orientation.w,msg->relativePoseToParent.pose.pose.orientation.x,
+                                     msg->relativePoseToParent.pose.pose.orientation.y, msg->relativePoseToParent.pose.pose.orientation.z);
 
     if(distorter_){
       static double tlast = 0;
       if(tlast != 0){
         double dt = time - tlast;
-        distorter_->distort(z_p_, z_q_, dt);
+        distorter_->distort(z_p_rel_, z_q_rel_, dt);
       }
       tlast = time;
     }
@@ -84,9 +94,9 @@ private:
 
     }else{// take covariance from sensor
 
-      R_.block<6, 6>(0, 0) = Eigen::Matrix<double, 6, 6>(&msg->pose.covariance[0]);
+      R_.block<6, 6>(0, 0) = Eigen::Matrix<double, 6, 6>(&msg->relativePoseToParent.pose.covariance[0]);
 
-      if(msg->header.seq % 100 == 0){ //only do this check from time to time
+      if(msg->relativePoseToParent.header.seq % 100 == 0){ //only do this check from time to time
         if(R_.block<6, 6>(0, 0).determinant() < -0.001)
           ROS_WARN_STREAM_THROTTLE(60,"The covariance matrix you provided for the pose sensor is not positive definite: "<<(R_.block<6, 6>(0, 0)));
       }
@@ -94,31 +104,34 @@ private:
       //clear cross-correlations between q and p
       R_.block<3, 3>(0, 3) = Eigen::Matrix<double, 3, 3>::Zero();
       R_.block<3, 3>(3, 0) = Eigen::Matrix<double, 3, 3>::Zero();
-      R_(6, 6) = 1e-6; // q_wv yaw-measurement noise //TODO: WHY???
+      R_(6, 6) = 1e-6; // q_wv yaw-measurement noise
 
-      /*************************************************************************************/
-      // use this if your pose sensor is ethzasl_ptam (www.ros.org/wiki/ethzasl_ptam)
-      // ethzasl_ptam publishes the camera pose as the world seen from the camera
-      if (!measurement_world_sensor_)
-      {
-        Eigen::Matrix<double, 3, 3> C_zq = z_q_.toRotationMatrix();
-        z_q_ = z_q_.conjugate();
-        z_p_ = -C_zq.transpose() * z_p_;
-
-        Eigen::Matrix<double, 6, 6> C_cov(Eigen::Matrix<double, 6, 6>::Zero());
-        C_cov.block<3, 3>(0, 0) = C_zq;
-        C_cov.block<3, 3>(3, 3) = C_zq;
-
-        R_.block<6, 6>(0, 0) = C_cov.transpose() * R_.block<6, 6>(0, 0) * C_cov;
-      }
-      /*************************************************************************************/
+//      /*************************************************************************************/
+//      // use this if your pose sensor is ethzasl_ptam (www.ros.org/wiki/ethzasl_ptam)
+//      // ethzasl_ptam publishes the camera pose as the world seen from the camera
+//      if (!measurement_world_sensor_)
+//      {
+//        Eigen::Matrix<double, 3, 3> C_zq = z_q_rel_.toRotationMatrix();
+//        z_q_rel_ = z_q_rel_.conjugate();
+//        z_p_rel_ = -C_zq.transpose() * z_p_rel_;
+//
+//        Eigen::Matrix<double, 6, 6> C_cov(Eigen::Matrix<double, 6, 6>::Zero());
+//        C_cov.block<3, 3>(0, 0) = C_zq;
+//        C_cov.block<3, 3>(3, 3) = C_zq;
+//
+//        R_.block<6, 6>(0, 0) = C_cov.transpose() * R_.block<6, 6>(0, 0) * C_cov;
+//      }
+//      /*************************************************************************************/
     }
   }
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  Eigen::Quaternion<double> z_q_; /// attitude measurement camera seen from world
-  Eigen::Matrix<double, 3, 1> z_p_; /// position measurement camera seen from world
+  Eigen::Quaternion<double> z_q_rel_; /// attitude measurement camera seen from world
+  Eigen::Matrix<double, 3, 1> z_p_rel_; /// position measurement camera seen from world
+  Eigen::Quaternion<double> z_q_init_; /// attitude measurement camera seen from world
+  Eigen::Matrix<double, 3, 1> z_p_init_; /// position measurement camera seen from world
+
   double n_zp_, n_zq_; /// position and attitude measurement noise
 
   bool fixed_covariance_;
@@ -128,11 +141,11 @@ public:
   typedef msf_updates::EKFState EKFState_T;
   typedef EKFState_T::StateSequence_T StateSequence_T;
   typedef EKFState_T::StateDefinition_T StateDefinition_T;
-  virtual ~PoseMeasurement()
+  virtual ~KFPoseMeasurement()
   {
   }
-  PoseMeasurement(double n_zp, double n_zq, bool measurement_world_sensor, bool fixed_covariance, int sensorID, int fixedstates, msf_updates::PoseDistorter::Ptr distorter = msf_updates::PoseDistorter::Ptr()) :
-    PoseMeasurementBase(true, sensorID),
+  KFPoseMeasurement(double n_zp, double n_zq, bool fixed_covariance, int sensorID, int fixedstates, msf_updates::PoseDistorter::Ptr distorter = msf_updates::PoseDistorter::Ptr()) :
+    KFPoseMeasurementBase(true, sensorID),
     n_zp_(n_zp), n_zq_(n_zq), fixed_covariance_(fixed_covariance), distorter_(distorter), fixedstates_(fixedstates)
   {
 
@@ -233,7 +246,7 @@ public:
     }
 
     //try to make this a pose measurement
-    boost::shared_ptr<PoseMeasurement> prevmeas = boost::shared_dynamic_cast<PoseMeasurement>(prevmeas_base);
+    boost::shared_ptr<KFPoseMeasurement> prevmeas = boost::shared_static_cast<KFPoseMeasurement>(prevmeas_base);
     if(!prevmeas){
       ROS_WARN_STREAM("The dynamic cast of the previous measurement has failed. Could not apply measurement");
       return;
@@ -276,13 +289,13 @@ public:
                                                          (C_wv_old.transpose() * ( - state_old.get<StateDefinition_T::p_wv>() + state_old.get<StateDefinition_T::p>() + C_q_old.transpose() * state_old.get<StateDefinition_T::p_ic>()))
                                                          * state_old.get<StateDefinition_T::L>();
 
-    Eigen::Matrix<double, 3, 1> diffmeaspos = z_p_ - prevmeas->z_p_;
+    Eigen::Matrix<double, 3, 1> diffmeaspos = z_p_rel_ - prevmeas->z_p_rel_;
 
     r_new.block<3, 1>(0, 0) = diffmeaspos - diffprobpos;
 
     // attitude
     Eigen::Quaternion<double> diffprobatt = (state_new.get<StateDefinition_T::q_wv>() * state_new.get<StateDefinition_T::q>() * state_new.get<StateDefinition_T::q_ic>()).conjugate() * (state_old.get<StateDefinition_T::q_wv>() * state_old.get<StateDefinition_T::q>() * state_old.get<StateDefinition_T::q_ic>());
-    Eigen::Quaternion<double> diffmeasatt = z_q_.conjugate() * prevmeas->z_q_;
+    Eigen::Quaternion<double> diffmeasatt = z_q_rel_.conjugate() * prevmeas->z_q_rel_;
 
     Eigen::Quaternion<double> q_err;
     q_err = diffprobatt.conjugate() * diffmeasatt;

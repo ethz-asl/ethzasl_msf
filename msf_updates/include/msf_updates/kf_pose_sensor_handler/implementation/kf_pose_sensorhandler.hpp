@@ -128,8 +128,8 @@ void KFPoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement
 
   meas->makeFromSensorReading(msg, msg->header.stamp.toSec() - delay_);
 
-  z_p_ = meas->z_p_; //store this for the init procedure
-  z_q_ = meas->z_q_;
+  z_p_ = meas->z_p_init_; //store this for the init procedure
+  z_q_ = meas->z_q_init_;
 
   this->manager_.msf_core_->addMeasurement(meas);
 }

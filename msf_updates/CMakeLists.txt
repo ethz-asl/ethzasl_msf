@@ -32,14 +32,14 @@ include_directories(${Eigen_INCLUDE_DIRS})
 
 rosbuild_add_library(pose_distorter src/msf_distort/PoseDistorter.cc)
 
-add_subdirectory(src/pose_msf)
+#add_subdirectory(src/pose_msf)
 add_subdirectory(src/kf_pose_msf)
-add_subdirectory(src/pose_pressure_msf)
-add_subdirectory(src/position_msf)
-add_subdirectory(src/position_pose_msf)
+#add_subdirectory(src/pose_pressure_msf)
+#add_subdirectory(src/position_msf)
+#add_subdirectory(src/position_pose_msf)
 
-rosbuild_add_executable(test_distort src/test/test_distort.cc)
-target_link_libraries(test_distort pose_distorter)
+#rosbuild_add_executable(test_distort src/test/test_distort.cc)
+#target_link_libraries(test_distort pose_distorter)
 
 #rosbuild_add_executable(test_tmp src/test/tmp_devel.cc)
 
