@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <msf_core/gps_conversion.h>
 #include <msf_core/msf_macros.h>
 #include <ros/ros.h>
+#include <msf_core/sincos.h>
 
 namespace msf_core{
 
