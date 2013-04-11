@@ -8,6 +8,8 @@
 #include <msf_distort/MSF_DistortConfig.h>
 #include <dynamic_reconfigure/Reconfigure.h>
 #include <dynamic_reconfigure/server.h>
+#include <Eigen/Dense>
+#include <queue>
 
 
 struct CallbackHandler{
@@ -19,6 +21,7 @@ struct CallbackHandler{
   ros::Publisher pubPoseStamped_;
   ros::Publisher pubNavSatFix_;
   ros::Publisher pubPoint_;
+  std::queue<geometry_msgs::TransformStampedConstPtr> queue;
 
   CallbackHandler(ros::NodeHandle& nh){
     pubPoseWithCovarianceStamped_ = nh.advertise<geometry_msgs::PoseWithCovarianceStamped> ("pose_with_covariance_output", 100);
@@ -38,10 +41,46 @@ struct CallbackHandler{
     }
   }
 
-  void measurementCallback(const geometry_msgs::TransformStampedConstPtr & msg){
+  void measurementCallback(const geometry_msgs::TransformStampedConstPtr & newmsg){
     if(config_.publish_pose){
-      pubTransformStamped_.publish(msg);
+      pubTransformStamped_.publish(newmsg);
     }
+    double delay = 0.0;
+    queue.push(newmsg);
+
+    double current_time = newmsg->header.stamp.toSec();
+
+    if(queue.front()->header.stamp.toSec() <= current_time - delay){
+      geometry_msgs::TransformStampedConstPtr msg = queue.front();
+      queue.pop();
+
+      geometry_msgs::PoseStampedPtr msgpose(new geometry_msgs::PoseStamped);
+      msgpose->header = msg->header;
+      msgpose->header.stamp = ros::Time(msgpose->header.stamp.toSec());
+      msgpose->pose.position.x = 0;//msg->transform.translation.x;
+      msgpose->pose.position.y = 0;//msg->transform.translation.y;
+      msgpose->pose.position.z = 0;//msg->transform.translation.z;
+
+      //calibration camera body to vicon marker body
+      Eigen::Quaterniond align(0.0041,0.0056,-0.0315,-0.9995);
+      align.normalize();
+      Eigen::Quaterniond cam(0,1,0,0);
+      cam.normalize();
+      Eigen::Quaterniond rotz(0,0,0,1);
+      rotz.normalize();
+
+      Eigen::Quaterniond gt_pose(msg->transform.rotation.w, msg->transform.rotation.x, msg->transform.rotation.y, msg->transform.rotation.z);
+      Eigen::Quaterniond aligned = align.inverse() * gt_pose;
+
+      msgpose->pose.orientation.w = aligned.w();
+      msgpose->pose.orientation.x = aligned.x();
+      msgpose->pose.orientation.y = aligned.y();
+      msgpose->pose.orientation.z = aligned.z();
+      pubPoseStamped_.publish(msgpose);
+
+    }
+
+
   }
 
   void measurementCallback(const geometry_msgs::PoseStampedConstPtr & msg){
