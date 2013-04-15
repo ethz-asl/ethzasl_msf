@@ -52,7 +52,7 @@ enum
 /**
  * \brief a measurement as provided by a pose tracking algorithm
  */
-typedef msf_core::MSF_Measurement<PointWithCovarianceStamped, nMeasurements, msf_updates::EKFState> PositionMeasurementBase;
+typedef msf_core::MSF_Measurement<PointWithCovarianceStamped, Eigen::Matrix<double, nMeasurements, nMeasurements>, msf_updates::EKFState> PositionMeasurementBase;
 struct PositionMeasurement : public PositionMeasurementBase
 {
 private:

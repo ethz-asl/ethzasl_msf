@@ -43,11 +43,11 @@ enum
 /**
  * \brief a measurement as provided by a pressure sensor
  */
-typedef msf_core::MSF_Measurement<asctec_hl_comm::mav_imu, nMeasurements, msf_updates::EKFState> PressureMeasurementBase;
+typedef msf_core::MSF_Measurement<asctec_hl_comm::mav_imu, Eigen::Matrix<double, nMeasurements, nMeasurements>, msf_updates::EKFState> PressureMeasurementBase;
 struct PressureMeasurement : public PressureMeasurementBase
 {
 private:
-  typedef msf_core::MSF_Measurement<asctec_hl_comm::mav_imu, nMeasurements, msf_updates::EKFState> Measurement_t;
+  typedef PressureMeasurementBase Measurement_t;
   typedef Measurement_t::Measurement_ptr measptr_t;
 
   virtual void makeFromSensorReadingImpl(measptr_t msg)

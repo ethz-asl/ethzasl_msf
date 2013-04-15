@@ -49,11 +49,11 @@ enum
 /**
  * \brief a measurement as provided by a pose tracking algorithm
  */
-typedef msf_core::MSF_Measurement<geometry_msgs::PoseWithCovarianceStamped, nMeasurements, msf_updates::EKFState> PoseMeasurementBase;
+typedef msf_core::MSF_Measurement<geometry_msgs::PoseWithCovarianceStamped, Eigen::Matrix<double, nMeasurements, nMeasurements>, msf_updates::EKFState> PoseMeasurementBase;
 struct PoseMeasurement : public PoseMeasurementBase
 {
 private:
-  typedef msf_core::MSF_Measurement<geometry_msgs::PoseWithCovarianceStamped, nMeasurements, msf_updates::EKFState> Measurement_t;
+  typedef PoseMeasurementBase Measurement_t;
   typedef Measurement_t::Measurement_ptr measptr_t;
 
   virtual void makeFromSensorReadingImpl(measptr_t msg)
