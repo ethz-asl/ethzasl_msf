@@ -96,12 +96,12 @@ public:
  * method of the EKF core
  * \note provides an abstract NVI to create measurements from sensor readings
  */
-template<typename T, int MEASUREMENTSIZE, typename EKFState_T>
+template<typename T, typename RMAT_T, typename EKFState_T>
 class MSF_Measurement: public MSF_MeasurementBase<EKFState_T>{
 private:
   virtual void makeFromSensorReadingImpl(const boost::shared_ptr<T const> reading) = 0;
 protected:
-Eigen::Matrix<double, MEASUREMENTSIZE, MEASUREMENTSIZE> R_;
+RMAT_T R_;
 public:
 EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 typedef T Measurement_type;
