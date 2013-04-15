@@ -9,7 +9,6 @@
 #include <dynamic_reconfigure/Reconfigure.h>
 #include <dynamic_reconfigure/server.h>
 #include <Eigen/Dense>
-#include <queue>
 
 
 struct CallbackHandler{
@@ -18,14 +17,15 @@ struct CallbackHandler{
   Config_T config_;
   ros::Publisher pubPoseWithCovarianceStamped_;
   ros::Publisher pubTransformStamped_;
+  ros::Publisher pubTfToPoseStamped_;
   ros::Publisher pubPoseStamped_;
   ros::Publisher pubNavSatFix_;
   ros::Publisher pubPoint_;
-  std::queue<geometry_msgs::TransformStampedConstPtr> queue;
 
   CallbackHandler(ros::NodeHandle& nh){
     pubPoseWithCovarianceStamped_ = nh.advertise<geometry_msgs::PoseWithCovarianceStamped> ("pose_with_covariance_output", 100);
     pubTransformStamped_ = nh.advertise<geometry_msgs::TransformStamped> ("transform_output", 100);
+    pubTfToPoseStamped_ = nh.advertise<geometry_msgs::PoseStamped> ("tf_to_pose_output", 100);
     pubPoseStamped_ = nh.advertise<geometry_msgs::PoseStamped> ("pose_output", 100);
     pubNavSatFix_ = nh.advertise<sensor_msgs::NavSatFix>("navsatfix_output", 100);
     pubPoint_ = nh.advertise<geometry_msgs::PointStamped>("point_output", 100);
@@ -41,19 +41,11 @@ struct CallbackHandler{
     }
   }
 
-  void measurementCallback(const geometry_msgs::TransformStampedConstPtr & newmsg){
+  void measurementCallback(const geometry_msgs::TransformStampedConstPtr & msg){
     if(config_.publish_pose){
-      pubTransformStamped_.publish(newmsg);
-    }
-    double delay = 0.0;
-    queue.push(newmsg);
+      pubTransformStamped_.publish(msg);
 
-    double current_time = newmsg->header.stamp.toSec();
-
-    if(queue.front()->header.stamp.toSec() <= current_time - delay){
-      geometry_msgs::TransformStampedConstPtr msg = queue.front();
-      queue.pop();
-
+      //also publish as pose
       geometry_msgs::PoseStampedPtr msgpose(new geometry_msgs::PoseStamped);
       msgpose->header = msg->header;
       msgpose->header.stamp = ros::Time(msgpose->header.stamp.toSec());
@@ -61,32 +53,36 @@ struct CallbackHandler{
       msgpose->pose.position.y = 0;//msg->transform.translation.y;
       msgpose->pose.position.z = 0;//msg->transform.translation.z;
 
-      //calibration camera body to vicon marker body
-      Eigen::Quaterniond align(0.0041,0.0056,-0.0315,-0.9995);
-      align.normalize();
-      Eigen::Quaterniond cam(0,1,0,0);
-      cam.normalize();
-      Eigen::Quaterniond rotz(0,0,0,1);
-      rotz.normalize();
-
-      Eigen::Quaterniond gt_pose(msg->transform.rotation.w, msg->transform.rotation.x, msg->transform.rotation.y, msg->transform.rotation.z);
-      Eigen::Quaterniond aligned = align.inverse() * gt_pose;
-
-      msgpose->pose.orientation.w = aligned.w();
-      msgpose->pose.orientation.x = aligned.x();
-      msgpose->pose.orientation.y = aligned.y();
-      msgpose->pose.orientation.z = aligned.z();
-      pubPoseStamped_.publish(msgpose);
-
+      msgpose->pose.orientation.w = msg->transform.rotation.w;
+      msgpose->pose.orientation.x = msg->transform.rotation.x;
+      msgpose->pose.orientation.y = msg->transform.rotation.y;
+      msgpose->pose.orientation.z = msg->transform.rotation.z;
+      pubTfToPoseStamped_.publish(msgpose);
     }
-
-
   }
 
   void measurementCallback(const geometry_msgs::PoseStampedConstPtr & msg){
-    if(config_.publish_pose){
-      pubPoseStamped_.publish(msg);
-    }
+    //    if(config_.publish_pose){
+    //      pubPoseStamped_.publish(msg);
+    //    }
+
+    geometry_msgs::PoseStampedPtr msgpose(new geometry_msgs::PoseStamped);
+    msgpose->header = msg->header;
+    msgpose->pose = msg->pose;
+
+    //calibration camera body to vicon marker body
+    Eigen::Quaterniond align(0.0041,0.0056,-0.0315,-0.9995);
+    align.normalize();
+    Eigen::Quaterniond cam(0,0,1,0);
+
+    Eigen::Quaterniond pose(msg->pose.orientation.w, msg->pose.orientation.x, msg->pose.orientation.y, msg->pose.orientation.z);
+    Eigen::Quaterniond aligned = cam * pose * align; // good
+
+    msgpose->pose.orientation.w = aligned.w();
+    msgpose->pose.orientation.x = aligned.x();
+    msgpose->pose.orientation.y = aligned.y();
+    msgpose->pose.orientation.z = aligned.z();
+    pubPoseStamped_.publish(msgpose);
   }
 
   void measurementCallback(const sensor_msgs::NavSatFixConstPtr & msg){
