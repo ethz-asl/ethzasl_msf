@@ -52,7 +52,7 @@ enum
 /**
  * \brief an angle measurement from a spherical position sensor
  */
-typedef msf_core::MSF_Measurement<geometry_msgs::PointStamped, N_ANGLE_MEASUREMENTS, msf_updates::EKFState> AngleMeasurementBase;
+typedef msf_core::MSF_Measurement<geometry_msgs::PointStamped, Eigen::Matrix<double, N_ANGLE_MEASUREMENTS, N_ANGLE_MEASUREMENTS>, msf_updates::EKFState> AngleMeasurementBase;
 struct AngleMeasurement : public AngleMeasurementBase
 {
 private:
@@ -199,7 +199,7 @@ public:
 /**
  * \brief a distance measurement from a spherical position sensor
  */
-typedef msf_core::MSF_Measurement<geometry_msgs::PointStamped, N_DISTANCE_MEASUREMENTS, msf_updates::EKFState> DistanceMeasurementBase;
+typedef msf_core::MSF_Measurement<geometry_msgs::PointStamped, Eigen::Matrix<double, N_DISTANCE_MEASUREMENTS, N_DISTANCE_MEASUREMENTS>, msf_updates::EKFState> DistanceMeasurementBase;
 struct DistanceMeasurement : public DistanceMeasurementBase
 {
 private:
