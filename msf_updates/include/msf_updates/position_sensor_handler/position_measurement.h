@@ -53,7 +53,7 @@ enum
  * \brief a measurement as provided by a pose tracking algorithm
  */
 typedef msf_core::MSF_Measurement<PointWithCovarianceStamped, nMeasurements, msf_updates::EKFState> PositionMeasurementBase;
-struct PositionMeasurement : public PositionMeasurementBase
+struct AngleMeasurement : public PositionMeasurementBase
 {
 private:
   typedef PositionMeasurementBase Measurement_t;
@@ -99,10 +99,10 @@ public:
   typedef msf_updates::EKFState EKFState_T;
   typedef EKFState_T::StateSequence_T StateSequence_T;
   typedef EKFState_T::StateDefinition_T StateDefinition_T;
-  virtual ~PositionMeasurement()
+  virtual ~AngleMeasurement()
   {
   }
-  PositionMeasurement(double n_zp, bool fixed_covariance, bool isabsoluteMeasurement, int sensorID, int fixedstates) :
+  AngleMeasurement(double n_zp, bool fixed_covariance, bool isabsoluteMeasurement, int sensorID, int fixedstates) :
     PositionMeasurementBase(isabsoluteMeasurement, sensorID),
     n_zp_(n_zp), fixed_covariance_(fixed_covariance), fixedstates_(fixedstates)
   {
