@@ -137,12 +137,12 @@ bool checkForNumeric(const Eigen::MatrixBase<D> & mat, const std::string & info)
   for (int i = 0; i < rows; ++i)
   {
     for(int j = 0; j < cols ; ++j){
-      if (isnan(mat(i,j)))
+      if (std::isnan(mat(i,j)))
       {
         std::cerr << "=== ERROR ===  " << info << ": NAN at index [" << i << "," << j << "]" << std::endl;
         return false;
       }
-      if (isinf(mat(i,j)))
+      if (std::isinf(mat(i,j)))
       {
         std::cerr << "=== ERROR ===  " << info << ": INF at index [" << i << "," << j << "]" << std::endl;
         return false;
@@ -158,7 +158,7 @@ bool checkForNumeric(const Eigen::MatrixBase<D> & mat, const std::string & info)
 //{
 //  for (int i = 0; i < size; i++)
 //  {
-//    if (isnan(vec[i]))
+//    if (std::isnan(vec[i]))
 //    {
 //      std::cerr << "=== ERROR ===  " << info << ": NAN at index " << i << std::endl;
 //      return false;
