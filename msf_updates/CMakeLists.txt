@@ -42,6 +42,7 @@ add_subdirectory(src/pose_msf)
 add_subdirectory(src/pose_pressure_msf)
 add_subdirectory(src/position_msf)
 add_subdirectory(src/position_pose_msf)
+add_subdirectory(src/spherical_msf)
 
 rosbuild_add_executable(test_distort src/test/test_distort.cc)
 target_link_libraries(test_distort pose_distorter)
