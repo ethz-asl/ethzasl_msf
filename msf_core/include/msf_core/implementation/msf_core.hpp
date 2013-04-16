@@ -668,7 +668,7 @@ void MSF_Core<EKFState_T>::init(boost::shared_ptr<MSF_MeasurementBase<EKFState_T
   initialized_ = false;
   predictionMade_ = false;
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(100)); //hackish thread sync
+  usleep(100000); //hackish thread sync
 
   MeasurementBuffer_.clear();
   StateBuffer_.clear();
@@ -693,7 +693,7 @@ void MSF_Core<EKFState_T>::init(boost::shared_ptr<MSF_MeasurementBase<EKFState_T
   //apply init measurement, where the user can provide additional values for P
   measurement->apply(state, *this);
 
-  std::this_thread::sleep_for(std::chrono::milliseconds(100)); //wait for the external propagation to get the init message
+  usleep(10000); //wait for the external propagation to get the init message
 
   assert(state->time != 0);
 

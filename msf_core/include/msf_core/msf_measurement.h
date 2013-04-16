@@ -63,6 +63,9 @@ protected:
   void calculateAndApplyCorrection(boost::shared_ptr<EKFState_T> state, MSF_Core<EKFState_T>& core, const Eigen::MatrixBase<H_type>& H_delayed,
                                    const Eigen::MatrixBase<Res_type> & res_delayed, const Eigen::MatrixBase<R_type>& R_delayed);
 
+  void calculateAndApplyCorrection(boost::shared_ptr<EKFState_T> state, MSF_Core<EKFState_T>& core, const Eigen::MatrixXd& H_delayed,
+                                                                    const Eigen::MatrixXd & res_delayed, const Eigen::MatrixXd& R_delayed);
+
   template<class H_type, class Res_type, class R_type>
   void calculateAndApplyCorrectionRelative(boost::shared_ptr<EKFState_T> state_old, boost::shared_ptr<EKFState_T> state_new, MSF_Core<EKFState_T>& core,
                                                                             const Eigen::MatrixBase<H_type>& H_old, const Eigen::MatrixBase<H_type>& H_new,
@@ -93,12 +96,12 @@ public:
  * method of the EKF core
  * \note provides an abstract NVI to create measurements from sensor readings
  */
-template<typename T, int MEASUREMENTSIZE, typename EKFState_T>
+template<typename T, typename RMAT_T, typename EKFState_T>
 class MSF_Measurement: public MSF_MeasurementBase<EKFState_T>{
 private:
   virtual void makeFromSensorReadingImpl(const boost::shared_ptr<T const> reading) = 0;
 protected:
-Eigen::Matrix<double, MEASUREMENTSIZE, MEASUREMENTSIZE> R_;
+RMAT_T R_;
 public:
 EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 typedef T Measurement_type;
