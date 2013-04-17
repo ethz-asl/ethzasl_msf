@@ -45,7 +45,7 @@ template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
       SensorHandler<msf_updates::EKFState>(meas, topic_namespace, parameternamespace), n_za_(1e-6), delay_(0)
   {
     ros::NodeHandle pnh("~/spherical_position_sensor");
-    pnh.param("use_fixed_covariance", use_fixed_covariance_, false);
+    pnh.param("use_fixed_covariance", use_fixed_covariance_, true);
     pnh.param("absolute_measurements", provides_absolute_measurements_, false);
 
     ROS_INFO_COND(use_fixed_covariance_, "Angle sensor is using fixed covariance");
@@ -130,7 +130,7 @@ template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
       SensorHandler<msf_updates::EKFState>(meas, topic_namespace, parameternamespace), n_zd_(1e-6), delay_(0)
   {
     ros::NodeHandle pnh("~/spherical_position_sensor");
-    pnh.param("use_fixed_covariance", use_fixed_covariance_, false);
+    pnh.param("use_fixed_covariance", use_fixed_covariance_, true);
     pnh.param("absolute_measurements", provides_absolute_measurements_, false);
 
     ROS_INFO_COND(use_fixed_covariance_, "Distance sensor is using fixed covariance");
