@@ -216,7 +216,7 @@ private:
     R_.setZero(); //TODO:remove later, already done in ctor of base
 
     // get measurement
-    z_d_ << msg->point.x, msg->point.y;
+    z_d_ << msg->point.z;
 
     if (fixed_covariance_)//  take fix covariance from reconfigure GUI
     {
