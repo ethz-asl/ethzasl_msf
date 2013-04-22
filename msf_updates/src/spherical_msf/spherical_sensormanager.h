@@ -132,11 +132,13 @@ private:
 
     P.setZero(); // error state covariance; if zero, a default initialization in msf_core is used
 
-    // TODO: @georg get your measurements here and conver to xyz
+    // TODO: @georg get your measurements here and convert to xyz
     msf_core::Vector2 angles = angle_handler_->getAngleMeasurement();
     msf_core::Vector1 distance = distance_handler_->getDistanceMeasurement();
-
-    // p_vc =
+    // Check that angles(1) is theta and angles(2) is phi...
+    p_vc(0,0) = distance(1) * sin(angles(1)) * cos(angles(2));
+    p_vc(1,0) = distance(1) * sin(angles(1)) * sin(angles(2));
+    p_vc(2,0) = distance(1) * cos(angles(1));
 
     ROS_INFO_STREAM("initial measurement pos:["<<p_vc.transpose()<<"] orientation: "<<STREAMQUAT(q));
 
