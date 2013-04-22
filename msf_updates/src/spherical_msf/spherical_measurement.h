@@ -138,12 +138,34 @@ public:
     if(fixed_p_pos_imu) state_in->clearCrossCov<StateDefinition_T::p_ip>();
 
     // construct H matrix using H-blockx :-)
-    // position:
 
     // TODO: @georg: implement your H matrix for the angles here
-//    H.block<2, 3>(0, idxstartcorr_p_) = Eigen::Matrix<double, 3, 3>::Identity(); // p
-//    H.block<2, 3>(0, idxstartcorr_q_) = - C_q.transpose() * p_prism_imu_sk; // q
-//    H.block<2, 3>(0, idxstartcorr_p_pi_) = fixed_p_pos_imu ? Eigen::Matrix<double, 3, 3>::Zero() : (C_q.transpose()).eval(); //p_pos_imu_
+    Eigen::Matrix<double, 3, 1> p_ = state.get<StateDefinition_T::p>();
+    Eigen::Matrix<double, 3, 1> p_ip = state.get<StateDefinition_T::p_ip>();
+    Eigen::Matrix<double, 2, 3> dz_dp;
+    dz_dp(0,0) = (p_(0,0)*p_(2,0)*1.0/sqrt(p_(0,0)*p_(0,0)+p_(1,0)*p_(1,0)))/(p_(0,0)*p_(0,0)+p_(1,0)*p_(1,0)+p_(2,0)*p_(2,0));
+    dz_dp(0,1) = (p_(1,0)*p_(2,0)*1.0/sqrt(p_(0,0)*p_(0,0)+p_(1,0)*p_(1,0)))/(p_(0,0)*p_(0,0)+p_(1,0)*p_(1,0)+p_(2,0)*p_(2,0));
+    dz_dp(0,2) = -sqrt(p_(0,0)*p_(0,0)+p_(1,0)*p_(1,0))/(p_(0,0)*p_(0,0)+p_(1,0)*p_(1,0)+p_(2,0)*p_(2,0));
+    dz_dp(1,0) = -p_(1,0)/(p_(0,0)*p_(0,0)+p_(1,0)*p_(1,0));
+    dz_dp(1,1) = p_(0,0)/(p_(0,0)*p_(0,0)+p_(1,0)*p_(1,0));
+    dz_dp(1,2) = 0;
+    Eigen::Matrix<double, 2, 3> dz_dq;
+    dz_dq(0,0) = 1.0/sqrt(1.0/(p_(0,0)*p_(0,0)+p_(1,0)*p_(1,0)+p_(2,0)*p_(2,0)))*1.0/sqrt(p_(0,0)*p_(0,0)+p_(1,0)*p_(1,0))*1.0/pow(p_(0,0)*p_(0,0)+p_(1,0)*p_(1,0)+p_(2,0)*p_(2,0),3.0/2.0)*(C_q(2,1)*(p_(0,0)*p_(0,0))*p_ip(2,0)-C_q(2,2)*(p_(0,0)*p_(0,0))*p_ip(1,0)+C_q(2,1)*(p_(1,0)*p_(1,0))*p_ip(2,0)-C_q(2,2)*(p_(1,0)*p_(1,0))*p_ip(1,0)-C_q(0,1)*p_(0,0)*p_(2,0)*p_ip(2,0)+C_q(0,2)*p_(0,0)*p_(2,0)*p_ip(1,0)-C_q(1,1)*p_(1,0)*p_(2,0)*p_ip(2,0)+C_q(1,2)*p_(1,0)*p_(2,0)*p_ip(1,0));
+    dz_dq(0,1) = -1.0/sqrt(-(p_(2,0)*p_(2,0))/(p_(0,0)*p_(0,0)+p_(1,0)*p_(1,0)+p_(2,0)*p_(2,0))+1.0)*1.0/pow(p_(0,0)*p_(0,0)+p_(1,0)*p_(1,0)+p_(2,0)*p_(2,0),3.0/2.0)*(C_q(2,0)*(p_(0,0)*p_(0,0))*p_ip(2,0)-C_q(2,2)*(p_(0,0)*p_(0,0))*p_ip(0,0)+C_q(2,0)*(p_(1,0)*p_(1,0))*p_ip(2,0)-C_q(2,2)*(p_(1,0)*p_(1,0))*p_ip(0,0)-C_q(0,0)*p_(0,0)*p_(2,0)*p_ip(2,0)+C_q(0,2)*p_(0,0)*p_(2,0)*p_ip(0,0)-C_q(1,0)*p_(1,0)*p_(2,0)*p_ip(2,0)+C_q(1,2)*p_(1,0)*p_(2,0)*p_ip(0,0));
+    dz_dq(0,2) = 1.0/sqrt(1.0/(p_(0,0)*p_(0,0)+p_(1,0)*p_(1,0)+p_(2,0)*p_(2,0)))*1.0/sqrt(p_(0,0)*p_(0,0)+p_(1,0)*p_(1,0))*1.0/pow(p_(0,0)*p_(0,0)+p_(1,0)*p_(1,0)+p_(2,0)*p_(2,0),3.0/2.0)*(C_q(2,0)*(p_(0,0)*p_(0,0))*p_ip(1,0)-C_q(2,1)*(p_(0,0)*p_(0,0))*p_ip(0,0)+C_q(2,0)*(p_(1,0)*p_(1,0))*p_ip(1,0)-C_q(2,1)*(p_(1,0)*p_(1,0))*p_ip(0,0)-C_q(0,0)*p_(0,0)*p_(2,0)*p_ip(1,0)+C_q(0,1)*p_(0,0)*p_(2,0)*p_ip(0,0)-C_q(1,0)*p_(1,0)*p_(2,0)*p_ip(1,0)+C_q(1,1)*p_(1,0)*p_(2,0)*p_ip(0,0));
+    dz_dq(1,0) = (p_(1,0)*(C_q(0,1)*p_ip(2,0)-C_q(0,2)*p_ip(1,0))-p_(0,0)*(C_q(1,1)*p_ip(2,0)-C_q(1,2)*p_ip(1,0)))/(p_(0,0)*p_(0,0)+p_(1,0)*p_(1,0));
+    dz_dq(1,1) = -(p_(1,0)*(C_q(0,0)*p_ip(2,0)-C_q(0,2)*p_ip(0,0))-p_(0,0)*(C_q(1,0)*p_ip(2,0)-C_q(1,2)*p_ip(0,0)))/(p_(0,0)*p_(0,0)+p_(1,0)*p_(1,0));
+    dz_dq(1,2) = (p_(1,0)*(C_q(0,0)*p_ip(1,0)-C_q(0,1)*p_ip(0,0))-p_(0,0)*(C_q(1,0)*p_ip(1,0)-C_q(1,1)*p_ip(0,0)))/(p_(0,0)*p_(0,0)+p_(1,0)*p_(1,0));
+    Eigen::Matrix<double, 2, 3> dz_dp_pi;
+    dz_dp_pi(0,0) = 0;
+    dz_dp_pi(0,1) = 1;
+    dz_dp_pi(0,2) = 2;
+    dz_dp_pi(1,0) = 3;
+    dz_dp_pi(1,1) = 4;
+    dz_dp_pi(1,2) = 5;
+    H.block<2, 3>(0, idxstartcorr_p_) = dz_dp;
+    H.block<2, 3>(0, idxstartcorr_q_) = dz_dq;
+    H.block<2, 3>(0, idxstartcorr_p_pi_) = dz_dp_pi;
 
   }
 
@@ -282,12 +304,23 @@ public:
     if(fixed_p_pos_imu) state_in->clearCrossCov<StateDefinition_T::p_ip>();
 
     // construct H matrix using H-blockx :-)
-    // position:
 
     // TODO: @georg: implement your H matrix for the distance here
-//    H.block<1, 3>(0, idxstartcorr_p_) =  // p
-//    H.block<1, 3>(0, idxstartcorr_q_) =  // q
-//    H.block<1, 3>(0, idxstartcorr_p_pi_) =  //p_pos_imu_
+    Eigen::Matrix<double, 1, 3> dz_dp;
+    dz_dp(0,0) = 0;
+    dz_dp(0,1) = 1;
+    dz_dp(0,2) = 2;
+    Eigen::Matrix<double, 1, 3> dz_dq;
+    dz_dq(0,0) = 0;
+    dz_dq(0,1) = 1;
+    dz_dq(0,2) = 2;
+    Eigen::Matrix<double, 1, 3> dz_dp_pi;
+    dz_dp_pi(0,0) = 0;
+    dz_dp_pi(0,1) = 1;
+    dz_dp_pi(0,2) = 2;
+    H.block<1, 3>(0, idxstartcorr_p_) =  dz_dp;
+    H.block<1, 3>(0, idxstartcorr_q_) =  dz_dq;
+    H.block<1, 3>(0, idxstartcorr_p_pi_) =  dz_dp_pi;
 
   }
 
