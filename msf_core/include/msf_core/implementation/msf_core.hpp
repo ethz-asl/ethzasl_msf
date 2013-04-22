@@ -286,7 +286,7 @@ void MSF_Core<EKFState_T>::process_imu(const msf_core::Vector3& linear_accelerat
 
   sm::timing::Timer timer_PropPrepare("PropPrepare");
   if(lastState->time == -1){
-    ROS_WARN_STREAM_THROTTLE(2, "ImuCallback: closest state is invalid\n");
+    ROS_WARN_STREAM_THROTTLE(2, __PRETTY_FUNCTION__<<"ImuCallback: closest state is invalid\n");
     return; // // early abort // //
   }
 
@@ -297,7 +297,7 @@ void MSF_Core<EKFState_T>::process_imu(const msf_core::Vector3& linear_accelerat
   if (currentState->time - lastState->time < -0.01 && predictionMade_){
     initialized_ = false;
     predictionMade_ = false;
-    ROS_ERROR_STREAM("latest IMU message was out of order by a too large amount, resetting EKF: "
+    ROS_ERROR_STREAM(__PRETTY_FUNCTION__<<"latest IMU message was out of order by a too large amount, resetting EKF: "
         "last-state-time: "<<msf_core::timehuman(lastState->time)<<" "<<
         "current-imu-time: "<<msf_core::timehuman(currentState->time));
     return;
@@ -560,7 +560,7 @@ void MSF_Core<EKFState_T>::propagatePOneStep(){
     if(!checkForNumeric(stateIteratorPLastPropagatedNext->second-> template get<StateDefinition_T::p>(), "prediction p")){
       ROS_WARN_STREAM("prop state from:\t"<<stateIteratorPLastPropagated->second->toEigenVector());
       ROS_WARN_STREAM("prop state to:\t"<<stateIteratorPLastPropagatedNext->second->toEigenVector());
-      ROS_ERROR_STREAM("Resetting EKF");
+      ROS_ERROR_STREAM(__PRETTY_FUNCTION__<<" Resetting EKF");
       predictionMade_ = initialized_ = false;
     }
   }
@@ -748,7 +748,7 @@ sm::timing::Timer timer_meas_get_state("Get state for measurement");
     boost::shared_ptr<EKFState_T> state = getClosestState(it_meas->second->time); //propagates covariance to state
     timer_meas_get_state.stop();
     if(state->time <= 0){
-      ROS_ERROR_STREAM_THROTTLE(1,"getClosestState returned an invalid state");
+      ROS_ERROR_STREAM_THROTTLE(1, __PRETTY_FUNCTION__<< " getClosestState returned an invalid state");
       continue;
     }
 
@@ -778,7 +778,7 @@ sm::timing::Timer timer_meas_get_state("Get state for measurement");
     sm::timing::Timer timer_prop_state_after_meas("Repropagate state to now");
     for( ; it_curr != it_end && it_next != it_end && it_curr->second->time != -1 && it_next->second->time != -1; ++it_curr, ++it_next){ //propagate to selected state
       if(it_curr->second == it_next->second){
-        ROS_ERROR_STREAM("propagation : it_curr points to same state as it_next. This must not happen.");
+        ROS_ERROR_STREAM(__PRETTY_FUNCTION__<< " propagation : it_curr points to same state as it_next. This must not happen.");
         continue;
       }
       if(!initialized_ || !predictionMade_) //break loop if EKF reset in the meantime
@@ -818,7 +818,7 @@ sm::timing::Timer timer_meas_get_state("Get state for measurement");
 
 
     if(pubCorrect_.getNumSubscribers() > 0){
-      ROS_ERROR_STREAM_THROTTLE(1, "You have connected the external propagation topic but at the same time data_playback is on.");
+      ROS_ERROR_STREAM_THROTTLE(1, __PRETTY_FUNCTION__<< " You have connected the external propagation topic but at the same time data_playback is on.");
     }
 
   }
@@ -911,7 +911,7 @@ boost::shared_ptr<EKFState_T> MSF_Core<EKFState_T>::getClosestState(double tstam
   boost::shared_ptr<EKFState_T> closestState = it->second;
 
   if (closestState->time == -1 || fabs(closestState->time - timenow) > 0.1){ //check if the state really is close to the requested time. With the new buffer this might not be given.
-    ROS_ERROR_STREAM("Requested closest state to "<<timehuman(timenow)<<" but there was no suitable state in the map");
+    ROS_ERROR_STREAM(__PRETTY_FUNCTION__<< " Requested closest state to "<<timehuman(timenow)<<" but there was no suitable state in the map");
     return StateBuffer_.getInvalid(); // // early abort // //  not enough predictions made yet to apply measurement (too far in past)
   }
 
@@ -950,7 +950,7 @@ boost::shared_ptr<EKFState_T> MSF_Core<EKFState_T>::getClosestState(double tstam
   propPToState(closestState); // catch up with covariance propagation if necessary
 
   if(!closestState->checkStateForNumeric()){
-    ROS_ERROR_STREAM("State interpolation: interpolated state is invalid (nan)");
+    ROS_ERROR_STREAM(__PRETTY_FUNCTION__<< " State interpolation: interpolated state is invalid (nan)");
     return StateBuffer_.getInvalid(); // // early abort // //
   }
 
