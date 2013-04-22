@@ -1,0 +1,27 @@
+<package>
+  <description brief="msf_core">
+
+     Modular Sensor Fusion (MSF) framework containing the core filter functions including full state propagation and shell for update sensor modules
+
+  </description>
+  <author>Simon Lynen, Stephan Weiss, Markus Achtelik</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes="under active development"/>
+  <url>http://ros.org/wiki/ethzasl_modular_sensor_fusion/msf_core</url>
+  <depend package="roscpp"/>
+  <depend package="sensor_msgs"/>
+  <depend package="dynamic_reconfigure"/>
+  <depend package="sensor_fusion_comm"/>
+  <depend package="sm_timing"/>
+  <depend package="tf"/>
+  <depend package="image_transport"/>
+
+  <rosdep name="eigen"/>
+  <depend package="opencv2"/>
+
+  <export>
+    <cpp cflags="`pkg-config --cflags eigen3 ` -std=c++11 -I${prefix}/include -I${prefix}/cfg/cpp" lflags="-L${prefix}/lib -lmsf_core -lopencv_core" />
+  </export>
+</package>
+
+
