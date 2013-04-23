@@ -135,10 +135,10 @@ private:
     // TODO: @georg get your measurements here and convert to xyz
     msf_core::Vector2 angles = angle_handler_->getAngleMeasurement();
     msf_core::Vector1 distance = distance_handler_->getDistanceMeasurement();
-    // Check that angles(1) is theta and angles(2) is phi...
-    p_vc(0,0) = distance(1) * sin(angles(1)) * cos(angles(2));
-    p_vc(1,0) = distance(1) * sin(angles(1)) * sin(angles(2));
-    p_vc(2,0) = distance(1) * cos(angles(1));
+    // Check that angles(0) is theta and angles(1) is phi...
+    p_vc(0,0) = distance(0) * sin(angles(0)) * cos(angles(1));
+    p_vc(1,0) = distance(0) * sin(angles(0)) * sin(angles(1));
+    p_vc(2,0) = distance(0) * cos(angles(0));
 
     ROS_INFO_STREAM("initial measurement pos:["<<p_vc.transpose()<<"] orientation: "<<STREAMQUAT(q));
 
