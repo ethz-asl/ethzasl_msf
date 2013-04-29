@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include <msf_core/msf_core.h>
+#include <sm/timing/Timer.hpp>
 
 namespace msf_core{
 template<typename EKFState_T>
@@ -45,7 +46,6 @@ void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrection(boost::shared_
 
   EIGEN_STATIC_ASSERT_FIXED_SIZE(H_type);
   EIGEN_STATIC_ASSERT_FIXED_SIZE(R_type);
-
   // get measurements
   /// correction from EKF update
   Eigen::Matrix<double, MSF_Core<EKFState_T>::nErrorStatesAtCompileTime, 1> correction_;
@@ -53,11 +53,11 @@ void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrection(boost::shared_
   R_type S;
   Eigen::Matrix<double, MSF_Core<EKFState_T>::nErrorStatesAtCompileTime, R_type::RowsAtCompileTime> K;
   typename MSF_Core<EKFState_T>::ErrorStateCov & P = state->P;
-
   S = H_delayed * P * H_delayed.transpose() + R_delayed;
   K = P * H_delayed.transpose() * S.inverse();
 
   correction_ = K * res_delayed;
+
   const typename MSF_Core<EKFState_T>::ErrorStateCov KH = (MSF_Core<EKFState_T>::ErrorStateCov::Identity() - K * H_delayed);
   P = KH * P * KH.transpose() + K * R_delayed * K.transpose();
 
@@ -81,12 +81,33 @@ void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrection(boost::shared_
   Eigen::MatrixXd K(MSF_Core<EKFState_T>::nErrorStatesAtCompileTime, R_delayed.rows());
   typename MSF_Core<EKFState_T>::ErrorStateCov & P = state->P;
 
+  //4ms
+  sm::timing::Timer timer_CalculationS("OF CalculationS");
   S = H_delayed * P * H_delayed.transpose() + R_delayed;
-  K = P * H_delayed.transpose() * S.inverse();
+  timer_CalculationS.stop();
+
+  //106ms
+  sm::timing::Timer timer_CalculationK("OF CalculationK");
+  K = P * H_delayed.transpose() * S.inverse(); //TODO use decomposition
+  timer_CalculationK.stop();
+
+  std::cout<<"Size S "<<S.rows()<<" "<<S.cols()<<std::endl;
+
+
+  //TODO Matlab back
+  ROS_INFO_STREAM("H_delayed = " << H_delayed);
+  ROS_INFO_STREAM("R_delayed = " << R_delayed);
+  ROS_INFO_STREAM("S = " << S);
+  ROS_INFO_STREAM("K = " << K);
+
+  ///////////////////////
+
 
   correction_ = K * res_delayed;
   const typename MSF_Core<EKFState_T>::ErrorStateCov KH = (MSF_Core<EKFState_T>::ErrorStateCov::Identity() - K * H_delayed);
+  sm::timing::Timer timer_CalculationP_upd("OF CalculationP_upd");
   P = KH * P * KH.transpose() + K * R_delayed * K.transpose();
+  timer_CalculationP_upd.stop();
 
   // make sure P stays symmetric
   P = 0.5 * (P + P.transpose());

@@ -20,6 +20,10 @@ rosbuild_find_ros_package(dynamic_reconfigure)
 include(${dynamic_reconfigure_PACKAGE_PATH}/cmake/cfgbuild.cmake)
 gencfg()
 
+#FIND EIGEN
+find_package(Eigen REQUIRED)
+include_directories(${Eigen_INCLUDE_DIRS})
+
 set(CMAKE_CXX_FLAGS "-std=c++0x")
 
 #set the default path for built executables to the "bin" directory

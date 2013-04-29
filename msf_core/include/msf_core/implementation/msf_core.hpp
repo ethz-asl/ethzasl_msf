@@ -55,7 +55,11 @@ MSF_Core<EKFState_T>::MSF_Core(MSF_SensorManager<EKFState_T>& usercalc):usercalc
   predictionMade_ = false;
   isfuzzyState_ = false;
 
-  g_ << 0, 0, 9.80834; //at 47.37 lat
+  //  g_ << 0, 0, 9.80834; //at 47.37 lat
+
+  // TODO Matlab back
+  g_ << 0, 0, 9.81;
+  //////////////////////
 
   //TODO later: move all this to the external file and derive from this class. We could by this allow compilation on platforms withour ROS
   ros::NodeHandle nh("msf_core");
@@ -222,23 +226,46 @@ void MSF_Core<EKFState_T>::setPCore(Eigen::Matrix<double, EKFState_T::nErrorStat
 
   //now set the core state covariance to the simulated values
   Eigen::Matrix<double, coreErrorStates, coreErrorStates> P_core;
-  P_core<<  0.0166, 0.0122,-0.0015, 0.0211, 0.0074, 0.0000, 0.0012,-0.0012, 0.0001,-0.0000, 0.0000,-0.0000,-0.0003,-0.0002,-0.0000,
-      0.0129, 0.0508,-0.0020, 0.0179, 0.0432, 0.0006, 0.0020, 0.0004,-0.0002,-0.0000, 0.0000, 0.0000, 0.0003,-0.0002, 0.0000,
-      -0.0013,-0.0009, 0.0142,-0.0027, 0.0057, 0.0079, 0.0007, 0.0007, 0.0000,-0.0000,-0.0000, 0.0000,-0.0001,-0.0004,-0.0001,
-      0.0210, 0.0162,-0.0026, 0.0437, 0.0083,-0.0017, 0.0016,-0.0021,-0.0014,-0.0000, 0.0000, 0.0000, 0.0003,-0.0001, 0.0000,
-      0.0093, 0.0461, 0.0036, 0.0153, 0.0650,-0.0016, 0.0025, 0.0013,-0.0000,-0.0000, 0.0000, 0.0000, 0.0003, 0.0002, 0.0000,
-      -0.0000, 0.0005, 0.0080,-0.0019,-0.0021, 0.0130, 0.0001, 0.0001, 0.0000,-0.0000, 0.0000,-0.0000,-0.0003, 0.0001,-0.0001,
-      0.0012, 0.0024, 0.0006, 0.0017, 0.0037, 0.0001, 0.0005, 0.0000, 0.0001,-0.0000, 0.0000,-0.0000,-0.0000,-0.0001,-0.0000,
-      -0.0011, 0.0008, 0.0007,-0.0023, 0.0019, 0.0001, 0.0000, 0.0005,-0.0001,-0.0000,-0.0000, 0.0000, 0.0001,-0.0001,-0.0000,
-      0.0001,-0.0002,-0.0000,-0.0014, 0.0001, 0.0000, 0.0000,-0.0001, 0.0006,-0.0000,-0.0000,-0.0000, 0.0000, 0.0000,-0.0000,
-      -0.0000,-0.0000,-0.0000,-0.0000,-0.0000,-0.0000,-0.0000,-0.0000,-0.0000, 0.0000,-0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
-      0.0000, 0.0000,-0.0000, 0.0000, 0.0000, 0.0000, 0.0000,-0.0000,-0.0000,-0.0000, 0.0000,-0.0000, 0.0000, 0.0000, 0.0000,
-      -0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,-0.0000, 0.0000,-0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,-0.0000,
-      -0.0003, 0.0003,-0.0001, 0.0003, 0.0003,-0.0003,-0.0000, 0.0001, 0.0000, 0.0000, 0.0000, 0.0000, 0.0010, 0.0000, 0.0000,
-      -0.0002,-0.0002,-0.0004,-0.0001, 0.0003, 0.0001,-0.0001,-0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0010, 0.0000,
-      -0.0000, 0.0000,-0.0001, 0.0000, 0.0000,-0.0001,-0.0000,-0.0000,-0.0000, 0.0000, 0.0000,-0.0000, 0.0000, 0.0000, 0.0001;
+  //  P_core<<  0.0166, 0.0122,-0.0015, 0.0211, 0.0074, 0.0000, 0.0012,-0.0012, 0.0001,-0.0000, 0.0000,-0.0000,-0.0003,-0.0002,-0.0000,
+  //      0.0129, 0.0508,-0.0020, 0.0179, 0.0432, 0.0006, 0.0020, 0.0004,-0.0002,-0.0000, 0.0000, 0.0000, 0.0003,-0.0002, 0.0000,
+  //      -0.0013,-0.0009, 0.0142,-0.0027, 0.0057, 0.0079, 0.0007, 0.0007, 0.0000,-0.0000,-0.0000, 0.0000,-0.0001,-0.0004,-0.0001,
+  //      0.0210, 0.0162,-0.0026, 0.0437, 0.0083,-0.0017, 0.0016,-0.0021,-0.0014,-0.0000, 0.0000, 0.0000, 0.0003,-0.0001, 0.0000,
+  //      0.0093, 0.0461, 0.0036, 0.0153, 0.0650,-0.0016, 0.0025, 0.0013,-0.0000,-0.0000, 0.0000, 0.0000, 0.0003, 0.0002, 0.0000,
+  //      -0.0000, 0.0005, 0.0080,-0.0019,-0.0021, 0.0130, 0.0001, 0.0001, 0.0000,-0.0000, 0.0000,-0.0000,-0.0003, 0.0001,-0.0001,
+  //      0.0012, 0.0024, 0.0006, 0.0017, 0.0037, 0.0001, 0.0005, 0.0000, 0.0001,-0.0000, 0.0000,-0.0000,-0.0000,-0.0001,-0.0000,
+  //      -0.0011, 0.0008, 0.0007,-0.0023, 0.0019, 0.0001, 0.0000, 0.0005,-0.0001,-0.0000,-0.0000, 0.0000, 0.0001,-0.0001,-0.0000,
+  //      0.0001,-0.0002,-0.0000,-0.0014, 0.0001, 0.0000, 0.0000,-0.0001, 0.0006,-0.0000,-0.0000,-0.0000, 0.0000, 0.0000,-0.0000,
+  //      -0.0000,-0.0000,-0.0000,-0.0000,-0.0000,-0.0000,-0.0000,-0.0000,-0.0000, 0.0000,-0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+  //      0.0000, 0.0000,-0.0000, 0.0000, 0.0000, 0.0000, 0.0000,-0.0000,-0.0000,-0.0000, 0.0000,-0.0000, 0.0000, 0.0000, 0.0000,
+  //      -0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,-0.0000, 0.0000,-0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,-0.0000,
+  //      -0.0003, 0.0003,-0.0001, 0.0003, 0.0003,-0.0003,-0.0000, 0.0001, 0.0000, 0.0000, 0.0000, 0.0000, 0.0010, 0.0000, 0.0000,
+  //      -0.0002,-0.0002,-0.0004,-0.0001, 0.0003, 0.0001,-0.0001,-0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0010, 0.0000,
+  //      -0.0000, 0.0000,-0.0001, 0.0000, 0.0000,-0.0001,-0.0000,-0.0000,-0.0000, 0.0000, 0.0000,-0.0000, 0.0000, 0.0000, 0.0001;
+
+  //TODO Matlab back
+  P_core.setZero();
+  P_core(0,0) = 3;
+  P_core(1,1) = 3;
+  P_core(2,2) = 3;
+  P_core(3,3) = 2;
+  P_core(4,4) = 2;
+  P_core(5,5) = 2;
+  P_core(6,6) = 0.04;
+  P_core(7,7) = 0.04;
+  P_core(8,8) = 0.04;
+  P_core(9,9) = 0.015;
+  P_core(10,10) = 0.015;
+  P_core(11,11) = 0.015;
+  P_core(12,12) = 0.163;
+  P_core(13,13) = 0.163;
+  P_core(14,14) = 0.163;
+  ///////////////////////////////
+
+
   P_core = 0.5 * (P_core + P_core.transpose());
   P.template block<coreErrorStates, coreErrorStates>(0,0) = P_core;
+
+
 }
 
 template<typename EKFState_T>
@@ -257,17 +284,27 @@ void MSF_Core<EKFState_T>::imuCallback_asctec(const  asctec_hl_comm::mav_imuCons
 template<typename EKFState_T>
 void MSF_Core<EKFState_T>::imuCallback(const sensor_msgs::ImuConstPtr & msg)
 {
-  static int lastseq = -1;
-  if((int)msg->header.seq != lastseq + 1 && lastseq != -1){
-      ROS_WARN_STREAM("msf_core: imu message drop curr seq:"<<msg->header.seq<<" expected: "<<lastseq + 1);
-  }
-  lastseq = msg->header.seq;
+  //  static int lastseq = -1;
+  //  if((int)msg->header.seq != lastseq + 1 && lastseq != -1){
+  //      ROS_WARN_STREAM("msf_core: imu message drop curr seq:"<<msg->header.seq<<" expected: "<<lastseq + 1);
+  //  }
+  //  lastseq = msg->header.seq;
+
+
+  //  if(msg->header.seq % 10 != 0){
+  //    ROS_WARN_STREAM_THROTTLE(60, "IMU throttling is on now!!!");
+  //    return;
+  //  }
 
   msf_core::Vector3 linacc;
   linacc << msg->linear_acceleration.x, msg->linear_acceleration.y, msg->linear_acceleration.z;
 
+  //  ROS_WARN_STREAM("core linacc: "<<linacc.transpose());
+
   msf_core::Vector3 angvel;
   angvel << msg->angular_velocity.x, msg->angular_velocity.y, msg->angular_velocity.z;
+
+  //  ROS_WARN_STREAM("core  angvel: "<<  angvel.transpose());
 
   process_imu(linacc, angvel, msg->header.stamp, msg->header.seq);
 }
@@ -276,9 +313,12 @@ template<typename EKFState_T>
 void MSF_Core<EKFState_T>::process_imu(const msf_core::Vector3& linear_acceleration, const msf_core::Vector3& angular_velocity,
                                        const ros::Time& msg_stamp, size_t msg_seq)
                                        {
+  ROS_INFO_STREAM("MSF_Core: process_imu :"<<msf_core::timehuman(msg_stamp.toSec()));
 
-  if(!initialized_)
+  if(!initialized_){
+    ROS_INFO_STREAM("IMU rejected not initialized");
     return;
+  }
 
   sm::timing::Timer timer_PropgetClosestState("PropgetClosestState");
   boost::shared_ptr<EKFState_T> lastState = StateBuffer_.getClosestBefore(msg_stamp.toSec());
@@ -347,10 +387,15 @@ void MSF_Core<EKFState_T>::process_imu(const msf_core::Vector3& linear_accelerat
   timer_PropState.stop();
   sm::timing::Timer timer_PropCov("PropCov");
   propagatePOneStep();
+
   timer_PropCov.stop();
 
-  if(StateBuffer_.size() > 3) //making sure we have sufficient states to apply measurements to
-    predictionMade_ = true;
+
+  // TODO Matlab back
+//  if(StateBuffer_.size() > 3) //making sure we have sufficient states to apply measurements to
+  predictionMade_ = true;
+  ////////////////////////////
+  //  ROS_WARN_STREAM("pred made: "<<predictionMade_<<" imu stamp: "<<timehuman(currentState->time));
 
   msgPose_.header.stamp = msg_stamp;
   msgPose_.header.seq = msg_seq;
@@ -371,6 +416,9 @@ void MSF_Core<EKFState_T>::process_imu(const msf_core::Vector3& linear_accelerat
     handlePendingMeasurements(); //check if we can apply some pending measurement
   }
   seq++;
+
+  ROS_INFO_STREAM("msf_core process_imu done, pred. state:"<<std::endl<<currentState->print());
+
 
 
                                        }
@@ -431,6 +479,13 @@ void MSF_Core<EKFState_T>::stateCallback(const sensor_fusion_comm::ExtEkfConstPt
     currentState-> template get<StateDefinition_T::q>() = Eigen::Quaternion<double>(msg->state[6], msg->state[7], msg->state[8], msg->state[9]);
     currentState-> template get<StateDefinition_T::q>().normalize();
 
+
+    //	ROS_INFO_STREAM("TEST p_!!!");
+    //	ROS_INFO_STREAM(currentState-> template get<StateDefinition_T::p>());
+    ////	ROS_INFO_STREAM("p_ "<<(state.get<StateDefinition_T::p>()));
+
+
+
     // zero props: copy non propagation states from last state
     boost::fusion::for_each(
         currentState->statevars,
@@ -480,6 +535,16 @@ template<typename EKFState_T>
 void MSF_Core<EKFState_T>::propagateState(boost::shared_ptr<EKFState_T>& state_old, boost::shared_ptr<EKFState_T>& state_new)
 {
 
+  ROS_INFO_STREAM("MSF_Core: propagateState from:"<<msf_core::timehuman(state_old->time)<<" to "<<msf_core::timehuman(state_new->time));
+
+  bool debug = false;
+
+
+  //	  ROS_INFO_STREAM("STATES before propagation step:");
+  //	  std::cout<<state_old->print()<<std::endl;
+
+  //	  ROS_INFO_STREAM("P before propagation: "<<state_new->P);
+
   double dt = state_new->time - state_old->time;
 
   //reset new state to zero
@@ -495,40 +560,150 @@ void MSF_Core<EKFState_T>::propagateState(boost::shared_ptr<EKFState_T>& state_o
       msf_tmp::copyNonPropagationStates<EKFState_T>(*state_old)
   );
 
+  ROS_INFO_STREAM_COND(debug, "w_m: "<<state_new->w_m);
+  ROS_INFO_STREAM_COND(debug, "a_m: "<<state_new->a_m);
+  ROS_INFO_STREAM_COND(debug, "C_est_transposed = " << state_old-> template get<StateDefinition_T::q>().conjugate().toRotationMatrix());
+
+
+
+  //TODO Matlab back
+  Eigen::Matrix<double,4,1> stream_qbeforepred =  state_old-> template get<StateDefinition_T::q>().coeffs();
+  ROS_INFO_STREAM("C_est_transposed = " << state_old-> template get<StateDefinition_T::q>().conjugate().toRotationMatrix());
+
+
+  /////////////////////
+
+  ROS_INFO_STREAM("C_est_transposed = "<<state_old-> template get<StateDefinition_T::q>().toRotationMatrix());
+
+  //  // DB test
+  //  state_new-> template get<StateDefinition_T::b_a>()(0) = 0;
+  //  state_new-> template get<StateDefinition_T::b_a>()(1) = 0;
+
   Eigen::Matrix<double, 3, 1> dv;
   const Vector3 ew = state_new->w_m - state_new-> template get<StateDefinition_T::b_w>();
   const Vector3 ewold = state_old->w_m - state_old-> template get<StateDefinition_T::b_w>();
   const Vector3 ea = state_new->a_m - state_new-> template get<StateDefinition_T::b_a>();
   const Vector3 eaold = state_old->a_m - state_old-> template get<StateDefinition_T::b_a>();
-  const Matrix4 Omega = omegaMatJPL(ew);
+
+
+  //TODO Matlab back
+//  const Matrix4 Omega = omegaMatJPL(ew);
+
+  const Matrix4 Omega = omegaMatJPL(state_new->w_m - state_new-> template get<StateDefinition_T::b_w>());
+
+  Vector3 wm_bwest = state_new->w_m - state_new-> template get<StateDefinition_T::b_w>();
+  Vector3 wm = state_new->w_m;
+  Vector3 bwest= state_new-> template get<StateDefinition_T::b_w>();
+
+  ROS_INFO_STREAM( "wm_bwest: "<< wm_bwest);
+  ROS_INFO_STREAM( "wm: "<< wm);
+  ROS_INFO_STREAM("am: "<< state_new->a_m);
+  ROS_INFO_STREAM( "bwest: "<< bwest);
+
+
+
+
+  /////////////////////////////////////
+
+
+  ROS_INFO_STREAM( "Omega: "<<Omega);
+  ROS_INFO_STREAM("dt: "<<dt);
+
   const Matrix4 OmegaOld = omegaMatJPL(ewold);
   Matrix4 OmegaMean = omegaMatJPL((ew + ewold) / 2);
 
-  // zero order quaternion integration
-  //	cur_state.q_ = (Eigen::Matrix<double,4,4>::Identity() + 0.5*Omega*dt)*StateBuffer_[(unsigned char)(idx_state_-1)].q_.coeffs();
 
-  // first order quaternion integration, this is kind of costly and may not add a lot to the quality of propagation...
-  int div = 1;
-  Matrix4 MatExp;
-  MatExp.setIdentity();
-  OmegaMean *= 0.5 * dt;
-  for (int i = 1; i < 5; i++) //can be made fourth order or less
-  {
-    div *= i;
-    MatExp = MatExp + OmegaMean / div;
-    OmegaMean *= OmegaMean;
-  }
 
-  // first oder quat integration matrix
-  const Matrix4 quat_int = MatExp + 1.0 / 48.0 * (Omega * OmegaOld - OmegaOld * Omega) * dt * dt;
+  //  // zero order quaternion integration
+  //  //	cur_state.q_ = (Eigen::Matrix<double,4,4>::Identity() + 0.5*Omega*dt)*StateBuffer_[(unsigned char)(idx_state_-1)].q_.coeffs();
+  //
+  //  ROS_INFO_STREAM("q before quaternion integration: "<<state_old-> template get<StateDefinition_T::q>().coeffs());
+  //
+  //  ROS_INFO_STREAM("Omega: "<<Omega);
 
-  // first oder quaternion integration
-  state_new-> template get<StateDefinition_T::q>().coeffs() = quat_int * state_old-> template get<StateDefinition_T::q>().coeffs();
+
+
+
+  //TODO Matlab back
+  state_new-> template get<StateDefinition_T::q>().coeffs() = (Eigen::Matrix<double,4,4>::Identity() + 0.5*Omega*dt)*state_old-> template get<StateDefinition_T::q>().coeffs();
   state_new-> template get<StateDefinition_T::q>().normalize();
 
-  dv = (state_new-> template get<StateDefinition_T::q>().toRotationMatrix() * ea + state_old-> template get<StateDefinition_T::q>().toRotationMatrix() * eaold) / 2;
+
+
+  Eigen::Matrix<double,4,1> stream_qpred =  (Eigen::Matrix<double,4,4>::Identity() + 0.5*Omega*dt)*state_old-> template get<StateDefinition_T::q>().coeffs();
+
+  //
+  //  ROS_INFO_STREAM("q after quaternion integration: "<<state_new-> template get<StateDefinition_T::q>().coeffs());
+
+  /////////////////////////
+
+
+
+  //TODO Matlab back
+
+  //  // first order quaternion integration, this is kind of costly and may not add a lot to the quality of propagation...
+  //  int div = 1;
+  //  Matrix4 MatExp;
+  //  MatExp.setIdentity();
+  //  OmegaMean *= 0.5 * dt;
+  //  for (int i = 1; i < 5; i++) //can be made fourth order or less
+  //  {
+  //    div *= i;
+  //    MatExp = MatExp + OmegaMean / div;
+  //    OmegaMean *= OmegaMean;
+  //  }
+  //
+  //  // first oder quat integration matrix
+  //  const Matrix4 quat_int = MatExp + 1.0 / 48.0 * (Omega * OmegaOld - OmegaOld * Omega) * dt * dt;
+  //
+  //  // first oder quaternion integration
+  //  state_new-> template get<StateDefinition_T::q>().coeffs() = quat_int * state_old-> template get<StateDefinition_T::q>().coeffs();
+  //  state_new-> template get<StateDefinition_T::q>().normalize();
+  //
+  ///////////////////////////////////////
+
+
+  //TODO Matlab back
+  //  dv = (state_new-> template get<StateDefinition_T::q>().toRotationMatrix() * ea + state_old-> template get<StateDefinition_T::q>().toRotationMatrix() * eaold) / 2;
+
+  dv = state_old-> template get<StateDefinition_T::q>().toRotationMatrix() * ea;
+  ///////////////////////////////////////////
+
+  ROS_INFO_STREAM_COND(debug, "ea: "<<ea);
+  ROS_INFO_STREAM_COND(debug, "dv: "<<dv);
+
+
+  //TODO Matlab back
+
+
+
   state_new-> template get<StateDefinition_T::v>() = state_old-> template get<StateDefinition_T::v>() + (dv - g_) * dt;
-  state_new-> template get<StateDefinition_T::p>() = state_old-> template get<StateDefinition_T::p>() + ((state_new-> template get<StateDefinition_T::v>() + state_old-> template get<StateDefinition_T::v>()) / 2 * dt);
+//  state_new-> template get<StateDefinition_T::p>() = state_old-> template get<StateDefinition_T::p>() + ((state_new-> template get<StateDefinition_T::v>() + state_old-> template get<StateDefinition_T::v>()) / 2 * dt);
+
+//  r_est_new = r_est + dt*v_est + dt^2/2*(C_est'*(a_m - b_a_est) + grav);
+//  v_est_new = v_est + dt*(C_est'*(a_m - b_a_est) + grav);
+
+
+  Vector3 p_old = state_old-> template get<StateDefinition_T::p>();
+  Vector3 v_old = state_old-> template get<StateDefinition_T::v>();
+
+
+  state_new-> template get<StateDefinition_T::p>() = state_old-> template get<StateDefinition_T::p>() + state_old-> template get<StateDefinition_T::v>() * dt + (dv - g_) * dt * dt /2;
+
+
+  Eigen::Matrix<double,3,1> stream_ppred = state_old-> template get<StateDefinition_T::p>() + state_old-> template get<StateDefinition_T::v>() * dt + (dv - g_) * dt * dt /2;
+  Eigen::Matrix<double,3,1> stream_vpred = state_old-> template get<StateDefinition_T::v>() + (dv - g_) * dt;
+
+  ROS_INFO_STREAM("dv: " << dv);
+  ROS_INFO_STREAM("p_old: " << p_old);
+  ROS_INFO_STREAM("v_old: " << v_old);
+  ROS_INFO_STREAM("p_pred: " << stream_ppred);
+  ROS_INFO_STREAM("v_pred: " << stream_vpred);
+  ROS_INFO_STREAM("q_pred: " << stream_qpred);
+
+
+
+  //////////////////////////////////////////
 
   tf::Transform transform;
   Eigen::Matrix<double, 3, 1>& pos = state_new-> template get<StateDefinition_T::p>();
@@ -544,6 +719,13 @@ void MSF_Core<EKFState_T>::propagateState(boost::shared_ptr<EKFState_T>& state_o
   state_new->toFullStateMsg(msgState_);
   pubState_.publish(msgState_);
 #endif
+
+  //  ROS_INFO_STREAM("STATES after propagation step:");
+  //  		std::cout<<state_new->print()<<std::endl;
+
+  //  		ROS_INFO_STREAM("P after propagation: "<<state_new->P);
+
+
 }
 
 template<typename EKFState_T>
@@ -554,6 +736,11 @@ void MSF_Core<EKFState_T>::propagatePOneStep(){
 
   ++stateIteratorPLastPropagatedNext;
   if(stateIteratorPLastPropagatedNext != StateBuffer_.getIteratorEnd()){ //might happen if there is a measurement in the future
+
+
+    // TODO Matlab back
+    ROS_INFO_STREAM("propPOneStep!!!");
+    //////////////////////////////////////
 
     predictProcessCovariance(stateIteratorPLastPropagated->second, stateIteratorPLastPropagatedNext->second);
 
@@ -606,7 +793,7 @@ void MSF_Core<EKFState_T>::predictProcessCovariance(boost::shared_ptr<EKFState_T
   const Matrix3 w_sk = skew(ew);
   const Matrix3 eye3 = Eigen::Matrix<double, 3, 3>::Identity();
 
-  const Matrix3 C_eq = state_new-> template get<StateDefinition_T::q>().toRotationMatrix();
+  const Matrix3 C_eq = state_old-> template get<StateDefinition_T::q>().toRotationMatrix();
 
   const double dt_p2_2 = dt * dt * 0.5; // dt^2 / 2
   const double dt_p3_6 = dt_p2_2 * dt / 3.0; // dt^3 / 6
@@ -627,35 +814,72 @@ void MSF_Core<EKFState_T>::predictProcessCovariance(boost::shared_ptr<EKFState_T
   // IEEE International Conference on Robotics and Automation. Shanghai, China, 2011
   typename EKFState_T::F_type& Fd = state_old->Fd;
 
-  Fd. template block<3, 3> (0, 3) = dt * eye3;
-  Fd. template block<3, 3> (0, 6) = A;
-  Fd. template block<3, 3> (0, 9) = B;
-  Fd. template block<3, 3> (0, 12) = -C_eq * dt_p2_2;
 
-  Fd. template block<3, 3> (3, 6) = C;
-  Fd. template block<3, 3> (3, 9) = D;
-  Fd. template block<3, 3> (3, 12) = -C_eq * dt;
+  // TODO Matlab back
+//  Fd. template block<3, 3> (0, 3) = dt * eye3;
+//  Fd. template block<3, 3> (0, 6) = A;
+//  Fd. template block<3, 3> (0, 9) = B;
+//  Fd. template block<3, 3> (0, 12) = -C_eq * dt_p2_2;
+//
+//  Fd. template block<3, 3> (3, 6) = C;
+//  Fd. template block<3, 3> (3, 9) = D;
+//  Fd. template block<3, 3> (3, 12) = -C_eq * dt;
+//
+//  Fd. template block<3, 3> (6, 6) = E;
+//  Fd. template block<3, 3> (6, 9) = F;
 
-  Fd. template block<3, 3> (6, 6) = E;
-  Fd. template block<3, 3> (6, 9) = F;
+
+
+  const Eigen::MatrixXd eye = Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime>::Identity();
+  Fd. template setZero();
+
+  Fd. template block<3, 3> (0, 3) = eye3;
+
+  Fd. template block<3, 3> (3, 6) = - C_eq * skew(ea);
+  Fd. template block<3, 3> (3, 12) = - C_eq;
+
+  Fd. template block<3, 3> (6, 6) = - skew(ew);
+  Fd. template block<3, 3> (6, 9) = - eye3;
+
+
+  Fd = (eye + Fd * dt);// + Fd * Fd * (dt*dt/2)); // + Fd * Fd * Fd * (dt*dt*dt/6));
+
+
+  ROS_INFO_STREAM("w_m for F,Q,P: " << state_new->w_m);
+  ROS_INFO_STREAM("a_m for F,Q,P: " << state_new->a_m);
+
+  ROS_INFO_STREAM("Fd: " << Fd);
+  //////////////////////////////////////////
 
   typename EKFState_T::Q_type& Qd = state_old->Qd;
 
   //Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> Qd(Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime>::Zero()); ///< discrete propagation noise matrix
-  calc_QCore(dt, state_new-> template get<StateDefinition_T::q>(), ew, ea, nav, nbav, nwv, nbwv, Qd);
+  calc_QCore(dt, state_old-> template get<StateDefinition_T::q>(), ew, ea, nav, nbav, nwv, nbwv, Qd);
 
   //call user Q calc to fill in the blocks of auxiliary states
   //TODO optim: make state Q-blocks map respective parts of Q using Eigen Map, avoids copy
-  usercalc_.calculateQAuxiliaryStates(*state_new, dt);
+  usercalc_.calculateQAuxiliaryStates(*state_old, dt);
 
   //now copy the userdefined blocks to Qd
   boost::fusion::for_each(
-      state_new->statevars,
+      state_old->statevars,
       msf_tmp::copyQBlocksFromAuxiliaryStatesToQ<StateSequence_T>(Qd)
   );
 
   //TODO optim: multiplication of F blockwise, using the fact that aux states have no entries outside their block
+
+
+
+  // TODO Matlab back
+//  state_new->P = Fd * state_old->P * Fd.transpose() + Qd;
   state_new->P = Fd * state_old->P * Fd.transpose() + Qd;
+
+//  ROS_INFO_STREAM("P_PREV: "<<state_old->P);
+  ROS_INFO_STREAM("P_pred: "<<state_new->P);
+
+
+  //////////////////////
+
 
   //set time for best cov prop to now
   time_P_propagated = state_new->time;
@@ -719,11 +943,15 @@ void MSF_Core<EKFState_T>::init(boost::shared_ptr<MSF_MeasurementBase<EKFState_T
 template<typename EKFState_T>
 void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase<EKFState_T> > measurement){
 
-  if(!initialized_ || !predictionMade_)
+  ROS_INFO_STREAM("Core: add measurement "<<msf_core::timehuman(measurement->time));
+
+  if(!initialized_ || !predictionMade_){
+    ROS_WARN_STREAM("Rejected, no prediction"<<predictionMade_<<" or not initialized "<<initialized_);
     return;
+  }
 
   if(measurement->time > StateBuffer_.getLast()->time){
-    //ROS_WARN_STREAM("You tried to give me a measurement in the future. Are you sure your clocks are synced and delays compensated correctly? I will store that and apply it next time... [measurement: "<<timehuman(measurement->time)<<" (s) latest state: "<<timehuman(StateBuffer_.getLast()->time)<<" (s)]");
+    ROS_WARN_STREAM("You tried to give me a measurement in the future. Are you sure your clocks are synced and delays compensated correctly? I will store that and apply it next time... [measurement: "<<timehuman(measurement->time)<<" (s) latest state: "<<timehuman(StateBuffer_.getLast()->time)<<" (s)]");
     queueFutureMeasurements_.push(measurement);
     return;
   }
@@ -744,7 +972,7 @@ void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase<
 
     if(it_meas->second->time <= 0) //valid?
       continue;
-sm::timing::Timer timer_meas_get_state("Get state for measurement");
+    sm::timing::Timer timer_meas_get_state("Get state for measurement");
     boost::shared_ptr<EKFState_T> state = getClosestState(it_meas->second->time); //propagates covariance to state
     timer_meas_get_state.stop();
     if(state->time <= 0){
@@ -918,7 +1146,13 @@ boost::shared_ptr<EKFState_T> MSF_Core<EKFState_T>::getClosestState(double tstam
   //do state interpolation if state is too far away from the measurement
   double tdiff = fabs(closestState->time - timenow); //timediff to closest state
 
-  if(tdiff > 0.001){ // if time diff too large, insert new state and do state interpolation
+
+  //TODO Matlab back
+//  if(tdiff > 0.001){ // if time diff too large, insert new state and do state interpolation
+  if(0){ // if time diff too large, insert new state and do state interpolation
+    ///////////////////////
+
+
     boost::shared_ptr<EKFState_T> lastState = StateBuffer_.getClosestBefore(timenow);
     boost::shared_ptr<EKFState_T> nextState = StateBuffer_.getClosestAfter(timenow);
 
@@ -965,14 +1199,25 @@ boost::shared_ptr<EKFState_T> MSF_Core<EKFState_T>::getClosestState(double tstam
 template<typename EKFState_T>
 void MSF_Core<EKFState_T>::propPToState(boost::shared_ptr<EKFState_T>& state)
 {
+
+  // TODO Matlab back
+  ROS_INFO_STREAM("propPToState!!!");
+  ///////////////
+
+
   // propagate cov matrix until the current states time
   typename stateBufferT::iterator_T it = StateBuffer_.getIteratorAtValue(time_P_propagated, false);
   typename stateBufferT::iterator_T itMinus = it;
   ++it;
   //until we reached the current state or the end of the state list
   for( ; it != StateBuffer_.getIteratorEnd() && it->second->time <= state->time ; ++it, ++itMinus){
+    ROS_INFO_STREAM("Propagating state from "<<itMinus->second->time<<" to "<<it->second->time);
     predictProcessCovariance(itMinus->second, it->second);
   }
+
+  //////////////////////////////////////////////
+
+
 }
 
 template<typename EKFState_T>

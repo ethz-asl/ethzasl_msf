@@ -8,6 +8,7 @@
 #include <msf_distort/MSF_DistortConfig.h>
 #include <dynamic_reconfigure/Reconfigure.h>
 #include <dynamic_reconfigure/server.h>
+#include <Eigen/Dense>
 
 
 struct CallbackHandler{
@@ -16,6 +17,7 @@ struct CallbackHandler{
   Config_T config_;
   ros::Publisher pubPoseWithCovarianceStamped_;
   ros::Publisher pubTransformStamped_;
+  ros::Publisher pubTfToPoseStamped_;
   ros::Publisher pubPoseStamped_;
   ros::Publisher pubNavSatFix_;
   ros::Publisher pubPoint_;
@@ -23,6 +25,7 @@ struct CallbackHandler{
   CallbackHandler(ros::NodeHandle& nh){
     pubPoseWithCovarianceStamped_ = nh.advertise<geometry_msgs::PoseWithCovarianceStamped> ("pose_with_covariance_output", 100);
     pubTransformStamped_ = nh.advertise<geometry_msgs::TransformStamped> ("transform_output", 100);
+    pubTfToPoseStamped_ = nh.advertise<geometry_msgs::PoseStamped> ("tf_to_pose_output", 100);
     pubPoseStamped_ = nh.advertise<geometry_msgs::PoseStamped> ("pose_output", 100);
     pubNavSatFix_ = nh.advertise<sensor_msgs::NavSatFix>("navsatfix_output", 100);
     pubPoint_ = nh.advertise<geometry_msgs::PointStamped>("point_output", 100);
@@ -41,13 +44,58 @@ struct CallbackHandler{
   void measurementCallback(const geometry_msgs::TransformStampedConstPtr & msg){
     if(config_.publish_pose){
       pubTransformStamped_.publish(msg);
+
+      //also publish as pose
+      geometry_msgs::PoseStampedPtr msgpose(new geometry_msgs::PoseStamped);
+      msgpose->header = msg->header;
+      msgpose->header.stamp = ros::Time(msgpose->header.stamp.toSec());
+      msgpose->pose.position.x = msg->transform.translation.x;
+      msgpose->pose.position.y = msg->transform.translation.y;
+      msgpose->pose.position.z = msg->transform.translation.z;
+
+Eigen::Quaterniond rot;
+rot.w() = msg->transform.rotation.w;
+rot.x() = msg->transform.rotation.x;
+rot.y() = msg->transform.rotation.y;
+rot.z() = msg->transform.rotation.z;
+
+Eigen::Quaterniond imutovicon;
+imutovicon.w() = 0.9993;
+imutovicon.x() = 0.0342;
+imutovicon.y() = 0.0031;
+imutovicon.z() = 0.0111;
+
+rot = rot * imutovicon.inverse();
+
+      msgpose->pose.orientation.w = rot.w();
+      msgpose->pose.orientation.x = rot.x();
+      msgpose->pose.orientation.y = rot.y();
+      msgpose->pose.orientation.z = rot.z();
+      pubTfToPoseStamped_.publish(msgpose);
     }
   }
 
   void measurementCallback(const geometry_msgs::PoseStampedConstPtr & msg){
-    if(config_.publish_pose){
-      pubPoseStamped_.publish(msg);
-    }
+    //    if(config_.publish_pose){
+    //      pubPoseStamped_.publish(msg);
+    //    }
+
+    geometry_msgs::PoseStampedPtr msgpose(new geometry_msgs::PoseStamped);
+    msgpose->header = msg->header;
+    msgpose->pose = msg->pose;
+
+    //calibration camera body to vicon marker body
+    Eigen::Quaterniond align(0.0041,0.0056,-0.0315,-0.9995);
+    align.normalize();
+
+    Eigen::Quaterniond pose(msg->pose.orientation.w, msg->pose.orientation.x, msg->pose.orientation.y, msg->pose.orientation.z);
+    Eigen::Quaterniond aligned = pose * align; // good
+
+    msgpose->pose.orientation.w = aligned.w();
+    msgpose->pose.orientation.x = aligned.x();
+    msgpose->pose.orientation.y = aligned.y();
+    msgpose->pose.orientation.z = aligned.z();
+    pubPoseStamped_.publish(msgpose);
   }
 
   void measurementCallback(const sensor_msgs::NavSatFixConstPtr & msg){

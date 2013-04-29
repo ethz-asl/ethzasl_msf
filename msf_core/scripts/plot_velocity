@@ -7,7 +7,10 @@ else
 T=5
 fi
 
+T=55
+
 echo " ### plotting velocities x y z [m/s] ###"
 echo " ### buffer = " $T "sec"
 
-rxplot msf_core/state_out/data[3]:data[4]:data[5] -b $T -t "velocity" -l x,y,z 
+rosrun rxtools rxplot msf_core/state_out/data[3]:data[4]:data[5] -b $T -t "velocity" -l v_x,v_y,v_z -p 55
+

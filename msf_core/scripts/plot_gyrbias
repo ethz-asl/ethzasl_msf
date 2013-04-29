@@ -1,3 +1,18 @@
+##!/bin/bash
+#
+#if [ -n "$1" ]
+#then
+#T=$1
+#else
+#T=5
+#fi
+#
+#echo " ### plotting gyro bias x y z [rad/s] ###"
+#echo " ### buffer = " $T "sec"
+#
+#rxplot msf_core/state_out/data[10]:data[11]:data[12] -b $T -t "gyr bias" -l x,y,z 
+
+
 #!/bin/bash
 
 if [ -n "$1" ]
@@ -7,7 +22,9 @@ else
 T=5
 fi
 
-echo " ### plotting gyro bias x y z [rad/s] ###"
+T=55
+
+echo " ### plotting biases x y z [m/s^2] ###"
 echo " ### buffer = " $T "sec"
 
-rxplot msf_core/state_out/data[10]:data[11]:data[12] -b $T -t "gyr bias" -l x,y,z 
+rosrun rxtools rxplot msf_core/state_out/data[10]:data[11]:data[12]:data[13]:data[14]:data[15] -b $T -t "biases" -l bwx,bwy,bwz,bax,bay,baz -p 55
