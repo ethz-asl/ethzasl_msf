@@ -125,8 +125,8 @@ private:
     a_m = g;			/// initial acceleration
 
     q_wv.setIdentity(); // vision-world rotation drift
-    q_wv = Eigen::Quaterniond(cos(90. / 180. * M_PI / 2.),0 ,0 , sin(90. / 180. * M_PI / 2.));
-    q_wv.normalize();
+//    q_wv = Eigen::Quaterniond(cos(90. / 180. * M_PI / 2.),0 ,0 , sin(90. / 180. * M_PI / 2.));
+//    q_wv.normalize();
     p_wv.setZero(); //vision-world position drift
 
     P.setZero(); // error state covariance; if zero, a default initialization in msf_core is used
