@@ -117,12 +117,9 @@ public:
 
     H.setZero();
 
-    // get rotation matrices
-    Eigen::Matrix<double, 3, 3> C_q = state.get<StateDefinition_T::q>().conjugate().toRotationMatrix();
-
     // preprocess for elements in H matrix
 
-    Eigen::Matrix<double, 3, 3> p_prism_imu_sk = skew(state.get<StateDefinition_T::p_ip>());
+    //Eigen::Matrix<double, 3, 3> p_prism_imu_sk = skew(state.get<StateDefinition_T::p_ip>());
 
     //get indices of states in error vector
     enum{
@@ -140,6 +137,7 @@ public:
     // construct H matrix using H-blockx :-)
 
     // TODO: @georg: implement your H matrix for the angles here
+    Eigen::Matrix<double, 3, 3> C_q = state.get<StateDefinition_T::q>().conjugate().toRotationMatrix();
     Eigen::Matrix<double, 3, 1> p_ = state.get<StateDefinition_T::p>();
     Eigen::Matrix<double, 3, 1> p_ip = state.get<StateDefinition_T::p_ip>();
     Eigen::Matrix<double, 2, 3> dz_dp;
@@ -188,7 +186,14 @@ public:
 
       // construct residuals
       // TODO: @georg: implement your residual here
-      r_old = z_a_ ;//- (state.get<StateDefinition_T::p>() + C_q.transpose() * state.get<StateDefinition_T::p_ip>());
+      Eigen::Matrix<double, 3, 1> z_carth = (state.get<StateDefinition_T::p>() + C_q.transpose() * state.get<StateDefinition_T::p_ip>());
+      double radius_old = sqrt(z_carth(0,0)*z_carth(0,0) + z_carth(1,0)*z_carth(1,0) + z_carth(2,0)*z_carth(2,0));
+      double theta_old = acos(z_carth(2,0)/radius_old);
+      double phi_old = atan(z_carth(1,0)/z_carth(0,0));
+
+      msf_core::Vector2 z_spherical;
+      z_spherical << theta_old, phi_old;
+      r_old = z_a_ - z_spherical;
 
       if(!checkForNumeric(r_old, "r_old")){
         ROS_ERROR_STREAM("r_old: "<<r_old);
@@ -345,7 +350,12 @@ public:
 
       // construct residuals
       // TODO: @georg: implement your residual here
-      r_old = z_d_ ;//- (state.get<StateDefinition_T::p>() + C_q.transpose() * state.get<StateDefinition_T::p_ip>());
+      Eigen::Matrix<double, 3, 1> z_carth = (state.get<StateDefinition_T::p>() + C_q.transpose() * state.get<StateDefinition_T::p_ip>());
+      double radius_old = sqrt(z_carth(0,0)*z_carth(0,0) + z_carth(1,0)*z_carth(1,0) + z_carth(2,0)*z_carth(2,0));
+
+      msf_core::Vector1 z_spherical;
+      z_spherical << radius_old;
+      r_old = z_d_ - z_spherical;
 
       if(!checkForNumeric(r_old, "r_old")){
         ROS_ERROR_STREAM("r_old: "<<r_old);
