@@ -82,7 +82,7 @@ template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
     this->sequenceWatchDog(msg->header.seq, subPointStamped_.getTopic());
 
     ROS_INFO_STREAM_ONCE(
-        "*** position sensor got first measurement from topic " << this->topic_namespace_ << "/"
+        "*** Angle sensor got first measurement from topic " << this->topic_namespace_ << "/"
             << subPointStamped_.getTopic() << " ***");
 
     //get the fixed states
@@ -167,7 +167,7 @@ template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
     this->sequenceWatchDog(msg->header.seq, subPointStamped_.getTopic());
 
     ROS_INFO_STREAM_ONCE(
-        "*** position sensor got first measurement from topic " << this->topic_namespace_ << "/"
+        "*** Distance sensor got first measurement from topic " << this->topic_namespace_ << "/"
             << subPointStamped_.getTopic() << " ***");
 
     //get the fixed states
