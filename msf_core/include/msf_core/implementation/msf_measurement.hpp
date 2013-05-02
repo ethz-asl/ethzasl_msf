@@ -94,11 +94,11 @@ void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrection(boost::shared_
   std::cout<<"Size S "<<S.rows()<<" "<<S.cols()<<std::endl;
 
 
-  //TODO Matlab back
-  ROS_INFO_STREAM("H_delayed = " << H_delayed);
-  ROS_INFO_STREAM("R_delayed = " << R_delayed);
-  ROS_INFO_STREAM("S = " << S);
-  ROS_INFO_STREAM("K = " << K);
+  //TODO Matlab back (done)
+//  ROS_INFO_STREAM("H_delayed = " << H_delayed);
+//  ROS_INFO_STREAM("R_delayed = " << R_delayed);
+//  ROS_INFO_STREAM("S = " << S);
+//  ROS_INFO_STREAM("K = " << K);
 
   ///////////////////////
 

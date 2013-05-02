@@ -566,10 +566,10 @@ void MSF_Core<EKFState_T>::propagateState(boost::shared_ptr<EKFState_T>& state_o
 
 
 
-  //TODO Matlab back
-  Eigen::Matrix<double,4,1> stream_qbeforepred =  state_old-> template get<StateDefinition_T::q>().coeffs();
-  ROS_INFO_STREAM("C_est_transposed = " << state_old-> template get<StateDefinition_T::q>().conjugate().toRotationMatrix());
-
+  //TODO Matlab back (done)
+//  Eigen::Matrix<double,4,1> stream_qbeforepred =  state_old-> template get<StateDefinition_T::q>().coeffs();
+//  ROS_INFO_STREAM("C_est_transposed = " << state_old-> template get<StateDefinition_T::q>().conjugate().toRotationMatrix());
+//
 
   /////////////////////
 
@@ -595,19 +595,19 @@ void MSF_Core<EKFState_T>::propagateState(boost::shared_ptr<EKFState_T>& state_o
   Vector3 wm = state_new->w_m;
   Vector3 bwest= state_new-> template get<StateDefinition_T::b_w>();
 
-  ROS_INFO_STREAM( "wm_bwest: "<< wm_bwest);
-  ROS_INFO_STREAM( "wm: "<< wm);
-  ROS_INFO_STREAM("am: "<< state_new->a_m);
-  ROS_INFO_STREAM( "bwest: "<< bwest);
+//  ROS_INFO_STREAM( "wm_bwest: "<< wm_bwest);
+//  ROS_INFO_STREAM( "wm: "<< wm);
+//  ROS_INFO_STREAM("am: "<< state_new->a_m);
+//  ROS_INFO_STREAM( "bwest: "<< bwest);
 
 
-
+//  ROS_INFO_STREAM( "Omega: "<<Omega);
+//  ROS_INFO_STREAM("dt: "<<dt);
 
   /////////////////////////////////////
 
 
-  ROS_INFO_STREAM( "Omega: "<<Omega);
-  ROS_INFO_STREAM("dt: "<<dt);
+
 
   const Matrix4 OmegaOld = omegaMatJPL(ewold);
   Matrix4 OmegaMean = omegaMatJPL((ew + ewold) / 2);
@@ -694,12 +694,12 @@ void MSF_Core<EKFState_T>::propagateState(boost::shared_ptr<EKFState_T>& state_o
   Eigen::Matrix<double,3,1> stream_ppred = state_old-> template get<StateDefinition_T::p>() + state_old-> template get<StateDefinition_T::v>() * dt + (dv - g_) * dt * dt /2;
   Eigen::Matrix<double,3,1> stream_vpred = state_old-> template get<StateDefinition_T::v>() + (dv - g_) * dt;
 
-  ROS_INFO_STREAM("dv: " << dv);
-  ROS_INFO_STREAM("p_old: " << p_old);
-  ROS_INFO_STREAM("v_old: " << v_old);
-  ROS_INFO_STREAM("p_pred: " << stream_ppred);
-  ROS_INFO_STREAM("v_pred: " << stream_vpred);
-  ROS_INFO_STREAM("q_pred: " << stream_qpred);
+//  ROS_INFO_STREAM("dv: " << dv);
+//  ROS_INFO_STREAM("p_old: " << p_old);
+//  ROS_INFO_STREAM("v_old: " << v_old);
+//  ROS_INFO_STREAM("p_pred: " << stream_ppred);
+//  ROS_INFO_STREAM("v_pred: " << stream_vpred);
+//  ROS_INFO_STREAM("q_pred: " << stream_qpred);
 
 
 
@@ -738,8 +738,8 @@ void MSF_Core<EKFState_T>::propagatePOneStep(){
   if(stateIteratorPLastPropagatedNext != StateBuffer_.getIteratorEnd()){ //might happen if there is a measurement in the future
 
 
-    // TODO Matlab back
-    ROS_INFO_STREAM("propPOneStep!!!");
+    // TODO Matlab back (done)
+//    ROS_INFO_STREAM("propPOneStep!!!");
     //////////////////////////////////////
 
     predictProcessCovariance(stateIteratorPLastPropagated->second, stateIteratorPLastPropagatedNext->second);
@@ -845,10 +845,12 @@ void MSF_Core<EKFState_T>::predictProcessCovariance(boost::shared_ptr<EKFState_T
   Fd = (eye + Fd * dt);// + Fd * Fd * (dt*dt/2)); // + Fd * Fd * Fd * (dt*dt*dt/6));
 
 
-  ROS_INFO_STREAM("w_m for F,Q,P: " << state_new->w_m);
-  ROS_INFO_STREAM("a_m for F,Q,P: " << state_new->a_m);
+//  ROS_INFO_STREAM("w_m for F,Q,P: " << state_new->w_m);
+//  ROS_INFO_STREAM("a_m for F,Q,P: " << state_new->a_m);
 
-  ROS_INFO_STREAM("Fd: " << Fd);
+//  ROS_INFO_STREAM("dt: " << dt);
+//  ROS_INFO_STREAM("C_eq: " << C_eq);
+//  ROS_INFO_STREAM("Fd: " << Fd);
   //////////////////////////////////////////
 
   typename EKFState_T::Q_type& Qd = state_old->Qd;
@@ -875,7 +877,7 @@ void MSF_Core<EKFState_T>::predictProcessCovariance(boost::shared_ptr<EKFState_T
   state_new->P = Fd * state_old->P * Fd.transpose() + Qd;
 
 //  ROS_INFO_STREAM("P_PREV: "<<state_old->P);
-  ROS_INFO_STREAM("P_pred: "<<state_new->P);
+//  ROS_INFO_STREAM("P_pred: "<<state_new->P);
 
 
   //////////////////////
@@ -1200,9 +1202,9 @@ template<typename EKFState_T>
 void MSF_Core<EKFState_T>::propPToState(boost::shared_ptr<EKFState_T>& state)
 {
 
-  // TODO Matlab back
-  ROS_INFO_STREAM("propPToState!!!");
-  ///////////////
+  // TODO Matlab back (done)
+//  ROS_INFO_STREAM("propPToState!!!");
+//  ///////////////
 
 
   // propagate cov matrix until the current states time

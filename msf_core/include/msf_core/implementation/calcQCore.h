@@ -195,7 +195,7 @@ void calc_QCore(const double dt, const Eigen::Quaternion<double> & q, const Eige
   Qd = Qd / 5;
 
 
-  ROS_INFO_STREAM("Qd =" << Qd);
+//  ROS_INFO_STREAM("Qd =" << Qd);
 
 //
 //  ROS_INFO_STREAM("dt =" << dt);
