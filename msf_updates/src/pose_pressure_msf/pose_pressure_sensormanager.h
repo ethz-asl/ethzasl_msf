@@ -112,7 +112,7 @@ private:
 
   }
 
-  void init(double scale)
+  void init(double scale) const
   {
 
     Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ic, p_vc;
@@ -190,18 +190,18 @@ private:
   }
 
   //prior to this call, all states are initialized to zero/identity
-  virtual void resetState(EKFState_T& state){
+  virtual void resetState(EKFState_T& state) const {
     //set scale to 1
 
     Eigen::Matrix<double, 1, 1> scale;
     scale << 1.0;
     state.set<StateDefinition_T::L>(scale);
   }
-  virtual void initState(EKFState_T& state){
+  virtual void initState(EKFState_T& state) const {
     UNUSED(state);
   }
 
-  virtual void calculateQAuxiliaryStates(EKFState_T& state, double dt){
+  virtual void calculateQAuxiliaryStates(EKFState_T& state, double dt) const {
     const msf_core::Vector3 nqwvv = msf_core::Vector3::Constant(config_.pose_noise_q_wv);
     const msf_core::Vector3 nqicv = msf_core::Vector3::Constant(config_.pose_noise_q_ic);
     const msf_core::Vector3 npicv = msf_core::Vector3::Constant(config_.pose_noise_p_ic);
@@ -217,16 +217,16 @@ private:
     state.getQBlock<StateDefinition_T::b_p>() = (dt * nb_p.cwiseProduct(nb_p)).asDiagonal();
   }
 
-  virtual void setP(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, EKFState_T::nErrorStatesAtCompileTime>& P){
+  virtual void setP(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, EKFState_T::nErrorStatesAtCompileTime>& P) const {
     UNUSED(P);
   }
 
-  virtual void augmentCorrectionVector(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& correction){
+  virtual void augmentCorrectionVector(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& correction) const {
     UNUSED(correction);
   }
 
   virtual void sanityCheckCorrection(EKFState_T& delaystate, const EKFState_T& buffstate,
-                                     Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& correction){
+                                     Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& correction) const {
 
     UNUSED(buffstate);
     UNUSED(correction);

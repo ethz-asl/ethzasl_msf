@@ -84,22 +84,22 @@ public:
   }
 
   //parameter getters
-  virtual bool getParam_fixed_bias(){
+  virtual bool getParam_fixed_bias() const {
     return config_.core_fixed_bias;
   }
-  virtual double getParam_noise_acc(){
+  virtual double getParam_noise_acc() const {
     return config_.core_noise_acc;
   }
-  virtual double getParam_noise_accbias(){
+  virtual double getParam_noise_accbias() const {
     return config_.core_noise_accbias;
   }
-  virtual double getParam_noise_gyr(){
+  virtual double getParam_noise_gyr() const {
     return config_.core_noise_gyr;
   }
-  virtual double getParam_noise_gyrbias(){
+  virtual double getParam_noise_gyrbias() const {
     return config_.core_noise_gyrbias;
   }
-  virtual double getParam_fuzzythres(){
+  virtual double getParam_fuzzythres() const {
     return 0.1;
   }
 

@@ -170,7 +170,7 @@ public:
    * \brief ctor takes a pointer to an object which does the user defined calculations and provides interfaces for initialization etc.
    * \param usercalc the class providing the user defined calculations DO ABSOLUTELY NOT USE THIS REFERENCE INSIDE THIS CTOR!!
    */
-  MSF_Core(MSF_SensorManager<EKFState_T>& usercalc);
+  MSF_Core(const MSF_SensorManager<EKFState_T>& usercalc);
   ~MSF_Core();
 
 
@@ -208,7 +208,7 @@ private:
   bool isfuzzyState_; ///< was the filter pushed to fuzzy state by a measurement?
 
   CheckFuzzyTracking<EKFState_T, nonDriftingStateType> fuzzyTracker_;  ///< watch dog to determine fuzzy tracking by observing non temporal drifting states
-  MSF_SensorManager<EKFState_T>& usercalc_; ///< a class which provides methods for customization of several calculations
+  const MSF_SensorManager<EKFState_T>& usercalc_; ///< a class which provides methods for customization of several calculations
 
   ros::Publisher pubState_; ///< publishes all states of the filter
   ros::Publisher pubPose_; ///< publishes 6DoF pose output

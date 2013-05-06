@@ -82,28 +82,28 @@ public:
   /***
    * init function for the EKF
    */
-  virtual void init(double scale) = 0;
+  virtual void init(double scale) const  = 0;
 
   /***
    * this method will be called for the user to set the initial state
    */
-  virtual void initState(EKFState_T& state) = 0;
+  virtual void initState(EKFState_T& state) const  = 0;
 
   /***
    * this method will be called for the user to set the Q block entries for Auxiliary states
    * only changes to blocks in Q belonging to the auxiliary states are allowed / evaluated
    */
-  virtual void calculateQAuxiliaryStates(EKFState_T& UNUSEDPARAM(state), double UNUSEDPARAM(dt)){};
+  virtual void calculateQAuxiliaryStates(EKFState_T& UNUSEDPARAM(state), double UNUSEDPARAM(dt)) const {};
 
   /***
    * this method will be called for the user to set the initial P matrix
    */
-  virtual void setP(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, EKFState_T::nErrorStatesAtCompileTime>& P) = 0;
+  virtual void setP(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, EKFState_T::nErrorStatesAtCompileTime>& P) const  = 0;
 
   /***
    * this method will be called for the user to have the possibility to augment the correction vector
    */
-  virtual void augmentCorrectionVector(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& UNUSEDPARAM(correction)){};
+  virtual void augmentCorrectionVector(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& UNUSEDPARAM(correction)) const {};
 
   /***
    * this method will be called for the user to check the correction after it has been applied to the state
@@ -111,17 +111,17 @@ public:
    * buffstate is the state before the correction was applied
    */
   virtual void sanityCheckCorrection(EKFState_T& UNUSEDPARAM(delaystate), const EKFState_T& UNUSEDPARAM(buffstate),
-                                     Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& UNUSEDPARAM(correction)){};
+                                     Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& UNUSEDPARAM(correction)) const {};
 
   /***
    * provide a getter for these parameters, this is implemented for a given middleware or param file parser
    */
-  virtual bool getParam_fixed_bias() = 0;
-  virtual double getParam_noise_acc() = 0;
-  virtual double getParam_noise_accbias() = 0;
-  virtual double getParam_noise_gyr() = 0;
-  virtual double getParam_noise_gyrbias() = 0;
-  virtual double getParam_fuzzythres() = 0;
+  virtual bool getParam_fixed_bias() const  = 0;
+  virtual double getParam_noise_acc() const  = 0;
+  virtual double getParam_noise_accbias() const  = 0;
+  virtual double getParam_noise_gyr() const  = 0;
+  virtual double getParam_noise_gyrbias() const  = 0;
+  virtual double getParam_fuzzythres() const  = 0;
 
 };
 

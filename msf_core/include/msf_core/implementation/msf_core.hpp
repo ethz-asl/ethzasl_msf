@@ -31,22 +31,22 @@
 
  */
 
+#include <chrono>
+#include <thread>
+#include <deque>
+#include <numeric>
 #include "calcQCore.h"
 #include <msf_core/eigen_utils.h>
 #include <msf_core/msf_sensormanager.h>
 #include <msf_core/msf_tools.h>
 #include <msf_core/msf_measurement.h>
-#include <chrono>
-#include <thread>
-#include <sm/timing/Timer.hpp>
-#include <deque>
-#include <numeric>
-#include <sensor_msgs/image_encodings.h>
 #include <msf_core/falsecolor.h>
+#include <sm/timing/Timer.hpp>
+#include <sensor_msgs/image_encodings.h>
 
 namespace msf_core {
 template<typename EKFState_T>
-MSF_Core<EKFState_T>::MSF_Core(MSF_SensorManager<EKFState_T>& usercalc)
+MSF_Core<EKFState_T>::MSF_Core(const MSF_SensorManager<EKFState_T>& usercalc)
     : usercalc_(usercalc)  //the interface for the user to customize EKF interna, DO ABSOLUTELY NOT USE THIS POINTER INSIDE THIS CTOR!!
 {
   std::setprecision(NUMERIC_PREC);  //set the output precision for numeric values
@@ -230,29 +230,7 @@ void MSF_Core<EKFState_T>::setPCore(
 
   //now set the core state covariance to the simulated values
   Eigen::Matrix<double, coreErrorStates, coreErrorStates> P_core;
-  P_core << 0.0166, 0.0122, -0.0015, 0.0211, 0.0074, 0.0000, 0.0012, -0.0012, 0.0001, -0.0000,
-      0.0000, -0.0000, -0.0003, -0.0002, -0.0000, 0.0129, 0.0508, -0.0020, 0.0179, 0.0432,
-      0.0006, 0.0020, 0.0004, -0.0002, -0.0000, 0.0000, 0.0000, 0.0003, -0.0002, 0.0000,
-      -0.0013, -0.0009, 0.0142, -0.0027, 0.0057, 0.0079, 0.0007, 0.0007, 0.0000, -0.0000,
-      -0.0000, 0.0000, -0.0001, -0.0004, -0.0001, 0.0210, 0.0162, -0.0026, 0.0437, 0.0083,
-      -0.0017, 0.0016, -0.0021, -0.0014, -0.0000, 0.0000, 0.0000, 0.0003, -0.0001, 0.0000,
-      0.0093, 0.0461, 0.0036, 0.0153, 0.0650, -0.0016, 0.0025, 0.0013, -0.0000, -0.0000,
-      0.0000, 0.0000, 0.0003, 0.0002, 0.0000, -0.0000, 0.0005, 0.0080, -0.0019, -0.0021,
-      0.0130, 0.0001, 0.0001, 0.0000, -0.0000, 0.0000, -0.0000, -0.0003, 0.0001, -0.0001,
-      0.0012, 0.0024, 0.0006, 0.0017, 0.0037, 0.0001, 0.0005, 0.0000, 0.0001, -0.0000,
-      0.0000, -0.0000, -0.0000, -0.0001, -0.0000, -0.0011, 0.0008, 0.0007, -0.0023, 0.0019,
-      0.0001, 0.0000, 0.0005, -0.0001, -0.0000, -0.0000, 0.0000, 0.0001, -0.0001, -0.0000,
-      0.0001, -0.0002, -0.0000, -0.0014, 0.0001, 0.0000, 0.0000, -0.0001, 0.0006, -0.0000,
-      -0.0000, -0.0000, 0.0000, 0.0000, -0.0000, -0.0000, -0.0000, -0.0000, -0.0000,
-      -0.0000, -0.0000, -0.0000, -0.0000, -0.0000, 0.0000, -0.0000, 0.0000, 0.0000, 0.0000,
-      0.0000, 0.0000, 0.0000, -0.0000, 0.0000, 0.0000, 0.0000, 0.0000, -0.0000, -0.0000,
-      -0.0000, 0.0000, -0.0000, 0.0000, 0.0000, 0.0000, -0.0000, 0.0000, 0.0000, 0.0000,
-      0.0000, 0.0000, -0.0000, 0.0000, -0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
-      -0.0000, -0.0003, 0.0003, -0.0001, 0.0003, 0.0003, -0.0003, -0.0000, 0.0001, 0.0000,
-      0.0000, 0.0000, 0.0000, 0.0010, 0.0000, 0.0000, -0.0002, -0.0002, -0.0004, -0.0001,
-      0.0003, 0.0001, -0.0001, -0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0010,
-      0.0000, -0.0000, 0.0000, -0.0001, 0.0000, 0.0000, -0.0001, -0.0000, -0.0000, -0.0000,
-      0.0000, 0.0000, -0.0000, 0.0000, 0.0000, 0.0001;
+  P_core << 0.0166, 0.0122, -0.0015, 0.0211, 0.0074, 0.0000, 0.0012, -0.0012, 0.0001, -0.0000, 0.0000, -0.0000, -0.0003, -0.0002, -0.0000, 0.0129, 0.0508, -0.0020, 0.0179, 0.0432, 0.0006, 0.0020, 0.0004, -0.0002, -0.0000, 0.0000, 0.0000, 0.0003, -0.0002, 0.0000, -0.0013, -0.0009, 0.0142, -0.0027, 0.0057, 0.0079, 0.0007, 0.0007, 0.0000, -0.0000, -0.0000, 0.0000, -0.0001, -0.0004, -0.0001, 0.0210, 0.0162, -0.0026, 0.0437, 0.0083, -0.0017, 0.0016, -0.0021, -0.0014, -0.0000, 0.0000, 0.0000, 0.0003, -0.0001, 0.0000, 0.0093, 0.0461, 0.0036, 0.0153, 0.0650, -0.0016, 0.0025, 0.0013, -0.0000, -0.0000, 0.0000, 0.0000, 0.0003, 0.0002, 0.0000, -0.0000, 0.0005, 0.0080, -0.0019, -0.0021, 0.0130, 0.0001, 0.0001, 0.0000, -0.0000, 0.0000, -0.0000, -0.0003, 0.0001, -0.0001, 0.0012, 0.0024, 0.0006, 0.0017, 0.0037, 0.0001, 0.0005, 0.0000, 0.0001, -0.0000, 0.0000, -0.0000, -0.0000, -0.0001, -0.0000, -0.0011, 0.0008, 0.0007, -0.0023, 0.0019, 0.0001, 0.0000, 0.0005, -0.0001, -0.0000, -0.0000, 0.0000, 0.0001, -0.0001, -0.0000, 0.0001, -0.0002, -0.0000, -0.0014, 0.0001, 0.0000, 0.0000, -0.0001, 0.0006, -0.0000, -0.0000, -0.0000, 0.0000, 0.0000, -0.0000, -0.0000, -0.0000, -0.0000, -0.0000, -0.0000, -0.0000, -0.0000, -0.0000, -0.0000, 0.0000, -0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, -0.0000, 0.0000, 0.0000, 0.0000, 0.0000, -0.0000, -0.0000, -0.0000, 0.0000, -0.0000, 0.0000, 0.0000, 0.0000, -0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, -0.0000, 0.0000, -0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, -0.0000, -0.0003, 0.0003, -0.0001, 0.0003, 0.0003, -0.0003, -0.0000, 0.0001, 0.0000, 0.0000, 0.0000, 0.0000, 0.0010, 0.0000, 0.0000, -0.0002, -0.0002, -0.0004, -0.0001, 0.0003, 0.0001, -0.0001, -0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0010, 0.0000, -0.0000, 0.0000, -0.0001, 0.0000, 0.0000, -0.0001, -0.0000, -0.0000, -0.0000, 0.0000, 0.0000, -0.0000, 0.0000, 0.0000, 0.0001;
   P_core = 0.5 * (P_core + P_core.transpose());
   P.template block<coreErrorStates, coreErrorStates>(0, 0) = P_core;
 }
@@ -281,10 +259,12 @@ void MSF_Core<EKFState_T>::imuCallback(const sensor_msgs::ImuConstPtr & msg) {
   lastseq = msg->header.seq;
 
   msf_core::Vector3 linacc;
-  linacc << msg->linear_acceleration.x, msg->linear_acceleration.y, msg->linear_acceleration.z;
+  linacc << msg->linear_acceleration.x, msg->linear_acceleration.y, msg
+      ->linear_acceleration.z;
 
   msf_core::Vector3 angvel;
-  angvel << msg->angular_velocity.x, msg->angular_velocity.y, msg->angular_velocity.z;
+  angvel << msg->angular_velocity.x, msg->angular_velocity.y, msg
+      ->angular_velocity.z;
 
   process_imu(linacc, angvel, msg->header.stamp, msg->header.seq);
 }
@@ -319,8 +299,7 @@ void MSF_Core<EKFState_T>::process_imu(
     predictionMade_ = false;
     ROS_ERROR_STREAM(
         __FUNCTION__<<"latest IMU message was out of order by a too large amount, resetting EKF: "
-        "last-state-time: "<<msf_core::timehuman(lastState->time)<<" "<< "current-imu-time: "<<
-        msf_core::timehuman(currentState->time));
+        "last-state-time: "<<msf_core::timehuman(lastState->time)<<" "<< "current-imu-time: "<< msf_core::timehuman(currentState->time));
     return;
   }
 
@@ -347,7 +326,7 @@ void MSF_Core<EKFState_T>::process_imu(
   if (!predictionMade_) {
     if (lastState->time == -1) {
       ROS_WARN_STREAM("Wanted to compare prediction time offset to last state, "
-          "but no prior state was in the buffer to take cleaner measurements from");
+      "but no prior state was in the buffer to take cleaner measurements from");
       return;
     }
     if (fabs(currentState->time - lastState->time) > 0.1) {
@@ -513,11 +492,11 @@ void MSF_Core<EKFState_T>::handlePendingMeasurements() {
 }
 
 template<typename EKFState_T>
-void MSF_Core<EKFState_T>::CleanUpBuffers(){
-    double timeold = 60; //1 min
-    StateBuffer_.clearOlderThan(timeold);
-    MeasurementBuffer_.clearOlderThan(timeold);
-  }
+void MSF_Core<EKFState_T>::CleanUpBuffers() {
+  double timeold = 60;  //1 min
+  StateBuffer_.clearOlderThan(timeold);
+  MeasurementBuffer_.clearOlderThan(timeold);
+}
 
 template<typename EKFState_T>
 void MSF_Core<EKFState_T>::propagateState(
@@ -976,7 +955,6 @@ void MSF_Core<EKFState_T>::addMeasurement(
   if (pubPoseAfterUpdate_.getNumSubscribers()) {
     //publish pose after correction with covariance
     propPToState(latestState);  //get the covar
-
 
     geometry_msgs::PoseWithCovarianceStamped msgPose;
     msgPose.header.stamp = ros::Time(latestState->time);

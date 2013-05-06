@@ -94,7 +94,7 @@ private:
     }
   }
 
-  void init(double scale)
+  void init(double scale) const
   {
     if(scale < 0.001){
       ROS_WARN_STREAM("init scale is "<<scale<<" correcting to 1");
@@ -160,14 +160,14 @@ private:
   }
 
   //prior to this call, all states are initialized to zero/identity
-  virtual void resetState(EKFState_T& state){
+  virtual void resetState(EKFState_T& state) const {
     UNUSED(state);
   }
-  virtual void initState(EKFState_T& state){
+  virtual void initState(EKFState_T& state) const {
     UNUSED(state);
   }
 
-  virtual void calculateQAuxiliaryStates(EKFState_T& state, double dt){
+  virtual void calculateQAuxiliaryStates(EKFState_T& state, double dt) const {
     const msf_core::Vector3 npipv = msf_core::Vector3::Constant(config_.position_noise_p_ip);
 
     //compute the blockwise Q values and store them with the states,
@@ -175,17 +175,17 @@ private:
     state.getQBlock<StateDefinition_T::p_ip>() = (dt * npipv.cwiseProduct(npipv)).asDiagonal();
   }
 
-  virtual void setP(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, EKFState_T::nErrorStatesAtCompileTime>& P){
+  virtual void setP(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, EKFState_T::nErrorStatesAtCompileTime>& P) const {
     UNUSED(P);
     //nothing, we only use the simulated cov for the core plus diagonal for the rest
   }
 
-  virtual void augmentCorrectionVector(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& correction){
+  virtual void augmentCorrectionVector(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& correction) const {
     UNUSED(correction);
   }
 
   virtual void sanityCheckCorrection(EKFState_T& delaystate, const EKFState_T& buffstate,
-                                     Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& correction){
+                                     Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& correction) const {
     UNUSED(delaystate);
     UNUSED(buffstate);
     UNUSED(correction);
