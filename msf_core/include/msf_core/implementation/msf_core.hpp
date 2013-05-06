@@ -291,10 +291,10 @@ void MSF_Core<EKFState_T>::imuCallback(const sensor_msgs::ImuConstPtr & msg)
   //  lastseq = msg->header.seq;
 
 
-  //  if(msg->header.seq % 10 != 0){
-  //    ROS_WARN_STREAM_THROTTLE(60, "IMU throttling is on now!!!");
-  //    return;
-  //  }
+//    if(msg->header.seq % 10 != 0){
+//      ROS_WARN_STREAM_THROTTLE(60, "IMU throttling is on now!!!");
+//      return;
+//    }
 
   msf_core::Vector3 linacc;
   linacc << msg->linear_acceleration.x, msg->linear_acceleration.y, msg->linear_acceleration.z;
@@ -313,7 +313,7 @@ template<typename EKFState_T>
 void MSF_Core<EKFState_T>::process_imu(const msf_core::Vector3& linear_acceleration, const msf_core::Vector3& angular_velocity,
                                        const ros::Time& msg_stamp, size_t msg_seq)
                                        {
-  ROS_INFO_STREAM("MSF_Core: process_imu :"<<msf_core::timehuman(msg_stamp.toSec()));
+  //ROS_INFO_STREAM("MSF_Core: process_imu :"<<msf_core::timehuman(msg_stamp.toSec()));
 
   if(!initialized_){
     ROS_INFO_STREAM("IMU rejected not initialized");
@@ -417,7 +417,7 @@ void MSF_Core<EKFState_T>::process_imu(const msf_core::Vector3& linear_accelerat
   }
   seq++;
 
-  ROS_INFO_STREAM("msf_core process_imu done, pred. state:"<<std::endl<<currentState->print());
+  //ROS_INFO_STREAM("msf_core process_imu done, pred. state:"<<std::endl<<currentState->print());
 
 
 
@@ -535,7 +535,7 @@ template<typename EKFState_T>
 void MSF_Core<EKFState_T>::propagateState(boost::shared_ptr<EKFState_T>& state_old, boost::shared_ptr<EKFState_T>& state_new)
 {
 
-  ROS_INFO_STREAM("MSF_Core: propagateState from:"<<msf_core::timehuman(state_old->time)<<" to "<<msf_core::timehuman(state_new->time));
+  //ROS_INFO_STREAM("MSF_Core: propagateState from:"<<msf_core::timehuman(state_old->time)<<" to "<<msf_core::timehuman(state_new->time));
 
   bool debug = false;
 
@@ -560,10 +560,9 @@ void MSF_Core<EKFState_T>::propagateState(boost::shared_ptr<EKFState_T>& state_o
       msf_tmp::copyNonPropagationStates<EKFState_T>(*state_old)
   );
 
-  ROS_INFO_STREAM_COND(debug, "w_m: "<<state_new->w_m);
-  ROS_INFO_STREAM_COND(debug, "a_m: "<<state_new->a_m);
-  ROS_INFO_STREAM_COND(debug, "C_est_transposed = " << state_old-> template get<StateDefinition_T::q>().conjugate().toRotationMatrix());
-
+//  ROS_INFO_STREAM_COND(debug, "w_m: "<<state_new->w_m);
+//  ROS_INFO_STREAM_COND(debug, "a_m: "<<state_new->a_m);
+//  ROS_INFO_STREAM_COND(debug, "C_est_transposed = " << state_old-> template get<StateDefinition_T::q>().conjugate().toRotationMatrix());
 
 
   //TODO Matlab back (done)
@@ -573,7 +572,7 @@ void MSF_Core<EKFState_T>::propagateState(boost::shared_ptr<EKFState_T>& state_o
 
   /////////////////////
 
-  ROS_INFO_STREAM("C_est_transposed = "<<state_old-> template get<StateDefinition_T::q>().toRotationMatrix());
+  //ROS_INFO_STREAM("C_est_transposed = "<<state_old-> template get<StateDefinition_T::q>().toRotationMatrix());
 
   //  // DB test
   //  state_new-> template get<StateDefinition_T::b_a>()(0) = 0;
