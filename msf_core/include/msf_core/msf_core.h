@@ -225,6 +225,7 @@ private:
   ros::Subscriber subImuCustom_; ///< subscriber to IMU readings for asctec custom
 
   sensor_fusion_comm::ExtEkf hl_state_buf_; ///< buffer to store external propagation data
+  sensor_fusion_comm::ExtEkf msgCorrect_;
 
   /**
    * \brief applies the correction
