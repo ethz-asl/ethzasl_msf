@@ -97,7 +97,7 @@ public:
   typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, 1> ErrorState; ///< the error state type
   typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> ErrorStateCov; ///<the error state covariance type
 
-  typedef msf_core::SortedContainer<EKFState_T> stateBufferT; ///< the type of the state buffer containing all the states
+  typedef msf_core::SortedContainer<EKFState_T> StateBuffer_T; ///< the type of the state buffer containing all the states
   typedef msf_core::SortedContainer<typename msf_core::MSF_MeasurementBase<EKFState_T>, typename msf_core::MSF_InvalidMeasurement<EKFState_T> > measurementBufferT; ///< the type of the measurement buffer containing all the measurements
 
   /**
@@ -186,7 +186,7 @@ private:
 
   typedef typename msf_tmp::getEnumStateType<StateSequence_T, indexOfStateWithoutTemporalDrift>::value nonDriftingStateType; //returns void type for invalid types
 
-  stateBufferT StateBuffer_; ///<EKF buffer containing pretty much all info needed at time t. sorted by t asc
+  StateBuffer_T stateBuffer_; ///<EKF buffer containing pretty much all info needed at time t. sorted by t asc
   measurementBufferT MeasurementBuffer_; ///< EKF Measurements and init values sorted by t asc
   std::queue<boost::shared_ptr<MSF_MeasurementBase<EKFState_T> > > queueFutureMeasurements_; ///< buffer for measurements to apply in future
 

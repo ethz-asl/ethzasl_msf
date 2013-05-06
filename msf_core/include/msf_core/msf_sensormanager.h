@@ -1,31 +1,31 @@
 /*
 
-Copyright (c) 2012, Simon Lynen, ASL, ETH Zurich, Switzerland
-You can contact the author at <slynen at ethz dot ch>
+ Copyright (c) 2012, Simon Lynen, ASL, ETH Zurich, Switzerland
+ You can contact the author at <slynen at ethz dot ch>
 
-All rights reserved.
+ All rights reserved.
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions are met:
  * Redistributions of source code must retain the above copyright
-notice, this list of conditions and the following disclaimer.
+ notice, this list of conditions and the following disclaimer.
  * Redistributions in binary form must reproduce the above copyright
-notice, this list of conditions and the following disclaimer in the
-documentation and/or other materials provided with the distribution.
+ notice, this list of conditions and the following disclaimer in the
+ documentation and/or other materials provided with the distribution.
  * Neither the name of ETHZ-ASL nor the
-names of its contributors may be used to endorse or promote products
-derived from this software without specific prior written permission.
+ names of its contributors may be used to endorse or promote products
+ derived from this software without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL ETHZ-ASL BE LIABLE FOR ANY
-DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ DISCLAIMED. IN NO EVENT SHALL ETHZ-ASL BE LIABLE FOR ANY
+ DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
 
@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Eigen/Dense>
 #include <string.h>
 
-namespace msf_core{
+namespace msf_core {
 
 template<typename EKFState_T>
 class SensorHandler;
@@ -51,30 +51,30 @@ class MSF_Core;
  * EKF core instance and handles the initialization of the filter
  */
 template<typename EKFState_T>
-class MSF_SensorManager:public StateVisitor<EKFState_T>
-{
-private:
+class MSF_SensorManager : public StateVisitor<EKFState_T> {
+ private:
   int sensorID_;
-protected:
+ protected:
   typedef std::vector<boost::shared_ptr<SensorHandler<EKFState_T> > > Handlers;
-  Handlers handlers; ///<a list of sensor handlers which provide measurements
+  Handlers handlers;  ///<a list of sensor handlers which provide measurements
 
-public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  ;
 
-  boost::shared_ptr<MSF_Core<EKFState_T> > msf_core_; ///< the ekf core instance
+  boost::shared_ptr<MSF_Core<EKFState_T> > msf_core_;  ///< the ekf core instance
 
   MSF_SensorManager();
 
-  virtual ~MSF_SensorManager(){
+  virtual ~MSF_SensorManager() {
 
-  };
+  }
+  ;
   /***
    * add a new sensor handler to the list of handlers owned by this manager
    * a sensor handler is in turn owning the sensor (camera/vicon etc.)
    */
-  void addHandler(boost::shared_ptr<SensorHandler<EKFState_T> > handler)
-  {
+  void addHandler(boost::shared_ptr<SensorHandler<EKFState_T> > handler) {
     handler->setSensorID(sensorID_++);
     handlers.push_back(handler);
   }
@@ -82,46 +82,58 @@ public:
   /***
    * init function for the EKF
    */
-  virtual void init(double scale) const  = 0;
+  virtual void init(double scale) const = 0;
 
   /***
    * this method will be called for the user to set the initial state
    */
-  virtual void initState(EKFState_T& state) const  = 0;
+  virtual void initState(EKFState_T& state) const = 0;
 
   /***
    * this method will be called for the user to set the Q block entries for Auxiliary states
    * only changes to blocks in Q belonging to the auxiliary states are allowed / evaluated
    */
-  virtual void calculateQAuxiliaryStates(EKFState_T& UNUSEDPARAM(state), double UNUSEDPARAM(dt)) const {};
+  virtual void calculateQAuxiliaryStates(EKFState_T& UNUSEDPARAM(state),
+                                         double UNUSEDPARAM(dt)) const {
+  }
+  ;
 
   /***
    * this method will be called for the user to set the initial P matrix
    */
-  virtual void setP(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, EKFState_T::nErrorStatesAtCompileTime>& P) const  = 0;
+  virtual void setP(
+      Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,
+          EKFState_T::nErrorStatesAtCompileTime>& P) const = 0;
 
   /***
    * this method will be called for the user to have the possibility to augment the correction vector
    */
-  virtual void augmentCorrectionVector(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& UNUSEDPARAM(correction)) const {};
+  virtual void augmentCorrectionVector(
+      Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, 1>& UNUSEDPARAM(correction)) const {
+  }
+  ;
 
   /***
    * this method will be called for the user to check the correction after it has been applied to the state
    * delaystate is the state on which the correction has been applied
    * buffstate is the state before the correction was applied
    */
-  virtual void sanityCheckCorrection(EKFState_T& UNUSEDPARAM(delaystate), const EKFState_T& UNUSEDPARAM(buffstate),
-                                     Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& UNUSEDPARAM(correction)) const {};
+  virtual void sanityCheckCorrection(
+      EKFState_T& UNUSEDPARAM(delaystate),
+      const EKFState_T& UNUSEDPARAM(buffstate),
+      Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, 1>& UNUSEDPARAM(correction)) const {
+  }
+  ;
 
   /***
    * provide a getter for these parameters, this is implemented for a given middleware or param file parser
    */
-  virtual bool getParam_fixed_bias() const  = 0;
-  virtual double getParam_noise_acc() const  = 0;
-  virtual double getParam_noise_accbias() const  = 0;
-  virtual double getParam_noise_gyr() const  = 0;
-  virtual double getParam_noise_gyrbias() const  = 0;
-  virtual double getParam_fuzzythres() const  = 0;
+  virtual bool getParam_fixed_bias() const = 0;
+  virtual double getParam_noise_acc() const = 0;
+  virtual double getParam_noise_accbias() const = 0;
+  virtual double getParam_noise_gyr() const = 0;
+  virtual double getParam_noise_gyrbias() const = 0;
+  virtual double getParam_fuzzythres() const = 0;
 
 };
 
@@ -130,31 +142,44 @@ public:
  * \brief handles a sensor driver which provides the sensor readings
  */
 template<typename EKFState_T>
-class SensorHandler
-{
-  friend class MSF_SensorManager<EKFState_T>;
+class SensorHandler {
+  friend class MSF_SensorManager<EKFState_T> ;
   int lastseq_;
-protected:
+ protected:
   MSF_SensorManager<EKFState_T>& manager_;
   int sensorID;
   std::string topic_namespace_;
   std::string parameternamespace_;
-  void setSensorID(int ID){sensorID = ID;}
-  void sequenceWatchDog(size_t seq, const std::string& topic){
-    if((int)seq != lastseq_ + 1 && lastseq_ != 0){
-        ROS_WARN_STREAM(topic<<": message drop curr seq:"<<seq<<" expected: "<<lastseq_ + 1);
+  void setSensorID(int ID) {
+    sensorID = ID;
+  }
+  void sequenceWatchDog(size_t seq, const std::string& topic) {
+    if ((int) seq != lastseq_ + 1 && lastseq_ != 0) {
+      ROS_WARN_STREAM(
+          topic << ": message drop curr seq:" << seq << " expected: "
+              << lastseq_ + 1);
     }
     lastseq_ = seq;
   }
-public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  ;
 
-  SensorHandler(MSF_SensorManager<EKFState_T>& mng, std::string& topic_namespace, std::string& parameternamespace):
-  lastseq_(0), manager_(mng), sensorID(-1), topic_namespace_(topic_namespace), parameternamespace_(parameternamespace){}
-  virtual ~SensorHandler() {}
+  SensorHandler(MSF_SensorManager<EKFState_T>& mng,
+                std::string& topic_namespace, std::string& parameternamespace)
+      : lastseq_(0),
+        manager_(mng),
+        sensorID(-1),
+        topic_namespace_(topic_namespace),
+        parameternamespace_(parameternamespace) {
+  }
+  virtual ~SensorHandler() {
+  }
 };
 
-}; // end msf_core
+}
+;
+// end msf_core
 
 #include <msf_core/implementation/msf_sensormanager.hpp>
 

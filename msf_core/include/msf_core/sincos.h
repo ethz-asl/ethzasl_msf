@@ -1,5 +1,4 @@
 
-
 #ifndef SINCOS_H_
 #define SINCOS_H_
 
@@ -13,21 +12,19 @@
 
 #ifdef __x87_inline_math__
 /*
-** Compute sine and cosine at same time (faster than separate calls).
-** (*s) gets sin(x)
-** (*c) gets cos(x)
-*/
+ ** Compute sine and cosine at same time (faster than separate calls).
+ ** (*s) gets sin(x)
+ ** (*c) gets cos(x)
+ */
 #define sincos(x,s,c) sincos_x87_inline(x,s,c)
 void sincos_x87_inline(double x,double *s,double *c);
-extern __inline__  void sincos_x87_inline(double x,double *s,double *c)
-    {
-    __asm__ ("fsincos;" : "=t" (*c), "=u" (*s) : "0" (x) : "st(7)");
-    }
+extern __inline__ void sincos_x87_inline(double x,double *s,double *c)
+{
+  __asm__ ("fsincos;" : "=t" (*c), "=u" (*s) : "0" (x) : "st(7)");
+}
 #else
 #define sincos(th,x,y) { (*(x))=sin(th); (*(y))=cos(th); }
 #endif
 #endif
-
-
 
 #endif /* SINCOS_H_ */

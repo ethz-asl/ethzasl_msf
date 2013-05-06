@@ -34,24 +34,22 @@
 
 #include <boost/static_assert.hpp>
 
-namespace
-{
+namespace {
 
 template<typename EKFState_T>
-  struct StaticAssertCoreStateOrderingCorrect
-  {
-    typedef typename EKFState_T::StateSequence_T StateSequence_T;
-    typedef typename EKFState_T::StateDefinition_T StateDefinition_T;
+struct StaticAssertCoreStateOrderingCorrect {
+  typedef typename EKFState_T::StateSequence_T StateSequence_T;
+  typedef typename EKFState_T::StateDefinition_T StateDefinition_T;
 
-    enum{
-      value
-    };
+  enum {
+    value
+  };
 
-    //for now we have no make sure, the core states are in the correct order
-    //(calculation of observation noise cov has hardcoded order) DO NOT REMOVE THIS!! UNLESS YOU ALSO FIXED CalcQCore!
-    //{
-    enum{
-      idxstartcorr_p_ = msf_tmp::getStartIndex<StateSequence_T,
+  //for now we have no make sure, the core states are in the correct order
+  //(calculation of observation noise cov has hardcoded order) DO NOT REMOVE THIS!! UNLESS YOU ALSO FIXED CalcQCore!
+  //{
+  enum {
+    idxstartcorr_p_ = msf_tmp::getStartIndex<StateSequence_T,
         typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::p>::value,
         msf_tmp::CorrectionStateLengthForType>::value,
 
@@ -64,22 +62,24 @@ template<typename EKFState_T>
         msf_tmp::CorrectionStateLengthForType>::value,
 
     idxstartcorr_b_w_ = msf_tmp::getStartIndex<StateSequence_T,
-        typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::b_w>::value,
+        typename msf_tmp::getEnumStateType<StateSequence_T,
+            StateDefinition_T::b_w>::value,
         msf_tmp::CorrectionStateLengthForType>::value,
 
-   idxstartcorr_b_a_ = msf_tmp::getStartIndex<StateSequence_T,
-        typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::b_a>::value,
+    idxstartcorr_b_a_ = msf_tmp::getStartIndex<StateSequence_T,
+        typename msf_tmp::getEnumStateType<StateSequence_T,
+            StateDefinition_T::b_a>::value,
         msf_tmp::CorrectionStateLengthForType>::value
-    };
-
-    BOOST_STATIC_ASSERT_MSG(idxstartcorr_p_==0, "Indexing of core states has been altered, but this is currently not allowed");
-    BOOST_STATIC_ASSERT_MSG(idxstartcorr_v_==3, "Indexing of core states has been altered, but this is currently not allowed");
-    BOOST_STATIC_ASSERT_MSG(idxstartcorr_q_==6, "Indexing of core states has been altered, but this is currently not allowed");
-    BOOST_STATIC_ASSERT_MSG(idxstartcorr_b_w_==9, "Indexing of core states has been altered, but this is currently not allowed");
-    BOOST_STATIC_ASSERT_MSG(idxstartcorr_b_a_==12, "Indexing of core states has been altered, but this is currently not allowed");
-    //}
   };
 
-  }
+  BOOST_STATIC_ASSERT_MSG(idxstartcorr_p_==0, "Indexing of core states has been altered, but this is currently not allowed");
+  BOOST_STATIC_ASSERT_MSG(idxstartcorr_v_==3, "Indexing of core states has been altered, but this is currently not allowed");
+  BOOST_STATIC_ASSERT_MSG(idxstartcorr_q_==6, "Indexing of core states has been altered, but this is currently not allowed");
+  BOOST_STATIC_ASSERT_MSG(idxstartcorr_b_w_==9, "Indexing of core states has been altered, but this is currently not allowed");
+  BOOST_STATIC_ASSERT_MSG(idxstartcorr_b_a_==12, "Indexing of core states has been altered, but this is currently not allowed");
+  //}
+};
+
+}
 
 #endif /* STATIC_ORDERING_ASSERTIONS_HPP_ */

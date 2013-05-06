@@ -35,6 +35,8 @@
 #include <thread>
 #include <deque>
 #include <numeric>
+#include <string>
+#include <vector>
 #include "calcQCore.h"
 #include <msf_core/eigen_utils.h>
 #include <msf_core/msf_sensormanager.h>
@@ -47,17 +49,17 @@
 namespace msf_core {
 template<typename EKFState_T>
 MSF_Core<EKFState_T>::MSF_Core(const MSF_SensorManager<EKFState_T>& usercalc)
-    : usercalc_(usercalc)  //the interface for the user to customize EKF interna, DO ABSOLUTELY NOT USE THIS POINTER INSIDE THIS CTOR!!
-{
+    : usercalc_(usercalc) {  // the interface for the user to customize EKF interna, DO ABSOLUTELY NOT USE THIS POINTER INSIDE THIS CTOR!!
+
   std::setprecision(NUMERIC_PREC);  //set the output precision for numeric values
 
   initialized_ = false;
   predictionMade_ = false;
   isfuzzyState_ = false;
 
-  g_ << 0, 0, 9.80834;  //at 47.37 lat
+  g_ << 0, 0, 9.80834;  // at 47.37 lat
 
-  //TODO later: move all this to the external file and derive from this class. We could by this allow compilation on platforms withour ROS
+  // TODO(slynen): move all this to the external file and derive from this class. We could by this allow compilation on platforms withour ROS
   ros::NodeHandle nh("msf_core");
   ros::NodeHandle pnh("~");
 
@@ -89,7 +91,6 @@ MSF_Core<EKFState_T>::MSF_Core(const MSF_SensorManager<EKFState_T>& usercalc)
   pnh.param("data_playback", data_playback_, false);
 
   time_P_propagated = 0;
-
 }
 
 template<typename EKFState_T>
@@ -124,94 +125,113 @@ void MSF_Core<EKFState_T>::publishCovImage(
     boost::shared_ptr<EKFState_T> stateptr) const {
 
 #ifdef  WITHCOVIMAGE
-  if(!pubCov_.getNumSubscribers())
-  return;
+  if (!pubCov_.getNumSubscribers())
+    return;
 
   const EKFState_T& state = *stateptr;
 
   static int imgseq = 0;
 
   enum {
-    blocksize = 10,  //size of cov blocks in pixels
-    imgrows = EKFState_T::nErrorStatesAtCompileTime * blocksize + EKFState_T::nStateVarsAtCompileTime - 1
+    blocksize = 10,  // size of cov blocks in pixels
+    imgrows = EKFState_T::nErrorStatesAtCompileTime * blocksize
+        + EKFState_T::nStateVarsAtCompileTime - 1
   };
 
   cv::Mat colorimg(imgrows, imgrows, CV_8UC3);
   colorimg.setTo(0);
 
-  std::vector<std::tuple<int, int, int> > enumsandindices;
+  std::vector < std::tuple<int, int, int> > enumsandindices;
   stateptr->calculateIndicesInErrorState(enumsandindices);
 
-  //smooth min max values of P
+  // smooth min max values of P
   static struct smoothP {
     std::deque<double> dmin;
     std::deque<double> dmax;
-  }smoother;
+  } smoother;
 
   smoother.dmin.push_back(state.P.minCoeff());
   smoother.dmax.push_back(state.P.maxCoeff());
 
   size_t filtsize = 50;
-  if(smoother.dmin.size() > filtsize)
-  smoother.dmin.pop_front();
+  if (smoother.dmin.size() > filtsize)
+    smoother.dmin.pop_front();
 
-  if(smoother.dmax.size() > filtsize)
-  smoother.dmax.pop_front();
+  if (smoother.dmax.size() > filtsize)
+    smoother.dmax.pop_front();
 
-  double min = std::accumulate(smoother.dmin.begin(), smoother.dmin.end(), 0.0) / smoother.dmin.size();
-  double max = std::accumulate(smoother.dmax.begin(), smoother.dmax.end(), 0.0) / smoother.dmax.size();
+  double min = std::accumulate(smoother.dmin.begin(), smoother.dmin.end(), 0.0)
+      / smoother.dmin.size();
+  double max = std::accumulate(smoother.dmax.begin(), smoother.dmax.end(), 0.0)
+      / smoother.dmax.size();
 
   static palette pal = GetPalette(palette::False_color_palette4);
 
-  //draw the blocks for covs of the state variables
-  for(size_t i = 0; i < enumsandindices.size(); ++i) {
-    for(size_t j = 0; j < enumsandindices.size(); ++j) {
-      int lengthincorrectionrows = std::get<2>(enumsandindices.at(i));
-      int lengthincorrectioncols = std::get<2>(enumsandindices.at(j));
-      //print all entries for this state combination
-      for(int rowidx = 0;rowidx<lengthincorrectionrows;++rowidx) {
-        for(int colidx = 0;colidx<lengthincorrectioncols;++colidx) {
+  // draw the blocks for covs of the state variables
+  for (size_t i = 0; i < enumsandindices.size(); ++i) {
+    for (size_t j = 0; j < enumsandindices.size(); ++j) {
+      int lengthincorrectionrows = std::get < 2 > (enumsandindices.at(i));
+      int lengthincorrectioncols = std::get < 2 > (enumsandindices.at(j));
+      // print all entries for this state combination
+      for (int rowidx = 0; rowidx < lengthincorrectionrows; ++rowidx) {
+        for (int colidx = 0; colidx < lengthincorrectioncols; ++colidx) {
 
-          int startrow = std::get<0>(enumsandindices.at(i)) + (std::get<1>(enumsandindices.at(i)) + rowidx) * blocksize;
-          int startcol = std::get<0>(enumsandindices.at(j)) + (std::get<1>(enumsandindices.at(j)) + colidx) * blocksize;
+          int startrow = std::get < 0
+              > (enumsandindices.at(i))
+                  + (std::get < 1 > (enumsandindices.at(i)) + rowidx)
+                      * blocksize;
+          int startcol = std::get < 0
+              > (enumsandindices.at(j))
+                  + (std::get < 1 > (enumsandindices.at(j)) + colidx)
+                      * blocksize;
 
-          double value = state.P(std::get<1>(enumsandindices.at(i)) + rowidx, std::get<1>(enumsandindices.at(j)) + colidx);
+          double value = state.P(
+              std::get < 1 > (enumsandindices.at(i)) + rowidx,
+              std::get < 1 > (enumsandindices.at(j)) + colidx);
 
           int brightness = (value - min) / (max - min) * 255.;
           brightness = brightness > 255 ? 255 : brightness < 0 ? 0 : brightness;  //clamp
 
-          cv::rectangle(colorimg, cv::Point(startrow, startcol),cv::Point(startrow + blocksize, startcol + blocksize),
-              CV_RGB(pal.colors[brightness].rgbRed, pal.colors[brightness].rgbGreen, pal.colors[brightness].rgbBlue), CV_FILLED);
+          cv::rectangle(
+              colorimg,
+              cv::Point(startrow, startcol),
+              cv::Point(startrow + blocksize, startcol + blocksize),
+              CV_RGB(pal.colors[brightness].rgbRed, pal.colors[brightness].rgbGreen, pal.colors[brightness].rgbBlue),
+              CV_FILLED);
 
         }
       }
     }
   }
 
-  //draw the lines between the state variables
-  for(size_t i = 1; i < enumsandindices.size(); ++i) {
+  // draw the lines between the state variables
+  for (size_t i = 1; i < enumsandindices.size(); ++i) {
 
-    int startrow = std::get<0>(enumsandindices.at(i)) + std::get<1>(enumsandindices.at(i)) * blocksize;
+    int startrow = std::get < 0 > (enumsandindices.at(i)) + std::get < 1
+        > (enumsandindices.at(i)) * blocksize;
 
-    cv::line(colorimg,cv::Point(startrow, 0),cv::Point(startrow, imgrows),CV_RGB(227,176,55));
-    cv::line(colorimg,cv::Point(0, startrow),cv::Point(imgrows, startrow),CV_RGB(227,176,55));
+    cv::line(colorimg, cv::Point(startrow, 0), cv::Point(startrow, imgrows),
+             CV_RGB(227,176,55));
+    cv::line(colorimg, cv::Point(0, startrow), cv::Point(imgrows, startrow),
+             CV_RGB(227,176,55));
 
   }
 
   sensor_msgs::ImagePtr msgimg_(new sensor_msgs::Image);
-  msgimg_->data.resize(colorimg.cols*colorimg.rows*3);
+  msgimg_->data.resize(colorimg.cols * colorimg.rows * 3);
   msgimg_->header.stamp = ros::Time(state.time);
   msgimg_->header.seq = ++imgseq;
   msgimg_->width = colorimg.cols;
   msgimg_->height = colorimg.rows;
   msgimg_->encoding = sensor_msgs::image_encodings::BGR8;
-  msgimg_->step =colorimg.cols*3;
+  msgimg_->step = colorimg.cols * 3;
   msgimg_->is_bigendian = 0;
-  memcpy(&msgimg_->data[0],&colorimg.data[0],sizeof(char)*msgimg_->data.size());
+  memcpy(&msgimg_->data[0], &colorimg.data[0],
+         sizeof(char) * msgimg_->data.size());
 
   pubCov_.publish(msgimg_);
 
-  //  ROS_WARN_STREAM("P=["<<state.P<<"];");
+  // ROS_WARN_STREAM("P=["<<state.P<<"];");
 #else
   UNUSED(stateptr)
 #endif
@@ -226,9 +246,9 @@ void MSF_Core<EKFState_T>::setPCore(
     coreErrorStates = 15  // we might want to calculate this, but on the other hand the values for the matrix later on are anyway hardcoded
   };
   P.setIdentity();
-  P *= 0.0001;  //set diagonal small covariance for all states
+  P *= 0.0001;  // set diagonal small covariance for all states
 
-  //now set the core state covariance to the simulated values
+  // now set the core state covariance to the simulated values
   Eigen::Matrix<double, coreErrorStates, coreErrorStates> P_core;
   P_core << 0.0166, 0.0122, -0.0015, 0.0211, 0.0074, 0.0000, 0.0012, -0.0012, 0.0001, -0.0000, 0.0000, -0.0000, -0.0003, -0.0002, -0.0000, 0.0129, 0.0508, -0.0020, 0.0179, 0.0432, 0.0006, 0.0020, 0.0004, -0.0002, -0.0000, 0.0000, 0.0000, 0.0003, -0.0002, 0.0000, -0.0013, -0.0009, 0.0142, -0.0027, 0.0057, 0.0079, 0.0007, 0.0007, 0.0000, -0.0000, -0.0000, 0.0000, -0.0001, -0.0004, -0.0001, 0.0210, 0.0162, -0.0026, 0.0437, 0.0083, -0.0017, 0.0016, -0.0021, -0.0014, -0.0000, 0.0000, 0.0000, 0.0003, -0.0001, 0.0000, 0.0093, 0.0461, 0.0036, 0.0153, 0.0650, -0.0016, 0.0025, 0.0013, -0.0000, -0.0000, 0.0000, 0.0000, 0.0003, 0.0002, 0.0000, -0.0000, 0.0005, 0.0080, -0.0019, -0.0021, 0.0130, 0.0001, 0.0001, 0.0000, -0.0000, 0.0000, -0.0000, -0.0003, 0.0001, -0.0001, 0.0012, 0.0024, 0.0006, 0.0017, 0.0037, 0.0001, 0.0005, 0.0000, 0.0001, -0.0000, 0.0000, -0.0000, -0.0000, -0.0001, -0.0000, -0.0011, 0.0008, 0.0007, -0.0023, 0.0019, 0.0001, 0.0000, 0.0005, -0.0001, -0.0000, -0.0000, 0.0000, 0.0001, -0.0001, -0.0000, 0.0001, -0.0002, -0.0000, -0.0014, 0.0001, 0.0000, 0.0000, -0.0001, 0.0006, -0.0000, -0.0000, -0.0000, 0.0000, 0.0000, -0.0000, -0.0000, -0.0000, -0.0000, -0.0000, -0.0000, -0.0000, -0.0000, -0.0000, -0.0000, 0.0000, -0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, -0.0000, 0.0000, 0.0000, 0.0000, 0.0000, -0.0000, -0.0000, -0.0000, 0.0000, -0.0000, 0.0000, 0.0000, 0.0000, -0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, -0.0000, 0.0000, -0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, -0.0000, -0.0003, 0.0003, -0.0001, 0.0003, 0.0003, -0.0003, -0.0000, 0.0001, 0.0000, 0.0000, 0.0000, 0.0000, 0.0010, 0.0000, 0.0000, -0.0002, -0.0002, -0.0004, -0.0001, 0.0003, 0.0001, -0.0001, -0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0010, 0.0000, -0.0000, 0.0000, -0.0001, 0.0000, 0.0000, -0.0001, -0.0000, -0.0000, -0.0000, 0.0000, 0.0000, -0.0000, 0.0000, 0.0000, 0.0001;
   P_core = 0.5 * (P_core + P_core.transpose());
@@ -254,7 +274,7 @@ void MSF_Core<EKFState_T>::imuCallback(const sensor_msgs::ImuConstPtr & msg) {
   static int lastseq = -1;
   if ((int) msg->header.seq != lastseq + 1 && lastseq != -1) {
     ROS_WARN_STREAM(
-        "msf_core: imu message drop curr seq:"<<msg->header.seq<<" expected: "<<lastseq + 1);
+        "msf_core: imu message drop curr seq:" << msg->header.seq << " expected: " << lastseq + 1);
   }
   lastseq = msg->header.seq;
 
@@ -279,7 +299,7 @@ void MSF_Core<EKFState_T>::process_imu(
     return;
 
   sm::timing::Timer timer_PropgetClosestState("PropgetClosestState");
-  boost::shared_ptr<EKFState_T> lastState = StateBuffer_.getClosestBefore(
+  boost::shared_ptr<EKFState_T> lastState = stateBuffer_.getClosestBefore(
       msg_stamp.toSec());
   timer_PropgetClosestState.stop();
 
@@ -332,7 +352,7 @@ void MSF_Core<EKFState_T>::process_imu(
     if (fabs(currentState->time - lastState->time) > 0.1) {
       ROS_WARN_STREAM_THROTTLE(
           2, "large time-gap re-initializing to last state\n");
-      typename stateBufferT::Ptr_T tmp = StateBuffer_.updateTime(
+      typename StateBuffer_T::Ptr_T tmp = stateBuffer_.updateTime(
           lastState->time, currentState->time);
       time_P_propagated = currentState->time;
       return;  // // early abort // // (if timegap too big)
@@ -354,7 +374,7 @@ void MSF_Core<EKFState_T>::process_imu(
   propagatePOneStep();
   timer_PropCov.stop();
 
-  if (StateBuffer_.size() > 3)  //making sure we have sufficient states to apply measurements to
+  if (stateBuffer_.size() > 3)  //making sure we have sufficient states to apply measurements to
     predictionMade_ = true;
 
   geometry_msgs::PoseWithCovarianceStamped msgPose;
@@ -371,7 +391,7 @@ void MSF_Core<EKFState_T>::process_imu(
   pubPoseCrtl_.publish(msgPoseCtrl);
 
   sm::timing::Timer timer_PropInsertState("PropInsertState");
-  StateBuffer_.insert(currentState);
+  stateBuffer_.insert(currentState);
   timer_PropInsertState.stop();
 
   if (predictionMade_) {
@@ -388,7 +408,7 @@ void MSF_Core<EKFState_T>::stateCallback(
     return;
 
   //get the closest state and check validity
-  boost::shared_ptr<EKFState_T> lastState = StateBuffer_.getClosestBefore(
+  boost::shared_ptr<EKFState_T> lastState = stateBuffer_.getClosestBefore(
       msg->header.stamp.toSec());
   if (lastState->time == -1) {
     ROS_WARN_STREAM_THROTTLE(2, "StateCallback: closest state is invalid\n");
@@ -415,7 +435,7 @@ void MSF_Core<EKFState_T>::stateCallback(
 
   if (!predictionMade_) {
     if (fabs(currentState->time - lastState->time) > 5) {
-      typename stateBufferT::Ptr_T tmp = StateBuffer_.updateTime(
+      typename StateBuffer_T::Ptr_T tmp = stateBuffer_.updateTime(
           lastState->time, currentState->time);
       ROS_WARN_STREAM_THROTTLE(
           2,
@@ -466,10 +486,10 @@ void MSF_Core<EKFState_T>::stateCallback(
 
   if (!predictionMade_) {  //clean reset of state and measurement buffer, before we start propagation
 
-    currentState->P = StateBuffer_.getLast()->P;  //make sure we keep the covariance for the first state
+    currentState->P = stateBuffer_.getLast()->P;  //make sure we keep the covariance for the first state
     time_P_propagated = currentState->time;
 
-    StateBuffer_.clear();
+    stateBuffer_.clear();
     MeasurementBuffer_.clear();
     while (!queueFutureMeasurements_.empty()) {
       queueFutureMeasurements_.pop();
@@ -477,7 +497,7 @@ void MSF_Core<EKFState_T>::stateCallback(
   }
   predictionMade_ = true;
 
-  StateBuffer_.insert(currentState);
+  stateBuffer_.insert(currentState);
   handlePendingMeasurements();  //check if we can apply some pending measurement
 }
 
@@ -494,7 +514,7 @@ void MSF_Core<EKFState_T>::handlePendingMeasurements() {
 template<typename EKFState_T>
 void MSF_Core<EKFState_T>::CleanUpBuffers() {
   double timeold = 60;  //1 min
-  StateBuffer_.clearOlderThan(timeold);
+  stateBuffer_.clearOlderThan(timeold);
   MeasurementBuffer_.clearOlderThan(timeold);
 }
 
@@ -581,13 +601,13 @@ void MSF_Core<EKFState_T>::propagateState(
 template<typename EKFState_T>
 void MSF_Core<EKFState_T>::propagatePOneStep() {
   //also propagate the covariance one step further, to distribute the processing load over time
-  typename stateBufferT::iterator_T stateIteratorPLastPropagated = StateBuffer_
+  typename StateBuffer_T::iterator_T stateIteratorPLastPropagated = stateBuffer_
       .getIteratorAtValue(time_P_propagated, false);
-  typename stateBufferT::iterator_T stateIteratorPLastPropagatedNext =
+  typename StateBuffer_T::iterator_T stateIteratorPLastPropagatedNext =
       stateIteratorPLastPropagated;
 
   ++stateIteratorPLastPropagatedNext;
-  if (stateIteratorPLastPropagatedNext != StateBuffer_.getIteratorEnd()) {  //might happen if there is a measurement in the future
+  if (stateIteratorPLastPropagatedNext != stateBuffer_.getIteratorEnd()) {  //might happen if there is a measurement in the future
 
     predictProcessCovariance(stateIteratorPLastPropagated->second,
                              stateIteratorPLastPropagatedNext->second);
@@ -612,9 +632,9 @@ void MSF_Core<EKFState_T>::getAccumF_SC(
     const boost::shared_ptr<EKFState_T>& state_new,
     Eigen::Matrix<double, MSF_Core<EKFState_T>::nErrorStatesAtCompileTime,
         MSF_Core<EKFState_T>::nErrorStatesAtCompileTime>& F) {
-  typename stateBufferT::iterator_T it = StateBuffer_.getIteratorAtValue(
+  typename StateBuffer_T::iterator_T it = stateBuffer_.getIteratorAtValue(
       state_old);
-  typename stateBufferT::iterator_T itend = StateBuffer_.getIteratorAtValue(
+  typename StateBuffer_T::iterator_T itend = stateBuffer_.getIteratorAtValue(
       state_new);
   typedef Eigen::Matrix<double, MSF_Core<EKFState_T>::nErrorStatesAtCompileTime,
       MSF_Core<EKFState_T>::nErrorStatesAtCompileTime> F_type;
@@ -729,7 +749,7 @@ void MSF_Core<EKFState_T>::init(
   usleep(100000);  //hackish thread sync
 
   MeasurementBuffer_.clear();
-  StateBuffer_.clear();
+  stateBuffer_.clear();
   fuzzyTracker_.reset();
 
   while (!queueFutureMeasurements_.empty())
@@ -752,7 +772,7 @@ void MSF_Core<EKFState_T>::init(
 
   assert(state->time != 0);
 
-  StateBuffer_.insert(state);
+  stateBuffer_.insert(state);
   time_P_propagated = state->time;  //will be set upon first IMU message
 
   //  print published/subscribed topics
@@ -786,14 +806,14 @@ void MSF_Core<EKFState_T>::addMeasurement(
   if (!initialized_ || !predictionMade_)
     return;
 
-  if (measurement->time > StateBuffer_.getLast()->time) {
+  if (measurement->time > stateBuffer_.getLast()->time) {
     //ROS_WARN_STREAM("You tried to give me a measurement in the future. Are you sure your clocks are synced and delays compensated correctly? I will store that and apply it next time... [measurement: "<<timehuman(measurement->time)<<" (s) latest state: "<<timehuman(StateBuffer_.getLast()->time)<<" (s)]");
     queueFutureMeasurements_.push(measurement);
     return;
   }
-  if (measurement->time < StateBuffer_.getFirst()->time) {
+  if (measurement->time < stateBuffer_.getFirst()->time) {
     ROS_WARN_STREAM(
-        "You tried to give me a measurement which is too far in the past. Are you sure your clocks are synced and delays compensated correctly? [measurement: "<<timehuman(measurement->time)<<" (s) first state in buffer: "<<timehuman(StateBuffer_.getFirst()->time)<<" (s)]");
+        "You tried to give me a measurement which is too far in the past. Are you sure your clocks are synced and delays compensated correctly? [measurement: "<<timehuman(measurement->time)<<" (s) first state in buffer: "<<timehuman(stateBuffer_.getFirst()->time)<<" (s)]");
     return;  //reject measurements too far in the past
   }
 
@@ -801,7 +821,7 @@ void MSF_Core<EKFState_T>::addMeasurement(
       measurement);
   typename measurementBufferT::iterator_T it_meas_end = MeasurementBuffer_
       .getIteratorEnd();
-  typename stateBufferT::iterator_T it_curr = StateBuffer_.getIteratorEnd();  //no propagation if no update is applied
+  typename StateBuffer_T::iterator_T it_curr = stateBuffer_.getIteratorEnd();  //no propagation if no update is applied
 
   bool appliedOne = false;
 
@@ -825,22 +845,22 @@ void MSF_Core<EKFState_T>::addMeasurement(
     it_meas->second->apply(state, *this);  //calls back core::applyCorrection(), which sets time_P_propagated to meas time
     timer_meas_apply.stop();
     //make sure to propagate to next measurement or up to now if no more measurements
-    it_curr = StateBuffer_.getIteratorAtValue(state);  //propagate from current state
+    it_curr = stateBuffer_.getIteratorAtValue(state);  //propagate from current state
 
-    typename stateBufferT::iterator_T it_end;
+    typename StateBuffer_T::iterator_T it_end;
     typename measurementBufferT::iterator_T it_nextmeas = it_meas;
     ++it_nextmeas;  //the next measurement in the list
 
     if (it_nextmeas == it_meas_end) {  //that was the last measurement, so propagate state to now
-      it_end = StateBuffer_.getIteratorEnd();
+      it_end = stateBuffer_.getIteratorEnd();
     } else {
-      it_end = StateBuffer_.getIteratorClosestAfter(it_nextmeas->second->time);
-      if (it_end != StateBuffer_.getIteratorEnd()) {
-        ++it_end;  //propagate to state closest after the measurement so we can interpolate
+      it_end = stateBuffer_.getIteratorClosestAfter(it_nextmeas->second->time);
+      if (it_end != stateBuffer_.getIteratorEnd()) {
+        ++it_end;  // propagate to state closest after the measurement so we can interpolate
       }
     }
 
-    typename stateBufferT::iterator_T it_next = it_curr;
+    typename StateBuffer_T::iterator_T it_next = it_curr;
     ++it_next;
 
     sm::timing::Timer timer_prop_state_after_meas("Repropagate state to now");
@@ -865,11 +885,11 @@ void MSF_Core<EKFState_T>::addMeasurement(
     return;
   }
 
-  //now publish the best current estimate
+  // now publish the best current estimate
   static int seq_m = 0;
 
   // publish correction for external propagation
-  boost::shared_ptr<EKFState_T>& latestState = StateBuffer_.getLast();
+  boost::shared_ptr<EKFState_T>& latestState = stateBuffer_.getLast();
 
   msgCorrect_.header.stamp = ros::Time(latestState->time);
   msgCorrect_.header.seq = seq_m;
@@ -953,8 +973,8 @@ void MSF_Core<EKFState_T>::addMeasurement(
   pubState_.publish(msgState);
 
   if (pubPoseAfterUpdate_.getNumSubscribers()) {
-    //publish pose after correction with covariance
-    propPToState(latestState);  //get the covar
+    // publish pose after correction with covariance
+    propPToState(latestState);  // get the covar
 
     geometry_msgs::PoseWithCovarianceStamped msgPose;
     msgPose.header.stamp = ros::Time(latestState->time);
@@ -993,37 +1013,33 @@ boost::shared_ptr<msf_core::MSF_MeasurementBase<EKFState_T> > MSF_Core<
 template<typename EKFState_T>
 boost::shared_ptr<EKFState_T> MSF_Core<EKFState_T>::getStateAtTime(
     double tstamp) {
-  return StateBuffer_.getValueAt(tstamp);
+  return stateBuffer_.getValueAt(tstamp);
 }
 
 template<typename EKFState_T>
 boost::shared_ptr<EKFState_T> MSF_Core<EKFState_T>::getClosestState(
     double tstamp) {
 
-  //sweiss{
-  // we subtracted one too much before.... :)
-  //}
+  double timenow = tstamp;  // delay compensated by sensor handler
 
-  double timenow = tstamp;  //delay compensated by sensor handler
-
-  typename stateBufferT::iterator_T it = StateBuffer_.getIteratorClosest(
+  typename StateBuffer_T::iterator_T it = stateBuffer_.getIteratorClosest(
       timenow);
 
   boost::shared_ptr<EKFState_T> closestState = it->second;
 
-  if (closestState->time == -1 || fabs(closestState->time - timenow) > 0.1) {  //check if the state really is close to the requested time. With the new buffer this might not be given.
+  if (closestState->time == -1 || fabs(closestState->time - timenow) > 0.1) {  // check if the state really is close to the requested time. With the new buffer this might not be given.
     ROS_ERROR_STREAM(
         __FUNCTION__<< " Requested closest state to "<<timehuman(timenow)<<" but there was no suitable state in the map");
-    return StateBuffer_.getInvalid();  // // early abort // //  not enough predictions made yet to apply measurement (too far in past)
+    return stateBuffer_.getInvalid();  // // early abort // //  not enough predictions made yet to apply measurement (too far in past)
   }
 
-  //do state interpolation if state is too far away from the measurement
-  double tdiff = fabs(closestState->time - timenow);  //timediff to closest state
+  // do state interpolation if state is too far away from the measurement
+  double tdiff = fabs(closestState->time - timenow);  // timediff to closest state
 
   if (tdiff > 0.001) {  // if time diff too large, insert new state and do state interpolation
-    boost::shared_ptr<EKFState_T> lastState = StateBuffer_.getClosestBefore(
+    boost::shared_ptr<EKFState_T> lastState = stateBuffer_.getClosestBefore(
         timenow);
-    boost::shared_ptr<EKFState_T> nextState = StateBuffer_.getClosestAfter(
+    boost::shared_ptr<EKFState_T> nextState = stateBuffer_.getClosestAfter(
         timenow);
 
     bool statevalid = lastState->time != -1 && nextState->time != -1;
@@ -1033,10 +1049,10 @@ boost::shared_ptr<EKFState_T> MSF_Core<EKFState_T>::getClosestState(
 
     if (statevalid && statenotnan && statesnotsame) {  //if one of the states is invalid, we don't do interpolation, but just take closest
 
-      //prepare a new state
+      // prepare a new state
       boost::shared_ptr<EKFState_T> currentState(new EKFState_T);
       currentState->time = timenow;  //set state time to measurement time
-      //linearly interpolate imu readings
+      // linearly interpolate imu readings
       currentState->a_m = lastState->a_m
           + (nextState->a_m - lastState->a_m)
               / (nextState->time - lastState->time)
@@ -1048,7 +1064,7 @@ boost::shared_ptr<EKFState_T> MSF_Core<EKFState_T>::getClosestState(
 
       propagateState(lastState, currentState);  //propagate with respective dt
 
-      StateBuffer_.insert(currentState);
+      stateBuffer_.insert(currentState);
 
       if (time_P_propagated > lastState->time) {  //make sure we propagate P correctly to the new state
         time_P_propagated = lastState->time;
@@ -1063,12 +1079,12 @@ boost::shared_ptr<EKFState_T> MSF_Core<EKFState_T>::getClosestState(
   if (!closestState->checkStateForNumeric()) {
     ROS_ERROR_STREAM(
         __FUNCTION__<< " State interpolation: interpolated state is invalid (nan)");
-    return StateBuffer_.getInvalid();  // // early abort // //
+    return stateBuffer_.getInvalid();  // // early abort // //
   }
 
   static int janitorRun = 0;
   if (janitorRun++ > 100) {
-    CleanUpBuffers();  //remove very old states and measurements from the buffers
+    CleanUpBuffers();  // remove very old states and measurements from the buffers
     janitorRun = 0;
   }
   return closestState;
@@ -1077,12 +1093,12 @@ boost::shared_ptr<EKFState_T> MSF_Core<EKFState_T>::getClosestState(
 template<typename EKFState_T>
 void MSF_Core<EKFState_T>::propPToState(boost::shared_ptr<EKFState_T>& state) {
   // propagate cov matrix until the current states time
-  typename stateBufferT::iterator_T it = StateBuffer_.getIteratorAtValue(
+  typename StateBuffer_T::iterator_T it = stateBuffer_.getIteratorAtValue(
       time_P_propagated, false);
-  typename stateBufferT::iterator_T itMinus = it;
+  typename StateBuffer_T::iterator_T itMinus = it;
   ++it;
-  //until we reached the current state or the end of the state list
-  for (; it != StateBuffer_.getIteratorEnd() && it->second->time <= state->time;
+  // until we reached the current state or the end of the state list
+  for (; it != stateBuffer_.getIteratorEnd() && it->second->time <= state->time;
       ++it, ++itMinus) {
     predictProcessCovariance(itMinus->second, it->second);
   }
@@ -1096,10 +1112,10 @@ bool MSF_Core<EKFState_T>::applyCorrection(
   if (!initialized_ || !predictionMade_)
     return false;
 
-  //give the user the possibility to fix some states
+  // give the user the possibility to fix some states
   usercalc_.augmentCorrectionVector(correction);
 
-  //now augment core states
+  // now augment core states
   if (usercalc_.getParam_fixed_bias()) {
     typedef typename msf_tmp::getEnumStateType<StateSequence_T,
         StateDefinition_T::b_a>::value b_a_type;
@@ -1133,20 +1149,20 @@ bool MSF_Core<EKFState_T>::applyCorrection(
   }
 
   // state update:
-  // TODO: sweiss what to do with attitude? augment measurement noise?
+  // TODO(slynen) what to do with attitude? augment measurement noise?
   // store old values in case of fuzzy tracking
   EKFState_T buffstate = *delaystate;
 
-  //call correction function for every state
+  // call correction function for every state
   delaystate->correct(correction);
 
-  //allow the user to sanity check the new state
+  // allow the user to sanity check the new state
   usercalc_.sanityCheckCorrection(*delaystate, buffstate, correction);
 
-  //TODO: allow multiple fuzzy tracking states at the same time
+  // TODO(slynen): allow multiple fuzzy tracking states at the same time
   isfuzzyState_ |= fuzzyTracker_.check(delaystate, buffstate, fuzzythres);
 
-  //no publishing and propagation here, because this might not be the last update we have to apply
+  // no publishing and propagation here, because this might not be the last update we have to apply
 
   checkForNumeric(correction, "update");
 
@@ -1156,7 +1172,4 @@ bool MSF_Core<EKFState_T>::applyCorrection(
 
   return 1;
 }
-
-}
-;
-// end namespace
+}// namespace msf_core
