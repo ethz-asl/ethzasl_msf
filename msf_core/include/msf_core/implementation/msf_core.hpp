@@ -764,8 +764,20 @@ void MSF_Core<EKFState_T>::init(
   StateBuffer_.insert(state);
   time_P_propagated = state->time;  //will be set upon first IMU message
 
-  //echo topics
+  //  print published/subscribed topics
+  ros::V_string topics;
+  ros::this_node::getSubscribedTopics(topics);
+  std::string nodeName = ros::this_node::getName();
+  std::string topicsStr = nodeName + ":\n\tsubscribed to topics:\n";
+  for (unsigned int i = 0; i < topics.size(); i++)
+    topicsStr += ("\t\t" + topics.at(i) + "\n");
 
+  topicsStr += "\tadvertised topics:\n";
+  ros::this_node::getAdvertisedTopics(topics);
+  for (unsigned int i = 0; i < topics.size(); i++)
+    topicsStr += ("\t\t" + topics.at(i) + "\n");
+
+  ROS_INFO_STREAM(""<< topicsStr);
   //echo params
   ROS_INFO_STREAM(
       "Core parameters:"<<std::endl<< "\tfixed_bias:\t"<<usercalc_.getParam_fixed_bias()<<std::endl<< "\tfuzzythres:\t"<<usercalc_.getParam_fuzzythres()<<std::endl<< "\tnoise_acc:\t"<<usercalc_.getParam_noise_acc()<<std::endl<< "\tnoise_accbias:\t"<<usercalc_.getParam_noise_accbias()<<std::endl<< "\tnoise_gyr:\t"<<usercalc_.getParam_noise_gyr()<<std::endl<< "\tnoise_gyrbias:\t"<<usercalc_.getParam_noise_gyrbias()<<std::endl);
