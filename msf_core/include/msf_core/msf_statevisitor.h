@@ -40,7 +40,6 @@ namespace msf_core{
 template<typename EKFState_T>
 class StateVisitor{
 public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   /**
    * \brief the state is set to zero/identity, this method will be called to
    * give the user the possibility to change the reset values of some states

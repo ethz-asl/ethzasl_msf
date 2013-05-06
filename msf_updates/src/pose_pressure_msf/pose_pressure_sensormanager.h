@@ -185,7 +185,7 @@ private:
     meas->time = ros::Time::now().toSec();
 
     // call initialization in core
-    msf_core_->init(meas);
+    this->msf_core_->init(meas);
 
   }
 

@@ -60,7 +60,7 @@ protected:
   Handlers handlers; ///<a list of sensor handlers which provide measurements
 
 public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
   boost::shared_ptr<MSF_Core<EKFState_T> > msf_core_; ///< the ekf core instance
 
@@ -147,7 +147,8 @@ protected:
     lastseq_ = seq;
   }
 public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+
   SensorHandler(MSF_SensorManager<EKFState_T>& mng, std::string& topic_namespace, std::string& parameternamespace):
   lastseq_(0), manager_(mng), sensorID(-1), topic_namespace_(topic_namespace), parameternamespace_(parameternamespace){}
   virtual ~SensorHandler() {}
