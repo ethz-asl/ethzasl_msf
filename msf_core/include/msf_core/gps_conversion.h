@@ -41,6 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace msf_core{
 
 class GPSConversion{
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 private:
   msf_core::Quaternion ecef_ref_orientation_;
   msf_core::Vector3 ecef_ref_point_;

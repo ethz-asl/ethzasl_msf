@@ -78,7 +78,7 @@ void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrection(boost::shared_
   Eigen::Matrix<double, MSF_Core<EKFState_T>::nErrorStatesAtCompileTime, 1> correction_;
 
   Eigen::MatrixXd S;
-  Eigen::MatrixXd K(MSF_Core<EKFState_T>::nErrorStatesAtCompileTime, R_delayed.rows());
+  Eigen::MatrixXd K(static_cast<int>(MSF_Core<EKFState_T>::nErrorStatesAtCompileTime), R_delayed.rows());
   typename MSF_Core<EKFState_T>::ErrorStateCov & P = state->P;
 
   //4ms

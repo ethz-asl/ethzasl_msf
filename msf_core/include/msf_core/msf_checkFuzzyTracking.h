@@ -38,6 +38,7 @@ namespace msf_core{
 
 template<typename EKFState_T, typename NONTEMPORALDRIFTINGTYPE>
 class CheckFuzzyTracking{
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
 private:
 

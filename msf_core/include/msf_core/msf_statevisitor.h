@@ -39,6 +39,7 @@ namespace msf_core{
  */
 template<typename EKFState_T>
 class StateVisitor{
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 public:
   /**
    * \brief the state is set to zero/identity, this method will be called to
