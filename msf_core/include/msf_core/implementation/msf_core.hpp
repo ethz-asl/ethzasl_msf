@@ -69,7 +69,9 @@ MSF_Core<EKFState_T>::MSF_Core(MSF_SensorManager<EKFState_T>& usercalc)
   pubPoseAfterUpdate_ = nh.advertise<geometry_msgs::PoseWithCovarianceStamped>(
       "pose_after_update", 100);
   pubPoseCrtl_ = nh.advertise<sensor_fusion_comm::ExtState>("ext_state", 1);
-  msgState_.data.resize(nStatesAtCompileTime, 0);
+
+  sensor_fusion_comm::DoubleArrayStamped msgState;
+  msgState.data.resize(nStatesAtCompileTime, 0);
 
 #ifdef  WITHCOVIMAGE
   pubCov_ = nh.advertise<sensor_msgs::Image>("covariance_img", 1);
@@ -81,7 +83,8 @@ MSF_Core<EKFState_T>::MSF_Core(MSF_SensorManager<EKFState_T>& usercalc)
   subState_ = nh.subscribe("hl_state_input", 10, &MSF_Core::stateCallback,
                            this);
 
-  msgCorrect_.state.resize(HLI_EKF_STATE_SIZE, 0);
+  sensor_fusion_comm::ExtEkf msgCorrect;
+  msgCorrect.state.resize(HLI_EKF_STATE_SIZE, 0);
   hl_state_buf_.state.resize(HLI_EKF_STATE_SIZE, 0);
 
   pnh.param("data_playback", data_playback_, false);
@@ -98,23 +101,24 @@ template<typename EKFState_T>
 void MSF_Core<EKFState_T>::initExternalPropagation(
     boost::shared_ptr<EKFState_T> state) {
   // init external propagation
-  msgCorrect_.header.stamp = ros::Time(state->time);
-  msgCorrect_.header.seq = 0;
-  msgCorrect_.angular_velocity.x = 0;
-  msgCorrect_.angular_velocity.y = 0;
-  msgCorrect_.angular_velocity.z = 0;
-  msgCorrect_.linear_acceleration.x = 0;
-  msgCorrect_.linear_acceleration.y = 0;
-  msgCorrect_.linear_acceleration.z = 0;
+  sensor_fusion_comm::ExtEkf msgCorrect;
+  msgCorrect.header.stamp = ros::Time(state->time);
+  msgCorrect.header.seq = 0;
+  msgCorrect.angular_velocity.x = 0;
+  msgCorrect.angular_velocity.y = 0;
+  msgCorrect.angular_velocity.z = 0;
+  msgCorrect.linear_acceleration.x = 0;
+  msgCorrect.linear_acceleration.y = 0;
+  msgCorrect.linear_acceleration.z = 0;
 
-  msgCorrect_.state.resize(HLI_EKF_STATE_SIZE);
+  msgCorrect.state.resize(HLI_EKF_STATE_SIZE);
   boost::fusion::for_each(
       state->statevars,
       msf_tmp::CoreStatetoDoubleArray<std::vector<float>, StateSequence_T>(
-          msgCorrect_.state));
+          msgCorrect.state));
 
-  msgCorrect_.flag = sensor_fusion_comm::ExtEkf::initialization;
-  pubCorrect_.publish(msgCorrect_);
+  msgCorrect.flag = sensor_fusion_comm::ExtEkf::initialization;
+  pubCorrect_.publish(msgCorrect);
 }
 
 template<typename EKFState_T>
@@ -376,16 +380,18 @@ void MSF_Core<EKFState_T>::process_imu(
   if (StateBuffer_.size() > 3)  //making sure we have sufficient states to apply measurements to
     predictionMade_ = true;
 
-  msgPose_.header.stamp = msg_stamp;
-  msgPose_.header.seq = msg_seq;
-  msgPose_.header.frame_id = "/world";
+  geometry_msgs::PoseWithCovarianceStamped msgPose;
+  msgPose.header.stamp = msg_stamp;
+  msgPose.header.seq = msg_seq;
+  msgPose.header.frame_id = "/world";
 
-  currentState->toPoseMsg(msgPose_);
-  pubPose_.publish(msgPose_);
+  currentState->toPoseMsg(msgPose);
+  pubPose_.publish(msgPose);
 
-  msgPoseCtrl_.header = msgPose_.header;
-  currentState->toExtStateMsg(msgPoseCtrl_);
-  pubPoseCrtl_.publish(msgPoseCtrl_);
+  sensor_fusion_comm::ExtState msgPoseCtrl;
+  msgPoseCtrl.header = msgPose.header;
+  currentState->toExtStateMsg(msgPoseCtrl);
+  pubPoseCrtl_.publish(msgPoseCtrl);
 
   sm::timing::Timer timer_PropInsertState("PropInsertState");
   StateBuffer_.insert(currentState);
@@ -509,6 +515,13 @@ void MSF_Core<EKFState_T>::handlePendingMeasurements() {
 }
 
 template<typename EKFState_T>
+void MSF_Core<EKFState_T>::CleanUpBuffers(){
+    double timeold = 60; //1 min
+    StateBuffer_.clearOlderThan(timeold);
+    MeasurementBuffer_.clearOlderThan(timeold);
+  }
+
+template<typename EKFState_T>
 void MSF_Core<EKFState_T>::propagateState(
     boost::shared_ptr<EKFState_T>& state_old,
     boost::shared_ptr<EKFState_T>& state_new) {
@@ -579,11 +592,12 @@ void MSF_Core<EKFState_T>::propagateState(
                            "world", "state"));
 
 #ifdef DEBUGPUBLISH
+  sensor_fusion_comm::DoubleArrayStamped msgState;
   static int seq = 0;
-  msgState_.header.seq = seq++;
-  msgState_.header.stamp = ros::Time(state_new->time);
-  state_new->toFullStateMsg(msgState_);
-  pubState_.publish(msgState_);
+  msgState.header.seq = seq++;
+  msgState.header.stamp = ros::Time(state_new->time);
+  state_new->toFullStateMsg(msgState);
+  pubState_.publish(msgState);
 #endif
 }
 
@@ -879,22 +893,23 @@ void MSF_Core<EKFState_T>::addMeasurement(
 
   // publish correction for external propagation
   boost::shared_ptr<EKFState_T>& latestState = StateBuffer_.getLast();
-  msgCorrect_.header.stamp = ros::Time(latestState->time);
-  msgCorrect_.header.seq = seq_m;
-  msgCorrect_.angular_velocity.x = 0;
-  msgCorrect_.angular_velocity.y = 0;
-  msgCorrect_.angular_velocity.z = 0;
-  msgCorrect_.linear_acceleration.x = 0;
-  msgCorrect_.linear_acceleration.y = 0;
-  msgCorrect_.linear_acceleration.z = 0;
+  sensor_fusion_comm::ExtEkf msgCorrect;
+  msgCorrect.header.stamp = ros::Time(latestState->time);
+  msgCorrect.header.seq = seq_m;
+  msgCorrect.angular_velocity.x = 0;
+  msgCorrect.angular_velocity.y = 0;
+  msgCorrect.angular_velocity.z = 0;
+  msgCorrect.linear_acceleration.x = 0;
+  msgCorrect.linear_acceleration.y = 0;
+  msgCorrect.linear_acceleration.z = 0;
 
   // prevent junk being sent to the external state propagation when data playback is (accidentally) on
   if (data_playback_) {
     for (int i = 0; i < HLI_EKF_STATE_SIZE; ++i) {
-      msgCorrect_.state[i] = 0;
+      msgCorrect.state[i] = 0;
     }
-    msgCorrect_.state[6] = 1;
-    msgCorrect_.flag = sensor_fusion_comm::ExtEkf::initialization;
+    msgCorrect.state[6] = 1;
+    msgCorrect.flag = sensor_fusion_comm::ExtEkf::initialization;
 
     if (pubCorrect_.getNumSubscribers() > 0) {
       ROS_ERROR_STREAM_THROTTLE(
@@ -903,72 +918,75 @@ void MSF_Core<EKFState_T>::addMeasurement(
     }
 
   } else {
-    msgCorrect_.state[0] = latestState->template get<StateDefinition_T::p>()[0]
+    msgCorrect.state[0] = latestState->template get<StateDefinition_T::p>()[0]
         - hl_state_buf_.state[0];
-    msgCorrect_.state[1] = latestState->template get<StateDefinition_T::p>()[1]
+    msgCorrect.state[1] = latestState->template get<StateDefinition_T::p>()[1]
         - hl_state_buf_.state[1];
-    msgCorrect_.state[2] = latestState->template get<StateDefinition_T::p>()[2]
+    msgCorrect.state[2] = latestState->template get<StateDefinition_T::p>()[2]
         - hl_state_buf_.state[2];
-    msgCorrect_.state[3] = latestState->template get<StateDefinition_T::v>()[0]
+    msgCorrect.state[3] = latestState->template get<StateDefinition_T::v>()[0]
         - hl_state_buf_.state[3];
-    msgCorrect_.state[4] = latestState->template get<StateDefinition_T::v>()[1]
+    msgCorrect.state[4] = latestState->template get<StateDefinition_T::v>()[1]
         - hl_state_buf_.state[4];
-    msgCorrect_.state[5] = latestState->template get<StateDefinition_T::v>()[2]
+    msgCorrect.state[5] = latestState->template get<StateDefinition_T::v>()[2]
         - hl_state_buf_.state[5];
 
     Eigen::Quaterniond hl_q(hl_state_buf_.state[6], hl_state_buf_.state[7],
                             hl_state_buf_.state[8], hl_state_buf_.state[9]);
     Eigen::Quaterniond qbuff_q = hl_q.inverse()
         * latestState->template get<StateDefinition_T::q>();
-    msgCorrect_.state[6] = qbuff_q.w();
-    msgCorrect_.state[7] = qbuff_q.x();
-    msgCorrect_.state[8] = qbuff_q.y();
-    msgCorrect_.state[9] = qbuff_q.z();
+    msgCorrect.state[6] = qbuff_q.w();
+    msgCorrect.state[7] = qbuff_q.x();
+    msgCorrect.state[8] = qbuff_q.y();
+    msgCorrect.state[9] = qbuff_q.z();
 
-    msgCorrect_.state[10] =
+    msgCorrect.state[10] =
         latestState->template get<StateDefinition_T::b_w>()[0]
             - hl_state_buf_.state[10];
-    msgCorrect_.state[11] =
+    msgCorrect.state[11] =
         latestState->template get<StateDefinition_T::b_w>()[1]
             - hl_state_buf_.state[11];
-    msgCorrect_.state[12] =
+    msgCorrect.state[12] =
         latestState->template get<StateDefinition_T::b_w>()[2]
             - hl_state_buf_.state[12];
-    msgCorrect_.state[13] =
+    msgCorrect.state[13] =
         latestState->template get<StateDefinition_T::b_a>()[0]
             - hl_state_buf_.state[13];
-    msgCorrect_.state[14] =
+    msgCorrect.state[14] =
         latestState->template get<StateDefinition_T::b_a>()[1]
             - hl_state_buf_.state[14];
-    msgCorrect_.state[15] =
+    msgCorrect.state[15] =
         latestState->template get<StateDefinition_T::b_a>()[2]
             - hl_state_buf_.state[15];
 
-    msgCorrect_.flag = sensor_fusion_comm::ExtEkf::state_correction;
+    msgCorrect.flag = sensor_fusion_comm::ExtEkf::state_correction;
   }
 
   if (latestState->checkStateForNumeric()) {  //if not NaN
-    pubCorrect_.publish(msgCorrect_);
+    pubCorrect_.publish(msgCorrect);
   } else {
     ROS_WARN_STREAM_THROTTLE(
         1, "Not sending updates to external EKF, because state NaN/inf");
   }
 
   // publish state
-  msgState_.header = msgCorrect_.header;
-  latestState->toFullStateMsg(msgState_);
-  pubState_.publish(msgState_);
+  sensor_fusion_comm::DoubleArrayStamped msgState;
+  msgState.header = msgCorrect.header;
+  latestState->toFullStateMsg(msgState);
+  pubState_.publish(msgState);
 
   if (pubPoseAfterUpdate_.getNumSubscribers()) {
     //publish pose after correction with covariance
     propPToState(latestState);  //get the covar
 
-    msgPose_.header.stamp = ros::Time(latestState->time);
-    msgPose_.header.seq = seq_m;
-    msgPose_.header.frame_id = "/world";
 
-    latestState->toPoseMsg(msgPose_);
-    pubPoseAfterUpdate_.publish(msgPose_);
+    geometry_msgs::PoseWithCovarianceStamped msgPose;
+    msgPose.header.stamp = ros::Time(latestState->time);
+    msgPose.header.seq = seq_m;
+    msgPose.header.frame_id = "/world";
+
+    latestState->toPoseMsg(msgPose);
+    pubPoseAfterUpdate_.publish(msgPose);
   }
   seq_m++;
 }

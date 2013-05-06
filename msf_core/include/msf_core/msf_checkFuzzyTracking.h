@@ -50,6 +50,7 @@ private:
   Eigen::Matrix<double, nBuff_, qbuffRowsAtCompiletime> qbuff_; //if there is no non temporal drifting state this matrix will have zero rows, to make use of it illegal
 
 public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
   void reset(){
     // buffer for vision failure check

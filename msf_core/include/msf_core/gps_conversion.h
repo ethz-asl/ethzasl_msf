@@ -45,6 +45,7 @@ private:
   msf_core::Quaternion ecef_ref_orientation_;
   msf_core::Vector3 ecef_ref_point_;
 public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   GPSConversion();
   void initReference(const double & latitude, const double & longitude, const double & altitude);
   msf_core::Vector3 wgs84ToEcef(const double & latitude, const double & longitude, const double & altitude) const;

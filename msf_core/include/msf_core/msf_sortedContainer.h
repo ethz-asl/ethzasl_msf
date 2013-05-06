@@ -45,6 +45,7 @@ class SortedContainer{
 
 public:
   typedef boost::shared_ptr<T> Ptr_T;
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
 private:
   typedef std::map<double, Ptr_T > ListT; ///< the container type in which to store the data

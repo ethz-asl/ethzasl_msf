@@ -84,15 +84,16 @@ template<typename EKFState_T>
 class MSF_Core
 {
   friend class MSF_MeasurementBase<EKFState_T>;
-  bool initialized_; ///< is the filter initialized, so that we can propagate the state?
-  bool predictionMade_; ///< is there a state prediction, so we can apply measurements?
 public:
-  typedef typename EKFState_T::StateDefinition_T StateDefinition_T;
-  typedef typename EKFState_T::StateSequence_T StateSequence_T;
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+
   enum{
     nErrorStatesAtCompileTime = EKFState_T::nErrorStatesAtCompileTime,  ///< error state length
     nStatesAtCompileTime = EKFState_T::nStatesAtCompileTime ///< complete state length
   };
+
+  typedef typename EKFState_T::StateDefinition_T StateDefinition_T;
+  typedef typename EKFState_T::StateSequence_T StateSequence_T;
   typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, 1> ErrorState; ///< the error state type
   typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> ErrorStateCov; ///<the error state covariance type
 
@@ -157,11 +158,7 @@ public:
   /**
    * \brief delete very old states and measurements from the buffers to free memory
    */
-  void CleanUpBuffers(){
-    double timeold = 60; //1 min
-    StateBuffer_.clearOlderThan(timeold);
-    MeasurementBuffer_.clearOlderThan(timeold);
-  }
+  void CleanUpBuffers();
 
   /**
    * \brief sets the covariance matrix of the core states to simulated values
@@ -178,15 +175,7 @@ public:
 
 
 private:
-  stateBufferT StateBuffer_; ///<EKF buffer containing pretty much all info needed at time t. sorted by t asc
-  measurementBufferT MeasurementBuffer_; ///< EKF Measurements and init values sorted by t asc
-  tf::TransformBroadcaster tf_broadcaster_;
 
-  std::queue<boost::shared_ptr<MSF_MeasurementBase<EKFState_T> > > queueFutureMeasurements_; ///< buffer for measurements to apply in future
-
-  double time_P_propagated; ///< last time stamp where we have a valid propagation
-
-  Eigen::Matrix<double, 3, 1> g_; ///< gravity vector
 
   /**
    * \brief get the index of the best state having no temporal drift at compile time
@@ -194,11 +183,22 @@ private:
   enum{
     indexOfStateWithoutTemporalDrift = msf_tmp::IndexOfBestNonTemporalDriftingState<StateSequence_T>::value
   };
+
   typedef typename msf_tmp::getEnumStateType<StateSequence_T, indexOfStateWithoutTemporalDrift>::value nonDriftingStateType; //returns void type for invalid types
 
-  CheckFuzzyTracking<EKFState_T, nonDriftingStateType> fuzzyTracker_;  ///< watch dog to determine fuzzy tracking by observing non temporal drifting states
+  stateBufferT StateBuffer_; ///<EKF buffer containing pretty much all info needed at time t. sorted by t asc
+  measurementBufferT MeasurementBuffer_; ///< EKF Measurements and init values sorted by t asc
+  std::queue<boost::shared_ptr<MSF_MeasurementBase<EKFState_T> > > queueFutureMeasurements_; ///< buffer for measurements to apply in future
 
-  /// enables internal state predictions for log replay
+  tf::TransformBroadcaster tf_broadcaster_;
+
+  double time_P_propagated; ///< last time stamp where we have a valid propagation
+  Eigen::Matrix<double, 3, 1> g_; ///< gravity vector
+
+  bool initialized_; ///< is the filter initialized, so that we can propagate the state?
+  bool predictionMade_; ///< is there a state prediction, so we can apply measurements?
+
+
   /**
    * used to determine if internal states get overwritten by the external
    * state prediction (online) or internal state prediction is performed
@@ -207,26 +207,14 @@ private:
   bool data_playback_;
   bool isfuzzyState_; ///< was the filter pushed to fuzzy state by a measurement?
 
+  CheckFuzzyTracking<EKFState_T, nonDriftingStateType> fuzzyTracker_;  ///< watch dog to determine fuzzy tracking by observing non temporal drifting states
   MSF_SensorManager<EKFState_T>& usercalc_; ///< a class which provides methods for customization of several calculations
 
-  enum
-  {
-    NO_UP, GOOD_UP, FUZZY_UP
-  };
-
   ros::Publisher pubState_; ///< publishes all states of the filter
-  sensor_fusion_comm::DoubleArrayStamped msgState_;
-
   ros::Publisher pubPose_; ///< publishes 6DoF pose output
   ros::Publisher pubPoseAfterUpdate_; ///< publishes 6DoF pose output after the update has been applied
-
-  geometry_msgs::PoseWithCovarianceStamped msgPose_;
-
   ros::Publisher pubPoseCrtl_; ///< publishes 6DoF pose including velocity output
-  sensor_fusion_comm::ExtState msgPoseCtrl_;
-
   ros::Publisher pubCorrect_; ///< publishes corrections for external state propagation
-  sensor_fusion_comm::ExtEkf msgCorrect_;
 
 #ifdef  WITHCOVIMAGE
   ros::Publisher pubCov_; ///< publishes the state covariance as image
