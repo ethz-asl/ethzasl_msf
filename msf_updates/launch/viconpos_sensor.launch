@@ -6,7 +6,7 @@
             <remap from="msf_core/imu_state_input" to="imu0" />
             <remap from="msf_updates/transform_input" to="/vicon/SLAM_SENSOR_P0/SLAM_SENSOR_P0" />
 
-          <remap from="msf_core/state_out" to="/ref/msf_core/state_out" />
+          <!--remap from="msf_core/state_out" to="/ref/msf_core/state_out" /-->
           
             <rosparam file="$(find msf_updates)/viconpos_sensor_fix.yaml"/>
     </node>

@@ -33,11 +33,11 @@ pose_sensor/init/p_ic/x: 0.0
 pose_sensor/init/p_ic/y: 0.0
 pose_sensor/init/p_ic/z: 0.0
 
-position_pose_sensor/pose_fixed_scale: true
-position_pose_sensor/pose_fixed_p_ic: true
-position_pose_sensor/pose_fixed_q_ic: true
-position_pose_sensor/pose_fixed_p_wv: true
-position_pose_sensor/pose_fixed_q_wv: true
+pose_sensor/pose_fixed_scale: true
+pose_sensor/pose_fixed_p_ic: true
+pose_sensor/pose_fixed_q_ic: true
+pose_sensor/pose_fixed_p_wv: true
+pose_sensor/pose_fixed_q_wv: true
  
 pose_sensor/pose_absolute_measurements: true
 pose_sensor/pose_use_fixed_covariance: true
