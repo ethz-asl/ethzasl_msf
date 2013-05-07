@@ -45,6 +45,12 @@ pose_sensor/init/p_ic/z: -0.08
 #pose_sensor/init/p_ic/y: -0.086751
 #pose_sensor/init/p_ic/z: 0.0123919
 
+position_pose_sensor/pose_fixed_scale: false
+position_pose_sensor/pose_fixed_p_ic: false
+position_pose_sensor/pose_fixed_q_ic: false
+position_pose_sensor/pose_fixed_p_wv: false
+position_pose_sensor/pose_fixed_q_wv: false
+
 pose_sensor/pose_absolute_measurements: true
 pose_sensor/pose_use_fixed_covariance: false
 pose_sensor/pose_measurement_world_sensor: false  # selects if sensor measures its position w.r.t. world (true, e.g. Vicon) or the position of the world coordinate system w.r.t. the sensor (false, e.g. ethzasl_ptam
