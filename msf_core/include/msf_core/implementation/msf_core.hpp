@@ -59,7 +59,7 @@ MSF_Core<EKFState_T>::MSF_Core(const MSF_SensorManager<EKFState_T>& usercalc)
 
   g_ << 0, 0, 9.80834;  // at 47.37 lat
 
-  // TODO(slynen): move all this to the external file and derive from this class. We could by this allow compilation on platforms withour ROS
+  // TODO(slynen): move all this to the external file and derive from this class. We could by this allow compilation on platforms without ROS
   ros::NodeHandle nh("msf_core");
   ros::NodeHandle pnh("~");
 
@@ -79,7 +79,7 @@ MSF_Core<EKFState_T>::MSF_Core(const MSF_SensorManager<EKFState_T>& usercalc)
   pubCov_ = nh.advertise<sensor_msgs::Image>("covariance_img", 1);
 #endif
 
-  subImu_ = nh.subscribe("imu_state_input", 10, &MSF_Core::imuCallback, this);
+  subImu_ = nh.subscribe("imu_state_input", 100, &MSF_Core::imuCallback, this);
   subImuCustom_ = nh.subscribe("imu_state_input_asctec", 10,
                                &MSF_Core::imuCallback_asctec, this);
   subState_ = nh.subscribe("hl_state_input", 10, &MSF_Core::stateCallback,
@@ -297,6 +297,11 @@ void MSF_Core<EKFState_T>::process_imu(
 
   if (!initialized_)
     return;
+
+//  if(msg_seq % 10 != 0){
+//        ROS_WARN_STREAM_THROTTLE(60, "IMU throttling is on now!!!");
+//        return;
+//  }
 
   sm::timing::Timer timer_PropgetClosestState("PropgetClosestState");
   boost::shared_ptr<EKFState_T> lastState = stateBuffer_.getClosestBefore(
