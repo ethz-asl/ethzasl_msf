@@ -78,7 +78,7 @@ void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrection(boost::shared_
   Eigen::Matrix<double, MSF_Core<EKFState_T>::nErrorStatesAtCompileTime, 1> correction_;
 
   Eigen::MatrixXd S;
-  Eigen::MatrixXd K(MSF_Core<EKFState_T>::nErrorStatesAtCompileTime, R_delayed.rows());
+  Eigen::MatrixXd K(static_cast<int>(MSF_Core<EKFState_T>::nErrorStatesAtCompileTime), R_delayed.rows());
   typename MSF_Core<EKFState_T>::ErrorStateCov & P = state->P;
 
   //4ms
@@ -87,7 +87,7 @@ void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrection(boost::shared_
   timer_CalculationS.stop();
 
   //106ms
-  std::cout<<"Size S "<<S.rows()<<" "<<S.cols()<<std::endl;
+  //std::cout<<"Size S "<<S.rows()<<" "<<S.cols()<<std::endl;
   sm::timing::Timer timer_CalculationK("OF CalculationK");
   K = P * H_delayed.transpose() * S.inverse(); //TODO use decomposition
   timer_CalculationK.stop();

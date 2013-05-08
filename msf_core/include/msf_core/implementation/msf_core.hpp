@@ -334,7 +334,7 @@ void MSF_Core<EKFState_T>::process_imu(const msf_core::Vector3& linear_accelerat
   //ROS_INFO_STREAM("MSF_Core: process_imu :"<<msf_core::timehuman(msg_stamp.toSec()));
 
   if(!initialized_){
-    ROS_INFO_STREAM("IMU rejected not initialized");
+    ROS_INFO_STREAM_THROTTLE(1, "IMU rejected not initialized");
     return;
   }
 
@@ -962,8 +962,6 @@ void MSF_Core<EKFState_T>::init(boost::shared_ptr<MSF_MeasurementBase<EKFState_T
 template<typename EKFState_T>
 void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase<EKFState_T> > measurement){
 
-  ROS_INFO_STREAM("Core: add measurement "<<msf_core::timehuman(measurement->time));
-
   if(!initialized_ || !predictionMade_){
     ROS_WARN_STREAM("Rejected, no prediction"<<predictionMade_<<" or not initialized "<<initialized_);
     return;
@@ -1230,7 +1228,6 @@ void MSF_Core<EKFState_T>::propPToState(boost::shared_ptr<EKFState_T>& state)
   ++it;
   //until we reached the current state or the end of the state list
   for( ; it != StateBuffer_.getIteratorEnd() && it->second->time <= state->time ; ++it, ++itMinus){
-    ROS_INFO_STREAM("Propagating state from "<<itMinus->second->time<<" to "<<it->second->time);
     predictProcessCovariance(itMinus->second, it->second);
   }
 
