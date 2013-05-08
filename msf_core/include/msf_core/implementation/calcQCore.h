@@ -97,113 +97,113 @@ void calc_QCore(const double dt, const Eigen::Quaternion<double> & q, const Eige
 
 
 
-  Qd.setZero();
-
-
-
-  Eigen::Matrix<double, 3, 3> C = q.toRotationMatrix().transpose();
-
-//  ROS_INFO_STREAM("C =" << C);
-
-  Eigen::Matrix<double, 3, 1> gyr_corr = ew;
-
-
-//  msf_core::Vector3& gyr_corr = ew;
-
-  msf_core::Matrix3 Q_acc = (Eigen::Matrix<double,3, 1>() << n_a(0) * n_a(0), n_a(1) * n_a(1), n_a(2) * n_a(2)).finished().asDiagonal();
-  msf_core::Matrix3 Q_acc_bias = (Eigen::Matrix<double,3, 1>() << n_ba(0) * n_ba(0), n_ba(1) * n_ba(1), n_ba(2) * n_ba(2)).finished().asDiagonal();
-
-  msf_core::Matrix3 Q_gyr = (Eigen::Matrix<double,3, 1>() << n_w(0) * n_w(0), n_w(1) * n_w(1), n_w(2) * n_w(2)).finished().asDiagonal();
-  msf_core::Matrix3 Q_gyr_bias = (Eigen::Matrix<double,3, 1>() << n_bw(0) * n_bw(0), n_bw(1) * n_bw(1), n_bw(2) * n_bw(2)).finished().asDiagonal();
-
-//  ROS_INFO_STREAM("Q_acc =" << Q_acc);
-//  ROS_INFO_STREAM("Q_acc_bias =" << Q_acc);
-//  ROS_INFO_STREAM("Q_gyr =" << Q_acc);
-//  ROS_INFO_STREAM("Q_gyr_bias =" << Q_acc);
-
-
-
-
-// Building Qd (compared to Matlab, b_a and b_w are switched)
-  // First Column
-  Qd.block(0, 0, 3, 3) =  dt*dt*dt / 3.0 * Q_acc + dt*dt*dt*dt*dt / 20.0 * Q_acc_bias;
-  Qd.block(3, 0, 3, 3) = dt*dt/2*Q_acc + dt*dt*dt*dt/8*Q_acc_bias;
-  Qd.block(12, 0, 3, 3) = -dt*dt*dt/6*Q_acc_bias*C;
-/*
-  Qd = (dt ^ 3 / 3 * Q_acc + dt ^ 5 / 20 * Q_acc_bias);
-  Qd(4:6,1:3) = dt*dt/2*Q_acc + dt^4/8*Q_acc_bias;
-  Qd(7:9,1:3) = O;
-  Qd(10:12,1:3) = -dt^3/6*Q_acc_bias*C;
-  Qd(13:15,1:3) = O;
-*/
-
-
-  // Second Column
-  Qd.block(0, 3, 3, 3) = dt*dt/2 * Q_acc + dt*dt*dt*dt/8*Q_acc_bias;
-  Qd.block(3, 3, 3, 3) = (dt*Q_acc + dt*dt*dt/3*Q_acc_bias);
-  Qd.block(12, 3, 3, 3) = -dt*dt/2*Q_acc_bias*C;
-  /*
-  Q_k(1:3,4:6) = dt^2/2*Q_acc + dt^4/8*Q_acc_bias;
-  Q_k(4:6,4:6) = (dt*Q_acc + dt^3/3*Q_acc_bias);
-  Q_k(7:9,4:6) = O;
-  Q_k(10:12,4:6) = -dt^2/2*Q_acc_bias*C;
-  %%%Q_k(10:12,4:6) = -dt^2/2*Q_acc_bias*C';
-  Q_k(13:15,1:3) = O;
-  */
-
-
-  //  Third column
-  Qd.block(6, 6, 3, 3)= dt*Q_gyr + (Sigma<3>(gyr_corr,dt) + Sigma<3>(gyr_corr,dt).transpose()) * Q_gyr_bias;
-  Qd.block(9, 6, 3, 3) = - Q_gyr_bias * Sigma<2>(gyr_corr,dt);
-  /*
-  Qd(1:3,7:9) = O;
-  Qd(4:6,7:9) = O;
-  Qd(7:9,7:9) = dt*Q_gyr + (Sigma<3>(gyr_corr,dt) + Sigma<3>(gyr_corr,dt)')*Q_gyr_bias;
-      Qd(10:12,7:9) = O;
-  Qd(13:15,7:9) = -Q_gyr_bias*Sigma<2>(gyr_corr,dt);
-  */
-
-
-  //  Fourth column
-  Qd.block(6, 9, 3, 3) = -Sigma<2>(gyr_corr,dt).transpose()*Q_gyr_bias;
-  Qd.block(9, 9, 3, 3) = dt*Q_gyr_bias;
-
-
-  /*
-  Q_k(1:3,13:15) = O;
-  Q_k(4:6,13:15) = O;
-  Q_k(7:9,13:15) = -Sigma(2,gyr_corr,dt)'*Q_gyr_bias;
-  Q_k(10:12,13:15) = O;
-  Q_k(13:15,13:15) = dt*Q_gyr_bias;
-  %Q_k(16:17,16:17) = dt*Q_normal/150;
-  Q_k = Q_k/5;
-  */
-
-
-  //  Fifth column
-  Qd.block(0, 12, 3, 3) = -dt*dt*dt/6*C.transpose()*Q_acc_bias;
-  Qd.block(3, 12, 3, 3) = -dt*dt/2*C.transpose()*Q_acc_bias;
-  Qd.block(12, 12, 3, 3) = dt*Q_acc_bias;
-  /*
-  Qd(1:3,10:12) = -dt^3/6*C'*Q_acc_bias;
-      Qd(4:6,10:12) = -dt^2/2*C'*Q_acc_bias;
-      Qd(7:9,10:12) = O;
-  Qd(10:12,10:12) = dt*Q_acc_bias;
-  Qd(13:15,10:12) = O;
-  */
-
-  Qd = Qd / 5;
-
-
-//  ROS_INFO_STREAM("Qd =" << Qd);
-
+//  Qd.setZero();
 //
-//  ROS_INFO_STREAM("dt =" << dt);
-//  ROS_INFO_STREAM("Q_gyr_bias =" << Q_gyr_bias);
+//
+//
+//  Eigen::Matrix<double, 3, 3> C = q.toRotationMatrix().transpose();
+//
+////  ROS_INFO_STREAM("C =" << C);
+//
+//  Eigen::Matrix<double, 3, 1> gyr_corr = ew;
+//
+//
+////  msf_core::Vector3& gyr_corr = ew;
+//
+//  msf_core::Matrix3 Q_acc = (Eigen::Matrix<double,3, 1>() << n_a(0) * n_a(0), n_a(1) * n_a(1), n_a(2) * n_a(2)).finished().asDiagonal();
+//  msf_core::Matrix3 Q_acc_bias = (Eigen::Matrix<double,3, 1>() << n_ba(0) * n_ba(0), n_ba(1) * n_ba(1), n_ba(2) * n_ba(2)).finished().asDiagonal();
+//
+//  msf_core::Matrix3 Q_gyr = (Eigen::Matrix<double,3, 1>() << n_w(0) * n_w(0), n_w(1) * n_w(1), n_w(2) * n_w(2)).finished().asDiagonal();
+//  msf_core::Matrix3 Q_gyr_bias = (Eigen::Matrix<double,3, 1>() << n_bw(0) * n_bw(0), n_bw(1) * n_bw(1), n_bw(2) * n_bw(2)).finished().asDiagonal();
+//
+////  ROS_INFO_STREAM("Q_acc =" << Q_acc);
+////  ROS_INFO_STREAM("Q_acc_bias =" << Q_acc);
+////  ROS_INFO_STREAM("Q_gyr =" << Q_acc);
+////  ROS_INFO_STREAM("Q_gyr_bias =" << Q_acc);
+//
+//
+//
+//
+//// Building Qd (compared to Matlab, b_a and b_w are switched)
+//  // First Column
+//  Qd.block(0, 0, 3, 3) =  dt*dt*dt / 3.0 * Q_acc + dt*dt*dt*dt*dt / 20.0 * Q_acc_bias;
+//  Qd.block(3, 0, 3, 3) = dt*dt/2*Q_acc + dt*dt*dt*dt/8*Q_acc_bias;
+//  Qd.block(12, 0, 3, 3) = -dt*dt*dt/6*Q_acc_bias*C;
+///*
+//  Qd = (dt ^ 3 / 3 * Q_acc + dt ^ 5 / 20 * Q_acc_bias);
+//  Qd(4:6,1:3) = dt*dt/2*Q_acc + dt^4/8*Q_acc_bias;
+//  Qd(7:9,1:3) = O;
+//  Qd(10:12,1:3) = -dt^3/6*Q_acc_bias*C;
+//  Qd(13:15,1:3) = O;
+//*/
+//
+//
+//  // Second Column
+//  Qd.block(0, 3, 3, 3) = dt*dt/2 * Q_acc + dt*dt*dt*dt/8*Q_acc_bias;
+//  Qd.block(3, 3, 3, 3) = (dt*Q_acc + dt*dt*dt/3*Q_acc_bias);
+//  Qd.block(12, 3, 3, 3) = -dt*dt/2*Q_acc_bias*C;
+//  /*
+//  Q_k(1:3,4:6) = dt^2/2*Q_acc + dt^4/8*Q_acc_bias;
+//  Q_k(4:6,4:6) = (dt*Q_acc + dt^3/3*Q_acc_bias);
+//  Q_k(7:9,4:6) = O;
+//  Q_k(10:12,4:6) = -dt^2/2*Q_acc_bias*C;
+//  %%%Q_k(10:12,4:6) = -dt^2/2*Q_acc_bias*C';
+//  Q_k(13:15,1:3) = O;
+//  */
+//
+//
+//  //  Third column
+//  Qd.block(6, 6, 3, 3)= dt*Q_gyr + (Sigma<3>(gyr_corr,dt) + Sigma<3>(gyr_corr,dt).transpose()) * Q_gyr_bias;
+//  Qd.block(9, 6, 3, 3) = - Q_gyr_bias * Sigma<2>(gyr_corr,dt);
+//  /*
+//  Qd(1:3,7:9) = O;
+//  Qd(4:6,7:9) = O;
+//  Qd(7:9,7:9) = dt*Q_gyr + (Sigma<3>(gyr_corr,dt) + Sigma<3>(gyr_corr,dt)')*Q_gyr_bias;
+//      Qd(10:12,7:9) = O;
+//  Qd(13:15,7:9) = -Q_gyr_bias*Sigma<2>(gyr_corr,dt);
+//  */
+//
+//
+//  //  Fourth column
+//  Qd.block(6, 9, 3, 3) = -Sigma<2>(gyr_corr,dt).transpose()*Q_gyr_bias;
+//  Qd.block(9, 9, 3, 3) = dt*Q_gyr_bias;
+//
+//
+//  /*
+//  Q_k(1:3,13:15) = O;
+//  Q_k(4:6,13:15) = O;
+//  Q_k(7:9,13:15) = -Sigma(2,gyr_corr,dt)'*Q_gyr_bias;
+//  Q_k(10:12,13:15) = O;
+//  Q_k(13:15,13:15) = dt*Q_gyr_bias;
+//  %Q_k(16:17,16:17) = dt*Q_normal/150;
+//  Q_k = Q_k/5;
+//  */
+//
+//
+//  //  Fifth column
+//  Qd.block(0, 12, 3, 3) = -dt*dt*dt/6*C.transpose()*Q_acc_bias;
+//  Qd.block(3, 12, 3, 3) = -dt*dt/2*C.transpose()*Q_acc_bias;
+//  Qd.block(12, 12, 3, 3) = dt*Q_acc_bias;
+//  /*
+//  Qd(1:3,10:12) = -dt^3/6*C'*Q_acc_bias;
+//      Qd(4:6,10:12) = -dt^2/2*C'*Q_acc_bias;
+//      Qd(7:9,10:12) = O;
+//  Qd(10:12,10:12) = dt*Q_acc_bias;
+//  Qd(13:15,10:12) = O;
+//  */
+//
+//  Qd = Qd / 5;
+//
+//
+////  ROS_INFO_STREAM("Qd =" << Qd);
+//
+////
+////  ROS_INFO_STREAM("dt =" << dt);
+////  ROS_INFO_STREAM("Q_gyr_bias =" << Q_gyr_bias);
 
 
 
-  /*
+
          const double q1=q.w(), q2=q.x(), q3=q.y(), q4=q.z();
          const double ew1=ew(0), ew2=ew(1), ew3=ew(2);
          const double ea1=ea(0), ea2=ea(1), ea3=ea(2);
@@ -680,7 +680,7 @@ void calc_QCore(const double dt, const Eigen::Quaternion<double> & q, const Eige
          Qd(14,4) = t663;
          Qd(14,5) = t343*t370*t400*(-1.0/2.0);
          Qd(14,14) = dt*t400;
-   */
+
 }
 ;
 

@@ -19,12 +19,12 @@ if [ -n "$1" ]
 then
 T=$1
 else
-T=50
+T=5
 fi
 
-T=50
+T=55
 
 echo " ### plotting biases x y z [m/s^2] ###"
 echo " ### buffer = " $T "sec"
 
-rosrun rxtools rxplot msf_core/state_out/data[10]:data[11]:data[12]:data[13]:data[14]:data[15] -b $T -t "biases" -l bwx,bwy,bwz,bax,bay,baz -p 50
+rosrun rxtools rxplot /ref/msf_core/state_out/data[10]:data[11]:data[12]:data[13]:data[14]:data[15] -b $T -t "biases" -l bwx,bwy,bwz,bax,bay,baz -p 55

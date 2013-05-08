@@ -42,8 +42,6 @@ SensorHandler<msf_updates::EKFState>(meas, topic_namespace, parameternamespace),
 {
   ros::NodeHandle pnh("~/"+parameternamespace);
 
-  ROS_INFO_STREAM("Loading parameters for pose sensor from namespace: "<<pnh.getNamespace());
-
   pnh.param("pose_absolute_measurements", provides_absolute_measurements_, true);
   pnh.param("pose_measurement_world_sensor", measurement_world_sensor_, true);
   pnh.param("pose_use_fixed_covariance", use_fixed_covariance_, false);

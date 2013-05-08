@@ -55,7 +55,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef FUSION_MAX_VECTOR_SIZE
 #undef FUSION_MAX_VECTOR_SIZE
 #endif
-#define FUSION_MAX_VECTOR_SIZE 15 //maximum number of statevariables (can be set to a larger value)
+#define FUSION_MAX_VECTOR_SIZE 20 //maximum number of statevariables (can be set to a larger value)
 
 #include <boost/lexical_cast.hpp>
 #include <boost/static_assert.hpp>

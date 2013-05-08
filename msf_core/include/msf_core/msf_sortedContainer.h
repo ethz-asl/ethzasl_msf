@@ -42,7 +42,6 @@ namespace msf_core{
  */
 template<typename T, typename PrototypeInvalidT = T>
 class SortedContainer{
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 public:
   typedef boost::shared_ptr<T> Ptr_T;

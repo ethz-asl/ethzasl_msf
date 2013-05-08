@@ -1,0 +1,18 @@
+#!/bin/bash
+
+if [ -n "$1" ]
+then
+T=$1
+else
+T=10
+fi
+
+
+echo " ### plotting attitude qw qx qy qz [quat] ###"
+echo " ### buffer = " $T "sec"
+
+rosrun rxtools rxplot /msf_core/state_out/data[6]:data[7]:data[8]:data[9] /msf_distort/tf_to_pose_output/pose/orientation/w:x:y:z -b $T -t "attitude / gt" -l w,x,y,z,w_gt,x_gt,y_gt,z_gt  -p 10
+
+#rosrun rxtools rxplot /msf_core/state_out/data[0]:data[1]:data[2] /msf_distort/tf_to_pose_output/pose/position/x:y:z -b $T -t #"position / gt" -l x,y,z,gt_x,gt_y,gt_z -p 55
+
+

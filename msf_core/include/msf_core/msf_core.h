@@ -83,12 +83,10 @@ class MSF_SensorManager;
 template<typename EKFState_T>
 class MSF_Core
 {
-
   friend class MSF_MeasurementBase<EKFState_T>;
   bool initialized_; ///< is the filter initialized, so that we can propagate the state?
   bool predictionMade_; ///< is there a state prediction, so we can apply measurements?
 public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   typedef typename EKFState_T::StateDefinition_T StateDefinition_T;
   typedef typename EKFState_T::StateSequence_T StateSequence_T;
   enum{

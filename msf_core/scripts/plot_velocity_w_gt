@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if [ -n "$1" ]
+then
+T=$1
+else
+T=5
+fi
+
+T=55
+
+echo " ### plotting velocities x y z [m/s] ###"
+echo " ### buffer = " $T "sec"
+
+rosrun rxtools rxplot /msf_core/state_out/data[3]:data[4]:data[5] /msf_distort/tf_to_pose_output/velocity/x:y:z -b $T -t "velocity / gt" -l v_x,v_y,v_z,v_x_gt,v_y_gt,v_z_gt 

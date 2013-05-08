@@ -20,7 +20,7 @@
   <depend package="opencv2"/>
 
   <export>
-    <cpp cflags="`pkg-config --cflags eigen3 ` -std=c++11 -I${prefix}/include -I${prefix}/cfg/cpp" lflags="-L${prefix}/lib -lmsf_core -lopencv_core" />
+    <cpp cflags="`pkg-config --cflags eigen3 ` -std=c++0x -I${prefix}/include -I${prefix}/cfg/cpp" lflags="-L${prefix}/lib -lmsf_core -lopencv_core" />
   </export>
 </package>
 

@@ -21,13 +21,7 @@ include(${dynamic_reconfigure_PACKAGE_PATH}/cmake/cfgbuild.cmake)
 gencfg()
 rosbuild_genmsg()
 
-# assembler on mac os doesn't know avx commands :( switch to sse4.2. assuming that our mac machines have a corei7
-IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin") 
-  add_definitions (-msse4.2)
-ELSE(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-  add_definitions (-march=native)
-ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-
+add_definitions (-std=c++0x -march=native)
 set(ROS_COMPILE_FLAGS "-W -Wall")# -Wextra -pedantic")
 
 #add_definitions (-DDEBUGPUBLISH) #publish the state after each propagation step for full rate plotting
@@ -42,7 +36,6 @@ add_subdirectory(src/pose_msf)
 add_subdirectory(src/pose_pressure_msf)
 add_subdirectory(src/position_msf)
 add_subdirectory(src/position_pose_msf)
-add_subdirectory(src/spherical_msf)
 
 rosbuild_add_executable(test_distort src/test/test_distort.cc)
 target_link_libraries(test_distort pose_distorter)

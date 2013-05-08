@@ -226,40 +226,58 @@ void MSF_Core<EKFState_T>::setPCore(Eigen::Matrix<double, EKFState_T::nErrorStat
 
   //now set the core state covariance to the simulated values
   Eigen::Matrix<double, coreErrorStates, coreErrorStates> P_core;
-  //  P_core<<  0.0166, 0.0122,-0.0015, 0.0211, 0.0074, 0.0000, 0.0012,-0.0012, 0.0001,-0.0000, 0.0000,-0.0000,-0.0003,-0.0002,-0.0000,
-  //      0.0129, 0.0508,-0.0020, 0.0179, 0.0432, 0.0006, 0.0020, 0.0004,-0.0002,-0.0000, 0.0000, 0.0000, 0.0003,-0.0002, 0.0000,
-  //      -0.0013,-0.0009, 0.0142,-0.0027, 0.0057, 0.0079, 0.0007, 0.0007, 0.0000,-0.0000,-0.0000, 0.0000,-0.0001,-0.0004,-0.0001,
-  //      0.0210, 0.0162,-0.0026, 0.0437, 0.0083,-0.0017, 0.0016,-0.0021,-0.0014,-0.0000, 0.0000, 0.0000, 0.0003,-0.0001, 0.0000,
-  //      0.0093, 0.0461, 0.0036, 0.0153, 0.0650,-0.0016, 0.0025, 0.0013,-0.0000,-0.0000, 0.0000, 0.0000, 0.0003, 0.0002, 0.0000,
-  //      -0.0000, 0.0005, 0.0080,-0.0019,-0.0021, 0.0130, 0.0001, 0.0001, 0.0000,-0.0000, 0.0000,-0.0000,-0.0003, 0.0001,-0.0001,
-  //      0.0012, 0.0024, 0.0006, 0.0017, 0.0037, 0.0001, 0.0005, 0.0000, 0.0001,-0.0000, 0.0000,-0.0000,-0.0000,-0.0001,-0.0000,
-  //      -0.0011, 0.0008, 0.0007,-0.0023, 0.0019, 0.0001, 0.0000, 0.0005,-0.0001,-0.0000,-0.0000, 0.0000, 0.0001,-0.0001,-0.0000,
-  //      0.0001,-0.0002,-0.0000,-0.0014, 0.0001, 0.0000, 0.0000,-0.0001, 0.0006,-0.0000,-0.0000,-0.0000, 0.0000, 0.0000,-0.0000,
-  //      -0.0000,-0.0000,-0.0000,-0.0000,-0.0000,-0.0000,-0.0000,-0.0000,-0.0000, 0.0000,-0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
-  //      0.0000, 0.0000,-0.0000, 0.0000, 0.0000, 0.0000, 0.0000,-0.0000,-0.0000,-0.0000, 0.0000,-0.0000, 0.0000, 0.0000, 0.0000,
-  //      -0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,-0.0000, 0.0000,-0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,-0.0000,
-  //      -0.0003, 0.0003,-0.0001, 0.0003, 0.0003,-0.0003,-0.0000, 0.0001, 0.0000, 0.0000, 0.0000, 0.0000, 0.0010, 0.0000, 0.0000,
-  //      -0.0002,-0.0002,-0.0004,-0.0001, 0.0003, 0.0001,-0.0001,-0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0010, 0.0000,
-  //      -0.0000, 0.0000,-0.0001, 0.0000, 0.0000,-0.0001,-0.0000,-0.0000,-0.0000, 0.0000, 0.0000,-0.0000, 0.0000, 0.0000, 0.0001;
+//    P_core<<  0.0166, 0.0122,-0.0015, 0.0211, 0.0074, 0.0000, 0.0012,-0.0012, 0.0001,-0.0000, 0.0000,-0.0000,-0.0003,-0.0002,-0.0000,
+//        0.0129, 0.0508,-0.0020, 0.0179, 0.0432, 0.0006, 0.0020, 0.0004,-0.0002,-0.0000, 0.0000, 0.0000, 0.0003,-0.0002, 0.0000,
+//        -0.0013,-0.0009, 0.0142,-0.0027, 0.0057, 0.0079, 0.0007, 0.0007, 0.0000,-0.0000,-0.0000, 0.0000,-0.0001,-0.0004,-0.0001,
+//        0.0210, 0.0162,-0.0026, 0.0437, 0.0083,-0.0017, 0.0016,-0.0021,-0.0014,-0.0000, 0.0000, 0.0000, 0.0003,-0.0001, 0.0000,
+//        0.0093, 0.0461, 0.0036, 0.0153, 0.0650,-0.0016, 0.0025, 0.0013,-0.0000,-0.0000, 0.0000, 0.0000, 0.0003, 0.0002, 0.0000,
+//        -0.0000, 0.0005, 0.0080,-0.0019,-0.0021, 0.0130, 0.0001, 0.0001, 0.0000,-0.0000, 0.0000,-0.0000,-0.0003, 0.0001,-0.0001,
+//        0.0012, 0.0024, 0.0006, 0.0017, 0.0037, 0.0001, 0.0005, 0.0000, 0.0001,-0.0000, 0.0000,-0.0000,-0.0000,-0.0001,-0.0000,
+//        -0.0011, 0.0008, 0.0007,-0.0023, 0.0019, 0.0001, 0.0000, 0.0005,-0.0001,-0.0000,-0.0000, 0.0000, 0.0001,-0.0001,-0.0000,
+//        0.0001,-0.0002,-0.0000,-0.0014, 0.0001, 0.0000, 0.0000,-0.0001, 0.0006,-0.0000,-0.0000,-0.0000, 0.0000, 0.0000,-0.0000,
+//        -0.0000,-0.0000,-0.0000,-0.0000,-0.0000,-0.0000,-0.0000,-0.0000,-0.0000, 0.0000,-0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+//        0.0000, 0.0000,-0.0000, 0.0000, 0.0000, 0.0000, 0.0000,-0.0000,-0.0000,-0.0000, 0.0000,-0.0000, 0.0000, 0.0000, 0.0000,
+//        -0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,-0.0000, 0.0000,-0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000,-0.0000,
+//        -0.0003, 0.0003,-0.0001, 0.0003, 0.0003,-0.0003,-0.0000, 0.0001, 0.0000, 0.0000, 0.0000, 0.0000, 0.0010, 0.0000, 0.0000,
+//        -0.0002,-0.0002,-0.0004,-0.0001, 0.0003, 0.0001,-0.0001,-0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0010, 0.0000,
+//        -0.0000, 0.0000,-0.0001, 0.0000, 0.0000,-0.0001,-0.0000,-0.0000,-0.0000, 0.0000, 0.0000,-0.0000, 0.0000, 0.0000, 0.0001;
 
-  //TODO Matlab back
-  P_core.setZero();
-  P_core(0,0) = 3;
-  P_core(1,1) = 3;
-  P_core(2,2) = 3;
-  P_core(3,3) = 2;
-  P_core(4,4) = 2;
-  P_core(5,5) = 2;
-  P_core(6,6) = 0.04;
-  P_core(7,7) = 0.04;
-  P_core(8,8) = 0.04;
-  P_core(9,9) = 0.015;
-  P_core(10,10) = 0.015;
-  P_core(11,11) = 0.015;
-  P_core(12,12) = 0.163;
-  P_core(13,13) = 0.163;
-  P_core(14,14) = 0.163;
-  ///////////////////////////////
+
+  P_core<< 3.00086,  7.51337e-05,  1.66385e-05,  8.93782e-06, 1.53845e-06, -1.2653e-05, -6.61888e-07, -1.37912e-05,  0.000131836, -6.04721e-08,  2.76981e-07, -3.79139e-06,   0.00016278,  1.16048e-05,  1.34879e-06,
+   7.51337e-05,3.00076,  3.99831e-05, -1.26983e-05,  2.26705e-05 , 5.28182e-06, -8.98194e-06,  7.19556e-06,   0.00024316  ,3.10009e-07  , 9.5851e-08, -8.00355e-06, -1.76053e-05, -4.03244e-05,  5.57302e-07,
+   1.66384e-05,  3.99831e-05, 0.000874768, -2.2499e-05 ,-2.84821e-05, 9.73556e-05 , 2.04936e-05, 9.31698e-06, 2.1803e-05, -3.06216e-08, -1.44031e-07, -6.39018e-07 , -4.0063e-05 , 0.000191473,  2.87644e-06,
+   8.93829e-06, -1.26964e-05, -2.25004e-05,  2.37453e-05, -1.04012e-06 ,-5.40794e-06, -5.31478e-07, -3.76391e-06, -3.98025e-05, -5.87104e-09,  5.44963e-08,  1.23138e-06,  1.23169e-05, -1.34348e-05, -1.32695e-07,
+   1.53704e-06,   2.2671e-05, -2.84805e-05, -1.16443e-06,  2.63155e-05, -9.95426e-07, -3.15046e-06,  1.63826e-06,  2.84765e-05,  5.66775e-08,  1.38911e-08,  -9.0897e-07, -1.29378e-05, -1.10091e-05, -4.79721e-08,
+   -1.2653e-05,  5.28182e-06,  9.73556e-05, -5.40759e-06, -9.95318e-07,  3.28836e-05,  2.49675e-06,  8.00741e-06,  9.70208e-06,   4.4046e-09, -1.32115e-08,  -2.8648e-07, -7.23793e-05,  2.67769e-05,  8.33117e-07,
+  -6.62245e-07,  -8.9832e-06,  2.04947e-05, -5.31688e-07, -3.23185e-06,  2.49698e-06,  8.43701e-06,  -1.4539e-06, -1.89459e-05, -1.13307e-08, -1.51975e-08,  5.81262e-07,  1.31976e-05,   7.5001e-05, -4.88314e-08,
+  -1.37913e-05,   7.1956e-06,  9.31721e-06, -3.77545e-06,  1.63842e-06,  8.00743e-06, -1.45398e-06,  7.41575e-06,  2.43303e-05,  6.97444e-09,  -4.8326e-09, -7.52004e-07, -6.53142e-05, -8.47091e-06,   7.6716e-08,
+   0.000131836,   0.00024316,  2.18031e-05, -3.98031e-05,  2.84757e-05,   9.7021e-06, -1.89454e-05,  2.43302e-05,  0.000731082,  4.89429e-08,  9.29108e-08, -2.31437e-05, -7.87083e-05, -5.39542e-05,  4.66545e-07,
+  -6.04721e-08,  3.10009e-07, -3.06222e-08, -5.86548e-09,  5.66801e-08,  4.40452e-09, -1.13349e-08,  6.97452e-09,  4.89427e-08,  5.34985e-09,  8.64308e-11, -2.52926e-09, -6.71258e-08, -1.12465e-08,  1.95952e-10,
+   2.76981e-07,  9.58509e-08,  -1.4403e-07,  5.44966e-08,  1.38855e-08, -1.32114e-08, -1.51976e-08, -4.83317e-09,  9.29106e-08,  8.64324e-11,  5.35169e-09, -4.96914e-09, -1.83667e-08, -1.34507e-07, -1.76329e-10,
+  -3.79139e-06, -8.00355e-06, -6.39022e-07,   1.2314e-06, -9.08938e-07, -2.86481e-07,  5.81245e-07, -7.52001e-07, -2.31437e-05, -2.52927e-09, -4.96915e-09,  7.57833e-07,  2.34049e-06,   1.5266e-06, -1.27473e-08,
+    0.00016278, -1.76053e-05, -4.00629e-05,  1.23157e-05, -1.29381e-05, -7.23793e-05,  1.31984e-05, -6.53142e-05, -7.87082e-05, -6.71258e-08, -1.83663e-08,  2.34048e-06,  0.000628949,   9.9532e-05, -5.55973e-07,
+   1.16049e-05, -4.03244e-05,  0.000191472, -1.34348e-05, -1.10082e-05,  2.67769e-05,  7.50009e-05, -8.47082e-06, -5.39542e-05, -1.12468e-08, -1.34507e-07,   1.5266e-06,   9.9532e-05,  0.000722253, -4.20019e-07,
+   1.34879e-06,  5.57302e-07,  2.87644e-06, -1.32689e-07, -4.79779e-08,  8.33117e-07,  -4.8836e-08,  7.67151e-08,  4.66545e-07,  1.95954e-10,  -1.7633e-10, -1.27473e-08, -5.55973e-07, -4.20019e-07,  1.67777e-07;
+
+
+//  //TODO Matlab back
+//  P_core.setZero();
+//  P_core(0,0) = 3;
+//  P_core(1,1) = 3;
+//  P_core(2,2) = 3;
+//  P_core(3,3) = 2;
+//  P_core(4,4) = 2;
+//  P_core(5,5) = 2;
+//  P_core(6,6) = 0.04;
+//  P_core(7,7) = 0.04;
+//  P_core(8,8) = 0.04;
+//  P_core(9,9) = 0.015;
+//  P_core(10,10) = 0.015;
+//  P_core(11,11) = 0.015;
+//  P_core(12,12) = 0.163;
+//  P_core(13,13) = 0.163;
+//  P_core(14,14) = 0.163;
+//  ///////////////////////////////
 
 
   P_core = 0.5 * (P_core + P_core.transpose());
@@ -326,7 +344,7 @@ void MSF_Core<EKFState_T>::process_imu(const msf_core::Vector3& linear_accelerat
 
   sm::timing::Timer timer_PropPrepare("PropPrepare");
   if(lastState->time == -1){
-    ROS_WARN_STREAM_THROTTLE(2, __PRETTY_FUNCTION__<<"ImuCallback: closest state is invalid\n");
+    ROS_WARN_STREAM_THROTTLE(2, "ImuCallback: closest state is invalid\n");
     return; // // early abort // //
   }
 
@@ -337,7 +355,7 @@ void MSF_Core<EKFState_T>::process_imu(const msf_core::Vector3& linear_accelerat
   if (currentState->time - lastState->time < -0.01 && predictionMade_){
     initialized_ = false;
     predictionMade_ = false;
-    ROS_ERROR_STREAM(__PRETTY_FUNCTION__<<"latest IMU message was out of order by a too large amount, resetting EKF: "
+    ROS_ERROR_STREAM("latest IMU message was out of order by a too large amount, resetting EKF: "
         "last-state-time: "<<msf_core::timehuman(lastState->time)<<" "<<
         "current-imu-time: "<<msf_core::timehuman(currentState->time));
     return;
@@ -746,7 +764,7 @@ void MSF_Core<EKFState_T>::propagatePOneStep(){
     if(!checkForNumeric(stateIteratorPLastPropagatedNext->second-> template get<StateDefinition_T::p>(), "prediction p")){
       ROS_WARN_STREAM("prop state from:\t"<<stateIteratorPLastPropagated->second->toEigenVector());
       ROS_WARN_STREAM("prop state to:\t"<<stateIteratorPLastPropagatedNext->second->toEigenVector());
-      ROS_ERROR_STREAM(__PRETTY_FUNCTION__<<" Resetting EKF");
+      ROS_ERROR_STREAM("Resetting EKF");
       predictionMade_ = initialized_ = false;
     }
   }
@@ -815,33 +833,33 @@ void MSF_Core<EKFState_T>::predictProcessCovariance(boost::shared_ptr<EKFState_T
 
 
   // TODO Matlab back
-//  Fd. template block<3, 3> (0, 3) = dt * eye3;
-//  Fd. template block<3, 3> (0, 6) = A;
-//  Fd. template block<3, 3> (0, 9) = B;
-//  Fd. template block<3, 3> (0, 12) = -C_eq * dt_p2_2;
+  Fd. template block<3, 3> (0, 3) = dt * eye3;
+  Fd. template block<3, 3> (0, 6) = A;
+  Fd. template block<3, 3> (0, 9) = B;
+  Fd. template block<3, 3> (0, 12) = -C_eq * dt_p2_2;
+
+  Fd. template block<3, 3> (3, 6) = C;
+  Fd. template block<3, 3> (3, 9) = D;
+  Fd. template block<3, 3> (3, 12) = -C_eq * dt;
+
+  Fd. template block<3, 3> (6, 6) = E;
+  Fd. template block<3, 3> (6, 9) = F;
+
+
+
+//  const Eigen::MatrixXd eye = Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime>::Identity();
+//  Fd. template setZero();
 //
-//  Fd. template block<3, 3> (3, 6) = C;
-//  Fd. template block<3, 3> (3, 9) = D;
-//  Fd. template block<3, 3> (3, 12) = -C_eq * dt;
+//  Fd. template block<3, 3> (0, 3) = eye3;
 //
-//  Fd. template block<3, 3> (6, 6) = E;
-//  Fd. template block<3, 3> (6, 9) = F;
-
-
-
-  const Eigen::MatrixXd eye = Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime>::Identity();
-  Fd. template setZero();
-
-  Fd. template block<3, 3> (0, 3) = eye3;
-
-  Fd. template block<3, 3> (3, 6) = - C_eq * skew(ea);
-  Fd. template block<3, 3> (3, 12) = - C_eq;
-
-  Fd. template block<3, 3> (6, 6) = - skew(ew);
-  Fd. template block<3, 3> (6, 9) = - eye3;
-
-
-  Fd = (eye + Fd * dt);// + Fd * Fd * (dt*dt/2)); // + Fd * Fd * Fd * (dt*dt*dt/6));
+//  Fd. template block<3, 3> (3, 6) = - C_eq * skew(ea);
+//  Fd. template block<3, 3> (3, 12) = - C_eq;
+//
+//  Fd. template block<3, 3> (6, 6) = - skew(ew);
+//  Fd. template block<3, 3> (6, 9) = - eye3;
+//
+//
+//  Fd = (eye + Fd * dt);// + Fd * Fd * (dt*dt/2)); // + Fd * Fd * Fd * (dt*dt*dt/6));
 
 
 //  ROS_INFO_STREAM("w_m for F,Q,P: " << state_new->w_m);
@@ -893,7 +911,7 @@ void MSF_Core<EKFState_T>::init(boost::shared_ptr<MSF_MeasurementBase<EKFState_T
   initialized_ = false;
   predictionMade_ = false;
 
-  usleep(100000); //hackish thread sync
+  std::this_thread::sleep_for(std::chrono::milliseconds(100)); //hackish thread sync
 
   MeasurementBuffer_.clear();
   StateBuffer_.clear();
@@ -918,7 +936,7 @@ void MSF_Core<EKFState_T>::init(boost::shared_ptr<MSF_MeasurementBase<EKFState_T
   //apply init measurement, where the user can provide additional values for P
   measurement->apply(state, *this);
 
-  usleep(10000); //wait for the external propagation to get the init message
+  std::this_thread::sleep_for(std::chrono::milliseconds(100)); //wait for the external propagation to get the init message
 
   assert(state->time != 0);
 
@@ -977,7 +995,7 @@ void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase<
     boost::shared_ptr<EKFState_T> state = getClosestState(it_meas->second->time); //propagates covariance to state
     timer_meas_get_state.stop();
     if(state->time <= 0){
-      ROS_ERROR_STREAM_THROTTLE(1, __PRETTY_FUNCTION__<< " getClosestState returned an invalid state");
+      ROS_ERROR_STREAM_THROTTLE(1,"getClosestState returned an invalid state");
       continue;
     }
 
@@ -1007,7 +1025,7 @@ void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase<
     sm::timing::Timer timer_prop_state_after_meas("Repropagate state to now");
     for( ; it_curr != it_end && it_next != it_end && it_curr->second->time != -1 && it_next->second->time != -1; ++it_curr, ++it_next){ //propagate to selected state
       if(it_curr->second == it_next->second){
-        ROS_ERROR_STREAM(__PRETTY_FUNCTION__<< " propagation : it_curr points to same state as it_next. This must not happen.");
+        ROS_ERROR_STREAM("propagation : it_curr points to same state as it_next. This must not happen.");
         continue;
       }
       if(!initialized_ || !predictionMade_) //break loop if EKF reset in the meantime
@@ -1047,7 +1065,7 @@ void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase<
 
 
     if(pubCorrect_.getNumSubscribers() > 0){
-      ROS_ERROR_STREAM_THROTTLE(1, __PRETTY_FUNCTION__<< " You have connected the external propagation topic but at the same time data_playback is on.");
+      ROS_ERROR_STREAM_THROTTLE(1, "You have connected the external propagation topic but at the same time data_playback is on.");
     }
 
   }
@@ -1140,7 +1158,7 @@ boost::shared_ptr<EKFState_T> MSF_Core<EKFState_T>::getClosestState(double tstam
   boost::shared_ptr<EKFState_T> closestState = it->second;
 
   if (closestState->time == -1 || fabs(closestState->time - timenow) > 0.1){ //check if the state really is close to the requested time. With the new buffer this might not be given.
-    ROS_ERROR_STREAM(__PRETTY_FUNCTION__<< " Requested closest state to "<<timehuman(timenow)<<" but there was no suitable state in the map");
+    ROS_ERROR_STREAM("Requested closest state to "<<timehuman(timenow)<<" but there was no suitable state in the map");
     return StateBuffer_.getInvalid(); // // early abort // //  not enough predictions made yet to apply measurement (too far in past)
   }
 
@@ -1185,7 +1203,7 @@ boost::shared_ptr<EKFState_T> MSF_Core<EKFState_T>::getClosestState(double tstam
   propPToState(closestState); // catch up with covariance propagation if necessary
 
   if(!closestState->checkStateForNumeric()){
-    ROS_ERROR_STREAM(__PRETTY_FUNCTION__<< " State interpolation: interpolated state is invalid (nan)");
+    ROS_ERROR_STREAM("State interpolation: interpolated state is invalid (nan)");
     return StateBuffer_.getInvalid(); // // early abort // //
   }
 

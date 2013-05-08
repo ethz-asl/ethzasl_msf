@@ -1,0 +1,20 @@
+#!/bin/bash
+
+if [ -n "$1" ]
+then
+T=$1
+else
+T=10
+fi
+
+echo " ### plotting position x y z [m] ###"
+echo " ### buffer = " $T "sec"
+
+#rosrun rxtools rxplot /msf_core/state_out/data[0]:data[1]:data[2] /ref/msf_core/state_out/data[0]:data
+#[1]:data[2] -b $T -t "position / gt" -l x,y,z,gt_x,gt_y,gt_z -p 55
+
+rosrun rxtools rxplot /msf_core/state_out/data[0]:data[1]:data[2] /msf_distort/tf_to_pose_output/pose/position/x:y:z -b $T -t "position / gt" -l x,y,z,gt_x,gt_y,gt_z -p 10
+
+#rosrun rxtools rxplot /ref/msf_core/state_out/data[0]:data[1]:data[2] /ctr/pose/pose/position/x:y:z -b $T -#t "position / gt" -l x,y,z,gt_x,gt_y,gt_z -p 55
+
+

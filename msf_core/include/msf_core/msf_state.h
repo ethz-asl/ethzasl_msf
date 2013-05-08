@@ -75,7 +75,7 @@ struct StateVar_T{
     hasResetValue = false;
     Q.setZero();
   }
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 };
 
 
@@ -92,7 +92,7 @@ public:
   friend struct msf_core::copyNonPropagationStates<GenericState_T>;
   friend class msf_core::MSF_InitMeasurement<GenericState_T<StateSequence_T, StateDefinition_T> >;
 
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   enum{
     nStateVarsAtCompileTime = boost::fusion::result_of::size<StateSequence_T>::type::value, ///<n state vars
     nErrorStatesAtCompileTime = msf_tmp::CountStates<StateSequence_T, msf_tmp::CorrectionStateLengthForType>::value, ///<n error states
@@ -270,6 +270,6 @@ public:
 
 }
 
-#include <msf_core/implementation/msf_state_.hpp>
+#include <msf_core/implementation/msf_state.hpp>
 
 #endif /* MSF_STATE_HPP_ */

@@ -1,0 +1,13 @@
+#!/bin/bash
+
+if [ -n "$1" ]
+then
+T=$1
+else
+T=5
+fi
+
+echo " ### plotting position x y z [m] ###"
+echo " ### buffer = " $T "sec"
+
+rxplot msf_core/state_out/data[0]:data[1]:data[2] -b $T -t "position" -l x,y,z 
