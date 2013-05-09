@@ -331,12 +331,6 @@ template<typename EKFState_T>
 void MSF_Core<EKFState_T>::process_imu(const msf_core::Vector3& linear_acceleration, const msf_core::Vector3& angular_velocity,
                                        const ros::Time& msg_stamp, size_t msg_seq)
                                        {
-  //ROS_INFO_STREAM("MSF_Core: process_imu :"<<msf_core::timehuman(msg_stamp.toSec()));
-
-  if(!initialized_){
-    ROS_INFO_STREAM_THROTTLE(1, "IMU rejected not initialized");
-    return;
-  }
 
   sm::timing::Timer timer_PropgetClosestState("PropgetClosestState");
   boost::shared_ptr<EKFState_T> lastState = StateBuffer_.getClosestBefore(msg_stamp.toSec());
@@ -963,7 +957,7 @@ template<typename EKFState_T>
 void MSF_Core<EKFState_T>::addMeasurement(boost::shared_ptr<MSF_MeasurementBase<EKFState_T> > measurement){
 
   if(!initialized_ || !predictionMade_){
-    ROS_WARN_STREAM("Rejected, no prediction"<<predictionMade_<<" or not initialized "<<initialized_);
+    ROS_WARN_STREAM_THROTTLE(1, "Measurement rejected, no prediction"<<predictionMade_<<" or not initialized "<<initialized_);
     return;
   }
 
