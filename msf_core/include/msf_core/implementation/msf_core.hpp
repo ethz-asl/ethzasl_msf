@@ -780,6 +780,8 @@ void MSF_Core<EKFState_T>::init(
   stateBuffer_.insert(state);
   time_P_propagated = state->time;  //will be set upon first IMU message
 
+  ROS_INFO_STREAM("Initializing msf_core which was compiled on :" <<__DATE__);
+
   //  print published/subscribed topics
   ros::V_string topics;
   ros::this_node::getSubscribedTopics(topics);
