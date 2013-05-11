@@ -3,8 +3,8 @@
         
         <remap from="msf_core/imu_state_input" to="PuppetCopterImu" />
 
-	    <remap from="msf_updates/angle_input" to="vicon/angle" />
-	    <remap from="msf_updates/distance_input" to="vicon/radius" />
+	    <remap from="msf_updates/angle_input" to="leica/angles" />
+	    <remap from="msf_updates/distance_input" to="leica/radius" />
 
         <rosparam file="$(find msf_updates)/sph_position_sensor_fix.yaml"/>
     </node>

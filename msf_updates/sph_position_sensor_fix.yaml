@@ -20,15 +20,15 @@ core/core_noise_accbias: 0.0083
 core/core_noise_gyr: 0.0013
 core/core_noise_gyrbias: 0.00013
 
-spherical_position_sensor/angle_delay: 0.001 #0.08
+spherical_position_sensor/angle_delay: 0.08
 #spherical_position_sensor/angle_noise_meas:
-spherical_position_sensor/distance_delay: 0.002 #0.15
+spherical_position_sensor/distance_delay: 0.15
 #spherical_position_sensor/distance_noise_meas:
 
 #init position offset prism imu
 position_sensor/init/p_ip/x: 0    
 position_sensor/init/p_ip/y: 0
-position_sensor/init/p_ip/z: 0.05
+position_sensor/init/p_ip/z: 0.08
 
 spherical_position_sensor/absolute_measurements: true
 spherical_position_sensor/use_fixed_covariance: true
