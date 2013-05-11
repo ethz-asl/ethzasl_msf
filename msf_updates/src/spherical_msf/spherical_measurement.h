@@ -192,14 +192,11 @@ public:
       double phi_old = atan(z_carth(1,0)/z_carth(0,0));
       // Handle all exeptions that occur when transforming in spherical coordinates
       if(z_carth(0,0) < 0 && z_carth(1,0) < 0){
-        phi_old -= 3.141593;
+        phi_old -= M_PI;
       }
       if(z_carth(0,0) < 0 && z_carth(1,0) > 0){
-        phi_old += 3.141593;
+        phi_old += M_PI;
       }
-//      if(phi_old > 0){
-//        phi_old -= 2 * 3.141593;
-//      }
 
       msf_core::Vector2 z_spherical;
       z_spherical << theta_old, phi_old;
@@ -207,11 +204,11 @@ public:
 //      ROS_INFO_STREAM("State: " << z_spherical.transpose());
       r_old = z_a_ - z_spherical;
 //      ROS_INFO_STREAM("Residual: " << r_old(0,0) << " " << r_old(1,0));
-      if(r_old(1,0) < -3.141593){
-        r_old(1,0) += 2*3.141593;
+      if(r_old(1,0) < -M_PI){
+        r_old(1,0) += 2*M_PI;
       }
-      if(r_old(1,0) > 3.141593){
-        r_old(1,0) -= 2*3.141593;
+      if(r_old(1,0) > M_PI){
+        r_old(1,0) -= 2*M_PI;
       }
 //      ROS_INFO_STREAM("Residual corrected: " << r_old(0,0) << " " << r_old(1,0));
 
