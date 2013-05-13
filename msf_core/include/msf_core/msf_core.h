@@ -49,10 +49,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef WITHCOVIMAGE
 #include <image_transport/image_transport.h>
-#endif
-
 #include <opencv/cvwimage.h>
 #include <opencv/highgui.h>
+#endif
+
 
 #include <msf_core/msf_sortedContainer.h>
 #include <vector>
