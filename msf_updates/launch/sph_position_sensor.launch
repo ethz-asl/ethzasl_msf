@@ -1,0 +1,12 @@
+<launch>
+    <node launch-prefix="gdb -ex run --args" name="msf_spherical_position_filter" pkg="msf_updates" type="spherical_position_sensor" clear_params="true" output="screen">
+        
+        <remap from="msf_core/imu_state_input" to="PuppetCopterImu" />
+
+	    <remap from="msf_updates/angle_input" to="leica/angles" />
+	    <remap from="msf_updates/distance_input" to="leica/radius" />
+
+        <rosparam file="$(find msf_updates)/sph_position_sensor_fix.yaml"/>
+    </node>
+</launch>
+
