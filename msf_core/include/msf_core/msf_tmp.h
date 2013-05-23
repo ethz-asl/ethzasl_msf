@@ -48,6 +48,7 @@
 #include <Eigen/Core>
 #include <sstream>
 #include <iostream>
+#include <iomanip>
 
 #ifdef FUSION_MAX_VECTOR_SIZE
 #undef FUSION_MAX_VECTOR_SIZE
