@@ -17,10 +17,10 @@
   <depend package="image_transport"/>
 
   <rosdep name="eigen"/>
-  <depend package="opencv2"/>
+  <rosdep name="opencv2"/>
 
   <export>
-    <cpp cflags="`pkg-config --cflags eigen3 ` -std=c++11 -I${prefix}/include -I${prefix}/cfg/cpp" lflags="-L${prefix}/lib -lmsf_core -lopencv_core" />
+    <cpp cflags="`pkg-config --cflags eigen3 ` `pkg-config --cflags opencv` -std=c++11 -I${prefix}/include -I${prefix}/cfg/cpp" lflags="-L${prefix}/lib -lmsf_core `pkg-config --libs opencv`" />
   </export>
 </package>
 
