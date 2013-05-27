@@ -32,6 +32,7 @@
 #ifndef MSF_STATE_HPP_
 #define MSF_STATE_HPP_
 
+#include <msf_core/msf_macros.h>
 #include <msf_core/msf_types.tpp>
 #include <msf_core/msf_tmp.h>
 #include <msf_core/msf_statevisitor.h>
@@ -43,6 +44,8 @@
 #include <sensor_fusion_comm/ExtState.h>
 #include <sensor_fusion_comm/DoubleArrayStamped.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
+
+#include <boost/tuple/tuple.hpp>
 
 namespace msf_core {
 
@@ -222,7 +225,7 @@ struct GenericState_T {
    * returns a vector of int pairs with enum index in errorstate and numblocks
    */
   void calculateIndicesInErrorState(
-      std::vector<std::tuple<int, int, int> >& vec);
+      std::vector<boost::tuple<int, int, int> >& vec);
 
   /**
    * \brief returns a string describing the state

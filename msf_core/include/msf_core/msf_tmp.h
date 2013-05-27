@@ -40,6 +40,8 @@
 #ifndef MSF_TMP_HPP_
 #define MSF_TMP_HPP_
 
+#include <msf_core/msf_macros.h>
+
 #include <msf_core/msf_fwds.h>
 #include <msf_core/msf_typetraits.tpp>
 #include <msf_core/eigen_utils.h>
@@ -66,8 +68,11 @@
 #include <boost/fusion/include/begin.hpp>
 #include <boost/fusion/include/end.hpp>
 #include <boost/fusion/include/next.hpp>
+
 #include <boost/mpl/bool.hpp>
+#include <boost/mpl/void.hpp>
 #include <boost/fusion/include/at_key.hpp>
+
 
 //this namespace contains some metaprogramming tools
 namespace msf_tmp {

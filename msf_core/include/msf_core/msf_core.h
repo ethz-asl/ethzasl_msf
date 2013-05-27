@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MSF_CORE_H_
 #define MSF_CORE_H_
 
-
 #include <Eigen/Eigen>
 
 #include <ros/ros.h>

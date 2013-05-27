@@ -177,7 +177,7 @@ Eigen::Matrix<double,
 //TODO template to container
 template<typename stateVector_T, typename StateDefinition_T>
 void GenericState_T<stateVector_T, StateDefinition_T>::calculateIndicesInErrorState(
-    std::vector<std::tuple<int, int, int> >& vec) {  //boost fusion unfortunately doesn't like this to be const
+    std::vector<boost::tuple<int, int, int> >& vec) {  //boost fusion unfortunately doesn't like this to be const
 
   boost::fusion::for_each(
       statevars,

@@ -32,8 +32,9 @@
 #ifndef MSF_FWD_HPP_
 #define MSF_FWD_HPP_
 
-#include <boost/shared_ptr.hpp>
 #include <msf_core/msf_macros.h>
+#include <boost/shared_ptr.hpp>
+
 
 namespace msf_core {
 
