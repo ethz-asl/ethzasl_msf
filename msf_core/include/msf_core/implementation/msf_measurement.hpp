@@ -58,11 +58,17 @@ void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrection(
 
   R_type S;
   Eigen::Matrix<double, MSF_Core<EKFState_T>::nErrorStatesAtCompileTime,
-      R_type::RowsAtCompileTime> K;
+      R_type::RowsAtCompileTime> K_old, K;
   typename MSF_Core<EKFState_T>::ErrorStateCov & P = state->P;
 
   S = H_delayed * P * H_delayed.transpose() + R_delayed;
-  K = P * H_delayed.transpose() * S.inverse();
+//  K_old = P * H_delayed.transpose() * S.inverse();
+  K = (S.ldlt().solve(H_delayed * P.transpose())).transpose();
+
+//  if((K-K_test).norm() < 0.001){
+//    std::cout<<"K:\n"<<K.transpose()<<std::endl<<"K test:\n"<<K_test.transpose()<<std::endl<<"norm: "<<(K-K_test).norm()<<std::endl;
+//    assert(0);
+//  }
 
   correction_ = K * res_delayed;
   const typename MSF_Core<EKFState_T>::ErrorStateCov KH =
