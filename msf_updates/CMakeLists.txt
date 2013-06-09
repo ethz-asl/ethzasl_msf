@@ -28,7 +28,7 @@ ELSE(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   add_definitions (-march=native)
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
-set(ROS_COMPILE_FLAGS "-W -Wall")# -Wextra -pedantic")
+set(ROS_COMPILE_FLAGS "-W -Wall -Wno-unused-parameter")# -Wextra -pedantic")
 
 #add_definitions (-DDEBUGPUBLISH) #publish the state after each propagation step for full rate plotting
 
