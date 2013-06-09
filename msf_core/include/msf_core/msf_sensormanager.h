@@ -55,14 +55,14 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
  private:
   int sensorID_;
  protected:
-  typedef std::vector<boost::shared_ptr<SensorHandler<EKFState_T> > > Handlers;
+  typedef std::vector<std::shared_ptr<SensorHandler<EKFState_T> > > Handlers;
   Handlers handlers;  ///<a list of sensor handlers which provide measurements
 
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   ;
 
-  boost::shared_ptr<MSF_Core<EKFState_T> > msf_core_;  ///< the ekf core instance
+  std::shared_ptr<MSF_Core<EKFState_T> > msf_core_;  ///< the ekf core instance
 
   MSF_SensorManager();
 
@@ -74,7 +74,7 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
    * add a new sensor handler to the list of handlers owned by this manager
    * a sensor handler is in turn owning the sensor (camera/vicon etc.)
    */
-  void addHandler(boost::shared_ptr<SensorHandler<EKFState_T> > handler) {
+  void addHandler(std::shared_ptr<SensorHandler<EKFState_T> > handler) {
     handler->setSensorID(sensorID_++);
     handlers.push_back(handler);
   }

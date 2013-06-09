@@ -47,7 +47,7 @@ namespace msf_updates {
 
 typedef msf_updates::PositionPoseSensorConfig Config_T;
 typedef dynamic_reconfigure::Server<Config_T> ReconfigureServer;
-typedef boost::shared_ptr<ReconfigureServer> ReconfigureServerPtr;
+typedef std::shared_ptr<ReconfigureServer> ReconfigureServerPtr;
 
 class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     msf_updates::EKFState> {
@@ -90,8 +90,8 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
   }
 
  private:
-  boost::shared_ptr<PoseSensorHandler_T> pose_handler_;
-  boost::shared_ptr<PositionSensorHandler_T> position_handler_;
+  std::shared_ptr<PoseSensorHandler_T> pose_handler_;
+  std::shared_ptr<PositionSensorHandler_T> position_handler_;
 
   Config_T config_;
   ReconfigureServerPtr reconf_server_;  ///< dynamic reconfigure server
@@ -214,7 +214,7 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
 //    position_handler_->adjustGPSZReference(p(2));
 
     //prepare init "measurement"
-    boost::shared_ptr<msf_core::MSF_InitMeasurement<EKFState_T> > meas(
+    std::shared_ptr<msf_core::MSF_InitMeasurement<EKFState_T> > meas(
         new msf_core::MSF_InitMeasurement<EKFState_T>(true));  //hand over that we will also set the sensor readings
 
     meas->setStateInitValue < StateDefinition_T::p > (p);

@@ -64,7 +64,7 @@ class CheckFuzzyTracking {
     reset();
   }
 
-  bool check(boost::shared_ptr<EKFState_T> delaystate, EKFState_T& buffstate,
+  bool check(std::shared_ptr<EKFState_T> delaystate, EKFState_T& buffstate,
              double fuzzythres) {
     //for now make sure the non drifting state is a quaternion.
 
@@ -132,7 +132,7 @@ class CheckFuzzyTracking {
 template<typename EKFState_T>
 class CheckFuzzyTracking<EKFState_T, mpl_::void_> {
  public:
-  bool check(boost::shared_ptr<EKFState_T> UNUSEDPARAM(delaystate),
+  bool check(std::shared_ptr<EKFState_T> UNUSEDPARAM(delaystate),
              EKFState_T& UNUSEDPARAM(buffstate),
              double UNUSEDPARAM(fuzzythres)) {
     return false;

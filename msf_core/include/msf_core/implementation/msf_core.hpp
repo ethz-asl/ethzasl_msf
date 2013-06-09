@@ -99,7 +99,7 @@ MSF_Core<EKFState_T>::~MSF_Core() {
 
 template<typename EKFState_T>
 void MSF_Core<EKFState_T>::initExternalPropagation(
-    boost::shared_ptr<EKFState_T> state) {
+    std::shared_ptr<EKFState_T> state) {
   // init external propagation
   msgCorrect_.header.stamp = ros::Time(state->time);
   msgCorrect_.header.seq = 0;
@@ -122,7 +122,7 @@ void MSF_Core<EKFState_T>::initExternalPropagation(
 
 template<typename EKFState_T>
 void MSF_Core<EKFState_T>::publishCovImage(
-    boost::shared_ptr<EKFState_T> stateptr) const {
+    std::shared_ptr<EKFState_T> stateptr) const {
 
 #ifdef  WITHCOVIMAGE
   if (!pubCov_.getNumSubscribers())
@@ -304,7 +304,7 @@ void MSF_Core<EKFState_T>::process_imu(
 //  }
 
   sm::timing::Timer timer_PropgetClosestState("PropgetClosestState");
-  boost::shared_ptr<EKFState_T> lastState = stateBuffer_.getClosestBefore(
+  std::shared_ptr<EKFState_T> lastState = stateBuffer_.getClosestBefore(
       msg_stamp.toSec());
   timer_PropgetClosestState.stop();
 
@@ -315,7 +315,7 @@ void MSF_Core<EKFState_T>::process_imu(
     return;  // // early abort // //
   }
 
-  boost::shared_ptr<EKFState_T> currentState(new EKFState_T);
+  std::shared_ptr<EKFState_T> currentState(new EKFState_T);
   currentState->time = msg_stamp.toSec();
 
   //check if this IMU message is really after the last one (caused by restarting a bag file)
@@ -413,7 +413,7 @@ void MSF_Core<EKFState_T>::stateCallback(
     return;
 
   //get the closest state and check validity
-  boost::shared_ptr<EKFState_T> lastState = stateBuffer_.getClosestBefore(
+  std::shared_ptr<EKFState_T> lastState = stateBuffer_.getClosestBefore(
       msg->header.stamp.toSec());
   if (lastState->time == -1) {
     ROS_WARN_STREAM_THROTTLE(2, "StateCallback: closest state is invalid\n");
@@ -421,7 +421,7 @@ void MSF_Core<EKFState_T>::stateCallback(
   }
 
   //create a new state
-  boost::shared_ptr<EKFState_T> currentState(new EKFState_T);
+  std::shared_ptr<EKFState_T> currentState(new EKFState_T);
   currentState->time = msg->header.stamp.toSec();
 
   // get inputs
@@ -510,7 +510,7 @@ template<typename EKFState_T>
 void MSF_Core<EKFState_T>::handlePendingMeasurements() {
   if (queueFutureMeasurements_.empty())
     return;
-  boost::shared_ptr<MSF_MeasurementBase<EKFState_T> > meas =
+  std::shared_ptr<MSF_MeasurementBase<EKFState_T> > meas =
       queueFutureMeasurements_.front();
   queueFutureMeasurements_.pop();
   addMeasurement(meas);
@@ -525,8 +525,8 @@ void MSF_Core<EKFState_T>::CleanUpBuffers() {
 
 template<typename EKFState_T>
 void MSF_Core<EKFState_T>::propagateState(
-    boost::shared_ptr<EKFState_T>& state_old,
-    boost::shared_ptr<EKFState_T>& state_new) {
+    std::shared_ptr<EKFState_T>& state_old,
+    std::shared_ptr<EKFState_T>& state_new) {
 
   double dt = state_new->time - state_old->time;
 
@@ -633,8 +633,8 @@ void MSF_Core<EKFState_T>::propagatePOneStep() {
 
 template<typename EKFState_T>
 void MSF_Core<EKFState_T>::getAccumF_SC(
-    const boost::shared_ptr<EKFState_T>& state_old,
-    const boost::shared_ptr<EKFState_T>& state_new,
+    const std::shared_ptr<EKFState_T>& state_old,
+    const std::shared_ptr<EKFState_T>& state_new,
     Eigen::Matrix<double, MSF_Core<EKFState_T>::nErrorStatesAtCompileTime,
         MSF_Core<EKFState_T>::nErrorStatesAtCompileTime>& F) {
   typename StateBuffer_T::iterator_T it = stateBuffer_.getIteratorAtValue(
@@ -651,8 +651,8 @@ void MSF_Core<EKFState_T>::getAccumF_SC(
 
 template<typename EKFState_T>
 void MSF_Core<EKFState_T>::predictProcessCovariance(
-    boost::shared_ptr<EKFState_T>& state_old,
-    boost::shared_ptr<EKFState_T>& state_new) {
+    std::shared_ptr<EKFState_T>& state_old,
+    std::shared_ptr<EKFState_T>& state_new) {
 
   double dt = state_new->time - state_old->time;
 
@@ -746,7 +746,7 @@ void MSF_Core<EKFState_T>::predictProcessCovariance(
 
 template<typename EKFState_T>
 void MSF_Core<EKFState_T>::init(
-    boost::shared_ptr<MSF_MeasurementBase<EKFState_T> > measurement) {
+    std::shared_ptr<MSF_MeasurementBase<EKFState_T> > measurement) {
 
   initialized_ = false;
   predictionMade_ = false;
@@ -761,7 +761,7 @@ void MSF_Core<EKFState_T>::init(
     queueFutureMeasurements_.pop();
 
   //push one state to the buffer to apply the init on
-  boost::shared_ptr<EKFState_T> state(new EKFState_T);
+  std::shared_ptr<EKFState_T> state(new EKFState_T);
   state->time = 0;  //will be set by the measurement
 
   //reset new state to zero
@@ -808,7 +808,7 @@ void MSF_Core<EKFState_T>::init(
 
 template<typename EKFState_T>
 void MSF_Core<EKFState_T>::addMeasurement(
-    boost::shared_ptr<MSF_MeasurementBase<EKFState_T> > measurement) {
+    std::shared_ptr<MSF_MeasurementBase<EKFState_T> > measurement) {
 
   if (!initialized_ || !predictionMade_)
     return;
@@ -839,7 +839,7 @@ void MSF_Core<EKFState_T>::addMeasurement(
     if (it_meas->second->time <= 0)  //valid?
       continue;
     sm::timing::Timer timer_meas_get_state("Get state for measurement");
-    boost::shared_ptr<EKFState_T> state = getClosestState(
+    std::shared_ptr<EKFState_T> state = getClosestState(
         it_meas->second->time);  //propagates covariance to state
     timer_meas_get_state.stop();
     if (state->time <= 0) {
@@ -896,7 +896,7 @@ void MSF_Core<EKFState_T>::addMeasurement(
   static int seq_m = 0;
 
   // publish correction for external propagation
-  boost::shared_ptr<EKFState_T>& latestState = stateBuffer_.getLast();
+  std::shared_ptr<EKFState_T>& latestState = stateBuffer_.getLast();
 
   msgCorrect_.header.stamp = ros::Time(latestState->time);
   msgCorrect_.header.seq = seq_m;
@@ -995,7 +995,7 @@ void MSF_Core<EKFState_T>::addMeasurement(
 }
 
 template<typename EKFState_T>
-boost::shared_ptr<msf_core::MSF_MeasurementBase<EKFState_T> > MSF_Core<
+std::shared_ptr<msf_core::MSF_MeasurementBase<EKFState_T> > MSF_Core<
     EKFState_T>::getPreviousMeasurement(double time, int sensorID) {
   typename measurementBufferT::iterator_T it = MeasurementBuffer_
       .getIteratorAtValue(time);
@@ -1018,13 +1018,13 @@ boost::shared_ptr<msf_core::MSF_MeasurementBase<EKFState_T> > MSF_Core<
 }
 
 template<typename EKFState_T>
-boost::shared_ptr<EKFState_T> MSF_Core<EKFState_T>::getStateAtTime(
+std::shared_ptr<EKFState_T> MSF_Core<EKFState_T>::getStateAtTime(
     double tstamp) {
   return stateBuffer_.getValueAt(tstamp);
 }
 
 template<typename EKFState_T>
-boost::shared_ptr<EKFState_T> MSF_Core<EKFState_T>::getClosestState(
+std::shared_ptr<EKFState_T> MSF_Core<EKFState_T>::getClosestState(
     double tstamp) {
 
   double timenow = tstamp;  // delay compensated by sensor handler
@@ -1032,7 +1032,7 @@ boost::shared_ptr<EKFState_T> MSF_Core<EKFState_T>::getClosestState(
   typename StateBuffer_T::iterator_T it = stateBuffer_.getIteratorClosest(
       timenow);
 
-  boost::shared_ptr<EKFState_T> closestState = it->second;
+  std::shared_ptr<EKFState_T> closestState = it->second;
 
   if (closestState->time == -1 || fabs(closestState->time - timenow) > 0.1) {  // check if the state really is close to the requested time. With the new buffer this might not be given.
     ROS_ERROR_STREAM(
@@ -1044,9 +1044,9 @@ boost::shared_ptr<EKFState_T> MSF_Core<EKFState_T>::getClosestState(
   double tdiff = fabs(closestState->time - timenow);  // timediff to closest state
 
   if (tdiff > 0.001) {  // if time diff too large, insert new state and do state interpolation
-    boost::shared_ptr<EKFState_T> lastState = stateBuffer_.getClosestBefore(
+    std::shared_ptr<EKFState_T> lastState = stateBuffer_.getClosestBefore(
         timenow);
-    boost::shared_ptr<EKFState_T> nextState = stateBuffer_.getClosestAfter(
+    std::shared_ptr<EKFState_T> nextState = stateBuffer_.getClosestAfter(
         timenow);
 
     bool statevalid = lastState->time != -1 && nextState->time != -1;
@@ -1057,7 +1057,7 @@ boost::shared_ptr<EKFState_T> MSF_Core<EKFState_T>::getClosestState(
     if (statevalid && statenotnan && statesnotsame) {  //if one of the states is invalid, we don't do interpolation, but just take closest
 
       // prepare a new state
-      boost::shared_ptr<EKFState_T> currentState(new EKFState_T);
+      std::shared_ptr<EKFState_T> currentState(new EKFState_T);
       currentState->time = timenow;  //set state time to measurement time
       // linearly interpolate imu readings
       currentState->a_m = lastState->a_m
@@ -1098,7 +1098,7 @@ boost::shared_ptr<EKFState_T> MSF_Core<EKFState_T>::getClosestState(
 }
 
 template<typename EKFState_T>
-void MSF_Core<EKFState_T>::propPToState(boost::shared_ptr<EKFState_T>& state) {
+void MSF_Core<EKFState_T>::propPToState(std::shared_ptr<EKFState_T>& state) {
   // propagate cov matrix until the current states time
   typename StateBuffer_T::iterator_T it = stateBuffer_.getIteratorAtValue(
       time_P_propagated, false);
@@ -1113,7 +1113,7 @@ void MSF_Core<EKFState_T>::propPToState(boost::shared_ptr<EKFState_T>& state) {
 
 template<typename EKFState_T>
 bool MSF_Core<EKFState_T>::applyCorrection(
-    boost::shared_ptr<EKFState_T>& delaystate, ErrorState & correction,
+    std::shared_ptr<EKFState_T>& delaystate, ErrorState & correction,
     double fuzzythres) {
 
   if (!initialized_ || !predictionMade_)

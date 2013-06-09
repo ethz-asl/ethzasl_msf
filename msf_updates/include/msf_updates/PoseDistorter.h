@@ -11,7 +11,7 @@
 #include <Eigen/Dense>
 #include <random>
 #include <cmath>
-#include <boost/shared_ptr.hpp>
+#include  <memory> //std::shared_ptr
 
 namespace msf_updates
 {
@@ -20,7 +20,7 @@ class PoseDistorter
 {
 public:
   typedef std::normal_distribution<> distribution_t;
-  typedef boost::shared_ptr<PoseDistorter> Ptr;
+  typedef std::shared_ptr<PoseDistorter> Ptr;
 private:
   Eigen::Vector3d posdrift_;
   Eigen::Quaterniond attdrift_;

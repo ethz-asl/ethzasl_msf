@@ -38,7 +38,7 @@ int main(int argc, char** argv)
 //just to instantiate all templates, no production code
 
 //	ros::init(argc, argv, "msf_core");
-//	boost::shared_ptr<msf_core::MSF_SensorManager> usercalcs(new msf_core::MSF_InitMeasurement(true));
+//	std::shared_ptr<msf_core::MSF_SensorManager> usercalcs(new msf_core::MSF_InitMeasurement(true));
 //	msf_core::MSF_Core core(usercalcs);
 
 //	ros::spin();

@@ -34,6 +34,7 @@
 
 #include <msf_core/msf_fwds.h>
 #include <Eigen/Dense>
+#include <boost/shared_ptr.hpp>
 
 namespace msf_core {
 
@@ -51,7 +52,7 @@ class MSF_MeasurementBase {
   /**
    * \brief the method called by the msf_core to apply the measurement represented by this object
    */
-  virtual void apply(boost::shared_ptr<EKFState_T> stateWithCovariance,
+  virtual void apply(std::shared_ptr<EKFState_T> stateWithCovariance,
                      MSF_Core<EKFState_T>& core) = 0;
   virtual std::string type() = 0;
   int sensorID_;
@@ -63,12 +64,12 @@ class MSF_MeasurementBase {
    */
   template<class H_type, class Res_type, class R_type>
   void calculateAndApplyCorrection(
-      boost::shared_ptr<EKFState_T> state, MSF_Core<EKFState_T>& core,
+      std::shared_ptr<EKFState_T> state, MSF_Core<EKFState_T>& core,
       const Eigen::MatrixBase<H_type>& H_delayed,
       const Eigen::MatrixBase<Res_type> & res_delayed,
       const Eigen::MatrixBase<R_type>& R_delayed);
 
-  void calculateAndApplyCorrection(boost::shared_ptr<EKFState_T> state,
+  void calculateAndApplyCorrection(std::shared_ptr<EKFState_T> state,
                                    MSF_Core<EKFState_T>& core,
                                    const Eigen::MatrixXd& H_delayed,
                                    const Eigen::MatrixXd & res_delayed,
@@ -76,8 +77,8 @@ class MSF_MeasurementBase {
 
   template<class H_type, class Res_type, class R_type>
   void calculateAndApplyCorrectionRelative(
-      boost::shared_ptr<EKFState_T> state_old,
-      boost::shared_ptr<EKFState_T> state_new, MSF_Core<EKFState_T>& core,
+      std::shared_ptr<EKFState_T> state_old,
+      std::shared_ptr<EKFState_T> state_new, MSF_Core<EKFState_T>& core,
       const Eigen::MatrixBase<H_type>& H_old,
       const Eigen::MatrixBase<H_type>& H_new,
       const Eigen::MatrixBase<Res_type> & res,
@@ -93,7 +94,7 @@ class MSF_InvalidMeasurement : public MSF_MeasurementBase<EKFState_T> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   virtual void apply(
-      boost::shared_ptr<EKFState_T> UNUSEDPARAM(stateWithCovariance),
+      std::shared_ptr<EKFState_T> UNUSEDPARAM(stateWithCovariance),
       MSF_Core<EKFState_T>& UNUSEDPARAM(core)) {
     ROS_ERROR_STREAM(
         "Called apply() on an MSF_InvalidMeasurement object. This should never happen.");
@@ -223,7 +224,7 @@ class MSF_InitMeasurement : public MSF_MeasurementBase<EKFState_T> {
     return InitState.template get<INDEX>();
   }
 
-  virtual void apply(boost::shared_ptr<EKFState_T> stateWithCovariance, MSF_Core<EKFState_T>& core);
+  virtual void apply(std::shared_ptr<EKFState_T> stateWithCovariance, MSF_Core<EKFState_T>& core);
 };
 
     /**

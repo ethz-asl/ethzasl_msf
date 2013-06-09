@@ -49,7 +49,7 @@ namespace msf_position_sensor{
 
 typedef msf_updates::SinglePositionSensorConfig Config_T;
 typedef dynamic_reconfigure::Server<Config_T> ReconfigureServer;
-typedef boost::shared_ptr<ReconfigureServer> ReconfigureServerPtr;
+typedef std::shared_ptr<ReconfigureServer> ReconfigureServerPtr;
 
 class PositionSensorManager : public msf_core::MSF_SensorManagerROS<msf_updates::EKFState>
 {
@@ -76,7 +76,7 @@ public:
   }
 
 private:
-  boost::shared_ptr<PositionSensorHandler_T> position_handler_;
+  std::shared_ptr<PositionSensorHandler_T> position_handler_;
 
   Config_T config_;
   ReconfigureServerPtr reconf_server_; ///< dynamic reconfigure server
@@ -141,7 +141,7 @@ private:
     p = p_vc - q.toRotationMatrix() * p_ip;
 
     //prepare init "measurement"
-    boost::shared_ptr<msf_core::MSF_InitMeasurement<EKFState_T> > meas(new msf_core::MSF_InitMeasurement<EKFState_T>(true)); //hand over that we will also set the sensor readings
+    std::shared_ptr<msf_core::MSF_InitMeasurement<EKFState_T> > meas(new msf_core::MSF_InitMeasurement<EKFState_T>(true)); //hand over that we will also set the sensor readings
 
     meas->setStateInitValue<StateDefinition_T::p>(p);
     meas->setStateInitValue<StateDefinition_T::v>(v);
