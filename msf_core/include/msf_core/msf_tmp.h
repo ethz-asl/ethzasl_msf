@@ -652,7 +652,8 @@ struct IndexOfBestNonTemporalDriftingState {
  private:
   enum {
     bestindex = -1,  //must not change this
-  };BOOST_STATIC_ASSERT_MSG(CheckCorrectIndexing<Sequence>::indexingerrors == 0, "The indexing of the state vector is not the same as in the enum,"
+  };
+  BOOST_STATIC_ASSERT_MSG(CheckCorrectIndexing<Sequence>::indexingerrors == 0, "The indexing of the state vector is not the same as in the enum,"
       " but this must be the same");
 public:
   enum {
