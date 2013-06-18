@@ -709,17 +709,25 @@ void MSF_Core<EKFState_T>::predictProcessCovariance(
   // IEEE International Conference on Robotics and Automation. Shanghai, China, 2011
   typename EKFState_T::F_type& Fd = state_old->Fd;
 
-  Fd.template block<3, 3>(0, 3) = dt * eye3;
-  Fd.template block<3, 3>(0, 6) = A;
-  Fd.template block<3, 3>(0, 9) = B;
-  Fd.template block<3, 3>(0, 12) = -C_eq * dt_p2_2;
+  enum{
+    idxstartcorr_p = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::p>::value,
+    idxstartcorr_v = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::v>::value,
+    idxstartcorr_q = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::q>::value,
+    idxstartcorr_b_w = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::b_w>::value,
+    idxstartcorr_b_a = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::b_a>::value
+  };
 
-  Fd.template block<3, 3>(3, 6) = C;
-  Fd.template block<3, 3>(3, 9) = D;
-  Fd.template block<3, 3>(3, 12) = -C_eq * dt;
+  Fd.template block<3, 3>(idxstartcorr_p, idxstartcorr_v) = dt * eye3;
+  Fd.template block<3, 3>(idxstartcorr_p, idxstartcorr_q) = A;
+  Fd.template block<3, 3>(idxstartcorr_p, idxstartcorr_b_w) = B;
+  Fd.template block<3, 3>(idxstartcorr_p, idxstartcorr_b_a) = -C_eq * dt_p2_2;
 
-  Fd.template block<3, 3>(6, 6) = E;
-  Fd.template block<3, 3>(6, 9) = F;
+  Fd.template block<3, 3>(idxstartcorr_v, idxstartcorr_q) = C;
+  Fd.template block<3, 3>(idxstartcorr_v, idxstartcorr_b_w) = D;
+  Fd.template block<3, 3>(idxstartcorr_v, idxstartcorr_b_a) = -C_eq * dt;
+
+  Fd.template block<3, 3>(idxstartcorr_q, idxstartcorr_q) = E;
+  Fd.template block<3, 3>(idxstartcorr_q, idxstartcorr_b_w) = F;
 
   typename EKFState_T::Q_type& Qd = state_old->Qd;
 
