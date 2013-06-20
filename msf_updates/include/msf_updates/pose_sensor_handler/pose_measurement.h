@@ -36,6 +36,7 @@
 #ifndef POSE_MEASUREMENT_HPP_
 #define POSE_MEASUREMENT_HPP_
 
+#include <msf_core/msf_types.tpp>
 #include <msf_core/msf_measurement.h>
 #include <msf_core/msf_core.h>
 #include <msf_updates/PoseDistorter.h>
@@ -145,7 +146,7 @@ public:
     return "pose";
   }
 
-  virtual void calculateH(std::shared_ptr<EKFState_T> state_in, Eigen::Matrix<double, nMeasurements, msf_core::MSF_Core<EKFState_T>::nErrorStatesAtCompileTime>& H){
+  virtual void calculateH(shared_ptr<EKFState_T> state_in, Eigen::Matrix<double, nMeasurements, msf_core::MSF_Core<EKFState_T>::nErrorStatesAtCompileTime>& H){
     const EKFState_T& state = *state_in; //get a const ref, so we can read core states
 
     H.setZero();
@@ -223,7 +224,7 @@ public:
   /**
    * the method called by the msf_core to apply the measurement represented by this object
    */
-  virtual void apply(std::shared_ptr<EKFState_T> state_nonconst_new, msf_core::MSF_Core<EKFState_T>& core)
+  virtual void apply(shared_ptr<EKFState_T> state_nonconst_new, msf_core::MSF_Core<EKFState_T>& core)
   {
 
     if(isabsolute_){//does this measurement refer to an absolute measurement, or is is just relative to the last measurement
@@ -273,7 +274,7 @@ public:
 
       // init variables
       //get previous measurement
-      std::shared_ptr<msf_core::MSF_MeasurementBase<EKFState_T> > prevmeas_base = core.getPreviousMeasurement(this->time, this->sensorID_);
+      shared_ptr<msf_core::MSF_MeasurementBase<EKFState_T> > prevmeas_base = core.getPreviousMeasurement(this->time, this->sensorID_);
 
       if(prevmeas_base->time == -1){
         ROS_WARN_STREAM("The previous measurement is invalid. Could not apply measurement! time:"<<this->time<<" sensorID: "<<this->sensorID_);
@@ -281,14 +282,14 @@ public:
       }
 
       //try to make this a pose measurement
-      std::shared_ptr<PoseMeasurement> prevmeas = std::dynamic_pointer_cast<PoseMeasurement>(prevmeas_base);
+      shared_ptr<PoseMeasurement> prevmeas = dynamic_pointer_cast<PoseMeasurement>(prevmeas_base);
       if(!prevmeas){
         ROS_WARN_STREAM("The dynamic cast of the previous measurement has failed. Could not apply measurement");
         return;
       }
 
       //get state at previous measurement
-      std::shared_ptr<EKFState_T> state_nonconst_old = core.getClosestState(prevmeas->time);
+      shared_ptr<EKFState_T> state_nonconst_old = core.getClosestState(prevmeas->time);
 
       if(state_nonconst_old->time == -1){
         ROS_WARN_STREAM("The state at the previous measurement is invalid. Could not apply measurement");

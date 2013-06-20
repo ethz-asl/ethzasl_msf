@@ -104,56 +104,56 @@ public:
    * \brief add a sensor measurement or an init measurement to the internal queue and apply it to the state
    * \param measurement the measurement to add to the internal measurement queue
    */
-  void addMeasurement(std::shared_ptr<MSF_MeasurementBase<EKFState_T> > measurement);
+  void addMeasurement(shared_ptr<MSF_MeasurementBase<EKFState_T> > measurement);
 
   /**
    * \brief initializes the filter with the values of the given measurement, other init values from other
    * sensors can be passed in as "measurement" using the initMeasurement structs
    * \param measurement a measurement containing initial values for the state
    */
-  void init(std::shared_ptr<MSF_MeasurementBase<EKFState_T> > measurement);
+  void init(shared_ptr<MSF_MeasurementBase<EKFState_T> > measurement);
 
   /**
    * \brief initialize the HLP based propagation
    * \param state the state to send to the HLP
    */
-  void initExternalPropagation(std::shared_ptr<EKFState_T> state);
+  void initExternalPropagation(shared_ptr<EKFState_T> state);
 
   /**
    * \brief finds the closest state to the requested time in the internal state
    * \param tstamp the time stamp to find the closest state to
    */
-  std::shared_ptr<EKFState_T> getClosestState(double tstamp);
+  shared_ptr<EKFState_T> getClosestState(double tstamp);
 
   /**
    * \brief returns the accumulated dynamic matrix between two states
    */
-  void getAccumF_SC(const std::shared_ptr<EKFState_T>& state_old, const std::shared_ptr<EKFState_T>& state_new,
+  void getAccumF_SC(const shared_ptr<EKFState_T>& state_old, const shared_ptr<EKFState_T>& state_new,
                     Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime>& F);
   /**
    * \brief returns previous measurement of the same type
    */
-  std::shared_ptr<msf_core::MSF_MeasurementBase<EKFState_T> > getPreviousMeasurement(double time, int sensorID);
+  shared_ptr<msf_core::MSF_MeasurementBase<EKFState_T> > getPreviousMeasurement(double time, int sensorID);
 
   /**
    * \brief finds the state at the requested time in the internal state
    * \param tstamp the time stamp to find the state to
    */
-  std::shared_ptr<EKFState_T> getStateAtTime(double tstamp);
+  shared_ptr<EKFState_T> getStateAtTime(double tstamp);
 
   /**
    * \brief propagates the error state covariance
    * \param state_old the state to propagate the covariance from
    * \param state_new the state to propagate the covariance to
    */
-  void predictProcessCovariance(std::shared_ptr<EKFState_T>& state_old, std::shared_ptr<EKFState_T>& state_new);
+  void predictProcessCovariance(shared_ptr<EKFState_T>& state_old, shared_ptr<EKFState_T>& state_new);
 
   /**
    * \brief propagates the state with given dt
    * \param state_old the state to propagate from
    * \param state_new the state to propagate to
    */
-  void propagateState(std::shared_ptr<EKFState_T>& state_old, std::shared_ptr<EKFState_T>& state_new);
+  void propagateState(shared_ptr<EKFState_T>& state_old, shared_ptr<EKFState_T>& state_new);
 
   /**
    * \brief delete very old states and measurements from the buffers to free memory
@@ -188,7 +188,7 @@ private:
 
   StateBuffer_T stateBuffer_; ///<EKF buffer containing pretty much all info needed at time t. sorted by t asc
   measurementBufferT MeasurementBuffer_; ///< EKF Measurements and init values sorted by t asc
-  std::queue<std::shared_ptr<MSF_MeasurementBase<EKFState_T> > > queueFutureMeasurements_; ///< buffer for measurements to apply in future
+  std::queue<shared_ptr<MSF_MeasurementBase<EKFState_T> > > queueFutureMeasurements_; ///< buffer for measurements to apply in future
 
   tf::TransformBroadcaster tf_broadcaster_;
 
@@ -233,13 +233,13 @@ private:
    * \param correction the correction vector
    * \param fuzzythres the error of the non temporal drifting state allowed before fuzzy tracking will be triggered
    */
-  bool applyCorrection(std::shared_ptr<EKFState_T>& delaystate, ErrorState & correction, double fuzzythres = 0.1);
+  bool applyCorrection(shared_ptr<EKFState_T>& delaystate, ErrorState & correction, double fuzzythres = 0.1);
 
   /**
    * \brief propagate covariance to a given state in time
    * \param state the state to propagate to from the last propagated time
    */
-  void propPToState(std::shared_ptr<EKFState_T>& state);
+  void propPToState(shared_ptr<EKFState_T>& state);
 
   //internal state propagation
   /**
@@ -271,7 +271,7 @@ private:
   void handlePendingMeasurements();
 
   ///publish the state cov as image
-  void publishCovImage(std::shared_ptr<EKFState_T> state) const;
+  void publishCovImage(shared_ptr<EKFState_T> state) const;
 
 };
 

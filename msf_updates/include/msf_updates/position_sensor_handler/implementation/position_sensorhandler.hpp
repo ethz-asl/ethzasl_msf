@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
 
+#include <msf_core/msf_types.tpp>
 #include <msf_core/eigen_utils.h>
 #include <msf_core/gps_conversion.h>
 
@@ -102,7 +103,7 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::processPositionMeasu
     }
   }
 
-  typename std::shared_ptr<MEASUREMENT_TYPE> meas( new MEASUREMENT_TYPE(n_zp_, use_fixed_covariance_, provides_absolute_measurements_, this->sensorID, fixedstates));
+  shared_ptr<MEASUREMENT_TYPE> meas( new MEASUREMENT_TYPE(n_zp_, use_fixed_covariance_, provides_absolute_measurements_, this->sensorID, fixedstates));
 
   meas->makeFromSensorReading(msg, msg->header.stamp.toSec() - delay_);
 

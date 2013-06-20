@@ -42,7 +42,7 @@
  * The user has the possibility to set the blocks of Q for user defined states.
  * The EKF core calls the respective user defined function.
  */
-template<class Derived, class DerivedQ> void calc_QCore(
+template<typename StateSequence_T, typename StateDefinition_T, class Derived, class DerivedQ> void calc_QCore(
     const double dt, const Eigen::Quaternion<double> & q,
     const Eigen::MatrixBase<Derived> & ew,
     const Eigen::MatrixBase<Derived> & ea,
@@ -393,6 +393,7 @@ template<class Derived, class DerivedQ> void calc_QCore(
   const double t662 = dt * t343 * t376 * t400 * (1.0 / 6.0);
   const double t663 = t343 * t376 * t400 * (1.0 / 2.0);
 
+
   enum{
     idxstartcorr_p = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::p>::value,
     idxstartcorr_v = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::v>::value,
@@ -401,6 +402,7 @@ template<class Derived, class DerivedQ> void calc_QCore(
     idxstartcorr_b_a = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::b_a>::value
   };
 
+
   Qd(idxstartcorr_p + 0, idxstartcorr_p + 0) = dt * t343 * t347 * t361 * (1.0 / 3.0)
       + dt * t343 * t354 * t359 * (1.0 / 3.0)
       + dt * t343 * t355 * t360 * (1.0 / 3.0);
@@ -408,15 +410,15 @@ template<class Derived, class DerivedQ> void calc_QCore(
       - dt * t343 * t345 * t355 * (t358 - q3 * q4 * 2.0) * (1.0 / 3.0)
       - dt * t343 * t344 * t354 * t367 * (1.0 / 3.0);
   Qd(idxstartcorr_p + 0, idxstartcorr_p + 2) = t402;
-  Qd(idxstartcorr_p + 0, idxstartcorr_v) = t419;
+  Qd(idxstartcorr_p + 0, idxstartcorr_v + 0) = t419;
   Qd(idxstartcorr_p + 0, idxstartcorr_v + 1) = t420;
   Qd(idxstartcorr_p + 0, idxstartcorr_v + 2) = t408;
   Qd(idxstartcorr_p + 0, idxstartcorr_q + 0) = t564;
   Qd(idxstartcorr_p + 0, idxstartcorr_q + 2) = t615;
-  Qd(idxstartcorr_p + 0, idxstartcorr_b_w + 0) = dt * t343 * t346 * t398 * (-1.0 / 6.0);
-  Qd(idxstartcorr_p + 0, idxstartcorr_b_w + 1) = t660;
-  Qd(idxstartcorr_p + 0, idxstartcorr_b_w + 2) = dt * t343 * t345 * t400 * (-1.0 / 6.0);
-  Qd(idxstartcorr_p + 1, idxstartcorr_p) = t375 - dt * t343 * t344 * t354 * t367 * (1.0 / 3.0)
+  Qd(idxstartcorr_p + 0, idxstartcorr_b_a + 0) = dt * t343 * t346 * t398 * (-1.0 / 6.0);
+  Qd(idxstartcorr_p + 0, idxstartcorr_b_a + 1) = t660;
+  Qd(idxstartcorr_p + 0, idxstartcorr_b_a + 2) = dt * t343 * t345 * t400 * (-1.0 / 6.0);
+  Qd(idxstartcorr_p + 1, idxstartcorr_p + 0) = t375 - dt * t343 * t344 * t354 * t367 * (1.0 / 3.0)
       - dt * t343 * t345 * t355 * t376 * (1.0 / 3.0);
   Qd(idxstartcorr_p + 1, idxstartcorr_p + 1) = dt * t343 * t347 * t378 * (1.0 / 3.0)
       + dt * t343 * t355 * t379 * (1.0 / 3.0)
@@ -431,9 +433,9 @@ template<class Derived, class DerivedQ> void calc_QCore(
   Qd(idxstartcorr_p + 1, idxstartcorr_q + 0) = dt * t343 * t374 * t384 * (-1.0 / 6.0);
   Qd(idxstartcorr_p + 1, idxstartcorr_q + 1) = t581;
   Qd(idxstartcorr_p + 1, idxstartcorr_q + 2) = t616;
-  Qd(idxstartcorr_p + 1, idxstartcorr_b_w + 0) = dt * t343 * t366 * t398 * (-1.0 / 6.0);
-  Qd(idxstartcorr_p + 1, idxstartcorr_b_w + 1) = dt * t343 * t367 * t399 * (-1.0 / 6.0);
-  Qd(idxstartcorr_p + 1, idxstartcorr_b_w + 2) = t662;
+  Qd(idxstartcorr_p + 1, idxstartcorr_b_a + 0) = dt * t343 * t366 * t398 * (-1.0 / 6.0);
+  Qd(idxstartcorr_p + 1, idxstartcorr_b_a + 1) = dt * t343 * t367 * t399 * (-1.0 / 6.0);
+  Qd(idxstartcorr_p + 1, idxstartcorr_b_a + 2) = t662;
   Qd(idxstartcorr_p + 2, idxstartcorr_p + 0) = t402;
   Qd(idxstartcorr_p + 2, idxstartcorr_p + 1) = t404;
   Qd(idxstartcorr_p + 2, idxstartcorr_p + 2) = dt * t343 * t347 * t413 * (1.0 / 3.0)

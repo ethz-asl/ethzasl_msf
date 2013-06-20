@@ -44,7 +44,7 @@ MSF_MeasurementBase<EKFState_T>::MSF_MeasurementBase(bool isabsoluteMeasurement,
 template<typename EKFState_T>
 template<class H_type, class Res_type, class R_type>
 void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrection(
-    std::shared_ptr<EKFState_T> state, MSF_Core<EKFState_T>& core,
+    shared_ptr<EKFState_T> state, MSF_Core<EKFState_T>& core,
     const Eigen::MatrixBase<H_type>& H_delayed,
     const Eigen::MatrixBase<Res_type> & res_delayed,
     const Eigen::MatrixBase<R_type>& R_delayed) {
@@ -77,7 +77,7 @@ void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrection(
 
 template<typename EKFState_T>
 void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrection(
-    std::shared_ptr<EKFState_T> state, MSF_Core<EKFState_T>& core,
+    shared_ptr<EKFState_T> state, MSF_Core<EKFState_T>& core,
     const Eigen::MatrixXd& H_delayed, const Eigen::MatrixXd & res_delayed,
     const Eigen::MatrixXd& R_delayed) {
 
@@ -108,8 +108,8 @@ void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrection(
 template<typename EKFState_T>
 template<class H_type, class Res_type, class R_type>
 void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrectionRelative(
-    std::shared_ptr<EKFState_T> state_old,
-    std::shared_ptr<EKFState_T> state_new, MSF_Core<EKFState_T>& core,
+    shared_ptr<EKFState_T> state_old,
+    shared_ptr<EKFState_T> state_new, MSF_Core<EKFState_T>& core,
     const Eigen::MatrixBase<H_type>& H_old,
     const Eigen::MatrixBase<H_type>& H_new,
     const Eigen::MatrixBase<Res_type> & res,
@@ -181,7 +181,7 @@ void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrectionRelative(
 
 template<typename EKFState_T>
 void MSF_InitMeasurement<EKFState_T>::apply(
-    std::shared_ptr<EKFState_T> stateWithCovariance,
+    shared_ptr<EKFState_T> stateWithCovariance,
     MSF_Core<EKFState_T>& core) {
 
   stateWithCovariance->time = this->time;  //makes this state a valid starting point

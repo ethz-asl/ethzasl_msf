@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #include <msf_core/eigen_utils.h>
+#include <msf_core/msf_types.tpp>
 
 namespace msf_pose_sensor{
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
@@ -139,7 +140,7 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(c
     }
   }
 
-  std::shared_ptr<MEASUREMENT_TYPE> meas( new MEASUREMENT_TYPE(n_zp_, n_zq_, measurement_world_sensor_, use_fixed_covariance_, provides_absolute_measurements_, this->sensorID, fixedstates, distorter_));
+  shared_ptr<MEASUREMENT_TYPE> meas( new MEASUREMENT_TYPE(n_zp_, n_zq_, measurement_world_sensor_, use_fixed_covariance_, provides_absolute_measurements_, this->sensorID, fixedstates, distorter_));
 
   meas->makeFromSensorReading(msg, msg->header.stamp.toSec() - delay_);
 

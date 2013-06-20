@@ -82,8 +82,8 @@ typedef boost::fusion::vector<
 }
 
 typedef msf_core::GenericState_T<fullState_T, StateDefinition> EKFState; ///<the state we want to use in this EKF
-typedef std::shared_ptr<EKFState> EKFStatePtr;
-typedef std::shared_ptr<const EKFState> EKFStateConstPtr;
+typedef shared_ptr<EKFState> EKFStatePtr;
+typedef shared_ptr<const EKFState> EKFStateConstPtr;
 
 }
 

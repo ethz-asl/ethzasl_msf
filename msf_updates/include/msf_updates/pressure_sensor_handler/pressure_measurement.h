@@ -87,7 +87,7 @@ public:
   /**
    * the method called by the msf_core to apply the measurement represented by this object
    */
-  virtual void apply(std::shared_ptr<EKFState_T> non_const_state, msf_core::MSF_Core<EKFState_T>& core)
+  virtual void apply(shared_ptr<EKFState_T> non_const_state, msf_core::MSF_Core<EKFState_T>& core)
   {
     // init variables
     Eigen::Matrix<double, nMeasurements, msf_core::MSF_Core<EKFState_T>::nErrorStatesAtCompileTime> H_old;

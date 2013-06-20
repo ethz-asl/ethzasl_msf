@@ -29,6 +29,7 @@
 
  */
 
+#include <msf_core/msf_types.tpp>
 #include <msf_core/msf_core.h>
 
 namespace msf_core {

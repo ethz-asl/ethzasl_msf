@@ -32,11 +32,13 @@
 #ifndef SENSORMANAGERROS_H
 #define SENSORMANAGERROS_H
 
-#include <msf_core/MSF_CoreConfig.h>
-#include <msf_core/msf_sensormanager.h>
 
 #include <ros/ros.h>
 #include <dynamic_reconfigure/server.h>
+
+#include <msf_core/MSF_CoreConfig.h>
+#include <msf_core/msf_sensormanager.h>
+#include <msf_core/msf_types.tpp>
 
 namespace msf_core {
 

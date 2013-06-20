@@ -111,7 +111,7 @@ public:
     return "position";
   }
 
-  virtual void calculateH(std::shared_ptr<EKFState_T> state_in, Eigen::Matrix<double, nMeasurements, msf_core::MSF_Core<EKFState_T>::nErrorStatesAtCompileTime>& H){
+  virtual void calculateH(shared_ptr<EKFState_T> state_in, Eigen::Matrix<double, nMeasurements, msf_core::MSF_Core<EKFState_T>::nErrorStatesAtCompileTime>& H){
     const EKFState_T& state = *state_in; //get a const ref, so we can read core states
 
     H.setZero();
@@ -149,7 +149,7 @@ public:
   /**
    * the method called by the msf_core to apply the measurement represented by this object
    */
-  virtual void apply(std::shared_ptr<EKFState_T> state_nonconst_new, msf_core::MSF_Core<EKFState_T>& core)
+  virtual void apply(shared_ptr<EKFState_T> state_nonconst_new, msf_core::MSF_Core<EKFState_T>& core)
   {
 
     if(isabsolute_){//does this measurement refer to an absolute measurement, or is is just relative to the last measurement
