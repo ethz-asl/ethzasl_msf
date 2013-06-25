@@ -14,3 +14,4 @@ src/msf_updates/*
 docs/
 camera.cfg
 unported_ssf
+/COMPILE_ONLY_POSEFILTER

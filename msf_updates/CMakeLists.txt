@@ -38,10 +38,15 @@ include_directories(${Eigen_INCLUDE_DIRS})
 
 rosbuild_add_library(pose_distorter src/msf_distort/PoseDistorter.cc)
 
+#just build the pose filter on the helicopters
+if(EXISTS "${PROJECT_SOURCE_DIR}/COMPILE_ONLY_POSEFILTER")
+add_subdirectory(src/pose_msf)
+else()
 add_subdirectory(src/pose_msf)
 add_subdirectory(src/pose_pressure_msf)
 add_subdirectory(src/position_msf)
 add_subdirectory(src/position_pose_msf)
+endif()
 
 rosbuild_add_executable(test_distort src/test/test_distort.cc)
 target_link_libraries(test_distort pose_distorter)
