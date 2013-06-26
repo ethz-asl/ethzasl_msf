@@ -1,8 +1,6 @@
 /*
- * aslam_eval.cpp
+ * msf eval adapted from aslam_eval by stefan leutenegger
  *
- *  Created on: Dez 26, 2012
- *      Author: lestefan
  */
 
 #include <boost/thread.hpp>
