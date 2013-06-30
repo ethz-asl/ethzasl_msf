@@ -114,11 +114,6 @@ void MSF_Core<EKFState_T>::process_imu(
   if (!initialized_)
     return;
 
-//  if(msg_seq % 10 != 0){
-//        ROS_WARN_STREAM_THROTTLE(60, "IMU throttling is on now!!!");
-//        return;
-//  }
-
   sm::timing::Timer timer_PropgetClosestState("PropgetClosestState");
   shared_ptr<EKFState_T> lastState = stateBuffer_.getClosestBefore(
       msg_stamp);
