@@ -179,7 +179,7 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(
   pointwCov->point.y = enu[1];
   pointwCov->point.z = enu[2];
 
-  //get the covariance TODO: should we handle the cases differently?
+  //get the covariance TODO: handle the cases differently?
   if(msg->position_covariance_type == sensor_msgs::NavSatFix::COVARIANCE_TYPE_KNOWN){
     pointwCov->covariance = msg->position_covariance;
   }else if(msg->position_covariance_type == sensor_msgs::NavSatFix::COVARIANCE_TYPE_DIAGONAL_KNOWN){

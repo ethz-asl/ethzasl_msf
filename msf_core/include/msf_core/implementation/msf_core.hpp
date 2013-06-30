@@ -592,30 +592,35 @@ template<typename EKFState_T>
 void MSF_Core<EKFState_T>::addMeasurement(
     shared_ptr<MSF_MeasurementBase<EKFState_T> > measurement) {
 
+  //return if not initialized of no imu data available
   if (!initialized_ || !predictionMade_)
     return;
 
+  //check if the measurement is in the future where we don't have imu measurements yet
   if (measurement->time > stateBuffer_.getLast()->time) {
     //ROS_WARN_STREAM("You tried to give me a measurement in the future. Are you sure your clocks are synced and delays compensated correctly? I will store that and apply it next time... [measurement: "<<timehuman(measurement->time)<<" (s) latest state: "<<timehuman(StateBuffer_.getLast()->time)<<" (s)]");
     queueFutureMeasurements_.push(measurement);
     return;
   }
+  //check if there is still a state in the buffer for this message (too old)
   if (measurement->time < stateBuffer_.getFirst()->time) {
     ROS_WARN_STREAM(
         "You tried to give me a measurement which is too far in the past. Are you sure your clocks are synced and delays compensated correctly? [measurement: "<<timehuman(measurement->time)<<" (s) first state in buffer: "<<timehuman(stateBuffer_.getFirst()->time)<<" (s)]");
     return;  //reject measurements too far in the past
   }
 
-  typename measurementBufferT::iterator_T it_meas = MeasurementBuffer_.insert(
-      measurement);
-  typename measurementBufferT::iterator_T it_meas_end = MeasurementBuffer_
-      .getIteratorEnd();
+  //add this measurement to the buffer and get an iterator to it
+  typename measurementBufferT::iterator_T it_meas = MeasurementBuffer_.insert(measurement);
+  //get an iterator the the end of the measurement buffer
+  typename measurementBufferT::iterator_T it_meas_end = MeasurementBuffer_.getIteratorEnd();
+
   typename StateBuffer_T::iterator_T it_curr = stateBuffer_.getIteratorEnd();  //no propagation if no update is applied
 
   bool appliedOne = false;
 
   isfuzzyState_ = false;
 
+  //now go through all the measurements and apply them one by one
   for (; it_meas != it_meas_end; ++it_meas) {
 
     if (it_meas->second->time <= 0)  //valid?
@@ -657,8 +662,7 @@ void MSF_Core<EKFState_T>::addMeasurement(
         it_curr != it_end && it_next != it_end && it_curr->second->time != -1
             && it_next->second->time != -1; ++it_curr, ++it_next) {  //propagate to selected state
       if (it_curr->second == it_next->second) {
-        ROS_ERROR_STREAM(
-            __FUNCTION__<< " propagation : it_curr points to same state as it_next. This must not happen.");
+        ROS_ERROR_STREAM(__FUNCTION__<< " propagation : it_curr points to same state as it_next. This must not happen.");
         continue;
       }
       if (!initialized_ || !predictionMade_)  //break loop if EKF reset in the meantime

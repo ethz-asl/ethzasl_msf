@@ -48,10 +48,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace msf_core{
 
-enum{
-  HLI_EKF_STATE_SIZE = 16 ///< number of states exchanged with external propagation. Here: p,v,q,bw,bw=16
-};
-
 template<typename EKFState_T>
 class MSF_SensorManager;
 template<typename EKFState_T>

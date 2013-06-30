@@ -35,7 +35,7 @@ namespace msf_core{
 
 double timehuman(double val)
 {
-  return val - floor(val / 1000.) * 1000.;
+  return val - floor(val / 10000.) * 10000.;
 }
 
 

@@ -40,6 +40,7 @@ class IMUHandler_ROS:public IMUHandler<EKFState_T>{
   ros::Subscriber subState_; ///< subscriber to external state propagation
   ros::Subscriber subImu_; ///< subscriber to IMU readings
   ros::Subscriber subImuCustom_; ///< subscriber to IMU readings for asctec custom
+
  public:
   IMUHandler_ROS(MSF_SensorManager<EKFState_T>& mng,
                  const std::string& topic_namespace, const std::string& parameternamespace):
@@ -57,6 +58,9 @@ class IMUHandler_ROS:public IMUHandler<EKFState_T>{
 
   void stateCallback(const sensor_fusion_comm::ExtEkfConstPtr & msg) {
 
+    static_cast<MSF_SensorManagerROS<EKFState_T>& >(this->manager_).setHLStateBuffer(*msg);
+
+    //get the imu values
     msf_core::Vector3 linacc;
     linacc << msg->linear_acceleration.x, msg->linear_acceleration.y, msg->linear_acceleration.z;
 
@@ -76,15 +80,13 @@ class IMUHandler_ROS:public IMUHandler<EKFState_T>{
           "before prediction p,v,q");
     }
 
+    //get the propagated states
     msf_core::Vector3 p, v;
     msf_core::Quaternion q;
 
-    p = Eigen::Matrix<double,
-        3, 1>(msg->state[0], msg->state[1], msg->state[2]);
-    v = Eigen::Matrix<double,
-        3, 1>(msg->state[3], msg->state[4], msg->state[5]);
-    q = Eigen::Quaternion<
-        double>(msg->state[6], msg->state[7], msg->state[8], msg->state[9]);
+    p = Eigen::Matrix<double, 3, 1>(msg->state[0], msg->state[1], msg->state[2]);
+    v = Eigen::Matrix<double, 3, 1>(msg->state[3], msg->state[4], msg->state[5]);
+    q = Eigen::Quaternion<double>(msg->state[6], msg->state[7], msg->state[8], msg->state[9]);
     q.normalize();
 
     bool is_already_propagated = false;

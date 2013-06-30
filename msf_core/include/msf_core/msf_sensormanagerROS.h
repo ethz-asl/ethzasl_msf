@@ -52,6 +52,10 @@
 
 namespace msf_core {
 
+enum{
+  HLI_EKF_STATE_SIZE = 16 ///< number of states exchanged with external propagation. Here: p,v,q,bw,bw=16
+};
+
 typedef dynamic_reconfigure::Server<msf_core::MSF_CoreConfig> ReconfigureServer;
 
 /** \class MSF_SensorManagerROS
@@ -98,6 +102,8 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
     pubPoseAfterUpdate_ = nh.advertise<geometry_msgs::PoseWithCovarianceStamped>(
         "pose_after_update", 100);
     pubPoseCrtl_ = nh.advertise<sensor_fusion_comm::ExtState>("ext_state", 1);
+
+    hl_state_buf_.state.resize(HLI_EKF_STATE_SIZE, 0);
   }
 
   virtual ~MSF_SensorManagerROS() {
@@ -118,6 +124,11 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
   void Config(msf_core::MSF_CoreConfig &config, uint32_t level) {
     config_ = config;
     coreConfig(config, level);
+  }
+
+  //set the latest HL state which is needed to compute the correction to be send back to the HL
+  void setHLStateBuffer(const sensor_fusion_comm::ExtEkf& msg){
+    hl_state_buf_ = msg;
   }
 
   //parameter getters
@@ -216,7 +227,6 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
 
       } else {
         const EKFState_T& state_const = *state;
-        //TODO (slynen) use compile time computed indices!
         msgCorrect_.state[0] = state_const.template get<StateDefinition_T::p>()[0] - hl_state_buf_.state[0];
         msgCorrect_.state[1] = state_const.template get<StateDefinition_T::p>()[1] - hl_state_buf_.state[1];
         msgCorrect_.state[2] = state_const.template get<StateDefinition_T::p>()[2] - hl_state_buf_.state[2];

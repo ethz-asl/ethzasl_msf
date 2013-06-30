@@ -64,7 +64,7 @@ private:
     Eigen::Matrix<double, nMeasurements, 1> r_old;
 
     H_old.setZero();
-    R_.setZero(); //TODO:remove later, already done in ctor of base
+//    R_.setZero(); //already done in ctor of base
 
     // get measurements
     z_p_ = Eigen::Matrix<double, 3, 1>(msg->pose.pose.position.x, msg->pose.pose.position.y, msg->pose.pose.position.z);

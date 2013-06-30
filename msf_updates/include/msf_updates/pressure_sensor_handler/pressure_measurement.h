@@ -57,7 +57,7 @@ private:
     Eigen::Matrix<double, nMeasurements, 1> r_old;
 
     H_old.setZero();
-    R_.setZero(); //TODO:remove later, already done in ctor of base
+//    R_.setZero(); //already done in ctor of base
 
     // get measurements
     z_p_ = Eigen::Matrix<double, 1, 1>::Constant(msg->height);
