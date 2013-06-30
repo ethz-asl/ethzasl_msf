@@ -74,6 +74,8 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
   ros::Publisher pubPoseCrtl_; ///< publishes 6DoF pose including velocity output
   ros::Publisher pubCorrect_; ///< publishes corrections for external state propagation
 
+  mutable tf::TransformBroadcaster tf_broadcaster_;
+
   sensor_fusion_comm::ExtEkf hl_state_buf_; ///< buffer to store external propagation data
 
 
@@ -166,19 +168,23 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
 
   virtual void publishStateAfterPropagation(const shared_ptr<EKFState_T>& state) const{
 
-    static int msg_seq = 0;
+    if(pubPoseCrtl_.getNumSubscribers()){
+      static int msg_seq = 0;
 
-    geometry_msgs::PoseWithCovarianceStamped msgPose;
-    msgPose.header.stamp = ros::Time(state->time);
-    msgPose.header.seq = msg_seq++;
-    msgPose.header.frame_id = "/world";
-    state->toPoseMsg(msgPose);
-    pubPose_.publish(msgPose);
+      geometry_msgs::PoseWithCovarianceStamped msgPose;
+      msgPose.header.stamp = ros::Time(state->time);
+      msgPose.header.seq = msg_seq++;
+      msgPose.header.frame_id = "/world";
+      state->toPoseMsg(msgPose);
+      pubPose_.publish(msgPose);
 
-    sensor_fusion_comm::ExtState msgPoseCtrl;
-    msgPoseCtrl.header = msgPose.header;
-    state->toExtStateMsg(msgPoseCtrl);
-    pubPoseCrtl_.publish(msgPoseCtrl);
+      sensor_fusion_comm::ExtState msgPoseCtrl;
+      msgPoseCtrl.header = msgPose.header;
+      state->toExtStateMsg(msgPoseCtrl);
+      pubPoseCrtl_.publish(msgPoseCtrl);
+
+
+    }
   }
 
   virtual void publishStateAfterUpdate(const shared_ptr<EKFState_T>& state) const{
@@ -221,7 +227,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
         Eigen::Quaterniond hl_q(hl_state_buf_.state[6], hl_state_buf_.state[7],
                                 hl_state_buf_.state[8], hl_state_buf_.state[9]);
         Eigen::Quaterniond qbuff_q = hl_q.inverse()
-                    * state_const.template get<StateDefinition_T::q>();
+                            * state_const.template get<StateDefinition_T::q>();
         msgCorrect_.state[6] = qbuff_q.w();
         msgCorrect_.state[7] = qbuff_q.x();
         msgCorrect_.state[8] = qbuff_q.y();
@@ -263,10 +269,22 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
       state->toPoseMsg(msgPose);
       pubPoseAfterUpdate_.publish(msgPose);
     }
+
+    {
+    tf::Transform transform;
+    const EKFState_T& state_const = *state;
+    const Eigen::Matrix<double, 3, 1>& pos = state_const.template get<StateDefinition_T::p>();
+    const Eigen::Quaterniond& ori = state_const.template get<StateDefinition_T::q>();
+    transform.setOrigin(tf::Vector3(pos[0], pos[1], pos[2]));
+    transform.setRotation(tf::Quaternion(ori.x(), ori.y(), ori.z(), ori.w()));
+    tf_broadcaster_.sendTransform(
+        tf::StampedTransform(transform,
+                             ros::Time::now() /*ros::Time(latestState->time_)*/,
+                             "world", "state"));
+    }
     msg_seq++;
+
   }
-
-
 };
 
 }

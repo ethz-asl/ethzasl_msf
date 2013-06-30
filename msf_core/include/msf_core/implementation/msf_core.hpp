@@ -37,14 +37,15 @@
 #include <numeric>
 #include <string>
 #include <vector>
-#include "calcQCore.h"
+
+#include <sm/timing/Timer.hpp>
+
+#include <msf_core/implementation/calcQCore.h>
 #include <msf_core/eigen_utils.h>
 #include <msf_core/msf_sensormanager.h>
 #include <msf_core/msf_tools.h>
 #include <msf_core/msf_measurement.h>
 #include <msf_core/falsecolor.h>
-#include <sm/timing/Timer.hpp>
-#include <sensor_msgs/image_encodings.h>
 #include <msf_core/msf_types.tpp>
 
 namespace msf_core {
@@ -369,25 +370,7 @@ void MSF_Core<EKFState_T>::propagateState(
       + ((state_new->template get<StateDefinition_T::v>()
           + state_old->template get<StateDefinition_T::v>()) / 2 * dt);
 
-  tf::Transform transform;
-  Eigen::Matrix<double, 3, 1>& pos = state_new
-      ->template get<StateDefinition_T::p>();
-  Eigen::Quaterniond& ori = state_new->template get<StateDefinition_T::q>();
-  transform.setOrigin(tf::Vector3(pos[0], pos[1], pos[2]));
-  transform.setRotation(tf::Quaternion(ori.x(), ori.y(), ori.z(), ori.w()));
-  tf_broadcaster_.sendTransform(
-      tf::StampedTransform(transform,
-                           ros::Time::now() /*ros::Time(latestState->time_)*/,
-                           "world", "state"));
-
-#ifdef DEBUGPUBLISH
-  sensor_fusion_comm::DoubleArrayStamped msgState;
-  static int seq = 0;
-  msgState.header.seq = seq++;
-  msgState.header.stamp = ros::Time(state_new->time);
-  state_new->toFullStateMsg(msgState);
-  pubState_.publish(msgState);
-#endif
+  usercalc_.publishStateAfterPropagation(state_new);
 }
 
 template<typename EKFState_T>

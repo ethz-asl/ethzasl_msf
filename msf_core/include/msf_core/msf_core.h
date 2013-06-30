@@ -34,31 +34,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef MSF_CORE_H_
 #define MSF_CORE_H_
 
+#include <vector>
+#include <queue>
 
 #include <Eigen/Eigen>
 
-//TODO delete these //**//
-#include <ros/ros.h>
-// message includes
-#include <sensor_fusion_comm/DoubleArrayStamped.h>
-#include <sensor_fusion_comm/ExtState.h>
-#include <sensor_fusion_comm/ExtEkf.h>
-#include <geometry_msgs/PoseWithCovarianceStamped.h>
-#include <sensor_msgs/Imu.h>
-#include <asctec_hl_comm/mav_imu.h>
-#include <tf/transform_broadcaster.h>
-//**//
-
-#ifdef WITHCOVIMAGE
-#include <image_transport/image_transport.h>
-#include <opencv/cvwimage.h>
-#include <opencv/highgui.h>
-#endif
-
-
 #include <msf_core/msf_sortedContainer.h>
-#include <vector>
-#include <queue>
 #include <msf_core/msf_state.h>
 #include <msf_core/msf_checkFuzzyTracking.h>
 
@@ -188,8 +169,6 @@ private:
   StateBuffer_T stateBuffer_; ///<EKF buffer containing pretty much all info needed at time t. sorted by t asc
   measurementBufferT MeasurementBuffer_; ///< EKF Measurements and init values sorted by t asc
   std::queue<shared_ptr<MSF_MeasurementBase<EKFState_T> > > queueFutureMeasurements_; ///< buffer for measurements to apply in future
-
-  tf::TransformBroadcaster tf_broadcaster_;
 
   double time_P_propagated; ///< last time stamp where we have a valid propagation
   Eigen::Matrix<double, 3, 1> g_; ///< gravity vector
