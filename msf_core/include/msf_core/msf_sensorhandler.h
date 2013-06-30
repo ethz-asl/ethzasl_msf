@@ -1,6 +1,6 @@
 /*
 
- Copyright (c) 2012, Simon Lynen, ASL, ETH Zurich, Switzerland
+ Copyright (c) 2013, Simon Lynen, ASL, ETH Zurich, Switzerland
  You can contact the author at <slynen at ethz dot ch>
 
  All rights reserved.
@@ -29,16 +29,49 @@
 
  */
 
-#include <msf_core/msf_sensorhandler.h>
-#include <msf_core/msf_types.tpp>
-#include <msf_core/msf_core.h>
+#ifndef MSF_SENSORHANDLER_H_
+#define MSF_SENSORHANDLER_H_
 
-namespace msf_core {
+namespace msf_core{
+/**
+ * \class SensorHandler
+ * \brief handles a sensor driver which provides the sensor readings
+ */
 template<typename EKFState_T>
-MSF_SensorManager<EKFState_T>::MSF_SensorManager() {
-  sensorID_ = 0;
-  data_playback_ = false;
-  msf_core_.reset(new msf_core::MSF_Core<EKFState_T>(*this));  //TODO: make this a (better) design. This is so aweful.
-}
+class SensorHandler {
+  friend class MSF_SensorManager<EKFState_T> ;
+  int lastseq_;
+ protected:
+  MSF_SensorManager<EKFState_T>& manager_;
+  int sensorID;
+  std::string topic_namespace_;
+  std::string parameternamespace_;
+  void setSensorID(int ID) {
+    sensorID = ID;
+  }
+  void sequenceWatchDog(size_t seq, const std::string& topic) {
+    if ((int) seq != lastseq_ + 1 && lastseq_ != 0) {
+      ROS_WARN_STREAM(
+          topic << ": message drop curr seq:" << seq << " expected: "
+              << lastseq_ + 1);
+    }
+    lastseq_ = seq;
+  }
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  ;
+
+  SensorHandler(MSF_SensorManager<EKFState_T>& mng,
+                const std::string& topic_namespace, const std::string& parameternamespace)
+      : lastseq_(0),
+        manager_(mng),
+        sensorID(-1),
+        topic_namespace_(topic_namespace),
+        parameternamespace_(parameternamespace) {
+  }
+  virtual ~SensorHandler() {
+  }
+};
 }
 
+#endif /* MSF_SENSORHANDLER_H_ */

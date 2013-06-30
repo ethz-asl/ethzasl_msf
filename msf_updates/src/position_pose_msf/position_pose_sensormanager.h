@@ -36,6 +36,7 @@
 
 #include <msf_core/msf_core.h>
 #include <msf_core/msf_sensormanagerROS.h>
+#include <msf_core/msf_IMUHandler_ROS.h>
 #include "msf_statedef.hpp"
 #include <msf_updates/pose_sensor_handler/pose_sensorhandler.h>
 #include <msf_updates/pose_sensor_handler/pose_measurement.h>
@@ -67,6 +68,9 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
 
   PositionPoseSensorManager(
       ros::NodeHandle pnh = ros::NodeHandle("~/position_pose_sensor")) {
+
+    imu_handler_.reset(new msf_core::IMUHandler_ROS<msf_updates::EKFState>(*this, "msf_core", "imu_handler"));
+
     bool distortmeas = false;  ///<distort the pose measurements TODO make param
 
     pose_handler_.reset(
@@ -90,6 +94,7 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
   }
 
  private:
+  shared_ptr<msf_core::IMUHandler_ROS<msf_updates::EKFState> > imu_handler_;
   shared_ptr<PoseSensorHandler_T> pose_handler_;
   shared_ptr<PositionSensorHandler_T> position_handler_;
 

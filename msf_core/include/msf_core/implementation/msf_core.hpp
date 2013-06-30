@@ -60,183 +60,11 @@ MSF_Core<EKFState_T>::MSF_Core(const MSF_SensorManager<EKFState_T>& usercalc)
 
   g_ << 0, 0, 9.80834;  // at 47.37 lat
 
-  // TODO(slynen): move all this to the external file and derive from this class. We could by this allow compilation on platforms without ROS
-  ros::NodeHandle nh("msf_core");
-  ros::NodeHandle pnh("~");
-
-  pubState_ = nh.advertise<sensor_fusion_comm::DoubleArrayStamped>("state_out",
-                                                                   100);
-  pubCorrect_ = nh.advertise<sensor_fusion_comm::ExtEkf>("correction", 1);
-  pubPose_ = nh.advertise<geometry_msgs::PoseWithCovarianceStamped>("pose",
-                                                                    100);
-  pubPoseAfterUpdate_ = nh.advertise<geometry_msgs::PoseWithCovarianceStamped>(
-      "pose_after_update", 100);
-  pubPoseCrtl_ = nh.advertise<sensor_fusion_comm::ExtState>("ext_state", 1);
-
-  sensor_fusion_comm::DoubleArrayStamped msgState;
-  msgState.data.resize(nStatesAtCompileTime, 0);
-
-#ifdef  WITHCOVIMAGE
-  pubCov_ = nh.advertise<sensor_msgs::Image>("covariance_img", 1);
-#endif
-
-  subImu_ = nh.subscribe("imu_state_input", 100, &MSF_Core::imuCallback, this);
-  subImuCustom_ = nh.subscribe("imu_state_input_asctec", 10,
-                               &MSF_Core::imuCallback_asctec, this);
-  subState_ = nh.subscribe("hl_state_input", 10, &MSF_Core::stateCallback,
-                           this);
-
-  msgCorrect_.state.resize(HLI_EKF_STATE_SIZE, 0);
-  hl_state_buf_.state.resize(HLI_EKF_STATE_SIZE, 0);
-
-  pnh.param("data_playback", data_playback_, false);
-
   time_P_propagated = 0;
 }
 
 template<typename EKFState_T>
 MSF_Core<EKFState_T>::~MSF_Core() {
-}
-
-template<typename EKFState_T>
-void MSF_Core<EKFState_T>::initExternalPropagation(
-    shared_ptr<EKFState_T> state) {
-  // init external propagation
-  msgCorrect_.header.stamp = ros::Time(state->time);
-  msgCorrect_.header.seq = 0;
-  msgCorrect_.angular_velocity.x = 0;
-  msgCorrect_.angular_velocity.y = 0;
-  msgCorrect_.angular_velocity.z = 0;
-  msgCorrect_.linear_acceleration.x = 0;
-  msgCorrect_.linear_acceleration.y = 0;
-  msgCorrect_.linear_acceleration.z = 0;
-
-  msgCorrect_.state.resize(HLI_EKF_STATE_SIZE);
-  boost::fusion::for_each(
-      state->statevars,
-      msf_tmp::CoreStatetoDoubleArray<std::vector<float>, StateSequence_T>(
-          msgCorrect_.state));
-
-  msgCorrect_.flag = sensor_fusion_comm::ExtEkf::initialization;
-  pubCorrect_.publish(msgCorrect_);
-}
-
-template<typename EKFState_T>
-void MSF_Core<EKFState_T>::publishCovImage(
-    shared_ptr<EKFState_T> stateptr) const {
-
-#ifdef  WITHCOVIMAGE
-  if (!pubCov_.getNumSubscribers())
-    return;
-
-  const EKFState_T& state = *stateptr;
-
-  static int imgseq = 0;
-
-  enum {
-    blocksize = 10,  // size of cov blocks in pixels
-    imgrows = EKFState_T::nErrorStatesAtCompileTime * blocksize
-        + EKFState_T::nStateVarsAtCompileTime - 1
-  };
-
-  cv::Mat colorimg(imgrows, imgrows, CV_8UC3);
-  colorimg.setTo(0);
-
-  std::vector < std::tuple<int, int, int> > enumsandindices;
-  stateptr->calculateIndicesInErrorState(enumsandindices);
-
-  // smooth min max values of P
-  static struct smoothP {
-    std::deque<double> dmin;
-    std::deque<double> dmax;
-  } smoother;
-
-  smoother.dmin.push_back(state.P.minCoeff());
-  smoother.dmax.push_back(state.P.maxCoeff());
-
-  size_t filtsize = 50;
-  if (smoother.dmin.size() > filtsize)
-    smoother.dmin.pop_front();
-
-  if (smoother.dmax.size() > filtsize)
-    smoother.dmax.pop_front();
-
-  double min = std::accumulate(smoother.dmin.begin(), smoother.dmin.end(), 0.0)
-      / smoother.dmin.size();
-  double max = std::accumulate(smoother.dmax.begin(), smoother.dmax.end(), 0.0)
-      / smoother.dmax.size();
-
-  static palette pal = GetPalette(palette::False_color_palette4);
-
-  // draw the blocks for covs of the state variables
-  for (size_t i = 0; i < enumsandindices.size(); ++i) {
-    for (size_t j = 0; j < enumsandindices.size(); ++j) {
-      int lengthincorrectionrows = std::get < 2 > (enumsandindices.at(i));
-      int lengthincorrectioncols = std::get < 2 > (enumsandindices.at(j));
-      // print all entries for this state combination
-      for (int rowidx = 0; rowidx < lengthincorrectionrows; ++rowidx) {
-        for (int colidx = 0; colidx < lengthincorrectioncols; ++colidx) {
-
-          int startrow = std::get < 0
-              > (enumsandindices.at(i))
-                  + (std::get < 1 > (enumsandindices.at(i)) + rowidx)
-                      * blocksize;
-          int startcol = std::get < 0
-              > (enumsandindices.at(j))
-                  + (std::get < 1 > (enumsandindices.at(j)) + colidx)
-                      * blocksize;
-
-          double value = state.P(
-              std::get < 1 > (enumsandindices.at(i)) + rowidx,
-              std::get < 1 > (enumsandindices.at(j)) + colidx);
-
-          int brightness = (value - min) / (max - min) * 255.;
-          brightness = brightness > 255 ? 255 : brightness < 0 ? 0 : brightness;  //clamp
-
-          cv::rectangle(
-              colorimg,
-              cv::Point(startrow, startcol),
-              cv::Point(startrow + blocksize, startcol + blocksize),
-              CV_RGB(pal.colors[brightness].rgbRed, pal.colors[brightness].rgbGreen, pal.colors[brightness].rgbBlue),
-              CV_FILLED);
-
-        }
-      }
-    }
-  }
-
-  // draw the lines between the state variables
-  for (size_t i = 1; i < enumsandindices.size(); ++i) {
-
-    int startrow = std::get < 0 > (enumsandindices.at(i)) + std::get < 1
-        > (enumsandindices.at(i)) * blocksize;
-
-    cv::line(colorimg, cv::Point(startrow, 0), cv::Point(startrow, imgrows),
-             CV_RGB(227,176,55));
-    cv::line(colorimg, cv::Point(0, startrow), cv::Point(imgrows, startrow),
-             CV_RGB(227,176,55));
-
-  }
-
-  sensor_msgs::ImagePtr msgimg_(new sensor_msgs::Image);
-  msgimg_->data.resize(colorimg.cols * colorimg.rows * 3);
-  msgimg_->header.stamp = ros::Time(state.time);
-  msgimg_->header.seq = ++imgseq;
-  msgimg_->width = colorimg.cols;
-  msgimg_->height = colorimg.rows;
-  msgimg_->encoding = sensor_msgs::image_encodings::BGR8;
-  msgimg_->step = colorimg.cols * 3;
-  msgimg_->is_bigendian = 0;
-  memcpy(&msgimg_->data[0], &colorimg.data[0],
-         sizeof(char) * msgimg_->data.size());
-
-  pubCov_.publish(msgimg_);
-
-  // ROS_WARN_STREAM("P=["<<state.P<<"];");
-#else
-  UNUSED(stateptr)
-#endif
-
 }
 
 template<typename EKFState_T>
@@ -251,49 +79,35 @@ void MSF_Core<EKFState_T>::setPCore(
 
   // now set the core state covariance to the simulated values
   Eigen::Matrix<double, coreErrorStates, coreErrorStates> P_core;
-  P_core << 0.0166, 0.0122, -0.0015, 0.0211, 0.0074, 0.0000, 0.0012, -0.0012, 0.0001, -0.0000, 0.0000, -0.0000, -0.0003, -0.0002, -0.0000, 0.0129, 0.0508, -0.0020, 0.0179, 0.0432, 0.0006, 0.0020, 0.0004, -0.0002, -0.0000, 0.0000, 0.0000, 0.0003, -0.0002, 0.0000, -0.0013, -0.0009, 0.0142, -0.0027, 0.0057, 0.0079, 0.0007, 0.0007, 0.0000, -0.0000, -0.0000, 0.0000, -0.0001, -0.0004, -0.0001, 0.0210, 0.0162, -0.0026, 0.0437, 0.0083, -0.0017, 0.0016, -0.0021, -0.0014, -0.0000, 0.0000, 0.0000, 0.0003, -0.0001, 0.0000, 0.0093, 0.0461, 0.0036, 0.0153, 0.0650, -0.0016, 0.0025, 0.0013, -0.0000, -0.0000, 0.0000, 0.0000, 0.0003, 0.0002, 0.0000, -0.0000, 0.0005, 0.0080, -0.0019, -0.0021, 0.0130, 0.0001, 0.0001, 0.0000, -0.0000, 0.0000, -0.0000, -0.0003, 0.0001, -0.0001, 0.0012, 0.0024, 0.0006, 0.0017, 0.0037, 0.0001, 0.0005, 0.0000, 0.0001, -0.0000, 0.0000, -0.0000, -0.0000, -0.0001, -0.0000, -0.0011, 0.0008, 0.0007, -0.0023, 0.0019, 0.0001, 0.0000, 0.0005, -0.0001, -0.0000, -0.0000, 0.0000, 0.0001, -0.0001, -0.0000, 0.0001, -0.0002, -0.0000, -0.0014, 0.0001, 0.0000, 0.0000, -0.0001, 0.0006, -0.0000, -0.0000, -0.0000, 0.0000, 0.0000, -0.0000, -0.0000, -0.0000, -0.0000, -0.0000, -0.0000, -0.0000, -0.0000, -0.0000, -0.0000, 0.0000, -0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, -0.0000, 0.0000, 0.0000, 0.0000, 0.0000, -0.0000, -0.0000, -0.0000, 0.0000, -0.0000, 0.0000, 0.0000, 0.0000, -0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, -0.0000, 0.0000, -0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, -0.0000, -0.0003, 0.0003, -0.0001, 0.0003, 0.0003, -0.0003, -0.0000, 0.0001, 0.0000, 0.0000, 0.0000, 0.0000, 0.0010, 0.0000, 0.0000, -0.0002, -0.0002, -0.0004, -0.0001, 0.0003, 0.0001, -0.0001, -0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0010, 0.0000, -0.0000, 0.0000, -0.0001, 0.0000, 0.0000, -0.0001, -0.0000, -0.0000, -0.0000, 0.0000, 0.0000, -0.0000, 0.0000, 0.0000, 0.0001;
+  P_core << 0.0166, 0.0122, -0.0015, 0.0211, 0.0074, 0.0000, 0.0012, -0.0012, 0.0001, -0.0000, 0.0000, -0.0000, -0.0003, -0.0002, -0.0000,
+            0.0129, 0.0508, -0.0020, 0.0179, 0.0432, 0.0006, 0.0020, 0.0004, -0.0002, -0.0000, 0.0000, 0.0000, 0.0003, -0.0002, 0.0000,
+            -0.0013, -0.0009, 0.0142, -0.0027, 0.0057, 0.0079, 0.0007, 0.0007, 0.0000, -0.0000, -0.0000, 0.0000, -0.0001, -0.0004, -0.0001,
+            0.0210, 0.0162, -0.0026, 0.0437, 0.0083, -0.0017, 0.0016, -0.0021, -0.0014, -0.0000, 0.0000, 0.0000, 0.0003, -0.0001, 0.0000,
+            0.0093, 0.0461, 0.0036, 0.0153, 0.0650, -0.0016, 0.0025, 0.0013, -0.0000, -0.0000, 0.0000, 0.0000, 0.0003, 0.0002, 0.0000,
+            -0.0000, 0.0005, 0.0080, -0.0019, -0.0021, 0.0130, 0.0001, 0.0001, 0.0000, -0.0000, 0.0000, -0.0000, -0.0003, 0.0001, -0.0001,
+            0.0012, 0.0024, 0.0006, 0.0017, 0.0037, 0.0001, 0.0005, 0.0000, 0.0001, -0.0000, 0.0000, -0.0000, -0.0000, -0.0001, -0.0000,
+            -0.0011, 0.0008, 0.0007, -0.0023, 0.0019, 0.0001, 0.0000, 0.0005, -0.0001, -0.0000, -0.0000, 0.0000, 0.0001, -0.0001, -0.0000,
+            0.0001, -0.0002, -0.0000, -0.0014, 0.0001, 0.0000, 0.0000, -0.0001, 0.0006, -0.0000, -0.0000, -0.0000, 0.0000, 0.0000, -0.0000,
+            -0.0000, -0.0000, -0.0000, -0.0000, -0.0000, -0.0000, -0.0000, -0.0000, -0.0000, 0.0000, -0.0000, 0.0000, 0.0000, 0.0000, 0.0000,
+            0.0000, 0.0000, -0.0000, 0.0000, 0.0000, 0.0000, 0.0000, -0.0000, -0.0000, -0.0000, 0.0000, -0.0000, 0.0000, 0.0000, 0.0000,
+            -0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, -0.0000, 0.0000, -0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, -0.0000,
+            -0.0003, 0.0003, -0.0001, 0.0003, 0.0003, -0.0003, -0.0000, 0.0001, 0.0000, 0.0000, 0.0000, 0.0000, 0.0010, 0.0000, 0.0000,
+            -0.0002, -0.0002, -0.0004, -0.0001, 0.0003, 0.0001, -0.0001, -0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0010, 0.0000,
+            -0.0000, 0.0000, -0.0001, 0.0000, 0.0000, -0.0001, -0.0000, -0.0000, -0.0000, 0.0000, 0.0000, -0.0000, 0.0000, 0.0000, 0.0001;
+
   P_core = 0.5 * (P_core + P_core.transpose());
   P.template block<coreErrorStates, coreErrorStates>(0, 0) = P_core;
 }
 
 template<typename EKFState_T>
-void MSF_Core<EKFState_T>::imuCallback_asctec(
-    const asctec_hl_comm::mav_imuConstPtr & msg) {
-
-  msf_core::Vector3 linacc;
-  linacc << msg->acceleration.x, msg->acceleration.y, msg->acceleration.z;
-
-  msf_core::Vector3 angvel;
-  angvel << msg->angular_velocity.x, msg->angular_velocity.y, msg
-      ->angular_velocity.z;
-
-  process_imu(linacc, angvel, msg->header.stamp, msg->header.seq);
-
-}
-template<typename EKFState_T>
-void MSF_Core<EKFState_T>::imuCallback(const sensor_msgs::ImuConstPtr & msg) {
-  static int lastseq = -1;
-  if ((int) msg->header.seq != lastseq + 1 && lastseq != -1) {
-    ROS_WARN_STREAM(
-        "msf_core: imu message drop curr seq:" << msg->header.seq << " expected: " << lastseq + 1);
-  }
-  lastseq = msg->header.seq;
-
-  msf_core::Vector3 linacc;
-  linacc << msg->linear_acceleration.x, msg->linear_acceleration.y, msg
-      ->linear_acceleration.z;
-
-  msf_core::Vector3 angvel;
-  angvel << msg->angular_velocity.x, msg->angular_velocity.y, msg
-      ->angular_velocity.z;
-
-  process_imu(linacc, angvel, msg->header.stamp, msg->header.seq);
+const MSF_SensorManager<EKFState_T>& MSF_Core<EKFState_T>::usercalc() const {
+  return usercalc_;
 }
 
 template<typename EKFState_T>
 void MSF_Core<EKFState_T>::process_imu(
     const msf_core::Vector3& linear_acceleration,
-    const msf_core::Vector3& angular_velocity, const ros::Time& msg_stamp,
+    const msf_core::Vector3& angular_velocity, const double& msg_stamp,
     size_t msg_seq) {
 
   if (!initialized_)
@@ -306,7 +120,7 @@ void MSF_Core<EKFState_T>::process_imu(
 
   sm::timing::Timer timer_PropgetClosestState("PropgetClosestState");
   shared_ptr<EKFState_T> lastState = stateBuffer_.getClosestBefore(
-      msg_stamp.toSec());
+      msg_stamp);
   timer_PropgetClosestState.stop();
 
   sm::timing::Timer timer_PropPrepare("PropPrepare");
@@ -317,7 +131,7 @@ void MSF_Core<EKFState_T>::process_imu(
   }
 
   shared_ptr<EKFState_T> currentState(new EKFState_T);
-  currentState->time = msg_stamp.toSec();
+  currentState->time = msg_stamp;
 
   //check if this IMU message is really after the last one (caused by restarting a bag file)
   if (currentState->time - lastState->time < -0.01 && predictionMade_) {
@@ -383,19 +197,6 @@ void MSF_Core<EKFState_T>::process_imu(
   if (stateBuffer_.size() > 3)  //making sure we have sufficient states to apply measurements to
     predictionMade_ = true;
 
-  geometry_msgs::PoseWithCovarianceStamped msgPose;
-  msgPose.header.stamp = msg_stamp;
-  msgPose.header.seq = msg_seq;
-  msgPose.header.frame_id = "/world";
-
-  currentState->toPoseMsg(msgPose);
-  pubPose_.publish(msgPose);
-
-  sensor_fusion_comm::ExtState msgPoseCtrl;
-  msgPoseCtrl.header = msgPose.header;
-  currentState->toExtStateMsg(msgPoseCtrl);
-  pubPoseCrtl_.publish(msgPoseCtrl);
-
   sm::timing::Timer timer_PropInsertState("PropInsertState");
   stateBuffer_.insert(currentState);
   timer_PropInsertState.stop();
@@ -408,14 +209,16 @@ void MSF_Core<EKFState_T>::process_imu(
 }
 
 template<typename EKFState_T>
-void MSF_Core<EKFState_T>::stateCallback(
-    const sensor_fusion_comm::ExtEkfConstPtr & msg) {
+void MSF_Core<EKFState_T>::process_extstate(const msf_core::Vector3& linear_acceleration,
+                                         const msf_core::Vector3& angular_velocity, const msf_core::Vector3& p,
+                                         const msf_core::Vector3& v, const msf_core::Quaternion& q, bool is_already_propagated, const double& msg_stamp,
+                                         size_t msg_seq) {
+
   if (!initialized_)
     return;
 
   //get the closest state and check validity
-  shared_ptr<EKFState_T> lastState = stateBuffer_.getClosestBefore(
-      msg->header.stamp.toSec());
+  shared_ptr<EKFState_T> lastState = stateBuffer_.getClosestBefore(msg_stamp);
   if (lastState->time == -1) {
     ROS_WARN_STREAM_THROTTLE(2, "StateCallback: closest state is invalid\n");
     return;  // // early abort // //
@@ -423,13 +226,11 @@ void MSF_Core<EKFState_T>::stateCallback(
 
   //create a new state
   shared_ptr<EKFState_T> currentState(new EKFState_T);
-  currentState->time = msg->header.stamp.toSec();
+  currentState->time = msg_stamp;
 
   // get inputs
-  currentState->a_m << msg->linear_acceleration.x, msg->linear_acceleration.y, msg
-      ->linear_acceleration.z;
-  currentState->w_m << msg->angular_velocity.x, msg->angular_velocity.y, msg
-      ->angular_velocity.z;
+  currentState->a_m = linear_acceleration;
+  currentState->w_m = angular_velocity;
 
   // remove acc spikes (TODO: find a cleaner way to do this)
   static Eigen::Matrix<double, 3, 1> last_am = Eigen::Matrix<double, 3, 1>(0, 0,
@@ -450,37 +251,22 @@ void MSF_Core<EKFState_T>::stateCallback(
     }
   }
 
-  int32_t flag = msg->flag;
-  if (data_playback_)
-    flag = sensor_fusion_comm::ExtEkf::ignore_state;
-
-  bool isnumeric = true;
-  if (flag == sensor_fusion_comm::ExtEkf::current_state)
-    isnumeric = checkForNumeric(
-        Eigen::Map<const Eigen::Matrix<float, 10, 1> >(msg->state.data()),
-        "before prediction p,v,q");
-
-  isnumeric = checkForNumeric(
+  bool isnumeric = checkForNumeric(
       currentState->template get<StateDefinition_T::p>(),
       "before prediction p");
 
-  if (flag == sensor_fusion_comm::ExtEkf::current_state && isnumeric)  // state propagation is made externally, so we read the actual state
+  if (is_already_propagated && isnumeric)  // state propagation is made externally, so we read the actual state
       {
-    currentState->template get<StateDefinition_T::p>() = Eigen::Matrix<double,
-        3, 1>(msg->state[0], msg->state[1], msg->state[2]);
-    currentState->template get<StateDefinition_T::v>() = Eigen::Matrix<double,
-        3, 1>(msg->state[3], msg->state[4], msg->state[5]);
-    currentState->template get<StateDefinition_T::q>() = Eigen::Quaternion<
-        double>(msg->state[6], msg->state[7], msg->state[8], msg->state[9]);
-    currentState->template get<StateDefinition_T::q>().normalize();
+    currentState->template get<StateDefinition_T::p>() = p;
+    currentState->template get<StateDefinition_T::v>() = v;
+    currentState->template get<StateDefinition_T::q>() = q;
 
     // zero props: copy non propagation states from last state
     boost::fusion::for_each(
         currentState->statevars,
         msf_tmp::copyNonPropagationStates<EKFState_T>(*lastState));
 
-    hl_state_buf_ = *msg;
-  } else if (flag == sensor_fusion_comm::ExtEkf::ignore_state || !isnumeric) {  // otherwise let's do the state prop. here
+  } else if (!is_already_propagated || !isnumeric) {  // otherwise let's do the state prop. here
     propagateState(lastState, currentState);
   }
 
@@ -789,7 +575,7 @@ void MSF_Core<EKFState_T>::init(
   stateBuffer_.insert(state);
   time_P_propagated = state->time;  //will be set upon first IMU message
 
-  ROS_INFO_STREAM("Initializing msf_core which was compiled on :" <<__DATE__);
+  ROS_INFO_STREAM("Initializing msf_core (built: " <<__DATE__<<")");
 
   //  print published/subscribed topics
   ros::V_string topics;
@@ -902,105 +688,11 @@ void MSF_Core<EKFState_T>::addMeasurement(
   }
 
   // now publish the best current estimate
-  static int seq_m = 0;
-
-  // publish correction for external propagation
   shared_ptr<EKFState_T>& latestState = stateBuffer_.getLast();
 
-  msgCorrect_.header.stamp = ros::Time(latestState->time);
-  msgCorrect_.header.seq = seq_m;
-  msgCorrect_.angular_velocity.x = 0;
-  msgCorrect_.angular_velocity.y = 0;
-  msgCorrect_.angular_velocity.z = 0;
-  msgCorrect_.linear_acceleration.x = 0;
-  msgCorrect_.linear_acceleration.y = 0;
-  msgCorrect_.linear_acceleration.z = 0;
+  propPToState(latestState);  // get the latest covariance
 
-  // prevent junk being sent to the external state propagation when data playback is (accidentally) on
-  if (data_playback_) {
-    for (int i = 0; i < HLI_EKF_STATE_SIZE; ++i) {
-      msgCorrect_.state[i] = 0;
-    }
-    msgCorrect_.state[6] = 1;
-    msgCorrect_.flag = sensor_fusion_comm::ExtEkf::initialization;
-
-    if (pubCorrect_.getNumSubscribers() > 0) {
-      ROS_ERROR_STREAM_THROTTLE(
-          1,
-          __FUNCTION__<< " You have connected the external propagation topic but at the same time data_playback is on.");
-    }
-
-  } else {
-    msgCorrect_.state[0] = latestState->template get<StateDefinition_T::p>()[0]
-        - hl_state_buf_.state[0];
-    msgCorrect_.state[1] = latestState->template get<StateDefinition_T::p>()[1]
-        - hl_state_buf_.state[1];
-    msgCorrect_.state[2] = latestState->template get<StateDefinition_T::p>()[2]
-        - hl_state_buf_.state[2];
-    msgCorrect_.state[3] = latestState->template get<StateDefinition_T::v>()[0]
-        - hl_state_buf_.state[3];
-    msgCorrect_.state[4] = latestState->template get<StateDefinition_T::v>()[1]
-        - hl_state_buf_.state[4];
-    msgCorrect_.state[5] = latestState->template get<StateDefinition_T::v>()[2]
-        - hl_state_buf_.state[5];
-
-    Eigen::Quaterniond hl_q(hl_state_buf_.state[6], hl_state_buf_.state[7],
-                            hl_state_buf_.state[8], hl_state_buf_.state[9]);
-    Eigen::Quaterniond qbuff_q = hl_q.inverse()
-        * latestState->template get<StateDefinition_T::q>();
-    msgCorrect_.state[6] = qbuff_q.w();
-    msgCorrect_.state[7] = qbuff_q.x();
-    msgCorrect_.state[8] = qbuff_q.y();
-    msgCorrect_.state[9] = qbuff_q.z();
-
-    msgCorrect_.state[10] =
-        latestState->template get<StateDefinition_T::b_w>()[0]
-            - hl_state_buf_.state[10];
-    msgCorrect_.state[11] =
-        latestState->template get<StateDefinition_T::b_w>()[1]
-            - hl_state_buf_.state[11];
-    msgCorrect_.state[12] =
-        latestState->template get<StateDefinition_T::b_w>()[2]
-            - hl_state_buf_.state[12];
-    msgCorrect_.state[13] =
-        latestState->template get<StateDefinition_T::b_a>()[0]
-            - hl_state_buf_.state[13];
-    msgCorrect_.state[14] =
-        latestState->template get<StateDefinition_T::b_a>()[1]
-            - hl_state_buf_.state[14];
-    msgCorrect_.state[15] =
-        latestState->template get<StateDefinition_T::b_a>()[2]
-            - hl_state_buf_.state[15];
-
-    msgCorrect_.flag = sensor_fusion_comm::ExtEkf::state_correction;
-  }
-
-  if (latestState->checkStateForNumeric()) {  //if not NaN
-    pubCorrect_.publish(msgCorrect_);
-  } else {
-    ROS_WARN_STREAM_THROTTLE(
-        1, "Not sending updates to external EKF, because state NaN/inf");
-  }
-
-  // publish state
-  sensor_fusion_comm::DoubleArrayStamped msgState;
-  msgState.header = msgCorrect_.header;
-  latestState->toFullStateMsg(msgState);
-  pubState_.publish(msgState);
-
-  if (pubPoseAfterUpdate_.getNumSubscribers()) {
-    // publish pose after correction with covariance
-    propPToState(latestState);  // get the covar
-
-    geometry_msgs::PoseWithCovarianceStamped msgPose;
-    msgPose.header.stamp = ros::Time(latestState->time);
-    msgPose.header.seq = seq_m;
-    msgPose.header.frame_id = "/world";
-
-    latestState->toPoseMsg(msgPose);
-    pubPoseAfterUpdate_.publish(msgPose);
-  }
-  seq_m++;
+  usercalc_.publishStateAfterUpdate(latestState);
 }
 
 template<typename EKFState_T>
@@ -1183,8 +875,6 @@ bool MSF_Core<EKFState_T>::applyCorrection(
   checkForNumeric(correction, "update");
 
   time_P_propagated = delaystate->time;  //set time latest propagated, we need to repropagate at least from here
-
-  publishCovImage(delaystate);  //publish cov image
 
   return 1;
 }

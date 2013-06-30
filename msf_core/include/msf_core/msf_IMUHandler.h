@@ -1,6 +1,6 @@
 /*
 
- Copyright (c) 2012, Simon Lynen, ASL, ETH Zurich, Switzerland
+ Copyright (c) 2013, Simon Lynen, ASL, ETH Zurich, Switzerland
  You can contact the author at <slynen at ethz dot ch>
 
  All rights reserved.
@@ -28,17 +28,37 @@
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  */
+#ifndef MSF_IMU_HANDLER_H_
+#define MSF_IMU_HANDLER_H_
 
 #include <msf_core/msf_sensorhandler.h>
-#include <msf_core/msf_types.tpp>
-#include <msf_core/msf_core.h>
 
-namespace msf_core {
+namespace msf_core{
+
 template<typename EKFState_T>
-MSF_SensorManager<EKFState_T>::MSF_SensorManager() {
-  sensorID_ = 0;
-  data_playback_ = false;
-  msf_core_.reset(new msf_core::MSF_Core<EKFState_T>(*this));  //TODO: make this a (better) design. This is so aweful.
-}
+class IMUHandler:public SensorHandler<EKFState_T>{
+ protected:
+  shared_ptr<MSF_Core<EKFState_T> > core_;
+public:
+  IMUHandler(MSF_SensorManager<EKFState_T>& mng,
+             const std::string& topic_namespace, const std::string& parameternamespace):
+               SensorHandler<EKFState_T>(mng, topic_namespace, parameternamespace){
+    core_ = mng.msf_core_;
+  }
+  virtual ~IMUHandler(){};
+  virtual bool initialize() = 0;
+  void process_imu(const msf_core::Vector3& linear_acceleration,
+      const msf_core::Vector3& angular_velocity, const double& msg_stamp,
+      size_t msg_seq){
+    core_->process_imu(linear_acceleration, angular_velocity, msg_stamp, msg_seq);
+  }
+  void process_state(const msf_core::Vector3& linear_acceleration,
+      const msf_core::Vector3& angular_velocity, const msf_core::Vector3& p,
+      const msf_core::Vector3& v, const msf_core::Quaternion& q, bool is_already_propagated, const double& msg_stamp,
+      size_t msg_seq){
+    core_->process_extstate(linear_acceleration, angular_velocity, p, v, q, is_already_propagated, msg_stamp, msg_seq);
+  }
+};
 }
 
+#endif /* MSF_IMU_HANDLER_H_ */

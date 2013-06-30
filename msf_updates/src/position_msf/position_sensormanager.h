@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <msf_core/msf_core.h>
 #include <msf_core/msf_sensormanagerROS.h>
+#include <msf_core/msf_IMUHandler_ROS.h>
 #include "msf_statedef.hpp"
 #include <msf_updates/position_sensor_handler/position_sensorhandler.h>
 #include <msf_updates/position_sensor_handler/position_measurement.h>
@@ -62,6 +63,8 @@ public:
 
   PositionSensorManager(ros::NodeHandle pnh = ros::NodeHandle("~/position_sensor"))
   {
+    imu_handler_.reset(new msf_core::IMUHandler_ROS<msf_updates::EKFState>(*this, "msf_core", "imu_handler"));
+
     position_handler_.reset(new PositionSensorHandler_T(*this, "", "position_sensor"));
     addHandler(position_handler_);
 
@@ -76,6 +79,7 @@ public:
   }
 
 private:
+  shared_ptr<msf_core::IMUHandler_ROS<msf_updates::EKFState> > imu_handler_;
   shared_ptr<PositionSensorHandler_T> position_handler_;
 
   Config_T config_;

@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ros/ros.h>
 #include <msf_core/msf_sensormanagerROS.h>
+#include <msf_core/msf_IMUHandler_ROS.h>
 #include <msf_core/msf_core.h>
 #include "msf_statedef.hpp"
 #include <msf_updates/pose_sensor_handler/pose_sensorhandler.h>
@@ -59,7 +60,8 @@ public:
 
   PosePressureSensorManager(ros::NodeHandle pnh = ros::NodeHandle("~/pose_pressure_sensor"))
   {
-    bool distortmeasurement = true;
+    imu_handler_.reset(new msf_core::IMUHandler_ROS<msf_updates::EKFState>(*this, "msf_core", "imu_handler"));
+    bool distortmeasurement = false;
     pose_handler_.reset(new PoseSensorHandler_T(*this, "", "pose_sensor", distortmeasurement));
     addHandler(pose_handler_);
 
@@ -78,6 +80,7 @@ public:
   }
 
 private:
+  shared_ptr<msf_core::IMUHandler_ROS<msf_updates::EKFState> > imu_handler_;
   shared_ptr<PoseSensorHandler_T> pose_handler_;
   shared_ptr<msf_pressure_sensor::PressureSensorHandler> pressure_handler_;
 

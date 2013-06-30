@@ -205,7 +205,7 @@ void MSF_InitMeasurement<EKFState_T>::apply(
     stateWithCovariance->w_m.setZero();
   }
 
-  core.initExternalPropagation(stateWithCovariance);
+  core.usercalc().publishStateInitial(stateWithCovariance);
 
 }
 }

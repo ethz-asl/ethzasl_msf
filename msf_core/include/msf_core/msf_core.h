@@ -37,8 +37,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <Eigen/Eigen>
 
+//TODO delete these //**//
 #include <ros/ros.h>
-
 // message includes
 #include <sensor_fusion_comm/DoubleArrayStamped.h>
 #include <sensor_fusion_comm/ExtState.h>
@@ -46,6 +46,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <sensor_msgs/Imu.h>
 #include <asctec_hl_comm/mav_imu.h>
+#include <tf/transform_broadcaster.h>
+//**//
 
 #ifdef WITHCOVIMAGE
 #include <image_transport/image_transport.h>
@@ -59,7 +61,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <queue>
 #include <msf_core/msf_state.h>
 #include <msf_core/msf_checkFuzzyTracking.h>
-#include <tf/transform_broadcaster.h>
 
 //good old days...
 //#define N_STATE_BUFFER 256	///< size of unsigned char, do not change!
@@ -72,6 +73,8 @@ enum{
 
 template<typename EKFState_T>
 class MSF_SensorManager;
+template<typename EKFState_T>
+class IMUHandler;
 
 /** \class MSF_Core
  *
@@ -84,6 +87,7 @@ template<typename EKFState_T>
 class MSF_Core
 {
   friend class MSF_MeasurementBase<EKFState_T>;
+  friend class IMUHandler<EKFState_T>;
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
@@ -112,12 +116,6 @@ public:
    * \param measurement a measurement containing initial values for the state
    */
   void init(shared_ptr<MSF_MeasurementBase<EKFState_T> > measurement);
-
-  /**
-   * \brief initialize the HLP based propagation
-   * \param state the state to send to the HLP
-   */
-  void initExternalPropagation(shared_ptr<EKFState_T> state);
 
   /**
    * \brief finds the closest state to the requested time in the internal state
@@ -173,6 +171,7 @@ public:
   MSF_Core(const MSF_SensorManager<EKFState_T>& usercalc);
   ~MSF_Core();
 
+  const MSF_SensorManager<EKFState_T>& usercalc() const;
 
 private:
 
@@ -199,33 +198,10 @@ private:
   bool predictionMade_; ///< is there a state prediction, so we can apply measurements?
 
 
-  /**
-   * used to determine if internal states get overwritten by the external
-   * state prediction (online) or internal state prediction is performed
-   * for log replay, when the external prediction is not available.
-   */
-  bool data_playback_;
   bool isfuzzyState_; ///< was the filter pushed to fuzzy state by a measurement?
 
   CheckFuzzyTracking<EKFState_T, nonDriftingStateType> fuzzyTracker_;  ///< watch dog to determine fuzzy tracking by observing non temporal drifting states
   const MSF_SensorManager<EKFState_T>& usercalc_; ///< a class which provides methods for customization of several calculations
-
-  ros::Publisher pubState_; ///< publishes all states of the filter
-  ros::Publisher pubPose_; ///< publishes 6DoF pose output
-  ros::Publisher pubPoseAfterUpdate_; ///< publishes 6DoF pose output after the update has been applied
-  ros::Publisher pubPoseCrtl_; ///< publishes 6DoF pose including velocity output
-  ros::Publisher pubCorrect_; ///< publishes corrections for external state propagation
-
-#ifdef  WITHCOVIMAGE
-  ros::Publisher pubCov_; ///< publishes the state covariance as image
-#endif
-
-  ros::Subscriber subState_; ///< subscriber to external state propagation
-  ros::Subscriber subImu_; ///< subscriber to IMU readings
-  ros::Subscriber subImuCustom_; ///< subscriber to IMU readings for asctec custom
-
-  sensor_fusion_comm::ExtEkf hl_state_buf_; ///< buffer to store external propagation data
-  sensor_fusion_comm::ExtEkf msgCorrect_;
 
   /**
    * \brief applies the correction
@@ -249,10 +225,8 @@ private:
    * \param msg the imu ros message
    * \sa{stateCallback}
    */
-  void imuCallback(const sensor_msgs::ImuConstPtr & msg);
-  void imuCallback_asctec(const asctec_hl_comm::mav_imuConstPtr & msg);
   void process_imu(const msf_core::Vector3&linear_acceleration,
-                   const msf_core::Vector3&angular_velocity, const ros::Time& msg_stamp, size_t msg_seq);
+                   const msf_core::Vector3&angular_velocity, const double& msg_stamp, size_t msg_seq);
 
   /// external state propagation
   /**
@@ -262,16 +236,16 @@ private:
    * \param msg the state message from the external propagation
    * \sa{imuCallback}
    */
-  void stateCallback(const sensor_fusion_comm::ExtEkfConstPtr & msg);
+  void process_extstate(const msf_core::Vector3& linear_acceleration,
+                     const msf_core::Vector3& angular_velocity, const msf_core::Vector3& p,
+                     const msf_core::Vector3& v, const msf_core::Quaternion& q, bool is_already_propagated, const double& msg_stamp,
+                     size_t msg_seq);
 
   /// propagates P by one step to distribute processing load
   void propagatePOneStep();
 
   ///checks the queue of measurements to be applied in the future
   void handlePendingMeasurements();
-
-  ///publish the state cov as image
-  void publishCovImage(shared_ptr<EKFState_T> state) const;
 
 };
 

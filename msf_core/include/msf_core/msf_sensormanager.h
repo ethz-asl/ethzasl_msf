@@ -59,6 +59,14 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
   typedef std::vector<shared_ptr<SensorHandler<EKFState_T> > > Handlers;
   Handlers handlers;  ///<a list of sensor handlers which provide measurements
 
+  /**
+   * used to determine if internal states get overwritten by the external
+   * state prediction (online) or internal state prediction is performed
+   * for log replay, when the external prediction is not available or should be
+   * done on the host.
+   */
+  bool data_playback_;
+
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   ;
@@ -66,6 +74,8 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
   shared_ptr<MSF_Core<EKFState_T> > msf_core_;  ///< the ekf core instance
 
   MSF_SensorManager();
+
+  bool data_playback(){return data_playback_;}
 
   virtual ~MSF_SensorManager() {
 
@@ -136,48 +146,14 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
   virtual double getParam_noise_gyrbias() const = 0;
   virtual double getParam_fuzzythres() const = 0;
 
+  /**
+   * This functions get called by the core to publish data to external middlewares like ROS
+   */
+  virtual void publishStateInitial(const shared_ptr<EKFState_T>& state) const = 0;
+  virtual void publishStateAfterPropagation(const shared_ptr<EKFState_T>& state) const = 0;
+  virtual void publishStateAfterUpdate(const shared_ptr<EKFState_T>& state) const = 0;
+
 };
-
-/**
- * \class SensorHandler
- * \brief handles a sensor driver which provides the sensor readings
- */
-template<typename EKFState_T>
-class SensorHandler {
-  friend class MSF_SensorManager<EKFState_T> ;
-  int lastseq_;
- protected:
-  MSF_SensorManager<EKFState_T>& manager_;
-  int sensorID;
-  std::string topic_namespace_;
-  std::string parameternamespace_;
-  void setSensorID(int ID) {
-    sensorID = ID;
-  }
-  void sequenceWatchDog(size_t seq, const std::string& topic) {
-    if ((int) seq != lastseq_ + 1 && lastseq_ != 0) {
-      ROS_WARN_STREAM(
-          topic << ": message drop curr seq:" << seq << " expected: "
-              << lastseq_ + 1);
-    }
-    lastseq_ = seq;
-  }
- public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  ;
-
-  SensorHandler(MSF_SensorManager<EKFState_T>& mng,
-                std::string& topic_namespace, std::string& parameternamespace)
-      : lastseq_(0),
-        manager_(mng),
-        sensorID(-1),
-        topic_namespace_(topic_namespace),
-        parameternamespace_(parameternamespace) {
-  }
-  virtual ~SensorHandler() {
-  }
-};
-
 }
 ;
 // end msf_core

@@ -40,6 +40,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <msf_core/msf_core.h>
 #include <msf_core/msf_sensormanagerROS.h>
+#include <msf_core/msf_IMUHandler_ROS.h>
 #include "msf_statedef.hpp"
 #include <msf_updates/pose_sensor_handler/pose_sensorhandler.h>
 #include <msf_updates/pose_sensor_handler/pose_measurement.h>
@@ -64,8 +65,8 @@ public:
   {
     bool distortmeas = false; ///<distort the pose measurements TODO make param
 
+    imu_handler_.reset(new msf_core::IMUHandler_ROS<msf_updates::EKFState>(*this, "msf_core", "imu_handler"));
     pose_handler_.reset(new PoseSensorHandler_T(*this, "", "pose_sensor", distortmeas));
-
 
     addHandler(pose_handler_);
 
@@ -80,6 +81,7 @@ public:
   }
 
 private:
+  shared_ptr<msf_core::IMUHandler_ROS<msf_updates::EKFState> > imu_handler_;
   shared_ptr<PoseSensorHandler_T> pose_handler_;
 
   Config_T config_;

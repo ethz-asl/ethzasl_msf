@@ -11,11 +11,9 @@
   <depend package="roscpp"/>
   <depend package="sensor_msgs"/>
   <depend package="dynamic_reconfigure"/>
-  <depend package="sensor_fusion_comm"/>
   <depend package="sm_timing"/>
   <depend package="tf"/>
-  <depend package="image_transport"/>
-
+  
   <rosdep name="eigen"/>
   <rosdep name="opencv2"/>
 

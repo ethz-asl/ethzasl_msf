@@ -141,24 +141,4 @@ bool checkForNumeric(const Eigen::MatrixBase<D> & mat,
   return true;
 }
 
-///// debug output to check misbehavior of Eigen
-//template<class T>
-//bool checkForNumeric(const T & vec, int size, const std::string & info)
-//{
-//  for (int i = 0; i < size; i++)
-//  {
-//    if (std::isnan(vec[i]))
-//    {
-//      std::cerr << "=== ERROR ===  " << info << ": NAN at index " << i << std::endl;
-//      return false;
-//    }
-//    if (isinf(vec[i]))
-//    {
-//      std::cerr << "=== ERROR ===  " << info << ": INF at index " << i << std::endl;
-//      return false;
-//    }
-//  }
-//  return true;
-//}
-
 #endif /* EIGEN_UTILS_H_ */
