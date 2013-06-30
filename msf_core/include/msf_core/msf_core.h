@@ -171,11 +171,11 @@ private:
   std::queue<shared_ptr<MSF_MeasurementBase<EKFState_T> > > queueFutureMeasurements_; ///< buffer for measurements to apply in future
 
   double time_P_propagated; ///< last time stamp where we have a valid propagation
+  typename StateBuffer_T::iterator_T it_last_IMU; ///< last time stamp where we have a valid state
   Eigen::Matrix<double, 3, 1> g_; ///< gravity vector
 
   bool initialized_; ///< is the filter initialized, so that we can propagate the state?
   bool predictionMade_; ///< is there a state prediction, so we can apply measurements?
-
 
   bool isfuzzyState_; ///< was the filter pushed to fuzzy state by a measurement?
 

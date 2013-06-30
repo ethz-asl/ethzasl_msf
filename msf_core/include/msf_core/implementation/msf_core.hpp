@@ -62,6 +62,8 @@ MSF_Core<EKFState_T>::MSF_Core(const MSF_SensorManager<EKFState_T>& usercalc)
   g_ << 0, 0, 9.80834;  // at 47.37 lat
 
   time_P_propagated = 0;
+
+  it_last_IMU = stateBuffer_.getIteratorEnd();
 }
 
 template<typename EKFState_T>
@@ -115,8 +117,11 @@ void MSF_Core<EKFState_T>::process_imu(
     return;
 
   sm::timing::Timer timer_PropgetClosestState("PropgetClosestState");
-  shared_ptr<EKFState_T> lastState = stateBuffer_.getClosestBefore(
-      msg_stamp);
+  if(it_last_IMU == stateBuffer_.getIteratorEnd()){
+    it_last_IMU = stateBuffer_.getIteratorClosestBefore(msg_stamp);
+  }
+
+  shared_ptr<EKFState_T> lastState = it_last_IMU->second;
   timer_PropgetClosestState.stop();
 
   sm::timing::Timer timer_PropPrepare("PropPrepare");
@@ -194,7 +199,7 @@ void MSF_Core<EKFState_T>::process_imu(
     predictionMade_ = true;
 
   sm::timing::Timer timer_PropInsertState("PropInsertState");
-  stateBuffer_.insert(currentState);
+  it_last_IMU = stateBuffer_.insert(currentState);
   timer_PropInsertState.stop();
 
   if (predictionMade_) {
@@ -214,7 +219,11 @@ void MSF_Core<EKFState_T>::process_extstate(const msf_core::Vector3& linear_acce
     return;
 
   //get the closest state and check validity
-  shared_ptr<EKFState_T> lastState = stateBuffer_.getClosestBefore(msg_stamp);
+  if(it_last_IMU == stateBuffer_.getIteratorEnd()){
+    it_last_IMU = stateBuffer_.getIteratorClosestBefore(msg_stamp);
+  }
+
+  shared_ptr<EKFState_T> lastState = it_last_IMU->second;
   if (lastState->time == -1) {
     ROS_WARN_STREAM_THROTTLE(2, "StateCallback: closest state is invalid\n");
     return;  // // early abort // //
@@ -550,7 +559,7 @@ void MSF_Core<EKFState_T>::init(
 
   assert(state->time != 0);
 
-  stateBuffer_.insert(state);
+  it_last_IMU = stateBuffer_.insert(state);
   time_P_propagated = state->time;  //will be set upon first IMU message
 
   ROS_INFO_STREAM("Initializing msf_core (built: " <<__DATE__<<")");
