@@ -48,7 +48,7 @@ PoseDistorter::PoseDistorter(const Eigen::Vector3d& meanposdrift, const Eigen::V
   }
   d_scale = distribution_t(meanscaledrift, stddevscaledrift);
 
-  ROS_WARN_STREAM("Distortion:\nPosition: Mean:"<<meanposdrift.transpose()<<" stddev: "<<stddevposdrift.transpose()<<
+  MSF_WARN_STREAM("Distortion:\nPosition: Mean:"<<meanposdrift.transpose()<<" stddev: "<<stddevposdrift.transpose()<<
                   "\nAttitude: Mean:"<<meanattdrift.transpose()<<" stddev: "<<stddevattdrift.transpose()<<
                   "\nScale: Mean:"<<meanscaledrift<<" stddev: "<<stddevscaledrift);
 
@@ -79,7 +79,7 @@ void PoseDistorter::distort(Eigen::Vector3d& pos, double dt){
   pos *= scaledrift_;
   ss<<" distorted: ["<<pos.transpose()<<"]";
 
-  ROS_INFO_STREAM(ss.str());
+  MSF_INFO_STREAM(ss.str());
 
 }
 
@@ -96,7 +96,7 @@ void PoseDistorter::distort(Eigen::Quaterniond& att, double dt){
 
   //augment state
   att *= attdrift_;
-  ROS_INFO_STREAM("Distort att:  ["<<attdrift_.w()<<", "<<attdrift_.x()<<", "<<attdrift_.y()<<", "<<attdrift_.z()<<"]");
+  MSF_INFO_STREAM("Distort att:  ["<<attdrift_.w()<<", "<<attdrift_.x()<<", "<<attdrift_.y()<<", "<<attdrift_.z()<<"]");
 
 }
 

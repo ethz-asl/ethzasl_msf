@@ -98,7 +98,7 @@ class MSF_InvalidMeasurement : public MSF_MeasurementBase<EKFState_T> {
   virtual void apply(
       shared_ptr<EKFState_T> UNUSEDPARAM(stateWithCovariance),
       MSF_Core<EKFState_T>& UNUSEDPARAM(core)) {
-    ROS_ERROR_STREAM(
+    MSF_ERROR_STREAM(
         "Called apply() on an MSF_InvalidMeasurement object. This should never happen.");
   }
   virtual std::string type() {
@@ -144,14 +144,14 @@ class MSF_Measurement : public MSF_MeasurementBase<EKFState_T> {
     makeFromSensorReadingImpl(reading);
 
     if (R_.minCoeff() == 0.0 && R_.maxCoeff() == 0.0) {  //check whether the user has set R
-      ROS_WARN_STREAM_THROTTLE(
+      MSF_WARN_STREAM_THROTTLE(
           2,
           "The measurement covariance matrix seems to be not set for the current measurement. Please double check!");
     }
 
     for (int i = 0; i < R_.RowsAtCompileTime; ++i) {
       if (R_(i, i) == 0.0) {
-        ROS_WARN_STREAM_THROTTLE(
+        MSF_WARN_STREAM_THROTTLE(
             2,
             "The measurement covariance matrix has some diagonal elements set to zero. Please double check!");
       }

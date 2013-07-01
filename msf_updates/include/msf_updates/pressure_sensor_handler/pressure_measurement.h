@@ -97,7 +97,7 @@ public:
 
     if (non_const_state->time == -1)
     {
-      ROS_WARN_STREAM("apply pressure update was called with an invalid state");
+      MSF_WARN_STREAM("apply pressure update was called with an invalid state");
       return;	// // early abort // //
     }
 

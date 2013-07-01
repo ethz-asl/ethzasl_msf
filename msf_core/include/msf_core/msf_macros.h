@@ -31,6 +31,8 @@
 #ifndef MSF_MACROS_H_
 #define MSF_MACROS_H_
 
+#include <chrono>
+
 #ifndef NUMERIC_PREC
 #define NUMERIC_PREC 4 //number of decimal places
 #endif
@@ -56,4 +58,124 @@
 #define DEG2RAD (M_PI/180.0)
 #endif
 
+#ifdef WIN32
+#define MSF_LIKELY(x)       (x)
+#define MSF_UNLIKELY(x)     (x)
+#else
+#define MSF_LIKELY(x)       __builtin_expect((x),1)
+#define MSF_UNLIKELY(x)     __builtin_expect((x),0)
+#endif
+
+#ifndef MSF_INFO_STREAM
+#define MSF_INFO_STREAM(x) std::cerr<<"\033[0;0m[INFO] "<<x<<"\033[0;0m"<<std::endl;
+#endif
+
+#ifndef MSF_WARN_STREAM
+#define MSF_WARN_STREAM(x) std::cerr<<"\033[0;33m[WARN] "<<x<<"\033[0;0m"<<std::endl;
+#endif
+
+#ifndef MSF_ERROR_STREAM
+#define MSF_ERROR_STREAM(x) std::cerr<<"\033[1;31m[ERROR] "<<x<<"\033[0;0m"<<std::endl;
+#endif
+
+//adapted from rosconsole
+//Copyright (c) 2008, Willow Garage, Inc.
+#define MSF_INFO_STREAM_ONCE(x) \
+  do \
+  { \
+    static bool __log_stream_once__hit__ = false; \
+    if (MSF_UNLIKELY(!__log_stream_once__hit__)) \
+    { \
+      __log_stream_once__hit__ = true; \
+      MSF_INFO_STREAM(x); \
+    } \
+  } while(0)
+
+
+#define MSF_WARN_STREAM_ONCE(x) \
+  do \
+  { \
+    static bool __log_stream_once__hit__ = false; \
+    if (MSF_UNLIKELY(!__log_stream_once__hit__)) \
+    { \
+      __log_stream_once__hit__ = true; \
+      MSF_WARN_STREAM(x); \
+    } \
+  } while(0)
+
+
+#define MSF_ERROR_STREAM_ONCE(x) \
+  do \
+  { \
+    static bool __log_stream_once__hit__ = false; \
+    if (MSF_UNLIKELY(!__log_stream_once__hit__)) \
+    { \
+      __log_stream_once__hit__ = true; \
+      MSF_ERROR_STREAM(x); \
+    } \
+  } while(0)
+
+
+#define MSF_LOG_STREAM_THROTTLE(rate, x) \
+  do \
+  { \
+    static double __log_stream_throttle__last_hit__ = 0.0; \
+    std::chrono::time_point<std::chrono::system_clock> __log_stream_throttle__now__ = std::chrono::system_clock::now(); \
+    if (MSF_UNLIKELY(__log_stream_throttle__last_hit__ + rate <= std::chrono::duration_cast<std::chrono::seconds>(__log_stream_throttle__now__.time_since_epoch()).count())) \
+    { \
+      __log_stream_throttle__last_hit__ = std::chrono::duration_cast<std::chrono::seconds>(__log_stream_throttle__now__.time_since_epoch()).count(); \
+      MSF_INFO_STREAM(x); \
+    } \
+  } while(0)
+
+#define MSF_WARN_STREAM_THROTTLE(rate, x) \
+  do \
+  { \
+    static double __log_stream_throttle__last_hit__ = 0.0; \
+    std::chrono::time_point<std::chrono::system_clock> __log_stream_throttle__now__ = std::chrono::system_clock::now(); \
+    if (MSF_UNLIKELY(__log_stream_throttle__last_hit__ + rate <= std::chrono::duration_cast<std::chrono::seconds>(__log_stream_throttle__now__.time_since_epoch()).count())) \
+    { \
+      __log_stream_throttle__last_hit__ = std::chrono::duration_cast<std::chrono::seconds>(__log_stream_throttle__now__.time_since_epoch()).count(); \
+      MSF_WARN_STREAM(x); \
+    } \
+  } while(0)
+
+#define MSF_ERROR_STREAM_THROTTLE(rate, x) \
+  do \
+  { \
+    static double __log_stream_throttle__last_hit__ = 0.0; \
+    std::chrono::time_point<std::chrono::system_clock> __log_stream_throttle__now__ = std::chrono::system_clock::now(); \
+    if (MSF_UNLIKELY(__log_stream_throttle__last_hit__ + rate <= std::chrono::duration_cast<std::chrono::seconds>(__log_stream_throttle__now__.time_since_epoch()).count())) \
+    { \
+      __log_stream_throttle__last_hit__ = std::chrono::duration_cast<std::chrono::seconds>(__log_stream_throttle__now__.time_since_epoch()).count(); \
+      MSF_ERROR_STREAM(x); \
+    } \
+  } while(0)
+
+#define MSF_INFO_STREAM_COND(cond, x) \
+  do \
+  {  \
+    if (MSF_UNLIKELY(cond)) \
+    { \
+      MSF_INFO_STREAM(x); \
+    } \
+  } while(0)
+
+#define MSF_WARN_STREAM_COND(cond, x) \
+  do \
+  {  \
+    if (MSF_UNLIKELY(cond)) \
+    { \
+      MSF_WARN_STREAM(x); \
+    } \
+  } while(0)
+
+#define MSF_ERROR_STREAM_COND(cond, x) \
+  do \
+  {  \
+    if (MSF_UNLIKELY(cond)) \
+    { \
+      MSF_ERROR_STREAM(x); \
+    } \
+  } while(0)
 #endif /* MSF_MACROS_H_ */

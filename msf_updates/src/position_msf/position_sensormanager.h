@@ -101,7 +101,7 @@ private:
   void init(double scale) const
   {
     if(scale < 0.001){
-      ROS_WARN_STREAM("init scale is "<<scale<<" correcting to 1");
+      MSF_WARN_STREAM("init scale is "<<scale<<" correcting to 1");
       scale = 1;
     }
 
@@ -130,11 +130,11 @@ private:
 
     p_vc = position_handler_->getPositionMeasurement();
 
-    ROS_INFO_STREAM("initial measurement pos:["<<p_vc.transpose()<<"] orientation: "<<STREAMQUAT(q));
+    MSF_INFO_STREAM("initial measurement pos:["<<p_vc.transpose()<<"] orientation: "<<STREAMQUAT(q));
 
     // check if we have already input from the measurement sensor
     if (p_vc.norm() == 0)
-      ROS_WARN_STREAM("No measurements received yet to initialize position - using [0 0 0]");
+      MSF_WARN_STREAM("No measurements received yet to initialize position - using [0 0 0]");
 
     ros::NodeHandle pnh("~");
     pnh.param("position_sensor/init/p_ip/x", p_ip[0], 0.0);

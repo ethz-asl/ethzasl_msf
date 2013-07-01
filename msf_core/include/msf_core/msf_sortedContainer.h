@@ -34,6 +34,7 @@
 
 #include <msf_core/msf_types.tpp>
 #include <msf_core/msf_tools.h>
+#include <msf_core/msf_macros.h>
 #include <iomanip>
 
 namespace msf_core {
@@ -350,7 +351,7 @@ class SortedContainer {
           it2 != stateList.end(); ++it2) {
         ss << it2->first << std::endl;
       }
-      std::cerr<<"[WARN] "<<ss.str()<<std::endl;
+      MSF_WARN_STREAM(ss.str());
 
       return getClosest(timeOld);
     }

@@ -90,15 +90,15 @@ msf_core::Vector3 GPSConversion::wgs84ToEcef(const double & latitude, const doub
 msf_core::Vector3 GPSConversion::ecefToEnu(const msf_core::Vector3 & ecef) const
 {
   if(ecef_ref_point_.norm() == 0){
-    ROS_ERROR_STREAM_ONCE("The gps reference is not initialized. Returning global coordinates. This warning will only show once.");
+    MSF_ERROR_STREAM_ONCE("The gps reference is not initialized. Returning global coordinates. This warning will only show once.");
   }
   return ecef_ref_orientation_ * (ecef - ecef_ref_point_);
 }
 
 void GPSConversion::adjustReference(double z_corr){
-  ROS_WARN_STREAM("z-ref old: "<<ecef_ref_point_(2));
+  MSF_WARN_STREAM("z-ref old: "<<ecef_ref_point_(2));
   ecef_ref_point_(2) += z_corr;
-  ROS_WARN_STREAM("z-ref new: "<<ecef_ref_point_(2));
+  MSF_WARN_STREAM("z-ref new: "<<ecef_ref_point_(2));
 }
 
 }

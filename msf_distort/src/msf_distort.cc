@@ -97,7 +97,7 @@ int main(int argc, char** argv){
   for(unsigned int i=0; i<topics.size(); i++)
     topicsStr+=("\t\t" + topics.at(i) + "\n");
 
-  ROS_INFO_STREAM(""<< topicsStr);
+  MSF_INFO_STREAM(""<< topicsStr);
 
   ros::spin();
 

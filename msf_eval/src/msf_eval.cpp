@@ -92,7 +92,7 @@ int main(int argc, char **argv)
 
   if (argc < 4)
   {
-    ROS_ERROR_STREAM("usage: ./"<<argv[0]<<" bagfile EVAL_topic GT_topic [singleRunOnly]");
+    MSF_ERROR_STREAM("usage: ./"<<argv[0]<<" bagfile EVAL_topic GT_topic [singleRunOnly]");
     return -1;
   }
   bool singleRun = false;
@@ -102,9 +102,9 @@ int main(int argc, char **argv)
   }
 
   if(singleRun){
-    ROS_WARN_STREAM("Doing only a single run.");
+    MSF_WARN_STREAM("Doing only a single run.");
   }else{
-    ROS_WARN_STREAM("Will process the dataset from different starting points.");
+    MSF_WARN_STREAM("Will process the dataset from different starting points.");
   }
 
   typedef geometry_msgs::TransformStamped GT_TYPE;
@@ -139,19 +139,19 @@ int main(int argc, char **argv)
   //check topics
   if (view_EVAL.size() == 0)
   {
-    ROS_ERROR_STREAM("The bag you provided does not contain messages for topic "<<argv[EVAL_topic]);
+    MSF_ERROR_STREAM("The bag you provided does not contain messages for topic "<<argv[EVAL_topic]);
     return -1;
   }
   if (view_GT.size() == 0)
   {
-    ROS_ERROR_STREAM("The bag you provided does not contain messages for topic "<<argv[GT_topic]);
+    MSF_ERROR_STREAM("The bag you provided does not contain messages for topic "<<argv[GT_topic]);
     return -1;
   }
 
   //litter console with number of messages
-  ROS_INFO_STREAM("Reading from "<<argv[bagfile]);
-  ROS_INFO_STREAM("Topic "<<argv[EVAL_topic]<<", size: "<<view_EVAL.size());
-  ROS_INFO_STREAM("Topic "<<argv[GT_topic]<<", size: "<<view_GT.size());
+  MSF_INFO_STREAM("Reading from "<<argv[bagfile]);
+  MSF_INFO_STREAM("Topic "<<argv[EVAL_topic]<<", size: "<<view_EVAL.size());
+  MSF_INFO_STREAM("Topic "<<argv[GT_topic]<<", size: "<<view_GT.size());
 
   //get times of first messages
   GT_TYPE::ConstPtr GT_begin = view_GT.begin()->instantiate<GT_TYPE>();
@@ -159,8 +159,8 @@ int main(int argc, char **argv)
   EVAL_TYPE::ConstPtr POSE_begin = view_EVAL.begin()->instantiate<EVAL_TYPE>();
   assert(POSE_begin);
 
-  ROS_INFO_STREAM("First GT data at "<<GT_begin->header.stamp);
-  ROS_INFO_STREAM("First EVAL data at "<<POSE_begin->header.stamp);
+  MSF_INFO_STREAM("First GT data at "<<GT_begin->header.stamp);
+  MSF_INFO_STREAM("First EVAL data at "<<POSE_begin->header.stamp);
 
   while (true) // start eval from different starting points
   {
@@ -190,14 +190,14 @@ int main(int argc, char **argv)
         it_GT++;
         if (it_GT == view_GT.end())
         {
-          ROS_ERROR_STREAM("Time synchronization failed");
+          MSF_ERROR_STREAM("Time synchronization failed");
           return false;
         }
       }
       else
       {
         start = time_GT;
-        ROS_INFO_STREAM("Time synced! GT start: "<<start <<" EVAL start: "<<time_EKF);
+        MSF_INFO_STREAM("Time synced! GT start: "<<start <<" EVAL start: "<<time_EKF);
         break;
       }
     }
@@ -213,7 +213,7 @@ int main(int argc, char **argv)
     double ds = 0.0; // distance travelled
     ros::Time lastTime(0.0);
 
-    ROS_INFO_STREAM("Processing measurements... Current start point: "<<startOffset<<"s into the bag.");
+    MSF_INFO_STREAM("Processing measurements... Current start point: "<<startOffset<<"s into the bag.");
 
     for (; it_GT != view_GT.end(); ++it_GT)
     {
@@ -236,7 +236,7 @@ int main(int argc, char **argv)
         if (it_EVAL == view_EVAL.end())
         {
           terminate = true;
-          ROS_INFO_STREAM("done. All EKF meas processed!");
+          MSF_INFO_STREAM("done. All EKF meas processed!");
           break;
         }
         pose = it_EVAL->instantiate<EVAL_TYPE>();
@@ -288,7 +288,7 @@ int main(int argc, char **argv)
           if ((T_WgBg * T_WgBg_last.inverse()).t().norm() > .1)
           {
             ds += (T_WgBg.t() - T_WgBg_last.t()).norm();
-            //ROS_INFO_STREAM((T_WgBg*T_WgBg_last.inverse()).t().norm());
+            //MSF_INFO_STREAM((T_WgBg*T_WgBg_last.inverse()).t().norm());
             // store last GT transformation
             T_WgBg_last = T_WgBg;
           }
@@ -332,7 +332,7 @@ int main(int argc, char **argv)
       }
     }
 
-    ROS_INFO_STREAM("Added "<<ctr<<" measurement edges.");
+    MSF_INFO_STREAM("Added "<<ctr<<" measurement edges.");
 
     //where in the bag should the next eval start
     startOffset += ros::Duration(timeDiscretization);

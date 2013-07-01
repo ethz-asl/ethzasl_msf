@@ -43,20 +43,20 @@ SensorHandler<msf_updates::EKFState>(meas, topic_namespace, parameternamespace),
 {
   ros::NodeHandle pnh("~/"+parameternamespace);
 
-  ROS_INFO_STREAM("Loading parameters for pose sensor from namespace: "<<pnh.getNamespace());
+  MSF_INFO_STREAM("Loading parameters for pose sensor from namespace: "<<pnh.getNamespace());
 
   pnh.param("pose_absolute_measurements", provides_absolute_measurements_, true);
   pnh.param("pose_measurement_world_sensor", measurement_world_sensor_, true);
   pnh.param("pose_use_fixed_covariance", use_fixed_covariance_, false);
 
-  ROS_INFO_COND(measurement_world_sensor_, "Pose sensor is interpreting measurement as sensor w.r.t. world");
-  ROS_INFO_COND(!measurement_world_sensor_, "Pose sensor is interpreting measurement as world w.r.t. sensor (e.g. ethzasl_ptam)");
+  MSF_INFO_STREAM_COND(measurement_world_sensor_, "Pose sensor is interpreting measurement as sensor w.r.t. world");
+  MSF_INFO_STREAM_COND(!measurement_world_sensor_, "Pose sensor is interpreting measurement as world w.r.t. sensor (e.g. ethzasl_ptam)");
 
-  ROS_INFO_COND(use_fixed_covariance_, "Pose sensor is using fixed covariance");
-  ROS_INFO_COND(!use_fixed_covariance_, "Pose sensor is using covariance from sensor");
+  MSF_INFO_STREAM_COND(use_fixed_covariance_, "Pose sensor is using fixed covariance");
+  MSF_INFO_STREAM_COND(!use_fixed_covariance_, "Pose sensor is using covariance from sensor");
 
-  ROS_INFO_COND(provides_absolute_measurements_, "Pose sensor is handling measurements as absolute values");
-  ROS_INFO_COND(!provides_absolute_measurements_, "Pose sensor is handling measurements as relative values");
+  MSF_INFO_STREAM_COND(provides_absolute_measurements_, "Pose sensor is handling measurements as absolute values");
+  MSF_INFO_STREAM_COND(!provides_absolute_measurements_, "Pose sensor is handling measurements as relative values");
 
   ros::NodeHandle nh("msf_updates/" + topic_namespace);
   subPoseWithCovarianceStamped_ = nh.subscribe<geometry_msgs::PoseWithCovarianceStamped>("pose_with_covariance_input", 20, &PoseSensorHandler::measurementCallback, this);
@@ -154,7 +154,7 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(cons
 {
 
   this->sequenceWatchDog(msg->header.seq, subPoseWithCovarianceStamped_.getTopic());
-  ROS_INFO_STREAM_ONCE("*** pose sensor got first measurement from topic "<<this->topic_namespace_<<"/"<<subPoseWithCovarianceStamped_.getTopic()<<" ***");
+  MSF_INFO_STREAM_ONCE("*** pose sensor got first measurement from topic "<<this->topic_namespace_<<"/"<<subPoseWithCovarianceStamped_.getTopic()<<" ***");
   ProcessPoseMeasurement(msg);
 
 }
@@ -163,10 +163,10 @@ template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(const geometry_msgs::TransformStampedConstPtr & msg)
 {
   this->sequenceWatchDog(msg->header.seq, subTransformStamped_.getTopic());
-  ROS_INFO_STREAM_ONCE("*** pose sensor got first measurement from topic "<<this->topic_namespace_<<"/"<<subTransformStamped_.getTopic()<<" ***");
+  MSF_INFO_STREAM_ONCE("*** pose sensor got first measurement from topic "<<this->topic_namespace_<<"/"<<subTransformStamped_.getTopic()<<" ***");
 
   if(msg->header.seq%5!=0){ //slow down vicon
-    ROS_WARN_STREAM_THROTTLE(30, "Measurement throttling is on, dropping every but the 5th message");
+    MSF_WARN_STREAM_THROTTLE(30, "Measurement throttling is on, dropping every but the 5th message");
     return;
   }
 
@@ -174,7 +174,7 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(cons
 
   if (!use_fixed_covariance_)  // take covariance from sensor
   {
-    ROS_WARN_STREAM_THROTTLE(2,"Provided message type without covariance but set fixed_covariance=false at the same time. Discarding message.");
+    MSF_WARN_STREAM_THROTTLE(2,"Provided message type without covariance but set fixed_covariance=false at the same time. Discarding message.");
     return;
   }
 
@@ -198,13 +198,13 @@ template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(const geometry_msgs::PoseStampedConstPtr & msg)
 {
   this->sequenceWatchDog(msg->header.seq, subPoseStamped_.getTopic());
-  ROS_INFO_STREAM_ONCE("*** pose sensor got first measurement from topic "<<this->topic_namespace_<<"/"<<subPoseStamped_.getTopic()<<" ***");
+  MSF_INFO_STREAM_ONCE("*** pose sensor got first measurement from topic "<<this->topic_namespace_<<"/"<<subPoseStamped_.getTopic()<<" ***");
 
   geometry_msgs::PoseWithCovarianceStampedPtr pose(new geometry_msgs::PoseWithCovarianceStamped());
 
   if (!use_fixed_covariance_)  // take covariance from sensor
   {
-    ROS_WARN_STREAM_THROTTLE(2,"Provided message type without covariance but set fixed_covariance=false at the same time. Discarding message.");
+    MSF_WARN_STREAM_THROTTLE(2,"Provided message type without covariance but set fixed_covariance=false at the same time. Discarding message.");
     return;
   }
 

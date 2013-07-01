@@ -126,7 +126,7 @@ void MSF_Core<EKFState_T>::process_imu(
 
   sm::timing::Timer timer_PropPrepare("PropPrepare");
   if (lastState->time == -1) {
-    ROS_WARN_STREAM_THROTTLE(
+    MSF_WARN_STREAM_THROTTLE(
         2, __FUNCTION__<<"ImuCallback: closest state is invalid\n");
     return;  // // early abort // //
   }
@@ -138,7 +138,7 @@ void MSF_Core<EKFState_T>::process_imu(
   if (currentState->time - lastState->time < -0.01 && predictionMade_) {
     initialized_ = false;
     predictionMade_ = false;
-    ROS_ERROR_STREAM(
+    MSF_ERROR_STREAM(
         __FUNCTION__<<"latest IMU message was out of order by a too large amount, resetting EKF: "
         "last-state-time: "<<msf_core::timehuman(lastState->time)<<" "<< "current-imu-time: "<< msf_core::timehuman(currentState->time));
     return;
@@ -157,7 +157,7 @@ void MSF_Core<EKFState_T>::process_imu(
   else {
     //try to get the state before the current time
     if (lastState->time == -1) {
-      ROS_WARN_STREAM(
+      MSF_WARN_STREAM(
           "Accelerometer readings had a spike, but no prior state was in the "
           "buffer to take cleaner measurements from");
       return;
@@ -166,12 +166,12 @@ void MSF_Core<EKFState_T>::process_imu(
   }
   if (!predictionMade_) {
     if (lastState->time == -1) {
-      ROS_WARN_STREAM("Wanted to compare prediction time offset to last state, "
+      MSF_WARN_STREAM("Wanted to compare prediction time offset to last state, "
       "but no prior state was in the buffer to take cleaner measurements from");
       return;
     }
     if (fabs(currentState->time - lastState->time) > 0.1) {
-      ROS_WARN_STREAM_THROTTLE(
+      MSF_WARN_STREAM_THROTTLE(
           2, "large time-gap re-initializing to last state\n");
       typename StateBuffer_T::Ptr_T tmp = stateBuffer_.updateTime(
           lastState->time, currentState->time);
@@ -181,7 +181,7 @@ void MSF_Core<EKFState_T>::process_imu(
   }
 
   if (lastState->time == -1) {
-    ROS_WARN_STREAM(
+    MSF_WARN_STREAM(
         "Wanted to propagate state, but no valid prior state could be found in the buffer");
     return;
   }
@@ -225,7 +225,7 @@ void MSF_Core<EKFState_T>::process_extstate(const msf_core::Vector3& linear_acce
 
   shared_ptr<EKFState_T> lastState = it_last_IMU->second;
   if (lastState->time == -1) {
-    ROS_WARN_STREAM_THROTTLE(2, "StateCallback: closest state is invalid\n");
+    MSF_WARN_STREAM_THROTTLE(2, "StateCallback: closest state is invalid\n");
     return;  // // early abort // //
   }
 
@@ -249,7 +249,7 @@ void MSF_Core<EKFState_T>::process_extstate(const msf_core::Vector3& linear_acce
     if (fabs(currentState->time - lastState->time) > 5) {
       typename StateBuffer_T::Ptr_T tmp = stateBuffer_.updateTime(
           lastState->time, currentState->time);
-      ROS_WARN_STREAM_THROTTLE(
+      MSF_WARN_STREAM_THROTTLE(
           2,
           "large time-gap re-initializing to last state: "<<msf_core::timehuman(tmp->time));
       return;  // // early abort // // (if timegap too big)
@@ -395,11 +395,11 @@ void MSF_Core<EKFState_T>::propagatePOneStep() {
         stateIteratorPLastPropagatedNext->second
             ->template get<StateDefinition_T::p>(),
         "prediction p")) {
-      ROS_WARN_STREAM(
+      MSF_WARN_STREAM(
           "prop state from:\t"<<stateIteratorPLastPropagated->second->toEigenVector());
-      ROS_WARN_STREAM(
+      MSF_WARN_STREAM(
           "prop state to:\t"<<stateIteratorPLastPropagatedNext->second->toEigenVector());
-      ROS_ERROR_STREAM(__FUNCTION__<<" Resetting EKF");
+      MSF_ERROR_STREAM(__FUNCTION__<<" Resetting EKF");
       predictionMade_ = initialized_ = false;
     }
   }
@@ -431,7 +431,7 @@ void MSF_Core<EKFState_T>::predictProcessCovariance(
   double dt = state_new->time - state_old->time;
 
   if (dt <= 0) {
-    ROS_WARN_STREAM_THROTTLE(
+    MSF_WARN_STREAM_THROTTLE(
         1,
         "Requested cov prop between two states that where "<<dt<<" seconds apart. Rejecting");
     return;
@@ -562,13 +562,13 @@ void MSF_Core<EKFState_T>::init(
   it_last_IMU = stateBuffer_.insert(state);
   time_P_propagated = state->time;  //will be set upon first IMU message
 
-  ROS_INFO_STREAM("Initializing msf_core (built: " <<__DATE__<<")");
+  MSF_INFO_STREAM("Initializing msf_core (built: " <<__DATE__<<")");
 
   //echo params
-  ROS_INFO_STREAM(
+  MSF_INFO_STREAM(
       "Core parameters:"<<std::endl<< "\tfixed_bias:\t"<<usercalc_.getParam_fixed_bias()<<std::endl<< "\tfuzzythres:\t"<<usercalc_.getParam_fuzzythres()<<std::endl<< "\tnoise_acc:\t"<<usercalc_.getParam_noise_acc()<<std::endl<< "\tnoise_accbias:\t"<<usercalc_.getParam_noise_accbias()<<std::endl<< "\tnoise_gyr:\t"<<usercalc_.getParam_noise_gyr()<<std::endl<< "\tnoise_gyrbias:\t"<<usercalc_.getParam_noise_gyrbias()<<std::endl);
 
-  ROS_INFO_STREAM("core init with state:"<<std::endl<<state->print());
+  MSF_INFO_STREAM("core init with state:"<<std::endl<<state->print());
   initialized_ = true;
 
   sm::timing::Timing::print(std::cout);
@@ -584,13 +584,13 @@ void MSF_Core<EKFState_T>::addMeasurement(
 
   //check if the measurement is in the future where we don't have imu measurements yet
   if (measurement->time > stateBuffer_.getLast()->time) {
-    //ROS_WARN_STREAM("You tried to give me a measurement in the future. Are you sure your clocks are synced and delays compensated correctly? I will store that and apply it next time... [measurement: "<<timehuman(measurement->time)<<" (s) latest state: "<<timehuman(StateBuffer_.getLast()->time)<<" (s)]");
+    //MSF_WARN_STREAM("You tried to give me a measurement in the future. Are you sure your clocks are synced and delays compensated correctly? I will store that and apply it next time... [measurement: "<<timehuman(measurement->time)<<" (s) latest state: "<<timehuman(StateBuffer_.getLast()->time)<<" (s)]");
     queueFutureMeasurements_.push(measurement);
     return;
   }
   //check if there is still a state in the buffer for this message (too old)
   if (measurement->time < stateBuffer_.getFirst()->time) {
-    ROS_WARN_STREAM(
+    MSF_WARN_STREAM(
         "You tried to give me a measurement which is too far in the past. Are you sure your clocks are synced and delays compensated correctly? [measurement: "<<timehuman(measurement->time)<<" (s) first state in buffer: "<<timehuman(stateBuffer_.getFirst()->time)<<" (s)]");
     return;  //reject measurements too far in the past
   }
@@ -616,7 +616,7 @@ void MSF_Core<EKFState_T>::addMeasurement(
         it_meas->second->time);  //propagates covariance to state
     timer_meas_get_state.stop();
     if (state->time <= 0) {
-      ROS_ERROR_STREAM_THROTTLE(
+      MSF_ERROR_STREAM_THROTTLE(
           1, __FUNCTION__<< " getClosestState returned an invalid state");
       continue;
     }
@@ -648,7 +648,7 @@ void MSF_Core<EKFState_T>::addMeasurement(
         it_curr != it_end && it_next != it_end && it_curr->second->time != -1
             && it_next->second->time != -1; ++it_curr, ++it_next) {  //propagate to selected state
       if (it_curr->second == it_next->second) {
-        ROS_ERROR_STREAM(__FUNCTION__<< " propagation : it_curr points to same state as it_next. This must not happen.");
+        MSF_ERROR_STREAM(__FUNCTION__<< " propagation : it_curr points to same state as it_next. This must not happen.");
         continue;
       }
       if (!initialized_ || !predictionMade_)  //break loop if EKF reset in the meantime
@@ -660,7 +660,7 @@ void MSF_Core<EKFState_T>::addMeasurement(
   }
 
   if (!appliedOne) {
-    ROS_WARN_STREAM("no measurement was applied, this should not happen");
+    MSF_WARN_STREAM("no measurement was applied, this should not happen");
     return;
   }
 
@@ -678,7 +678,7 @@ shared_ptr<msf_core::MSF_MeasurementBase<EKFState_T> > MSF_Core<
   typename measurementBufferT::iterator_T it = MeasurementBuffer_
       .getIteratorAtValue(time);
   if (it->second->time != time) {
-    ROS_WARN_STREAM("getPreviousMeasurement: Error invalid iterator at value");
+    MSF_WARN_STREAM("getPreviousMeasurement: Error invalid iterator at value");
     return MeasurementBuffer_.getInvalid();
   }
   --it;
@@ -689,7 +689,7 @@ shared_ptr<msf_core::MSF_MeasurementBase<EKFState_T> > MSF_Core<
     --it;
   }
   if (it == itbeforebegin) {
-    ROS_WARN_STREAM("getPreviousMeasurement: Error hit before begin");
+    MSF_WARN_STREAM("getPreviousMeasurement: Error hit before begin");
     return MeasurementBuffer_.getInvalid();
   }
   return it->second;
@@ -713,7 +713,7 @@ shared_ptr<EKFState_T> MSF_Core<EKFState_T>::getClosestState(
   shared_ptr<EKFState_T> closestState = it->second;
 
   if (closestState->time == -1 || fabs(closestState->time - timenow) > 0.1) {  // check if the state really is close to the requested time. With the new buffer this might not be given.
-    ROS_ERROR_STREAM(
+    MSF_ERROR_STREAM(
         __FUNCTION__<< " Requested closest state to "<<timehuman(timenow)<<" but there was no suitable state in the map");
     return stateBuffer_.getInvalid();  // // early abort // //  not enough predictions made yet to apply measurement (too far in past)
   }
@@ -762,7 +762,7 @@ shared_ptr<EKFState_T> MSF_Core<EKFState_T>::getClosestState(
   propPToState(closestState);  // catch up with covariance propagation if necessary
 
   if (!closestState->checkStateForNumeric()) {
-    ROS_ERROR_STREAM(
+    MSF_ERROR_STREAM(
         __FUNCTION__<< " State interpolation: interpolated state is invalid (nan)");
     return stateBuffer_.getInvalid();  // // early abort // //
   }

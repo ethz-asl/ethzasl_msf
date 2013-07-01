@@ -51,7 +51,7 @@ class SensorHandler {
   }
   void sequenceWatchDog(size_t seq, const std::string& topic) {
     if ((int) seq != lastseq_ + 1 && lastseq_ != 0) {
-      ROS_WARN_STREAM(
+      MSF_WARN_STREAM(
           topic << ": message drop curr seq:" << seq << " expected: "
               << lastseq_ + 1);
     }

@@ -124,7 +124,7 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
         && config.core_set_height == true) {
       Eigen::Matrix<double, 3, 1> p = pose_handler_->getPositionMeasurement();
       if (p.norm() == 0) {
-        ROS_WARN_STREAM(
+        MSF_WARN_STREAM(
             "No measurements received yet to initialize position. Height init not allowed.");
         return;
       }
@@ -159,20 +159,20 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     p_vc = pose_handler_->getPositionMeasurement();
     q_vc = pose_handler_->getAttitudeMeasurement();
 
-    ROS_INFO_STREAM(
+    MSF_INFO_STREAM(
         "initial measurement vision: pos:["<<p_vc.transpose()<<"] orientation: "<<STREAMQUAT(q_vc));
-    ROS_INFO_STREAM(
+    MSF_INFO_STREAM(
         "initial measurement position: pos:["<<p_pos.transpose()<<"]");
 
     // check if we have already input from the measurement sensor
     if (p_vc.norm() == 0)
-      ROS_WARN_STREAM(
+      MSF_WARN_STREAM(
           "No measurements received yet to initialize vision position - using [0 0 0]");
     if (p_pos.norm() == 0)
-      ROS_WARN_STREAM(
+      MSF_WARN_STREAM(
           "No measurements received yet to initialize absolute position - using [0 0 0]");
     if (q_vc.w() == 1)
-      ROS_WARN_STREAM(
+      MSF_WARN_STREAM(
           "No measurements received yet to initialize attitude - using [1 0 0 0]");
 
     ros::NodeHandle pnh("~");
@@ -186,8 +186,8 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     pnh.param("pose_sensor/init/q_ic/z", q_ic.z(), 0.0);
     q_ic.normalize();
 
-    ROS_INFO_STREAM("p_ic: "<<p_ic.transpose());
-    ROS_INFO_STREAM("q_ic: "<<STREAMQUAT(q_ic));
+    MSF_INFO_STREAM("p_ic: "<<p_ic.transpose());
+    MSF_INFO_STREAM("q_ic: "<<STREAMQUAT(q_ic));
 
     pnh.param("position_sensor/init/p_ip/x", p_ip[0], 0.0);
     pnh.param("position_sensor/init/p_ip/y", p_ip[1], 0.0);
@@ -202,8 +202,8 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     q = yawq;
     q_wv = (q * q_ic * q_vc.conjugate()).conjugate();
 
-    ROS_WARN_STREAM("q "<<STREAMQUAT(q));
-    ROS_WARN_STREAM("q_wv "<<STREAMQUAT(q_wv));
+    MSF_WARN_STREAM("q "<<STREAMQUAT(q));
+    MSF_WARN_STREAM("q_wv "<<STREAMQUAT(q_wv));
 
     Eigen::Matrix<double, 3, 1> p_vision = q_wv.conjugate().toRotationMatrix()
         * p_vc / scale - q.toRotationMatrix() * p_ic;
@@ -304,7 +304,7 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
 
     const EKFState_T& state = delaystate;
     if (state.get<StateDefinition_T::L>()(0) < 0) {
-      ROS_WARN_STREAM_THROTTLE(
+      MSF_WARN_STREAM_THROTTLE(
           1,
           "Negative scale detected: " << state.get<StateDefinition_T::L>()(0) << ". Correcting to 0.1");
       Eigen::Matrix<double, 1, 1> L_;

@@ -101,7 +101,7 @@ private:
     if((level & msf_updates::SinglePoseSensor_SET_HEIGHT) && config.core_set_height == true){
       Eigen::Matrix<double, 3, 1> p = pose_handler_->getPositionMeasurement();
       if (p.norm() == 0){
-        ROS_WARN_STREAM("No measurements received yet to initialize position. Height init not allowed.");
+        MSF_WARN_STREAM("No measurements received yet to initialize position. Height init not allowed.");
         return;
       }
       double scale =  p[2]/config.core_height;
@@ -143,9 +143,9 @@ private:
 
     // check if we have already input from the measurement sensor
     if (p_vc.norm() == 0)
-      ROS_WARN_STREAM("No measurements received yet to initialize position - using [0 0 0]");
+      MSF_WARN_STREAM("No measurements received yet to initialize position - using [0 0 0]");
     if (q_vc.w() == 1)
-      ROS_WARN_STREAM("No measurements received yet to initialize attitude - using [1 0 0 0]");
+      MSF_WARN_STREAM("No measurements received yet to initialize attitude - using [1 0 0 0]");
 
     ros::NodeHandle pnh("~");
     pnh.param("pose_sensor/init/p_ic/x", p_ic[0], 0.0);
@@ -237,7 +237,7 @@ private:
     const EKFState_T& state = delaystate;
     if (state.get<StateDefinition_T::L>()(0) < 0)
     {
-      ROS_WARN_STREAM_THROTTLE(1,"Negative scale detected: " << state.get<StateDefinition_T::L>()(0) << ". Correcting to 0.1");
+      MSF_WARN_STREAM_THROTTLE(1,"Negative scale detected: " << state.get<StateDefinition_T::L>()(0) << ". Correcting to 0.1");
       Eigen::Matrix<double, 1, 1> L_;
       L_ << 0.1;
       delaystate.set<StateDefinition_T::L>(L_);

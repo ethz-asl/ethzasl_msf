@@ -191,9 +191,9 @@ void MSF_InitMeasurement<EKFState_T>::apply(
 
   if (!(InitState.P.minCoeff() == 0 && InitState.P.maxCoeff() == 0)) {
     stateWithCovariance->P = InitState.P;
-    ROS_WARN_STREAM("Using user defined initial error state covariance");
+    MSF_WARN_STREAM("Using user defined initial error state covariance");
   } else {
-    ROS_WARN_STREAM(
+    MSF_WARN_STREAM(
         "Using simulated core plus fixed diag initial error state covariance");
   }
 

@@ -93,7 +93,7 @@ private:
 
       if(msg->header.seq % 100 == 0){ //only do this check from time to time
         if(R_.block<6, 6>(0, 0).determinant() < -0.001)
-          ROS_WARN_STREAM_THROTTLE(60,"The covariance matrix you provided for the pose sensor is not positive definite: "<<(R_.block<6, 6>(0, 0)));
+          MSF_WARN_STREAM_THROTTLE(60,"The covariance matrix you provided for the pose sensor is not positive definite: "<<(R_.block<6, 6>(0, 0)));
       }
 
       //clear cross-correlations between q and p
@@ -255,16 +255,16 @@ public:
       r_old(6, 0) = -2 * (q_err.w() * q_err.z() + q_err.x() * q_err.y()) / (1 - 2 * (q_err.y() * q_err.y() + q_err.z() * q_err.z()));
 
       if(!checkForNumeric(r_old, "r_old")){
-        ROS_ERROR_STREAM("r_old: "<<r_old);
-        ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
+        MSF_ERROR_STREAM("r_old: "<<r_old);
+        MSF_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
       }
       if(!checkForNumeric(H_new, "H_old")){
-        ROS_ERROR_STREAM("H_old: "<<H_new);
-        ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
+        MSF_ERROR_STREAM("H_old: "<<H_new);
+        MSF_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
       }
       if(!checkForNumeric(R_, "R_")){
-        ROS_ERROR_STREAM("R_: "<<R_);
-        ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
+        MSF_ERROR_STREAM("R_: "<<R_);
+        MSF_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
       }
 
       // call update step in base class
@@ -277,14 +277,14 @@ public:
       shared_ptr<msf_core::MSF_MeasurementBase<EKFState_T> > prevmeas_base = core.getPreviousMeasurement(this->time, this->sensorID_);
 
       if(prevmeas_base->time == -1){
-        ROS_WARN_STREAM("The previous measurement is invalid. Could not apply measurement! time:"<<this->time<<" sensorID: "<<this->sensorID_);
+        MSF_WARN_STREAM("The previous measurement is invalid. Could not apply measurement! time:"<<this->time<<" sensorID: "<<this->sensorID_);
         return;
       }
 
       //try to make this a pose measurement
       shared_ptr<PoseMeasurement> prevmeas = dynamic_pointer_cast<PoseMeasurement>(prevmeas_base);
       if(!prevmeas){
-        ROS_WARN_STREAM("The dynamic cast of the previous measurement has failed. Could not apply measurement");
+        MSF_WARN_STREAM("The dynamic cast of the previous measurement has failed. Could not apply measurement");
         return;
       }
 
@@ -292,7 +292,7 @@ public:
       shared_ptr<EKFState_T> state_nonconst_old = core.getClosestState(prevmeas->time);
 
       if(state_nonconst_old->time == -1){
-        ROS_WARN_STREAM("The state at the previous measurement is invalid. Could not apply measurement");
+        MSF_WARN_STREAM("The state at the previous measurement is invalid. Could not apply measurement");
         return;
       }
 
@@ -343,16 +343,16 @@ public:
 
 
       if(!checkForNumeric(r_old, "r_old")){
-        ROS_ERROR_STREAM("r_old: "<<r_old);
-        ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state_new).toEigenVector().transpose());
+        MSF_ERROR_STREAM("r_old: "<<r_old);
+        MSF_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state_new).toEigenVector().transpose());
       }
       if(!checkForNumeric(H_new, "H_old")){
-        ROS_ERROR_STREAM("H_old: "<<H_new);
-        ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state_new).toEigenVector().transpose());
+        MSF_ERROR_STREAM("H_old: "<<H_new);
+        MSF_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state_new).toEigenVector().transpose());
       }
       if(!checkForNumeric(R_, "R_")){
-        ROS_ERROR_STREAM("R_: "<<R_);
-        ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state_new).toEigenVector().transpose());
+        MSF_ERROR_STREAM("R_: "<<R_);
+        MSF_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state_new).toEigenVector().transpose());
       }
 
       // call update step in base class

@@ -118,7 +118,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
     for (unsigned int i = 0; i < topics.size(); i++)
       topicsStr += ("\t\t" + topics.at(i) + "\n");
 
-    ROS_INFO_STREAM(""<< topicsStr);
+    MSF_INFO_STREAM(""<< topicsStr);
   }
 
   virtual ~MSF_SensorManagerROS() {
@@ -237,7 +237,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
         msgCorrect_.state[6] = 1; //w
         msgCorrect_.flag = sensor_fusion_comm::ExtEkf::initialization;
 
-        ROS_ERROR_STREAM_THROTTLE(1, __FUNCTION__ <<
+        MSF_ERROR_STREAM_THROTTLE(1, __FUNCTION__ <<
                                   " You have connected the external propagation topic but at the same time data_playback is on.");
 
       } else {
@@ -271,7 +271,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
       if (state->checkStateForNumeric()) {  //if not NaN
         pubCorrect_.publish(msgCorrect_);
       } else {
-        ROS_WARN_STREAM_THROTTLE(
+        MSF_WARN_STREAM_THROTTLE(
             1, "Not sending updates to external EKF, because state NaN/inf");
       }
     }

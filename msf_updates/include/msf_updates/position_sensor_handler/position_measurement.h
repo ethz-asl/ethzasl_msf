@@ -83,7 +83,7 @@ private:
 
       if(msg->header.seq % 100 == 0){ //only do this check from time to time
         if(R_.block<3, 3>(0, 0).determinant() < -0.01)
-          ROS_WARN_STREAM_THROTTLE(60,"The covariance matrix you provided for the position sensor is not positive definite");
+          MSF_WARN_STREAM_THROTTLE(60,"The covariance matrix you provided for the position sensor is not positive definite");
       }
     }
   }
@@ -168,23 +168,23 @@ public:
       r_old.block<3, 1>(0, 0) = z_p_ - (state.get<StateDefinition_T::p>() + C_q.transpose() * state.get<StateDefinition_T::p_ip>());
 
       if(!checkForNumeric(r_old, "r_old")){
-        ROS_ERROR_STREAM("r_old: "<<r_old);
-        ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
+        MSF_ERROR_STREAM("r_old: "<<r_old);
+        MSF_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
       }
       if(!checkForNumeric(H_new, "H_old")){
-        ROS_ERROR_STREAM("H_old: "<<H_new);
-        ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
+        MSF_ERROR_STREAM("H_old: "<<H_new);
+        MSF_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
       }
       if(!checkForNumeric(R_, "R_")){
-        ROS_ERROR_STREAM("R_: "<<R_);
-        ROS_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
+        MSF_ERROR_STREAM("R_: "<<R_);
+        MSF_WARN_STREAM("state: "<<const_cast<EKFState_T&>(state).toEigenVector().transpose());
       }
 
       // call update step in base class
       this->calculateAndApplyCorrection(state_nonconst_new, core, H_new, r_old, R_);
 
     }else{
-      ROS_ERROR_STREAM_THROTTLE(1, "You chose to apply the position measurement as a relative quantitiy, which is currently not implemented.");
+      MSF_ERROR_STREAM_THROTTLE(1, "You chose to apply the position measurement as a relative quantitiy, which is currently not implemented.");
     }
   }
 };

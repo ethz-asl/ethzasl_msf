@@ -46,11 +46,11 @@ SensorHandler<msf_updates::EKFState>(meas, topic_namespace, parameternamespace),
   pnh.param("position_use_fixed_covariance", use_fixed_covariance_, false);
   pnh.param("position_absolute_measurements", provides_absolute_measurements_, false);
 
-  ROS_INFO_COND(use_fixed_covariance_, "Position sensor is using fixed covariance");
-  ROS_INFO_COND(!use_fixed_covariance_, "Position sensor is using covariance from sensor");
+  MSF_INFO_STREAM_COND(use_fixed_covariance_, "Position sensor is using fixed covariance");
+  MSF_INFO_STREAM_COND(!use_fixed_covariance_, "Position sensor is using covariance from sensor");
 
-  ROS_INFO_COND(provides_absolute_measurements_, "Position sensor is handling measurements as absolute values");
-  ROS_INFO_COND(!provides_absolute_measurements_, "Position sensor is handling measurements as relative values");
+  MSF_INFO_STREAM_COND(provides_absolute_measurements_, "Position sensor is handling measurements as absolute values");
+  MSF_INFO_STREAM_COND(!provides_absolute_measurements_, "Position sensor is handling measurements as relative values");
 
   ros::NodeHandle nh("msf_updates");
 
@@ -90,7 +90,7 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::processPositionMeasu
 
   if (!use_fixed_covariance_ && msg->covariance[0] == 0)  // take covariance from sensor
   {
-    ROS_WARN_STREAM_THROTTLE(2,"Provided message type without covariance but set fixed_covariance=false at the same time. Discarding message.");
+    MSF_WARN_STREAM_THROTTLE(2,"Provided message type without covariance but set fixed_covariance=false at the same time. Discarding message.");
     return;
   }
 
@@ -117,7 +117,7 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(
 {
   this->sequenceWatchDog(msg->header.seq, subPointStamped_.getTopic());
 
-  ROS_INFO_STREAM_ONCE("*** position sensor got first measurement from topic "<<this->topic_namespace_<<"/"<<subPointStamped_.getTopic()<<" ***");
+  MSF_INFO_STREAM_ONCE("*** position sensor got first measurement from topic "<<this->topic_namespace_<<"/"<<subPointStamped_.getTopic()<<" ***");
 
   msf_updates::PointWithCovarianceStampedPtr pointwCov(new msf_updates::PointWithCovarianceStamped);
   pointwCov->header = msg->header;
@@ -131,10 +131,10 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(
 {
   this->sequenceWatchDog(msg->header.seq, subTransformStamped_.getTopic());
 
-  ROS_INFO_STREAM_ONCE("*** position sensor got first measurement from topic "<<this->topic_namespace_<<"/"<<subTransformStamped_.getTopic()<<" ***");
+  MSF_INFO_STREAM_ONCE("*** position sensor got first measurement from topic "<<this->topic_namespace_<<"/"<<subTransformStamped_.getTopic()<<" ***");
 
   if(msg->header.seq%5!=0){ //slow down vicon
-    ROS_WARN_STREAM_ONCE("Measurement throttling is on, dropping every but the 5th message");
+    MSF_WARN_STREAM_ONCE("Measurement throttling is on, dropping every but the 5th message");
     return;
   }
 
@@ -156,14 +156,14 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(
 {
   this->sequenceWatchDog(msg->header.seq, subNavSatFix_.getTopic());
 
-  ROS_INFO_STREAM_ONCE("*** position sensor got first measurement from topic "<<this->topic_namespace_<<"/"<<subNavSatFix_.getTopic()<<" ***");
+  MSF_INFO_STREAM_ONCE("*** position sensor got first measurement from topic "<<this->topic_namespace_<<"/"<<subNavSatFix_.getTopic()<<" ***");
 
   //fixed covariance will be set in measurement class -> makeFromSensorReadingImpl
 
   static bool referenceinit = false; //TODO dynreconf reset ref
   if(!referenceinit){
     gpsConversion_.initReference(msg->latitude, msg->longitude, msg->altitude);
-    ROS_WARN_STREAM("Initialized GPS reference of topic: "<<this->topic_namespace_<<"/"<<subNavSatFix_.getTopic()<<
+    MSF_WARN_STREAM("Initialized GPS reference of topic: "<<this->topic_namespace_<<"/"<<subNavSatFix_.getTopic()<<
                     " to lat/lon/alt: ["<<msg->latitude<<", "<<msg->longitude<<", "<<msg->altitude<<"]");
     referenceinit = true;
   }
