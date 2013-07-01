@@ -8,7 +8,7 @@
 #include <msf_distort/MSF_DistortConfig.h>
 #include <dynamic_reconfigure/Reconfigure.h>
 #include <dynamic_reconfigure/server.h>
-
+#include <msf_core/msf_types.tpp>
 
 struct CallbackHandler{
 

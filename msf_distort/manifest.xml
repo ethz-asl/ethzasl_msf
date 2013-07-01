@@ -16,7 +16,7 @@
   <depend package="geometry_msgs"/>
   <depend package="ptam_com"/>
   <depend package="dynamic_reconfigure"/> 
-  
+  <depend package="msf_core"/> 
 </package>
 
 
