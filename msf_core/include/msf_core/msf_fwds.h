@@ -32,6 +32,7 @@
 #ifndef MSF_FWD_HPP_
 #define MSF_FWD_HPP_
 
+#include <msf_core/msf_types.tpp>
 #include <msf_core/msf_macros.h>
 
 namespace msf_core {

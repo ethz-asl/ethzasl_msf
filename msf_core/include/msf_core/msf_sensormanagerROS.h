@@ -104,6 +104,21 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
     pubPoseCrtl_ = nh.advertise<sensor_fusion_comm::ExtState>("ext_state", 1);
 
     hl_state_buf_.state.resize(HLI_EKF_STATE_SIZE, 0);
+
+    //  print published/subscribed topics
+    ros::V_string topics;
+    ros::this_node::getSubscribedTopics(topics);
+    std::string nodeName = ros::this_node::getName();
+    std::string topicsStr = nodeName + ":\n\tsubscribed to topics:\n";
+    for (unsigned int i = 0; i < topics.size(); i++)
+      topicsStr += ("\t\t" + topics.at(i) + "\n");
+
+    topicsStr += "\tadvertised topics:\n";
+    ros::this_node::getAdvertisedTopics(topics);
+    for (unsigned int i = 0; i < topics.size(); i++)
+      topicsStr += ("\t\t" + topics.at(i) + "\n");
+
+    ROS_INFO_STREAM(""<< topicsStr);
   }
 
   virtual ~MSF_SensorManagerROS() {

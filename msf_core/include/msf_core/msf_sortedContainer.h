@@ -34,6 +34,7 @@
 
 #include <msf_core/msf_types.tpp>
 #include <msf_core/msf_tools.h>
+#include <iomanip>
 
 namespace msf_core {
 /**
@@ -89,10 +90,9 @@ class SortedContainer {
     std::pair<typename ListT::iterator, bool> itpr = stateList.insert(
         std::pair<double, shared_ptr<T> >(value->time, value));
     if (!itpr.second) {
-      ROS_WARN_STREAM(
-          "Wanted to insert a value to the sorted container at time "
+      std::cerr<<"[WARN] Wanted to insert a value to the sorted container at time "
               << std::fixed << std::setprecision(9) << value->time
-              << " but the map already contained a value at this time. discarding.");
+              << " but the map already contained a value at this time. discarding."<<std::endl;
     }
     return itpr.first;
   }
@@ -130,9 +130,8 @@ class SortedContainer {
     typename ListT::iterator it = stateList.find(value->time);
     if (it == stateList.end()) {  //there is no value in the map with this time
       if (warnIfNotExistant)
-        ROS_WARN_STREAM(
-            "getIteratorAtValue(state): Could not find value for time "
-                << std::fixed << std::setprecision(9) << value->time << "");
+        std::cerr<<"[WARN] getIteratorAtValue(state): Could not find value for time "
+                << std::fixed << std::setprecision(9) << value->time << std::endl;
       it = stateList.lower_bound(value->time);
     }
     return it;
@@ -150,9 +149,8 @@ class SortedContainer {
     typename ListT::iterator it = stateList.find(time);
     if (it == stateList.end()) {  //there is no value in the map with this time
       if (warnIfNotExistant)
-        ROS_WARN_STREAM(
-            "getIteratorAtValue(double): Could not find value for time "
-                << std::fixed << std::setprecision(9) << time << "");
+        std::cerr<<"[WARN] getIteratorAtValue(double): Could not find value for time "
+                << std::fixed << std::setprecision(9) << time << std::endl;
       it = stateList.lower_bound(time);
     }
     return it;
@@ -307,8 +305,7 @@ class SortedContainer {
    */
   inline shared_ptr<T>& getLast() {
     if (stateList.empty()) {
-      ROS_ERROR_STREAM(
-          "requested the last object in the sorted container, but the container is empty");
+      std::cerr<<"[WARN] requested the last object in the sorted container, but the container is empty"<<std::endl;
       return getInvalid();
     }
     typename ListT::iterator end = stateList.end();
@@ -322,8 +319,7 @@ class SortedContainer {
    */
   inline shared_ptr<T>& getFirst() {
     if (stateList.empty()) {
-      ROS_ERROR_STREAM(
-          "requested the first object in the sorted container, but the container is empty");
+      std::cerr<<"[WARN] requested the first object in the sorted container, but the container is empty"<<std::endl;
       return getInvalid();
     }
     typename ListT::iterator start = stateList.begin();
@@ -354,7 +350,7 @@ class SortedContainer {
           it2 != stateList.end(); ++it2) {
         ss << it2->first << std::endl;
       }
-      ROS_ERROR_STREAM_THROTTLE(1, ss.str());
+      std::cerr<<"[WARN] "<<ss.str()<<std::endl;
 
       return getClosest(timeOld);
     }

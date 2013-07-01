@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/shared_ptr.hpp>
 #include  <memory> //std::shared_ptr
 
-//c++11 alias template to switch between boost shared and std shared
+//switch between boost shared and std shared
 using boost::shared_ptr;
 using boost::dynamic_pointer_cast;
 
