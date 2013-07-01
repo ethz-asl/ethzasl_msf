@@ -31,7 +31,6 @@
 #ifndef MSF_MACROS_H_
 #define MSF_MACROS_H_
 
-#include <chrono>
 
 #ifndef NUMERIC_PREC
 #define NUMERIC_PREC 4 //number of decimal places
@@ -86,6 +85,7 @@
 #define MSF_ERROR_STREAM_COND(cond, x) ROS_ERROR_STREAM_COND(cond, x)
 
 #else
+#include <chrono> //using std::chrono instead of ros time
 
 //adapted from rosconsole
 //Copyright (c) 2008, Willow Garage, Inc.

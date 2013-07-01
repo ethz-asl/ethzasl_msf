@@ -1,0 +1,16 @@
+<package>
+  <description brief="msf_simulate">
+
+     msf_simulate
+
+  </description>
+  <author>slynen</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/msf_simulate</url>
+  <depend package="msf_core"/>
+  <depend package="msf_updates"/>
+  
+</package>
+
+
