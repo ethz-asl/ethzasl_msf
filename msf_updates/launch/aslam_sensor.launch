@@ -1,8 +1,9 @@
 <launch>
-    <node name="pose_sensor" pkg="msf_updates" type="pose_sensor" clear_params="true" output="screen">
-            <remap from="msf_core/imu_state_input" to="imu0" />
-            <remap from="msf_updates/pose_with_covariance_input" to="/aslam/aslam_pose" />
-
-            <rosparam file="$(find msf_updates)/aslam_sensor_fix.yaml"/>
-    </node>
+		<node name="pose_sensor" pkg="msf_updates" type="pose_sensor" clear_params="true" output="screen">
+			<remap from="msf_core/hl_state_input" to="/auk/fcu/ekf_state_out" />
+			<remap from="msf_core/correction" to="/auk/fcu/ekf_state_in" />
+			<remap from="msf_updates/transform_input" to="/aslam/aslam_transform" />
+			<rosparam file="$(find msf_updates)/aslam_sensor_fix.yaml"/>
+			<param name="capability_group" value="Sensor Fusion"></param>
+		</node>
 </launch>
