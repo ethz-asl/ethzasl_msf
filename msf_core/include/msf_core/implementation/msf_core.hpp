@@ -363,10 +363,12 @@ void MSF_Core<EKFState_T>::propagateState(
       + 1.0 / 48.0 * (Omega * OmegaOld - OmegaOld * Omega) * dt * dt;
 
   // first oder quaternion integration
-  state_new->template get<StateDefinition_T::q>().coeffs() = quat_int * state_old->template get<StateDefinition_T::q>().coeffs();
+  state_new->template get<StateDefinition_T::q>().coeffs() = quat_int *
+		  state_old->template get<StateDefinition_T::q>().coeffs();
   state_new->template get<StateDefinition_T::q>().normalize();
 
-  dv = (state_new->template get<StateDefinition_T::q>().toRotationMatrix() * ea + state_old-> template get<StateDefinition_T::q>().toRotationMatrix() * eaold) / 2;
+  dv = (state_new->template get<StateDefinition_T::q>().toRotationMatrix() * ea +
+		  state_old-> template get<StateDefinition_T::q>().toRotationMatrix() * eaold) / 2;
   state_new->template get<StateDefinition_T::v>() = state_old
       ->template get<StateDefinition_T::v>() + (dv - g_) * dt;
   state_new->template get<StateDefinition_T::p>() = state_old

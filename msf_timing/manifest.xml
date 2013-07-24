@@ -1,0 +1,14 @@
+<package>
+  <description brief="msf_timing">
+
+     msf_timing
+
+  </description>
+  <author>slynen</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/msf_timing</url>
+  
+</package>
+
+
