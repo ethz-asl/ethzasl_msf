@@ -43,9 +43,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <msf_core/msf_state.h>
 #include <msf_core/msf_checkFuzzyTracking.h>
 
-//good old days...
-//#define N_STATE_BUFFER 256	///< size of unsigned char, do not change!
-
 namespace msf_core{
 
 template<typename EKFState_T>
@@ -58,7 +55,7 @@ class IMUHandler;
  * \brief The core class of the EKF
  * Does propagation of state and covariance
  * but also applying measurements and managing states and measurements
- * in lists sorted by time stamp
+ * in lists sorted by time stamp.
  */
 template<typename EKFState_T>
 class MSF_Core
@@ -69,81 +66,101 @@ public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
   enum{
-    nErrorStatesAtCompileTime = EKFState_T::nErrorStatesAtCompileTime,  ///< error state length
-    nStatesAtCompileTime = EKFState_T::nStatesAtCompileTime ///< complete state length
+    /// Error state length.
+    nErrorStatesAtCompileTime = EKFState_T::nErrorStatesAtCompileTime,
+    /// Complete state length.
+    nStatesAtCompileTime = EKFState_T::nStatesAtCompileTime
   };
 
   typedef typename EKFState_T::StateDefinition_T StateDefinition_T;
   typedef typename EKFState_T::StateSequence_T StateSequence_T;
-  typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, 1> ErrorState; ///< the error state type
-  typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> ErrorStateCov; ///<the error state covariance type
+  /// The error state type.
+  typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, 1> ErrorState;
+  /// The error state covariance type.
+  typedef Eigen::Matrix<double, nErrorStatesAtCompileTime,
+      nErrorStatesAtCompileTime> ErrorStateCov;
 
-  typedef msf_core::SortedContainer<EKFState_T> StateBuffer_T; ///< the type of the state buffer containing all the states
-  typedef msf_core::SortedContainer<typename msf_core::MSF_MeasurementBase<EKFState_T>, typename msf_core::MSF_InvalidMeasurement<EKFState_T> > measurementBufferT; ///< the type of the measurement buffer containing all the measurements
+  /// The type of the state buffer containing all the states.
+  typedef msf_core::SortedContainer<EKFState_T> StateBuffer_T;
+  /// The type of the measurement buffer containing all the measurements
+  typedef msf_core::SortedContainer<
+      typename msf_core::MSF_MeasurementBase<EKFState_T>,
+      typename msf_core::MSF_InvalidMeasurement<EKFState_T> > measurementBufferT;
 
   /**
-   * \brief add a sensor measurement or an init measurement to the internal queue and apply it to the state
-   * \param measurement the measurement to add to the internal measurement queue
+   * \brief Add a sensor measurement or an init measurement to the internal
+   * queue and apply it to the state.
+   * \param Measurement the measurement to add to the internal measurement queue.
    */
   void addMeasurement(shared_ptr<MSF_MeasurementBase<EKFState_T> > measurement);
 
   /**
-   * \brief initializes the filter with the values of the given measurement, other init values from other
-   * sensors can be passed in as "measurement" using the initMeasurement structs
-   * \param measurement a measurement containing initial values for the state
+   * \brief Initializes the filter with the values of the given measurement,
+   * other init values from other sensors can be passed in as "measurement"
+   * using the initMeasurement structs.
+   * \param Measurement a measurement containing initial values for the state
    */
   void init(shared_ptr<MSF_MeasurementBase<EKFState_T> > measurement);
 
   /**
-   * \brief finds the closest state to the requested time in the internal state
-   * \param tstamp the time stamp to find the closest state to
+   * \brief Finds the closest state to the requested time in the internal state.
+   * \param tstamp The time stamp to find the closest state to.
    */
   shared_ptr<EKFState_T> getClosestState(double tstamp);
 
   /**
-   * \brief returns the accumulated dynamic matrix between two states
+   * \brief Returns the accumulated dynamic matrix between two states.
    */
-  void getAccumF_SC(const shared_ptr<EKFState_T>& state_old, const shared_ptr<EKFState_T>& state_new,
-                    Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime>& F);
+  void getAccumF_SC(const shared_ptr<EKFState_T>& state_old,
+                    const shared_ptr<EKFState_T>& state_new,
+                    Eigen::Matrix<double, nErrorStatesAtCompileTime,
+                    nErrorStatesAtCompileTime>& F);
   /**
-   * \brief returns previous measurement of the same type
+   * \brief Returns previous measurement of the same type.
    */
-  shared_ptr<msf_core::MSF_MeasurementBase<EKFState_T> > getPreviousMeasurement(double time, int sensorID);
+  shared_ptr<msf_core::MSF_MeasurementBase<EKFState_T> > getPreviousMeasurement
+      (double time, int sensorID);
 
   /**
-   * \brief finds the state at the requested time in the internal state
-   * \param tstamp the time stamp to find the state to
+   * \brief Finds the state at the requested time in the internal state.
+   * \param tstamp The time stamp to find the state to.
    */
   shared_ptr<EKFState_T> getStateAtTime(double tstamp);
 
   /**
-   * \brief propagates the error state covariance
-   * \param state_old the state to propagate the covariance from
-   * \param state_new the state to propagate the covariance to
+   * \brief Propagates the error state covariance.
+   * \param state_old The state to propagate the covariance from.
+   * \param state_new The state to propagate the covariance to.
    */
-  void predictProcessCovariance(shared_ptr<EKFState_T>& state_old, shared_ptr<EKFState_T>& state_new);
+  void predictProcessCovariance(shared_ptr<EKFState_T>& state_old,
+                                shared_ptr<EKFState_T>& state_new);
 
   /**
-   * \brief propagates the state with given dt
-   * \param state_old the state to propagate from
-   * \param state_new the state to propagate to
+   * \brief Propagates the state with given dt.
+   * \param state_old The state to propagate from.
+   * \param state_new The state to propagate to.
    */
-  void propagateState(shared_ptr<EKFState_T>& state_old, shared_ptr<EKFState_T>& state_new);
+  void propagateState(shared_ptr<EKFState_T>& state_old,
+                      shared_ptr<EKFState_T>& state_new);
 
   /**
-   * \brief delete very old states and measurements from the buffers to free memory
+   * \brief Delete very old states and measurements from the buffers to free
+   * memory.
    */
   void CleanUpBuffers();
 
   /**
-   * \brief sets the covariance matrix of the core states to simulated values
-   * \param P the error state covariance Matrix to fill
+   * \brief sets the covariance matrix of the core states to simulated values.
+   * \param P the error state covariance Matrix to fill.
    */
-  void setPCore(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, EKFState_T::nErrorStatesAtCompileTime>& P);
+  void setPCore(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,
+                EKFState_T::nErrorStatesAtCompileTime>& P);
 
   /**
-   * \brief ctor takes a pointer to an object which does the user defined calculations and provides interfaces for initialization etc.
-   * \param usercalc the class providing the user defined calculations DO ABSOLUTELY NOT USE THIS REFERENCE INSIDE THIS CTOR!!
+   * \brief Ctor takes a pointer to an object which does the user defined
+   * calculations and provides interfaces for initialization etc.
+   * \param usercalc The class providing the user defined calculations
+   * DO ABSOLUTELY NOT USE THIS REFERENCE INSIDE THIS CTOR!!
    */
   MSF_Core(const MSF_SensorManager<EKFState_T>& usercalc);
   ~MSF_Core();
@@ -154,77 +171,96 @@ private:
 
 
   /**
-   * \brief get the index of the best state having no temporal drift at compile time
+   * \brief Get the index of the best state having no temporal drift at compile
+   * time.
    */
   enum{
-    indexOfStateWithoutTemporalDrift = msf_tmp::IndexOfBestNonTemporalDriftingState<StateSequence_T>::value
+    indexOfStateWithoutTemporalDrift =
+        msf_tmp::IndexOfBestNonTemporalDriftingState<StateSequence_T>::value
   };
 
-  typedef typename msf_tmp::getEnumStateType<StateSequence_T, indexOfStateWithoutTemporalDrift>::value nonDriftingStateType; //returns void type for invalid types
+  /// Returns void type for invalid types
+  typedef typename msf_tmp::getEnumStateType<StateSequence_T,
+      indexOfStateWithoutTemporalDrift>::value nonDriftingStateType;
 
-  StateBuffer_T stateBuffer_; ///<EKF buffer containing pretty much all info needed at time t. sorted by t asc
-  measurementBufferT MeasurementBuffer_; ///< EKF Measurements and init values sorted by t asc
-  std::queue<shared_ptr<MSF_MeasurementBase<EKFState_T> > > queueFutureMeasurements_; ///< buffer for measurements to apply in future
+  /// EKF buffer containing pretty much all info needed at time t. Sorted by t
+  // asc.
+  StateBuffer_T stateBuffer_;
+  /// EKF Measurements and init values sorted by t asc.
+  measurementBufferT MeasurementBuffer_;
+  /// Buffer for measurements to apply in future.
+  std::queue<shared_ptr<MSF_MeasurementBase<EKFState_T> > > queueFutureMeasurements_;
+  /// Last time stamp where we have a valid propagation.
+  double time_P_propagated;
+  /// Last time stamp where we have a valid state.
+  typename StateBuffer_T::iterator_T it_last_IMU;
+  /// Gravity vector.
+  Eigen::Matrix<double, 3, 1> g_;
 
-  double time_P_propagated; ///< last time stamp where we have a valid propagation
-  typename StateBuffer_T::iterator_T it_last_IMU; ///< last time stamp where we have a valid state
-  Eigen::Matrix<double, 3, 1> g_; ///< gravity vector
-
-  bool initialized_; ///< is the filter initialized, so that we can propagate the state?
-  bool predictionMade_; ///< is there a state prediction, so we can apply measurements?
-
-  bool isfuzzyState_; ///< was the filter pushed to fuzzy state by a measurement?
-
-  CheckFuzzyTracking<EKFState_T, nonDriftingStateType> fuzzyTracker_;  ///< watch dog to determine fuzzy tracking by observing non temporal drifting states
-  const MSF_SensorManager<EKFState_T>& usercalc_; ///< a class which provides methods for customization of several calculations
+  /// Is the filter initialized, so that we can propagate the state?
+  bool initialized_;
+  /// Is there a state prediction, so we can apply measurements?
+  bool predictionMade_;
+  /// Was the filter pushed to fuzzy state by a measurement?
+  bool isfuzzyState_;
+  /// Watch dog to determine fuzzy tracking by observing non temporal drifting
+  // states.
+  CheckFuzzyTracking<EKFState_T, nonDriftingStateType> fuzzyTracker_;
+  /// A class which provides methods for customization of several calculations.
+  const MSF_SensorManager<EKFState_T>& usercalc_;
 
   /**
-   * \brief applies the correction
-   * \param delaystate the state to apply the correction on
-   * \param correction the correction vector
-   * \param fuzzythres the error of the non temporal drifting state allowed before fuzzy tracking will be triggered
+   * \brief Applies the correction.
+   * \param delaystate The state to apply the correction on.
+   * \param correction The correction vector.
+   * \param fuzzythres The error of the non temporal drifting state allowed
+   *  before fuzzy tracking will be triggered.
    */
-  bool applyCorrection(shared_ptr<EKFState_T>& delaystate, ErrorState & correction, double fuzzythres = 0.1);
+  bool applyCorrection(shared_ptr<EKFState_T>& delaystate,
+                       ErrorState & correction, double fuzzythres = 0.1);
 
   /**
-   * \brief propagate covariance to a given state in time
-   * \param state the state to propagate to from the last propagated time
+   * \brief Propagate covariance to a given state in time.
+   * \param State the state to propagate to from the last propagated time.
    */
   void propPToState(shared_ptr<EKFState_T>& state);
 
-  //internal state propagation
+  //Internal state propagation:
   /**
    * \brief This function gets called on incoming imu messages
    * and then performs the state prediction internally.
    * Only use this OR stateCallback by remapping the topics accordingly.
-   * \param msg the imu ros message
+   * \param msg The imu ros message.
    * \sa{stateCallback}
    */
   void process_imu(const msf_core::Vector3&linear_acceleration,
-                   const msf_core::Vector3&angular_velocity, const double& msg_stamp, size_t msg_seq);
+                   const msf_core::Vector3&angular_velocity,
+                   const double& msg_stamp, size_t msg_seq);
 
-  /// external state propagation
+  /// External state propagation:
   /**
-   * \brief This function gets called when state prediction is performed externally,
-   * e.g. by asctec_mav_framework. Msg has to be the latest predicted state.
+   * \brief This function gets called when state prediction is performed
+   * externally, e.g. by asctec_mav_framework. Msg has to be the latest
+   * predicted state.
    * Only use this OR imuCallback by remapping the topics accordingly.
-   * \param msg the state message from the external propagation
+   * \param msg The state message from the external propagation.
    * \sa{imuCallback}
    */
   void process_extstate(const msf_core::Vector3& linear_acceleration,
-                     const msf_core::Vector3& angular_velocity, const msf_core::Vector3& p,
-                     const msf_core::Vector3& v, const msf_core::Quaternion& q, bool is_already_propagated, const double& msg_stamp,
-                     size_t msg_seq);
+                     const msf_core::Vector3& angular_velocity,
+                     const msf_core::Vector3& p, const msf_core::Vector3& v,
+                     const msf_core::Quaternion& q, bool is_already_propagated,
+                     const double& msg_stamp, size_t msg_seq);
 
-  /// propagates P by one step to distribute processing load
+  /// Propagates P by one step to distribute processing load.
   void propagatePOneStep();
 
-  ///checks the queue of measurements to be applied in the future
+  /// Checks the queue of measurements to be applied in the future.
   void handlePendingMeasurements();
 
 };
 
-};// end namespace
+};  // msf_core
 
 #include <msf_core/implementation/msf_core.hpp>
 
