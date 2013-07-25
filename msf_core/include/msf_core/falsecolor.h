@@ -59,4 +59,4 @@ struct palette {
 
 palette GetPalette(palette::palettetypes pal);
 
-#endif /* FALSECOLOR_H_ */
+#endif  // FALSECOLOR_H_

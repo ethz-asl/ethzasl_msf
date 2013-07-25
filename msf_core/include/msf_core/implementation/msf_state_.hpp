@@ -43,36 +43,38 @@
 
 namespace msf_core {
 
-// returns the stateVar at position INDEX in the state list, non const version only for msf_core use
-// you must not make these functions public. Instead const_cast the state object to const to use the overload
+// Returns the stateVar at position INDEX in the state list, non const version
+// only for msf_core use you must not make these functions public. Instead
+// const_cast the state object to const to use the overload.
 template<typename stateVector_T, typename StateDefinition_T>
 template<int INDEX>
-inline typename boost::fusion::result_of::at_c<stateVector_T, INDEX>::type GenericState_T<
-    stateVector_T, StateDefinition_T>::getStateVar() {
+inline typename boost::fusion::result_of::at_c<stateVector_T, INDEX>::type
+    GenericState_T<stateVector_T, StateDefinition_T>::getStateVar() {
 
-  BOOST_STATIC_ASSERT_MSG(
+  static_assert(
       (msf_tmp::IsReferenceType<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::value),
-      "Assumed that boost::fusion would return a reference type here, which is not the case");
+      "Assumed that boost::fusion would return a reference type here, which is not the case.");
 
   return boost::fusion::at < boost::mpl::int_<INDEX> > (statevars);
 }
 
-//returns the state at position INDEX in the state list, non const version
-//you must not make these functions public. Instead const_cast the state object to const to use the overload
+// Returns the state at position INDEX in the state list, non const version
+// you must not make these functions public. Instead const_cast the state object
+// to const to use the overload.
 template<typename stateVector_T, typename StateDefinition_T>
 template<int INDEX>
 inline typename msf_tmp::StripReference<
     typename boost::fusion::result_of::at_c<stateVector_T, INDEX>::type>::result_t::value_t&
 GenericState_T<stateVector_T, StateDefinition_T>::get() {
 
-  BOOST_STATIC_ASSERT_MSG(
+  static_assert(
       (msf_tmp::IsReferenceType<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::value),
-      "Assumed that boost::fusion would return a reference type here, which is not the case");
+      "Assumed that boost::fusion would return a reference type here, which is not the case.");
 
   return boost::fusion::at < boost::mpl::int_<INDEX> > (statevars).state_;
 }
 
-//apply the correction vector to all state vars
+// Apply the correction vector to all state vars.
 template<typename stateVector_T, typename StateDefinition_T>
 inline void GenericState_T<stateVector_T, StateDefinition_T>::correct(
     const Eigen::Matrix<double, nErrorStatesAtCompileTime, 1>& correction) {
@@ -83,7 +85,8 @@ inline void GenericState_T<stateVector_T, StateDefinition_T>::correct(
           stateVector_T>(correction));
 }
 
-//returns the Q-block of the state at position INDEX in the state list, not allowed for core states
+// Returns the Q-block of the state at position INDEX in the state list, not
+// allowed for core states.
 template<typename stateVector_T, typename StateDefinition_T>
 template<int INDEX>
 inline typename msf_tmp::StripReference<
@@ -92,15 +95,20 @@ GenericState_T<stateVector_T, StateDefinition_T>::getQBlock() {
   typedef typename msf_tmp::StripReference<
       typename boost::fusion::result_of::at_c<stateVector_T, INDEX>::type>::result_t StateVar_T;
 
-  BOOST_STATIC_ASSERT_MSG(
-      static_cast<int>(StateVar_T::statetype_) != static_cast<int>(msf_core::CoreStateWithPropagation) || static_cast<int>(StateVar_T::statetype_) != static_cast<int>(msf_core::CoreStateWithoutPropagation),
+  static_assert(
+      static_cast<int>(StateVar_T::statetype_) != static_cast<int>(
+          msf_core::CoreStateWithPropagation) ||
+          static_cast<int>(StateVar_T::statetype_) !=
+          static_cast<int>(msf_core::CoreStateWithoutPropagation),
       "You requested a non-const reference to a Q-Block for a"
-      "core state of the EKF, but this is not allowed! Use the const version to get Q-blocks for core states.");
+      "core state of the EKF, but this is not allowed! Use the const version to "
+      "get Q-blocks for core states.");
 
   return boost::fusion::at < boost::mpl::int_<INDEX> > (statevars).Q;
 }
 
-//returns the Q-block of the state at position INDEX in the state list, also possible for core states, since const
+// Returns the Q-block of the state at position INDEX in the state list, also
+// possible for core states, since const.
 template<typename stateVector_T, typename StateDefinition_T>
 template<int INDEX>
 inline const typename msf_tmp::StripReference<
@@ -110,11 +118,11 @@ GenericState_T<stateVector_T, StateDefinition_T>::getQBlock() const {
   return boost::fusion::at < boost::mpl::int_<INDEX> > (statevars).Q_;
 }
 
-/// assembles a PoseWithCovarianceStamped message from the state
+/// Assembles a PoseWithCovarianceStamped message from the state
 /** it does not set the header */
 template<typename stateVector_T, typename StateDefinition_T>
 void GenericState_T<stateVector_T, StateDefinition_T>::toPoseMsg(
-    geometry_msgs::PoseWithCovarianceStamped & pose) {  //boost fusion unfortunately doesn't like this to be const
+    geometry_msgs::PoseWithCovarianceStamped & pose) {
   eigen_conversions::vector3dToPoint(get<StateDefinition_T::p>(),
                                      pose.pose.pose.position);
   eigen_conversions::quaternionToMsg(get<StateDefinition_T::q>(),
@@ -122,7 +130,7 @@ void GenericState_T<stateVector_T, StateDefinition_T>::toPoseMsg(
   getPoseCovariance(pose.pose.covariance);
 }
 
-/// assembles an ExtState message from the state
+/// Assembles an ExtState message from the state
 /** it does not set the header */
 template<typename stateVector_T, typename StateDefinition_T>
 void GenericState_T<stateVector_T, StateDefinition_T>::toExtStateMsg(
@@ -135,24 +143,24 @@ void GenericState_T<stateVector_T, StateDefinition_T>::toExtStateMsg(
                                      state.velocity);
 }
 
-/// assembles a DoubleArrayStamped message from the state
+/// Assembles a DoubleArrayStamped message from the state
 /** it does not set the header */
 template<typename stateVector_T, typename StateDefinition_T>
 void GenericState_T<stateVector_T, StateDefinition_T>::toFullStateMsg(
-    sensor_fusion_comm::DoubleArrayStamped & state) {  //boost fusion unfortunately doesn't like this to be const
-  state.data.resize(nStatesAtCompileTime);  //make sure this is correctly sized
+    sensor_fusion_comm::DoubleArrayStamped & state) {
+  state.data.resize(nStatesAtCompileTime);  // Make sure this is correctly sized.
   boost::fusion::for_each(
       statevars,
       msf_tmp::FullStatetoDoubleArray<std::vector<double>, stateVector_T>(
           state.data));
 }
 
-/// assembles a DoubleArrayStamped message from the state
+/// Assembles a DoubleArrayStamped message from the state
 /** it does not set the header */
 template<typename stateVector_T, typename StateDefinition_T>
 void GenericState_T<stateVector_T, StateDefinition_T>::toCoreStateMsg(
-    sensor_fusion_comm::DoubleArrayStamped & state) {  //boost fusion unfortunately doesn't like this to be const
-  state.data.resize(nCoreStatesAtCompileTime);  //make sure this is correctly sized
+    sensor_fusion_comm::DoubleArrayStamped & state) {
+  state.data.resize(nCoreStatesAtCompileTime);  // Make sure this is correctly sized.
   boost::fusion::for_each(
       statevars,
       msf_tmp::CoreStatetoDoubleArray<std::vector<double>, stateVector_T>(
@@ -162,7 +170,7 @@ void GenericState_T<stateVector_T, StateDefinition_T>::toCoreStateMsg(
 template<typename stateVector_T, typename StateDefinition_T>
 Eigen::Matrix<double,
     GenericState_T<stateVector_T, StateDefinition_T>::nCoreStatesAtCompileTime,
-    1> GenericState_T<stateVector_T, StateDefinition_T>::toEigenVector() {  //boost fusion unfortunately doesn't like this to be const
+    1> GenericState_T<stateVector_T, StateDefinition_T>::toEigenVector() {
   Eigen::Matrix<double,
       GenericState_T<stateVector_T, StateDefinition_T>::nCoreStatesAtCompileTime,
       1> data;
@@ -174,10 +182,11 @@ Eigen::Matrix<double,
               1>, stateVector_T>(data));
   return data;
 }
-//TODO template to container
+
+//TODO (slynen) Template to container.
 template<typename stateVector_T, typename StateDefinition_T>
 void GenericState_T<stateVector_T, StateDefinition_T>::calculateIndicesInErrorState(
-    std::vector<std::tuple<int, int, int> >& vec) {  //boost fusion unfortunately doesn't like this to be const
+    std::vector<std::tuple<int, int, int> >& vec) {
 
   boost::fusion::for_each(
       statevars,
@@ -186,7 +195,7 @@ void GenericState_T<stateVector_T, StateDefinition_T>::calculateIndicesInErrorSt
 }
 
 template<typename stateVector_T, typename StateDefinition_T>
-std::string GenericState_T<stateVector_T, StateDefinition_T>::print() {  //boost fusion unfortunately doesn't like this to be const
+std::string GenericState_T<stateVector_T, StateDefinition_T>::print() {
   std::stringstream ss;
   ss << "--------- State at time " << msf_core::timehuman(time)
       << "s: ---------" << std::endl;
@@ -198,7 +207,7 @@ std::string GenericState_T<stateVector_T, StateDefinition_T>::print() {  //boost
 }
 
 template<typename stateVector_T, typename StateDefinition_T>
-bool GenericState_T<stateVector_T, StateDefinition_T>::checkStateForNumeric() {  //boost fusion unfortunately doesn't like this to be const
+bool GenericState_T<stateVector_T, StateDefinition_T>::checkStateForNumeric() {
   Eigen::Matrix<double,
       GenericState_T<stateVector_T, StateDefinition_T>::nCoreStatesAtCompileTime,
       1> data;
@@ -212,16 +221,17 @@ bool GenericState_T<stateVector_T, StateDefinition_T>::checkStateForNumeric() { 
   return checkForNumeric(data, "checkStateForNumeric");
 }
 
-//returns the state at position INDEX in the state list, const version
+// Returns the state at position INDEX in the state list, const version.
 template<typename stateVector_T, typename StateDefinition_T>
 template<int INDEX>
 inline const typename msf_tmp::StripReference<
     typename boost::fusion::result_of::at_c<stateVector_T, INDEX>::type>::result_t::value_t&
 GenericState_T<stateVector_T, StateDefinition_T>::get() const {
 
-  BOOST_STATIC_ASSERT_MSG(
+  static_assert(
       (msf_tmp::IsReferenceType<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::value),
-      "Assumed that boost::fusion would return a reference type here, which is not the case");
+      "Assumed that boost::fusion would return a reference type here, which is "
+      "not the case");
 
   return boost::fusion::at < boost::mpl::int_<INDEX> > (statevars).state_;
 }
@@ -232,9 +242,10 @@ inline typename msf_tmp::AddConstReference<
     typename boost::fusion::result_of::at_c<stateVector_T, INDEX>::type>::result_t GenericState_T<
     stateVector_T, StateDefinition_T>::getStateVar() const {
 
-  BOOST_STATIC_ASSERT_MSG(
+  static_assert(
       (msf_tmp::IsReferenceType<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::value),
-      "Assumed that boost::fusion would return a reference type here, which is not the case");
+      "Assumed that boost::fusion would return a reference type here, which is "
+      "not the case");
 
   return boost::fusion::at < boost::mpl::int_<INDEX> > (statevars);
 }
@@ -247,8 +258,11 @@ inline void GenericState_T<stateVector_T, StateDefinition_T>::set(
   typedef typename msf_tmp::StripReference<
       typename boost::fusion::result_of::at_c<stateVector_T, INDEX>::type>::result_t StateVar_T;
 
-  BOOST_STATIC_ASSERT_MSG(
-      static_cast<int>(StateVar_T::statetype_) != static_cast<int>(msf_core::CoreStateWithPropagation) || static_cast<int>(StateVar_T::statetype_) != static_cast<int>(msf_core::CoreStateWithoutPropagation),
+  static_assert(
+      static_cast<int>(StateVar_T::statetype_) !=
+          static_cast<int>(msf_core::CoreStateWithPropagation) ||
+          static_cast<int>(StateVar_T::statetype_) !=
+          static_cast<int>(msf_core::CoreStateWithoutPropagation),
       "You requested to set a new value for a"
       "core state of the EKF, but this is not allowed! This is an Error.");
 
@@ -263,56 +277,57 @@ inline void GenericState_T<stateVector_T, StateDefinition_T>::clearCrossCov() {
 
   enum {
     startIdxInState = msf_tmp::getStartIndex<StateSequence_T, StateVar_T,
-        msf_tmp::CorrectionStateLengthForType>::value,  //index of the data in the correction vector
+        // Index of the data in the correction vector.
+        msf_tmp::CorrectionStateLengthForType>::value,
     lengthInState = StateVar_T::sizeInCorrection_
   };
-
-  Eigen::Matrix<double, lengthInState, lengthInState> cov = P
-      .template block<lengthInState, lengthInState>(startIdxInState,
-                                                    startIdxInState);  //save covariance block
+  // Save covariance block.
+  Eigen::Matrix<double, lengthInState, lengthInState> cov =
+      P.template block<lengthInState, lengthInState>(startIdxInState,
+                                                    startIdxInState);
   P.template block<lengthInState, nErrorStatesAtCompileTime>(startIdxInState, 0)
       .setZero();
   P.template block<nErrorStatesAtCompileTime, lengthInState>(0, startIdxInState)
       .setZero();
+  // Write back cov block.
   P.template block<lengthInState, lengthInState>(startIdxInState,
-                                                 startIdxInState) = cov;  //write back cov block
+                                                 startIdxInState) = cov;
 
 }
 
-/// resets the state
+/// Resets the state.
 /**
- * 3D vectors: 0; quaternion: unit quaternion; scale: 1; time:0; Error covariance: zeros
+ * 3D vectors: 0; quaternion: unit quaternion; scale: 1; time:0;
+ * Error covariance: zeros
  */
 template<typename stateVector_T, typename StateDefinition_T>
 void GenericState_T<stateVector_T, StateDefinition_T>::reset(
     msf_core::StateVisitor<GenericState_T<stateVector_T, StateDefinition_T> >* statevisitor) {
 
-  // reset all states
+  // Reset all states.
   boost::fusion::for_each(statevars, msf_tmp::resetState());
 
-  //reset system inputs
+  // Reset system inputs.
   w_m.setZero();
   a_m.setZero();
 
   P.setZero();
   time = 0;
 
-  //now call the user provided function
+  // Now call the user provided function.
   if (statevisitor)
     statevisitor->resetState(*this);
 }
 
-/// writes the covariance corresponding to position and attitude to cov
+/// Writes the covariance corresponding to position and attitude to cov.
 template<typename stateVector_T, typename StateDefinition_T>
 void GenericState_T<stateVector_T, StateDefinition_T>::getPoseCovariance(
     geometry_msgs::PoseWithCovariance::_covariance_type & cov) {
-  BOOST_STATIC_ASSERT(
-      geometry_msgs::PoseWithCovariance::_covariance_type::static_size == 36);
 
   typedef typename msf_tmp::getEnumStateType<stateVector_T, StateDefinition_T::p>::value p_type;
   typedef typename msf_tmp::getEnumStateType<stateVector_T, StateDefinition_T::q>::value q_type;
 
-  //get indices of position and attitude in the covariance matrix
+  // Get indices of position and attitude in the covariance matrix.
   static const int idxstartcorr_p = msf_tmp::getStartIndex<stateVector_T,
       p_type, msf_tmp::CorrectionStateLengthForType>::value;
   static const int idxstartcorr_q = msf_tmp::getStartIndex<stateVector_T,

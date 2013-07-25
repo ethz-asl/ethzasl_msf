@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2012, Simon Lynen, ASL, ETH Zurich, Switzerland
+Copyright (c) 2013, Simon Lynen, ASL, ETH Zurich, Switzerland
 You can contact the author at <slynen at ethz dot ch>
 
 All rights reserved.
@@ -30,16 +30,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 
-#ifndef MDF_TYPETRAITS_HPP_
-#define MDF_TYPETRAITS_HPP_
+#ifndef MDF_TYPETRAITS_H_
+#define MDF_TYPETRAITS_H_
 
 namespace msf_tmp{
 
-//two types of same type
+// Two types of same type.
 template <typename T, typename U> struct SameType{enum { value = false };};
 template <typename T> struct SameType<T,T>{enum { value = true };};
 
-//strip qualifiers
+// Strip qualifiers.
 template<typename T>
 struct StripReference{
   typedef T result_t;
@@ -91,7 +91,7 @@ struct StripConstPtr<const T>{
   typedef T result_t;
 };
 
-//add qualifiers
+// Add qualifiers.
 template<typename T>
 struct AddReference{
   typedef T& result_t;
@@ -201,4 +201,4 @@ struct IsPointerType<const T*>{
 
 }
 
-#endif /* MDF_TYPETRAITS_HPP_ */
+#endif  // MDF_TYPETRAITS_TPP_

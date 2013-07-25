@@ -40,7 +40,7 @@
 
 namespace eigen_conversions {
 
-/// copies eigen quaternion to geometry_msgs/quaternion
+/// Copies eigen quaternion to geometry_msgs/quaternion.
 template<class Scalar>
 inline void quaternionToMsg(const Eigen::Quaternion<Scalar> & q_in,
                             geometry_msgs::Quaternion & q_out) {
@@ -50,7 +50,7 @@ inline void quaternionToMsg(const Eigen::Quaternion<Scalar> & q_in,
   q_out.z = q_in.z();
 }
 
-/// copies eigen quaternion to geometry_msgs/quaternion
+/// Copies eigen quaternion to geometry_msgs/quaternion.
 template<class Scalar>
 inline geometry_msgs::Quaternion quaternionToMsg(
     const Eigen::Quaternion<Scalar> & q_in) {
@@ -59,7 +59,7 @@ inline geometry_msgs::Quaternion quaternionToMsg(
   return q_out;
 }
 
-/// copies an eigen 3d vector to a 3d Point struct. point has to have members x,y,z!
+/// Copies an eigen 3d vector to a 3d Point struct. point has to have members x,y,z!
 template<class Derived, class Point>
 inline void vector3dToPoint(const Eigen::MatrixBase<Derived> & vec,
                             Point & point) {
@@ -69,7 +69,7 @@ inline void vector3dToPoint(const Eigen::MatrixBase<Derived> & vec,
   point.z = vec[2];
 }
 
-/// copies an eigen 3d vector to a 3d Point struct. point has to have members x,y,z!
+/// Copies an eigen 3d vector to a 3d Point struct. point has to have members x,y,z!
 template<class Derived, class Point>
 inline Point vector3dToPoint(const Eigen::MatrixBase<Derived> & vec) {
   Point point;
@@ -80,4 +80,4 @@ inline Point vector3dToPoint(const Eigen::MatrixBase<Derived> & vec) {
 }
 ;
 
-#endif /* EIGEN_CONVERSIONS_H_ */
+#endif  // EIGEN_CONVERSIONS_H_

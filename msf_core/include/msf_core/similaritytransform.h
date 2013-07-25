@@ -42,7 +42,8 @@
 #include <msf_core/msf_types.tpp>
 #include <msf_core/eigen_utils.h>
 
-/// defines the start row and col for the covariance entries in geometry_msgs::PoseWithCovariance
+/// Defines the start row and col for the covariance entries in
+//  geometry_msgs::PoseWithCovariance.
 namespace geometry_msgs {
 namespace cov {
 enum {
@@ -54,55 +55,65 @@ enum {
 
 namespace msf_core {
 
-/// converts a geometry_msgs::Point to an Eigen Vector3d
+/// Converts a geometry_msgs::Point to an Eigen Vector3d.
 inline Vector3 geometry_msgsToEigen(const geometry_msgs::Point & p) {
   return (Vector3() << p.x, p.y, p.z).finished();
 }
 
-/// converts a geometry_msgs::Quaternion to an Eigen::Quaterniond
+/// Converts a geometry_msgs::Quaternion to an Eigen::Quaterniond.
 inline Eigen::Quaterniond geometry_msgsToEigen(
-    const geometry_msgs::Quaternion & q) {
+                                               const geometry_msgs::Quaternion & q) {
   return Eigen::Quaterniond(q.w, q.x, q.y, q.z);
 }
 
 /**
- * \brief returns a 3x3 covariance block entry from a geometry_msgs::PoseWithCovariance::covariance array
- * \param gcov the geometry_msgs::PoseWithCovariance::covariance array to get the block from
- * \param start_row start row of the block; use \code geometry_msgs::cov::p and geometry_msgs::cov::q \endcode
- * \param start_col start column of the block; use \code geometry_msgs::cov::p and geometry_msgs::cov::q \endcode
- * \return 3x3 Eigen::Matrix covariance block
+ * \brief Returns a 3x3 covariance block entry from a
+ * geometry_msgs::PoseWithCovariance::covariance array
+ * \param gcov the geometry_msgs::PoseWithCovariance::covariance array to get
+ * the block from.
+ * \param start_row start row of the block; use \code geometry_msgs::cov::p and
+ * geometry_msgs::cov::q \endcode .
+ * \param start_col start column of the block; use \code geometry_msgs::cov::p
+ * and geometry_msgs::cov::q \endcode .
+ * \return 3x3 Eigen::Matrix covariance block.
  */
 inline Matrix3 geometry_msgsCovBlockToEigen(
-    const geometry_msgs::PoseWithCovariance::_covariance_type & gcov,
-    int start_row, int start_col) {
+                                            const geometry_msgs::PoseWithCovariance::_covariance_type & gcov,
+                                            int start_row, int start_col) {
   Eigen::Map<const Matrix6> cov(gcov.data());
   return Matrix3(cov.block<3, 3>(start_row, start_col));
 }
 
 /**
- * \brief fills a 3x3 covariance block entry of a geometry_msgs::PoseWithCovariance::covariance array from an Eigen 3x3 matrix
- * \param[out] gcov the geometry_msgs::PoseWithCovariance::covariance array to get the block from
+ * \brief Fills a 3x3 covariance block entry of a
+ * geometry_msgs::PoseWithCovariance::covariance array from an Eigen 3x3 matrix
+ * \param[out] gcov the geometry_msgs::PoseWithCovariance::covariance array to
+ * get the block from
  * \param[in] ecov 3x3 Eigen::Matrix covariance block
- * \param[in] start_row start row of the block; use \code geometry_msgs::cov::p and geometry_msgs::cov::q \endcode
- * \param[in] start_col start column of the block; use \code geometry_msgs::cov::p and geometry_msgs::cov::q \endcode
+ * \param[in] start_row start row of the block; use \code geometry_msgs::cov::p
+ * and geometry_msgs::cov::q \endcode
+ * \param[in] start_col start column of the block; use \code geometry_msgs::cov::p
+ * and geometry_msgs::cov::q \endcode
  */
 template<class Derived>
 inline void eigenCovBlockToGeometry_msgs(
-    geometry_msgs::PoseWithCovariance::_covariance_type & gcov,
-    const Eigen::MatrixBase<Derived> &ecov, int start_row, int start_col) {
+                                         geometry_msgs::PoseWithCovariance::_covariance_type & gcov,
+                                         const Eigen::MatrixBase<Derived> &ecov, int start_row, int start_col) {
   EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(Derived, 3, 3)
   Eigen::Map<Matrix6> _gcov(gcov.data());
   _gcov.block<3, 3>(start_row, start_col) = ecov;
-  if (start_row != start_col)  // off diagonal entries --> we need to copy it to the opposite off-diagonal as well
+  // Off diagonal entries --> we need to copy it to the opposite off-diagonal
+  // as well.
+  if (start_row != start_col)
     _gcov.block<3, 3>(start_col, start_row) = ecov.transpose();
 }
 
-/// converts any eigen vector with 3 elements to a geometry_msgs::Point
+/// Converts any eigen vector with 3 elements to a geometry_msgs::Point.
 template<class Derived>
 inline geometry_msgs::Point eigenToGeometry_msgs(
-    const Eigen::MatrixBase<Derived> & p) {
-  EIGEN_STATIC_ASSERT_VECTOR_ONLY(Derived);
-  assert(p.size()==3);
+                                                 const Eigen::MatrixBase<Derived> & p) {
+  EIGEN_STATIC_ASSERT_VECTOR_ONLY (Derived);
+  assert(p.size() == 3);
 
   geometry_msgs::Point _p;
   _p.x = p[0];
@@ -111,9 +122,9 @@ inline geometry_msgs::Point eigenToGeometry_msgs(
   return _p;
 }
 
-/// converts an Eigen::Quaterniond to a geometry_msgs::Quaternion
+/// Converts an Eigen::Quaterniond to a geometry_msgs::Quaternion.
 inline geometry_msgs::Quaternion eigenToGeometry_msgs(
-    const Eigen::Quaterniond & q) {
+                                                      const Eigen::Quaterniond & q) {
   geometry_msgs::Quaternion _q;
   _q.w = q.w();
   _q.x = q.x();
@@ -130,30 +141,33 @@ typedef std::vector<PosePair> PosePairVector;
 
 /** \class From6DoF
  *
- * \brief computes the average similarity transform (rotation, position, scale) between two sets of 6 DoF poses
+ * \brief Computes the average similarity transform (rotation, position, scale)
+ * between two sets of 6 DoF poses.
  */
 class From6DoF {
  public:
   From6DoF();
-  /// Adds a pair of measurements. No other computation is performed
+  /// Adds a pair of measurements. No other computation is performed.
   void addMeasurement(const PosePair & measurement);
 
-  /// Adds a pair of measurements. No other computation is performed
+  /// Adds a pair of measurements. No other computation is performed.
   void addMeasurement(const Pose & pose1, const Pose & pose2);
 
   /**
    * \brief computes the average similarity transform
-   * the transform is computed between the previously added sets of poses
+   * the transform is computed between the previously added sets of poses.
    * \param[out] pose resulting position / orientation
    * \param[out] scale resulting scale: pos1 = pos2*scale
-   * \param[out] cond condition number of the problem to detect (non) sufficient number of measurements
-   * \param[in] eps in case of badly posed problems, eps can be set for the Moore-Penrose pseudo inverse
+   * \param[out] cond condition number of the problem to detect (non) sufficient
+   * number of measurements
+   * \param[in] eps in case of badly posed problems, eps can be set for the
+   * Moore-Penrose pseudo inverse
    */
   bool compute(Pose & pose, double *scale = NULL, double *cond = NULL,
                double eps = std::numeric_limits<double>::epsilon() * 4 * 4);
- private:
+private:
   PosePairVector measurements_;
 };
 }
-} /* namespace msf_core */
-#endif /* SIMILARITYTRANSFORM_H_ */
+}  // namespace msf_core
+#endif  // SIMILARITYTRANSFORM_H_

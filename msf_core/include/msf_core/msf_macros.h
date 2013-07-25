@@ -31,7 +31,6 @@
 #ifndef MSF_MACROS_H_
 #define MSF_MACROS_H_
 
-
 #ifndef NUMERIC_PREC
 #define NUMERIC_PREC 4 //number of decimal places
 #endif
@@ -50,7 +49,8 @@
 #endif
 
 #ifndef STREAMQUAT
-#define STREAMQUAT(q) "["<<std::setprecision(3)<<(q).w()<<", "<<(q).x()<<", "<<(q).y()<<", "<<(q).z()<<std::setprecision(NUMERIC_PREC)<<"]"
+#define STREAMQUAT(q) "["<<std::setprecision(3)<<(q).w()<<", "<<(q).x()<<", "<< \
+    (q).y()<<", "<<(q).z()<<std::setprecision(NUMERIC_PREC)<<"]"
 #endif
 
 #ifndef DEG2RAD
@@ -141,10 +141,14 @@
     do \
     { \
       static double __log_stream_throttle__last_hit__ = 0.0; \
-      std::chrono::time_point<std::chrono::system_clock> __log_stream_throttle__now__ = std::chrono::system_clock::now(); \
-      if (MSF_UNLIKELY(__log_stream_throttle__last_hit__ + rate <= std::chrono::duration_cast<std::chrono::seconds>(__log_stream_throttle__now__.time_since_epoch()).count())) \
+      std::chrono::time_point<std::chrono::system_clock> __log_stream_throttle__now__ = \
+          std::chrono::system_clock::now(); \
+      if (MSF_UNLIKELY(__log_stream_throttle__last_hit__ + rate <= \
+         std::chrono::duration_cast<std::chrono::seconds>( \
+         __log_stream_throttle__now__.time_since_epoch()).count())) \
       { \
-        __log_stream_throttle__last_hit__ = std::chrono::duration_cast<std::chrono::seconds>(__log_stream_throttle__now__.time_since_epoch()).count(); \
+        __log_stream_throttle__last_hit__ = std::chrono::duration_cast< \
+        std::chrono::seconds>(__log_stream_throttle__now__.time_since_epoch()).count(); \
         MSF_INFO_STREAM(x); \
       } \
     } while(0)
@@ -153,10 +157,15 @@
     do \
     { \
       static double __log_stream_throttle__last_hit__ = 0.0; \
-      std::chrono::time_point<std::chrono::system_clock> __log_stream_throttle__now__ = std::chrono::system_clock::now(); \
-      if (MSF_UNLIKELY(__log_stream_throttle__last_hit__ + rate <= std::chrono::duration_cast<std::chrono::seconds>(__log_stream_throttle__now__.time_since_epoch()).count())) \
+      std::chrono::time_point<std::chrono::system_clock> __log_stream_throttle__now__ = \
+      std::chrono::system_clock::now(); \
+      if (MSF_UNLIKELY(__log_stream_throttle__last_hit__ + rate <= \
+        std::chrono::duration_cast<std::chrono::seconds>( \
+        __log_stream_throttle__now__.time_since_epoch()).count())) \
       { \
-        __log_stream_throttle__last_hit__ = std::chrono::duration_cast<std::chrono::seconds>(__log_stream_throttle__now__.time_since_epoch()).count(); \
+        __log_stream_throttle__last_hit__ = \
+        std::chrono::duration_cast<std::chrono::seconds>( \
+        __log_stream_throttle__now__.time_since_epoch()).count(); \
         MSF_WARN_STREAM(x); \
       } \
     } while(0)
@@ -165,10 +174,15 @@
     do \
     { \
       static double __log_stream_throttle__last_hit__ = 0.0; \
-      std::chrono::time_point<std::chrono::system_clock> __log_stream_throttle__now__ = std::chrono::system_clock::now(); \
-      if (MSF_UNLIKELY(__log_stream_throttle__last_hit__ + rate <= std::chrono::duration_cast<std::chrono::seconds>(__log_stream_throttle__now__.time_since_epoch()).count())) \
+      std::chrono::time_point<std::chrono::system_clock> __log_stream_throttle__now__ = \
+      std::chrono::system_clock::now(); \
+      if (MSF_UNLIKELY(__log_stream_throttle__last_hit__ + rate <= \
+        std::chrono::duration_cast<std::chrono::seconds>(\
+        __log_stream_throttle__now__.time_since_epoch()).count())) \
       { \
-        __log_stream_throttle__last_hit__ = std::chrono::duration_cast<std::chrono::seconds>(__log_stream_throttle__now__.time_since_epoch()).count(); \
+        __log_stream_throttle__last_hit__ = \
+        std::chrono::duration_cast<std::chrono::seconds>\
+        (__log_stream_throttle__now__.time_since_epoch()).count(); \
         MSF_ERROR_STREAM(x); \
       } \
     } while(0)
@@ -201,4 +215,4 @@
     } while(0)
 
 #endif
-#endif /* MSF_MACROS_H_ */
+#endif  // MSF_MACROS_H_
