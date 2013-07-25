@@ -27,4 +27,4 @@ extern __inline__ void sincos_x87_inline(double x,double *s,double *c)
 #endif
 #endif
 
-#endif /* SINCOS_H_ */
+#endif  // SINCOS_H_

@@ -38,7 +38,8 @@ template<typename EKFState_T>
 MSF_SensorManager<EKFState_T>::MSF_SensorManager() {
   sensorID_ = 0;
   data_playback_ = false;
-  msf_core_.reset(new msf_core::MSF_Core<EKFState_T>(*this));  //TODO: make this a (better) design. This is so aweful.
+  //TODO (slynen): Make this a (better) design. This is so aweful.
+  msf_core_.reset(new msf_core::MSF_Core<EKFState_T>(*this));
 }
 }
 

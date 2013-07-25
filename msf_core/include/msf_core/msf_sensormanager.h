@@ -47,9 +47,10 @@ template<typename EKFState_T>
 class MSF_Core;
 
 /** \class MSF_SensorManager
- * \brief A manager for a given sensor set. Handlers for individual sensors (camera/vicon etc.) are
- * registered with this class as handlers of particular sensors. This class also owns the
- * EKF core instance and handles the initialization of the filter
+ * \brief A manager for a given sensor set. Handlers for individual sensors
+ * (camera/vicon etc.) are registered with this class as handlers of particular
+ * sensors. This class also owns the EKF core instance and handles the
+ * initialization of the filter.
  */
 template<typename EKFState_T>
 class MSF_SensorManager : public StateVisitor<EKFState_T> {
@@ -57,10 +58,10 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
   int sensorID_;
  protected:
   typedef std::vector<shared_ptr<SensorHandler<EKFState_T> > > Handlers;
-  Handlers handlers;  ///<a list of sensor handlers which provide measurements
+  Handlers handlers;  ///< A list of sensor handlers which provide measurements.
 
   /**
-   * used to determine if internal states get overwritten by the external
+   * Used to determine if internal states get overwritten by the external
    * state prediction (online) or internal state prediction is performed
    * for log replay, when the external prediction is not available or should be
    * done on the host.
@@ -69,9 +70,8 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
 
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  ;
 
-  shared_ptr<MSF_Core<EKFState_T> > msf_core_;  ///< the ekf core instance
+  shared_ptr<MSF_Core<EKFState_T> > msf_core_;  ///< The ekf core instance.
 
   MSF_SensorManager();
 
@@ -82,8 +82,8 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
   }
   ;
   /***
-   * add a new sensor handler to the list of handlers owned by this manager
-   * a sensor handler is in turn owning the sensor (camera/vicon etc.)
+   * Add a new sensor handler to the list of handlers owned by this manager
+   * a sensor handler is in turn owning the sensor (camera/vicon etc.).
    */
   void addHandler(shared_ptr<SensorHandler<EKFState_T> > handler) {
     handler->setSensorID(sensorID_++);
@@ -91,18 +91,19 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
   }
 
   /***
-   * init function for the EKF
+   * Init function for the EKF.
    */
   virtual void init(double scale) const = 0;
 
   /***
-   * this method will be called for the user to set the initial state
+   * This method will be called for the user to set the initial state.
    */
   virtual void initState(EKFState_T& state) const = 0;
 
   /***
-   * this method will be called for the user to set the Q block entries for Auxiliary states
-   * only changes to blocks in Q belonging to the auxiliary states are allowed / evaluated
+   * This method will be called for the user to set the Q block entries for
+   * Auxiliary states only changes to blocks in Q belonging to the auxiliary
+   * states are allowed / evaluated.
    */
   virtual void calculateQAuxiliaryStates(EKFState_T& UNUSEDPARAM(state),
                                          double UNUSEDPARAM(dt)) const {
@@ -110,14 +111,15 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
   ;
 
   /***
-   * this method will be called for the user to set the initial P matrix
+   * This method will be called for the user to set the initial P matrix.
    */
   virtual void setP(
       Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,
           EKFState_T::nErrorStatesAtCompileTime>& P) const = 0;
 
   /***
-   * this method will be called for the user to have the possibility to augment the correction vector
+   * This method will be called for the user to have the possibility to augment
+   * the correction vector.
    */
   virtual void augmentCorrectionVector(
       Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, 1>& UNUSEDPARAM(correction)) const {
@@ -125,9 +127,9 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
   ;
 
   /***
-   * this method will be called for the user to check the correction after it has been applied to the state
-   * delaystate is the state on which the correction has been applied
-   * buffstate is the state before the correction was applied
+   * This method will be called for the user to check the correction after it
+   * has been applied to the state delaystate is the state on which the correction
+   * has been applied buffstate is the state before the correction was applied.
    */
   virtual void sanityCheckCorrection(
       EKFState_T& UNUSEDPARAM(delaystate),
@@ -137,7 +139,8 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
   ;
 
   /***
-   * provide a getter for these parameters, this is implemented for a given middleware or param file parser
+   * Provide a getter for these parameters, this is implemented for a given
+   * middleware or param file parser.
    */
   virtual bool getParam_fixed_bias() const = 0;
   virtual double getParam_noise_acc() const = 0;
@@ -147,17 +150,16 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
   virtual double getParam_fuzzythres() const = 0;
 
   /**
-   * This functions get called by the core to publish data to external middlewares like ROS
+   * This functions get called by the core to publish data to external
+   * middlewares like ROS.
    */
   virtual void publishStateInitial(const shared_ptr<EKFState_T>& state) const = 0;
   virtual void publishStateAfterPropagation(const shared_ptr<EKFState_T>& state) const = 0;
   virtual void publishStateAfterUpdate(const shared_ptr<EKFState_T>& state) const = 0;
 
 };
-}
-;
-// end msf_core
+}  // msf_core
 
 #include <msf_core/implementation/msf_sensormanager.hpp>
 
-#endif /* SENSORMANAGER_H */
+#endif  // SENSORMANAGER_H

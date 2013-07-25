@@ -36,7 +36,7 @@
 #include <ros/ros.h>
 #include <dynamic_reconfigure/server.h>
 
-// message includes
+// Message includes.
 #include <sensor_fusion_comm/DoubleArrayStamped.h>
 #include <sensor_fusion_comm/ExtState.h>
 #include <sensor_fusion_comm/ExtEkf.h>
@@ -53,34 +53,37 @@
 namespace msf_core {
 
 enum{
-  HLI_EKF_STATE_SIZE = 16 ///< number of states exchanged with external propagation. Here: p,v,q,bw,bw=16
+  ///< Number of states exchanged with external propagation.
+  // Here: p, v, q, bw, bw = 16
+  HLI_EKF_STATE_SIZE = 16
 };
 
 typedef dynamic_reconfigure::Server<msf_core::MSF_CoreConfig> ReconfigureServer;
 
 /** \class MSF_SensorManagerROS
- * \brief Abstract class defining user configurable calculations for the msf_core with ROS interfaces
+ * \brief Abstract class defining user configurable calculations for the msf_core
+ * with ROS interfaces.
  */
 template<typename EKFState_T>
 struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
  protected:
-  msf_core::MSF_CoreConfig config_;  ///< dynamic reconfigure config
+  msf_core::MSF_CoreConfig config_;  ///< Dynamic reconfigure config.
  private:
 
   typedef typename EKFState_T::StateDefinition_T StateDefinition_T;
   typedef typename EKFState_T::StateSequence_T StateSequence_T;
 
-  ReconfigureServer *reconfServer_;  ///< dynamic reconfigure server
+  ReconfigureServer *reconfServer_;  ///< Dynamic reconfigure server.
 
-  ros::Publisher pubState_; ///< publishes all states of the filter
-  ros::Publisher pubPose_; ///< publishes 6DoF pose output
-  ros::Publisher pubPoseAfterUpdate_; ///< publishes 6DoF pose output after the update has been applied
-  ros::Publisher pubPoseCrtl_; ///< publishes 6DoF pose including velocity output
-  ros::Publisher pubCorrect_; ///< publishes corrections for external state propagation
+  ros::Publisher pubState_; ///< Publishes all states of the filter.
+  ros::Publisher pubPose_; ///< Publishes 6DoF pose output.
+  ros::Publisher pubPoseAfterUpdate_; ///< Publishes 6DoF pose output after the update has been applied.
+  ros::Publisher pubPoseCrtl_; ///< Publishes 6DoF pose including velocity output.
+  ros::Publisher pubCorrect_; ///< Publishes corrections for external state propagation.
 
   mutable tf::TransformBroadcaster tf_broadcaster_;
 
-  sensor_fusion_comm::ExtEkf hl_state_buf_; ///< buffer to store external propagation data
+  sensor_fusion_comm::ExtEkf hl_state_buf_; ///< Buffer to store external propagation data.
 
 
  public:
@@ -105,7 +108,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
 
     hl_state_buf_.state.resize(HLI_EKF_STATE_SIZE, 0);
 
-    //  print published/subscribed topics
+    // Print published/subscribed topics.
     ros::V_string topics;
     ros::this_node::getSubscribedTopics(topics);
     std::string nodeName = ros::this_node::getName();
@@ -126,7 +129,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
   }
 
   /**
-   * \brief gets called by the internal callback caller
+   * \brief Gets called by the internal callback caller.
    */
   virtual void coreConfig(msf_core::MSF_CoreConfig &config, uint32_t level) {
     UNUSED(config);
@@ -134,19 +137,21 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
   }
 
   /**
-   * \brief gets called by dynamic reconfigure and calls all registered callbacks in callbacks_
+   * \brief Gets called by dynamic reconfigure and calls all registered
+   * callbacks in callbacks_.
    */
   void Config(msf_core::MSF_CoreConfig &config, uint32_t level) {
     config_ = config;
     coreConfig(config, level);
   }
 
-  //set the latest HL state which is needed to compute the correction to be send back to the HL
+  // Set the latest HL state which is needed to compute the correction to be
+  // send back to the HL.
   void setHLStateBuffer(const sensor_fusion_comm::ExtEkf& msg){
     hl_state_buf_ = msg;
   }
 
-  //parameter getters
+  // Parameter getters.
   virtual bool getParam_fixed_bias() const {
     return config_.core_fixed_bias;
   }
@@ -167,8 +172,8 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
   }
   virtual void publishStateInitial(const shared_ptr<EKFState_T>& state) const {
     /**
-     * \brief initialize the HLP based propagation
-     * \param state the state to send to the HLP
+     * \brief Initialize the HLP based propagation.
+     * \param State the state to send to the HLP.
      */
     sensor_fusion_comm::ExtEkf msgCorrect_;
     msgCorrect_.state.resize(HLI_EKF_STATE_SIZE, 0);
@@ -227,8 +232,8 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
     msgCorrect_.linear_acceleration.y = 0;
     msgCorrect_.linear_acceleration.z = 0;
 
-    // prevent junk being sent to the external state propagation when data playback is (accidentally) on
-
+    // Prevent junk being sent to the external state propagation when data
+    // playback is (accidentally) on.
     if (pubCorrect_.getNumSubscribers() > 0) {
       if (this->data_playback_) {
         for (int i = 0; i < HLI_EKF_STATE_SIZE; ++i) {
@@ -238,7 +243,8 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
         msgCorrect_.flag = sensor_fusion_comm::ExtEkf::initialization;
 
         MSF_ERROR_STREAM_THROTTLE(1, __FUNCTION__ <<
-                                  " You have connected the external propagation topic but at the same time data_playback is on.");
+                                  " You have connected the external propagation "
+                                  "topic but at the same time data_playback is on.");
 
       } else {
         const EKFState_T& state_const = *state;
@@ -258,25 +264,37 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
         msgCorrect_.state[8] = qbuff_q.y();
         msgCorrect_.state[9] = qbuff_q.z();
 
-        msgCorrect_.state[10] = state_const.template get<StateDefinition_T::b_w>()[0] - hl_state_buf_.state[10];
-        msgCorrect_.state[11] = state_const.template get<StateDefinition_T::b_w>()[1] - hl_state_buf_.state[11];
-        msgCorrect_.state[12] = state_const.template get<StateDefinition_T::b_w>()[2] - hl_state_buf_.state[12];
-        msgCorrect_.state[13] = state_const.template get<StateDefinition_T::b_a>()[0] - hl_state_buf_.state[13];
-        msgCorrect_.state[14] = state_const.template get<StateDefinition_T::b_a>()[1] - hl_state_buf_.state[14];
-        msgCorrect_.state[15] = state_const.template get<StateDefinition_T::b_a>()[2] - hl_state_buf_.state[15];
+        msgCorrect_.state[10] =
+            state_const.template get<StateDefinition_T::b_w>()[0] -
+            hl_state_buf_.state[10];
+        msgCorrect_.state[11] =
+            state_const.template get<StateDefinition_T::b_w>()[1] -
+            hl_state_buf_.state[11];
+        msgCorrect_.state[12] =
+            state_const.template get<StateDefinition_T::b_w>()[2] -
+            hl_state_buf_.state[12];
+        msgCorrect_.state[13] =
+            state_const.template get<StateDefinition_T::b_a>()[0] -
+            hl_state_buf_.state[13];
+        msgCorrect_.state[14] =
+            state_const.template get<StateDefinition_T::b_a>()[1] -
+            hl_state_buf_.state[14];
+        msgCorrect_.state[15] =
+            state_const.template get<StateDefinition_T::b_a>()[2] -
+            hl_state_buf_.state[15];
 
         msgCorrect_.flag = sensor_fusion_comm::ExtEkf::state_correction;
       }
 
-      if (state->checkStateForNumeric()) {  //if not NaN
+      if (state->checkStateForNumeric()) {  // If not NaN.
         pubCorrect_.publish(msgCorrect_);
       } else {
         MSF_WARN_STREAM_THROTTLE(
-            1, "Not sending updates to external EKF, because state NaN/inf");
+            1, "Not sending updates to external EKF, because state NaN/inf.");
       }
     }
 
-    // publish state
+    // Publish state.
     sensor_fusion_comm::DoubleArrayStamped msgState;
     msgState.header = msgCorrect_.header;
     state->toFullStateMsg(msgState);
@@ -284,8 +302,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
 
     if (pubPoseAfterUpdate_.getNumSubscribers()) {
 
-      // publish pose after correction with covariance
-
+      // Publish pose after correction with covariance.
       geometry_msgs::PoseWithCovarianceStamped msgPose;
       msgPose.header.stamp = ros::Time(state->time);
       msgPose.header.seq = msg_seq;
@@ -308,9 +325,8 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
                              "world", "state"));
     }
     msg_seq++;
-
   }
 };
 
 }
-#endif /* SENSORMANAGERROS_H */
+#endif  // SENSORMANAGERROS_H

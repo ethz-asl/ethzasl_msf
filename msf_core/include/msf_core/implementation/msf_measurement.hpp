@@ -37,9 +37,7 @@ MSF_MeasurementBase<EKFState_T>::MSF_MeasurementBase(bool isabsoluteMeasurement,
                                                      int sensorID)
     : sensorID_(sensorID),
       isabsolute_(isabsoluteMeasurement),
-      time(0) {
-
-}
+      time(0) { }
 
 template<typename EKFState_T>
 template<class H_type, class Res_type, class R_type>
@@ -52,8 +50,8 @@ void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrection(
   EIGEN_STATIC_ASSERT_FIXED_SIZE(H_type);
   EIGEN_STATIC_ASSERT_FIXED_SIZE(R_type);
 
-  // get measurements
-  /// correction from EKF update
+  // Get measurements.
+  /// Correction from EKF update.
   Eigen::Matrix<double, MSF_Core<EKFState_T>::nErrorStatesAtCompileTime, 1> correction_;
 
   R_type S;
@@ -69,7 +67,7 @@ void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrection(
       (MSF_Core<EKFState_T>::ErrorStateCov::Identity() - K * H_delayed);
   P = KH * P * KH.transpose() + K * R_delayed * K.transpose();
 
-  // make sure P stays symmetric
+  // Make sure P stays symmetric.
   P = 0.5 * (P + P.transpose());
 
   core.applyCorrection(state, correction_);
@@ -81,8 +79,8 @@ void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrection(
     const Eigen::MatrixXd& H_delayed, const Eigen::MatrixXd & res_delayed,
     const Eigen::MatrixXd& R_delayed) {
 
-  // get measurements
-  /// correction from EKF update
+  // Get measurements.
+  /// Correction from EKF update.
   Eigen::Matrix<double, MSF_Core<EKFState_T>::nErrorStatesAtCompileTime, 1> correction_;
 
   Eigen::MatrixXd S;
@@ -99,7 +97,7 @@ void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrection(
       (MSF_Core<EKFState_T>::ErrorStateCov::Identity() - K * H_delayed);
   P = KH * P * KH.transpose() + K * R_delayed * K.transpose();
 
-  // make sure P stays symmetric
+  // Make sure P stays symmetric.
   P = 0.5 * (P + P.transpose());
 
   core.applyCorrection(state, correction_);
@@ -118,15 +116,15 @@ void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrectionRelative(
   EIGEN_STATIC_ASSERT_FIXED_SIZE(H_type);
   EIGEN_STATIC_ASSERT_FIXED_SIZE(R_type);
 
-  // get measurements
-  /// correction from EKF update
+  // Get measurements.
+  /// Correction from EKF update.
   Eigen::Matrix<double, MSF_Core<EKFState_T>::nErrorStatesAtCompileTime, 1> correction_;
 
   enum {
     Pdim = MSF_Core<EKFState_T>::nErrorStatesAtCompileTime
   };
 
-  //get the accumulated system dynamics
+  // Get the accumulated system dynamics.
   Eigen::Matrix<double, Pdim, Pdim> F_accum;
   core.getAccumF_SC(state_old, state_new, F_accum);
 
@@ -137,7 +135,8 @@ void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrectionRelative(
    */
   Eigen::Matrix<double, 2 * Pdim, 2 * Pdim> P_SC;
   P_SC.template block<Pdim, Pdim>(0, 0) = state_old->P;
-  P_SC.template block<Pdim, Pdim>(0, Pdim) = state_old->P * F_accum.transpose();  //according to TRO paper, ICRA paper has a mistake here
+  // According to TRO paper, ICRA paper has a mistake here.
+  P_SC.template block<Pdim, Pdim>(0, Pdim) = state_old->P * F_accum.transpose();
   P_SC.template block<Pdim, Pdim>(Pdim, 0) = F_accum * state_old->P;
   P_SC.template block<Pdim, Pdim>(Pdim, Pdim) = state_new->P;
 
@@ -146,16 +145,15 @@ void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrectionRelative(
    */
   Eigen::Matrix<double, H_type::RowsAtCompileTime, H_type::ColsAtCompileTime * 2> H_SC;
 
-  H_SC.template block<H_type::RowsAtCompileTime, H_type::ColsAtCompileTime>(0,
-                                                                            0) =
-      H_old;
+  H_SC.template block<H_type::RowsAtCompileTime,
+      H_type::ColsAtCompileTime>(0, 0) = H_old;
   H_SC.template block<H_type::RowsAtCompileTime, H_type::ColsAtCompileTime>(
       0, H_type::ColsAtCompileTime) = H_new;
 
   R_type S_SC;
   S_SC = H_SC * P_SC * H_SC.transpose() + R;
 
-  //TODO: only compute the part of K_SC that we need.
+  //TODO (slynen): Only compute the part of K_SC that we need.
   Eigen::Matrix<double, MSF_Core<EKFState_T>::nErrorStatesAtCompileTime * 2,
       R_type::RowsAtCompileTime> K_SC;
   K_SC = P_SC * H_SC.transpose() * S_SC.inverse();
@@ -172,11 +170,11 @@ void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrectionRelative(
   typename MSF_Core<EKFState_T>::ErrorStateCov & P = state_new->P;
   P = P - K * S_SC * K.transpose();
 
-  //TODO: EV, set Evalues<eps to zero, then reconstruct
-  state_new->P = 0.5 * (state_new->P + state_new->P.transpose());  // make sure P stays symmetric
+  // Make sure P stays symmetric.
+  // TODO (slynen): EV, set Evalues<eps to zero, then reconstruct.
+  state_new->P = 0.5 * (state_new->P + state_new->P.transpose());
 
   core.applyCorrection(state_new, correction_);
-
 }
 
 template<typename EKFState_T>
@@ -184,17 +182,18 @@ void MSF_InitMeasurement<EKFState_T>::apply(
     shared_ptr<EKFState_T> stateWithCovariance,
     MSF_Core<EKFState_T>& core) {
 
-  stateWithCovariance->time = this->time;  //makes this state a valid starting point
+  // Makes this state a valid starting point.
+  stateWithCovariance->time = this->time;
 
   boost::fusion::for_each(stateWithCovariance->statevars,
                           msf_tmp::copyInitStates<EKFState_T>(InitState));
 
   if (!(InitState.P.minCoeff() == 0 && InitState.P.maxCoeff() == 0)) {
     stateWithCovariance->P = InitState.P;
-    MSF_WARN_STREAM("Using user defined initial error state covariance");
+    MSF_WARN_STREAM("Using user defined initial error state covariance.");
   } else {
     MSF_WARN_STREAM(
-        "Using simulated core plus fixed diag initial error state covariance");
+        "Using simulated core plus fixed diag initial error state covariance.");
   }
 
   if (ContainsInitialSensorReadings_) {

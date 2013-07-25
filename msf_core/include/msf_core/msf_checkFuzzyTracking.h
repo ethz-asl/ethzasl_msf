@@ -45,19 +45,22 @@ class CheckFuzzyTracking {
 
   enum {
     qbuffRowsAtCompiletime = msf_tmp::StateLengthForType<
-        const typename msf_tmp::StripConstReference<NONTEMPORALDRIFTINGTYPE>::result_t&>::value,
-    nBuff_ = 30  ///< buffer size for median non drifting state values
+        const typename
+        msf_tmp::StripConstReference<NONTEMPORALDRIFTINGTYPE>::result_t&>::value,
+    nBuff_ = 30  ///< Buffer size for median non drifting state values.
   };
 
-  int nontemporaldrifting_inittimer_;  ///< a counter for fuzzy tracking detection
-  Eigen::Matrix<double, nBuff_, qbuffRowsAtCompiletime> qbuff_;  //if there is no non temporal drifting state this matrix will have zero rows, to make use of it illegal
+  int nontemporaldrifting_inittimer_;  ///< A counter for fuzzy tracking detection
+  // If there is no non temporal drifting state this matrix will have zero rows,
+  // to make use of it illegal.
+  Eigen::Matrix<double, nBuff_, qbuffRowsAtCompiletime> qbuff_;
 
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   ;
 
   void reset() {
-    // buffer for vision failure check
+    // Buffer for vision failure check.
     nontemporaldrifting_inittimer_ = 1;
     qbuff_ = Eigen::Matrix<double, nBuff_, qbuffRowsAtCompiletime>::Constant(0);
   }
@@ -68,28 +71,31 @@ class CheckFuzzyTracking {
 
   bool check(shared_ptr<EKFState_T> delaystate, EKFState_T& buffstate,
              double fuzzythres) {
-    //for now make sure the non drifting state is a quaternion.
-
+    // For now make sure the non drifting state is a quaternion.
     bool isfuzzy = false;
 
     const bool isquaternion =
         msf_tmp::isQuaternionType<
             typename msf_tmp::StripConstReference<NONTEMPORALDRIFTINGTYPE>::result_t>::value;
-    BOOST_STATIC_ASSERT_MSG(
+    static_assert(
         isquaternion,
         "Assumed that the non drifting state is a Quaternion, "
-        "which is not the case for the currently defined state vector. If you want to use an euclidean state, please first adapt qbuff and the error detection routines");
+        "which is not the case for the currently defined state vector. If you "
+        "want to use an euclidean state, please first adapt qbuff and the error "
+        "detection routines");
     typedef typename EKFState_T::StateDefinition_T StateDefinition_T;
     typedef typename EKFState_T::StateSequence_T StateSequence_T;
 
     enum {
       indexOfStateWithoutTemporalDrift = msf_tmp::IndexOfBestNonTemporalDriftingState<
           StateSequence_T>::value,
-      nErrorStatesAtCompileTime = EKFState_T::nErrorStatesAtCompileTime,  ///< error state length
-      nStatesAtCompileTime = EKFState_T::nStatesAtCompileTime  ///< complete state length
+       /// Error state length.
+      nErrorStatesAtCompileTime = EKFState_T::nErrorStatesAtCompileTime,
+      /// Complete state length.
+      nStatesAtCompileTime = EKFState_T::nStatesAtCompileTime
     };
 
-    // update qbuff_ and check for fuzzy tracking
+    // Update qbuff_ and check for fuzzy tracking.
     if (nontemporaldrifting_inittimer_ > nBuff_) {
       // should be unit quaternion if no error
       Eigen::Quaternion<double> errq =
@@ -102,34 +108,43 @@ class CheckFuzzyTracking {
               getMedian(qbuff_. template block<nBuff_, 1> (0, 2))
           );
 
-          if (std::max(errq.vec().maxCoeff(), -errq.vec().minCoeff()) / fabs(errq.w()) * 2 > fuzzythres) // fuzzy tracking (small angle approx)
+          if (std::max(errq.vec().maxCoeff(), -errq.vec().minCoeff()) /
+              fabs(errq.w()) * 2 > fuzzythres) // Fuzzy tracking (small angle approx).
       {
-        MSF_WARN_STREAM("fuzzy tracking triggered: " << std::max(errq.vec().maxCoeff(), -errq.vec().minCoeff())/fabs(errq.w())*2 << " limit: " << fuzzythres <<"\n");
+        MSF_WARN_STREAM("Fuzzy tracking triggered: " <<
+                        std::max(errq.vec().maxCoeff(), -errq.vec().minCoeff()) /
+                        fabs(errq.w())*2 << " limit: " << fuzzythres <<"\n");
 
-        //copy the non propagation states back from the buffer
+        // Copy the non propagation states back from the buffer.
         boost::fusion::for_each(
             delaystate->statevars,
             msf_tmp::copyNonPropagationStates<EKFState_T>(buffstate)
         );
 
-        BOOST_STATIC_ASSERT_MSG(static_cast<int>(EKFState_T::nPropagatedCoreErrorStatesAtCompileTime) == 9, "Assumed that nPropagatedCoreStates == 9, which is not the case");
+        static_assert(static_cast<int>(
+            EKFState_T::nPropagatedCoreErrorStatesAtCompileTime) == 9,
+                                "Assumed that nPropagatedCoreStates == 9, "
+                                "which is not the case");
         isfuzzy = true;
       }
-      else // if tracking ok: update mean and 3sigma of past N non drifting state values
+      else // If tracking ok: update mean and 3sigma of past N non drifting state values.
       {
-        qbuff_. template block<1, 4> (nontemporaldrifting_inittimer_ - nBuff_ - 1, 0) = Eigen::Matrix<double, 1, 4>(const_cast<const EKFState_T&>(*delaystate). template get<indexOfStateWithoutTemporalDrift>().coeffs());
+        qbuff_. template block<1, 4>(nontemporaldrifting_inittimer_ - nBuff_ - 1, 0) =
+            Eigen::Matrix<double, 1, 4>(const_cast<const EKFState_T&>(*delaystate).
+                                        template get<indexOfStateWithoutTemporalDrift>().coeffs());
         nontemporaldrifting_inittimer_ = (nontemporaldrifting_inittimer_) % nBuff_ + nBuff_ + 1;
       }
     }
-      else  // at beginning get mean and 3sigma of past N non drifting state values
+      else  // At beginning get mean and 3sigma of past N non drifting state values.
       {
-        qbuff_. template block<1, 4> (nontemporaldrifting_inittimer_ - 1, 0) = Eigen::Matrix<double, 1, 4>(const_cast<const EKFState_T&>(*delaystate). template get<indexOfStateWithoutTemporalDrift>().coeffs());
+        qbuff_. template block<1, 4> (nontemporaldrifting_inittimer_ - 1, 0) =
+            Eigen::Matrix<double, 1, 4>(const_cast<const EKFState_T&>(*delaystate).
+                                        template get<indexOfStateWithoutTemporalDrift>().coeffs());
         nontemporaldrifting_inittimer_++;
       }
     return isfuzzy;
   }
-}
-;
+};
 
 template<typename EKFState_T>
 class CheckFuzzyTracking<EKFState_T, mpl_::void_> {
@@ -143,7 +158,5 @@ class CheckFuzzyTracking<EKFState_T, mpl_::void_> {
   }
   ;
 };
-
 }
-
-#endif /* MSF_CHECKFUZZYTRACKING_H_ */
+#endif  // MSF_CHECKFUZZYTRACKING_H_

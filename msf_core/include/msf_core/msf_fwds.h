@@ -68,7 +68,8 @@ template<typename T> struct CorrectionStateLengthForType;
 template<typename T> struct StateLengthForType;
 template<typename T> struct getEnumStateName;
 
-template<typename Sequence, template<typename > class Counter, typename First, typename Last, bool T>
+template<typename Sequence, template<typename > class Counter, typename First,
+    typename Last, bool T>
 struct countStatesLinear;
 
 template<typename Sequence, typename First, typename Last, int CurrentIdx, bool T>

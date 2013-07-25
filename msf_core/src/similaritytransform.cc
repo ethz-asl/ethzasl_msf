@@ -43,38 +43,39 @@ From6DoF::From6DoF()
 }
 
 void From6DoF::addMeasurement(const PosePair & measurement)
-{
+                              {
   measurements_.push_back(measurement);
 }
 
 void From6DoF::addMeasurement(const Pose & pose1, const Pose & pose2)
-{
+                              {
   addMeasurement(PosePair(pose1, pose2));
 }
 
 bool From6DoF::compute(Pose & pose, double *scale, double *cond, double eps)
-{
-  const int n = 4; // number of parameters we need to optimize
+                       {
+  const int n = 4;  // Number of parameters we need to optimize.
   const int m = measurements_.size();
 
   if (m < 2)
     return false;
 
-  Matrix4 M(Matrix4::Zero()); // quaternion outer sum matrix
-  Eigen::Matrix<double, Eigen::Dynamic, n> A; // matrix collecting the measurements for position and scale
+  Matrix4 M(Matrix4::Zero());  // Quaternion outer sum matrix.
+  // Matrix collecting the measurements for position and scale.
+  Eigen::Matrix<double, Eigen::Dynamic, n> A;
   A.resize(m * 3, Eigen::NoChange);
 
   Eigen::Matrix<double, Eigen::Dynamic, 1> b;
   b.resize(m * 3, Eigen::NoChange);
 
   for (int i = 0; i < m; i++)
-  {
-    // quaternion averaging
+      {
+    // Quaternion averaging.
     const PosePair & pp = measurements_[i];
     const Eigen::Quaterniond q1 = geometry_msgsToEigen(pp.first.pose.orientation);
     const Eigen::Quaterniond q2 = geometry_msgsToEigen(pp.second.pose.orientation);
     Eigen::Quaterniond q(q1.inverse() * q2);
-    M += q.coeffs() * q.coeffs().transpose(); // order is x y z w here !!!
+    M += q.coeffs() * q.coeffs().transpose();  // Order is x y z w here !!!
 
         //
     const Vector3 t1 = geometry_msgsToEigen(pp.first.pose.position);
@@ -85,18 +86,19 @@ bool From6DoF::compute(Pose & pose, double *scale, double *cond, double eps)
     b.block<3, 1>(i * 3, 0) = q1.inverse() * t1;
   }
 
-  // mean quaternion
-  Eigen::SelfAdjointEigenSolver<Eigen::Matrix<double, 4, 4> > q_solver(M);
-  Eigen::Quaterniond q_mean = Eigen::Quaterniond(q_solver.eigenvectors().col(3)); // eigenvalues/vectors are sorted in increasing order here ...
+  // Mean quaternion.
+  Eigen::SelfAdjointEigenSolver < Eigen::Matrix<double, 4, 4> > q_solver(M);
+  // Eigenvalues/vectors are sorted in increasing order here ...
+  Eigen::Quaterniond q_mean = Eigen::Quaterniond(q_solver.eigenvectors().col(3));
 
-  // mean position and scale
+  // Mean position and scale.
   Matrix4 A_hat = A.transpose() * A;
   Matrix4 S_hat(Matrix4::Zero());
   Vector4 b_hat = A.transpose() * b;
 
   Eigen::JacobiSVD<Matrix4> svd(A_hat, Eigen::ComputeFullU | Eigen::ComputeFullV);
   for (int i = 0; i < n; i++)
-  {
+      {
     if (svd.singularValues()[i] < eps)
       S_hat(i, i) = 0;
     else
@@ -116,4 +118,4 @@ bool From6DoF::compute(Pose & pose, double *scale, double *cond, double eps)
 }
 
 }
-} /* namespace msf_core */
+}  // namespace msf_core

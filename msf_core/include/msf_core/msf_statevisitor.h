@@ -29,20 +29,20 @@
 
  */
 
-#ifndef MSF_STATEVISITOR_HPP_
-#define MSF_STATEVISITOR_HPP_
+#ifndef MSF_STATEVISITOR_H_
+#define MSF_STATEVISITOR_H_
 
 namespace msf_core {
 
 /**
- * \brief visitor pattern to allow the user to set state init values
+ * \brief Visitor pattern to allow the user to set state init values.
  */
 template<typename EKFState_T>
 class StateVisitor {
  public:
   /**
-   * \brief the state is set to zero/identity, this method will be called to
-   * give the user the possibility to change the reset values of some states
+   * \brief The state is set to zero/identity, this method will be called to
+   * give the user the possibility to change the reset values of some states.
    */
   virtual void resetState(EKFState_T& state) const = 0;
   virtual ~StateVisitor() {
@@ -51,4 +51,4 @@ class StateVisitor {
 };
 
 }
-#endif /* MSF_STATEVISITOR_HPP_ */
+#endif /* MSF_STATEVISITOR_H_ */

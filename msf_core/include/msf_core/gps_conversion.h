@@ -57,4 +57,4 @@ class GPSConversion {
 };
 
 }
-#endif /* GPS_CONVERSION_H_ */
+#endif  // GPS_CONVERSION_H_

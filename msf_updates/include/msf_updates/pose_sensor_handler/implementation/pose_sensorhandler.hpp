@@ -116,7 +116,7 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(c
 
   //get the fixed states
   int fixedstates = 0;
-  BOOST_STATIC_ASSERT_MSG(msf_updates::EKFState::nStateVarsAtCompileTime < 32, "Your state has more than 32 variables. "
+  static_assert(msf_updates::EKFState::nStateVarsAtCompileTime < 32, "Your state has more than 32 variables. "
                           "The code needs to be changed here to have a larger variable to mark the fixed_states"); //do not exceed the 32 bits of int
 
   //get all the fixed states and set flag bits
