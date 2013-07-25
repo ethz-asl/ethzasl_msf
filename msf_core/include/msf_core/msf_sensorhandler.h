@@ -35,7 +35,7 @@
 namespace msf_core{
 /**
  * \class SensorHandler
- * \brief handles a sensor driver which provides the sensor readings
+ * \brief Handles a sensor driver which provides the sensor readings.
  */
 template<typename EKFState_T>
 class SensorHandler {
@@ -73,5 +73,4 @@ class SensorHandler {
   }
 };
 }
-
-#endif /* MSF_SENSORHANDLER_H_ */
+#endif  // MSF_SENSORHANDLER_H_

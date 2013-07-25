@@ -29,8 +29,8 @@
 
  */
 
-#ifndef STATIC_ORDERING_ASSERTIONS_CORE_HPP_
-#define STATIC_ORDERING_ASSERTIONS_CORE_HPP_
+#ifndef STATIC_ORDERING_ASSERTIONS_CORE_H_
+#define STATIC_ORDERING_ASSERTIONS_CORE_H_
 
 #include <boost/static_assert.hpp>
 #include <msf_core/msf_tmp.h>
@@ -46,8 +46,10 @@ struct StaticAssertCoreStateOrderingCorrect {
     value
   };
 
-  //for now we have no make sure, the core states are in the correct order
-  //(calculation of observation noise cov has hardcoded order) DO NOT REMOVE THIS!! UNLESS YOU ALSO FIXED CalcQCore!
+  // For now we have no make sure, the core states are in the correct order
+  //(calculation of observation noise cov has hardcoded order)
+  // DO NOT REMOVE THIS!! UNLESS YOU ALSO FIXED CalcQCore!
+  // TODO: (slynen) This should be ok now, apart from the Cov init matrix.
   //{
   enum {
     idxstartcorr_p_ = msf_tmp::getStartIndex<StateSequence_T,
@@ -73,14 +75,19 @@ struct StaticAssertCoreStateOrderingCorrect {
         msf_tmp::CorrectionStateLengthForType>::value
   };
 
-  BOOST_STATIC_ASSERT_MSG(idxstartcorr_p_==0, "Indexing of core states has been altered, but this is currently not allowed");
-  BOOST_STATIC_ASSERT_MSG(idxstartcorr_v_==3, "Indexing of core states has been altered, but this is currently not allowed");
-  BOOST_STATIC_ASSERT_MSG(idxstartcorr_q_==6, "Indexing of core states has been altered, but this is currently not allowed");
-  BOOST_STATIC_ASSERT_MSG(idxstartcorr_b_w_==9, "Indexing of core states has been altered, but this is currently not allowed");
-  BOOST_STATIC_ASSERT_MSG(idxstartcorr_b_a_==12, "Indexing of core states has been altered, but this is currently not allowed");
+  static_assert(idxstartcorr_p_==0, "Indexing of core states has been altered, "
+      "but this is currently not allowed");
+  static_assert(idxstartcorr_v_==3, "Indexing of core states has been altered, "
+      "but this is currently not allowed");
+  static_assert(idxstartcorr_q_==6, "Indexing of core states has been altered, "
+      "but this is currently not allowed");
+  static_assert(idxstartcorr_b_w_==9, "Indexing of core states has been altered, "
+      "but this is currently not allowed");
+  static_assert(idxstartcorr_b_a_==12, "Indexing of core states has been altered, "
+      "but this is currently not allowed");
   //}
 };
 
 }
 
-#endif /* STATIC_ORDERING_ASSERTIONS_HPP_ */
+#endif  // STATIC_ORDERING_ASSERTIONS_H_

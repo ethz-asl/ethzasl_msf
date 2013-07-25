@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2012, Simon Lynen, ASL, ETH Zurich, Switzerland
+Copyright (c) 2013, Simon Lynen, ASL, ETH Zurich, Switzerland
 You can contact the author at <slynen at ethz dot ch>
 
 All rights reserved.
@@ -37,7 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <boost/shared_ptr.hpp>
 #include  <memory> //std::shared_ptr
 
-//switch between boost shared and std shared
+// Switch between boost shared and std shared:
 using boost::shared_ptr;
 using boost::dynamic_pointer_cast;
 
