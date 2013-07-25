@@ -38,8 +38,7 @@
 #include <string>
 #include <vector>
 
-#include <sm/timing/Timer.hpp>
-
+#include <msf_timing/Timer.h>
 #include <msf_core/implementation/calcQCore.h>
 #include <msf_core/eigen_utils.h>
 #include <msf_core/msf_sensormanager.h>
@@ -51,7 +50,8 @@
 namespace msf_core {
 template<typename EKFState_T>
 MSF_Core<EKFState_T>::MSF_Core(const MSF_SensorManager<EKFState_T>& usercalc)
-    : usercalc_(usercalc) {  // the interface for the user to customize EKF interna, DO ABSOLUTELY NOT USE THIS POINTER INSIDE THIS CTOR!!
+    : usercalc_(usercalc) {  // the interface for the user to customize EKF
+  // interna, DO ABSOLUTELY NOT USE THIS POINTER INSIDE THIS CTOR!!
 
   std::setprecision(NUMERIC_PREC);  //set the output precision for numeric values
 
@@ -116,15 +116,15 @@ void MSF_Core<EKFState_T>::process_imu(
   if (!initialized_)
     return;
 
-  sm::timing::Timer timer_PropgetClosestState("PropgetClosestState");
+  msf_timing::DebugTimer timer_PropgetClosestState("PropgetClosestState");
   if(it_last_IMU == stateBuffer_.getIteratorEnd()){
     it_last_IMU = stateBuffer_.getIteratorClosestBefore(msg_stamp);
   }
 
   shared_ptr<EKFState_T> lastState = it_last_IMU->second;
-  timer_PropgetClosestState.stop();
+  timer_PropgetClosestState.Stop();
 
-  sm::timing::Timer timer_PropPrepare("PropPrepare");
+  msf_timing::DebugTimer timer_PropPrepare("PropPrepare");
   if (lastState->time == -1) {
     MSF_WARN_STREAM_THROTTLE(
         2, __FUNCTION__<<"ImuCallback: closest state is invalid\n");
@@ -185,22 +185,22 @@ void MSF_Core<EKFState_T>::process_imu(
         "Wanted to propagate state, but no valid prior state could be found in the buffer");
     return;
   }
-  timer_PropPrepare.stop();
+  timer_PropPrepare.Stop();
 
-  sm::timing::Timer timer_PropState("PropState");
+  msf_timing::DebugTimer timer_PropState("PropState");
   //propagate state and covariance
   propagateState(lastState, currentState);
-  timer_PropState.stop();
-  sm::timing::Timer timer_PropCov("PropCov");
+  timer_PropState.Stop();
+  msf_timing::DebugTimer timer_PropCov("PropCov");
   propagatePOneStep();
-  timer_PropCov.stop();
+  timer_PropCov.Stop();
 
   if (stateBuffer_.size() > 3)  //making sure we have sufficient states to apply measurements to
     predictionMade_ = true;
 
-  sm::timing::Timer timer_PropInsertState("PropInsertState");
+  msf_timing::DebugTimer timer_PropInsertState("PropInsertState");
   it_last_IMU = stateBuffer_.insert(currentState);
-  timer_PropInsertState.stop();
+  timer_PropInsertState.Stop();
 
   if (predictionMade_) {
     handlePendingMeasurements();  //check if we can apply some pending measurement
@@ -573,7 +573,7 @@ void MSF_Core<EKFState_T>::init(
   MSF_INFO_STREAM("core init with state:"<<std::endl<<state->print());
   initialized_ = true;
 
-  sm::timing::Timing::print(std::cout);
+  msf_timing::Timing::Print(std::cout);
 }
 
 template<typename EKFState_T>
@@ -613,19 +613,19 @@ void MSF_Core<EKFState_T>::addMeasurement(
 
     if (it_meas->second->time <= 0)  //valid?
       continue;
-    sm::timing::Timer timer_meas_get_state("Get state for measurement");
+    msf_timing::DebugTimer timer_meas_get_state("Get state for measurement");
     shared_ptr<EKFState_T> state = getClosestState(
         it_meas->second->time);  //propagates covariance to state
-    timer_meas_get_state.stop();
+    timer_meas_get_state.Stop();
     if (state->time <= 0) {
       MSF_ERROR_STREAM_THROTTLE(
           1, __FUNCTION__<< " getClosestState returned an invalid state");
       continue;
     }
 
-    sm::timing::Timer timer_meas_apply("Apply measurement");
+    msf_timing::DebugTimer timer_meas_apply("Apply measurement");
     it_meas->second->apply(state, *this);  //calls back core::applyCorrection(), which sets time_P_propagated to meas time
-    timer_meas_apply.stop();
+    timer_meas_apply.Stop();
     //make sure to propagate to next measurement or up to now if no more measurements
     it_curr = stateBuffer_.getIteratorAtValue(state);  //propagate from current state
 
@@ -645,7 +645,7 @@ void MSF_Core<EKFState_T>::addMeasurement(
     typename StateBuffer_T::iterator_T it_next = it_curr;
     ++it_next;
 
-    sm::timing::Timer timer_prop_state_after_meas("Repropagate state to now");
+    msf_timing::DebugTimer timer_prop_state_after_meas("Repropagate state to now");
     for (;
         it_curr != it_end && it_next != it_end && it_curr->second->time != -1
             && it_next->second->time != -1; ++it_curr, ++it_next) {  //propagate to selected state
@@ -657,7 +657,7 @@ void MSF_Core<EKFState_T>::addMeasurement(
         return;
       propagateState(it_curr->second, it_next->second);
     }
-    timer_prop_state_after_meas.stop();
+    timer_prop_state_after_meas.Stop();
     appliedOne = true;
   }
 
