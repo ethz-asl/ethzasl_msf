@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Eigen/Dense>
 #include <msf_core/msf_fwds.h>
 #include <boost/fusion/container.hpp>
-#include <boost/static_assert.hpp>
+ 
 
 namespace msf_updates{
 

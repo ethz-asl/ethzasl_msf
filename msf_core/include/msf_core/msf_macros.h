@@ -1,38 +1,24 @@
 /*
-
- Copyright (c) 2013, Simon Lynen, ASL, ETH Zurich, Switzerland
- You can contact the author at <slynen at ethz dot ch>
-
- All rights reserved.
-
- Redistribution and use in source and binary forms, with or without
- modification, are permitted provided that the following conditions are met:
- * Redistributions of source code must retain the above copyright
- notice, this list of conditions and the following disclaimer.
- * Redistributions in binary form must reproduce the above copyright
- notice, this list of conditions and the following disclaimer in the
- documentation and/or other materials provided with the distribution.
- * Neither the name of ETHZ-ASL nor the
- names of its contributors may be used to endorse or promote products
- derived from this software without specific prior written permission.
-
- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- DISCLAIMED. IN NO EVENT SHALL ETHZ-ASL BE LIABLE FOR ANY
- DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+ * Copyright (C) 2012-2013 Simon Lynen, ASL, ETH Zurich, Switzerland
+ * You can contact the author at <slynen at ethz dot ch>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 #ifndef MSF_MACROS_H_
 #define MSF_MACROS_H_
 
 #ifndef NUMERIC_PREC
-#define NUMERIC_PREC 4 //number of decimal places
+#define NUMERIC_PREC 4 // Number of decimal places.
 #endif
 
 #ifdef UNUSEDPARAM
@@ -66,7 +52,7 @@
 #endif
 
 
-#ifdef ROS_PACKAGE_NAME //use ROS if it is available
+#ifdef ROS_PACKAGE_NAME // Use ROS if it is available.
 #include <ros/console.h>
 #define MSF_INFO_STREAM(x) ROS_INFO_STREAM(x)
 #define MSF_WARN_STREAM(x) ROS_WARN_STREAM(x)
@@ -85,9 +71,9 @@
 #define MSF_ERROR_STREAM_COND(cond, x) ROS_ERROR_STREAM_COND(cond, x)
 
 #else
-#include <chrono> //using std::chrono instead of ros time
+#include <chrono> // Using std::chrono instead of ros::Time.
 
-//adapted from rosconsole
+// Adapted from rosconsole.
 //Copyright (c) 2008, Willow Garage, Inc.
 #ifndef MSF_INFO_STREAM
 #define MSF_INFO_STREAM(x) std::cerr<<"\033[0;0m[INFO] "<<x<<"\033[0;0m"<<std::endl;
