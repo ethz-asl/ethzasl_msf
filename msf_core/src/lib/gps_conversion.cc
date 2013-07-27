@@ -19,15 +19,16 @@
 #include <ros/ros.h>
 #include <msf_core/sincos.h>
 
-namespace msf_core{
+namespace msf_core {
 
-GPSConversion::GPSConversion(){
+GPSConversion::GPSConversion() {
   ecef_ref_point_ = msf_core::Vector3::Zero();
   ecef_ref_orientation_.setIdentity();
 }
 
-void GPSConversion::initReference(const double & latitude, const double & longitude, const double & altitude)
-{
+void GPSConversion::initReference(const double & latitude,
+                                  const double & longitude,
+                                  const double & altitude) {
   msf_core::Matrix3 R;
   double s_long, s_lat, c_long, c_lat;
   sincos(latitude * DEG2RAD, &s_lat, &c_lat);
@@ -50,10 +51,11 @@ void GPSConversion::initReference(const double & latitude, const double & longit
   ecef_ref_point_ = wgs84ToEcef(latitude, longitude, altitude);
 }
 
-msf_core::Vector3 GPSConversion::wgs84ToEcef(const double & latitude, const double & longitude, const double & altitude) const
-{
-  const double a = 6378137.0; // semi-major axis
-  const double e_sq = 6.69437999014e-3; // first eccentricity squared
+msf_core::Vector3 GPSConversion::wgs84ToEcef(const double & latitude,
+                                             const double & longitude,
+                                             const double & altitude) const {
+  const double a = 6378137.0;  // semi-major axis
+  const double e_sq = 6.69437999014e-3;  // first eccentricity squared
 
   double s_long, s_lat, c_long, c_lat;
   sincos(latitude * DEG2RAD, &s_lat, &c_lat);
@@ -70,15 +72,16 @@ msf_core::Vector3 GPSConversion::wgs84ToEcef(const double & latitude, const doub
   return ecef;
 }
 
-msf_core::Vector3 GPSConversion::ecefToEnu(const msf_core::Vector3 & ecef) const
-{
-  if(ecef_ref_point_.norm() == 0){
-    MSF_ERROR_STREAM_ONCE("The gps reference is not initialized. Returning global coordinates. This warning will only show once.");
+msf_core::Vector3 GPSConversion::ecefToEnu(
+    const msf_core::Vector3 & ecef) const {
+  if (ecef_ref_point_.norm() == 0) {
+    MSF_ERROR_STREAM_ONCE(
+        "The gps reference is not initialized. Returning global coordinates. This warning will only show once.");
   }
   return ecef_ref_orientation_ * (ecef - ecef_ref_point_);
 }
 
-void GPSConversion::adjustReference(double z_corr){
+void GPSConversion::adjustReference(double z_corr) {
   MSF_WARN_STREAM("z-ref old: "<<ecef_ref_point_(2));
   ecef_ref_point_(2) += z_corr;
   MSF_WARN_STREAM("z-ref new: "<<ecef_ref_point_(2));

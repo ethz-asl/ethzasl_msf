@@ -53,10 +53,11 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
 
   PositionPoseSensorManager(
       ros::NodeHandle pnh = ros::NodeHandle("~/position_pose_sensor")) {
+    imu_handler_.reset(
+        new msf_core::IMUHandler_ROS<msf_updates::EKFState>(*this, "msf_core",
+                                                            "imu_handler"));
 
-    imu_handler_.reset(new msf_core::IMUHandler_ROS<msf_updates::EKFState>(*this, "msf_core", "imu_handler"));
-
-    bool distortmeas = false;  ///<distort the pose measurements TODO make param
+    bool distortmeas = false;  ///< Distort the pose measurements
 
     pose_handler_.reset(
         new PoseSensorHandler_T(*this, "", "pose_sensor", distortmeas));
@@ -84,10 +85,10 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
   shared_ptr<PositionSensorHandler_T> position_handler_;
 
   Config_T config_;
-  ReconfigureServerPtr reconf_server_;  ///< dynamic reconfigure server
+  ReconfigureServerPtr reconf_server_;  ///< Dynamic reconfigure server.
 
   /**
-   * \brief dynamic reconfigure callback
+   * \brief Dynamic reconfigure callback.
    */
   virtual void config(Config_T &config, uint32_t level) {
     config_ = config;
@@ -104,13 +105,14 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
       config.core_init_filter = false;
     }
 
-    //Init call with "set height" checkbox
+    // Init call with "set height" checkbox.
     if ((level & msf_updates::PositionPoseSensor_SET_HEIGHT)
         && config.core_set_height == true) {
       Eigen::Matrix<double, 3, 1> p = pose_handler_->getPositionMeasurement();
       if (p.norm() == 0) {
         MSF_WARN_STREAM(
-            "No measurements received yet to initialize position. Height init not allowed.");
+            "No measurements received yet to initialize position. Height init "
+            "not allowed.");
         return;
       }
       double scale = p[2] / config.core_height;
@@ -126,18 +128,18 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     msf_core::MSF_Core<EKFState_T>::ErrorStateCov P;
 
     // init values
-    g << 0, 0, 9.81;	        /// gravity
-    b_w << 0, 0, 0;		/// bias gyroscopes
-    b_a << 0, 0, 0;		/// bias accelerometer
+    g << 0, 0, 9.81;	/// Gravity.
+    b_w << 0, 0, 0;		/// Bias gyroscopes.
+    b_a << 0, 0, 0;		/// Bias accelerometer.
 
-    v << 0, 0, 0;			/// robot velocity (IMU centered)
-    w_m << 0, 0, 0;		/// initial angular velocity
-    a_m = g;			/// initial acceleration
+    v << 0, 0, 0;			/// Robot velocity (IMU centered).
+    w_m << 0, 0, 0;		/// Initial angular velocity.
+    a_m = g;			    /// Initial acceleration.
 
-    q_wv.setIdentity();  // world-vision rotation drift
-    p_wv.setZero();  //world-vision position drift
+    q_wv.setIdentity();  // World-vision rotation drift.
+    p_wv.setZero();      // World-vision position drift.
 
-    P.setZero();  // error state covariance; if zero, a default initialization in msf_core is used
+    P.setZero();  // Error state covariance; if zero, a default initialization in msf_core is used.
 
     p_pos = position_handler_->getPositionMeasurement();
 
@@ -145,11 +147,12 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     q_vc = pose_handler_->getAttitudeMeasurement();
 
     MSF_INFO_STREAM(
-        "initial measurement vision: pos:["<<p_vc.transpose()<<"] orientation: "<<STREAMQUAT(q_vc));
+        "initial measurement vision: pos:["<<p_vc.transpose()<<"] orientation: "
+        <<STREAMQUAT(q_vc));
     MSF_INFO_STREAM(
         "initial measurement position: pos:["<<p_pos.transpose()<<"]");
 
-    // check if we have already input from the measurement sensor
+    // Check if we have already input from the measurement sensor.
     if (p_vc.norm() == 0)
       MSF_WARN_STREAM(
           "No measurements received yet to initialize vision position - using [0 0 0]");
@@ -178,8 +181,9 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     pnh.param("position_sensor/init/p_ip/y", p_ip[1], 0.0);
     pnh.param("position_sensor/init/p_ip/z", p_ip[2], 0.0);
 
-    // calculate initial attitude and position based on sensor measurements
-    //here we take the attitude from the pose sensor and augment it with global yaw init
+    // Calculate initial attitude and position based on sensor measurements
+    // here we take the attitude from the pose sensor and augment it with
+    // global yaw init.
     double yawinit = config_.position_yaw_init / 180 * M_PI;
     Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
     yawq.normalize();
@@ -193,19 +197,23 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     Eigen::Matrix<double, 3, 1> p_vision = q_wv.conjugate().toRotationMatrix()
         * p_vc / scale - q.toRotationMatrix() * p_ic;
 
-    //TODO what if there is no initial position measurement? Then we have to shift vision-world later on, before
-    //applying the first position measurement
+    //TODO (slynen): what if there is no initial position measurement? Then we
+    // have to shift vision-world later on, before applying the first position
+    // measurement.
     p = p_pos - q.toRotationMatrix() * p_ip;
-    p_wv = p - p_vision;  //shift the vision frame so that it fits the position measurement
+    p_wv = p - p_vision;  // Shift the vision frame so that it fits the position
+    // measurement
 
+    //TODO (slynen) Fix this.
     //we want z from vision (we did scale init), so:
 //    p(2) = p_vision(2);
 //    p_wv(2) = 0;
 //    position_handler_->adjustGPSZReference(p(2));
 
-    //prepare init "measurement"
-    shared_ptr<msf_core::MSF_InitMeasurement<EKFState_T> > meas(
-        new msf_core::MSF_InitMeasurement<EKFState_T>(true));  //hand over that we will also set the sensor readings
+    // Prepare init "measurement"
+    // True means that we will also set the initial sensor readings.
+    shared_ptr < msf_core::MSF_InitMeasurement<EKFState_T>
+        > meas(new msf_core::MSF_InitMeasurement<EKFState_T>(true));
 
     meas->setStateInitValue < StateDefinition_T::p > (p);
     meas->setStateInitValue < StateDefinition_T::v > (v);
@@ -220,22 +228,21 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     meas->setStateInitValue < StateDefinition_T::p_ic > (p_ic);
     meas->setStateInitValue < StateDefinition_T::p_ip > (p_ip);
 
-    setP(meas->get_P());  //call my set P function
+    setP(meas->get_P());  // Call my set P function.
     meas->get_w_m() = w_m;
     meas->get_a_m() = a_m;
     meas->time = ros::Time::now().toSec();
 
-    // call initialization in core
+    // Call initialization in core.
     msf_core_->init(meas);
   }
 
-  //prior to this call, all states are initialized to zero/identity
+  // Prior to this call, all states are initialized to zero/identity.
   virtual void resetState(EKFState_T& state) const {
-    //set scale to 1
-
+    // Set scale to 1.
     Eigen::Matrix<double, 1, 1> scale;
     scale << 1.0;
-    state.set<StateDefinition_T::L>(scale);
+    state.set < StateDefinition_T::L > (scale);
   }
   virtual void initState(EKFState_T& state) const {
     UNUSED(state);
@@ -253,8 +260,8 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     const msf_core::Vector1 n_L = msf_core::Vector1::Constant(
         config_.pose_noise_scale);
 
-    //compute the blockwise Q values and store them with the states,
-    //these then get copied by the core to the correct places in Qd
+    // Compute the blockwise Q values and store them with the states,
+    // these then get copied by the core to the correct places in Qd.
     state.getQBlock<StateDefinition_T::L>() = (dt * n_L.cwiseProduct(n_L))
         .asDiagonal();
     state.getQBlock<StateDefinition_T::q_wv>() =
@@ -271,7 +278,8 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
       Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,
           EKFState_T::nErrorStatesAtCompileTime>& P) const {
     UNUSED(P);
-    //nothing, we only use the simulated cov for the core plus diagonal for the rest
+    // Nothing, we only use the simulated cov for the core plus diagonal for the
+    // rest.
   }
 
   virtual void augmentCorrectionVector(
@@ -290,16 +298,12 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     const EKFState_T& state = delaystate;
     if (state.get<StateDefinition_T::L>()(0) < 0) {
       MSF_WARN_STREAM_THROTTLE(
-          1,
-          "Negative scale detected: " << state.get<StateDefinition_T::L>()(0) << ". Correcting to 0.1");
+          1, "Negative scale detected: " << state.get<StateDefinition_T::L>()(0) << ". Correcting to 0.1");
       Eigen::Matrix<double, 1, 1> L_;
       L_ << 0.1;
-      delaystate.set<StateDefinition_T::L>(L_);
+      delaystate.set < StateDefinition_T::L > (L_);
     }
-
   }
-
 };
-
 }
 #endif /* POSITION_POSE_SENSOR_MANAGER_H */

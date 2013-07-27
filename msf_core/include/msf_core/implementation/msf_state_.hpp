@@ -33,8 +33,8 @@ namespace msf_core {
 // const_cast the state object to const to use the overload.
 template<typename stateVector_T, typename StateDefinition_T>
 template<int INDEX>
-inline typename boost::fusion::result_of::at_c<stateVector_T, INDEX>::type
-    GenericState_T<stateVector_T, StateDefinition_T>::getStateVar() {
+inline typename boost::fusion::result_of::at_c<stateVector_T, INDEX>::type GenericState_T<
+    stateVector_T, StateDefinition_T>::getStateVar() {
 
   static_assert(
       (msf_tmp::IsReferenceType<typename boost::fusion::result_of::at_c<stateVector_T, INDEX >::type>::value),
@@ -83,8 +83,8 @@ GenericState_T<stateVector_T, StateDefinition_T>::getQBlock() {
   static_assert(
       static_cast<int>(StateVar_T::statetype_) != static_cast<int>(
           msf_core::CoreStateWithPropagation) ||
-          static_cast<int>(StateVar_T::statetype_) !=
-          static_cast<int>(msf_core::CoreStateWithoutPropagation),
+      static_cast<int>(StateVar_T::statetype_) !=
+      static_cast<int>(msf_core::CoreStateWithoutPropagation),
       "You requested a non-const reference to a Q-Block for a"
       "core state of the EKF, but this is not allowed! Use the const version to "
       "get Q-blocks for core states.");
@@ -245,9 +245,9 @@ inline void GenericState_T<stateVector_T, StateDefinition_T>::set(
 
   static_assert(
       static_cast<int>(StateVar_T::statetype_) !=
-          static_cast<int>(msf_core::CoreStateWithPropagation) ||
-          static_cast<int>(StateVar_T::statetype_) !=
-          static_cast<int>(msf_core::CoreStateWithoutPropagation),
+      static_cast<int>(msf_core::CoreStateWithPropagation) ||
+      static_cast<int>(StateVar_T::statetype_) !=
+      static_cast<int>(msf_core::CoreStateWithoutPropagation),
       "You requested to set a new value for a"
       "core state of the EKF, but this is not allowed! This is an Error.");
 
@@ -262,13 +262,13 @@ inline void GenericState_T<stateVector_T, StateDefinition_T>::clearCrossCov() {
 
   enum {
     startIdxInState = msf_tmp::getStartIndex<StateSequence_T, StateVar_T,
-        // Index of the data in the correction vector.
+    // Index of the data in the correction vector.
         msf_tmp::CorrectionStateLengthForType>::value,
     lengthInState = StateVar_T::sizeInCorrection_
   };
   // Save covariance block.
-  Eigen::Matrix<double, lengthInState, lengthInState> cov =
-      P.template block<lengthInState, lengthInState>(startIdxInState,
+  Eigen::Matrix<double, lengthInState, lengthInState> cov = P
+      .template block<lengthInState, lengthInState>(startIdxInState,
                                                     startIdxInState);
   P.template block<lengthInState, nErrorStatesAtCompileTime>(startIdxInState, 0)
       .setZero();

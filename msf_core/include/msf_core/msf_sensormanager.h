@@ -60,7 +60,9 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
 
   MSF_SensorManager();
 
-  bool data_playback(){return data_playback_;}
+  bool data_playback() {
+    return data_playback_;
+  }
 
   virtual ~MSF_SensorManager() {
 
@@ -138,9 +140,12 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
    * This functions get called by the core to publish data to external
    * middlewares like ROS.
    */
-  virtual void publishStateInitial(const shared_ptr<EKFState_T>& state) const = 0;
-  virtual void publishStateAfterPropagation(const shared_ptr<EKFState_T>& state) const = 0;
-  virtual void publishStateAfterUpdate(const shared_ptr<EKFState_T>& state) const = 0;
+  virtual void publishStateInitial(
+      const shared_ptr<EKFState_T>& state) const = 0;
+  virtual void publishStateAfterPropagation(
+      const shared_ptr<EKFState_T>& state) const = 0;
+  virtual void publishStateAfterUpdate(
+      const shared_ptr<EKFState_T>& state) const = 0;
 
 };
 }  // msf_core

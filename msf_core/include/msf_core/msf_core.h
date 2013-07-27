@@ -28,7 +28,7 @@
 #include <msf_core/msf_state.h>
 #include <msf_core/msf_checkFuzzyTracking.h>
 
-namespace msf_core{
+namespace msf_core {
 
 template<typename EKFState_T>
 class MSF_SensorManager;
@@ -43,14 +43,13 @@ class IMUHandler;
  * in lists sorted by time stamp.
  */
 template<typename EKFState_T>
-class MSF_Core
-{
-  friend class MSF_MeasurementBase<EKFState_T>;
-  friend class IMUHandler<EKFState_T>;
-public:
+class MSF_Core {
+  friend class MSF_MeasurementBase<EKFState_T> ;
+  friend class IMUHandler<EKFState_T> ;
+ public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
-  enum{
+  enum {
     /// Error state length.
     nErrorStatesAtCompileTime = EKFState_T::nErrorStatesAtCompileTime,
     /// Complete state length.
@@ -96,15 +95,15 @@ public:
   /**
    * \brief Returns the accumulated dynamic matrix between two states.
    */
-  void getAccumF_SC(const shared_ptr<EKFState_T>& state_old,
-                    const shared_ptr<EKFState_T>& state_new,
-                    Eigen::Matrix<double, nErrorStatesAtCompileTime,
-                    nErrorStatesAtCompileTime>& F);
+  void getAccumF_SC(
+      const shared_ptr<EKFState_T>& state_old,
+      const shared_ptr<EKFState_T>& state_new,
+      Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime>& F);
   /**
    * \brief Returns previous measurement of the same type.
    */
-  shared_ptr<msf_core::MSF_MeasurementBase<EKFState_T> > getPreviousMeasurement
-      (double time, int sensorID);
+  shared_ptr<msf_core::MSF_MeasurementBase<EKFState_T> > getPreviousMeasurement(
+      double time, int sensorID);
 
   /**
    * \brief Finds the state at the requested time in the internal state.
@@ -138,8 +137,9 @@ public:
    * \brief sets the covariance matrix of the core states to simulated values.
    * \param P the error state covariance Matrix to fill.
    */
-  void setPCore(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,
-                EKFState_T::nErrorStatesAtCompileTime>& P);
+  void setPCore(
+      Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,
+          EKFState_T::nErrorStatesAtCompileTime>& P);
 
   /**
    * \brief Ctor takes a pointer to an object which does the user defined
@@ -152,16 +152,15 @@ public:
 
   const MSF_SensorManager<EKFState_T>& usercalc() const;
 
-private:
-
+ private:
 
   /**
    * \brief Get the index of the best state having no temporal drift at compile
    * time.
    */
-  enum{
-    indexOfStateWithoutTemporalDrift =
-        msf_tmp::IndexOfBestNonTemporalDriftingState<StateSequence_T>::value
+  enum {
+    indexOfStateWithoutTemporalDrift = msf_tmp::IndexOfBestNonTemporalDriftingState<
+        StateSequence_T>::value
   };
 
   /// Returns void type for invalid types
@@ -232,10 +231,11 @@ private:
    * \sa{imuCallback}
    */
   void process_extstate(const msf_core::Vector3& linear_acceleration,
-                     const msf_core::Vector3& angular_velocity,
-                     const msf_core::Vector3& p, const msf_core::Vector3& v,
-                     const msf_core::Quaternion& q, bool is_already_propagated,
-                     const double& msg_stamp, size_t msg_seq);
+                        const msf_core::Vector3& angular_velocity,
+                        const msf_core::Vector3& p, const msf_core::Vector3& v,
+                        const msf_core::Quaternion& q,
+                        bool is_already_propagated, const double& msg_stamp,
+                        size_t msg_seq);
 
   /// Propagates P by one step to distribute processing load.
   void propagatePOneStep();
@@ -245,7 +245,9 @@ private:
 
 };
 
-};  // msf_core
+}
+;
+// msf_core
 
 #include <msf_core/implementation/msf_core.hpp>
 

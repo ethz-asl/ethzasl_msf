@@ -15,16 +15,8 @@
  * limitations under the License.
  */
 #include <msf_core/msf_tools.h>
-
-namespace msf_core{
-
-double timehuman(double val)
-{
+namespace msf_core {
+double timehuman(double val) {
   return val - floor(val / 10000.) * 10000.;
 }
-
-
 }
-
-
-

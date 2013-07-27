@@ -34,9 +34,12 @@ Timing& Timing::Instance() {
   return t;
 }
 
-Timing::Timing() : maxTagLength_(0) { }
+Timing::Timing()
+    : maxTagLength_(0) {
+}
 
-Timing::~Timing() { }
+Timing::~Timing() {
+}
 
 // Static functions to query the timers:
 size_t Timing::GetHandle(std::string const& tag) {
@@ -94,10 +97,10 @@ void Timer::Start() {
 }
 
 void Timer::Stop() {
-  std::chrono::time_point <std::chrono::system_clock> now =
+  std::chrono::time_point < std::chrono::system_clock > now =
       std::chrono::system_clock::now();
   double dt = static_cast<double>(std::chrono::duration_cast
-      <std::chrono::nanoseconds> (now - time_).count())
+      < std::chrono::nanoseconds > (now - time_).count())
       * kNumSecondsPerNanosecond;
 
   Timing::Instance().AddTime(handle_, dt);
@@ -163,29 +166,29 @@ std::string Timing::SecondsToTimeString(double seconds) {
   int hours = (seconds / 3600);
   minutes = minutes - (hours * 60);
 
-char buffer[256];
-snprintf(buffer, sizeof(buffer),
+  char buffer[256];
+  snprintf(buffer, sizeof(buffer),
 #ifdef SM_TIMING_SHOW_HOURS
-"%02d:"
+           "%02d:"
 #endif
 #ifdef SM_TIMING_SHOW_MINUTES
-"%02d:"
+           "%02d:"
 #endif
-"%09.6f",
+           "%09.6f",
 #ifdef SM_TIMING_SHOW_HOURS
-hours,
+           hours,
 #endif
 #ifdef SM_TIMING_SHOW_MINUTES
-minutes,
+           minutes,
 #endif
-secs);
-return buffer;
+           secs);
+  return buffer;
 }
 
 void Timing::Print(std::ostream& out) {
   map_t& tagMap = Instance().tagMap_;
 
-  if(tagMap.empty()){
+  if (tagMap.empty()) {
     return;
   }
 

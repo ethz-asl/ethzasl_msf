@@ -33,10 +33,13 @@ template<typename T, typename Total, int N>
 class Accumulator {
  public:
   Accumulator()
-      : window_samples_(0), totalsamples_(0),
-        window_sum_(0), sum_(0),
-        min_(std::numeric_limits <T> ::max()),
-        max_(std::numeric_limits <T> ::min()) { }
+      : window_samples_(0),
+        totalsamples_(0),
+        window_sum_(0),
+        sum_(0),
+        min_(std::numeric_limits < T > ::max()),
+        max_(std::numeric_limits < T > ::min()) {
+  }
 
   void Add(T sample) {
     if (window_samples_ < N) {
@@ -82,7 +85,7 @@ class Accumulator {
   }
 
   double LazyVariance() const {
-    if(window_samples_ == 0){
+    if (window_samples_ == 0) {
       return 0.0;
     }
     double var = 0;
@@ -105,7 +108,8 @@ class Accumulator {
 };
 
 struct TimerMapValue {
-  TimerMapValue() { }
+  TimerMapValue() {
+  }
 
   //Create an accumulator with specified window size.
   Accumulator<double, double, 50> acc_;
@@ -116,12 +120,17 @@ struct TimerMapValue {
 // timing. Because all of the functions are inline, they should just disappear.
 class DummyTimer {
  public:
-  DummyTimer(size_t handle, bool constructStopped = false) { }
-  DummyTimer(std::string const& tag, bool constructStopped = false) { }
-  ~DummyTimer() { }
+  DummyTimer(size_t handle, bool constructStopped = false) {
+  }
+  DummyTimer(std::string const& tag, bool constructStopped = false) {
+  }
+  ~DummyTimer() {
+  }
 
-  void Start() { }
-  void Stop() { }
+  void Start() {
+  }
+  void Stop() {
+  }
   bool IsTiming() {
     return false;
   }
@@ -168,7 +177,9 @@ class Timing {
   static std::string Print();
   static std::string SecondsToTimeString(double seconds);
   static void Reset();
-  static const map_t& GetTimers() {return Instance().tagMap_;}
+  static const map_t& GetTimers() {
+    return Instance().tagMap_;
+  }
  private:
   void AddTime(size_t handle, double seconds);
 

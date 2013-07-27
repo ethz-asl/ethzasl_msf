@@ -30,8 +30,7 @@ class CheckFuzzyTracking {
 
   enum {
     qbuffRowsAtCompiletime = msf_tmp::StateLengthForType<
-        const typename
-        msf_tmp::StripConstReference<NONTEMPORALDRIFTINGTYPE>::result_t&>::value,
+        const typename msf_tmp::StripConstReference<NONTEMPORALDRIFTINGTYPE>::result_t&>::value,
     nBuff_ = 30  ///< Buffer size for median non drifting state values.
   };
 
@@ -41,8 +40,7 @@ class CheckFuzzyTracking {
   Eigen::Matrix<double, nBuff_, qbuffRowsAtCompiletime> qbuff_;
 
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  ;
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
   void reset() {
     // Buffer for vision failure check.
@@ -74,7 +72,7 @@ class CheckFuzzyTracking {
     enum {
       indexOfStateWithoutTemporalDrift = msf_tmp::IndexOfBestNonTemporalDriftingState<
           StateSequence_T>::value,
-       /// Error state length.
+      /// Error state length.
       nErrorStatesAtCompileTime = EKFState_T::nErrorStatesAtCompileTime,
       /// Complete state length.
       nStatesAtCompileTime = EKFState_T::nStatesAtCompileTime
@@ -94,39 +92,39 @@ class CheckFuzzyTracking {
           );
 
           if (std::max(errq.vec().maxCoeff(), -errq.vec().minCoeff()) /
-              fabs(errq.w()) * 2 > fuzzythres) // Fuzzy tracking (small angle approx).
-      {
-        MSF_WARN_STREAM("Fuzzy tracking triggered: " <<
-                        std::max(errq.vec().maxCoeff(), -errq.vec().minCoeff()) /
-                        fabs(errq.w())*2 << " limit: " << fuzzythres <<"\n");
+              fabs(errq.w()) * 2 > fuzzythres)  // Fuzzy tracking (small angle approx).
+              {
+                MSF_WARN_STREAM("Fuzzy tracking triggered: " <<
+                    std::max(errq.vec().maxCoeff(), -errq.vec().minCoeff()) /
+                    fabs(errq.w())*2 << " limit: " << fuzzythres <<"\n");
 
-        // Copy the non propagation states back from the buffer.
-        boost::fusion::for_each(
-            delaystate->statevars,
-            msf_tmp::copyNonPropagationStates<EKFState_T>(buffstate)
-        );
+                // Copy the non propagation states back from the buffer.
+                boost::fusion::for_each(
+                    delaystate->statevars,
+                    msf_tmp::copyNonPropagationStates<EKFState_T>(buffstate)
+                );
 
-        static_assert(static_cast<int>(
-            EKFState_T::nPropagatedCoreErrorStatesAtCompileTime) == 9,
-                                "Assumed that nPropagatedCoreStates == 9, "
-                                "which is not the case");
-        isfuzzy = true;
-      }
-      else // If tracking ok: Update mean and 3sigma of past N non drifting state values.
-      {
-        qbuff_. template block<1, 4>(nontemporaldrifting_inittimer_ - nBuff_ - 1, 0) =
-            Eigen::Matrix<double, 1, 4>(const_cast<const EKFState_T&>(*delaystate).
-                                        template get<indexOfStateWithoutTemporalDrift>().coeffs());
-        nontemporaldrifting_inittimer_ = (nontemporaldrifting_inittimer_) % nBuff_ + nBuff_ + 1;
-      }
-    }
-      else  // At beginning get mean and 3sigma of past N non drifting state values.
-      {
-        qbuff_. template block<1, 4> (nontemporaldrifting_inittimer_ - 1, 0) =
-            Eigen::Matrix<double, 1, 4>(const_cast<const EKFState_T&>(*delaystate).
-                                        template get<indexOfStateWithoutTemporalDrift>().coeffs());
-        nontemporaldrifting_inittimer_++;
-      }
+                static_assert(static_cast<int>(
+                        EKFState_T::nPropagatedCoreErrorStatesAtCompileTime) == 9,
+                    "Assumed that nPropagatedCoreStates == 9, "
+                    "which is not the case");
+                isfuzzy = true;
+              }
+              else  // If tracking ok: Update mean and 3sigma of past N non drifting state values.
+              {
+                qbuff_. template block<1, 4>(nontemporaldrifting_inittimer_ - nBuff_ - 1, 0) =
+                Eigen::Matrix<double, 1, 4>(const_cast<const EKFState_T&>(*delaystate).
+                    template get<indexOfStateWithoutTemporalDrift>().coeffs());
+                nontemporaldrifting_inittimer_ = (nontemporaldrifting_inittimer_) % nBuff_ + nBuff_ + 1;
+              }
+            }
+            else  // At beginning get mean and 3sigma of past N non drifting state values.
+            {
+              qbuff_. template block<1, 4> (nontemporaldrifting_inittimer_ - 1, 0) =
+              Eigen::Matrix<double, 1, 4>(const_cast<const EKFState_T&>(*delaystate).
+                  template get<indexOfStateWithoutTemporalDrift>().coeffs());
+              nontemporaldrifting_inittimer_++;
+            }
     return isfuzzy;
   }
 };

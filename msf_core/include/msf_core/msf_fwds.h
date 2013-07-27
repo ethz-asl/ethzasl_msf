@@ -38,7 +38,8 @@ enum {  //set power 2 flags here
 //forwards
 
 //state variable
-template<typename type_T, int name_T, int STATETYPE = Auxiliary, int OPTIONS = none>
+template<typename type_T, int name_T, int STATETYPE = Auxiliary, int OPTIONS =
+    none>
 struct StateVar_T;
 
 //the state
@@ -57,20 +58,23 @@ template<typename Sequence, template<typename > class Counter, typename First,
     typename Last, bool T>
 struct countStatesLinear;
 
-template<typename Sequence, typename First, typename Last, int CurrentIdx, bool T>
+template<typename Sequence, typename First, typename Last, int CurrentIdx,
+    bool T>
 struct CheckStateIndexing;
 
 template<typename TypeList, int INDEX> struct getEnumStateType;
 
-template<typename Sequence, typename StateVarT, template<typename > class OffsetCalculator,
-typename First, typename Last,  bool TypeFound, int CurrentVal, bool EndOfList>
+template<typename Sequence, typename StateVarT,
+    template<typename > class OffsetCalculator, typename First, typename Last,
+    bool TypeFound, int CurrentVal, bool EndOfList>
 struct ComputeStartIndex;
 
 template<typename Sequence> struct CheckCorrectIndexing;
 template<typename Sequence, template<typename > class Counter>
 struct CountStates;
 
-template<typename Sequence, typename StateVarT, template<typename > class Counter>
+template<typename Sequence, typename StateVarT,
+    template<typename > class Counter>
 struct getStartIndex;
 
 struct resetState;

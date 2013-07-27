@@ -22,94 +22,97 @@
 #include <msf_core/msf_measurement.h>
 #include <msf_core/msf_core.h>
 
-namespace pressure_measurement{
-enum
-{
+namespace pressure_measurement {
+enum {
   nMeasurements = 1
 };
 /**
- * \brief a measurement as provided by a pressure sensor
+ * \brief A measurement as provided by a pressure sensor.
  */
-typedef msf_core::MSF_Measurement<asctec_hl_comm::mav_imu, Eigen::Matrix<double, nMeasurements, nMeasurements>, msf_updates::EKFState> PressureMeasurementBase;
-struct PressureMeasurement : public PressureMeasurementBase
-{
-private:
+typedef msf_core::MSF_Measurement<asctec_hl_comm::mav_imu,
+    Eigen::Matrix<double, nMeasurements, nMeasurements>, msf_updates::EKFState> PressureMeasurementBase;
+struct PressureMeasurement : public PressureMeasurementBase {
+ private:
   typedef PressureMeasurementBase Measurement_t;
   typedef Measurement_t::Measurement_ptr measptr_t;
 
-  virtual void makeFromSensorReadingImpl(measptr_t msg)
-  {
+  virtual void makeFromSensorReadingImpl(measptr_t msg) {
 
-    Eigen::Matrix<double, nMeasurements, msf_core::MSF_Core<msf_updates::EKFState>::nErrorStatesAtCompileTime> H_old;
+    Eigen::Matrix<double, nMeasurements,
+        msf_core::MSF_Core<msf_updates::EKFState>::nErrorStatesAtCompileTime> H_old;
     Eigen::Matrix<double, nMeasurements, 1> r_old;
 
     H_old.setZero();
-//    R_.setZero(); //already done in ctor of base
 
-    // get measurements
+    // Get measurements.
     z_p_ = Eigen::Matrix<double, 1, 1>::Constant(msg->height);
 
     const double s_zp = n_zp_ * n_zp_;
-    R_ = (Eigen::Matrix<double, nMeasurements, 1>() << s_zp).finished().asDiagonal();
+    R_ = (Eigen::Matrix<double, nMeasurements, 1>() << s_zp).finished()
+        .asDiagonal();
   }
-public:
+ public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  Eigen::Matrix<double, 1, 1> z_p_; /// pressure measurement
-  double n_zp_; /// pressure measurement noise
+  Eigen::Matrix<double, 1, 1> z_p_;  /// Pressure measurement.
+  double n_zp_;  /// Pressure measurement noise.
 
   typedef msf_updates::EKFState EKFState_T;
   typedef EKFState_T::StateDefinition_T StateDefinition_T;
-  virtual ~PressureMeasurement()
-  {
+  virtual ~PressureMeasurement() {
   }
-  PressureMeasurement(double n_zp, bool isabsoluteMeasurement, int sensorID) :
-    PressureMeasurementBase(isabsoluteMeasurement, sensorID),
-    n_zp_(n_zp)
-  {
+  PressureMeasurement(double n_zp, bool isabsoluteMeasurement, int sensorID)
+      : PressureMeasurementBase(isabsoluteMeasurement, sensorID),
+        n_zp_(n_zp) {
   }
-  virtual std::string type(){
+  virtual std::string type() {
     return "pressure";
   }
   /**
-   * the method called by the msf_core to apply the measurement represented by this object
+   * The method called by the msf_core to apply the measurement represented by
+   * this object.
    */
-  virtual void apply(shared_ptr<EKFState_T> non_const_state, msf_core::MSF_Core<EKFState_T>& core)
-  {
-    // init variables
-    Eigen::Matrix<double, nMeasurements, msf_core::MSF_Core<EKFState_T>::nErrorStatesAtCompileTime> H_old;
+  virtual void apply(shared_ptr<EKFState_T> non_const_state,
+                     msf_core::MSF_Core<EKFState_T>& core) {
+    // Init variables.
+    Eigen::Matrix<double, nMeasurements,
+        msf_core::MSF_Core<EKFState_T>::nErrorStatesAtCompileTime> H_old;
     Eigen::Matrix<double, nMeasurements, 1> r_old;
 
     H_old.setZero();
 
-    if (non_const_state->time == -1)
-    {
-      MSF_WARN_STREAM("apply pressure update was called with an invalid state");
-      return;	// // early abort // //
+    if (non_const_state->time == -1) {
+      MSF_WARN_STREAM(
+          "Apply pressure update was called with an invalid state.");
+      return;  // Early abort.
     }
 
     const EKFState_T& state = *non_const_state;
 
-    enum{
+    enum {
       idx_p = msf_tmp::getStartIndex<EKFState_T::StateSequence_T,
-      typename msf_tmp::getEnumStateType<EKFState_T::StateSequence_T, StateDefinition_T::p>::value, msf_tmp::CorrectionStateLengthForType>::value,
+          typename msf_tmp::getEnumStateType<EKFState_T::StateSequence_T,
+              StateDefinition_T::p>::value,
+          msf_tmp::CorrectionStateLengthForType>::value,
 
       idx_b_p = msf_tmp::getStartIndex<EKFState_T::StateSequence_T,
-      typename msf_tmp::getEnumStateType<EKFState_T::StateSequence_T, StateDefinition_T::b_p>::value, msf_tmp::CorrectionStateLengthForType>::value
+          typename msf_tmp::getEnumStateType<EKFState_T::StateSequence_T,
+              StateDefinition_T::b_p>::value,
+          msf_tmp::CorrectionStateLengthForType>::value
     };
 
-    // construct H matrix using H-blockx :-)
-    // position:
-    H_old.block<1, 1>(0, idx_p + 2)(0) = 1; // p_z
-    //pressure bias
-    H_old.block<1, 1>(0, idx_b_p)(0) = -1; //p_b
+    // Construct H matrix.
+    // Position:
+    H_old.block<1, 1>(0, idx_p + 2)(0) = 1;  // p_z
+    // Pressure bias.
+    H_old.block<1, 1>(0, idx_b_p)(0) = -1;  //p_b
 
-    // construct residuals
-    // height
-    r_old.block<1, 1>(0,0) = (z_p_ + state.get<StateDefinition_T::b_p>()) - state.get<StateDefinition_T::p>().block<1,1>(2, 0);
+    // Construct residuals.
+    // Height.
+    r_old.block<1, 1>(0, 0) = (z_p_ + state.get<StateDefinition_T::b_p>())
+        - state.get<StateDefinition_T::p>().block<1, 1>(2, 0);
 
-
-    // call update step in base class
+    // Call update step in base class.
     this->calculateAndApplyCorrection(non_const_state, core, H_old, r_old, R_);
 
   }

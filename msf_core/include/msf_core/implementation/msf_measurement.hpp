@@ -22,7 +22,8 @@ MSF_MeasurementBase<EKFState_T>::MSF_MeasurementBase(bool isabsoluteMeasurement,
                                                      int sensorID)
     : sensorID_(sensorID),
       isabsolute_(isabsoluteMeasurement),
-      time(0) { }
+      time(0) {
+}
 
 template<typename EKFState_T>
 template<class H_type, class Res_type, class R_type>
@@ -32,8 +33,8 @@ void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrection(
     const Eigen::MatrixBase<Res_type> & res_delayed,
     const Eigen::MatrixBase<R_type>& R_delayed) {
 
-  EIGEN_STATIC_ASSERT_FIXED_SIZE(H_type);
-  EIGEN_STATIC_ASSERT_FIXED_SIZE(R_type);
+  EIGEN_STATIC_ASSERT_FIXED_SIZE (H_type);
+  EIGEN_STATIC_ASSERT_FIXED_SIZE (R_type);
 
   // Get measurements.
   /// Correction from EKF update.
@@ -91,15 +92,14 @@ void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrection(
 template<typename EKFState_T>
 template<class H_type, class Res_type, class R_type>
 void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrectionRelative(
-    shared_ptr<EKFState_T> state_old,
-    shared_ptr<EKFState_T> state_new, MSF_Core<EKFState_T>& core,
-    const Eigen::MatrixBase<H_type>& H_old,
+    shared_ptr<EKFState_T> state_old, shared_ptr<EKFState_T> state_new,
+    MSF_Core<EKFState_T>& core, const Eigen::MatrixBase<H_type>& H_old,
     const Eigen::MatrixBase<H_type>& H_new,
     const Eigen::MatrixBase<Res_type> & res,
     const Eigen::MatrixBase<R_type>& R) {
 
-  EIGEN_STATIC_ASSERT_FIXED_SIZE(H_type);
-  EIGEN_STATIC_ASSERT_FIXED_SIZE(R_type);
+  EIGEN_STATIC_ASSERT_FIXED_SIZE (H_type);
+  EIGEN_STATIC_ASSERT_FIXED_SIZE (R_type);
 
   // Get measurements.
   /// Correction from EKF update.
@@ -130,8 +130,9 @@ void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrectionRelative(
    */
   Eigen::Matrix<double, H_type::RowsAtCompileTime, H_type::ColsAtCompileTime * 2> H_SC;
 
-  H_SC.template block<H_type::RowsAtCompileTime,
-      H_type::ColsAtCompileTime>(0, 0) = H_old;
+  H_SC.template block<H_type::RowsAtCompileTime, H_type::ColsAtCompileTime>(0,
+                                                                            0) =
+      H_old;
   H_SC.template block<H_type::RowsAtCompileTime, H_type::ColsAtCompileTime>(
       0, H_type::ColsAtCompileTime) = H_new;
 
@@ -164,8 +165,7 @@ void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrectionRelative(
 
 template<typename EKFState_T>
 void MSF_InitMeasurement<EKFState_T>::apply(
-    shared_ptr<EKFState_T> stateWithCovariance,
-    MSF_Core<EKFState_T>& core) {
+    shared_ptr<EKFState_T> stateWithCovariance, MSF_Core<EKFState_T>& core) {
 
   // Makes this state a valid starting point.
   stateWithCovariance->time = this->time;

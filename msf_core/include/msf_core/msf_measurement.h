@@ -66,9 +66,8 @@ class MSF_MeasurementBase {
 
   template<class H_type, class Res_type, class R_type>
   void calculateAndApplyCorrectionRelative(
-      shared_ptr<EKFState_T> state_old,
-      shared_ptr<EKFState_T> state_new, MSF_Core<EKFState_T>& core,
-      const Eigen::MatrixBase<H_type>& H_old,
+      shared_ptr<EKFState_T> state_old, shared_ptr<EKFState_T> state_new,
+      MSF_Core<EKFState_T>& core, const Eigen::MatrixBase<H_type>& H_old,
       const Eigen::MatrixBase<H_type>& H_new,
       const Eigen::MatrixBase<Res_type> & res,
       const Eigen::MatrixBase<R_type>& R);
@@ -83,9 +82,8 @@ template<typename EKFState_T>
 class MSF_InvalidMeasurement : public MSF_MeasurementBase<EKFState_T> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-  virtual void apply(
-      shared_ptr<EKFState_T> UNUSEDPARAM(stateWithCovariance),
-      MSF_Core<EKFState_T>& UNUSEDPARAM(core)) {
+  virtual void apply(shared_ptr<EKFState_T> UNUSEDPARAM(stateWithCovariance),
+                     MSF_Core<EKFState_T>& UNUSEDPARAM(core)) {
     MSF_ERROR_STREAM(
         "Called apply() on an MSF_InvalidMeasurement object. This should never "
         "happen.");
@@ -94,8 +92,10 @@ class MSF_InvalidMeasurement : public MSF_MeasurementBase<EKFState_T> {
     return "invalid";
   }
   MSF_InvalidMeasurement()
-      : MSF_MeasurementBase<EKFState_T>(true, -1) { }
-  virtual ~MSF_InvalidMeasurement() { }
+      : MSF_MeasurementBase<EKFState_T>(true, -1) {
+  }
+  virtual ~MSF_InvalidMeasurement() {
+  }
 };
 
 /**
@@ -162,8 +162,8 @@ class MSF_InitMeasurement : public MSF_MeasurementBase<EKFState_T> {
   bool ContainsInitialSensorReadings_;
   typedef typename EKFState_T::StateSequence_T StateSequence_T;
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  MSF_InitMeasurement(bool ContainsInitialSensorReadings)
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW MSF_InitMeasurement(
+      bool ContainsInitialSensorReadings)
       : MSF_MeasurementBase<EKFState_T>(true, -1) {
     ContainsInitialSensorReadings_ = ContainsInitialSensorReadings;
     this->time = ros::Time::now().toSec();
@@ -215,7 +215,7 @@ class MSF_InitMeasurement : public MSF_MeasurementBase<EKFState_T> {
    */
   template<int INDEX>
   const typename msf_tmp::StripReference<typename boost::fusion::result_of::at_c
-      <StateSequence_T, INDEX >::type>::result_t::value_t&
+  <StateSequence_T, INDEX >::type>::result_t::value_t&
   getStateInitValue() const {
     return InitState.template get<INDEX>();
   }

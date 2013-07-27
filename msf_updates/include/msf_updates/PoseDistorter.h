@@ -23,15 +23,13 @@
 #include <msf_core/msf_types.hpp>
 #include <msf_core/msf_fwds.h>
 
-namespace msf_updates
-{
+namespace msf_updates {
 
-class PoseDistorter
-{
-public:
+class PoseDistorter {
+ public:
   typedef std::normal_distribution<> distribution_t;
   typedef shared_ptr<PoseDistorter> Ptr;
-private:
+ private:
   Eigen::Vector3d posdrift_;
   Eigen::Quaterniond attdrift_;
   double scaledrift_;
@@ -42,13 +40,17 @@ private:
   distribution_t d_pos_[3];
   distribution_t d_att_[3];
   distribution_t d_scale;
-public:
-  PoseDistorter(const Eigen::Vector3d& meanposdrift, const Eigen::Vector3d& stddevposdrift, const Eigen::Vector3d& meanattdrift, const Eigen::Vector3d& stddevattdrift, const double meanscaledrift, const double stddevscaledrift);
+ public:
+  PoseDistorter(const Eigen::Vector3d& meanposdrift,
+                const Eigen::Vector3d& stddevposdrift,
+                const Eigen::Vector3d& meanattdrift,
+                const Eigen::Vector3d& stddevattdrift,
+                const double meanscaledrift, const double stddevscaledrift);
   void distort(Eigen::Vector3d& pos, Eigen::Quaterniond& att, double dt);
   void distort(Eigen::Vector3d& pos, double dt);
   void distort(Eigen::Quaterniond& att, double dt);
   virtual ~PoseDistorter();
 };
 
-} /* namespace msf_updates */
+}  // namespace msf_updates
 #endif /* POSEDISTORTER_H_ */

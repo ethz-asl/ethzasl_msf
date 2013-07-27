@@ -22,39 +22,33 @@
 #include <msf_updates/pressure_sensor_handler/pressure_measurement.h>
 #include <queue>
 
-namespace msf_pressure_sensor{
-
-class PressureSensorHandler : public msf_core::SensorHandler<typename msf_updates::EKFState>
-{
-private:
-
-  enum{
+namespace msf_pressure_sensor {
+class PressureSensorHandler : public msf_core::SensorHandler<
+    typename msf_updates::EKFState> {
+ private:
+  enum {
     heightbuffsize = 10
   };
-  Eigen::Matrix<double, 1, 1> z_p_; ///< pressure measurement
-  double n_zp_; ///< pressure measurement noise
-  Eigen::Matrix<double, 1, 1> z_average_p; ///<averaged pressure measurement
+  Eigen::Matrix<double, 1, 1> z_p_;  ///< Pressure measurement.
+  double n_zp_;  ///< Pressure measurement noise.
+  Eigen::Matrix<double, 1, 1> z_average_p;  ///<Averaged pressure measurement.
   double heightbuff[heightbuffsize];
-
   ros::Subscriber subPressure_;
-
   void measurementCallback(const asctec_hl_comm::mav_imuConstPtr & msg);
-
-public:
-  PressureSensorHandler(msf_core::MSF_SensorManager<msf_updates::EKFState>& meas,
-                        std::string topic_namespace, std::string parameternamespace);
-  //used for the init
-  Eigen::Matrix<double, 1, 1> getPressureMeasurement(){
+ public:
+  PressureSensorHandler(
+      msf_core::MSF_SensorManager<msf_updates::EKFState>& meas,
+      std::string topic_namespace, std::string parameternamespace);
+  // Used for the init.
+  Eigen::Matrix<double, 1, 1> getPressureMeasurement() {
     return z_p_;
   }
-  Eigen::Matrix<double, 1, 1> getAveragedPressureMeasurement(){
+  Eigen::Matrix<double, 1, 1> getAveragedPressureMeasurement() {
     return z_average_p;
   }
-  //setters for configure values
+  // Setters for configure values.
   void setNoises(double n_zp);
-
 };
 }
 #include "implementation/pressure_sensorhandler.hpp"
-
 #endif /* POSE_SENSOR_H */

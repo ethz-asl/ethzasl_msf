@@ -17,7 +17,7 @@
 #ifndef MSF_SENSORHANDLER_H_
 #define MSF_SENSORHANDLER_H_
 
-namespace msf_core{
+namespace msf_core {
 /**
  * \class SensorHandler
  * \brief Handles a sensor driver which provides the sensor readings.
@@ -43,11 +43,11 @@ class SensorHandler {
     lastseq_ = seq;
   }
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  ;
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 
   SensorHandler(MSF_SensorManager<EKFState_T>& mng,
-                const std::string& topic_namespace, const std::string& parameternamespace)
+                const std::string& topic_namespace,
+                const std::string& parameternamespace)
       : lastseq_(0),
         manager_(mng),
         sensorID(-1),

@@ -51,7 +51,6 @@
 #define MSF_UNLIKELY(x)     __builtin_expect((x),0)
 #endif
 
-
 #ifdef ROS_PACKAGE_NAME // Use ROS if it is available.
 #include <ros/console.h>
 #define MSF_INFO_STREAM(x) ROS_INFO_STREAM(x)
@@ -72,7 +71,6 @@
 
 #else
 #include <chrono> // Using std::chrono instead of ros::Time.
-
 // Adapted from rosconsole.
 //Copyright (c) 2008, Willow Garage, Inc.
 #ifndef MSF_INFO_STREAM
@@ -98,7 +96,6 @@
       } \
     } while(0)
 
-
 #define MSF_WARN_STREAM_ONCE(x) \
     do \
     { \
@@ -110,7 +107,6 @@
       } \
     } while(0)
 
-
 #define MSF_ERROR_STREAM_ONCE(x) \
     do \
     { \
@@ -121,7 +117,6 @@
         MSF_ERROR_STREAM(x); \
       } \
     } while(0)
-
 
 #define MSF_LOG_STREAM_THROTTLE(rate, x) \
     do \

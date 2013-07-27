@@ -18,7 +18,6 @@
 #define MSF_STATEVISITOR_H_
 
 namespace msf_core {
-
 /**
  * \brief Visitor pattern to allow the user to set state init values.
  */
@@ -34,6 +33,5 @@ class StateVisitor {
   }
   ;
 };
-
 }
 #endif /* MSF_STATEVISITOR_H_ */

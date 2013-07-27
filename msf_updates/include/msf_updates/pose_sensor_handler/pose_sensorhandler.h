@@ -25,41 +25,48 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <msf_updates/PoseDistorter.h>
 
-namespace msf_pose_sensor{
+namespace msf_pose_sensor {
 
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
-class PoseSensorHandler : public msf_core::SensorHandler<typename msf_updates::EKFState>
-{
-private:
+class PoseSensorHandler : public msf_core::SensorHandler<
+    typename msf_updates::EKFState> {
+ private:
 
-  Eigen::Quaternion<double> z_q_; ///< attitude measurement camera seen from world
-  Eigen::Matrix<double, 3, 1> z_p_; ///< position measurement camera seen from world
-  double n_zp_, n_zq_; ///< position and attitude measurement noise
-  double delay_;        ///< delay to be subtracted from the ros-timestamp of the measurement provided by this sensor
+  Eigen::Quaternion<double> z_q_;  ///< Attitude measurement camera seen from world.
+  Eigen::Matrix<double, 3, 1> z_p_;  ///< Position measurement camera seen from world.
+  double n_zp_, n_zq_;  ///< Position and attitude measurement noise.
+  double delay_;        ///< Delay to be subtracted from the ros-timestamp of
+  // the measurement provided by this sensor.
 
   ros::Subscriber subPoseWithCovarianceStamped_;
   ros::Subscriber subTransformStamped_;
   ros::Subscriber subPoseStamped_;
 
-  bool measurement_world_sensor_; ///< defines if the pose of the sensor is measured in world coordinates (true, default) or vice versa (false, e.g. PTAM)
-  bool use_fixed_covariance_; ///< use fixed covariance set by dynamic reconfigure
-  bool provides_absolute_measurements_; ///<does this sensor measure relative or absolute values
+  bool measurement_world_sensor_;  ///< Defines if the pose of the sensor is
+                                   // measured in world coordinates (true, default)
+                                   // or vice versa (false, e.g. PTAM)
+  bool use_fixed_covariance_;  ///< Use fixed covariance set by dynamic reconfigure
+  bool provides_absolute_measurements_;  ///<Does this sensor measure relative or
+                                         // absolute values
 
   msf_updates::PoseDistorter::Ptr distorter_;
 
-  void ProcessPoseMeasurement(const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg);
-  void measurementCallback(const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg);
+  void ProcessPoseMeasurement(
+      const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg);
+  void measurementCallback(
+      const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg);
   void measurementCallback(const geometry_msgs::PoseStampedConstPtr & msg);
   void measurementCallback(const geometry_msgs::TransformStampedConstPtr & msg);
 
-public:
+ public:
   typedef MEASUREMENT_TYPE measurement_t;
-  PoseSensorHandler(MANAGER_TYPE& meas, std::string topic_namespace, std::string parameternamespace, bool distortmeas);
-  //used for the init
-  Eigen::Matrix<double, 3, 1> getPositionMeasurement(){
+  PoseSensorHandler(MANAGER_TYPE& meas, std::string topic_namespace,
+                    std::string parameternamespace, bool distortmeas);
+  // Used for the init.
+  Eigen::Matrix<double, 3, 1> getPositionMeasurement() {
     return z_p_;
   }
-  Eigen::Quaterniond getAttitudeMeasurement(){
+  Eigen::Quaterniond getAttitudeMeasurement() {
     return z_q_;
   }
   //setters for configure values

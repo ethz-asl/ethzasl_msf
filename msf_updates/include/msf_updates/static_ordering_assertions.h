@@ -16,18 +16,11 @@
  */
 #ifndef STATIC_ORDERING_ASSERTIONS_UPDATES_HPP_
 #define STATIC_ORDERING_ASSERTIONS_UPDATES_HPP_
-
- 
 #include <msf_core/static_ordering_assertions.h>
-
-namespace
-{
-
-enum CompileTimeChecker
-{
-  value = StaticAssertCoreStateOrderingCorrect<msf_updates::EKFState>::value ///< make sure the ordering of the core states has not been changed
+namespace {
+enum class CompileTimeChecker {
+  ///< make sure the ordering of the core states has not been changed
+  value = StaticAssertCoreStateOrderingCorrect<msf_updates::EKFState>::value
 };
-
 }
-
 #endif /* STATIC_ORDERING_ASSERTIONS_HPP_ */

@@ -25,7 +25,8 @@
  * The user has the possibility to set the blocks of Q for user defined states.
  * The EKF core calls the respective user defined function.
  */
-template<typename StateSequence_T, typename StateDefinition_T, class Derived, class DerivedQ>
+template<typename StateSequence_T, typename StateDefinition_T, class Derived,
+    class DerivedQ>
 void calc_QCore(const double dt, const Eigen::Quaternion<double> & q,
                 const Eigen::MatrixBase<Derived> & ew,
                 const Eigen::MatrixBase<Derived> & ea,
@@ -103,9 +104,11 @@ void calc_QCore(const double dt, const Eigen::Quaternion<double> & q,
   const double t399 = n_ba2 * n_ba2;
   const double t400 = n_ba3 * n_ba3;
   const double t401 = dt * t343 * t345 * t355 * t370 * (1.0 / 3.0);
-  const double t402 = t401 - dt * t343 * t346 * t347 * t369 * (1.0 / 3.0) - dt * t343 * t344 * t354 * t372 * (1.0 / 3.0);
+  const double t402 = t401 - dt * t343 * t346 * t347 * t369 * (1.0 / 3.0)
+      - dt * t343 * t344 * t354 * t372 * (1.0 / 3.0);
   const double t403 = dt * t343 * t354 * t367 * t372 * (1.0 / 3.0);
-  const double t404 = t403 - dt * t343 * t347 * t366 * t369 * (1.0 / 3.0) - dt * t343 * t355 * t370 * t376 * (1.0 / 3.0);
+  const double t404 = t403 - dt * t343 * t347 * t366 * t369 * (1.0 / 3.0)
+      - dt * t343 * t355 * t370 * t376 * (1.0 / 3.0);
   const double t405 = t343 * t345 * t355 * t370 * (1.0 / 2.0);
   const double t406 = dt * t343 * t362 * t373 * t397 * (1.0 / 6.0);
   const double t421 = t343 * t346 * t347 * t369 * (1.0 / 2.0);
@@ -126,7 +129,8 @@ void calc_QCore(const double dt, const Eigen::Quaternion<double> & q,
   const double t416 = t343 * t354 * t359 * (1.0 / 2.0);
   const double t417 = t343 * t355 * t360 * (1.0 / 2.0);
   const double t418 = t343 * t347 * t361 * (1.0 / 2.0);
-  const double t419 = t416 + t417 + t418 - dt * t343 * t365 * t371 * (1.0 / 6.0) - dt * t343 * t365 * t373 * (1.0 / 6.0)
+  const double t419 = t416 + t417 + t418 - dt * t343 * t365 * t371 * (1.0 / 6.0)
+      - dt * t343 * t365 * t373 * (1.0 / 6.0)
       - dt * t343 * t365 * t374 * (1.0 / 6.0);
   const double t453 = t343 * t344 * t354 * t367 * (1.0 / 2.0);
   const double t454 = t343 * t345 * t355 * t376 * (1.0 / 2.0);
@@ -167,7 +171,8 @@ void calc_QCore(const double dt, const Eigen::Quaternion<double> & q,
   const double t459 = t384 * t384;
   const double t460 = t343 * t354 * t385 * (1.0 / 2.0);
   const double t461 = t388 * t388;
-  const double t462 = t456 + t457 + t460 - dt * t343 * t371 * t458 * (1.0 / 6.0) - dt * t343 * t374 * t459 * (1.0 / 6.0)
+  const double t462 = t456 + t457 + t460 - dt * t343 * t371 * t458 * (1.0 / 6.0)
+      - dt * t343 * t374 * t459 * (1.0 / 6.0)
       - dt * t343 * t373 * t461 * (1.0 / 6.0);
   const double t466 = t433 + t442 - t443;
   const double t467 = ew1 * t362 * t388;
@@ -215,7 +220,8 @@ void calc_QCore(const double dt, const Eigen::Quaternion<double> & q,
   const double t507 = t390 * t390;
   const double t508 = t343 * t355 * t415 * (1.0 / 2.0);
   const double t509 = t394 * t394;
-  const double t510 = t504 + t505 + t508 - dt * t343 * t373 * t506 * (1.0 / 6.0) - dt * t343 * t371 * t509 * (1.0 / 6.0)
+  const double t510 = t504 + t505 + t508 - dt * t343 * t373 * t506 * (1.0 / 6.0)
+      - dt * t343 * t371 * t509 * (1.0 / 6.0)
       - dt * t343 * t374 * t507 * (1.0 / 6.0);
   const double t512 = -t444 + t490 + t491;
   const double t513 = t397 * t437 * (1.0 / 2.0);
@@ -263,8 +269,10 @@ void calc_QCore(const double dt, const Eigen::Quaternion<double> & q,
   const double t557 = t551 + t556 - dt * t343 * t555 * (1.0 / 3.0);
   const double t558 = dt * t343 * t367 * t372 * t399 * (1.0 / 3.0);
   const double t559 = dt * t354 * t367 * t372;
-  const double t560 = t548 + t558 + t559 - t371 * t542 - t374 * t557 - dt * t347 * t366 * t369 - dt * t355 * t370 * t376
-      - dt * t343 * t366 * t369 * t398 * (1.0 / 3.0) - dt * t343 * t370 * t376 * t400 * (1.0 / 3.0);
+  const double t560 = t548 + t558 + t559 - t371 * t542 - t374 * t557
+      - dt * t347 * t366 * t369 - dt * t355 * t370 * t376
+      - dt * t343 * t366 * t369 * t398 * (1.0 / 3.0)
+      - dt * t343 * t370 * t376 * t400 * (1.0 / 3.0);
   const double t561 = ew1 * t343 * t394 * t397;
   const double t562 = ew1 * t343 * t397 * (1.0 / 2.0);
   const double t563 = n_bw2 * n_bw2;
@@ -284,7 +292,8 @@ void calc_QCore(const double dt, const Eigen::Quaternion<double> & q,
   const double t577 = dt * t390;
   const double t578 = t576 + t577 - dt * t343 * t575 * (1.0 / 3.0);
   const double t579 = dt * t343 * t371 * t394 * t432 * (1.0 / 6.0);
-  const double t580 = t579 - t374 * t578 - dt * t343 * t373 * t397 * t432 * (1.0 / 6.0);
+  const double t580 = t579 - t374 * t578
+      - dt * t343 * t373 * t397 * t432 * (1.0 / 6.0);
   const double t581 = dt * t343 * t373 * t388 * (1.0 / 6.0);
   const double t582 = t362 * t432 * (1.0 / 2.0);
   const double t583 = ew2 * ew3 * t362 * (1.0 / 2.0);
@@ -370,16 +379,23 @@ void calc_QCore(const double dt, const Eigen::Quaternion<double> & q,
   const double t663 = t343 * t376 * t400 * (1.0 / 2.0);
 
   enum {
-    idxstartcorr_p = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::p>::value,
-    idxstartcorr_v = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::v>::value,
-    idxstartcorr_q = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::q>::value,
-    idxstartcorr_b_w = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::b_w>::value,
-    idxstartcorr_b_a = msf_tmp::getStartIndexInCorrection<StateSequence_T, StateDefinition_T::b_a>::value
+    idxstartcorr_p = msf_tmp::getStartIndexInCorrection<StateSequence_T,
+        StateDefinition_T::p>::value,
+    idxstartcorr_v = msf_tmp::getStartIndexInCorrection<StateSequence_T,
+        StateDefinition_T::v>::value,
+    idxstartcorr_q = msf_tmp::getStartIndexInCorrection<StateSequence_T,
+        StateDefinition_T::q>::value,
+    idxstartcorr_b_w = msf_tmp::getStartIndexInCorrection<StateSequence_T,
+        StateDefinition_T::b_w>::value,
+    idxstartcorr_b_a = msf_tmp::getStartIndexInCorrection<StateSequence_T,
+        StateDefinition_T::b_a>::value
   };
 
-  Qd(idxstartcorr_p + 0, idxstartcorr_p + 0) = dt * t343 * t347 * t361 * (1.0 / 3.0) + dt * t343 * t354 * t359 * (1.0 / 3.0)
+  Qd(idxstartcorr_p + 0, idxstartcorr_p + 0) = dt * t343 * t347 * t361
+      * (1.0 / 3.0) + dt * t343 * t354 * t359 * (1.0 / 3.0)
       + dt * t343 * t355 * t360 * (1.0 / 3.0);
-  Qd(idxstartcorr_p + 0, idxstartcorr_p + 1) = t375 - dt * t343 * t345 * t355 * (t358 - q3 * q4 * 2.0) * (1.0 / 3.0)
+  Qd(idxstartcorr_p + 0, idxstartcorr_p + 1) = t375
+      - dt * t343 * t345 * t355 * (t358 - q3 * q4 * 2.0) * (1.0 / 3.0)
       - dt * t343 * t344 * t354 * t367 * (1.0 / 3.0);
   Qd(idxstartcorr_p + 0, idxstartcorr_p + 2) = t402;
   Qd(idxstartcorr_p + 0, idxstartcorr_v + 0) = t419;
@@ -387,199 +403,319 @@ void calc_QCore(const double dt, const Eigen::Quaternion<double> & q,
   Qd(idxstartcorr_p + 0, idxstartcorr_v + 2) = t408;
   Qd(idxstartcorr_p + 0, idxstartcorr_q + 0) = t564;
   Qd(idxstartcorr_p + 0, idxstartcorr_q + 2) = t615;
-  Qd(idxstartcorr_p + 0, idxstartcorr_b_a + 0) = dt * t343 * t346 * t398 * (-1.0 / 6.0);
+  Qd(idxstartcorr_p + 0, idxstartcorr_b_a + 0) = dt * t343 * t346 * t398
+      * (-1.0 / 6.0);
   Qd(idxstartcorr_p + 0, idxstartcorr_b_a + 1) = t660;
-  Qd(idxstartcorr_p + 0, idxstartcorr_b_a + 2) = dt * t343 * t345 * t400 * (-1.0 / 6.0);
-  Qd(idxstartcorr_p + 1, idxstartcorr_p + 0) = t375 - dt * t343 * t344 * t354 * t367 * (1.0 / 3.0)
+  Qd(idxstartcorr_p + 0, idxstartcorr_b_a + 2) = dt * t343 * t345 * t400
+      * (-1.0 / 6.0);
+  Qd(idxstartcorr_p + 1, idxstartcorr_p + 0) = t375
+      - dt * t343 * t344 * t354 * t367 * (1.0 / 3.0)
       - dt * t343 * t345 * t355 * t376 * (1.0 / 3.0);
-  Qd(idxstartcorr_p + 1, idxstartcorr_p + 1) = dt * t343 * t347 * t378 * (1.0 / 3.0) + dt * t343 * t355 * t379 * (1.0 / 3.0)
+  Qd(idxstartcorr_p + 1, idxstartcorr_p + 1) = dt * t343 * t347 * t378
+      * (1.0 / 3.0) + dt * t343 * t355 * t379 * (1.0 / 3.0)
       + dt * t343 * t354 * t385 * (1.0 / 3.0);
   Qd(idxstartcorr_p + 1, idxstartcorr_p + 2) = t404;
-  Qd(idxstartcorr_p + 1, idxstartcorr_v + 0) = t377 + t455 - t343 * t344 * t354 * t367 * (1.0 / 2.0)
-      - t343 * t345 * t355 * t376 * (1.0 / 2.0) - dt * t343 * t362 * t371 * t381 * (1.0 / 6.0)
+  Qd(idxstartcorr_p + 1, idxstartcorr_v + 0) = t377 + t455
+      - t343 * t344 * t354 * t367 * (1.0 / 2.0)
+      - t343 * t345 * t355 * t376 * (1.0 / 2.0)
+      - dt * t343 * t362 * t371 * t381 * (1.0 / 6.0)
       - dt * t343 * t362 * t373 * t388 * (1.0 / 6.0);
   Qd(idxstartcorr_p + 1, idxstartcorr_v + 1) = t462;
   Qd(idxstartcorr_p + 1, idxstartcorr_v + 2) = t412;
-  Qd(idxstartcorr_p + 1, idxstartcorr_q + 0) = dt * t343 * t374 * t384 * (-1.0 / 6.0);
+  Qd(idxstartcorr_p + 1, idxstartcorr_q + 0) = dt * t343 * t374 * t384
+      * (-1.0 / 6.0);
   Qd(idxstartcorr_p + 1, idxstartcorr_q + 1) = t581;
   Qd(idxstartcorr_p + 1, idxstartcorr_q + 2) = t616;
-  Qd(idxstartcorr_p + 1, idxstartcorr_b_a + 0) = dt * t343 * t366 * t398 * (-1.0 / 6.0);
-  Qd(idxstartcorr_p + 1, idxstartcorr_b_a + 1) = dt * t343 * t367 * t399 * (-1.0 / 6.0);
+  Qd(idxstartcorr_p + 1, idxstartcorr_b_a + 0) = dt * t343 * t366 * t398
+      * (-1.0 / 6.0);
+  Qd(idxstartcorr_p + 1, idxstartcorr_b_a + 1) = dt * t343 * t367 * t399
+      * (-1.0 / 6.0);
   Qd(idxstartcorr_p + 1, idxstartcorr_b_a + 2) = t662;
   Qd(idxstartcorr_p + 2, idxstartcorr_p + 0) = t402;
   Qd(idxstartcorr_p + 2, idxstartcorr_p + 1) = t404;
-  Qd(idxstartcorr_p + 2, idxstartcorr_p + 2) = dt * t343 * t347 * t413 * (1.0 / 3.0) + dt * t343 * t354 * t414 * (1.0 / 3.0)
+  Qd(idxstartcorr_p + 2, idxstartcorr_p + 2) = dt * t343 * t347 * t413
+      * (1.0 / 3.0) + dt * t343 * t354 * t414 * (1.0 / 3.0)
       + dt * t343 * t355 * t415 * (1.0 / 3.0);
   Qd(idxstartcorr_p + 2, idxstartcorr_v + 0) = t408;
   Qd(idxstartcorr_p + 2, idxstartcorr_v + 1) = t412;
   Qd(idxstartcorr_p + 2, idxstartcorr_v + 2) = t510;
   Qd(idxstartcorr_p + 2, idxstartcorr_q + 0) = t565;
-  Qd(idxstartcorr_p + 2, idxstartcorr_q + 1) = dt * t343 * t373 * t397 * (-1.0 / 6.0);
+  Qd(idxstartcorr_p + 2, idxstartcorr_q + 1) = dt * t343 * t373 * t397
+      * (-1.0 / 6.0);
   Qd(idxstartcorr_p + 2, idxstartcorr_q + 2) = t617;
   Qd(idxstartcorr_p + 2, idxstartcorr_b_a + 0) = t658;
-  Qd(idxstartcorr_p + 2, idxstartcorr_b_a + 1) = dt * t343 * t372 * t399 * (-1.0 / 6.0);
-  Qd(idxstartcorr_p + 2, idxstartcorr_b_a + 2) = dt * t343 * t370 * t400 * (-1.0 / 6.0);
+  Qd(idxstartcorr_p + 2, idxstartcorr_b_a + 1) = dt * t343 * t372 * t399
+      * (-1.0 / 6.0);
+  Qd(idxstartcorr_p + 2, idxstartcorr_b_a + 2) = dt * t343 * t370 * t400
+      * (-1.0 / 6.0);
   Qd(idxstartcorr_v + 0, idxstartcorr_p + 0) = t419;
   Qd(idxstartcorr_v + 0, idxstartcorr_p + 1) = t420;
   Qd(idxstartcorr_v + 0, idxstartcorr_p + 2) = t408;
-  Qd(idxstartcorr_v + 0, idxstartcorr_v + 0) = t374
-      * (t428 + t343 * t362 * t425 + dt * t343 * (t362 * (t448 + t449 - t362 * t432) + t425 * t425) * (1.0 / 3.0))
-      + t373 * (t428 - t434 + dt * t343 * (t365 * t429 - t362 * t437) * (1.0 / 3.0))
-      + t371 * (t428 + t434 + dt * t343 * (t365 * t429 - t362 * (t433 + t442 - ew2 * ew3 * t362)) * (1.0 / 3.0))
-      + dt * t347 * t361 + dt * t354 * t359 + dt * t355 * t360 + dt * t343 * t359 * t399 * (1.0 / 3.0)
-      + dt * t343 * t361 * t398 * (1.0 / 3.0) + dt * t343 * t360 * t400 * (1.0 / 3.0);
-  Qd(idxstartcorr_v + 0, idxstartcorr_v + 1) = t475 + t476 - dt * t344 * t354 * t367 - dt * t345 * t355 * t376
-      - dt * t343 * t344 * t367 * t399 * (1.0 / 3.0) - dt * t343 * t345 * t376 * t400 * (1.0 / 3.0);
+  Qd(idxstartcorr_v + 0, idxstartcorr_v + 0) =
+      t374
+          * (t428 + t343 * t362 * t425
+              + dt * t343 * (t362 * (t448 + t449 - t362 * t432) + t425 * t425)
+                  * (1.0 / 3.0))
+          + t373
+              * (t428 - t434
+                  + dt * t343 * (t365 * t429 - t362 * t437) * (1.0 / 3.0))
+          + t371
+              * (t428 + t434
+                  + dt * t343
+                      * (t365 * t429 - t362 * (t433 + t442 - ew2 * ew3 * t362))
+                      * (1.0 / 3.0)) + dt * t347 * t361 + dt * t354 * t359
+          + dt * t355 * t360 + dt * t343 * t359 * t399 * (1.0 / 3.0)
+          + dt * t343 * t361 * t398 * (1.0 / 3.0)
+          + dt * t343 * t360 * t400 * (1.0 / 3.0);
+  Qd(idxstartcorr_v + 0, idxstartcorr_v + 1) = t475 + t476
+      - dt * t344 * t354 * t367 - dt * t345 * t355 * t376
+      - dt * t343 * t344 * t367 * t399 * (1.0 / 3.0)
+      - dt * t343 * t345 * t376 * t400 * (1.0 / 3.0);
   Qd(idxstartcorr_v + 0, idxstartcorr_v + 2) = t522 + t534 + t535 + t536
-      - t373 * (t440 + t515 - dt * t343 * (t513 + t514 + t362 * (t490 + t491 - t390 * t432) * (1.0 / 2.0)) * (1.0 / 3.0))
-      - dt * t346 * t347 * t369 - dt * t344 * t354 * t372 - dt * t343 * t346 * t369 * t398 * (1.0 / 3.0)
+      - t373
+          * (t440 + t515
+              - dt * t343
+                  * (t513 + t514
+                      + t362 * (t490 + t491 - t390 * t432) * (1.0 / 2.0))
+                  * (1.0 / 3.0)) - dt * t346 * t347 * t369
+      - dt * t344 * t354 * t372 - dt * t343 * t346 * t369 * t398 * (1.0 / 3.0)
       - dt * t343 * t344 * t372 * t399 * (1.0 / 3.0);
   Qd(idxstartcorr_v + 0, idxstartcorr_q + 0) = t573;
   Qd(idxstartcorr_v + 0, idxstartcorr_q + 2) = -t371
-      * (t451 + t452 - dt * t343 * (t442 + t582 - ew2 * ew3 * t362 * (1.0 / 2.0)) * (1.0 / 3.0)) - t374 * t622
+      * (t451 + t452
+          - dt * t343 * (t442 + t582 - ew2 * ew3 * t362 * (1.0 / 2.0))
+              * (1.0 / 3.0)) - t374 * t622
       + t373 * (t452 - dt * t343 * t585 * (1.0 / 3.0));
-  Qd(idxstartcorr_v + 0, idxstartcorr_b_w + 0) = dt * t343 * t362 * t502 * (-1.0 / 6.0);
-  Qd(idxstartcorr_v + 0, idxstartcorr_b_w + 2) = dt * t343 * t362 * t503 * (-1.0 / 6.0);
-  Qd(idxstartcorr_v + 0, idxstartcorr_b_a + 0) = t343 * t346 * t398 * (-1.0 / 2.0);
+  Qd(idxstartcorr_v + 0, idxstartcorr_b_w + 0) = dt * t343 * t362 * t502
+      * (-1.0 / 6.0);
+  Qd(idxstartcorr_v + 0, idxstartcorr_b_w + 2) = dt * t343 * t362 * t503
+      * (-1.0 / 6.0);
+  Qd(idxstartcorr_v + 0, idxstartcorr_b_a + 0) = t343 * t346 * t398
+      * (-1.0 / 2.0);
   Qd(idxstartcorr_v + 0, idxstartcorr_b_a + 1) = t661;
-  Qd(idxstartcorr_v + 0, idxstartcorr_b_a + 2) = t343 * t345 * t400 * (-1.0 / 2.0);
-  Qd(idxstartcorr_v + 1, idxstartcorr_p + 0) = t377 - t453 - t454 + t455 - dt * t343 * t362 * t371 * t381 * (1.0 / 6.0)
+  Qd(idxstartcorr_v + 0, idxstartcorr_b_a + 2) = t343 * t345 * t400
+      * (-1.0 / 2.0);
+  Qd(idxstartcorr_v + 1, idxstartcorr_p + 0) = t377 - t453 - t454 + t455
+      - dt * t343 * t362 * t371 * t381 * (1.0 / 6.0)
       - dt * t343 * t362 * t373 * t388 * (1.0 / 6.0);
   Qd(idxstartcorr_v + 1, idxstartcorr_p + 1) = t462;
   Qd(idxstartcorr_v + 1, idxstartcorr_p + 2) = t412;
-  Qd(idxstartcorr_v + 1, idxstartcorr_v + 0) =
-      t475 + t476
-          - t374
-              * (t343 * (t384 * t425 - t362 * t473) * (1.0 / 2.0)
-                  - dt * t343 * (t362 * t483 * (1.0 / 2.0) - t384 * t474 * (1.0 / 2.0) + t425 * t473) * (1.0 / 3.0)
-                  + dt * t362 * t384)
-          + t371
-              * (t470 + dt * t362 * t381
-                  + dt * t343 * (t362 * t485 * (1.0 / 2.0) - t381 * t466 * (1.0 / 2.0) + t362 * t388 * t429) * (1.0 / 3.0))
-          + t373
-              * (-t470 + dt * t362 * t388
-                  + dt * t343 * (t388 * t437 * (-1.0 / 2.0) + t362 * t478 * (1.0 / 2.0) + t362 * t381 * t429) * (1.0 / 3.0))
-          - dt * t344 * t354 * t367 - dt * t345 * t355 * t376 - dt * t343 * t344 * t367 * t399 * (1.0 / 3.0)
-          - dt * t343 * t345 * t376 * t400 * (1.0 / 3.0);
+  Qd(idxstartcorr_v + 1, idxstartcorr_v + 0) = t475 + t476
+      - t374
+          * (t343 * (t384 * t425 - t362 * t473) * (1.0 / 2.0)
+              - dt * t343
+                  * (t362 * t483 * (1.0 / 2.0) - t384 * t474 * (1.0 / 2.0)
+                      + t425 * t473) * (1.0 / 3.0) + dt * t362 * t384)
+      + t371
+          * (t470 + dt * t362 * t381
+              + dt * t343
+                  * (t362 * t485 * (1.0 / 2.0) - t381 * t466 * (1.0 / 2.0)
+                      + t362 * t388 * t429) * (1.0 / 3.0))
+      + t373
+          * (-t470 + dt * t362 * t388
+              + dt * t343
+                  * (t388 * t437 * (-1.0 / 2.0) + t362 * t478 * (1.0 / 2.0)
+                      + t362 * t381 * t429) * (1.0 / 3.0))
+      - dt * t344 * t354 * t367 - dt * t345 * t355 * t376
+      - dt * t343 * t344 * t367 * t399 * (1.0 / 3.0)
+      - dt * t343 * t345 * t376 * t400 * (1.0 / 3.0);
   Qd(idxstartcorr_v + 1, idxstartcorr_v + 1) = -t374
-      * (-dt * t459 + dt * t343 * (t384 * t483 - t480 * t480) * (1.0 / 3.0) + t343 * t384 * t473)
-      + t373 * (dt * t461 + dt * t343 * (t388 * t478 + t429 * t458) * (1.0 / 3.0) - ew1 * t343 * t381 * t388)
-      + t371 * (dt * t458 + dt * t343 * (t381 * t485 + t429 * t461) * (1.0 / 3.0) + ew1 * t343 * t381 * t388) + dt * t347 * t378
-      + dt * t355 * t379 + dt * t354 * t385 + dt * t343 * t378 * t398 * (1.0 / 3.0) + dt * t343 * t385 * t399 * (1.0 / 3.0)
+      * (-dt * t459 + dt * t343 * (t384 * t483 - t480 * t480) * (1.0 / 3.0)
+          + t343 * t384 * t473)
+      + t373
+          * (dt * t461 + dt * t343 * (t388 * t478 + t429 * t458) * (1.0 / 3.0)
+              - ew1 * t343 * t381 * t388)
+      + t371
+          * (dt * t458 + dt * t343 * (t381 * t485 + t429 * t461) * (1.0 / 3.0)
+              + ew1 * t343 * t381 * t388) + dt * t347 * t378 + dt * t355 * t379
+      + dt * t354 * t385 + dt * t343 * t378 * t398 * (1.0 / 3.0)
+      + dt * t343 * t385 * t399 * (1.0 / 3.0)
       + dt * t343 * t379 * t400 * (1.0 / 3.0);
   Qd(idxstartcorr_v + 1, idxstartcorr_v + 2) = t560;
   Qd(idxstartcorr_v + 1, idxstartcorr_q + 0) = -t374
       * (-dt * t384 + t343 * t473 * (1.0 / 2.0)
-          + dt * t343 * (t471 + ew1 * ew2 * t388 * (1.0 / 2.0) + ew1 * ew3 * t381 * (1.0 / 2.0)) * (1.0 / 3.0))
-      + dt * t343 * t371 * t381 * t432 * (1.0 / 6.0) + dt * t343 * t373 * t388 * t432 * (1.0 / 6.0);
+          + dt * t343
+              * (t471 + ew1 * ew2 * t388 * (1.0 / 2.0)
+                  + ew1 * ew3 * t381 * (1.0 / 2.0)) * (1.0 / 3.0))
+      + dt * t343 * t371 * t381 * t432 * (1.0 / 6.0)
+      + dt * t343 * t373 * t388 * t432 * (1.0 / 6.0);
   Qd(idxstartcorr_v + 1, idxstartcorr_q + 1) = t599;
-  Qd(idxstartcorr_v + 1, idxstartcorr_q + 2) = -t374 * t631 - t371 * t635 - t373 * (t626 - ew1 * t343 * t388 * (1.0 / 2.0));
-  Qd(idxstartcorr_v + 1, idxstartcorr_b_w + 0) = dt * t343 * t384 * t502 * (1.0 / 6.0);
-  Qd(idxstartcorr_v + 1, idxstartcorr_b_w + 1) = dt * t343 * t388 * t563 * (-1.0 / 6.0);
-  Qd(idxstartcorr_v + 1, idxstartcorr_b_w + 2) = dt * t343 * t381 * t503 * (-1.0 / 6.0);
-  Qd(idxstartcorr_v + 1, idxstartcorr_b_a + 0) = t343 * t366 * t398 * (-1.0 / 2.0);
-  Qd(idxstartcorr_v + 1, idxstartcorr_b_a + 1) = t343 * t367 * t399 * (-1.0 / 2.0);
+  Qd(idxstartcorr_v + 1, idxstartcorr_q + 2) = -t374 * t631 - t371 * t635
+      - t373 * (t626 - ew1 * t343 * t388 * (1.0 / 2.0));
+  Qd(idxstartcorr_v + 1, idxstartcorr_b_w + 0) = dt * t343 * t384 * t502
+      * (1.0 / 6.0);
+  Qd(idxstartcorr_v + 1, idxstartcorr_b_w + 1) = dt * t343 * t388 * t563
+      * (-1.0 / 6.0);
+  Qd(idxstartcorr_v + 1, idxstartcorr_b_w + 2) = dt * t343 * t381 * t503
+      * (-1.0 / 6.0);
+  Qd(idxstartcorr_v + 1, idxstartcorr_b_a + 0) = t343 * t366 * t398
+      * (-1.0 / 2.0);
+  Qd(idxstartcorr_v + 1, idxstartcorr_b_a + 1) = t343 * t367 * t399
+      * (-1.0 / 2.0);
   Qd(idxstartcorr_v + 1, idxstartcorr_b_a + 2) = t663;
   Qd(idxstartcorr_v + 2, idxstartcorr_p + 0) = t408;
   Qd(idxstartcorr_v + 2, idxstartcorr_p + 1) = t412;
   Qd(idxstartcorr_v + 2, idxstartcorr_p + 2) = t510;
   Qd(idxstartcorr_v + 2, idxstartcorr_v + 0) = t522 + t534 + t535 + t536
-      - t373 * (t440 + t515 - dt * t343 * (t513 + t514 + t362 * t512 * (1.0 / 2.0)) * (1.0 / 3.0)) - dt * t346 * t347 * t369
-      - dt * t344 * t354 * t372 - dt * t343 * t346 * t369 * t398 * (1.0 / 3.0) - dt * t343 * t344 * t372 * t399 * (1.0 / 3.0);
+      - t373
+          * (t440 + t515
+              - dt * t343 * (t513 + t514 + t362 * t512 * (1.0 / 2.0))
+                  * (1.0 / 3.0)) - dt * t346 * t347 * t369
+      - dt * t344 * t354 * t372 - dt * t343 * t346 * t369 * t398 * (1.0 / 3.0)
+      - dt * t343 * t344 * t372 * t399 * (1.0 / 3.0);
   Qd(idxstartcorr_v + 2, idxstartcorr_v + 1) = t560;
-  Qd(idxstartcorr_v + 2, idxstartcorr_v + 2) = -t371 * (t561 - dt * t509 + dt * t343 * (t394 * t489 - t429 * t506) * (1.0 / 3.0))
-      + t373 * (t561 + dt * t506 - dt * t343 * (t397 * t512 - t429 * t509) * (1.0 / 3.0))
-      + t374 * (dt * t507 - dt * t343 * (t390 * t497 - t447 * t447) * (1.0 / 3.0) + t343 * t390 * t447) + dt * t347 * t413
-      + dt * t354 * t414 + dt * t355 * t415 + dt * t343 * t398 * t413 * (1.0 / 3.0) + dt * t343 * t399 * t414 * (1.0 / 3.0)
+  Qd(idxstartcorr_v + 2, idxstartcorr_v + 2) = -t371
+      * (t561 - dt * t509
+          + dt * t343 * (t394 * t489 - t429 * t506) * (1.0 / 3.0))
+      + t373
+          * (t561 + dt * t506
+              - dt * t343 * (t397 * t512 - t429 * t509) * (1.0 / 3.0))
+      + t374
+          * (dt * t507 - dt * t343 * (t390 * t497 - t447 * t447) * (1.0 / 3.0)
+              + t343 * t390 * t447) + dt * t347 * t413 + dt * t354 * t414
+      + dt * t355 * t415 + dt * t343 * t398 * t413 * (1.0 / 3.0)
+      + dt * t343 * t399 * t414 * (1.0 / 3.0)
       + dt * t343 * t400 * t415 * (1.0 / 3.0);
   Qd(idxstartcorr_v + 2, idxstartcorr_q + 0) = t580;
   Qd(idxstartcorr_v + 2, idxstartcorr_q + 1) = t608
-      + t371 * (dt * t343 * (t600 - ew2 * ew3 * t394 * (1.0 / 2.0)) * (1.0 / 3.0) - ew1 * t343 * t394 * (1.0 / 2.0))
-      + t373 * (t602 + t610 - dt * t343 * (t490 + t601 - t390 * t432 * (1.0 / 2.0)) * (1.0 / 3.0));
+      + t371
+          * (dt * t343 * (t600 - ew2 * ew3 * t394 * (1.0 / 2.0)) * (1.0 / 3.0)
+              - ew1 * t343 * t394 * (1.0 / 2.0))
+      + t373
+          * (t602 + t610
+              - dt * t343 * (t490 + t601 - t390 * t432 * (1.0 / 2.0))
+                  * (1.0 / 3.0));
   Qd(idxstartcorr_v + 2, idxstartcorr_q + 2) = t647 - t374 * t641
-      - t373 * (t562 + dt * t343 * (t642 - ew2 * ew3 * t397 * (1.0 / 2.0)) * (1.0 / 3.0));
-  Qd(idxstartcorr_v + 2, idxstartcorr_b_w + 0) = dt * t343 * t390 * t502 * (-1.0 / 6.0);
+      - t373
+          * (t562
+              + dt * t343 * (t642 - ew2 * ew3 * t397 * (1.0 / 2.0))
+                  * (1.0 / 3.0));
+  Qd(idxstartcorr_v + 2, idxstartcorr_b_w + 0) = dt * t343 * t390 * t502
+      * (-1.0 / 6.0);
   Qd(idxstartcorr_v + 2, idxstartcorr_b_w + 1) = t656;
-  Qd(idxstartcorr_v + 2, idxstartcorr_b_w + 2) = dt * t343 * t394 * t503 * (-1.0 / 6.0);
+  Qd(idxstartcorr_v + 2, idxstartcorr_b_w + 2) = dt * t343 * t394 * t503
+      * (-1.0 / 6.0);
   Qd(idxstartcorr_v + 2, idxstartcorr_b_a + 0) = t659;
-  Qd(idxstartcorr_v + 2, idxstartcorr_b_a + 1) = t343 * t372 * t399 * (-1.0 / 2.0);
-  Qd(idxstartcorr_v + 2, idxstartcorr_b_a + 2) = t343 * t370 * t400 * (-1.0 / 2.0);
+  Qd(idxstartcorr_v + 2, idxstartcorr_b_a + 1) = t343 * t372 * t399
+      * (-1.0 / 2.0);
+  Qd(idxstartcorr_v + 2, idxstartcorr_b_a + 2) = t343 * t370 * t400
+      * (-1.0 / 2.0);
   Qd(idxstartcorr_q + 0, idxstartcorr_p + 0) = t564;
   Qd(idxstartcorr_q + 0, idxstartcorr_p + 2) = t565;
   Qd(idxstartcorr_q + 0, idxstartcorr_v + 0) = t573;
   Qd(idxstartcorr_q + 0, idxstartcorr_v + 2) = t580;
-  Qd(idxstartcorr_q + 0, idxstartcorr_q + 0) = t374 * (dt - dt * t343 * t432 * (1.0 / 3.0)) + dt * t343 * t502 * (1.0 / 3.0);
+  Qd(idxstartcorr_q + 0, idxstartcorr_q + 0) = t374
+      * (dt - dt * t343 * t432 * (1.0 / 3.0)) + dt * t343 * t502 * (1.0 / 3.0);
   Qd(idxstartcorr_q + 0, idxstartcorr_q + 2) = t652;
   Qd(idxstartcorr_q + 0, idxstartcorr_b_w + 0) = t343 * t502 * (-1.0 / 2.0);
-  Qd(idxstartcorr_q + 1, idxstartcorr_p + 0) = dt * t343 * t362 * t373 * (1.0 / 6.0);
+  Qd(idxstartcorr_q + 1, idxstartcorr_p + 0) = dt * t343 * t362 * t373
+      * (1.0 / 6.0);
   Qd(idxstartcorr_q + 1, idxstartcorr_p + 1) = t581;
-  Qd(idxstartcorr_q + 1, idxstartcorr_p + 2) = dt * t343 * t373 * t397 * (-1.0 / 6.0);
+  Qd(idxstartcorr_q + 1, idxstartcorr_p + 2) = dt * t343 * t373 * t397
+      * (-1.0 / 6.0);
   Qd(idxstartcorr_q + 1, idxstartcorr_v + 0) = -t371 * (t452 + t623)
-      - t374 * (dt * t343 * (t566 - ew3 * t425) * (1.0 / 3.0) - ew3 * t343 * t362 * (1.0 / 2.0))
+      - t374
+          * (dt * t343 * (t566 - ew3 * t425) * (1.0 / 3.0)
+              - ew3 * t343 * t362 * (1.0 / 2.0))
       + t373 * (-t451 + t452 + dt * t343 * (t436 + t582 - t583) * (1.0 / 3.0));
   Qd(idxstartcorr_q + 1, idxstartcorr_v + 1) = t599;
-  Qd(idxstartcorr_q + 1, idxstartcorr_v + 2) = t608 + t373 * (t602 + t610 - dt * t343 * (t490 + t601 - t609) * (1.0 / 3.0))
+  Qd(idxstartcorr_q + 1, idxstartcorr_v + 2) = t608
+      + t373 * (t602 + t610 - dt * t343 * (t490 + t601 - t609) * (1.0 / 3.0))
       - t371 * (t602 - dt * t343 * (t600 - t601) * (1.0 / 3.0));
-  Qd(idxstartcorr_q + 1, idxstartcorr_q + 0) = -t374 * (ew3 * t343 * (1.0 / 2.0) - dt * ew1 * ew2 * t343 * (1.0 / 6.0))
+  Qd(idxstartcorr_q + 1, idxstartcorr_q + 0) = -t374
+      * (ew3 * t343 * (1.0 / 2.0) - dt * ew1 * ew2 * t343 * (1.0 / 6.0))
       - dt * t343 * t373 * t613 * (1.0 / 3.0);
-  Qd(idxstartcorr_q + 1, idxstartcorr_q + 1) = t373 * (dt - dt * t343 * t435 * (1.0 / 3.0)) + dt * t343 * t563 * (1.0 / 3.0)
-      + dt * t343 * t371 * t429 * (1.0 / 3.0) + dt * t343 * t374 * t431 * (1.0 / 3.0);
-  Qd(idxstartcorr_q + 1, idxstartcorr_q + 2) = t655 - t373 * (t614 - dt * ew2 * ew3 * t343 * (1.0 / 6.0))
+  Qd(idxstartcorr_q + 1, idxstartcorr_q + 1) = t373
+      * (dt - dt * t343 * t435 * (1.0 / 3.0)) + dt * t343 * t563 * (1.0 / 3.0)
+      + dt * t343 * t371 * t429 * (1.0 / 3.0)
+      + dt * t343 * t374 * t431 * (1.0 / 3.0);
+  Qd(idxstartcorr_q + 1, idxstartcorr_q + 2) = t655
+      - t373 * (t614 - dt * ew2 * ew3 * t343 * (1.0 / 6.0))
       - dt * ew2 * ew3 * t343 * t374 * (1.0 / 3.0);
-  Qd(idxstartcorr_q + 1, idxstartcorr_b_w + 0) = dt * ew3 * t343 * t502 * (1.0 / 6.0);
+  Qd(idxstartcorr_q + 1, idxstartcorr_b_w + 0) = dt * ew3 * t343 * t502
+      * (1.0 / 6.0);
   Qd(idxstartcorr_q + 1, idxstartcorr_b_w + 1) = t343 * t563 * (-1.0 / 2.0);
-  Qd(idxstartcorr_q + 1, idxstartcorr_b_w + 2) = dt * ew1 * t343 * t503 * (-1.0 / 6.0);
+  Qd(idxstartcorr_q + 1, idxstartcorr_b_w + 2) = dt * ew1 * t343 * t503
+      * (-1.0 / 6.0);
   Qd(idxstartcorr_q + 2, idxstartcorr_p + 0) = t615;
   Qd(idxstartcorr_q + 2, idxstartcorr_p + 1) = t616;
   Qd(idxstartcorr_q + 2, idxstartcorr_p + 2) = t617;
   Qd(idxstartcorr_q + 2, idxstartcorr_v + 0) = -t374 * t622
-      - t371 * (t451 + t452 - dt * t343 * (t442 + t582 - t583) * (1.0 / 3.0)) + t373 * (t452 - t623);
-  Qd(idxstartcorr_q + 2, idxstartcorr_v + 1) = -t374 * t631 - t371 * t635 - t373 * (t626 - t627);
-  Qd(idxstartcorr_q + 2, idxstartcorr_v + 2) = t647 - t374 * t641 - t373 * (t562 + dt * t343 * (t642 - t643) * (1.0 / 3.0));
+      - t371 * (t451 + t452 - dt * t343 * (t442 + t582 - t583) * (1.0 / 3.0))
+      + t373 * (t452 - t623);
+  Qd(idxstartcorr_q + 2, idxstartcorr_v + 1) = -t374 * t631 - t371 * t635
+      - t373 * (t626 - t627);
+  Qd(idxstartcorr_q + 2, idxstartcorr_v + 2) = t647 - t374 * t641
+      - t373 * (t562 + dt * t343 * (t642 - t643) * (1.0 / 3.0));
   Qd(idxstartcorr_q + 2, idxstartcorr_q + 0) = t652;
-  Qd(idxstartcorr_q + 2, idxstartcorr_q + 1) = t655 - t373 * (t614 - t653) - dt * ew2 * ew3 * t343 * t374 * (1.0 / 3.0);
-  Qd(idxstartcorr_q + 2, idxstartcorr_q + 2) = t371 * (dt - dt * t343 * t441 * (1.0 / 3.0)) + dt * t343 * t503 * (1.0 / 3.0)
-      + dt * t343 * t373 * t429 * (1.0 / 3.0) + dt * t343 * t374 * t430 * (1.0 / 3.0);
-  Qd(idxstartcorr_q + 2, idxstartcorr_b_w + 0) = dt * ew2 * t343 * t502 * (-1.0 / 6.0);
+  Qd(idxstartcorr_q + 2, idxstartcorr_q + 1) = t655 - t373 * (t614 - t653)
+      - dt * ew2 * ew3 * t343 * t374 * (1.0 / 3.0);
+  Qd(idxstartcorr_q + 2, idxstartcorr_q + 2) = t371
+      * (dt - dt * t343 * t441 * (1.0 / 3.0)) + dt * t343 * t503 * (1.0 / 3.0)
+      + dt * t343 * t373 * t429 * (1.0 / 3.0)
+      + dt * t343 * t374 * t430 * (1.0 / 3.0);
+  Qd(idxstartcorr_q + 2, idxstartcorr_b_w + 0) = dt * ew2 * t343 * t502
+      * (-1.0 / 6.0);
   Qd(idxstartcorr_q + 2, idxstartcorr_b_w + 1) = t657;
   Qd(idxstartcorr_q + 2, idxstartcorr_b_w + 2) = t343 * t503 * (-1.0 / 2.0);
-  Qd(idxstartcorr_b_w + 0, idxstartcorr_v + 0) = dt * t343 * t362 * t502 * (-1.0 / 6.0);
-  Qd(idxstartcorr_b_w + 0, idxstartcorr_v + 2) = dt * t343 * t390 * t502 * (-1.0 / 6.0);
+  Qd(idxstartcorr_b_w + 0, idxstartcorr_v + 0) = dt * t343 * t362 * t502
+      * (-1.0 / 6.0);
+  Qd(idxstartcorr_b_w + 0, idxstartcorr_v + 2) = dt * t343 * t390 * t502
+      * (-1.0 / 6.0);
   Qd(idxstartcorr_b_w + 0, idxstartcorr_q + 0) = t343 * t502 * (-1.0 / 2.0);
-  Qd(idxstartcorr_b_w + 0, idxstartcorr_q + 2) = dt * ew2 * t343 * t502 * (-1.0 / 6.0);
+  Qd(idxstartcorr_b_w + 0, idxstartcorr_q + 2) = dt * ew2 * t343 * t502
+      * (-1.0 / 6.0);
   Qd(idxstartcorr_b_w + 0, idxstartcorr_b_w + 0) = dt * t502;
-  Qd(idxstartcorr_b_w + 1, idxstartcorr_v + 0) = dt * t343 * t362 * t563 * (-1.0 / 6.0);
-  Qd(idxstartcorr_b_w + 1, idxstartcorr_v + 1) = dt * t343 * t388 * t563 * (-1.0 / 6.0);
+  Qd(idxstartcorr_b_w + 1, idxstartcorr_v + 0) = dt * t343 * t362 * t563
+      * (-1.0 / 6.0);
+  Qd(idxstartcorr_b_w + 1, idxstartcorr_v + 1) = dt * t343 * t388 * t563
+      * (-1.0 / 6.0);
   Qd(idxstartcorr_b_w + 1, idxstartcorr_v + 2) = t656;
   Qd(idxstartcorr_b_w + 1, idxstartcorr_q + 1) = t343 * t563 * (-1.0 / 2.0);
   Qd(idxstartcorr_b_w + 1, idxstartcorr_q + 2) = t657;
   Qd(idxstartcorr_b_w + 1, idxstartcorr_b_w + 1) = dt * t563;
-  Qd(idxstartcorr_b_w + 2, idxstartcorr_v + 0) = dt * t343 * t362 * t503 * (-1.0 / 6.0);
-  Qd(idxstartcorr_b_w + 2, idxstartcorr_v + 1) = dt * t343 * t381 * t503 * (-1.0 / 6.0);
-  Qd(idxstartcorr_b_w + 2, idxstartcorr_v + 2) = dt * t343 * t394 * t503 * (-1.0 / 6.0);
-  Qd(idxstartcorr_b_w + 2, idxstartcorr_q + 1) = dt * ew1 * t343 * t503 * (-1.0 / 6.0);
+  Qd(idxstartcorr_b_w + 2, idxstartcorr_v + 0) = dt * t343 * t362 * t503
+      * (-1.0 / 6.0);
+  Qd(idxstartcorr_b_w + 2, idxstartcorr_v + 1) = dt * t343 * t381 * t503
+      * (-1.0 / 6.0);
+  Qd(idxstartcorr_b_w + 2, idxstartcorr_v + 2) = dt * t343 * t394 * t503
+      * (-1.0 / 6.0);
+  Qd(idxstartcorr_b_w + 2, idxstartcorr_q + 1) = dt * ew1 * t343 * t503
+      * (-1.0 / 6.0);
   Qd(idxstartcorr_b_w + 2, idxstartcorr_q + 2) = t343 * t503 * (-1.0 / 2.0);
   Qd(idxstartcorr_b_w + 2, idxstartcorr_b_w + 2) = dt * t503;
-  Qd(idxstartcorr_b_a + 0, idxstartcorr_p + 0) = dt * t343 * t346 * t398 * (-1.0 / 6.0);
-  Qd(idxstartcorr_b_a + 0, idxstartcorr_p + 1) = dt * t343 * t366 * t398 * (-1.0 / 6.0);
+  Qd(idxstartcorr_b_a + 0, idxstartcorr_p + 0) = dt * t343 * t346 * t398
+      * (-1.0 / 6.0);
+  Qd(idxstartcorr_b_a + 0, idxstartcorr_p + 1) = dt * t343 * t366 * t398
+      * (-1.0 / 6.0);
   Qd(idxstartcorr_b_a + 0, idxstartcorr_p + 2) = t658;
-  Qd(idxstartcorr_b_a + 0, idxstartcorr_v + 0) = t343 * t346 * t398 * (-1.0 / 2.0);
-  Qd(idxstartcorr_b_a + 0, idxstartcorr_v + 1) = t343 * t366 * t398 * (-1.0 / 2.0);
+  Qd(idxstartcorr_b_a + 0, idxstartcorr_v + 0) = t343 * t346 * t398
+      * (-1.0 / 2.0);
+  Qd(idxstartcorr_b_a + 0, idxstartcorr_v + 1) = t343 * t366 * t398
+      * (-1.0 / 2.0);
   Qd(idxstartcorr_b_a + 0, idxstartcorr_v + 2) = t659;
   Qd(idxstartcorr_b_a + 0, idxstartcorr_b_a + 0) = dt * t398;
   Qd(idxstartcorr_b_a + 1, idxstartcorr_p + 0) = t660;
-  Qd(idxstartcorr_b_a + 1, idxstartcorr_p + 1) = dt * t343 * t367 * t399 * (-1.0 / 6.0);
-  Qd(idxstartcorr_b_a + 1, idxstartcorr_p + 2) = dt * t343 * t372 * t399 * (-1.0 / 6.0);
+  Qd(idxstartcorr_b_a + 1, idxstartcorr_p + 1) = dt * t343 * t367 * t399
+      * (-1.0 / 6.0);
+  Qd(idxstartcorr_b_a + 1, idxstartcorr_p + 2) = dt * t343 * t372 * t399
+      * (-1.0 / 6.0);
   Qd(idxstartcorr_b_a + 1, idxstartcorr_v + 0) = t661;
-  Qd(idxstartcorr_b_a + 1, idxstartcorr_v + 1) = t343 * t367 * t399 * (-1.0 / 2.0);
-  Qd(idxstartcorr_b_a + 1, idxstartcorr_v + 2) = t343 * t372 * t399 * (-1.0 / 2.0);
+  Qd(idxstartcorr_b_a + 1, idxstartcorr_v + 1) = t343 * t367 * t399
+      * (-1.0 / 2.0);
+  Qd(idxstartcorr_b_a + 1, idxstartcorr_v + 2) = t343 * t372 * t399
+      * (-1.0 / 2.0);
   Qd(idxstartcorr_b_a + 1, idxstartcorr_b_a + 1) = dt * t399;
-  Qd(idxstartcorr_b_a + 2, idxstartcorr_p + 0) = dt * t343 * t345 * t400 * (-1.0 / 6.0);
+  Qd(idxstartcorr_b_a + 2, idxstartcorr_p + 0) = dt * t343 * t345 * t400
+      * (-1.0 / 6.0);
   Qd(idxstartcorr_b_a + 2, idxstartcorr_p + 1) = t662;
-  Qd(idxstartcorr_b_a + 2, idxstartcorr_p + 2) = dt * t343 * t370 * t400 * (-1.0 / 6.0);
-  Qd(idxstartcorr_b_a + 2, idxstartcorr_v + 0) = t343 * t345 * t400 * (-1.0 / 2.0);
+  Qd(idxstartcorr_b_a + 2, idxstartcorr_p + 2) = dt * t343 * t370 * t400
+      * (-1.0 / 6.0);
+  Qd(idxstartcorr_b_a + 2, idxstartcorr_v + 0) = t343 * t345 * t400
+      * (-1.0 / 2.0);
   Qd(idxstartcorr_b_a + 2, idxstartcorr_v + 1) = t663;
-  Qd(idxstartcorr_b_a + 2, idxstartcorr_v + 2) = t343 * t370 * t400 * (-1.0 / 2.0);
+  Qd(idxstartcorr_b_a + 2, idxstartcorr_v + 2) = t343 * t370 * t400
+      * (-1.0 / 2.0);
   Qd(idxstartcorr_b_a + 2, idxstartcorr_b_a + 2) = dt * t400;
 
 }

@@ -32,8 +32,7 @@ template<typename T, typename PrototypeInvalidT = T>
 class SortedContainer {
 
  public:
-  typedef shared_ptr<T> Ptr_T;
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  typedef shared_ptr<T> Ptr_T;EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
  private:
   typedef std::map<double, Ptr_T> ListT;  ///< The container type in which to store the data.
@@ -75,11 +74,10 @@ class SortedContainer {
    */
   inline typename ListT::iterator insert(const shared_ptr<T>& value) {
     std::pair<typename ListT::iterator, bool> itpr = stateList.insert(
-                                                                      std::pair<double, shared_ptr<T> >(value->time, value));
+        std::pair<double, shared_ptr<T> >(value->time, value));
     if (!itpr.second) {
-      MSF_WARN_STREAM("Wanted to insert a value to the sorted container at time "
-                      << std::fixed << std::setprecision(9) << value->time
-                      << " but the map already contained a value at this time. discarding.");
+      MSF_WARN_STREAM(
+          "Wanted to insert a value to the sorted container at time " << std::fixed << std::setprecision(9) << value->time << " but the map already contained a value at this time. discarding.");
     }
     return itpr.first;
   }
@@ -112,14 +110,14 @@ class SortedContainer {
    * \param value The value to get the iterator for.
    * \returns iterator.
    */
-  inline typename ListT::iterator getIteratorAtValue(
-                                                     const shared_ptr<T>& value,
-                                                     bool warnIfNotExistant = true) {
+  inline typename ListT::iterator getIteratorAtValue(const shared_ptr<T>& value,
+                                                     bool warnIfNotExistant =
+                                                         true) {
     typename ListT::iterator it = stateList.find(value->time);
     if (it == stateList.end()) {  // There is no value in the map with this time.
       if (warnIfNotExistant)
-        MSF_WARN_STREAM("getIteratorAtValue(state): Could not find value for time "
-                        << std::fixed << std::setprecision(9) << value->time);
+        MSF_WARN_STREAM(
+            "getIteratorAtValue(state): Could not find value for time " << std::fixed << std::setprecision(9) << value->time);
       it = stateList.lower_bound(value->time);
     }
     return it;
@@ -137,8 +135,8 @@ class SortedContainer {
     typename ListT::iterator it = stateList.find(time);
     if (it == stateList.end()) {  //there is no value in the map with this time
       if (warnIfNotExistant)
-        MSF_WARN_STREAM("getIteratorAtValue(double): Could not find value for time "
-                        << std::fixed << std::setprecision(9) << time);
+        MSF_WARN_STREAM(
+            "getIteratorAtValue(double): Could not find value for time " << std::fixed << std::setprecision(9) << time);
       it = stateList.lower_bound(time);
     }
     return it;
@@ -150,7 +148,7 @@ class SortedContainer {
    * \returns iterator.
    */
   inline typename ListT::iterator getIteratorClosestBefore(
-                                                           const double& statetime) {
+      const double& statetime) {
     typename ListT::iterator it = stateList.lower_bound(statetime);
     it--;
     return it;
@@ -163,7 +161,7 @@ class SortedContainer {
    * \returns iterator.
    */
   inline typename ListT::iterator getIteratorClosestAfter(
-                                                          const double& statetime) {
+      const double& statetime) {
     return stateList.upper_bound(statetime);
   }
   ;

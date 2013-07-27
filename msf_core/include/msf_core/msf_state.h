@@ -119,8 +119,7 @@ struct GenericState_T {
    */
   template<int INDEX>
   inline typename msf_tmp::StripReference<
-      typename boost::fusion::result_of::at_c<StateSequence_T,
-      INDEX>::type>::result_t::value_t&
+      typename boost::fusion::result_of::at_c<StateSequence_T, INDEX>::type>::result_t::value_t&
   get();
 
  public:
@@ -162,8 +161,7 @@ struct GenericState_T {
    */
   template<int INDEX>
   inline typename msf_tmp::StripReference<
-      typename boost::fusion::result_of::at_c<StateSequence_T,
-      INDEX>::type>::result_t::Q_T&
+      typename boost::fusion::result_of::at_c<StateSequence_T, INDEX>::type>::result_t::Q_T&
   getQBlock();
 
   /**
@@ -172,8 +170,7 @@ struct GenericState_T {
    */
   template<int INDEX>
   inline const typename msf_tmp::StripReference<
-      typename boost::fusion::result_of::at_c<StateSequence_T,
-      INDEX>::type>::result_t::Q_T&
+      typename boost::fusion::result_of::at_c<StateSequence_T, INDEX>::type>::result_t::Q_T&
   getQBlock() const;
 
   /**
@@ -185,8 +182,8 @@ struct GenericState_T {
    * Error covariance: zeros.
    */
   void reset(
-      msf_core::StateVisitor<GenericState_T<StateSequence_T,
-      StateDefinition_T> >* usercalc = NULL);
+      msf_core::StateVisitor<GenericState_T<StateSequence_T, StateDefinition_T> >* usercalc =
+          NULL);
 
   /**
    * \brief Write the covariance corresponding to position and attitude to cov.
@@ -245,8 +242,7 @@ struct GenericState_T {
    */
   template<int INDEX>
   inline const typename msf_tmp::StripReference<
-      typename boost::fusion::result_of::at_c<StateSequence_T,
-      INDEX>::type>::result_t::value_t&
+      typename boost::fusion::result_of::at_c<StateSequence_T, INDEX>::type>::result_t::value_t&
   get() const;
 
   /**
@@ -255,8 +251,7 @@ struct GenericState_T {
    */
   template<int INDEX>
   inline typename msf_tmp::AddConstReference<
-      typename boost::fusion::result_of::at_c<StateSequence_T,
-      INDEX>::type>::result_t
+      typename boost::fusion::result_of::at_c<StateSequence_T, INDEX>::type>::result_t
   getStateVar() const;
 
   /**
@@ -266,8 +261,7 @@ struct GenericState_T {
   template<int INDEX>
   inline void
   set(const typename msf_tmp::StripConstReference<
-      typename boost::fusion::result_of::at_c<StateSequence_T,
-      INDEX>::type>::result_t::value_t& newvalue);
+      typename boost::fusion::result_of::at_c<StateSequence_T, INDEX>::type>::result_t::value_t& newvalue);
 
   /*
    * Clears the crosscovariance entries of a given state in P

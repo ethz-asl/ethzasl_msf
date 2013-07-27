@@ -26,38 +26,41 @@
 #include <msf_core/gps_conversion.h>
 #include <msf_updates/PointWithCovarianceStamped.h>
 
-namespace msf_position_sensor{
+namespace msf_position_sensor {
 
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
-class PositionSensorHandler : public msf_core::SensorHandler<typename msf_updates::EKFState>
-{
-private:
+class PositionSensorHandler : public msf_core::SensorHandler<
+    typename msf_updates::EKFState> {
+ private:
 
-  Eigen::Matrix<double, 3, 1> z_p_; ///< position measurement
-  double n_zp_; ///< position measurement noise
-  double delay_;        ///< delay to be subtracted from the ros-timestamp of the measurement provided by this sensor
+  Eigen::Matrix<double, 3, 1> z_p_;  ///< Position measurement.
+  double n_zp_;  ///< Position measurement noise.
+  double delay_;       ///< Delay to be subtracted from the ros-timestamp of
+                       //the measurement provided by this sensor.
 
   ros::Subscriber subPointStamped_;
   ros::Subscriber subTransformStamped_;
   ros::Subscriber subNavSatFix_;
   msf_core::GPSConversion gpsConversion_;
 
-  bool use_fixed_covariance_; ///< use fixed covariance set by dynamic reconfigure
-  bool provides_absolute_measurements_; ///<does this sensor measure relative or absolute values
+  bool use_fixed_covariance_;  ///< Use fixed covariance set by dynamic reconfigure.
+  bool provides_absolute_measurements_;  ///< Does this sensor measure relative or absolute values.
 
-  void processPositionMeasurement(const msf_updates::PointWithCovarianceStampedConstPtr& msg);
+  void processPositionMeasurement(
+      const msf_updates::PointWithCovarianceStampedConstPtr& msg);
   void measurementCallback(const geometry_msgs::PointStampedConstPtr & msg);
   void measurementCallback(const geometry_msgs::TransformStampedConstPtr & msg);
   void measurementCallback(const sensor_msgs::NavSatFixConstPtr& msg);
 
-public:
+ public:
   typedef MEASUREMENT_TYPE measurement_t;
-  PositionSensorHandler(MANAGER_TYPE& meas, std::string topic_namespace, std::string parameternamespace);
-  //used for the init
-  Eigen::Matrix<double, 3, 1> getPositionMeasurement(){
+  PositionSensorHandler(MANAGER_TYPE& meas, std::string topic_namespace,
+                        std::string parameternamespace);
+  // Used for the init.
+  Eigen::Matrix<double, 3, 1> getPositionMeasurement() {
     return z_p_;
   }
-  //setters for configure values
+  // Setters for configure values.
   void setNoises(double n_zp);
   void setDelay(double delay);
   void adjustGPSZReference(double current_z);

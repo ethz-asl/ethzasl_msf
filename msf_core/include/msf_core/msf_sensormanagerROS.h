@@ -17,7 +17,6 @@
 #ifndef SENSORMANAGERROS_H
 #define SENSORMANAGERROS_H
 
-
 #include <ros/ros.h>
 #include <dynamic_reconfigure/server.h>
 
@@ -34,10 +33,9 @@
 #include <msf_core/msf_sensormanager.h>
 #include <msf_core/msf_types.hpp>
 
-
 namespace msf_core {
 
-enum{
+enum {
   ///< Number of states exchanged with external propagation.
   // Here: p, v, q, bw, bw = 16
   HLI_EKF_STATE_SIZE = 16
@@ -60,16 +58,15 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
 
   ReconfigureServer *reconfServer_;  ///< Dynamic reconfigure server.
 
-  ros::Publisher pubState_; ///< Publishes all states of the filter.
-  ros::Publisher pubPose_; ///< Publishes 6DoF pose output.
-  ros::Publisher pubPoseAfterUpdate_; ///< Publishes 6DoF pose output after the update has been applied.
-  ros::Publisher pubPoseCrtl_; ///< Publishes 6DoF pose including velocity output.
-  ros::Publisher pubCorrect_; ///< Publishes corrections for external state propagation.
+  ros::Publisher pubState_;  ///< Publishes all states of the filter.
+  ros::Publisher pubPose_;  ///< Publishes 6DoF pose output.
+  ros::Publisher pubPoseAfterUpdate_;  ///< Publishes 6DoF pose output after the update has been applied.
+  ros::Publisher pubPoseCrtl_;  ///< Publishes 6DoF pose including velocity output.
+  ros::Publisher pubCorrect_;  ///< Publishes corrections for external state propagation.
 
   mutable tf::TransformBroadcaster tf_broadcaster_;
 
-  sensor_fusion_comm::ExtEkf hl_state_buf_; ///< Buffer to store external propagation data.
-
+  sensor_fusion_comm::ExtEkf hl_state_buf_;  ///< Buffer to store external propagation data.
 
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -84,12 +81,15 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
 
     ros::NodeHandle nh("msf_core");
 
-    pubState_ = nh.advertise<sensor_fusion_comm::DoubleArrayStamped>("state_out", 100);
-    pubCorrect_ = nh.advertise<sensor_fusion_comm::ExtEkf>("correction", 1);
-    pubPose_ = nh.advertise<geometry_msgs::PoseWithCovarianceStamped>("pose", 100);
-    pubPoseAfterUpdate_ = nh.advertise<geometry_msgs::PoseWithCovarianceStamped>(
-        "pose_after_update", 100);
-    pubPoseCrtl_ = nh.advertise<sensor_fusion_comm::ExtState>("ext_state", 1);
+    pubState_ = nh.advertise < sensor_fusion_comm::DoubleArrayStamped
+        > ("state_out", 100);
+    pubCorrect_ = nh.advertise < sensor_fusion_comm::ExtEkf > ("correction", 1);
+    pubPose_ = nh.advertise < geometry_msgs::PoseWithCovarianceStamped
+        > ("pose", 100);
+    pubPoseAfterUpdate_ = nh.advertise
+        < geometry_msgs::PoseWithCovarianceStamped > ("pose_after_update", 100);
+    pubPoseCrtl_ = nh.advertise < sensor_fusion_comm::ExtState
+        > ("ext_state", 1);
 
     hl_state_buf_.state.resize(HLI_EKF_STATE_SIZE, 0);
 
@@ -132,7 +132,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
 
   // Set the latest HL state which is needed to compute the correction to be
   // send back to the HL.
-  void setHLStateBuffer(const sensor_fusion_comm::ExtEkf& msg){
+  void setHLStateBuffer(const sensor_fusion_comm::ExtEkf& msg) {
     hl_state_buf_ = msg;
   }
 
@@ -182,9 +182,10 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
 
   }
 
-  virtual void publishStateAfterPropagation(const shared_ptr<EKFState_T>& state) const{
+  virtual void publishStateAfterPropagation(
+      const shared_ptr<EKFState_T>& state) const {
 
-    if(pubPoseCrtl_.getNumSubscribers()){
+    if (pubPoseCrtl_.getNumSubscribers()) {
       static int msg_seq = 0;
 
       geometry_msgs::PoseWithCovarianceStamped msgPose;
@@ -199,11 +200,11 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
       state->toExtStateMsg(msgPoseCtrl);
       pubPoseCrtl_.publish(msgPoseCtrl);
 
-
     }
   }
 
-  virtual void publishStateAfterUpdate(const shared_ptr<EKFState_T>& state) const{
+  virtual void publishStateAfterUpdate(
+      const shared_ptr<EKFState_T>& state) const {
 
     static int msg_seq = 0;
 
@@ -224,49 +225,61 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
         for (int i = 0; i < HLI_EKF_STATE_SIZE; ++i) {
           msgCorrect_.state[i] = 0;
         }
-        msgCorrect_.state[6] = 1; //w
+        msgCorrect_.state[6] = 1;  //w
         msgCorrect_.flag = sensor_fusion_comm::ExtEkf::initialization;
 
-        MSF_ERROR_STREAM_THROTTLE(1, __FUNCTION__ <<
-                                  " You have connected the external propagation "
-                                  "topic but at the same time data_playback is on.");
+        MSF_ERROR_STREAM_THROTTLE(
+            1, __FUNCTION__ << " You have connected the external propagation "
+            "topic but at the same time data_playback is on.");
 
       } else {
         const EKFState_T& state_const = *state;
-        msgCorrect_.state[0] = state_const.template get<StateDefinition_T::p>()[0] - hl_state_buf_.state[0];
-        msgCorrect_.state[1] = state_const.template get<StateDefinition_T::p>()[1] - hl_state_buf_.state[1];
-        msgCorrect_.state[2] = state_const.template get<StateDefinition_T::p>()[2] - hl_state_buf_.state[2];
-        msgCorrect_.state[3] = state_const.template get<StateDefinition_T::v>()[0] - hl_state_buf_.state[3];
-        msgCorrect_.state[4] = state_const.template get<StateDefinition_T::v>()[1] - hl_state_buf_.state[4];
-        msgCorrect_.state[5] = state_const.template get<StateDefinition_T::v>()[2] - hl_state_buf_.state[5];
+        msgCorrect_.state[0] =
+            state_const.template get<StateDefinition_T::p>()[0]
+                - hl_state_buf_.state[0];
+        msgCorrect_.state[1] =
+            state_const.template get<StateDefinition_T::p>()[1]
+                - hl_state_buf_.state[1];
+        msgCorrect_.state[2] =
+            state_const.template get<StateDefinition_T::p>()[2]
+                - hl_state_buf_.state[2];
+        msgCorrect_.state[3] =
+            state_const.template get<StateDefinition_T::v>()[0]
+                - hl_state_buf_.state[3];
+        msgCorrect_.state[4] =
+            state_const.template get<StateDefinition_T::v>()[1]
+                - hl_state_buf_.state[4];
+        msgCorrect_.state[5] =
+            state_const.template get<StateDefinition_T::v>()[2]
+                - hl_state_buf_.state[5];
 
         Eigen::Quaterniond hl_q(hl_state_buf_.state[6], hl_state_buf_.state[7],
                                 hl_state_buf_.state[8], hl_state_buf_.state[9]);
         Eigen::Quaterniond qbuff_q = hl_q.inverse()
-                            * state_const.template get<StateDefinition_T::q>();
+            * state_const.template get<StateDefinition_T::q>();
         msgCorrect_.state[6] = qbuff_q.w();
         msgCorrect_.state[7] = qbuff_q.x();
         msgCorrect_.state[8] = qbuff_q.y();
         msgCorrect_.state[9] = qbuff_q.z();
 
         msgCorrect_.state[10] =
-            state_const.template get<StateDefinition_T::b_w>()[0] -
-            hl_state_buf_.state[10];
+            state_const.template get<StateDefinition_T::b_w>()[0]
+                - hl_state_buf_.state[10];
         msgCorrect_.state[11] =
-            state_const.template get<StateDefinition_T::b_w>()[1] -
-            hl_state_buf_.state[11];
+            state_const.template get<StateDefinition_T::b_w>()[1]
+                - hl_state_buf_.state[11];
         msgCorrect_.state[12] =
-            state_const.template get<StateDefinition_T::b_w>()[2] -
-            hl_state_buf_.state[12];
+            state_const.template get<StateDefinition_T::b_w>()[2]
+                - hl_state_buf_.state[12];
         msgCorrect_.state[13] =
-            state_const.template get<StateDefinition_T::b_a>()[0] -
-            hl_state_buf_.state[13];
+            state_const.template get<StateDefinition_T::b_a>()[0]
+                - hl_state_buf_.state[13];
         msgCorrect_.state[14] =
-            state_const.template get<StateDefinition_T::b_a>()[1] -
-            hl_state_buf_.state[14];
+            state_const.template get<StateDefinition_T::b_a>()[1]
+                - hl_state_buf_.state[14];
         msgCorrect_.state[15] =
-            state_const.template get<StateDefinition_T::b_a>()[2] -
-            hl_state_buf_.state[15];
+            state_const.template get<StateDefinition_T::b_a>()[2]
+                - hl_state_buf_.state[15];
 
         msgCorrect_.flag = sensor_fusion_comm::ExtEkf::state_correction;
       }
@@ -298,16 +311,18 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
     }
 
     {
-    tf::Transform transform;
-    const EKFState_T& state_const = *state;
-    const Eigen::Matrix<double, 3, 1>& pos = state_const.template get<StateDefinition_T::p>();
-    const Eigen::Quaterniond& ori = state_const.template get<StateDefinition_T::q>();
-    transform.setOrigin(tf::Vector3(pos[0], pos[1], pos[2]));
-    transform.setRotation(tf::Quaternion(ori.x(), ori.y(), ori.z(), ori.w()));
-    tf_broadcaster_.sendTransform(
-        tf::StampedTransform(transform,
-                             ros::Time::now() /*ros::Time(latestState->time_)*/,
-                             "world", "state"));
+      tf::Transform transform;
+      const EKFState_T& state_const = *state;
+      const Eigen::Matrix<double, 3, 1>& pos = state_const
+          .template get<StateDefinition_T::p>();
+      const Eigen::Quaterniond& ori = state_const
+          .template get<StateDefinition_T::q>();
+      transform.setOrigin(tf::Vector3(pos[0], pos[1], pos[2]));
+      transform.setRotation(tf::Quaternion(ori.x(), ori.y(), ori.z(), ori.w()));
+      tf_broadcaster_.sendTransform(
+          tf::StampedTransform(
+              transform, ros::Time::now() /*ros::Time(latestState->time_)*/,
+              "world", "state"));
     }
     msg_seq++;
   }

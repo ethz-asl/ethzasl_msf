@@ -22,29 +22,27 @@
 
 #include <boost/shared_ptr.hpp>
 #include  <memory> //std::shared_ptr
-
 // Switch between boost shared and std shared:
 using boost::shared_ptr;
 using boost::dynamic_pointer_cast;
 
-namespace msf_core{
+namespace msf_core {
 
 typedef Eigen::Quaternion<double> Quaternion;
 
 #define MSF_MAKE_EIGEN_TYPES(DIMENSION) \
     typedef Eigen::Matrix<double, DIMENSION, DIMENSION> Matrix##DIMENSION; \
     typedef Eigen::Matrix<double, DIMENSION, 1> Vector##DIMENSION;
-  
-MSF_MAKE_EIGEN_TYPES(1)
-MSF_MAKE_EIGEN_TYPES(2)    
-MSF_MAKE_EIGEN_TYPES(3) 
-MSF_MAKE_EIGEN_TYPES(4)    
-MSF_MAKE_EIGEN_TYPES(5)    
-MSF_MAKE_EIGEN_TYPES(6)    
-MSF_MAKE_EIGEN_TYPES(7)    
-MSF_MAKE_EIGEN_TYPES(8)    
-MSF_MAKE_EIGEN_TYPES(9)  
 
+MSF_MAKE_EIGEN_TYPES(1)
+MSF_MAKE_EIGEN_TYPES(2)
+MSF_MAKE_EIGEN_TYPES(3)
+MSF_MAKE_EIGEN_TYPES(4)
+MSF_MAKE_EIGEN_TYPES(5)
+MSF_MAKE_EIGEN_TYPES(6)
+MSF_MAKE_EIGEN_TYPES(7)
+MSF_MAKE_EIGEN_TYPES(8)
+MSF_MAKE_EIGEN_TYPES(9)
 
 }
 #endif /* MSF_TYPES_HPP_ */

@@ -16,20 +16,21 @@
  */
 
 #include <msf_core/msf_state.hpp>
-int main(int argc, char** argv)
-{
+int main(int argc, char** argv) {
 
-	msf_core::EKFState somestate;
-	msf_core::EKFState otherstate;
+  msf_core::EKFState somestate;
+  msf_core::EKFState otherstate;
 
+  //find best non temporal drifting state
+  std::cout << "index of best non temporal drifting state "
+      << msf_tmp::IndexOfBestNonTemporalDriftingState<msf_core::fullState_T>::value
+      << std::endl;
+  typedef typename msf_tmp::getEnumStateType<msf_core::fullState_T,
+      msf_tmp::IndexOfBestNonTemporalDriftingState<msf_core::fullState_T>::value>::value nonDriftingStateType;
 
-	//find best non temporal drifting state
-	std::cout<<"index of best non temporal drifting state "<<
-			msf_tmp::IndexOfBestNonTemporalDriftingState<msf_core::fullState_T>::value
-			<<std::endl;
-	typedef typename msf_tmp::getEnumStateType<msf_core::fullState_T, msf_tmp::IndexOfBestNonTemporalDriftingState<msf_core::fullState_T>::value>::value nonDriftingStateType;
-
-	const bool isquaternion = msf_tmp::isQuaternionType<typename msf_tmp::StripConstReference<nonDriftingStateType>::result_t >::value;
+  const bool isquaternion =
+      msf_tmp::isQuaternionType<
+          typename msf_tmp::StripConstReference<nonDriftingStateType>::result_t>::value;
 
 //
 //	//qualifier stripping
