@@ -14,6 +14,7 @@
   
   <depend package="asctec_hl_comm"/>
   <depend package="ptam_com"/>
+  <depend package="sensor_fusion_comm"/>
   
   <export>
     <cpp cflags=" -I${prefix}/include -I${prefix}/cfg/cpp" />

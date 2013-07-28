@@ -1,18 +1,18 @@
 /*
 
-Copyright (c) 2012, Simon Lynen, ASL, ETH Zurich, Switzerland
-You can contact the author at <slynen at ethz dot ch>
+Copyright (c) 2013, Markus Achtelik, ASL, ETH Zurich, Switzerland
+You can contact the author at <markus dot achtelik at mavt dot ethz dot ch>
 
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
- * Redistributions of source code must retain the above copyright
+* Redistributions of source code must retain the above copyright
 notice, this list of conditions and the following disclaimer.
- * Redistributions in binary form must reproduce the above copyright
+* Redistributions in binary form must reproduce the above copyright
 notice, this list of conditions and the following disclaimer in the
 documentation and/or other materials provided with the distribution.
- * Neither the name of ETHZ-ASL nor the
+* Neither the name of ETHZ-ASL nor the
 names of its contributors may be used to endorse or promote products
 derived from this software without specific prior written permission.
 
@@ -27,31 +27,39 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
- */
+*/
 
-#ifndef MSF_TYPES_HPP_
-#define MSF_TYPES_HPP_
+#ifndef SOLVERS_H_
+#define SOLVERS_H_
 
-#include <Eigen/Dense>
+template<typename Derived>
+  Eigen::Matrix<typename Derived::Scalar, Derived::RowsAtCompileTime, 1> pseudoInverseSolver(
+      const Eigen::MatrixBase<Derived> & A,
+      const Eigen::Matrix<typename Derived::Scalar, Derived::RowsAtCompileTime, 1> & b, double tol = 1e-12)
+  {
+    typedef Derived A_type;
+    typedef Eigen::Matrix<typename A_type::Scalar, A_type::RowsAtCompileTime, 1> X_type;
 
-namespace msf_core{
+    Eigen::JacobiSVD<A_type> svd(A, Eigen::ComputeFullU | Eigen::ComputeFullV);
 
-typedef Eigen::Quaternion<double> Quaternion;
+    A_type U, V;
+    X_type S;
 
-#define MSF_MAKE_EIGEN_TYPES(DIMENSION) \
-    typedef Eigen::Matrix<double, DIMENSION, DIMENSION> Matrix##DIMENSION; \
-    typedef Eigen::Matrix<double, DIMENSION, 1> Vector##DIMENSION;
-  
-MSF_MAKE_EIGEN_TYPES(1)
-MSF_MAKE_EIGEN_TYPES(2)    
-MSF_MAKE_EIGEN_TYPES(3) 
-MSF_MAKE_EIGEN_TYPES(4)    
-MSF_MAKE_EIGEN_TYPES(5)    
-MSF_MAKE_EIGEN_TYPES(6)    
-MSF_MAKE_EIGEN_TYPES(7)    
-MSF_MAKE_EIGEN_TYPES(8)    
-MSF_MAKE_EIGEN_TYPES(9)  
+    U = svd.matrixU();
+    V = svd.matrixV();
+    S = svd.singularValues();
+
+    for (int i = 0; i < A.rows(); i++)
+    {
+      if (S[i] < tol)
+        S[i] = 0;
+      else
+        S[i] = 1.0 / S[i];
+    }
+
+    return V * S.asDiagonal() * U.transpose() * b;
+  }
 
 
-}
-#endif /* MSF_TYPES_HPP_ */
+
+#endif /* SOLVERS_H_ */

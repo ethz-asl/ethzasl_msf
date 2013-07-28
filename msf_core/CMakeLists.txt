@@ -7,11 +7,11 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 #  Release        : w/o debug symbols, w/ optimization
 #  RelWithDebInfo : w/ debug symbols, w/ optimization
 #  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
-set(ROS_BUILD_TYPE RelWithDebInfo)
+set(ROS_BUILD_TYPE Release)
 
 rosbuild_init()
 
-#set the default path for built executables to the "bin" directory
+# Set the default path for built executables to the "bin" directory
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 #set the default path for built libraries to the "lib" directory
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
@@ -23,23 +23,16 @@ include(${dynamic_reconfigure_PACKAGE_PATH}/cmake/cfgbuild.cmake)
 gencfg()
 #rosbuild_genmsg()
 
-add_definitions (-Wall -std=c++0x)
+add_definitions (-Wall -std=c++11 -Wno-unused-parameter)
 
-# get eigen
+# Enable timing the core
+add_definitions (-DENABLE_MSF_TIMING)
+
+# Get Eigen
 find_package(Eigen REQUIRED)
 include_directories(${Eigen_INCLUDE_DIRS})
 
 add_subdirectory(src/lib)
-
-#rosbuild_add_executable(staticstatelist src/test/test_staticstatelist.cc)
-#rosbuild_add_gtest_build_flags(staticstatelist)
-
-#rosbuild_add_executable(test_tmptestbed src/test/test_tmptestbed.cc)
-#rosbuild_add_executable(test_msfcore src/test_msf_core.cc)
-
-#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-#rosbuild_add_gtest(test_staticstatelist src/test/test_staticstatelist.cc)
-#rosbuild_link_boost(test_staticstatelist thread)
 
 rosbuild_add_library(similaritytransform src/similaritytransform.cc)
 rosbuild_add_executable(test_similaritytransform src/test/test_similaritytransform.cc)

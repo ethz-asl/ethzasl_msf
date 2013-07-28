@@ -1,43 +1,29 @@
 /*
-
-Copyright (c) 2012, Simon Lynen, ASL, ETH Zurich, Switzerland
-You can contact the author at <slynen at ethz dot ch>
-
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
- * Redistributions of source code must retain the above copyright
-notice, this list of conditions and the following disclaimer.
- * Redistributions in binary form must reproduce the above copyright
-notice, this list of conditions and the following disclaimer in the
-documentation and/or other materials provided with the distribution.
- * Neither the name of ETHZ-ASL nor the
-names of its contributors may be used to endorse or promote products
-derived from this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL ETHZ-ASL BE LIABLE FOR ANY
-DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+ * Copyright (C) 2012-2013 Simon Lynen, ASL, ETH Zurich, Switzerland
+ * You can contact the author at <slynen at ethz dot ch>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 #ifndef SENSORMANAGER_H
 #define SENSORMANAGER_H
 
-#include <msf_core/msf_statevisitor.h>
-#include <msf_core/msf_macros.h>
 #include <Eigen/Dense>
 #include <string.h>
+#include <msf_core/msf_types.hpp>
+#include <msf_core/msf_statevisitor.h>
+#include <msf_core/msf_macros.h>
 
-namespace msf_core{
+namespace msf_core {
 
 template<typename EKFState_T>
 class SensorHandler;
@@ -46,115 +32,124 @@ template<typename EKFState_T>
 class MSF_Core;
 
 /** \class MSF_SensorManager
- * \brief A manager for a given sensor set. Handlers for individual sensors (camera/vicon etc.) are
- * registered with this class as handlers of particular sensors. This class also owns the
- * EKF core instance and handles the initialization of the filter
+ * \brief A manager for a given sensor set. Handlers for individual sensors
+ * (camera/vicon etc.) are registered with this class as handlers of particular
+ * sensors. This class also owns the EKF core instance and handles the
+ * initialization of the filter.
  */
 template<typename EKFState_T>
-class MSF_SensorManager:public StateVisitor<EKFState_T>
-{
-private:
+class MSF_SensorManager : public StateVisitor<EKFState_T> {
+ private:
   int sensorID_;
-protected:
-  typedef std::vector<boost::shared_ptr<SensorHandler<EKFState_T> > > Handlers;
-  Handlers handlers; ///<a list of sensor handlers which provide measurements
+ protected:
+  typedef std::vector<shared_ptr<SensorHandler<EKFState_T> > > Handlers;
+  Handlers handlers;  ///< A list of sensor handlers which provide measurements.
 
-public:
+  /**
+   * Used to determine if internal states get overwritten by the external
+   * state prediction (online) or internal state prediction is performed
+   * for log replay, when the external prediction is not available or should be
+   * done on the host.
+   */
+  bool data_playback_;
+
+ public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  boost::shared_ptr<MSF_Core<EKFState_T> > msf_core_; ///< the ekf core instance
+  shared_ptr<MSF_Core<EKFState_T> > msf_core_;  ///< The ekf core instance.
 
   MSF_SensorManager();
 
-  virtual ~MSF_SensorManager(){
+  bool data_playback() {
+    return data_playback_;
+  }
 
-  };
+  virtual ~MSF_SensorManager() {
+
+  }
+  ;
   /***
-   * add a new sensor handler to the list of handlers owned by this manager
-   * a sensor handler is in turn owning the sensor (camera/vicon etc.)
+   * Add a new sensor handler to the list of handlers owned by this manager
+   * a sensor handler is in turn owning the sensor (camera/vicon etc.).
    */
-  void addHandler(boost::shared_ptr<SensorHandler<EKFState_T> > handler)
-  {
+  void addHandler(shared_ptr<SensorHandler<EKFState_T> > handler) {
     handler->setSensorID(sensorID_++);
     handlers.push_back(handler);
   }
 
   /***
-   * init function for the EKF
+   * Init function for the EKF.
    */
-  virtual void init(double scale) = 0;
+  virtual void init(double scale) const = 0;
 
   /***
-   * this method will be called for the user to set the initial state
+   * This method will be called for the user to set the initial state.
    */
-  virtual void initState(EKFState_T& state) = 0;
+  virtual void initState(EKFState_T& state) const = 0;
 
   /***
-   * this method will be called for the user to set the Q block entries for Auxiliary states
-   * only changes to blocks in Q belonging to the auxiliary states are allowed / evaluated
+   * This method will be called for the user to set the Q block entries for
+   * Auxiliary states only changes to blocks in Q belonging to the auxiliary
+   * states are allowed / evaluated.
    */
-  virtual void calculateQAuxiliaryStates(EKFState_T& UNUSEDPARAM(state), double UNUSEDPARAM(dt)){};
-
-  /***
-   * this method will be called for the user to set the initial P matrix
-   */
-  virtual void setP(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, EKFState_T::nErrorStatesAtCompileTime>& P) = 0;
-
-  /***
-   * this method will be called for the user to have the possibility to augment the correction vector
-   */
-  virtual void augmentCorrectionVector(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& UNUSEDPARAM(correction)){};
-
-  /***
-   * this method will be called for the user to check the correction after it has been applied to the state
-   * delaystate is the state on which the correction has been applied
-   * buffstate is the state before the correction was applied
-   */
-  virtual void sanityCheckCorrection(EKFState_T& UNUSEDPARAM(delaystate), const EKFState_T& UNUSEDPARAM(buffstate),
-                                     Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,1>& UNUSEDPARAM(correction)){};
-
-  /***
-   * provide a getter for these parameters, this is implemented for a given middleware or param file parser
-   */
-  virtual bool getParam_fixed_bias() = 0;
-  virtual double getParam_noise_acc() = 0;
-  virtual double getParam_noise_accbias() = 0;
-  virtual double getParam_noise_gyr() = 0;
-  virtual double getParam_noise_gyrbias() = 0;
-  virtual double getParam_fuzzythres() = 0;
-
-};
-
-/**
- * \class SensorHandler
- * \brief handles a sensor driver which provides the sensor readings
- */
-template<typename EKFState_T>
-class SensorHandler
-{
-  friend class MSF_SensorManager<EKFState_T>;
-  int lastseq_;
-protected:
-  MSF_SensorManager<EKFState_T>& manager_;
-  int sensorID;
-  std::string topic_namespace_;
-  std::string parameternamespace_;
-  void setSensorID(int ID){sensorID = ID;}
-  void sequenceWatchDog(size_t seq, const std::string& topic){
-    if((int)seq != lastseq_ + 1 && lastseq_ != 0){
-        ROS_WARN_STREAM(topic<<": message drop curr seq:"<<seq<<" expected: "<<lastseq_ + 1);
-    }
-    lastseq_ = seq;
+  virtual void calculateQAuxiliaryStates(EKFState_T& UNUSEDPARAM(state),
+                                         double UNUSEDPARAM(dt)) const {
   }
-public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  SensorHandler(MSF_SensorManager<EKFState_T>& mng, std::string& topic_namespace, std::string& parameternamespace):
-  lastseq_(0), manager_(mng), sensorID(-1), topic_namespace_(topic_namespace), parameternamespace_(parameternamespace){}
-  virtual ~SensorHandler() {}
-};
+  ;
 
-}; // end msf_core
+  /***
+   * This method will be called for the user to set the initial P matrix.
+   */
+  virtual void setP(
+      Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,
+          EKFState_T::nErrorStatesAtCompileTime>& P) const = 0;
+
+  /***
+   * This method will be called for the user to have the possibility to augment
+   * the correction vector.
+   */
+  virtual void augmentCorrectionVector(
+      Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, 1>& UNUSEDPARAM(correction)) const {
+  }
+  ;
+
+  /***
+   * This method will be called for the user to check the correction after it
+   * has been applied to the state delaystate is the state on which the correction
+   * has been applied buffstate is the state before the correction was applied.
+   */
+  virtual void sanityCheckCorrection(
+      EKFState_T& UNUSEDPARAM(delaystate),
+      const EKFState_T& UNUSEDPARAM(buffstate),
+      Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, 1>& UNUSEDPARAM(correction)) const {
+  }
+  ;
+
+  /***
+   * Provide a getter for these parameters, this is implemented for a given
+   * middleware or param file parser.
+   */
+  virtual bool getParam_fixed_bias() const = 0;
+  virtual double getParam_noise_acc() const = 0;
+  virtual double getParam_noise_accbias() const = 0;
+  virtual double getParam_noise_gyr() const = 0;
+  virtual double getParam_noise_gyrbias() const = 0;
+  virtual double getParam_fuzzythres() const = 0;
+
+  /**
+   * This functions get called by the core to publish data to external
+   * middlewares like ROS.
+   */
+  virtual void publishStateInitial(
+      const shared_ptr<EKFState_T>& state) const = 0;
+  virtual void publishStateAfterPropagation(
+      const shared_ptr<EKFState_T>& state) const = 0;
+  virtual void publishStateAfterUpdate(
+      const shared_ptr<EKFState_T>& state) const = 0;
+
+};
+}  // msf_core
 
 #include <msf_core/implementation/msf_sensormanager.hpp>
 
-#endif /* SENSORMANAGER_H */
+#endif  // SENSORMANAGER_H

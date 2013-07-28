@@ -1,292 +1,253 @@
 /*
-
-Copyright (c) 2010, Stephan Weiss, ASL, ETH Zurich, Switzerland
-You can contact the author at <stephan dot weiss at ieee dot org>
-Copyright (c) 2012, Simon Lynen, ASL, ETH Zurich, Switzerland
-You can contact the author at <slynen at ethz dot ch>
-
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
- * Redistributions of source code must retain the above copyright
-notice, this list of conditions and the following disclaimer.
- * Redistributions in binary form must reproduce the above copyright
-notice, this list of conditions and the following disclaimer in the
-documentation and/or other materials provided with the distribution.
- * Neither the name of ETHZ-ASL nor the
-names of its contributors may be used to endorse or promote products
-derived from this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL ETHZ-ASL BE LIABLE FOR ANY
-DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+ * Copyright (C) 2012-2013 Simon Lynen, ASL, ETH Zurich, Switzerland
+ * You can contact the author at <slynen at ethz dot ch>
+ * Copyright (C) 2011-2012 Stephan Weiss, ASL, ETH Zurich, Switzerland
+ * You can contact the author at <stephan dot weiss at ieee dot org>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
 #ifndef MSF_CORE_H_
 #define MSF_CORE_H_
 
+#include <vector>
+#include <queue>
 
 #include <Eigen/Eigen>
 
-#include <ros/ros.h>
-
-// message includes
-#include <sensor_fusion_comm/DoubleArrayStamped.h>
-#include <sensor_fusion_comm/ExtState.h>
-#include <sensor_fusion_comm/ExtEkf.h>
-#include <geometry_msgs/PoseWithCovarianceStamped.h>
-#include <sensor_msgs/Imu.h>
-#include <asctec_hl_comm/mav_imu.h>
-
-#ifdef WITHCOVIMAGE
-#include <image_transport/image_transport.h>
-#endif
-
-#include <opencv/cvwimage.h>
-#include <opencv/highgui.h>
-
 #include <msf_core/msf_sortedContainer.h>
-#include <vector>
-#include <queue>
 #include <msf_core/msf_state.h>
 #include <msf_core/msf_checkFuzzyTracking.h>
-#include <tf/transform_broadcaster.h>
 
-//good old days...
-//#define N_STATE_BUFFER 256	///< size of unsigned char, do not change!
-
-namespace msf_core{
-
-enum{
-  HLI_EKF_STATE_SIZE = 16 ///< number of states exchanged with external propagation. Here: p,v,q,bw,bw=16
-};
+namespace msf_core {
 
 template<typename EKFState_T>
 class MSF_SensorManager;
+template<typename EKFState_T>
+class IMUHandler;
 
 /** \class MSF_Core
  *
  * \brief The core class of the EKF
  * Does propagation of state and covariance
  * but also applying measurements and managing states and measurements
- * in lists sorted by time stamp
+ * in lists sorted by time stamp.
  */
 template<typename EKFState_T>
-class MSF_Core
-{
-  friend class MSF_MeasurementBase<EKFState_T>;
-  bool initialized_; ///< is the filter initialized, so that we can propagate the state?
-  bool predictionMade_; ///< is there a state prediction, so we can apply measurements?
-public:
+class MSF_Core {
+  friend class MSF_MeasurementBase<EKFState_T> ;
+  friend class IMUHandler<EKFState_T> ;
+ public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+
+  enum {
+    /// Error state length.
+    nErrorStatesAtCompileTime = EKFState_T::nErrorStatesAtCompileTime,
+    /// Complete state length.
+    nStatesAtCompileTime = EKFState_T::nStatesAtCompileTime
+  };
+
   typedef typename EKFState_T::StateDefinition_T StateDefinition_T;
   typedef typename EKFState_T::StateSequence_T StateSequence_T;
-  enum{
-    nErrorStatesAtCompileTime = EKFState_T::nErrorStatesAtCompileTime,  ///< error state length
-    nStatesAtCompileTime = EKFState_T::nStatesAtCompileTime ///< complete state length
-  };
-  typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, 1> ErrorState; ///< the error state type
-  typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime> ErrorStateCov; ///<the error state covariance type
+  /// The error state type.
+  typedef Eigen::Matrix<double, nErrorStatesAtCompileTime, 1> ErrorState;
+  /// The error state covariance type.
+  typedef Eigen::Matrix<double, nErrorStatesAtCompileTime,
+      nErrorStatesAtCompileTime> ErrorStateCov;
 
-  typedef msf_core::SortedContainer<EKFState_T> stateBufferT; ///< the type of the state buffer containing all the states
-  typedef msf_core::SortedContainer<typename msf_core::MSF_MeasurementBase<EKFState_T>, typename msf_core::MSF_InvalidMeasurement<EKFState_T> > measurementBufferT; ///< the type of the measurement buffer containing all the measurements
-
-  /**
-   * \brief add a sensor measurement or an init measurement to the internal queue and apply it to the state
-   * \param measurement the measurement to add to the internal measurement queue
-   */
-  void addMeasurement(boost::shared_ptr<MSF_MeasurementBase<EKFState_T> > measurement);
+  /// The type of the state buffer containing all the states.
+  typedef msf_core::SortedContainer<EKFState_T> StateBuffer_T;
+  /// The type of the measurement buffer containing all the measurements
+  typedef msf_core::SortedContainer<
+      typename msf_core::MSF_MeasurementBase<EKFState_T>,
+      typename msf_core::MSF_InvalidMeasurement<EKFState_T> > measurementBufferT;
 
   /**
-   * \brief initializes the filter with the values of the given measurement, other init values from other
-   * sensors can be passed in as "measurement" using the initMeasurement structs
-   * \param measurement a measurement containing initial values for the state
+   * \brief Add a sensor measurement or an init measurement to the internal
+   * queue and apply it to the state.
+   * \param Measurement the measurement to add to the internal measurement queue.
    */
-  void init(boost::shared_ptr<MSF_MeasurementBase<EKFState_T> > measurement);
+  void addMeasurement(shared_ptr<MSF_MeasurementBase<EKFState_T> > measurement);
 
   /**
-   * \brief initialize the HLP based propagation
-   * \param state the state to send to the HLP
+   * \brief Initializes the filter with the values of the given measurement,
+   * other init values from other sensors can be passed in as "measurement"
+   * using the initMeasurement structs.
+   * \param Measurement a measurement containing initial values for the state
    */
-  void initExternalPropagation(boost::shared_ptr<EKFState_T> state);
+  void init(shared_ptr<MSF_MeasurementBase<EKFState_T> > measurement);
 
   /**
-   * \brief finds the closest state to the requested time in the internal state
-   * \param tstamp the time stamp to find the closest state to
+   * \brief Finds the closest state to the requested time in the internal state.
+   * \param tstamp The time stamp to find the closest state to.
    */
-  boost::shared_ptr<EKFState_T> getClosestState(double tstamp);
+  shared_ptr<EKFState_T> getClosestState(double tstamp);
 
   /**
-   * \brief returns the accumulated dynamic matrix between two states
+   * \brief Returns the accumulated dynamic matrix between two states.
    */
-  void getAccumF_SC(const boost::shared_ptr<EKFState_T>& state_old, const boost::shared_ptr<EKFState_T>& state_new,
-                    Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime>& F);
+  void getAccumF_SC(
+      const shared_ptr<EKFState_T>& state_old,
+      const shared_ptr<EKFState_T>& state_new,
+      Eigen::Matrix<double, nErrorStatesAtCompileTime, nErrorStatesAtCompileTime>& F);
   /**
-   * \brief returns previous measurement of the same type
+   * \brief Returns previous measurement of the same type.
    */
-  boost::shared_ptr<msf_core::MSF_MeasurementBase<EKFState_T> > getPreviousMeasurement(double time, int sensorID);
+  shared_ptr<msf_core::MSF_MeasurementBase<EKFState_T> > getPreviousMeasurement(
+      double time, int sensorID);
 
   /**
-   * \brief finds the state at the requested time in the internal state
-   * \param tstamp the time stamp to find the state to
+   * \brief Finds the state at the requested time in the internal state.
+   * \param tstamp The time stamp to find the state to.
    */
-  boost::shared_ptr<EKFState_T> getStateAtTime(double tstamp);
+  shared_ptr<EKFState_T> getStateAtTime(double tstamp);
 
   /**
-   * \brief propagates the error state covariance
-   * \param state_old the state to propagate the covariance from
-   * \param state_new the state to propagate the covariance to
+   * \brief Propagates the error state covariance.
+   * \param state_old The state to propagate the covariance from.
+   * \param state_new The state to propagate the covariance to.
    */
-  void predictProcessCovariance(boost::shared_ptr<EKFState_T>& state_old, boost::shared_ptr<EKFState_T>& state_new);
+  void predictProcessCovariance(shared_ptr<EKFState_T>& state_old,
+                                shared_ptr<EKFState_T>& state_new);
 
   /**
-   * \brief propagates the state with given dt
-   * \param state_old the state to propagate from
-   * \param state_new the state to propagate to
+   * \brief Propagates the state with given dt.
+   * \param state_old The state to propagate from.
+   * \param state_new The state to propagate to.
    */
-  void propagateState(boost::shared_ptr<EKFState_T>& state_old, boost::shared_ptr<EKFState_T>& state_new);
+  void propagateState(shared_ptr<EKFState_T>& state_old,
+                      shared_ptr<EKFState_T>& state_new);
 
   /**
-   * \brief delete very old states and measurements from the buffers to free memory
+   * \brief Delete very old states and measurements from the buffers to free
+   * memory.
    */
-  void CleanUpBuffers(){
-    double timeold = 60; //1 min
-    StateBuffer_.clearOlderThan(timeold);
-    MeasurementBuffer_.clearOlderThan(timeold);
-  }
+  void CleanUpBuffers();
 
   /**
-   * \brief sets the covariance matrix of the core states to simulated values
-   * \param P the error state covariance Matrix to fill
+   * \brief sets the covariance matrix of the core states to simulated values.
+   * \param P the error state covariance Matrix to fill.
    */
-  void setPCore(Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, EKFState_T::nErrorStatesAtCompileTime>& P);
+  void setPCore(
+      Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,
+          EKFState_T::nErrorStatesAtCompileTime>& P);
 
   /**
-   * \brief ctor takes a pointer to an object which does the user defined calculations and provides interfaces for initialization etc.
-   * \param usercalc the class providing the user defined calculations DO ABSOLUTELY NOT USE THIS REFERENCE INSIDE THIS CTOR!!
+   * \brief Ctor takes a pointer to an object which does the user defined
+   * calculations and provides interfaces for initialization etc.
+   * \param usercalc The class providing the user defined calculations
+   * DO ABSOLUTELY NOT USE THIS REFERENCE INSIDE THIS CTOR!!
    */
-  MSF_Core(MSF_SensorManager<EKFState_T>& usercalc);
+  MSF_Core(const MSF_SensorManager<EKFState_T>& usercalc);
   ~MSF_Core();
 
+  const MSF_SensorManager<EKFState_T>& usercalc() const;
 
-private:
-  stateBufferT StateBuffer_; ///<EKF buffer containing pretty much all info needed at time t. sorted by t asc
-  measurementBufferT MeasurementBuffer_; ///< EKF Measurements and init values sorted by t asc
-  tf::TransformBroadcaster tf_broadcaster_;
-
-  std::queue<boost::shared_ptr<MSF_MeasurementBase<EKFState_T> > > queueFutureMeasurements_; ///< buffer for measurements to apply in future
-
-  double time_P_propagated; ///< last time stamp where we have a valid propagation
-
-  Eigen::Matrix<double, 3, 1> g_; ///< gravity vector
+ private:
 
   /**
-   * \brief get the index of the best state having no temporal drift at compile time
+   * \brief Get the index of the best state having no temporal drift at compile
+   * time.
    */
-  enum{
-    indexOfStateWithoutTemporalDrift = msf_tmp::IndexOfBestNonTemporalDriftingState<StateSequence_T>::value
-  };
-  typedef typename msf_tmp::getEnumStateType<StateSequence_T, indexOfStateWithoutTemporalDrift>::value nonDriftingStateType; //returns void type for invalid types
-
-  CheckFuzzyTracking<EKFState_T, nonDriftingStateType> fuzzyTracker_;  ///< watch dog to determine fuzzy tracking by observing non temporal drifting states
-
-  /// enables internal state predictions for log replay
-  /**
-   * used to determine if internal states get overwritten by the external
-   * state prediction (online) or internal state prediction is performed
-   * for log replay, when the external prediction is not available.
-   */
-  bool data_playback_;
-  bool isfuzzyState_; ///< was the filter pushed to fuzzy state by a measurement?
-
-  MSF_SensorManager<EKFState_T>& usercalc_; ///< a class which provides methods for customization of several calculations
-
-  enum
-  {
-    NO_UP, GOOD_UP, FUZZY_UP
+  enum {
+    indexOfStateWithoutTemporalDrift = msf_tmp::IndexOfBestNonTemporalDriftingState<
+        StateSequence_T>::value
   };
 
-  ros::Publisher pubState_; ///< publishes all states of the filter
-  sensor_fusion_comm::DoubleArrayStamped msgState_;
+  /// Returns void type for invalid types
+  typedef typename msf_tmp::getEnumStateType<StateSequence_T,
+      indexOfStateWithoutTemporalDrift>::value nonDriftingStateType;
 
-  ros::Publisher pubPose_; ///< publishes 6DoF pose output
-  ros::Publisher pubPoseAfterUpdate_; ///< publishes 6DoF pose output after the update has been applied
+  /// EKF buffer containing pretty much all info needed at time t. Sorted by t
+  // asc.
+  StateBuffer_T stateBuffer_;
+  /// EKF Measurements and init values sorted by t asc.
+  measurementBufferT MeasurementBuffer_;
+  /// Buffer for measurements to apply in future.
+  std::queue<shared_ptr<MSF_MeasurementBase<EKFState_T> > > queueFutureMeasurements_;
+  /// Last time stamp where we have a valid propagation.
+  double time_P_propagated;
+  /// Last time stamp where we have a valid state.
+  typename StateBuffer_T::iterator_T it_last_IMU;
+  /// Gravity vector.
+  Eigen::Matrix<double, 3, 1> g_;
 
-  geometry_msgs::PoseWithCovarianceStamped msgPose_;
-
-  ros::Publisher pubPoseCrtl_; ///< publishes 6DoF pose including velocity output
-  sensor_fusion_comm::ExtState msgPoseCtrl_;
-
-  ros::Publisher pubCorrect_; ///< publishes corrections for external state propagation
-  sensor_fusion_comm::ExtEkf msgCorrect_;
-
-#ifdef  WITHCOVIMAGE
-  ros::Publisher pubCov_; ///< publishes the state covariance as image
-#endif
-
-  ros::Subscriber subState_; ///< subscriber to external state propagation
-  ros::Subscriber subImu_; ///< subscriber to IMU readings
-  ros::Subscriber subImuCustom_; ///< subscriber to IMU readings for asctec custom
-
-  sensor_fusion_comm::ExtEkf hl_state_buf_; ///< buffer to store external propagation data
-
-  /**
-   * \brief applies the correction
-   * \param delaystate the state to apply the correction on
-   * \param correction the correction vector
-   * \param fuzzythres the error of the non temporal drifting state allowed before fuzzy tracking will be triggered
-   */
-  bool applyCorrection(boost::shared_ptr<EKFState_T>& delaystate, ErrorState & correction, double fuzzythres = 0.1);
+  /// Is the filter initialized, so that we can propagate the state?
+  bool initialized_;
+  /// Is there a state prediction, so we can apply measurements?
+  bool predictionMade_;
+  /// Was the filter pushed to fuzzy state by a measurement?
+  bool isfuzzyState_;
+  /// Watch dog to determine fuzzy tracking by observing non temporal drifting
+  // states.
+  CheckFuzzyTracking<EKFState_T, nonDriftingStateType> fuzzyTracker_;
+  /// A class which provides methods for customization of several calculations.
+  const MSF_SensorManager<EKFState_T>& usercalc_;
 
   /**
-   * \brief propagate covariance to a given state in time
-   * \param state the state to propagate to from the last propagated time
+   * \brief Applies the correction.
+   * \param delaystate The state to apply the correction on.
+   * \param correction The correction vector.
+   * \param fuzzythres The error of the non temporal drifting state allowed
+   *  before fuzzy tracking will be triggered.
    */
-  void propPToState(boost::shared_ptr<EKFState_T>& state);
+  bool applyCorrection(shared_ptr<EKFState_T>& delaystate,
+                       ErrorState & correction, double fuzzythres = 0.1);
 
-  //internal state propagation
+  /**
+   * \brief Propagate covariance to a given state in time.
+   * \param State the state to propagate to from the last propagated time.
+   */
+  void propPToState(shared_ptr<EKFState_T>& state);
+
+  //Internal state propagation:
   /**
    * \brief This function gets called on incoming imu messages
    * and then performs the state prediction internally.
    * Only use this OR stateCallback by remapping the topics accordingly.
-   * \param msg the imu ros message
+   * \param msg The imu ros message.
    * \sa{stateCallback}
    */
-  void imuCallback(const sensor_msgs::ImuConstPtr & msg);
-  void imuCallback_asctec(const asctec_hl_comm::mav_imuConstPtr & msg);
   void process_imu(const msf_core::Vector3&linear_acceleration,
-                   const msf_core::Vector3&angular_velocity, const ros::Time& msg_stamp, size_t msg_seq);
+                   const msf_core::Vector3&angular_velocity,
+                   const double& msg_stamp, size_t msg_seq);
 
-  /// external state propagation
+  /// External state propagation:
   /**
-   * \brief This function gets called when state prediction is performed externally,
-   * e.g. by asctec_mav_framework. Msg has to be the latest predicted state.
+   * \brief This function gets called when state prediction is performed
+   * externally, e.g. by asctec_mav_framework. Msg has to be the latest
+   * predicted state.
    * Only use this OR imuCallback by remapping the topics accordingly.
-   * \param msg the state message from the external propagation
+   * \param msg The state message from the external propagation.
    * \sa{imuCallback}
    */
-  void stateCallback(const sensor_fusion_comm::ExtEkfConstPtr & msg);
+  void process_extstate(const msf_core::Vector3& linear_acceleration,
+                        const msf_core::Vector3& angular_velocity,
+                        const msf_core::Vector3& p, const msf_core::Vector3& v,
+                        const msf_core::Quaternion& q,
+                        bool is_already_propagated, const double& msg_stamp,
+                        size_t msg_seq);
 
-  /// propagates P by one step to distribute processing load
+  /// Propagates P by one step to distribute processing load.
   void propagatePOneStep();
 
-  ///checks the queue of measurements to be applied in the future
+  /// Checks the queue of measurements to be applied in the future.
   void handlePendingMeasurements();
-
-  ///publish the state cov as image
-  void publishCovImage(boost::shared_ptr<EKFState_T> state) const;
 
 };
 
-};// end namespace
+}
+;
+// msf_core
 
 #include <msf_core/implementation/msf_core.hpp>
 
