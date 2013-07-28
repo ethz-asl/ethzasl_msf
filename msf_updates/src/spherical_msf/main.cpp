@@ -14,9 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "spherical_sensormanager.h"
-int main(int argc, char** argv)
-{
+#include "./spherical_sensormanager.h"
+int main(int argc, char** argv) {
   ros::init(argc, argv, "msf_spherical_position_sensor");
 
   msf_spherical_position::SensorManager manager;

@@ -389,9 +389,6 @@ struct DistanceMeasurement : public DistanceMeasurementBase {
         .conjugate().toRotationMatrix();
 
     // Preprocess for elements in H matrix.
-    Eigen::Matrix<double, 3, 3> p_prism_imu_sk = skew(
-        state.get<StateDefinition_T::p_ip>());
-
     // Get indices of states in error vector.
     enum {
       idxstartcorr_p_ = msf_tmp::getStartIndexInCorrection<StateSequence_T,
