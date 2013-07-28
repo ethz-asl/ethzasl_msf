@@ -116,7 +116,7 @@ struct AngleMeasurement : public AngleMeasurementBase {
 
     bool fixed_p_pos_imu = (fixedstates_ & 1 << StateDefinition_T::p_ip);
 
-    // Clear crosscorrelations.
+    // Clear cross correlations.
     if (fixed_p_pos_imu)
       state_in->clearCrossCov<StateDefinition_T::p_ip>();
 
@@ -151,9 +151,7 @@ struct AngleMeasurement : public AngleMeasurementBase {
             + C_q(0, 2) * p_ip(1, 0) * p_(0, 0) * p_(2, 0)
             - C_q(1, 1) * p_ip(2, 0) * p_(1, 0) * p_(2, 0)
             + C_q(1, 2) * p_ip(1, 0) * p_(1, 0) * p_(2, 0));
-    dz_dq(0, 1) = -1.0
-        / sqrt(
-            -(p_(2, 0) * p_(2, 0))
+    dz_dq(0, 1) = -1.0 / sqrt(-(p_(2, 0) * p_(2, 0))
                 / (p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0)
                     + p_(2, 0) * p_(2, 0)) + 1.0) * 1.0
         / pow(p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0) + p_(2, 0) * p_(2, 0),
