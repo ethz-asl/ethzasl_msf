@@ -1,1 +1,2 @@
 rosbuild_add_executable(spherical_position_sensor main.cpp)
+rosbuild_add_compile_flags(spherical_position_sensor)
