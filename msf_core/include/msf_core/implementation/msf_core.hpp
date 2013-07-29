@@ -594,7 +594,10 @@ void MSF_Core<EKFState_T>::addMeasurement(
   // Check if there is still a state in the buffer for this message (too old).
   if (measurement->time < stateBuffer_.getFirst()->time) {
     MSF_WARN_STREAM(
-        "You tried to give me a measurement which is too far in the past. Are you sure your clocks are synced and delays compensated correctly? [measurement: "<<timehuman(measurement->time)<<" (s) first state in buffer: "<<timehuman(stateBuffer_.getFirst()->time)<<" (s)]");
+        "You tried to give me a measurement which is too far in the past. Are "
+        "you sure your clocks are synced and delays compensated correctly? "
+        "[measurement: "<<timehuman(measurement->time)<<" (s) first state in "
+            "buffer: "<<timehuman(stateBuffer_.getFirst()->time)<<" (s)]");
     return;  // Reject measurements too far in the past.
   }
 
@@ -672,7 +675,7 @@ void MSF_Core<EKFState_T>::addMeasurement(
   }
 
   if (!appliedOne) {
-    MSF_WARN_STREAM("no measurement was applied, this should not happen");
+    MSF_ERROR_STREAM("No measurement was applied, this should not happen.");
     return;
   }
 
