@@ -148,7 +148,7 @@ class From6DoF {
    * \param[in] eps in case of badly posed problems, eps can be set for the
    * Moore-Penrose pseudo inverse
    */
-  bool compute(Pose & pose, double *scale = NULL, double *cond = NULL,
+  bool compute(Pose & pose, double *scale = nullptr , double *cond = nullptr ,
                double eps = std::numeric_limits<double>::epsilon() * 4 * 4);
  private:
   PosePairVector measurements_;

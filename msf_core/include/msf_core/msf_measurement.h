@@ -54,22 +54,22 @@ class MSF_MeasurementBase {
   template<class H_type, class Res_type, class R_type>
   void calculateAndApplyCorrection(
       shared_ptr<EKFState_T> state, MSF_Core<EKFState_T>& core,
-      const Eigen::MatrixBase<H_type>& H_delayed,
-      const Eigen::MatrixBase<Res_type> & res_delayed,
-      const Eigen::MatrixBase<R_type>& R_delayed);
+      const Eigen::MatrixBase<H_type>& H,
+      const Eigen::MatrixBase<Res_type>& residual,
+      const Eigen::MatrixBase<R_type>& R);
 
   void calculateAndApplyCorrection(shared_ptr<EKFState_T> state,
                                    MSF_Core<EKFState_T>& core,
-                                   const Eigen::MatrixXd& H_delayed,
-                                   const Eigen::MatrixXd & res_delayed,
-                                   const Eigen::MatrixXd& R_delayed);
+                                   const Eigen::MatrixXd& H,
+                                   const Eigen::MatrixXd& residual,
+                                   const Eigen::MatrixXd& R);
 
   template<class H_type, class Res_type, class R_type>
   void calculateAndApplyCorrectionRelative(
       shared_ptr<EKFState_T> state_old, shared_ptr<EKFState_T> state_new,
       MSF_Core<EKFState_T>& core, const Eigen::MatrixBase<H_type>& H_old,
       const Eigen::MatrixBase<H_type>& H_new,
-      const Eigen::MatrixBase<Res_type> & res,
+      const Eigen::MatrixBase<Res_type>& residual,
       const Eigen::MatrixBase<R_type>& R);
 
 };

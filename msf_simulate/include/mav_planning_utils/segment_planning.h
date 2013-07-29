@@ -210,7 +210,7 @@ template<int n_pos = 13, int n_yaw = 8>
                                const Motion4D<n_p, n_y> & final_states,
                                const Options4D<n_ip, n_iy, n_fp, n_fy> & options,
                                const Eigen::Matrix<double, n_p, 1> & max_pos,
-                               const Eigen::Matrix<double, n_y, 1> & max_yaw, double dt = -1, double * path_time = NULL)
+                               const Eigen::Matrix<double, n_y, 1> & max_yaw, double dt = -1, double * path_time = nullptr )
       {
         const int n_samples = n_pos * 2;
         const double dt_samples = segment_time / static_cast<double>(n_samples);

@@ -183,7 +183,7 @@ struct GenericState_T {
    */
   void reset(
       msf_core::StateVisitor<GenericState_T<StateSequence_T, StateDefinition_T> >* usercalc =
-          NULL);
+          nullptr);
 
   /**
    * \brief Write the covariance corresponding to position and attitude to cov.
