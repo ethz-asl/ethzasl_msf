@@ -93,9 +93,7 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
    * states are allowed / evaluated.
    */
   virtual void calculateQAuxiliaryStates(EKFState_T& UNUSEDPARAM(state),
-                                         double UNUSEDPARAM(dt)) const {
-  }
-  ;
+                                         double UNUSEDPARAM(dt)) const = 0;
 
   /***
    * This method will be called for the user to set the initial P matrix.
@@ -109,9 +107,8 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
    * the correction vector.
    */
   virtual void augmentCorrectionVector(
-      Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, 1>& UNUSEDPARAM(correction)) const {
-  }
-  ;
+      Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, 1>&
+      UNUSEDPARAM(correction)) const = 0;
 
   /***
    * This method will be called for the user to check the correction after it
@@ -121,9 +118,8 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
   virtual void sanityCheckCorrection(
       EKFState_T& UNUSEDPARAM(delaystate),
       const EKFState_T& UNUSEDPARAM(buffstate),
-      Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, 1>& UNUSEDPARAM(correction)) const {
-  }
-  ;
+      Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, 1>&
+      UNUSEDPARAM(correction)) const  = 0;
 
   /***
    * Provide a getter for these parameters, this is implemented for a given
