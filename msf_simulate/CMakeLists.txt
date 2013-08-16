@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 2.4.6)
-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
+cmake_minimum_required(VERSION 2.8.3)
+project(msf_simulate)
 
 # Set the build type.  Options are:
 #  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage
@@ -7,27 +7,26 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 #  Release        : w/o debug symbols, w/ optimization
 #  RelWithDebInfo : w/ debug symbols, w/ optimization
 #  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
-set(ROS_BUILD_TYPE RelWithDebInfo)
+set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
-rosbuild_init()
-
+find_package(catkin REQUIRED COMPONENTS msf_core msf_updates)
 find_package(Eigen REQUIRED)
-include_directories(${Eigen_INCLUDE_DIRS})
 
-#set the default path for built executables to the "bin" directory
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-#set the default path for built libraries to the "lib" directory
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+include_directories(include ${Eigen_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
 
 set(CMAKE_CXX_FLAGS "-std=c++0x")
 
-#set the default path for built executables to the "bin" directory
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-#set the default path for built libraries to the "lib" directory
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+catkin_package(
+    DEPENDS 
+    CATKIN_DEPENDS msf_core msf_updates
+    INCLUDE_DIRS 
+    LIBRARIES 
+)
 
-rosbuild_add_library(${PROJECT_NAME} src/MSFSimulator.cc)
+add_library(${PROJECT_NAME} src/MSFSimulator.cc)
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
-rosbuild_add_gtest(${PROJECT_NAME}_tests src/test/main.cc src/test/test_simulated_trajectory.cc)
+catkin_add_gtest(${PROJECT_NAME}_tests src/test/main.cc src/test/test_simulated_trajectory.cc)
 target_link_libraries(${PROJECT_NAME}_tests ${PROJECT_NAME})
+
 

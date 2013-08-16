@@ -1,0 +1,41 @@
+<package>
+  <name>msf_core</name>
+  <version>0.0.1</version>
+  <description>Modular Sensor Fusion (MSF) framework containing the core filter functions 
+     including full state propagation and shell for update sensor modules</description>
+  <maintainer email="simon.lynen@mavt.ethz.ch">Simon Lynen</maintainer>
+  <maintainer email="markus.achtelik_devel@mavt.ethz.ch">Markus Achtelik</maintainer>
+
+  <license>BSD</license>
+
+  <url type="website">http://ros.org/wiki/modular_sensor_fusion</url>
+  <url type="bugtracker">https://github.com/ethz-asl/sensor_fusion/issues</url>
+
+  <author>Simon Lynen</author>
+  <author>Markus Achtelik</author>
+  <author>Stephan Weiss</author>
+
+  <!-- Dependencies which this package needs to build itself. -->
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <!-- Dependencies needed to compile this package. -->
+  <build_depend>roscpp</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>dynamic_reconfigure</build_depend>
+  <build_depend>msf_timing</build_depend>
+  <build_depend>tf</build_depend>
+
+  <!-- Dependencies needed after this package is compiled. -->
+  <run_depend>roscpp</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+  <run_depend>dynamic_reconfigure</run_depend>
+  <run_depend>msf_timing</run_depend>
+  <run_depend>tf</run_depend>
+
+  <!-- Dependencies needed only for running tests. -->
+  <!-- <test_depend>roscpp</test_depend> -->
+  <!-- <test_depend>sensor_msgs</test_depend> -->
+  <!-- <test_depend>dynamic_reconfigure</test_depend> -->
+  <!-- <test_depend>msf_timing</test_depend> -->
+  <!-- <test_depend>tf</test_depend> -->
+</package>

@@ -1,9 +1,0 @@
-<stack>
-  <description brief="msf">msf</description>
-  <author>Maintained by slynen at ethz at ch</author>
-  <license>BSD</license>  
-  <review status="unreviewed" notes=""/>
-  <url>http://ros.org/wiki/modular_sensor_fusion</url>
-  <depend stack="ros" />
-
-</stack>

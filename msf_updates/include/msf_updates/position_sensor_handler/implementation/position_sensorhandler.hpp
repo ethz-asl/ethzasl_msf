@@ -80,7 +80,7 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::adjustGPSZReference(
 
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::processPositionMeasurement(
-    const msf_updates::PointWithCovarianceStampedConstPtr& msg) {
+    const sensor_fusion_comm::PointWithCovarianceStampedConstPtr& msg) {
   // Get the fixed states.
   int fixedstates = 0;
   static_assert(msf_updates::EKFState::nStateVarsAtCompileTime < 32, "Your state "
@@ -127,8 +127,8 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(
           << this->topic_namespace_ << "/" << subPointStamped_.getTopic()
           << " ***");
 
-  msf_updates::PointWithCovarianceStampedPtr pointwCov(
-      new msf_updates::PointWithCovarianceStamped);
+  sensor_fusion_comm::PointWithCovarianceStampedPtr pointwCov(
+      new sensor_fusion_comm::PointWithCovarianceStamped);
   pointwCov->header = msg->header;
   pointwCov->point = msg->point;
 
@@ -151,8 +151,8 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(
     return;
   }
 
-  msf_updates::PointWithCovarianceStampedPtr pointwCov(
-      new msf_updates::PointWithCovarianceStamped);
+  sensor_fusion_comm::PointWithCovarianceStampedPtr pointwCov(
+      new sensor_fusion_comm::PointWithCovarianceStamped);
   pointwCov->header = msg->header;
 
   // Fixed covariance will be set in measurement class -> makeFromSensorReadingImpl.
@@ -189,8 +189,8 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(
                                                       msg->altitude);
   msf_core::Vector3 enu = gpsConversion_.ecefToEnu(ecef);
 
-  msf_updates::PointWithCovarianceStampedPtr pointwCov(
-      new msf_updates::PointWithCovarianceStamped);
+  sensor_fusion_comm::PointWithCovarianceStampedPtr pointwCov(
+      new sensor_fusion_comm::PointWithCovarianceStamped);
   pointwCov->header = msg->header;
 
   // Store the ENU data in the position fields.

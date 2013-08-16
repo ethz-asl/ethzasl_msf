@@ -1,4 +1,5 @@
-rosbuild_add_executable(position_sensor main.cpp)
-rosbuild_add_compile_flags(position_sensor)
+add_executable(position_sensor main.cpp)
 
-target_link_libraries(position_sensor pose_distorter)
+target_link_libraries(position_sensor pose_distorter ${catkin_LIBRARIES})
+
+add_dependencies(position_sensor ${PROJECT_NAME}_gencfg})

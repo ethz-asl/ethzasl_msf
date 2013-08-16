@@ -1,0 +1,31 @@
+<package>
+  <name>sensor_fusion_comm</name>
+  <version>0.1.0</version>
+  <description>This package contains messages, services and action definitions needed by ethzasl_sensor_fusion and nodes communicating with it.</description>
+  <maintainer email="none@none.com">Stephan Weiss</maintainer>
+  <maintainer email="none@none.com">Markus Achtelik</maintainer>
+
+  <license>BSD</license>
+
+  <url type="website">http://ros.org/wiki/sensor_fusion_comm</url>
+  <!-- <url type="bugtracker"></url> -->
+
+  <author>Stephan Weiss</author>
+  <author>Markus Achtelik</author>
+
+  <!-- Dependencies which this package needs to build itself. -->
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <!-- Dependencies needed to compile this package. -->
+  <build_depend>geometry_msgs</build_depend>
+
+  <!-- Dependencies needed after this package is compiled. -->
+  <run_depend>geometry_msgs</run_depend>
+
+  <!-- Dependencies needed only for running tests. -->
+  <!-- <test_depend>geometry_msgs</test_depend> -->
+
+  <export>
+    
+  </export>
+</package>

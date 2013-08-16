@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 2.4.6)
-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
+cmake_minimum_required(VERSION 2.8.3)
+project(msf_eval)
 
 # Set the build type.  Options are:
 #  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage
@@ -7,16 +7,22 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 #  Release        : w/o debug symbols, w/ optimization
 #  RelWithDebInfo : w/ debug symbols, w/ optimization
 #  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
-#set(ROS_BUILD_TYPE RelWithDebInfo)
+set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
-rosbuild_init()
+find_package(catkin REQUIRED COMPONENTS std_msgs visualization_msgs sensor_msgs image_transport image_geometry rospy roscpp opencv2 sm_kinematics pcl_ros rosbag ptam_com)
+
+include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
 
 set(CMAKE_CXX_FLAGS "-std=c++0x")
 
-#set the default path for built executables to the "bin" directory
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-#set the default path for built libraries to the "lib" directory
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 
-rosbuild_add_executable(msf_eval_run src/msf_eval.cpp)
+catkin_package(
+    DEPENDS opencv2
+    CATKIN_DEPENDS std_msgs visualization_msgs sensor_msgs image_transport image_geometry rospy roscpp sm_kinematics pcl_ros rosbag
+ #   INCLUDE_DIRS include ${catkin_INCLUDE_DIRS}
+    LIBRARIES 
+)
+
+add_executable(msf_eval_run src/msf_eval.cpp)
+target_link_libraries(msf_eval ${catkin_LIBRARIES})
 

@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 2.4.6)
-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
+cmake_minimum_required(VERSION 2.8.3)
+project(msf_timing)
 
 # Set the build type.  Options are:
 #  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage
@@ -7,24 +7,22 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 #  Release        : w/o debug symbols, w/ optimization
 #  RelWithDebInfo : w/ debug symbols, w/ optimization
 #  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
-set(ROS_BUILD_TYPE RelWithDebInfo)
+set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
-rosbuild_init()
-
-#set the default path for built executables to the "bin" directory
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-#set the default path for built libraries to the "lib" directory
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+include_directories(include)
 
 set(CMAKE_CXX_FLAGS "-std=c++0x")
 
-#set the default path for built executables to the "bin" directory
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-#set the default path for built libraries to the "lib" directory
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+catkin_package(
+    DEPENDS  # TODO
+    CATKIN_DEPENDS # TODO
+    INCLUDE_DIRS include
+    LIBRARIES ${PROJECT_NAME}
+)
 
-rosbuild_add_library(${PROJECT_NAME} src/Timer.cc)
+add_library(${PROJECT_NAME} src/Timer.cc)
 
-rosbuild_add_gtest(${PROJECT_NAME}_tests src/test/testMSFTiming.cc)
+catkin_add_gtest(${PROJECT_NAME}_tests src/test/testMSFTiming.cc)
 target_link_libraries(${PROJECT_NAME}_tests ${PROJECT_NAME})
+
 
