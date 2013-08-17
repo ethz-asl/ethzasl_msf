@@ -62,9 +62,10 @@ typedef boost::fusion::vector<
     msf_core::StateVar_T<Eigen::Quaternion<double>, q_wv,///< Vision-world position drift.
         msf_core::AuxiliaryNonTemporalDrifting>,  ///< Vision-world attitude drift.
     msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_wv>,  ///< Vision world position drift.
-    msf_core::StateVar_T<Eigen::Quaternion<double>, q_ic>,  ///< Camera-imu attitude calibration.
-    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_ic>,  ///< Camera-imu position calibration.
-    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_ip> > fullState_T;
+    msf_core::StateVar_T<Eigen::Quaternion<double>, q_ic>,  ///< Relative attitude of the camera w.r.t. the IMU expressed in the IMU frame.
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_ic>,  ///< Relative position of the camera w.r.t. the IMU expressed in the IMU frame.
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_ip>  ///< Relative attitude of the position sensor w.r.t. the IMU expressed in the IMU frame.
+    > fullState_T;
 }
 ///< The state we want to use in this EKF.
 typedef msf_core::GenericState_T<fullState_T, StateDefinition> EKFState;
