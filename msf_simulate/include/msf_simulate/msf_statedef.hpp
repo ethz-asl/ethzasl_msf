@@ -70,8 +70,8 @@ typedef boost::fusion::vector<
     msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p, msf_core::CoreStateWithPropagation>,                          ///< position (IMU centered)          (0-2 / 0-2)
     msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, v, msf_core::CoreStateWithPropagation>,                          ///< velocity                         (3- 5 / 3- 5)
     msf_core::StateVar_T<Eigen::Quaternion<double>, q, msf_core::CoreStateWithPropagation>,                            ///< attitude                         (6- 9 / 6- 8)
-    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, b_w, msf_core::CoreStateWithoutPropagation>,                     ///< gyro biases                      (10-12 / 9-11)
-    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, b_a, msf_core::CoreStateWithoutPropagation>,                     ///< acceleration biases              (13-15 / 12-14)
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, b_w, msf_core::CoreStateWithoutPropagation>,                     ///< gyro biases                      
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, b_a, msf_core::CoreStateWithoutPropagation>,                     ///< acceleration biases              
 
     // states not varying during propagation
     msf_core::StateVar_T<Eigen::Matrix<double, 1, 1>, L, msf_core::Auxiliary>,                                                              ///< visual scale
