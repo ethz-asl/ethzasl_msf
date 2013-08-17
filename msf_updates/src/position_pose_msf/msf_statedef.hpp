@@ -39,14 +39,6 @@ enum StateDefinition {  //must not manually set the enum values!
   p_ip
 };
 
-
-
-
-
-
-
-
-
 namespace {
 /***
  * Setup core state, then auxiliary state.
