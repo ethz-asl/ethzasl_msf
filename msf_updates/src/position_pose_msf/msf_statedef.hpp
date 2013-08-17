@@ -47,11 +47,11 @@ typedef boost::fusion::vector<
     // States varying during propagation - must not change the ordering here for
     // now, CalcQ has the ordering hardcoded.
     msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p,
-        msf_core::CoreStateWithPropagation>,  ///< Position (IMU centered).         (0-2 / 0-2)
+        msf_core::CoreStateWithPropagation>,  ///< Position of the IMU w.r.t. the world frame expressed in the world frame.         (0-2 / 0-2)
     msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, v,
-        msf_core::CoreStateWithPropagation>,  ///< Velocity.                         (3- 5 / 3- 5)
+        msf_core::CoreStateWithPropagation>,  ///< Velocity of the IMU w.r.t. the world frame expressed in the world frame.                         (3- 5 / 3- 5)
     msf_core::StateVar_T<Eigen::Quaternion<double>, q,
-        msf_core::CoreStateWithPropagation>,  ///< Attitude.                         (6- 9 / 6- 8)
+        msf_core::CoreStateWithPropagation>,  ///< Orientation of the IMU w.r.t. the world frame expressed in the world frame.                          (6- 9 / 6- 8)
     msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, b_w,
         msf_core::CoreStateWithoutPropagation>,  ///< Gyro biases.                      (10-12 / 9-11)
     msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, b_a,
