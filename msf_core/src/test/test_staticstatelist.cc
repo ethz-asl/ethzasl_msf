@@ -144,8 +144,8 @@ TEST(RuntimeTimeComputation, copyForNonPropagationStates) {
   msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_, true>,///< position (IMU centered)          (0-2 / 0-2)
   msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, v_, true>,///< velocity                         (3- 5 / 3- 5)
   msf_core::StateVar_T<Eigen::Quaternion<double>, q_, true>,///< attitude                         (6- 9 / 6- 8)
-  msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, b_w_, true>,///< gyro biases                      (10-12 / 9-11)
-  msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, b_a_, true>,///< acceleration biases              (13-15 / 12-14)
+  msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, b_w_, true>,///< gyro biases                      
+  msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, b_a_, true>,///< acceleration biases              
 
   // states not varying during propagation
   msf_core::StateVar_T<Eigen::Matrix<double, 1, 1>, L_>,///< visual scale                     (16 / 15)

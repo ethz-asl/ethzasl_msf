@@ -50,23 +50,23 @@ typedef boost::fusion::vector<
     // States varying during propagation - must not change the ordering here for
     // now, CalcQ has the ordering hardcoded
     msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p,
-        msf_core::CoreStateWithPropagation>,  ///< Position (IMU centered).          (0-2 / 0-2)
+        msf_core::CoreStateWithPropagation>,  ///< Translation from the world frame to the IMU frame expressed in the world frame.
     msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, v,
-        msf_core::CoreStateWithPropagation>,  ///< Velocity.                         (3- 5 / 3- 5)
+        msf_core::CoreStateWithPropagation>,  ///< Velocity of the IMU frame expressed in the world frame.
     msf_core::StateVar_T<Eigen::Quaternion<double>, q,
-        msf_core::CoreStateWithPropagation>,  ///< Attitude.                         (6- 9 / 6- 8)
+        msf_core::CoreStateWithPropagation>,  ///< Rotation from the world frame to the IMU frame expressed in the world frame.
     msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, b_w,
-        msf_core::CoreStateWithoutPropagation>,  ///< Gyro biases.                      (10-12 / 9-11)
+        msf_core::CoreStateWithoutPropagation>,  ///< Gyro biases.
     msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, b_a,
-        msf_core::CoreStateWithoutPropagation>,  ///< Acceleration biases.              (13-15 / 12-14)
+        msf_core::CoreStateWithoutPropagation>,  ///< Acceleration biases.
 
     // States not varying during propagation.
     msf_core::StateVar_T<Eigen::Matrix<double, 1, 1>, L, msf_core::Auxiliary>,  ///< Visual scale.
-    msf_core::StateVar_T<Eigen::Quaternion<double>, q_wv,  ///< Vision-world position drift.
-        msf_core::AuxiliaryNonTemporalDrifting>,  ///< Vision-world attitude drift.
-    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_wv>,  ///< vision world position drift.
-    msf_core::StateVar_T<Eigen::Quaternion<double>, q_ic>,  ///< camera-imu attitude calibration.
-    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_ic>  ///< camera-imu position calibration.
+    msf_core::StateVar_T<Eigen::Quaternion<double>, q_wv,
+        msf_core::AuxiliaryNonTemporalDrifting>,  ///< Rotation from the world frame to the frame in which the pose is measured expressed in the world frame.
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_wv>,   ///< Translation from the world frame to the frame in which the pose is measured expressed in the world frame.
+    msf_core::StateVar_T<Eigen::Quaternion<double>, q_ic>,  ///< Rotation from the IMU frame to the camera frame expressed in the IMU frame.
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_ic>  ///< Translation from the IMU frame to the camera frame expressed in the IMU frame.
 
 > fullState_T;
 }
