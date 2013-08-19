@@ -27,6 +27,9 @@
 #include <msf_updates/pose_sensor_handler/pose_measurement.h>
 #include <msf_updates/SinglePoseSensorConfig.h>
 
+#include "sensor_fusion_comm/InitScale.h"
+#include "sensor_fusion_comm/InitHeight.h"
+
 namespace msf_pose_sensor {
 
 typedef msf_updates::SinglePoseSensorConfig Config_T;
@@ -59,6 +62,11 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
     ReconfigureServer::CallbackType f = boost::bind(&PoseSensorManager::config,
                                                     this, _1, _2);
     reconf_server_->setCallback(f);
+
+    init_scale_srv = pnh.advertiseService("initialize_msf_scale",
+                                          &PoseSensorManager::init_scale, this);
+    init_height_srv = pnh.advertiseService("initialize_msf_height",
+                                           &PoseSensorManager::init_height, this);
   }
   virtual ~PoseSensorManager() {
   }
@@ -73,6 +81,8 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
 
   Config_T config_;
   ReconfigureServerPtr reconf_server_;
+  ros::ServiceServer init_scale_srv;
+  ros::ServiceServer init_height_srv;
 
   /**
    * \brief Dynamic reconfigure callback.
@@ -101,6 +111,30 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
       init(scale);
       config.core_set_height = false;
     }
+  }
+
+  bool init_scale(sensor_fusion_comm::InitScale::Request &req,
+                  sensor_fusion_comm::InitScale::Response &res) {
+    ROS_INFO("Initialize filter with scale %f", req.scale);
+    init(req.scale);
+    res.result = "Initialized scale";
+    return true;
+  }
+
+  bool init_height(sensor_fusion_comm::InitHeight::Request &req,
+                   sensor_fusion_comm::InitHeight::Response &res) {
+    ROS_INFO("Initialize filter with height %f", req.height);
+    Eigen::Matrix<double, 3, 1> p = pose_handler_->getPositionMeasurement();
+    if (p.norm() == 0) {
+      MSF_WARN_STREAM(
+          "No measurements received yet to initialize position. Height init "
+          "not allowed.");
+      return false;
+    }
+    double scale = p[2] / req.height;
+    init(scale);
+    res.result = "Initialized height";
+    return true;
   }
 
   void init(double scale) const {
