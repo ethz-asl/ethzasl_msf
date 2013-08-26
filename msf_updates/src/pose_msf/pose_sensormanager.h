@@ -63,9 +63,9 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
                                                     this, _1, _2);
     reconf_server_->setCallback(f);
 
-    init_scale_srv = pnh.advertiseService("initialize_msf_scale",
+    init_scale_srv_ = pnh.advertiseService("initialize_msf_scale",
                                           &PoseSensorManager::init_scale, this);
-    init_height_srv = pnh.advertiseService("initialize_msf_height",
+    init_height_srv_ = pnh.advertiseService("initialize_msf_height",
                                            &PoseSensorManager::init_height, this);
   }
   virtual ~PoseSensorManager() {
@@ -81,8 +81,8 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
 
   Config_T config_;
   ReconfigureServerPtr reconf_server_;
-  ros::ServiceServer init_scale_srv;
-  ros::ServiceServer init_height_srv;
+  ros::ServiceServer init_scale_srv_;
+  ros::ServiceServer init_height_srv_;
 
   /**
    * \brief Dynamic reconfigure callback.
