@@ -182,6 +182,8 @@ void MSF_Core<EKFState_T>::process_imu(
   propagatePOneStep();
   timer_PropCov.Stop();
 
+  usercalc_.publishStateAfterPropagation(currentState);
+
   // Making sure we have sufficient states to apply measurements to.
   if (stateBuffer_.size() > 3)
     predictionMade_ = true;
@@ -370,8 +372,6 @@ void MSF_Core<EKFState_T>::propagateState(shared_ptr<EKFState_T>& state_old,
       ->template get<StateDefinition_T::p>()
       + ((state_new->template get<StateDefinition_T::v>()
           + state_old->template get<StateDefinition_T::v>()) / 2 * dt);
-
-  usercalc_.publishStateAfterPropagation(state_new);
 }
 
 template<typename EKFState_T>
