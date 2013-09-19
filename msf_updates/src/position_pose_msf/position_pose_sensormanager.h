@@ -215,18 +215,18 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     shared_ptr < msf_core::MSF_InitMeasurement<EKFState_T>
         > meas(new msf_core::MSF_InitMeasurement<EKFState_T>(true));
 
-    meas->setStateInitValue < StateDefinition_T::p > (p);
-    meas->setStateInitValue < StateDefinition_T::v > (v);
-    meas->setStateInitValue < StateDefinition_T::q > (q);
-    meas->setStateInitValue < StateDefinition_T::b_w > (b_w);
-    meas->setStateInitValue < StateDefinition_T::b_a > (b_a);
-    meas->setStateInitValue < StateDefinition_T::L
+    meas->setStateInitValue<StateDefinition_T::p> (p);
+    meas->setStateInitValue<StateDefinition_T::v> (v);
+    meas->setStateInitValue<StateDefinition_T::q> (q);
+    meas->setStateInitValue<StateDefinition_T::b_w> (b_w);
+    meas->setStateInitValue<StateDefinition_T::b_a> (b_a);
+    meas->setStateInitValue<StateDefinition_T::L
         > (Eigen::Matrix<double, 1, 1>::Constant(scale));
-    meas->setStateInitValue < StateDefinition_T::q_wv > (q_wv);
-    meas->setStateInitValue < StateDefinition_T::p_wv > (p_wv);
-    meas->setStateInitValue < StateDefinition_T::q_ic > (q_ic);
-    meas->setStateInitValue < StateDefinition_T::p_ic > (p_ic);
-    meas->setStateInitValue < StateDefinition_T::p_ip > (p_ip);
+    meas->setStateInitValue<StateDefinition_T::q_wv> (q_wv);
+    meas->setStateInitValue<StateDefinition_T::p_wv> (p_wv);
+    meas->setStateInitValue<StateDefinition_T::q_ic> (q_ic);
+    meas->setStateInitValue<StateDefinition_T::p_ic> (p_ic);
+    meas->setStateInitValue<StateDefinition_T::p_ip> (p_ip);
 
     setP(meas->get_P());  // Call my set P function.
     meas->get_w_m() = w_m;
