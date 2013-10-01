@@ -42,22 +42,4 @@
   <run_depend>sm_kinematics</run_depend>
   <run_depend>pcl_ros</run_depend>
   <run_depend>rosbag</run_depend>
-
-  <!-- Dependencies needed only for running tests. -->
-  <!-- <test_depend>std_msgs</test_depend> -->
-  <!-- <test_depend>visualization_msgs</test_depend> -->
-  <!-- <test_depend>sensor_msgs</test_depend> -->
-  <!-- <test_depend>image_transport</test_depend> -->
-  <!-- <test_depend>image_geometry</test_depend> -->
-  <!-- <test_depend>rospy</test_depend> -->
-  <!-- <test_depend>roscpp</test_depend> -->
-  <!-- <test_depend>opencv2</test_depend> -->
-  <!-- <test_depend>sm_kinematics</test_depend> -->
-  <!-- <test_depend>pcl_ros</test_depend> -->
-  <!-- <test_depend>rosbag</test_depend> -->
-  <!-- <test_depend>ptam_com</test_depend> -->
-
-  <export>
-
-  </export>
 </package>

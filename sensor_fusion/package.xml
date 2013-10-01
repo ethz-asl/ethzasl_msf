@@ -18,9 +18,6 @@
   <!-- Dependencies which this package needs to build itself. -->
   <buildtool_depend>catkin</buildtool_depend>
 
-  <!-- Dependencies needed to compile this package. -->
-
-
   <!-- Dependencies needed after this package is compiled. -->
   <run_depend>msf_eval</run_depend>
   <run_depend>msf_simulate</run_depend>
@@ -29,12 +26,6 @@
   <run_depend>msf_updates</run_depend>
   <run_depend>msf_timing</run_depend>  
   <run_depend>sensor_fusion_comm</run_depend>
-
-  <!-- Dependencies needed only for running tests. -->
-
-
-
-
 
   <export>
     <metapackage/>

@@ -9,7 +9,9 @@ project(msf_eval)
 #  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
-find_package(catkin REQUIRED COMPONENTS std_msgs visualization_msgs sensor_msgs image_transport image_geometry rospy roscpp opencv2 sm_kinematics pcl_ros rosbag ptam_com)
+find_package(catkin REQUIRED COMPONENTS std_msgs visualization_msgs sensor_msgs 
+image_transport image_geometry rospy roscpp opencv2 sm_kinematics pcl_ros rosbag 
+ptam_com)
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 
@@ -17,7 +19,16 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 
 catkin_package(
     DEPENDS opencv2
-    CATKIN_DEPENDS std_msgs visualization_msgs sensor_msgs image_transport image_geometry rospy roscpp sm_kinematics pcl_ros rosbag
+    CATKIN_DEPENDS 
+        std_msgs 
+        visualization_msgs 
+        sensor_msgs image_transport 
+        image_geometry 
+        rospy 
+        roscpp 
+        sm_kinematics 
+        pcl_ros 
+        rosbag
     INCLUDE_DIRS include ${catkin_INCLUDE_DIRS}
     LIBRARIES 
 )

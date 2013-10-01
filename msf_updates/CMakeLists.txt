@@ -21,11 +21,6 @@ generate_dynamic_reconfigure_options(
     cfg/SphericalPositionSensor.cfg
 )
 
-# TODO: fill in what other packages will need to use this package
-## DEPENDS: system dependencies of this project that dependent projects also need
-## CATKIN_DEPENDS: catkin_packages dependent projects also need
-## INCLUDE_DIRS: 
-## LIBRARIES: libraries you create in this project that dependent projects also need
 catkin_package(
     DEPENDS 
     CATKIN_DEPENDS roscpp msf_core geometry_msgs asctec_hl_comm sensor_fusion_comm
