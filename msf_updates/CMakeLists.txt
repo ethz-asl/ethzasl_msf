@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 2.4.6)
-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
+cmake_minimum_required(VERSION 2.8.3)
+project(msf_updates)
 
 # Set the build type.  Options are:
 #  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage
@@ -7,34 +7,29 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 #  Release        : w/o debug symbols, w/ optimization
 #  RelWithDebInfo : w/ debug symbols, w/ optimization
 #  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
-set(ROS_BUILD_TYPE RelWithDebInfo)
+set(CMAKE_BUILD_TYPE Release)
 
-rosbuild_init()
+find_package(catkin REQUIRED COMPONENTS roscpp msf_core geometry_msgs asctec_hl_comm sensor_fusion_comm)
 
-#set the default path for built executables to the "bin" directory
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-#set the default path for built libraries to the "lib" directory
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+include_directories(include ${catkin_INCLUDE_DIRS})
 
-rosbuild_find_ros_package(dynamic_reconfigure)
-include(${dynamic_reconfigure_PACKAGE_PATH}/cmake/cfgbuild.cmake)
-gencfg()
-rosbuild_genmsg()
+generate_dynamic_reconfigure_options(
+    cfg/PosePressureSensor.cfg  
+    cfg/PositionPoseSensor.cfg  
+    cfg/SinglePoseSensor.cfg  
+    cfg/SinglePositionSensor.cfg  
+    cfg/SphericalPositionSensor.cfg
+)
 
-# assembler on mac os doesn't know avx commands :( switch to sse4.2. assuming that our mac machines have a corei7
-IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin") 
-  add_definitions (-msse4.2)
-ELSE(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-  add_definitions (-march=native)
-ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+catkin_package(
+    DEPENDS 
+    CATKIN_DEPENDS roscpp msf_core geometry_msgs asctec_hl_comm sensor_fusion_comm
+    INCLUDE_DIRS include ${catkin_INCLUDE_DIRS}
+    LIBRARIES # TODO
+)
 
-set(ROS_COMPILE_FLAGS "-W -Wall -Wno-unused-parameter")# -Wextra -pedantic")
-
-#FIND EIGEN
-find_package(Eigen REQUIRED)
-include_directories(${Eigen_INCLUDE_DIRS})
-
-rosbuild_add_library(pose_distorter src/msf_distort/PoseDistorter.cc)
+add_library(pose_distorter src/msf_distort/PoseDistorter.cc)
+target_link_libraries(pose_distorter ${catkin_LIBRARIES})
 
 #just build the pose filter on the helicopters
 if(EXISTS "${PROJECT_SOURCE_DIR}/COMPILE_ONLY_POSEFILTER")
@@ -47,8 +42,7 @@ add_subdirectory(src/position_pose_msf)
 add_subdirectory(src/spherical_msf)
 endif()
 
-rosbuild_add_executable(test_distort src/test/test_distort.cc)
+add_executable(test_distort src/test/test_distort.cc)
 target_link_libraries(test_distort pose_distorter)
 
-#rosbuild_add_executable(test_tmp src/test/tmp_devel.cc)
 
