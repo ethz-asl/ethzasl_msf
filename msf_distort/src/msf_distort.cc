@@ -24,6 +24,7 @@
 #include <msf_distort/MSF_DistortConfig.h>
 #include <dynamic_reconfigure/Reconfigure.h>
 #include <dynamic_reconfigure/server.h>
+#include <msf_core/msf_macros.h>
 
 struct CallbackHandler {
 
@@ -91,7 +92,7 @@ int main(int argc, char** argv) {
 
   typedef msf_distort::MSF_DistortConfig Config_T;
   typedef dynamic_reconfigure::Server<Config_T> ReconfigureServer;
-  typedef shared_ptr<ReconfigureServer> ReconfigureServerPtr;
+  typedef boost::shared_ptr<ReconfigureServer> ReconfigureServerPtr;
 
   ros::NodeHandle nh("msf_distort");
 

@@ -22,7 +22,7 @@
 #include <msf_core/msf_measurement.h>
 #include <msf_core/msf_core.h>
 #include <msf_core/eigen_utils.h>
-#include <msf_updates/PointWithCovarianceStamped.h>
+#include <sensor_fusion_comm/PointWithCovarianceStamped.h>
 
 namespace msf_updates {
 namespace position_measurement {
@@ -33,7 +33,7 @@ enum {
 /**
  * \brief A measurement as provided by a position sensor, e.g. Total Station, GPS.
  */
-typedef msf_core::MSF_Measurement<PointWithCovarianceStamped,
+typedef msf_core::MSF_Measurement<sensor_fusion_comm::PointWithCovarianceStamped,
     Eigen::Matrix<double, nMeasurements, nMeasurements>, msf_updates::EKFState> PositionMeasurementBase;
 struct PositionMeasurement : public PositionMeasurementBase {
  private:

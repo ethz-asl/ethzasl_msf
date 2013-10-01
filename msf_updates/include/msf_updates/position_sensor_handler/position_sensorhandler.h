@@ -24,7 +24,7 @@
 #include <geometry_msgs/TransformStamped.h>
 #include <sensor_msgs/NavSatFix.h>
 #include <msf_core/gps_conversion.h>
-#include <msf_updates/PointWithCovarianceStamped.h>
+#include <sensor_fusion_comm/PointWithCovarianceStamped.h>
 
 namespace msf_position_sensor {
 
@@ -47,7 +47,7 @@ class PositionSensorHandler : public msf_core::SensorHandler<
   bool provides_absolute_measurements_;  ///< Does this sensor measure relative or absolute values.
 
   void processPositionMeasurement(
-      const msf_updates::PointWithCovarianceStampedConstPtr& msg);
+      const sensor_fusion_comm::PointWithCovarianceStampedConstPtr& msg);
   void measurementCallback(const geometry_msgs::PointStampedConstPtr & msg);
   void measurementCallback(const geometry_msgs::TransformStampedConstPtr & msg);
   void measurementCallback(const sensor_msgs::NavSatFixConstPtr& msg);
