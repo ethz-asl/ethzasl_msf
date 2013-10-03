@@ -7,7 +7,7 @@ project(msf_core)
 #  Release        : w/o debug symbols, w/ optimization
 #  RelWithDebInfo : w/ debug symbols, w/ optimization
 #  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
-set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
 find_package(catkin REQUIRED COMPONENTS roscpp sensor_msgs dynamic_reconfigure msf_timing tf)
 find_package(Eigen REQUIRED)
