@@ -224,6 +224,11 @@ class SortedContainer {
    */
   inline shared_ptr<T>& getClosestBefore(const double& statetime) {
     typename ListT::iterator it = stateList.lower_bound(statetime);
+    if (stateList.empty()) {
+      MSF_WARN_STREAM("Requested the first object before time " << statetime <<
+        "but the container is empty");
+      return getInvalid();
+    }
     if (it == stateList.begin()) {
       return it->second;
     }
