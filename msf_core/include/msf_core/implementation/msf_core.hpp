@@ -213,6 +213,7 @@ void MSF_Core<EKFState_T>::process_extstate(
   // Get the closest state and check validity.
   if (it_last_IMU == stateBuffer_.getIteratorEnd()) {
     it_last_IMU = stateBuffer_.getIteratorClosestBefore(msg_stamp);
+    assert(it_last_IMU != stateBuffer_.getInvalid());
   }
 
   shared_ptr<EKFState_T> lastState = it_last_IMU->second;

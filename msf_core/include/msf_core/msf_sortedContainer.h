@@ -22,6 +22,21 @@
 #include <msf_core/msf_macros.h>
 #include <iomanip>
 
+#define CHECK_IN_BOUNDS(iterator, container) \
+           do { \
+             decltype(iterator) __it = it; \
+             ++__it; \
+             if (__it == container.begin()) { \
+               MSF_ERROR_STREAM("Iterator out of bounds (begin) " << \
+                 __FILE__ << ":" << __LINE__); \
+             } \
+             if (iterator == container.end()) { \
+               MSF_ERROR_STREAM("Iterator out of bounds (end) " << \
+                 __FILE__ << ":" << __LINE__); \
+             } \
+           } while(0);
+
+
 namespace msf_core {
 /**
  * \brief Manages a sorted container with strict less than ordering
@@ -155,7 +170,9 @@ class SortedContainer {
   inline typename ListT::iterator getIteratorClosestBefore(
       const double& statetime) {
     typename ListT::iterator it = stateList.lower_bound(statetime);
+    CHECK_IN_BOUNDS(it, stateList);
     it--;
+    CHECK_IN_BOUNDS(it, stateList);
     return it;
   }
 
@@ -166,7 +183,9 @@ class SortedContainer {
    */
   inline typename ListT::iterator getIteratorClosestAfter(
       const double& statetime) {
-    return stateList.upper_bound(statetime);
+    typename ListT::iterator it = stateList.upper_bound(statetime);
+    CHECK_IN_BOUNDS(it, stateList);
+    return it;
   }
 
   /**
