@@ -31,11 +31,4 @@
   <run_depend>dynamic_reconfigure</run_depend>
   <run_depend>msf_timing</run_depend>
   <run_depend>tf</run_depend>
-
-  <!-- Dependencies needed only for running tests. -->
-  <!-- <test_depend>roscpp</test_depend> -->
-  <!-- <test_depend>sensor_msgs</test_depend> -->
-  <!-- <test_depend>dynamic_reconfigure</test_depend> -->
-  <!-- <test_depend>msf_timing</test_depend> -->
-  <!-- <test_depend>tf</test_depend> -->
 </package>

@@ -24,12 +24,4 @@
   <!-- Dependencies needed after this package is compiled. -->
   <run_depend>msf_core</run_depend>
   <run_depend>msf_updates</run_depend>
-
-  <!-- Dependencies needed only for running tests. -->
-  <!-- <test_depend>msf_core</test_depend> -->
-  <!-- <test_depend>msf_updates</test_depend> -->
-
-  <export>
-
-  </export>
 </package>

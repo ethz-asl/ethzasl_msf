@@ -36,15 +36,4 @@
   <run_depend>geometry_msgs</run_depend>
   <run_depend>dynamic_reconfigure</run_depend>
   <run_depend>msf_core</run_depend>
-
-  <!-- Dependencies needed only for running tests. -->
-  <!-- <test_depend>std_msgs</test_depend> -->
-  <!-- <test_depend>visualization_msgs</test_depend> -->
-  <!-- <test_depend>sensor_msgs</test_depend> -->
-  <!-- <test_depend>image_transport</test_depend> -->
-  <!-- <test_depend>image_geometry</test_depend> -->
-  <!-- <test_depend>geometry_msgs</test_depend> -->
-  <!-- <test_depend>ptam_com</test_depend> -->
-  <!-- <test_depend>dynamic_reconfigure</test_depend> -->
-
 </package>

@@ -22,6 +22,21 @@
 #include <msf_core/msf_macros.h>
 #include <iomanip>
 
+#define CHECK_IN_BOUNDS(iterator, container) \
+           do { \
+             decltype(iterator) __it = it; \
+             ++__it; \
+             if (__it == container.begin()) { \
+               MSF_ERROR_STREAM("Iterator out of bounds (begin) " << \
+                 __FILE__ << ":" << __LINE__); \
+             } \
+             if (iterator == container.end()) { \
+               MSF_ERROR_STREAM("Iterator out of bounds (end) " << \
+                 __FILE__ << ":" << __LINE__); \
+             } \
+           } while(0);
+
+
 namespace msf_core {
 /**
  * \brief Manages a sorted container with strict less than ordering
@@ -32,7 +47,8 @@ template<typename T, typename PrototypeInvalidT = T>
 class SortedContainer {
 
  public:
-  typedef shared_ptr<T> Ptr_T;EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  typedef shared_ptr<T> Ptr_T;
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
  private:
   typedef std::map<double, Ptr_T> ListT;  ///< The container type in which to store the data.
@@ -77,7 +93,9 @@ class SortedContainer {
         std::pair<double, shared_ptr<T> >(value->time, value));
     if (!itpr.second) {
       MSF_WARN_STREAM(
-          "Wanted to insert a value to the sorted container at time " << std::fixed << std::setprecision(9) << value->time << " but the map already contained a value at this time. discarding.");
+          "Wanted to insert a value to the sorted container at time " <<
+          std::fixed << std::setprecision(9) << value->time <<
+          " but the map already contained a value at this time. discarding.");
     }
     return itpr.first;
   }
@@ -117,7 +135,8 @@ class SortedContainer {
     if (it == stateList.end()) {  // There is no value in the map with this time.
       if (warnIfNotExistant)
         MSF_WARN_STREAM(
-            "getIteratorAtValue(state): Could not find value for time " << std::fixed << std::setprecision(9) << value->time);
+            "getIteratorAtValue(state): Could not find value for time " <<
+            std::fixed << std::setprecision(9) << value->time);
       it = stateList.lower_bound(value->time);
     }
     return it;
@@ -136,7 +155,8 @@ class SortedContainer {
     if (it == stateList.end()) {  //there is no value in the map with this time
       if (warnIfNotExistant)
         MSF_WARN_STREAM(
-            "getIteratorAtValue(double): Could not find value for time " << std::fixed << std::setprecision(9) << time);
+            "getIteratorAtValue(double): Could not find value for time " <<
+            std::fixed << std::setprecision(9) << time);
       it = stateList.lower_bound(time);
     }
     return it;
@@ -153,7 +173,6 @@ class SortedContainer {
     it--;
     return it;
   }
-  ;
 
   /**
    * \brief Returns the iterator closest after a specific time instant.
@@ -162,9 +181,9 @@ class SortedContainer {
    */
   inline typename ListT::iterator getIteratorClosestAfter(
       const double& statetime) {
-    return stateList.upper_bound(statetime);
+    typename ListT::iterator it = stateList.upper_bound(statetime);
+    return it;
   }
-  ;
 
   /**
    * \brief Returns the iterator closest to a specific time instant.
@@ -205,6 +224,11 @@ class SortedContainer {
    */
   inline shared_ptr<T>& getClosestBefore(const double& statetime) {
     typename ListT::iterator it = stateList.lower_bound(statetime);
+    if (stateList.empty()) {
+      MSF_WARN_STREAM("Requested the first object before time " << statetime <<
+        "but the container is empty");
+      return getInvalid();
+    }
     if (it == stateList.begin()) {
       return it->second;
     }
@@ -331,9 +355,9 @@ class SortedContainer {
     if (it == stateList.end()) {
       std::stringstream ss;
       ss
-          << "Wanted to update a states/measurements time, but could not find the old state, "
-              "for which the time was asked to be updated. time " << std::fixed
-          << std::setprecision(9) << timeOld << std::endl;
+          << "Wanted to update a states/measurements time, but could not find "
+              "the old state, for which the time was asked to be updated. time "
+          << std::fixed << std::setprecision(9) << timeOld << std::endl;
 
       ss << "Map: " << std::endl;
       for (typename ListT::iterator it2 = stateList.begin();

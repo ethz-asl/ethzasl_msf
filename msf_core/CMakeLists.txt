@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(msf_core)
 
-
-
 # Set the build type.  Options are:
 #  Coverage       : w/ debug symbols, w/o optimization, w/ code-coverage
 #  Debug          : w/ debug symbols, w/o optimization
@@ -16,7 +14,7 @@ find_package(Eigen REQUIRED)
 
 include_directories(include ${Eigen_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++11 -Wno-unused-parameter")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++11")
 
 # Enable timing the core
 add_definitions (-DENABLE_MSF_TIMING)
