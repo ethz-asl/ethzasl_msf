@@ -209,6 +209,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
     static int msg_seq = 0;
 
     sensor_fusion_comm::ExtEkf msgCorrect_;
+    msgCorrect_.state.resize(HLI_EKF_STATE_SIZE);
     msgCorrect_.header.stamp = ros::Time(state->time);
     msgCorrect_.header.seq = msg_seq;
     msgCorrect_.angular_velocity.x = 0;
