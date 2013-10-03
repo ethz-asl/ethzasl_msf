@@ -170,9 +170,7 @@ class SortedContainer {
   inline typename ListT::iterator getIteratorClosestBefore(
       const double& statetime) {
     typename ListT::iterator it = stateList.lower_bound(statetime);
-    CHECK_IN_BOUNDS(it, stateList);
     it--;
-    CHECK_IN_BOUNDS(it, stateList);
     return it;
   }
 
@@ -184,7 +182,6 @@ class SortedContainer {
   inline typename ListT::iterator getIteratorClosestAfter(
       const double& statetime) {
     typename ListT::iterator it = stateList.upper_bound(statetime);
-    CHECK_IN_BOUNDS(it, stateList);
     return it;
   }
 
