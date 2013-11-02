@@ -240,6 +240,6 @@ class sortMeasurements {
 
 }
 
-#include <msf_core/implementation/msf_measurement.hpp>
+#include <msf_core/implementation/msf_measurement_inl.h>
 
 #endif  // MEASUREMENT_H_

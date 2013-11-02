@@ -136,8 +136,8 @@ void MSF_Core<EKFState_T>::process_imu(
   currentState->w_m = angular_velocity;
 
   // Remove acc spikes (TODO (slynen): find a cleaner way to do this).
-  static Eigen::Matrix<double, 3, 1> last_am = Eigen::Matrix<double, 3, 1>(0, 0,
-                                                                           0);
+  static Eigen::Matrix<double, 3, 1> last_am =
+      Eigen::Matrix<double, 3, 1>(0, 0, 0);
   if (currentState->a_m.norm() > 50)
     currentState->a_m = last_am;
   else {
@@ -230,8 +230,8 @@ void MSF_Core<EKFState_T>::process_extstate(
   currentState->w_m = angular_velocity;
 
   // Remove acc spikes (TODO (slynen): Find a cleaner way to do this).
-  static Eigen::Matrix<double, 3, 1> last_am = Eigen::Matrix<double, 3, 1>(0, 0,
-                                                                           0);
+  static Eigen::Matrix<double, 3, 1> last_am =
+      Eigen::Matrix<double, 3, 1>(0, 0, 0);
   if (currentState->a_m.norm() > 50)
     currentState->a_m = last_am;
   else
@@ -242,8 +242,8 @@ void MSF_Core<EKFState_T>::process_extstate(
       typename StateBuffer_T::Ptr_T tmp = stateBuffer_.updateTime(
           lastState->time, currentState->time);
       MSF_WARN_STREAM_THROTTLE(
-          2,
-          "large time-gap re-initializing to last state: " << msf_core::timehuman(tmp->time));
+          2, "large time-gap re-initializing to last state: "
+          << msf_core::timehuman(tmp->time));
       return;  // Early abort (if timegap too big).
     }
   }
@@ -306,7 +306,7 @@ void MSF_Core<EKFState_T>::handlePendingMeasurements() {
 
 template<typename EKFState_T>
 void MSF_Core<EKFState_T>::CleanUpBuffers() {
-  double timeold = 60;  //1 min
+  double timeold = 60;  // 1 min.
   stateBuffer_.clearOlderThan(timeold);
   MeasurementBuffer_.clearOlderThan(timeold);
 }
@@ -355,8 +355,8 @@ void MSF_Core<EKFState_T>::propagateState(shared_ptr<EKFState_T>& state_old,
   }
 
   // First oder quat integration matrix.
-  const Matrix4 quat_int = MatExp
-      + 1.0 / 48.0 * (Omega * OmegaOld - OmegaOld * Omega) * dt * dt;
+  const Matrix4 quat_int =
+      MatExp + 1.0 / 48.0 * (Omega * OmegaOld - OmegaOld * Omega) * dt * dt;
 
   // First oder quaternion integration.
   state_new->template get<StateDefinition_T::q>().coeffs() = quat_int *
@@ -364,12 +364,12 @@ void MSF_Core<EKFState_T>::propagateState(shared_ptr<EKFState_T>& state_old,
   state_new->template get<StateDefinition_T::q>().normalize();
 
   dv = (state_new->template get<StateDefinition_T::q>().toRotationMatrix() *
-  ea + state_old-> template get<StateDefinition_T::q>().toRotationMatrix() *
-  eaold) / 2;
-  state_new->template get<StateDefinition_T::v>() = state_old
-      ->template get<StateDefinition_T::v>() + (dv - g_) * dt;
-  state_new->template get<StateDefinition_T::p>() = state_old
-      ->template get<StateDefinition_T::p>()
+       ea + state_old->template get<StateDefinition_T::q>().toRotationMatrix() *
+       eaold) / 2;
+  state_new->template get<StateDefinition_T::v>() =
+      state_old->template get<StateDefinition_T::v>() + (dv - g_) * dt;
+  state_new->template get<StateDefinition_T::p>() =
+      state_old->template get<StateDefinition_T::p>()
       + ((state_new->template get<StateDefinition_T::v>()
           + state_old->template get<StateDefinition_T::v>()) / 2 * dt);
 }
@@ -395,9 +395,11 @@ void MSF_Core<EKFState_T>::propagatePOneStep() {
             ->template get<StateDefinition_T::p>(),
         "prediction p")) {
       MSF_WARN_STREAM(
-          "prop state from:\t"<< stateIteratorPLastPropagated->second->toEigenVector());
+          "prop state from:\t"<<
+          stateIteratorPLastPropagated->second->toEigenVector());
       MSF_WARN_STREAM(
-          "prop state to:\t"<< stateIteratorPLastPropagatedNext->second->toEigenVector());
+          "prop state to:\t"<<
+          stateIteratorPLastPropagatedNext->second->toEigenVector());
       MSF_ERROR_STREAM(__FUNCTION__<<" Resetting EKF");
       predictionMade_ = initialized_ = false;
     }

@@ -242,13 +242,10 @@ class MSF_Core {
 
   /// Checks the queue of measurements to be applied in the future.
   void handlePendingMeasurements();
-
 };
-
 }
-;
 // msf_core
 
-#include <msf_core/implementation/msf_core.hpp>
+#include <msf_core/implementation/msf_core_inl.h>
 
 #endif /* MSF_CORE_H_ */

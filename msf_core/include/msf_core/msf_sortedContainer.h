@@ -22,6 +22,20 @@
 #include <msf_core/msf_macros.h>
 #include <iomanip>
 
+#define CHECK_IN_BOUNDS(iterator, container) \
+           do { \
+             decltype(iterator) __it = it; \
+             ++__it; \
+             if (__it == container.begin()) { \
+               MSF_ERROR_STREAM("Iterator out of bounds (begin) " << \
+                 __FILE__ << ":" << __LINE__); \
+             } \
+             if (iterator == container.end()) { \
+               MSF_ERROR_STREAM("Iterator out of bounds (end) " << \
+                 __FILE__ << ":" << __LINE__); \
+             } \
+           } while(0);
+
 namespace msf_core {
 /**
  * \brief Manages a sorted container with strict less than ordering
@@ -30,9 +44,9 @@ namespace msf_core {
  */
 template<typename T, typename PrototypeInvalidT = T>
 class SortedContainer {
-
  public:
-  typedef shared_ptr<T> Ptr_T;EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+  typedef shared_ptr<T> Ptr_T;
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
  private:
   typedef std::map<double, Ptr_T> ListT;  ///< The container type in which to store the data.
@@ -110,9 +124,8 @@ class SortedContainer {
    * \param value The value to get the iterator for.
    * \returns iterator.
    */
-  inline typename ListT::iterator getIteratorAtValue(const shared_ptr<T>& value,
-                                                     bool warnIfNotExistant =
-                                                         true) {
+  inline typename ListT::iterator getIteratorAtValue(
+      const shared_ptr<T>& value, bool warnIfNotExistant = true) {
     typename ListT::iterator it = stateList.find(value->time);
     if (it == stateList.end()) {  // There is no value in the map with this time.
       if (warnIfNotExistant)
@@ -129,9 +142,8 @@ class SortedContainer {
    * \param time The time where we want to get an iterator at.
    * \returns iterator.
    */
-  inline typename ListT::iterator getIteratorAtValue(const double& time,
-                                                     bool warnIfNotExistant =
-                                                         true) {
+  inline typename ListT::iterator getIteratorAtValue(
+      const double& time, bool warnIfNotExistant = true) {
     typename ListT::iterator it = stateList.find(time);
     if (it == stateList.end()) {  //there is no value in the map with this time
       if (warnIfNotExistant)
@@ -150,7 +162,7 @@ class SortedContainer {
   inline typename ListT::iterator getIteratorClosestBefore(
       const double& statetime) {
     typename ListT::iterator it = stateList.lower_bound(statetime);
-    it--;
+    --it;
     return it;
   }
   ;
@@ -208,10 +220,9 @@ class SortedContainer {
     if (it == stateList.begin()) {
       return it->second;
     }
-    it--;
+    --it;
     return it->second;
   }
-  ;
 
   /**
    * \brief Returns a pointer to the closest after a specific time instant
@@ -226,7 +237,6 @@ class SortedContainer {
     }
     return it->second;
   }
-  ;
 
   /**
    * \brief Returns a pointer to the object at a specific time instant
@@ -241,7 +251,6 @@ class SortedContainer {
     }
     return it->second;
   }
-  ;
 
   /**
    * \brief Returns a pointer to the closest to a specific time instant.
@@ -330,10 +339,9 @@ class SortedContainer {
     typename ListT::iterator it = stateList.find(timeOld);
     if (it == stateList.end()) {
       std::stringstream ss;
-      ss
-          << "Wanted to update a states/measurements time, but could not find the old state, "
-              "for which the time was asked to be updated. time " << std::fixed
-          << std::setprecision(9) << timeOld << std::endl;
+      ss << "Wanted to update a states/measurements time, but could not find "
+              "the old state, for which the time was asked to be updated. time "
+         << std::fixed << std::setprecision(9) << timeOld << std::endl;
 
       ss << "Map: " << std::endl;
       for (typename ListT::iterator it2 = stateList.begin();
@@ -341,7 +349,6 @@ class SortedContainer {
         ss << it2->first << std::endl;
       }
       MSF_WARN_STREAM(ss.str());
-
       return getClosest(timeOld);
     }
     // Get the data from the map, we need to update, then reinsert.
@@ -359,15 +366,12 @@ class SortedContainer {
    */
   std::string echoBufferContentTimes() {
     std::stringstream ss;
-
     for (typename ListT::iterator it = getIteratorBegin();
         it != getIteratorEnd(); ++it) {
       ss << std::fixed << std::setprecision(9) << it->second->time << std::endl;
     }
     return ss.str();
-
   }
-
 };
 }
 

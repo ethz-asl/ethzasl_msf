@@ -146,6 +146,6 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
 };
 }  // msf_core
 
-#include <msf_core/implementation/msf_sensormanager.hpp>
+#include <msf_core/implementation/msf_sensormanager_inl.h>
 
 #endif  // SENSORMANAGER_H

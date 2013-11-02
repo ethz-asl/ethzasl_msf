@@ -290,6 +290,6 @@ class sortStates {
 
 }
 
-#include <msf_core/implementation/msf_state_.hpp>
+#include <msf_core/implementation/msf_state_inl.h>
 
 #endif /* MSF_STATE_H_ */
