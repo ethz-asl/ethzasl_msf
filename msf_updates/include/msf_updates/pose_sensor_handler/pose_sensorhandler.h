@@ -53,25 +53,25 @@ class PoseSensorHandler : public msf_core::SensorHandler<
 
   void ProcessPoseMeasurement(
       const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg);
-  void measurementCallback(
+  void MeasurementCallback(
       const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg);
-  void measurementCallback(const geometry_msgs::PoseStampedConstPtr & msg);
-  void measurementCallback(const geometry_msgs::TransformStampedConstPtr & msg);
+  void MeasurementCallback(const geometry_msgs::PoseStampedConstPtr & msg);
+  void MeasurementCallback(const geometry_msgs::TransformStampedConstPtr & msg);
 
  public:
   typedef MEASUREMENT_TYPE measurement_t;
   PoseSensorHandler(MANAGER_TYPE& meas, std::string topic_namespace,
                     std::string parameternamespace, bool distortmeas);
   // Used for the init.
-  Eigen::Matrix<double, 3, 1> getPositionMeasurement() {
+  Eigen::Matrix<double, 3, 1> GetPositionMeasurement() {
     return z_p_;
   }
-  Eigen::Quaterniond getAttitudeMeasurement() {
+  Eigen::Quaterniond GetAttitudeMeasurement() {
     return z_q_;
   }
   //setters for configure values
-  void setNoises(double n_zp, double n_zq);
-  void setDelay(double delay);
+  void SetNoises(double n_zp, double n_zq);
+  void SetDelay(double delay);
 
 };
 }

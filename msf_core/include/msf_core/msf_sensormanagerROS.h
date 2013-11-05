@@ -31,7 +31,7 @@
 
 #include <msf_core/MSF_CoreConfig.h>
 #include <msf_core/msf_sensormanager.h>
-#include <msf_core/msf_types.hpp>
+#include <msf_core/msf_types.h>
 
 namespace msf_core {
 
@@ -77,7 +77,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
         &MSF_SensorManagerROS::Config, this, _1, _2);
     reconfServer_->setCallback(f);
 
-    pnh.param("data_playback", this->data_playback_, false);
+    pnh.param("GetDataPlaybackStatus", this->GetDataPlaybackStatus_, false);
 
     ros::NodeHandle nh("msf_core");
 
@@ -116,7 +116,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
   /**
    * \brief Gets called by the internal callback caller.
    */
-  virtual void coreConfig(msf_core::MSF_CoreConfig &config, uint32_t level) {
+  virtual void CoreConfigCallback(msf_core::MSF_CoreConfig &config, uint32_t level) {
     UNUSED(config);
     UNUSED(level);
   }
@@ -127,35 +127,35 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
    */
   void Config(msf_core::MSF_CoreConfig &config, uint32_t level) {
     config_ = config;
-    coreConfig(config, level);
+    CoreConfigCallback(config, level);
   }
 
   // Set the latest HL state which is needed to compute the correction to be
   // send back to the HL.
-  void setHLStateBuffer(const sensor_fusion_comm::ExtEkf& msg) {
+  void SetHLControllerStateBuffer(const sensor_fusion_comm::ExtEkf& msg) {
     hl_state_buf_ = msg;
   }
 
   // Parameter getters.
-  virtual bool getParam_fixed_bias() const {
+  virtual bool GetParamFixedBias() const {
     return config_.core_fixed_bias;
   }
-  virtual double getParam_noise_acc() const {
+  virtual double GetParamNoiseAcc() const {
     return config_.core_noise_acc;
   }
-  virtual double getParam_noise_accbias() const {
+  virtual double GetParamNoiseAccbias() const {
     return config_.core_noise_accbias;
   }
-  virtual double getParam_noise_gyr() const {
+  virtual double GetParamNoiseGyr() const {
     return config_.core_noise_gyr;
   }
-  virtual double getParam_noise_gyrbias() const {
+  virtual double GetParamNoiseGyrbias() const {
     return config_.core_noise_gyrbias;
   }
-  virtual double getParam_fuzzythres() const {
+  virtual double GetParamFuzzyTrackingThreshold() const {
     return 0.1;
   }
-  virtual void publishStateInitial(const shared_ptr<EKFState_T>& state) const {
+  virtual void PublishStateInitial(const shared_ptr<EKFState_T>& state) const {
     /**
      * \brief Initialize the HLP based propagation.
      * \param State the state to send to the HLP.
@@ -182,7 +182,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
 
   }
 
-  virtual void publishStateAfterPropagation(
+  virtual void PublishStateAfterPropagation(
       const shared_ptr<EKFState_T>& state) const {
 
     if (pubPoseCrtl_.getNumSubscribers()) {
@@ -192,18 +192,18 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
       msgPose.header.stamp = ros::Time(state->time);
       msgPose.header.seq = msg_seq++;
       msgPose.header.frame_id = "/world";
-      state->toPoseMsg(msgPose);
+      state->ToPoseMsg(msgPose);
       pubPose_.publish(msgPose);
 
       sensor_fusion_comm::ExtState msgPoseCtrl;
       msgPoseCtrl.header = msgPose.header;
-      state->toExtStateMsg(msgPoseCtrl);
+      state->ToExtStateMsg(msgPoseCtrl);
       pubPoseCrtl_.publish(msgPoseCtrl);
 
     }
   }
 
-  virtual void publishStateAfterUpdate(
+  virtual void PublishStateAfterUpdate(
       const shared_ptr<EKFState_T>& state) const {
 
     static int msg_seq = 0;
@@ -221,7 +221,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
     // Prevent junk being sent to the external state propagation when data
     // playback is (accidentally) on.
     if (pubCorrect_.getNumSubscribers() > 0) {
-      if (this->data_playback_) {
+      if (this->GetDataPlaybackStatus_) {
         for (int i = 0; i < HLI_EKF_STATE_SIZE; ++i) {
           msgCorrect_.state[i] = 0;
         }
@@ -230,61 +230,61 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
 
         MSF_ERROR_STREAM_THROTTLE(
             1, __FUNCTION__ << " You have connected the external propagation "
-            "topic but at the same time data_playback is on.");
+            "topic but at the same time GetDataPlaybackStatus is on.");
 
       } else {
         const EKFState_T& state_const = *state;
         msgCorrect_.state[0] =
-            state_const.template get<StateDefinition_T::p>()[0]
+            state_const.template Get<StateDefinition_T::p>()[0]
                 - hl_state_buf_.state[0];
         msgCorrect_.state[1] =
-            state_const.template get<StateDefinition_T::p>()[1]
+            state_const.template Get<StateDefinition_T::p>()[1]
                 - hl_state_buf_.state[1];
         msgCorrect_.state[2] =
-            state_const.template get<StateDefinition_T::p>()[2]
+            state_const.template Get<StateDefinition_T::p>()[2]
                 - hl_state_buf_.state[2];
         msgCorrect_.state[3] =
-            state_const.template get<StateDefinition_T::v>()[0]
+            state_const.template Get<StateDefinition_T::v>()[0]
                 - hl_state_buf_.state[3];
         msgCorrect_.state[4] =
-            state_const.template get<StateDefinition_T::v>()[1]
+            state_const.template Get<StateDefinition_T::v>()[1]
                 - hl_state_buf_.state[4];
         msgCorrect_.state[5] =
-            state_const.template get<StateDefinition_T::v>()[2]
+            state_const.template Get<StateDefinition_T::v>()[2]
                 - hl_state_buf_.state[5];
 
         Eigen::Quaterniond hl_q(hl_state_buf_.state[6], hl_state_buf_.state[7],
                                 hl_state_buf_.state[8], hl_state_buf_.state[9]);
         Eigen::Quaterniond qbuff_q = hl_q.inverse()
-            * state_const.template get<StateDefinition_T::q>();
+            * state_const.template Get<StateDefinition_T::q>();
         msgCorrect_.state[6] = qbuff_q.w();
         msgCorrect_.state[7] = qbuff_q.x();
         msgCorrect_.state[8] = qbuff_q.y();
         msgCorrect_.state[9] = qbuff_q.z();
 
         msgCorrect_.state[10] =
-            state_const.template get<StateDefinition_T::b_w>()[0]
+            state_const.template Get<StateDefinition_T::b_w>()[0]
                 - hl_state_buf_.state[10];
         msgCorrect_.state[11] =
-            state_const.template get<StateDefinition_T::b_w>()[1]
+            state_const.template Get<StateDefinition_T::b_w>()[1]
                 - hl_state_buf_.state[11];
         msgCorrect_.state[12] =
-            state_const.template get<StateDefinition_T::b_w>()[2]
+            state_const.template Get<StateDefinition_T::b_w>()[2]
                 - hl_state_buf_.state[12];
         msgCorrect_.state[13] =
-            state_const.template get<StateDefinition_T::b_a>()[0]
+            state_const.template Get<StateDefinition_T::b_a>()[0]
                 - hl_state_buf_.state[13];
         msgCorrect_.state[14] =
-            state_const.template get<StateDefinition_T::b_a>()[1]
+            state_const.template Get<StateDefinition_T::b_a>()[1]
                 - hl_state_buf_.state[14];
         msgCorrect_.state[15] =
-            state_const.template get<StateDefinition_T::b_a>()[2]
+            state_const.template Get<StateDefinition_T::b_a>()[2]
                 - hl_state_buf_.state[15];
 
         msgCorrect_.flag = sensor_fusion_comm::ExtEkf::state_correction;
       }
 
-      if (state->checkStateForNumeric()) {  // If not NaN.
+      if (state->CheckStateForNumeric()) {  // If not NaN.
         pubCorrect_.publish(msgCorrect_);
       } else {
         MSF_WARN_STREAM_THROTTLE(
@@ -295,7 +295,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
     // Publish state.
     sensor_fusion_comm::DoubleArrayStamped msgState;
     msgState.header = msgCorrect_.header;
-    state->toFullStateMsg(msgState);
+    state->ToFullStateMsg(msgState);
     pubState_.publish(msgState);
 
     if (pubPoseAfterUpdate_.getNumSubscribers()) {
@@ -306,7 +306,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
       msgPose.header.seq = msg_seq;
       msgPose.header.frame_id = "/world";
 
-      state->toPoseMsg(msgPose);
+      state->ToPoseMsg(msgPose);
       pubPoseAfterUpdate_.publish(msgPose);
     }
 
@@ -314,9 +314,9 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
       tf::Transform transform;
       const EKFState_T& state_const = *state;
       const Eigen::Matrix<double, 3, 1>& pos = state_const
-          .template get<StateDefinition_T::p>();
+          .template Get<StateDefinition_T::p>();
       const Eigen::Quaterniond& ori = state_const
-          .template get<StateDefinition_T::q>();
+          .template Get<StateDefinition_T::q>();
       transform.setOrigin(tf::Vector3(pos[0], pos[1], pos[2]));
       transform.setRotation(tf::Quaternion(ori.x(), ori.y(), ori.z(), ori.w()));
       tf_broadcaster_.sendTransform(

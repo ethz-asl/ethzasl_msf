@@ -14,8 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef MDF_TYPETRAITS_H_
-#define MDF_TYPETRAITS_H_
+#ifndef MSF_TYPETRAITS_H_
+#define MSF_TYPETRAITS_H_
 
 namespace msf_tmp {
 
@@ -190,6 +190,5 @@ struct IsPointerType<const T*> {
   };
 };
 
-}
-
-#endif  // MDF_TYPETRAITS_TPP_
+}  // namespace msf_tmp
+#endif  // MSF_TYPETRAITS_H_

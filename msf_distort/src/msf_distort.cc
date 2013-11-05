@@ -54,32 +54,32 @@ struct CallbackHandler {
     config_ = config;
   }
 
-  void measurementCallback(
+  void MeasurementCallback(
       const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg) {
     if (config_.publish_pose) {
       pubPoseWithCovarianceStamped_.publish(msg);
     }
   }
 
-  void measurementCallback(
+  void MeasurementCallback(
       const geometry_msgs::TransformStampedConstPtr & msg) {
     if (config_.publish_pose) {
       pubTransformStamped_.publish(msg);
     }
   }
 
-  void measurementCallback(const geometry_msgs::PoseStampedConstPtr & msg) {
+  void MeasurementCallback(const geometry_msgs::PoseStampedConstPtr & msg) {
     if (config_.publish_pose) {
       pubPoseStamped_.publish(msg);
     }
   }
 
-  void measurementCallback(const sensor_msgs::NavSatFixConstPtr & msg) {
+  void MeasurementCallback(const sensor_msgs::NavSatFixConstPtr & msg) {
     if (config_.publish_position) {
       pubNavSatFix_.publish(msg);
     }
   }
-  void measurementCallback(const geometry_msgs::PointStampedConstPtr & msg) {
+  void MeasurementCallback(const geometry_msgs::PointStampedConstPtr & msg) {
     if (config_.publish_position) {
       pubPoint_.publish(msg);
     }
@@ -106,17 +106,17 @@ int main(int argc, char** argv) {
 
   ros::Subscriber subPoseWithCovarianceStamped_ =
       nh.subscribe < geometry_msgs::PoseWithCovarianceStamped
-          > ("pose_with_covariance_input", 20, &CallbackHandler::measurementCallback, &handler);
+          > ("pose_with_covariance_input", 20, &CallbackHandler::MeasurementCallback, &handler);
   ros::Subscriber subTransformStamped_ =
       nh.subscribe < geometry_msgs::TransformStamped
-          > ("transform_input", 20, &CallbackHandler::measurementCallback, &handler);
+          > ("transform_input", 20, &CallbackHandler::MeasurementCallback, &handler);
   ros::Subscriber subPoseStamped_ = nh.subscribe < geometry_msgs::PoseStamped
-      > ("pose_input", 20, &CallbackHandler::measurementCallback, &handler);
+      > ("pose_input", 20, &CallbackHandler::MeasurementCallback, &handler);
   ros::Subscriber subNavSatFix_ =
       nh.subscribe < sensor_msgs::NavSatFix
-          > ("navsatfix_input", 20, &CallbackHandler::measurementCallback, &handler);
+          > ("navsatfix_input", 20, &CallbackHandler::MeasurementCallback, &handler);
   ros::Subscriber subPoint_ = nh.subscribe < geometry_msgs::PointStamped
-      > ("point_input", 20, &CallbackHandler::measurementCallback, &handler);
+      > ("point_input", 20, &CallbackHandler::MeasurementCallback, &handler);
 
   ros::V_string topics;
   ros::this_node::getSubscribedTopics(topics);

@@ -17,7 +17,7 @@
 #ifndef MSF_FWD_HPP_
 #define MSF_FWD_HPP_
 
-#include <msf_core/msf_types.hpp>
+#include <msf_core/msf_types.h>
 #include <msf_core/msf_macros.h>
 
 namespace msf_core {
@@ -35,53 +35,47 @@ enum {  //set power 2 flags here
   correctionMultiplicative = 0x1
 };
 
-//forwards
+// Forwards.
 
-//state variable
+// State variable.
 template<typename type_T, int name_T, int STATETYPE = Auxiliary, int OPTIONS =
-    none>
-struct StateVar_T;
+    none> struct StateVar_T;
 
-//the state
+// The state object.
 template<typename StateVector_T, typename StateDefinition_T>
 struct GenericState_T;
 
-template<typename EKFState_T>
-class MSF_Core;
+template<typename EKFState_T> class MSF_Core;
 
-template<typename T> struct echoStateVarType;
+template<typename T> struct EchoStateVarType;
 template<typename T> struct CorrectionStateLengthForType;
 template<typename T> struct StateLengthForType;
-template<typename T> struct getEnumStateName;
+template<typename T> struct GetEnumStateName;
 
 template<typename Sequence, template<typename > class Counter, typename First,
-    typename Last, bool T>
-struct countStatesLinear;
+    typename Last, bool T> struct CountStatesLinear;
 
 template<typename Sequence, typename First, typename Last, int CurrentIdx,
-    bool T>
-struct CheckStateIndexing;
+    bool T> struct CheckStateIndexing;
 
-template<typename TypeList, int INDEX> struct getEnumStateType;
+template<typename TypeList, int INDEX> struct GetEnumStateType;
 
 template<typename Sequence, typename StateVarT,
     template<typename > class OffsetCalculator, typename First, typename Last,
-    bool TypeFound, int CurrentVal, bool EndOfList>
-struct ComputeStartIndex;
+    bool TypeFound, int CurrentVal, bool EndOfList> struct ComputeStartIndex;
 
 template<typename Sequence> struct CheckCorrectIndexing;
 template<typename Sequence, template<typename > class Counter>
 struct CountStates;
 
 template<typename Sequence, typename StateVarT,
-    template<typename > class Counter>
-struct getStartIndex;
+    template<typename > class Counter> struct GetStartIndex;
 
-struct resetState;
+struct ResetState;
 
-template<typename stateT> struct copyNonPropagationStates;
-template<typename stateList_T> struct copyQBlocksFromAuxiliaryStatesToQ;
-template<typename T, typename stateList_T> struct correctState;
+template<typename stateT> struct CopyNonPropagationStates;
+template<typename stateList_T> struct CopyQBlocksFromAuxiliaryStatesToQ;
+template<typename T, typename stateList_T> struct CorrectState;
 template<typename T, typename stateList_T> struct StatetoDoubleArray;
 
 class MeasurementHandler;

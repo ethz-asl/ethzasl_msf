@@ -56,17 +56,17 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
 
     position_handler_.reset(
         new PositionSensorHandler_T(*this, "", "position_sensor"));
-    addHandler(position_handler_);
+    AddHandler(position_handler_);
 
     reconf_server_.reset(new ReconfigureServer(pnh));
     ReconfigureServer::CallbackType f = boost::bind(
-        &PositionSensorManager::config, this, _1, _2);
+        &PositionSensorManager::Config, this, _1, _2);
     reconf_server_->setCallback(f);
   }
   virtual ~PositionSensorManager() {
   }
 
-  virtual const Config_T& getcfg() {
+  virtual const Config_T& Getcfg() {
     return config_;
   }
 
@@ -80,18 +80,18 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
   /**
    * \brief Dynamic reconfigure callback.
    */
-  virtual void config(Config_T &config, uint32_t level) {
+  virtual void Config(Config_T &config, uint32_t level) {
     config_ = config;
-    position_handler_->setNoises(config.position_noise_meas);
-    position_handler_->setDelay(config.position_delay);
+    position_handler_->SetNoises(config.position_noise_meas);
+    position_handler_->SetDelay(config.position_delay);
     if ((level & msf_updates::SinglePositionSensor_INIT_FILTER)
         && config.core_init_filter == true) {
-      init(1.0);
+      Init(1.0);
       config.core_init_filter = false;
     }
   }
 
-  void init(double scale) const {
+  void Init(double scale) const {
     if (scale < 0.001) {
       MSF_WARN_STREAM("init scale is "<<scale<<" correcting to 1");
       scale = 1;
@@ -121,9 +121,10 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
     P.setZero();  // Error state covariance; if zero, a default initialization
                   // in msf_core is used
 
-    p_vc = position_handler_->getPositionMeasurement();
+    p_vc = position_handler_->GetPositionMeasurement();
 
-    MSF_INFO_STREAM("initial measurement pos:["<<p_vc.transpose()<<"] orientation: "<<STREAMQUAT(q));
+    MSF_INFO_STREAM("initial measurement pos:[" << p_vc.transpose() <<
+                    "] orientation: " << STREAMQUAT(q));
 
     // check if we have already input from the measurement sensor
     if (p_vc.norm() == 0)
@@ -140,44 +141,44 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
 
     //prepare init "measurement"
     // True means that we will also set the initialsensor readings.
-    shared_ptr < msf_core::MSF_InitMeasurement<EKFState_T>
-        > meas(new msf_core::MSF_InitMeasurement<EKFState_T>(true));
+    shared_ptr<msf_core::MSF_InitMeasurement<EKFState_T> >
+        meas(new msf_core::MSF_InitMeasurement<EKFState_T>(true));
 
-    meas->setStateInitValue < StateDefinition_T::p > (p);
-    meas->setStateInitValue < StateDefinition_T::v > (v);
-    meas->setStateInitValue < StateDefinition_T::q > (q);
-    meas->setStateInitValue < StateDefinition_T::b_w > (b_w);
-    meas->setStateInitValue < StateDefinition_T::b_a > (b_a);
-    meas->setStateInitValue < StateDefinition_T::p_ip > (p_ip);
+    meas->SetStateInitValue < StateDefinition_T::p > (p);
+    meas->SetStateInitValue < StateDefinition_T::v > (v);
+    meas->SetStateInitValue < StateDefinition_T::q > (q);
+    meas->SetStateInitValue < StateDefinition_T::b_w > (b_w);
+    meas->SetStateInitValue < StateDefinition_T::b_a > (b_a);
+    meas->SetStateInitValue < StateDefinition_T::p_ip > (p_ip);
 
-    setP(meas->get_P());  // Call my set P function.
-    meas->get_w_m() = w_m;
-    meas->get_a_m() = a_m;
+    SetStateCovariance(meas->GetStateCovariance());  // Call my set P function.
+    meas->Getw_m() = w_m;
+    meas->Geta_m() = a_m;
     meas->time = ros::Time::now().toSec();
 
     // Call initialization in core.
-    msf_core_->init(meas);
+    msf_core_->Init(meas);
   }
 
   // Prior to this call, all states are initialized to zero/identity.
-  virtual void resetState(EKFState_T& state) const {
+  virtual void ResetState(EKFState_T& state) const {
     UNUSED(state);
   }
-  virtual void initState(EKFState_T& state) const {
+  virtual void InitState(EKFState_T& state) const {
     UNUSED(state);
   }
 
-  virtual void calculateQAuxiliaryStates(EKFState_T& state, double dt) const {
+  virtual void CalculateQAuxiliaryStates(EKFState_T& state, double dt) const {
     const msf_core::Vector3 npipv = msf_core::Vector3::Constant(
         config_.position_noise_p_ip);
 
     // Compute the blockwise Q values and store them with the states,
     //these then get copied by the core to the correct places in Qd.
-    state.getQBlock<StateDefinition_T::p_ip>() =
+    state.GetQBlock<StateDefinition_T::p_ip>() =
         (dt * npipv.cwiseProduct(npipv)).asDiagonal();
   }
 
-  virtual void setP(
+  virtual void SetStateCovariance(
       Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,
           EKFState_T::nErrorStatesAtCompileTime>& P) const {
     UNUSED(P);
@@ -185,12 +186,12 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
     // rest.
   }
 
-  virtual void augmentCorrectionVector(
+  virtual void AugmentCorrectionVector(
       Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, 1>& correction) const {
     UNUSED(correction);
   }
 
-  virtual void sanityCheckCorrection(
+  virtual void SanityCheckCorrection(
       EKFState_T& delaystate,
       const EKFState_T& buffstate,
       Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, 1>& correction) const {

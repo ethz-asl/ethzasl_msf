@@ -27,7 +27,7 @@
 #define MSF_TMP_H_
 
 #include <msf_core/msf_fwds.h>
-#include <msf_core/msf_typetraits.hpp>
+#include <msf_core/msf_typetraits.h>
 #include <msf_core/eigen_utils.h>
 
 #include <Eigen/Dense>
@@ -73,7 +73,7 @@ struct overflow {
  * \brief Output a compile time constant.
  */
 template<int VALUE>
-void echoCompileTimeConstant() {
+void EchoCompileTimeConstant() {
   char(overflow<VALUE>());
   return;
 }
@@ -81,16 +81,16 @@ void echoCompileTimeConstant() {
 /**
  * \brief Runtime output of stateVariable types.
  */
-template<typename T> struct echoStateVarType;
+template<typename T> struct EchoStateVarType;
 
 /**
  * \brief Runtime output of stateVariable types for const ref eigen matrices.
  */
 template<int NAME, int N, int STATE_T, int OPTIONS>
-struct echoStateVarType<
+struct EchoStateVarType<
     const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATE_T,
         OPTIONS>&> {
-  static std::string value() {
+  static std::string Value() {
     return "const ref Eigen::Matrix<double, " + boost::lexical_cast
         < std::string > (N) + ", 1>";
   }
@@ -99,9 +99,9 @@ struct echoStateVarType<
  * \brief Runtime output of stateVariable types for const ref eigen quaternions.
  */
 template<int NAME, int STATE_T, int OPTIONS>
-struct echoStateVarType<
+struct EchoStateVarType<
     const msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATE_T, OPTIONS>&> {
-  static std::string value() {
+  static std::string Value() {
     return "const ref Eigen::Quaterniond";
   }
 };
@@ -109,9 +109,9 @@ struct echoStateVarType<
  * \brief Runtime output of stateVariable types for eigen matrices.
  */
 template<int NAME, int N, int STATE_T, int OPTIONS>
-struct echoStateVarType<
+struct EchoStateVarType<
     msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATE_T, OPTIONS> > {
-  static std::string value() {
+  static std::string Value() {
     return "Eigen::Matrix<double, " + boost::lexical_cast < std::string
         > (N) + ", 1>";
   }
@@ -120,9 +120,9 @@ struct echoStateVarType<
  * \brief Runtime output of stateVariable types for eigen matrices.
  */
 template<int NAME, int STATE_T, int OPTIONS>
-struct echoStateVarType<
+struct EchoStateVarType<
     msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATE_T, OPTIONS> > {
-  static std::string value() {
+  static std::string Value() {
     return "Eigen::Quaterniond";
   }
 };
@@ -327,26 +327,26 @@ struct PropagatedCoreErrorStateLengthForType<const mpl_::void_&> {
 
 // Return the number a state has in the enum.
 template<typename T>
-struct getEnumStateName;
+struct GetEnumStateName;
 template<typename U, int NAME, int STATE_T, int OPTIONS>
-struct getEnumStateName<const msf_core::StateVar_T<U, NAME, STATE_T, OPTIONS>&> {
+struct GetEnumStateName<const msf_core::StateVar_T<U, NAME, STATE_T, OPTIONS>&> {
   enum {
     value = NAME
   };
 };
 template<typename U, int NAME, int STATE_T, int OPTIONS>
-struct getEnumStateName<msf_core::StateVar_T<U, NAME, STATE_T, OPTIONS> > {
+struct GetEnumStateName<msf_core::StateVar_T<U, NAME, STATE_T, OPTIONS> > {
   enum {
     value = NAME
   };
 };
-template<> struct getEnumStateName<const mpl_::void_&> {
+template<> struct GetEnumStateName<const mpl_::void_&> {
   enum {
     value = -1
   };
   // Must not change this.
 };
-template<> struct getEnumStateName<mpl_::void_> {
+template<> struct GetEnumStateName<mpl_::void_> {
   enum {
     value = -1
   };
@@ -354,9 +354,9 @@ template<> struct getEnumStateName<mpl_::void_> {
 };
 
 template<typename T>
-struct isQuaternionType;
+struct IsQuaternionType;
 template<int NAME, int STATE_T, int OPTIONS, int M, int N>
-struct isQuaternionType<
+struct IsQuaternionType<
     const msf_core::StateVar_T<Eigen::Matrix<double, M, N>, NAME, STATE_T,
         OPTIONS>&> {
   enum {
@@ -364,34 +364,34 @@ struct isQuaternionType<
   };
 };
 template<int NAME, int STATE_T, int OPTIONS, int M, int N>
-struct isQuaternionType<
+struct IsQuaternionType<
     msf_core::StateVar_T<Eigen::Matrix<double, M, N>, NAME, STATE_T, OPTIONS> > {
   enum {
     value = false
   };
 };
 template<int NAME, int STATE_T, int OPTIONS>
-struct isQuaternionType<
+struct IsQuaternionType<
     const msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATE_T, OPTIONS>&> {
   enum {
     value = true
   };
 };
 template<int NAME, int STATE_T, int OPTIONS>
-struct isQuaternionType<
+struct IsQuaternionType<
     msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATE_T, OPTIONS> > {
   enum {
     value = true
   };
 };
 template<>
-struct isQuaternionType<const mpl_::void_&> {
+struct IsQuaternionType<const mpl_::void_&> {
   enum {
     value = false
   };
 };
 template<>
-struct isQuaternionType<mpl_::void_> {
+struct IsQuaternionType<mpl_::void_> {
   enum {
     value = false
   };
@@ -401,9 +401,9 @@ struct isQuaternionType<mpl_::void_> {
  * \brief Return whether a state is nontemporaldrifting.
  */
 template<typename T>
-struct getStateIsNonTemporalDrifting;
+struct GetStateIsNonTemporalDrifting;
 template<typename U, int NAME, int STATE_T, int OPTIONS>
-struct getStateIsNonTemporalDrifting<
+struct GetStateIsNonTemporalDrifting<
     const msf_core::StateVar_T<U, NAME, STATE_T, OPTIONS>&> {
   enum {
     value = static_cast<int>(msf_core::StateVar_T<U, NAME, STATE_T, OPTIONS>::statetype_)
@@ -411,19 +411,19 @@ struct getStateIsNonTemporalDrifting<
   };
 };
 template<typename U, int NAME, int STATE_T, int OPTIONS>
-struct getStateIsNonTemporalDrifting<
+struct GetStateIsNonTemporalDrifting<
     msf_core::StateVar_T<U, NAME, STATE_T, OPTIONS> > {
   enum {
     value = static_cast<int>(msf_core::StateVar_T<U, NAME, STATE_T, OPTIONS>::statetype_)
         == static_cast<int>(msf_core::AuxiliaryNonTemporalDrifting)
   };
 };
-template<> struct getStateIsNonTemporalDrifting<const mpl_::void_&> {
+template<> struct GetStateIsNonTemporalDrifting<const mpl_::void_&> {
   enum {
     value = false
   };
 };
-template<> struct getStateIsNonTemporalDrifting<mpl_::void_> {
+template<> struct GetStateIsNonTemporalDrifting<mpl_::void_> {
   enum {
     value = false
   };
@@ -435,22 +435,22 @@ template<> struct getStateIsNonTemporalDrifting<mpl_::void_> {
  */
 template<typename Sequence, template<typename > class Counter, typename First,
     typename Last, bool T>
-struct countStatesLinear;
+struct CountStatesLinear;
 template<typename Sequence, template<typename > class Counter, typename First,
     typename Last>
-struct countStatesLinear<Sequence, Counter, First, Last, true> {
+struct CountStatesLinear<Sequence, Counter, First, Last, true> {
   enum {  // The end does not add entries.
     value = 0
   };
 };
 template<typename Sequence, template<typename > class Counter, typename First,
     typename Last>
-struct countStatesLinear<Sequence, Counter, First, Last, false> {
+struct CountStatesLinear<Sequence, Counter, First, Last, false> {
   typedef typename boost::fusion::result_of::next<First>::type Next;
   typedef typename boost::fusion::result_of::deref<First>::type current_Type;
   enum {  // The length of the current state plus the tail of the list.
     value = Counter<current_Type>::value
-        + countStatesLinear<Sequence, Counter, Next, Last,
+        + CountStatesLinear<Sequence, Counter, Next, Last,
             SameType<typename msf_tmp::StripConstReference<First>::result_t,
                 typename msf_tmp::StripConstReference<Last>::result_t>::value>::value
   };
@@ -474,18 +474,18 @@ struct CheckStateIndexing<Sequence, First, Last, CurrentIdx, false> {
   typedef typename boost::fusion::result_of::deref<First>::type current_Type;
   enum {  // The length of the current state plus the tail of the list.
     // Only evaluate if not at the end of the list.
-    idxInEnum = boost::mpl::if_c<getEnumStateName<current_Type>::value != -1,
+    idxInEnum = boost::mpl::if_c<GetEnumStateName<current_Type>::value != -1,
     // If we're not at the end of the list, use the calculated enum index.
-        boost::mpl::int_<getEnumStateName<current_Type>::value>,
+        boost::mpl::int_<GetEnumStateName<current_Type>::value>,
         //Else use the current index, so the assertion doesn't fail.
         boost::mpl::int_<CurrentIdx> >::type::value,
 
     idxInState = CurrentIdx,
 
     indexingerrors = boost::mpl::if_c<idxInEnum == idxInState,
-    // Error here
+    // Error here.
         boost::mpl::int_<0>, boost::mpl::int_<1> >::type::value +
-    // And errors of other states
+    // And errors of other states.
         CheckStateIndexing<Sequence, Next, Last, CurrentIdx + 1,
             SameType<typename msf_tmp::StripConstReference<First>::result_t,
                 typename msf_tmp::StripConstReference<Last>::result_t>::value>::indexingerrors
@@ -503,7 +503,7 @@ struct CheckStateIndexing<Sequence, First, Last, CurrentIdx, false> {
  * \brief Return the state type of a given enum value.
  */
 template<typename TypeList, int INDEX>
-struct getEnumStateType {
+struct GetEnumStateType {
   typedef typename boost::fusion::result_of::at_c<TypeList, INDEX>::type value;
 };
 
@@ -511,12 +511,12 @@ struct getEnumStateType {
  * \brief Return void type if index is -1.
  */
 template<typename TypeList>
-struct getEnumStateType<TypeList, -1> {
+struct GetEnumStateType<TypeList, -1> {
   typedef mpl_::void_ value;
 };
 
 /**
- * \brief Helper for getStartIndex{
+ * \brief Helper for GetStartIndex{
  */
 template<typename Sequence, typename StateVarT,
     template<typename > class OffsetCalculator, typename First, typename Last,
@@ -582,12 +582,12 @@ struct FindBestNonTemporalDriftingStateImpl<Sequence, First, Last,
   typedef typename boost::fusion::result_of::next<First>::type Next;
   typedef typename boost::fusion::result_of::deref<First>::type current_Type;
   enum {
-    idxInState = getEnumStateName<
+    idxInState = GetEnumStateName<
     // We assert before calling that the indexing is correct.
         typename msf_tmp::StripConstReference<current_Type>::result_t>::value,
-    IsCurrentStateAQuaternion = isQuaternionType<
+    IsCurrentStateAQuaternion = IsQuaternionType<
         typename msf_tmp::StripConstReference<current_Type>::result_t>::value,
-    IsCurrentStateNonTemporalDrifting = getStateIsNonTemporalDrifting<
+    IsCurrentStateNonTemporalDrifting = GetStateIsNonTemporalDrifting<
         typename msf_tmp::StripConstReference<current_Type>::result_t>::value,
     isQuaternionAndNonTemporalDrifting = IsCurrentStateAQuaternion == true
         && IsCurrentStateNonTemporalDrifting == true,
@@ -675,7 +675,7 @@ struct CountStates {
   typedef typename boost::fusion::result_of::begin<Sequence const>::type First;
   typedef typename boost::fusion::result_of::end<Sequence const>::type Last;
   enum {
-    value = countStatesLinear<Sequence, Counter, First, Last,
+    value = CountStatesLinear<Sequence, Counter, First, Last,
         SameType<typename msf_tmp::StripConstReference<First>::result_t,
             typename msf_tmp::StripConstReference<Last>::result_t>::value>::value
     // will be zero, if no indexing errors, otherwise fails compilation.
@@ -688,7 +688,7 @@ struct CountStates {
  */
 template<typename Sequence, typename StateVarT,
     template<typename > class Counter>
-struct getStartIndex {
+struct GetStartIndex {
   typedef typename boost::fusion::result_of::begin<Sequence const>::type First;
   typedef typename boost::fusion::result_of::end<Sequence const>::type Last;
   typedef typename boost::fusion::result_of::deref<First>::type currentType;
@@ -706,13 +706,13 @@ struct getStartIndex {
  * \brief Compute start indices in the correction vector of a given type.
  */
 template<typename Sequence, int StateEnum>
-struct getStartIndexInCorrection {
+struct GetStartIndexInCorrection {
   typedef typename boost::fusion::result_of::begin<Sequence const>::type First;
   typedef typename boost::fusion::result_of::end<Sequence const>::type Last;
   typedef typename boost::fusion::result_of::deref<First>::type currentType;
   enum {
-    value = msf_tmp::getStartIndex<Sequence,
-        typename msf_tmp::getEnumStateType<Sequence, StateEnum>::value,
+    value = msf_tmp::GetStartIndex<Sequence,
+        typename msf_tmp::GetEnumStateType<Sequence, StateEnum>::value,
         msf_tmp::CorrectionStateLengthForType>::value
   };
 };
@@ -720,7 +720,7 @@ struct getStartIndexInCorrection {
 /**
  * \brief Reset the EKF state in a boost fusion unrolled call.
  */
-struct resetState {
+struct ResetState {
   template<int NAME, int N, int STATE_T, int OPTIONS>
   void operator()(
       msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATE_T, OPTIONS>& t) const {
@@ -741,15 +741,15 @@ struct resetState {
  * propagation in a boost fusion unrolled call.
  */
 template<typename stateVarT>
-struct copyInitStates {
-  copyInitStates(const stateVarT& oldstate)
+struct CopyInitStates {
+  CopyInitStates(const stateVarT& oldstate)
       : oldstate_(oldstate) {
   }
   template<typename T, int NAME, int STATE_T, int OPTIONS>
   void operator()(msf_core::StateVar_T<T, NAME, STATE_T, OPTIONS>& t) const {
-    if (oldstate_.template getStateVar<NAME>().hasResetValue) {
+    if (oldstate_.template GetStateVariable<NAME>().hasResetValue) {
       // Copy value from old state to new state var.
-        t = oldstate_.template getStateVar<NAME>();
+        t = oldstate_.template GetStateVariable<NAME>();
       }
     }
 
@@ -762,8 +762,8 @@ struct copyInitStates {
      * propagation.
      */
 template<typename stateVarT>
-struct copyNonPropagationStates {
-  copyNonPropagationStates(const stateVarT& oldstate)
+struct CopyNonPropagationStates {
+  CopyNonPropagationStates(const stateVarT& oldstate)
       : oldstate_(oldstate) {
   }
   template<typename T, int NAME, int OPTIONS>
@@ -782,10 +782,10 @@ struct copyNonPropagationStates {
 
     static_assert(
         STATE_T != msf_core::CoreStateWithPropagation,
-        "copyNonPropagationStates was instantiated for a core state. "
+        "CopyNonPropagationStates was instantiated for a core state. "
         "This is an error.");
     // Copy value from old state to new state var.
-    t = oldstate_.template getStateVar<NAME>();
+    t = oldstate_.template GetStateVariable<NAME>();
   }
 
  private:
@@ -796,21 +796,21 @@ struct copyNonPropagationStates {
  * \brief Copy the user calculated values in the Q-blocks to the main Q matrix.
  */
 template<typename stateList_T>
-struct copyQBlocksFromAuxiliaryStatesToQ {
+struct CopyQBlocksFromAuxiliaryStatesToQ {
   enum {
     nErrorStatesAtCompileTime = msf_tmp::CountStates<stateList_T,
         msf_tmp::CorrectionStateLengthForType>::value  // N correction states.
   };
   typedef Eigen::Matrix<double, nErrorStatesAtCompileTime,
       nErrorStatesAtCompileTime> Q_T;
-  copyQBlocksFromAuxiliaryStatesToQ(Q_T& Q)
+  CopyQBlocksFromAuxiliaryStatesToQ(Q_T& Q)
       : Q_(Q) {
   }
   template<typename T, int NAME, int STATE_T, int OPTIONS>
   void operator()(msf_core::StateVar_T<T, NAME, STATE_T, OPTIONS>& t) const {
     typedef msf_core::StateVar_T<T, NAME, STATE_T, OPTIONS> var_T;
     enum {
-      startIdxInCorrection = msf_tmp::getStartIndex<stateList_T, var_T,
+      startIdxInCorrection = msf_tmp::GetStartIndex<stateList_T, var_T,
           msf_tmp::CorrectionStateLengthForType>::value,
       sizeInCorrection = var_T::sizeInCorrection_
     };
@@ -820,7 +820,7 @@ struct copyQBlocksFromAuxiliaryStatesToQ {
         static_cast<int>(msf_core::CoreStateWithPropagation) &&
         static_cast<int>(var_T::statetype_) !=
         static_cast<int>(msf_core::CoreStateWithoutPropagation),
-        "copyQBlocksFromAuxiliaryStatesToQ was instantiated for a core state. "
+        "CopyQBlocksFromAuxiliaryStatesToQ was instantiated for a core state. "
         "This is an error.");
 
     static_assert(
@@ -828,7 +828,7 @@ struct copyQBlocksFromAuxiliaryStatesToQ {
         static_cast<int>(var_T::Q_T::ColsAtCompileTime) &&
         static_cast<int>(sizeInCorrection) ==
         static_cast<int>(var_T::Q_T::RowsAtCompileTime),
-        "copyQBlocksFromAuxiliaryStatesToQ size of Matrix Q stored with the stateVar,"
+        "CopyQBlocksFromAuxiliaryStatesToQ size of Matrix Q stored with the stateVar,"
         "is not the same as the reported dimension in the correction vector");
 
     Q_.template block<sizeInCorrection, sizeInCorrection>(startIdxInCorrection,
@@ -856,8 +856,8 @@ struct copyQBlocksFromAuxiliaryStatesToQ {
  * \brief Apply EKF corrections depending on the stateVar type.
  */
 template<typename T, typename stateList_T>
-struct correctState {
-  correctState(T& correction)
+struct CorrectState {
+  CorrectState(T& correction)
       : data_(correction) {
   }
   template<int NAME, int N, int STATE_T, int OPTIONS>
@@ -866,7 +866,7 @@ struct correctState {
     typedef msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATE_T,
         OPTIONS> var_T;
     enum {
-      startIdxInCorrection = msf_tmp::getStartIndex<stateList_T, var_T,
+      startIdxInCorrection = msf_tmp::GetStartIndex<stateList_T, var_T,
           msf_tmp::CorrectionStateLengthForType>::value
     };
     if (OPTIONS & msf_core::correctionMultiplicative) {
@@ -884,7 +884,7 @@ struct correctState {
       msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATE_T, OPTIONS>& t) const {
     typedef msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATE_T> var_T;
     enum {
-      startIdxInCorrection = msf_tmp::getStartIndex<stateList_T, var_T,
+      startIdxInCorrection = msf_tmp::GetStartIndex<stateList_T, var_T,
           msf_tmp::CorrectionStateLengthForType>::value
     };
     // Make sure the user does not define bogus options.
@@ -893,7 +893,7 @@ struct correctState {
         "You defined the Quaternion correction to be multiplicative, but this "
         "is anyway done and not an option");
 
-    Eigen::Quaternion<double> qbuff_q = quaternionFromSmallAngle(
+    Eigen::Quaternion<double> qbuff_q = QuaternionFromSmallAngle(
         data_.template block<var_T::sizeInCorrection_, 1>(startIdxInCorrection,
                                                           0));
     t.state_ = t.state_ * qbuff_q;
@@ -917,7 +917,7 @@ struct CoreStatetoDoubleArray {
     typedef msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATE_T,
         OPTIONS> var_T;
     enum {
-      startIdxInState = msf_tmp::getStartIndex<stateList_T, var_T,
+      startIdxInState = msf_tmp::GetStartIndex<stateList_T, var_T,
       // Index of the data in the state vector.
           msf_tmp::StateLengthForType>::value
     };
@@ -937,7 +937,7 @@ struct CoreStatetoDoubleArray {
       msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATE_T, OPTIONS>& t) const {
     typedef msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATE_T, OPTIONS> var_T;
     enum {
-      startIdxInState = msf_tmp::getStartIndex<stateList_T, var_T,
+      startIdxInState = msf_tmp::GetStartIndex<stateList_T, var_T,
       // Index of the data in the state vector.
           msf_tmp::StateLengthForType>::value
     };
@@ -997,7 +997,7 @@ struct GetIndicesInErrorState {
       msf_core::StateVar_T<VALUE_T, NAME, STATE_T, OPTIONS>& UNUSEDPARAM(t)) const {
     typedef msf_core::StateVar_T<VALUE_T, NAME, STATE_T, OPTIONS> var_T;
     enum {
-      startIdxInState = msf_tmp::getStartIndex<stateList_T, var_T,
+      startIdxInState = msf_tmp::GetStartIndex<stateList_T, var_T,
       // Index of the data in the correction vector.
           msf_tmp::CorrectionStateLengthForType>::value,
       lengthInState = var_T::sizeInCorrection_
@@ -1014,10 +1014,10 @@ struct GetIndicesInErrorState {
  * matrices.
  */
 template<typename stateVector_T, int INDEX>
-struct getStateIndexInState {
-  typedef typename msf_tmp::getEnumStateType<stateVector_T, INDEX>::value state_type;
+struct GetStateIndexInState {
+  typedef typename msf_tmp::GetEnumStateType<stateVector_T, INDEX>::value state_type;
   enum {
-    value = msf_tmp::getStartIndex<stateVector_T, state_type,
+    value = msf_tmp::GetStartIndex<stateVector_T, state_type,
         msf_tmp::StateLengthForType>::value,
   };
 };
@@ -1027,10 +1027,10 @@ struct getStateIndexInState {
  * matrices.
  */
 template<typename stateVector_T, int INDEX>
-struct getStateIndexInErrorState {
-  typedef typename msf_tmp::getEnumStateType<stateVector_T, INDEX>::value state_type;
+struct GetStateIndexInErrorState {
+  typedef typename msf_tmp::GetEnumStateType<stateVector_T, INDEX>::value state_type;
   enum {
-    value = msf_tmp::getStartIndex<stateVector_T, state_type,
+    value = msf_tmp::GetStartIndex<stateVector_T, state_type,
         msf_tmp::CorrectionStateLengthForType>::value,
   };
 };
@@ -1049,7 +1049,7 @@ struct FullStatetoString {
     typedef msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATE_T,
         OPTIONS> var_T;
     enum {
-      startIdxInState = msf_tmp::getStartIndex<stateList_T, var_T,
+      startIdxInState = msf_tmp::GetStartIndex<stateList_T, var_T,
       // Index of the data in the state vector.
           msf_tmp::StateLengthForType>::value
     };
@@ -1062,7 +1062,7 @@ struct FullStatetoString {
       msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATE_T, OPTIONS>& t) const {
     typedef msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATE_T, OPTIONS> var_T;
     enum {
-      startIdxInState = msf_tmp::getStartIndex<stateList_T, var_T,
+      startIdxInState = msf_tmp::GetStartIndex<stateList_T, var_T,
       // Index of the data in the state vector.
           msf_tmp::StateLengthForType>::value
     };
@@ -1088,7 +1088,7 @@ struct FullStatetoDoubleArray {
     typedef msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATE_T,
         OPTIONS> var_T;
     enum {
-      startIdxInState = msf_tmp::getStartIndex<stateList_T, var_T,
+      startIdxInState = msf_tmp::GetStartIndex<stateList_T, var_T,
       // Index of the data in the state vector.
           msf_tmp::StateLengthForType>::value
     };
@@ -1101,7 +1101,7 @@ struct FullStatetoDoubleArray {
       msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATE_T, OPTIONS>& t) const {
     typedef msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATE_T, OPTIONS> var_T;
     enum {
-      startIdxInState = msf_tmp::getStartIndex<stateList_T, var_T,
+      startIdxInState = msf_tmp::GetStartIndex<stateList_T, var_T,
       // Index of the data in the state vector.
           msf_tmp::StateLengthForType>::value
     };

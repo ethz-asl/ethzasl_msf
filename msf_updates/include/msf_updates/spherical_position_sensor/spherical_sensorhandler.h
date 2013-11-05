@@ -36,17 +36,17 @@ private:
   bool use_fixed_covariance_;
   bool provides_absolute_measurements_; ///< Does this sensor measure relative or absolute values.
 
-  void measurementCallback(const geometry_msgs::PointStampedConstPtr & msg);
+  void MeasurementCallback(const geometry_msgs::PointStampedConstPtr & msg);
 public:
   typedef MEASUREMENT_TYPE measurement_t;
   AngleSensorHandler(MANAGER_TYPE& meas, std::string topic_namespace, std::string parameternamespace);
   // Used for the init.
-  msf_core::Vector2 getAngleMeasurement(){
+  msf_core::Vector2 GetAngleMeasurement(){
     return z_a_;
   }
   // Setters for configure values.
-  void setNoises(double n_za);
-  void setDelay(double delay);
+  void SetNoises(double n_za);
+  void SetDelay(double delay);
 };
 
 
@@ -65,17 +65,17 @@ private:
   bool use_fixed_covariance_;
   bool provides_absolute_measurements_; ///< Does this sensor measure relative or absolute values.
 
-  void measurementCallback(const geometry_msgs::PointStampedConstPtr & msg);
+  void MeasurementCallback(const geometry_msgs::PointStampedConstPtr & msg);
 public:
   typedef MEASUREMENT_TYPE measurement_t;
   DistanceSensorHandler(MANAGER_TYPE& meas, std::string topic_namespace, std::string parameternamespace);
   // Used for the init.
-  msf_core::Vector1 getDistanceMeasurement(){
+  msf_core::Vector1 GetDistanceMeasurement(){
     return z_d_;
   }
   // Setters for configure values.
-  void setNoises(double n_za);
-  void setDelay(double delay);
+  void SetNoises(double n_za);
+  void SetDelay(double delay);
 };
 }
 #include "./implementation/spherical_sensorhandler.hpp"

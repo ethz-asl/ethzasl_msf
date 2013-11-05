@@ -185,7 +185,7 @@ template<class T>
   }
 
 template<class Derived>
-  Eigen::Quaternion<typename Derived::Scalar> quaternionFromSmallAngle(const Eigen::MatrixBase<Derived> & theta)
+  Eigen::Quaternion<typename Derived::Scalar> QuaternionFromSmallAngle(const Eigen::MatrixBase<Derived> & theta)
   {
   typedef typename Derived::Scalar Scalar;
   EIGEN_STATIC_ASSERT_FIXED_SIZE(Derived);

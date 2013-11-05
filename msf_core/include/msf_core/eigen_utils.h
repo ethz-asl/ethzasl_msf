@@ -25,9 +25,9 @@
 #include <Eigen/Geometry>
 #include <iostream>
 
-/// Returns the 3D cross product skew symmetric matrix of a given 3D vector.
+/// Returns the 3D cross product Skew symmetric matrix of a given 3D vector.
 template<class Derived>
-inline Eigen::Matrix<typename Derived::Scalar, 3, 3> skew(
+inline Eigen::Matrix<typename Derived::Scalar, 3, 3> Skew(
     const Eigen::MatrixBase<Derived> & vec) {
   EIGEN_STATIC_ASSERT_VECTOR_SPECIFIC_SIZE(Derived, 3);
   return (Eigen::Matrix<typename Derived::Scalar, 3, 3>() << 0.0, -vec[2], vec[1],
@@ -42,7 +42,7 @@ inline Eigen::Matrix<typename Derived::Scalar, 3, 3> skew(
  \return 4x4 matrix for multiplication with the quaternion.
  */
 template<class Derived>
-inline Eigen::Matrix<typename Derived::Scalar, 4, 4> omegaMatJPL(
+inline Eigen::Matrix<typename Derived::Scalar, 4, 4> OmegaMatJPL(
     const Eigen::MatrixBase<Derived> & vec) {
   EIGEN_STATIC_ASSERT_VECTOR_SPECIFIC_SIZE(Derived, 3);
   return (Eigen::Matrix<typename Derived::Scalar, 4, 4>() << 0, vec[2], -vec[1],
@@ -59,7 +59,7 @@ inline Eigen::Matrix<typename Derived::Scalar, 4, 4> omegaMatJPL(
  \return 4x4 Matrix for multiplication with the quaternion
  */
 template<class Derived>
-inline Eigen::Matrix<typename Derived::Scalar, 4, 4> omegaMatHamilton(
+inline Eigen::Matrix<typename Derived::Scalar, 4, 4> OmegaMatHamilton(
     const Eigen::MatrixBase<Derived> & vec) {
   EIGEN_STATIC_ASSERT_VECTOR_SPECIFIC_SIZE(Derived, 3);
   return (Eigen::Matrix<typename Derived::Scalar, 4, 4>() << 0, -vec[2], vec[1],
@@ -72,26 +72,26 @@ inline Eigen::Matrix<typename Derived::Scalar, 4, 4> omegaMatHamilton(
  \param q_vec 4D vector containing the quaternion's coefficients in the order x y z w.
  \return 4x3 matrix for error quaternion computation
  \verbatim
- Xi = [ w*I + skew([x y z])]  ; dq = [ Xi q]^T * q
+ Xi = [ w*I + Skew([x y z])]  ; dq = [ Xi q]^T * q
  [     -[x y z]       ]
  \endverbatim
  */
 template<class Derived>
-inline Eigen::Matrix<typename Derived::Scalar, 4, 3> xiMat(
+inline Eigen::Matrix<typename Derived::Scalar, 4, 3> XiMat(
     const Eigen::MatrixBase<Derived> & q_vec) {
   EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(Derived, 4, 1);
 
   return (Eigen::Matrix<typename Derived::Scalar, 4, 3>() <<
   // This is the Xi matrix ---
       q_vec[3] * Eigen::Matrix<typename Derived::Scalar, 3, 3>::Identity()
-          + skew(q_vec.template head<3>()), -q_vec.template head<3>().transpose()
+          + Skew(q_vec.template head<3>()), -q_vec.template head<3>().transpose()
   // ---
       ).finished();
     }
 
 /// Computes a quaternion from the 3-element small angle approximation theta.
 template<class Derived>
-Eigen::Quaternion<typename Derived::Scalar> quaternionFromSmallAngle(
+Eigen::Quaternion<typename Derived::Scalar> QuaternionFromSmallAngle(
     const Eigen::MatrixBase<Derived> & theta) {
   typedef typename Derived::Scalar Scalar;
   EIGEN_STATIC_ASSERT_FIXED_SIZE (Derived);
@@ -109,9 +109,9 @@ Eigen::Quaternion<typename Derived::Scalar> quaternionFromSmallAngle(
   }
 }
 
-/// Debug output to check misbehavior of Eigen.
+/// Debug output to check numeric value of Eigen types.
 template<class D>
-bool checkForNumeric(const Eigen::MatrixBase<D> & mat,
+bool CheckForNumeric(const Eigen::MatrixBase<D> & mat,
                      const std::string & info) {
   enum {
     rows = Eigen::MatrixBase < D > ::RowsAtCompileTime,

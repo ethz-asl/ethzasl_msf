@@ -21,7 +21,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include <msf_core/msf_fwds.h>
-#include <msf_core/msf_types.hpp>
+#include <msf_core/msf_types.h>
 
 namespace msf_core {
 /**
@@ -40,9 +40,9 @@ class MSF_MeasurementBase {
    * \brief The method called by the msf_core to apply the measurement
    * represented by this object.
    */
-  virtual void apply(shared_ptr<EKFState_T> stateWithCovariance,
+  virtual void Apply(shared_ptr<EKFState_T> stateWithCovariance,
                      MSF_Core<EKFState_T>& core) = 0;
-  virtual std::string type() = 0;
+  virtual std::string Type() = 0;
   int sensorID_;
   bool isabsolute_;
   double time;  ///< The time_ this measurement was taken.
@@ -52,20 +52,20 @@ class MSF_MeasurementBase {
    * the state inside the core.
    */
   template<class H_type, class Res_type, class R_type>
-  void calculateAndApplyCorrection(
+  void CalculateAndApplyCorrection(
       shared_ptr<EKFState_T> state, MSF_Core<EKFState_T>& core,
       const Eigen::MatrixBase<H_type>& H,
       const Eigen::MatrixBase<Res_type>& residual,
       const Eigen::MatrixBase<R_type>& R);
 
-  void calculateAndApplyCorrection(shared_ptr<EKFState_T> state,
+  void CalculateAndApplyCorrection(shared_ptr<EKFState_T> state,
                                    MSF_Core<EKFState_T>& core,
                                    const Eigen::MatrixXd& H,
                                    const Eigen::MatrixXd& residual,
                                    const Eigen::MatrixXd& R);
 
   template<class H_type, class Res_type, class R_type>
-  void calculateAndApplyCorrectionRelative(
+  void CalculateAndApplyCorrectionRelative(
       shared_ptr<EKFState_T> state_old, shared_ptr<EKFState_T> state_new,
       MSF_Core<EKFState_T>& core, const Eigen::MatrixBase<H_type>& H_old,
       const Eigen::MatrixBase<H_type>& H_new,
@@ -82,13 +82,13 @@ template<typename EKFState_T>
 class MSF_InvalidMeasurement : public MSF_MeasurementBase<EKFState_T> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
-  virtual void apply(shared_ptr<EKFState_T> UNUSEDPARAM(stateWithCovariance),
+  virtual void Apply(shared_ptr<EKFState_T> UNUSEDPARAM(stateWithCovariance),
                      MSF_Core<EKFState_T>& UNUSEDPARAM(core)) {
     MSF_ERROR_STREAM(
-        "Called apply() on an MSF_InvalidMeasurement object. This should never "
+        "Called Apply() on an MSF_InvalidMeasurement object. This should never "
         "happen.");
   }
-  virtual std::string type() {
+  virtual std::string Type() {
     return "invalid";
   }
   MSF_InvalidMeasurement()
@@ -107,7 +107,7 @@ class MSF_InvalidMeasurement : public MSF_MeasurementBase<EKFState_T> {
 template<typename T, typename RMAT_T, typename EKFState_T>
 class MSF_Measurement : public MSF_MeasurementBase<EKFState_T> {
  private:
-  virtual void makeFromSensorReadingImpl(
+  virtual void MakeFromSensorReadingImpl(
       const boost::shared_ptr<T const> reading) = 0;
  protected:
   RMAT_T R_;
@@ -123,11 +123,11 @@ class MSF_Measurement : public MSF_MeasurementBase<EKFState_T> {
   virtual ~MSF_Measurement() {
   }
   ;
-  void makeFromSensorReading(const boost::shared_ptr<T const> reading,
+  void MakeFromSensorReading(const boost::shared_ptr<T const> reading,
                              double timestamp) {
     this->time = timestamp;
 
-    makeFromSensorReadingImpl(reading);
+    MakeFromSensorReadingImpl(reading);
 
     // Check whether the user has set R.
     if (R_.minCoeff() == 0.0 && R_.maxCoeff() == 0.0) {
@@ -171,22 +171,22 @@ class MSF_InitMeasurement : public MSF_MeasurementBase<EKFState_T> {
   virtual ~MSF_InitMeasurement() {
   }
   ;
-  virtual std::string type() {
+  virtual std::string Type() {
     return "init";
   }
-  typename EKFState_T::P_type& get_P() {
+  typename EKFState_T::P_type& GetStateCovariance() {
     return InitState.P;
   }
   /**
    * \brief Get the gyro measurement.
    */
-  Eigen::Matrix<double, 3, 1>& get_w_m() {
+  Eigen::Matrix<double, 3, 1>& Getw_m() {
     return InitState.w_m;
   }
   /**
    * \brief Get the acceleration measurment.
    */
-  Eigen::Matrix<double, 3, 1>& get_a_m() {
+  Eigen::Matrix<double, 3, 1>& Geta_m() {
     return InitState.a_m;
   }
 
@@ -195,9 +195,9 @@ class MSF_InitMeasurement : public MSF_MeasurementBase<EKFState_T> {
    * for the state.
    */
   template<int INDEX, typename T>
-  void setStateInitValue(const T& initvalue) {
-    InitState.template getStateVar<INDEX>().state_ = initvalue;
-    InitState.template getStateVar<INDEX>().hasResetValue = true;
+  void SetStateInitValue(const T& initvalue) {
+    InitState.template GetStateVariable<INDEX>().state_ = initvalue;
+    InitState.template GetStateVariable<INDEX>().hasResetValue = true;
   }
 
   /**
@@ -205,7 +205,7 @@ class MSF_InitMeasurement : public MSF_MeasurementBase<EKFState_T> {
    * values for the state.
    */
   template<int INDEX>
-  void resetStateInitValue() {
+  void ResetStateInitValue() {
     InitState.template get<INDEX>().hasResetValue = false;
   }
 
@@ -216,16 +216,16 @@ class MSF_InitMeasurement : public MSF_MeasurementBase<EKFState_T> {
   template<int INDEX>
   const typename msf_tmp::StripReference<typename boost::fusion::result_of::at_c
   <StateSequence_T, INDEX >::type>::result_t::value_t&
-  getStateInitValue() const {
+  GetStateInitValue() const {
     return InitState.template get<INDEX>();
   }
 
-  virtual void apply(shared_ptr<EKFState_T> stateWithCovariance, MSF_Core<EKFState_T>& core);
+  virtual void Apply(shared_ptr<EKFState_T> stateWithCovariance, MSF_Core<EKFState_T>& core);
 };
 
-    /**
-     * \brief A comparator to sort measurements by time.
-     */
+/**
+* \brief A comparator to sort measurements by time.
+*/
 template<typename EKFState_T>
 class sortMeasurements {
  public:
@@ -233,11 +233,10 @@ class sortMeasurements {
    * Implements the sorting by time.
    */
   bool operator()(const MSF_MeasurementBase<EKFState_T>& lhs,
-                  const MSF_MeasurementBase<EKFState_T>&rhs) const {
+                  const MSF_MeasurementBase<EKFState_T>& rhs) const {
     return (lhs.time_ < rhs.time_);
   }
 };
-
 }
 
 #include <msf_core/implementation/msf_measurement_inl.h>

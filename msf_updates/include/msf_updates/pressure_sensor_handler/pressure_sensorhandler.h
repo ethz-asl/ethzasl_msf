@@ -34,20 +34,20 @@ class PressureSensorHandler : public msf_core::SensorHandler<
   Eigen::Matrix<double, 1, 1> z_average_p;  ///<Averaged pressure measurement.
   double heightbuff[heightbuffsize];
   ros::Subscriber subPressure_;
-  void measurementCallback(const asctec_hl_comm::mav_imuConstPtr & msg);
+  void MeasurementCallback(const asctec_hl_comm::mav_imuConstPtr & msg);
  public:
   PressureSensorHandler(
       msf_core::MSF_SensorManager<msf_updates::EKFState>& meas,
       std::string topic_namespace, std::string parameternamespace);
   // Used for the init.
-  Eigen::Matrix<double, 1, 1> getPressureMeasurement() {
+  Eigen::Matrix<double, 1, 1> GetPressureMeasurement() {
     return z_p_;
   }
-  Eigen::Matrix<double, 1, 1> getAveragedPressureMeasurement() {
+  Eigen::Matrix<double, 1, 1> GetAveragedPressureMeasurement() {
     return z_average_p;
   }
   // Setters for configure values.
-  void setNoises(double n_zp);
+  void SetNoises(double n_zp);
 };
 }
 #include "implementation/pressure_sensorhandler.hpp"

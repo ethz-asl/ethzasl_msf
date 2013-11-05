@@ -1,5 +1,5 @@
 scale_init: 1
-data_playback: true
+GetDataPlaybackStatus: true
 
 core/core_fixed_bias: 0
 

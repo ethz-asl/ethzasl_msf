@@ -76,23 +76,23 @@ TEST(CompileTimeComputation, stateIndexCalculation) {
   typedef GenericState_T<fullState_T> EKFState;
 
   EKFState somestate;
-  static const int idxstartcorr1 = msf_tmp::getStartIndex<fullState_T, StateVar_T<Eigen::Matrix<double, vectorlength1, 1>, a >, msf_tmp::CorrectionStateLengthForType>::value;
-  static const int idxstartstate1 = msf_tmp::getStartIndex<fullState_T, StateVar_T<Eigen::Matrix<double, vectorlength1, 1>, a >, msf_tmp::StateLengthForType>::value;
+  static const int idxstartcorr1 = msf_tmp::GetStartIndex<fullState_T, StateVar_T<Eigen::Matrix<double, vectorlength1, 1>, a >, msf_tmp::CorrectionStateLengthForType>::value;
+  static const int idxstartstate1 = msf_tmp::GetStartIndex<fullState_T, StateVar_T<Eigen::Matrix<double, vectorlength1, 1>, a >, msf_tmp::StateLengthForType>::value;
   ASSERT_EQ(idxstartcorr1, 0);
   ASSERT_EQ(idxstartstate1, 0);
 
-  static const int idxstartcorr2 = msf_tmp::getStartIndex<fullState_T, StateVar_T<Eigen::Quaterniond, b >, msf_tmp::CorrectionStateLengthForType>::value;
-  static const int idxstartstate2 = msf_tmp::getStartIndex<fullState_T, StateVar_T<Eigen::Quaterniond, b >, msf_tmp::StateLengthForType>::value;
+  static const int idxstartcorr2 = msf_tmp::GetStartIndex<fullState_T, StateVar_T<Eigen::Quaterniond, b >, msf_tmp::CorrectionStateLengthForType>::value;
+  static const int idxstartstate2 = msf_tmp::GetStartIndex<fullState_T, StateVar_T<Eigen::Quaterniond, b >, msf_tmp::StateLengthForType>::value;
   ASSERT_EQ(idxstartcorr2, vectorlength1);
   ASSERT_EQ(idxstartstate2, vectorlength1);
 
-  static const int idxstartcorr3 = msf_tmp::getStartIndex<fullState_T, StateVar_T<Eigen::Matrix<double, 1, 1>, c >, msf_tmp::CorrectionStateLengthForType>::value;
-  static const int idxstartstate3 = msf_tmp::getStartIndex<fullState_T, StateVar_T<Eigen::Matrix<double, 1, 1>, c >, msf_tmp::StateLengthForType>::value;
+  static const int idxstartcorr3 = msf_tmp::GetStartIndex<fullState_T, StateVar_T<Eigen::Matrix<double, 1, 1>, c >, msf_tmp::CorrectionStateLengthForType>::value;
+  static const int idxstartstate3 = msf_tmp::GetStartIndex<fullState_T, StateVar_T<Eigen::Matrix<double, 1, 1>, c >, msf_tmp::StateLengthForType>::value;
   ASSERT_EQ(idxstartcorr3, vectorlength1 + 3);
   ASSERT_EQ(idxstartstate3, vectorlength1 + 4);
 
-  static const int idxstartcorr4 = msf_tmp::getStartIndex<fullState_T, StateVar_T<Eigen::Matrix<double, vectorlength2, 1>, d >, msf_tmp::CorrectionStateLengthForType>::value;
-  static const int idxstartstate4 = msf_tmp::getStartIndex<fullState_T, StateVar_T<Eigen::Matrix<double, vectorlength2, 1>, d >, msf_tmp::StateLengthForType>::value;
+  static const int idxstartcorr4 = msf_tmp::GetStartIndex<fullState_T, StateVar_T<Eigen::Matrix<double, vectorlength2, 1>, d >, msf_tmp::CorrectionStateLengthForType>::value;
+  static const int idxstartstate4 = msf_tmp::GetStartIndex<fullState_T, StateVar_T<Eigen::Matrix<double, vectorlength2, 1>, d >, msf_tmp::StateLengthForType>::value;
   ASSERT_EQ(idxstartcorr4, vectorlength1 + 3 + 1);
   ASSERT_EQ(idxstartstate4, vectorlength1 + 4 + 1);
 
@@ -172,7 +172,7 @@ TEST(RuntimeTimeComputation, copyForNonPropagationStates) {
 
   boost::fusion::for_each(
       first_state.statevars_,
-      msf_tmp::copyNonPropagationStates<EKFState>(second_state)
+      msf_tmp::CopyNonPropagationStates<EKFState>(second_state)
   );
 
   ASSERT_DOUBLE_EQ(first_state.get<msf_core::p_>().state_(0), second_state.get<msf_core::p_>().state_(0));
@@ -219,7 +219,7 @@ int main(int argc, char** argv) {
   Eigen::Matrix<double, msf_core::EKFState::nErrorStatesAtCompileTime, 1> correction;
   std::cout << "passing random correction vector" << std::endl;
   correction.setRandom();
-  somestate.correct(correction);
+  somestate.Correct(correction);
 
 #if (WITHTESTS == 1)
   testing::InitGoogleTest(&argc, argv);

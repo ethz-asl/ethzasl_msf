@@ -25,11 +25,11 @@ int main(int argc, char** argv) {
   std::cout << "index of best non temporal drifting state "
       << msf_tmp::IndexOfBestNonTemporalDriftingState<msf_core::fullState_T>::value
       << std::endl;
-  typedef typename msf_tmp::getEnumStateType<msf_core::fullState_T,
+  typedef typename msf_tmp::GetEnumStateType<msf_core::fullState_T,
       msf_tmp::IndexOfBestNonTemporalDriftingState<msf_core::fullState_T>::value>::value nonDriftingStateType;
 
   const bool isquaternion =
-      msf_tmp::isQuaternionType<
+      msf_tmp::IsQuaternionType<
           typename msf_tmp::StripConstReference<nonDriftingStateType>::result_t>::value;
 
 //
@@ -39,11 +39,11 @@ int main(int argc, char** argv) {
 //	BOOST_MPL_ASSERT((boost::is_same<msf_tmp::StripConstReference<boost::fusion::result_of::at_c<vec, 1>::type>::result_t, float>));
 //
 //	//counting and index calculation
-//	static const int idxstartcorr_p_ = msf_tmp::getStartIndex<msf_core::fullState_T, msf_tmp::getEnumStateType<msf_core::fullState_T, msf_core::p_>::value, msf_tmp::CorrectionStateLengthForType>::value;
-//	static const int idxstartcorr_v_ = msf_tmp::getStartIndex<msf_core::fullState_T, msf_tmp::getEnumStateType<msf_core::fullState_T, msf_core::v_>::value, msf_tmp::CorrectionStateLengthForType>::value;
-//	static const int idxstartcorr_q_ = msf_tmp::getStartIndex<msf_core::fullState_T, msf_tmp::getEnumStateType<msf_core::fullState_T, msf_core::q_>::value, msf_tmp::CorrectionStateLengthForType>::value;
-//	static const int idxstartcorr_b_w_ = msf_tmp::getStartIndex<msf_core::fullState_T, msf_tmp::getEnumStateType<msf_core::fullState_T, msf_core::b_w_>::value, msf_tmp::CorrectionStateLengthForType>::value;
-//	static const int idxstartcorr_b_a_ = msf_tmp::getStartIndex<msf_core::fullState_T, msf_tmp::getEnumStateType<msf_core::fullState_T, msf_core::b_a_>::value, msf_tmp::CorrectionStateLengthForType>::value;
+//	static const int idxstartcorr_p_ = msf_tmp::GetStartIndex<msf_core::fullState_T, msf_tmp::GetEnumStateType<msf_core::fullState_T, msf_core::p_>::value, msf_tmp::CorrectionStateLengthForType>::value;
+//	static const int idxstartcorr_v_ = msf_tmp::GetStartIndex<msf_core::fullState_T, msf_tmp::GetEnumStateType<msf_core::fullState_T, msf_core::v_>::value, msf_tmp::CorrectionStateLengthForType>::value;
+//	static const int idxstartcorr_q_ = msf_tmp::GetStartIndex<msf_core::fullState_T, msf_tmp::GetEnumStateType<msf_core::fullState_T, msf_core::q_>::value, msf_tmp::CorrectionStateLengthForType>::value;
+//	static const int idxstartcorr_b_w_ = msf_tmp::GetStartIndex<msf_core::fullState_T, msf_tmp::GetEnumStateType<msf_core::fullState_T, msf_core::b_w_>::value, msf_tmp::CorrectionStateLengthForType>::value;
+//	static const int idxstartcorr_b_a_ = msf_tmp::GetStartIndex<msf_core::fullState_T, msf_tmp::GetEnumStateType<msf_core::fullState_T, msf_core::b_a_>::value, msf_tmp::CorrectionStateLengthForType>::value;
 //
 //	std::cout<<"idxstartcorr_p_ "<<idxstartcorr_p_<<std::endl;
 //	std::cout<<"idxstartcorr_v_ "<<idxstartcorr_v_<<std::endl;

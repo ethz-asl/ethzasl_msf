@@ -17,7 +17,7 @@
 #ifndef MSF_STATE_H_
 #define MSF_STATE_H_
 
-#include <msf_core/msf_types.hpp>
+#include <msf_core/msf_types.h>
 #include <msf_core/msf_tmp.h>
 #include <msf_core/msf_statevisitor.h>
 #include <Eigen/Dense>
@@ -81,7 +81,7 @@ struct GenericState_T {
 
   friend class msf_core::MSF_Core<
       GenericState_T<StateSequence_T, StateDefinition_T> >;
-  friend struct msf_core::copyNonPropagationStates<GenericState_T>;
+  friend struct msf_core::CopyNonPropagationStates<GenericState_T>;
   friend class msf_core::MSF_InitMeasurement<
       GenericState_T<StateSequence_T, StateDefinition_T> >;
 
@@ -97,8 +97,8 @@ struct GenericState_T {
         msf_tmp::CoreStateLengthForType>::value,  ///<N total core states.
     nPropagatedCoreStatesAtCompileTime = msf_tmp::CountStates<StateSequence_T,
         msf_tmp::PropagatedCoreStateLengthForType>::value,  ///<N total core states with propagation.
-    nPropagatedCoreErrorStatesAtCompileTime = msf_tmp::CountStates<
-        StateSequence_T, msf_tmp::PropagatedCoreErrorStateLengthForType>::value  ///<N total error states with propagation.
+    nPropagatedCoreErrorStatesAtCompileTime = msf_tmp::CountStates< ///<N total error states with propagation.
+        StateSequence_T, msf_tmp::PropagatedCoreErrorStateLengthForType>::value
   };
 
  private:
@@ -110,7 +110,7 @@ struct GenericState_T {
    */
   template<int INDEX>
   inline typename boost::fusion::result_of::at_c<StateSequence_T, INDEX>::type
-  getStateVar();
+  GetStateVariable();
 
   /**
    * \brief Returns the state at position INDEX in the state list, non const
@@ -119,8 +119,9 @@ struct GenericState_T {
    */
   template<int INDEX>
   inline typename msf_tmp::StripReference<
-      typename boost::fusion::result_of::at_c<StateSequence_T, INDEX>::type>::result_t::value_t&
-  get();
+      typename boost::fusion::result_of::at_c<StateSequence_T, INDEX>::type>::
+      result_t::value_t&
+  Get();
 
  public:
 
@@ -146,13 +147,13 @@ struct GenericState_T {
     P.setZero();
     Qd.setZero();
     Fd.setIdentity();
-    reset();
+    Reset();
   }
 
   /**
    * \brief Apply the correction vector to all state vars.
    */
-  inline void correct(
+  inline void Correct(
       const Eigen::Matrix<double, nErrorStatesAtCompileTime, 1>& correction);
 
   /**
@@ -161,8 +162,9 @@ struct GenericState_T {
    */
   template<int INDEX>
   inline typename msf_tmp::StripReference<
-      typename boost::fusion::result_of::at_c<StateSequence_T, INDEX>::type>::result_t::Q_T&
-  getQBlock();
+      typename boost::fusion::result_of::at_c<StateSequence_T, INDEX>::type>::
+      result_t::Q_T&
+  GetQBlock();
 
   /**
    * \brief Returns the Q-block of the state at position INDEX in the state list,
@@ -170,8 +172,9 @@ struct GenericState_T {
    */
   template<int INDEX>
   inline const typename msf_tmp::StripReference<
-      typename boost::fusion::result_of::at_c<StateSequence_T, INDEX>::type>::result_t::Q_T&
-  getQBlock() const;
+      typename boost::fusion::result_of::at_c<StateSequence_T, INDEX>::type>::
+      result_t::Q_T&
+  GetQBlock() const;
 
   /**
    * \brief Reset the state
@@ -181,60 +184,61 @@ struct GenericState_T {
    * time:0;
    * Error covariance: zeros.
    */
-  void reset(
-      msf_core::StateVisitor<GenericState_T<StateSequence_T, StateDefinition_T> >* usercalc =
-          nullptr);
+  void Reset(
+      msf_core::StateVisitor<GenericState_T<StateSequence_T,
+                                            StateDefinition_T> >*
+                                            GetUserCalc = nullptr);
 
   /**
    * \brief Write the covariance corresponding to position and attitude to cov.
    */
-  void getPoseCovariance(
+  void GetPoseCovariance(
       geometry_msgs::PoseWithCovariance::_covariance_type & cov);
 
   /**
    * \brief Assembles a PoseWithCovarianceStamped message from the state.
    * \note It does not set the header.
    */
-  void toPoseMsg(geometry_msgs::PoseWithCovarianceStamped & pose);
+  void ToPoseMsg(geometry_msgs::PoseWithCovarianceStamped & pose);
 
   /**
    * \brief Assemble an ExtState message from the state.
    * \note It does not set the header.
    */
-  void toExtStateMsg(sensor_fusion_comm::ExtState & state);
+  void ToExtStateMsg(sensor_fusion_comm::ExtState & state);
 
   /***
    * \brief Assemble a DoubleArrayStamped message from the state.
    * \note It does not set the header.
    */
-  void toFullStateMsg(sensor_fusion_comm::DoubleArrayStamped & state);
+  void ToFullStateMsg(sensor_fusion_comm::DoubleArrayStamped & state);
 
   /**
    * \brief Assembles a DoubleArrayStamped message from the state.
    * \note It does not set the header
    */
-  void toCoreStateMsg(sensor_fusion_comm::DoubleArrayStamped & state);
+  void ToCoreStateMsg(sensor_fusion_comm::DoubleArrayStamped & state);
 
   /**
    * \brief Returns all values as an eigen vector.
    */
-  Eigen::Matrix<double, nCoreStatesAtCompileTime, 1> toEigenVector();
+  Eigen::Matrix<double, nCoreStatesAtCompileTime, 1> ToEigenVector();
 
   /**
    * Returns a vector of int pairs with enum index in errorstate and numblocks.
    */
-  void calculateIndicesInErrorState(
+  void CalculateIndicesInErrorState(
       std::vector<std::tuple<int, int, int> >& vec);
 
   /**
    * \brief Returns a string describing the state.
    */
-  std::string print();
+  std::string Print();
 
   /**
    * \brief Returns whether the state is sane. No NaN no inf.
    */
-  bool checkStateForNumeric();
+  bool CheckStateForNumeric();
 
   /**
    * \brief Returns the state at position INDEX in the state list, const
@@ -242,8 +246,9 @@ struct GenericState_T {
    */
   template<int INDEX>
   inline const typename msf_tmp::StripReference<
-      typename boost::fusion::result_of::at_c<StateSequence_T, INDEX>::type>::result_t::value_t&
-  get() const;
+      typename boost::fusion::result_of::at_c<StateSequence_T, INDEX>::type>::
+      result_t::value_t&
+  Get() const;
 
   /**
    * \brief Returns the stateVar at position INDEX in the state list,
@@ -252,7 +257,7 @@ struct GenericState_T {
   template<int INDEX>
   inline typename msf_tmp::AddConstReference<
       typename boost::fusion::result_of::at_c<StateSequence_T, INDEX>::type>::result_t
-  getStateVar() const;
+  GetStateVariable() const;
 
   /**
    * \brief Sets state at position INDEX in the state list, fails for core
@@ -260,15 +265,16 @@ struct GenericState_T {
    */
   template<int INDEX>
   inline void
-  set(const typename msf_tmp::StripConstReference<
-      typename boost::fusion::result_of::at_c<StateSequence_T, INDEX>::type>::result_t::value_t& newvalue);
+  Set(const typename msf_tmp::StripConstReference<
+      typename boost::fusion::result_of::at_c<StateSequence_T, INDEX>::type>::
+      result_t::value_t& newvalue);
 
   /*
    * Clears the crosscovariance entries of a given state in P
    */
   template<int INDEX>
   inline void
-  clearCrossCov();
+  ClearCrossCov();
 
 };
 

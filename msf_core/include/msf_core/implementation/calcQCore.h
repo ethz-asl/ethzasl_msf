@@ -27,7 +27,7 @@
  */
 template<typename StateSequence_T, typename StateDefinition_T, class Derived,
     class DerivedQ>
-void calc_QCore(const double dt, const Eigen::Quaternion<double> & q,
+void CalcQCore(const double dt, const Eigen::Quaternion<double> & q,
                 const Eigen::MatrixBase<Derived> & ew,
                 const Eigen::MatrixBase<Derived> & ea,
                 const Eigen::MatrixBase<Derived> & n_a,
@@ -379,15 +379,15 @@ void calc_QCore(const double dt, const Eigen::Quaternion<double> & q,
   const double t663 = t343 * t376 * t400 * (1.0 / 2.0);
 
   enum {
-    idxstartcorr_p = msf_tmp::getStartIndexInCorrection<StateSequence_T,
+    idxstartcorr_p = msf_tmp::GetStartIndexInCorrection<StateSequence_T,
         StateDefinition_T::p>::value,
-    idxstartcorr_v = msf_tmp::getStartIndexInCorrection<StateSequence_T,
+    idxstartcorr_v = msf_tmp::GetStartIndexInCorrection<StateSequence_T,
         StateDefinition_T::v>::value,
-    idxstartcorr_q = msf_tmp::getStartIndexInCorrection<StateSequence_T,
+    idxstartcorr_q = msf_tmp::GetStartIndexInCorrection<StateSequence_T,
         StateDefinition_T::q>::value,
-    idxstartcorr_b_w = msf_tmp::getStartIndexInCorrection<StateSequence_T,
+    idxstartcorr_b_w = msf_tmp::GetStartIndexInCorrection<StateSequence_T,
         StateDefinition_T::b_w>::value,
-    idxstartcorr_b_a = msf_tmp::getStartIndexInCorrection<StateSequence_T,
+    idxstartcorr_b_a = msf_tmp::GetStartIndexInCorrection<StateSequence_T,
         StateDefinition_T::b_a>::value
   };
 

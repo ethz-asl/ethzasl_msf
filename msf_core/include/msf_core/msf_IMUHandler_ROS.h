@@ -35,22 +35,22 @@ class IMUHandler_ROS : public IMUHandler<EKFState_T> {
 
     ros::NodeHandle nh(topic_namespace);
 
-    subImu_ = nh.subscribe("imu_state_input", 100, &IMUHandler_ROS::imuCallback,
+    subImu_ = nh.subscribe("imu_state_input", 100, &IMUHandler_ROS::IMUCallback,
                            this);
     subImuCustom_ = nh.subscribe("imu_state_input_asctec", 10,
-                                 &IMUHandler_ROS::imuCallback_asctec, this);
+                                 &IMUHandler_ROS::IMUCallbackAsctec, this);
     subState_ = nh.subscribe("hl_state_input", 10,
-                             &IMUHandler_ROS::stateCallback, this);
+                             &IMUHandler_ROS::StateCallback, this);
   }
 
   virtual ~IMUHandler_ROS() {
   }
   ;
 
-  void stateCallback(const sensor_fusion_comm::ExtEkfConstPtr & msg) {
+  void StateCallback(const sensor_fusion_comm::ExtEkfConstPtr & msg) {
 
     static_cast<MSF_SensorManagerROS<EKFState_T>&>(this->manager_)
-        .setHLStateBuffer(*msg);
+        .SetHLControllerStateBuffer(*msg);
 
     //get the imu values
     msf_core::Vector3 linacc;
@@ -63,12 +63,12 @@ class IMUHandler_ROS : public IMUHandler<EKFState_T> {
 
     int32_t flag = msg->flag;
     //make sure we tell the HL to ignore if data playback is on
-    if (this->manager_.data_playback())
+    if (this->manager_.GetDataPlaybackStatus())
       flag = sensor_fusion_comm::ExtEkf::ignore_state;
 
     bool isnumeric = true;
     if (flag == sensor_fusion_comm::ExtEkf::current_state) {
-      isnumeric = checkForNumeric(
+      isnumeric = CheckForNumeric(
           Eigen::Map<const Eigen::Matrix<float, 10, 1> >(msg->state.data()),
           "before prediction p,v,q");
     }
@@ -90,11 +90,11 @@ class IMUHandler_ROS : public IMUHandler<EKFState_T> {
       is_already_propagated = true;
     }
 
-    this->process_state(linacc, angvel, p, v, q, is_already_propagated,
+    this->ProcessState(linacc, angvel, p, v, q, is_already_propagated,
                         msg->header.stamp.toSec(), msg->header.seq);
   }
 
-  void imuCallback_asctec(const asctec_hl_comm::mav_imuConstPtr & msg) {
+  void IMUCallbackAsctec(const asctec_hl_comm::mav_imuConstPtr & msg) {
 
     msf_core::Vector3 linacc;
     linacc << msg->acceleration.x, msg->acceleration.y, msg->acceleration.z;
@@ -103,12 +103,12 @@ class IMUHandler_ROS : public IMUHandler<EKFState_T> {
     angvel << msg->angular_velocity.x, msg->angular_velocity.y, msg
         ->angular_velocity.z;
 
-    this->process_imu(linacc, angvel, msg->header.stamp.toSec(),
+    this->ProcessIMU(linacc, angvel, msg->header.stamp.toSec(),
                       msg->header.seq);
 
   }
 
-  void imuCallback(const sensor_msgs::ImuConstPtr & msg) {
+  void IMUCallback(const sensor_msgs::ImuConstPtr & msg) {
     static int lastseq = -1;
     if ((int) msg->header.seq != lastseq + 1 && lastseq != -1) {
       MSF_WARN_STREAM(
@@ -125,11 +125,11 @@ class IMUHandler_ROS : public IMUHandler<EKFState_T> {
     angvel << msg->angular_velocity.x, msg->angular_velocity.y, msg
         ->angular_velocity.z;
 
-    this->process_imu(linacc, angvel, msg->header.stamp.toSec(),
+    this->ProcessIMU(linacc, angvel, msg->header.stamp.toSec(),
                       msg->header.seq);
   }
 
-  virtual bool initialize() {
+  virtual bool Initialize() {
     return true;
   }
 };

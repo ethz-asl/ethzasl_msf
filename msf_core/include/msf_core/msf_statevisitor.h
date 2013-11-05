@@ -28,7 +28,7 @@ class StateVisitor {
    * \brief The state is set to zero/identity, this method will be called to
    * give the user the possibility to change the reset values of some states.
    */
-  virtual void resetState(EKFState_T& state) const = 0;
+  virtual void ResetState(EKFState_T& state) const = 0;
   virtual ~StateVisitor() {
   }
   ;

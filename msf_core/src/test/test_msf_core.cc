@@ -20,8 +20,8 @@ int main(int argc, char** argv) {
 //just to instantiate all templates, no production code
 
 //	ros::init(argc, argv, "msf_core");
-//	shared_ptr<msf_core::MSF_SensorManager> usercalcs(new msf_core::MSF_InitMeasurement(true));
-//	msf_core::MSF_Core core(usercalcs);
+//	shared_ptr<msf_core::MSF_SensorManager> GetUserCalcs(new msf_core::MSF_InitMeasurement(true));
+//	msf_core::MSF_Core core(GetUserCalcs);
 
 //	ros::spin();
 }

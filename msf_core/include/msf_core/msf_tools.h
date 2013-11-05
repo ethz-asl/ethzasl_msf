@@ -25,11 +25,11 @@ namespace msf_core {
  * Computes the median of a given vector.
  */
 template<typename D>
-typename Eigen::MatrixBase<D>::Scalar getMedian(
+typename Eigen::MatrixBase<D>::Scalar GetMedian(
     const Eigen::MatrixBase<D> & data) {
   static_assert(
       (Eigen::MatrixBase<D>::ColsAtCompileTime == 1),
-      "getMedian only takes Eigen column vectors as arguments");
+      "GetMedian only takes Eigen column vectors as arguments");
   Eigen::Matrix<typename Eigen::MatrixBase<D>::Scalar,
       Eigen::MatrixBase<D>::RowsAtCompileTime,
       // Copy so we don't sort the original vector.

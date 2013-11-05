@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 #include <msf_core/eigen_utils.h>
-#include <msf_core/msf_types.hpp>
+#include <msf_core/msf_types.h>
 
 namespace msf_pose_sensor {
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
@@ -61,12 +61,13 @@ PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PoseSensorHandler(
 
   ros::NodeHandle nh("msf_updates/" + topic_namespace);
   subPoseWithCovarianceStamped_ =
-      nh.subscribe < geometry_msgs::PoseWithCovarianceStamped
-          > ("pose_with_covariance_input", 20, &PoseSensorHandler::measurementCallback, this);
-  subTransformStamped_ = nh.subscribe < geometry_msgs::TransformStamped
-      > ("transform_input", 20, &PoseSensorHandler::measurementCallback, this);
-  subPoseStamped_ = nh.subscribe < geometry_msgs::PoseStamped
-      > ("pose_input", 20, &PoseSensorHandler::measurementCallback, this);
+      nh.subscribe<geometry_msgs::PoseWithCovarianceStamped>
+      ("pose_with_covariance_input", 20,
+       &PoseSensorHandler::MeasurementCallback, this);
+  subTransformStamped_ = nh.subscribe<geometry_msgs::TransformStamped>
+      ("transform_input", 20, &PoseSensorHandler::MeasurementCallback, this);
+  subPoseStamped_ = nh.subscribe<geometry_msgs::PoseStamped>
+      ("pose_input", 20, &PoseSensorHandler::MeasurementCallback, this);
 
   z_p_.setZero();
   z_q_.setIdentity();
@@ -104,14 +105,14 @@ PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PoseSensorHandler(
 }
 
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
-void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::setNoises(double n_zp,
+void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::SetNoises(double n_zp,
                                                                   double n_zq) {
   n_zp_ = n_zp;
   n_zq_ = n_zq;
 }
 
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
-void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::setDelay(double delay) {
+void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::SetDelay(double delay) {
   delay_ = delay;
 }
 
@@ -130,19 +131,19 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
   MANAGER_TYPE* mngr = dynamic_cast<MANAGER_TYPE*>(&manager_);
 
   if (mngr) {
-    if (mngr->getcfg().pose_fixed_scale) {
+    if (mngr->Getcfg().pose_fixed_scale) {
       fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::L;
     }
-    if (mngr->getcfg().pose_fixed_p_ic) {
+    if (mngr->Getcfg().pose_fixed_p_ic) {
       fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::p_ic;
     }
-    if (mngr->getcfg().pose_fixed_q_ic) {
+    if (mngr->Getcfg().pose_fixed_q_ic) {
       fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::q_ic;
     }
-    if (mngr->getcfg().pose_fixed_p_wv) {
+    if (mngr->Getcfg().pose_fixed_p_wv) {
       fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::p_wv;
     }
-    if (mngr->getcfg().pose_fixed_q_wv) {
+    if (mngr->Getcfg().pose_fixed_q_wv) {
       fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::q_wv;
     }
   }
@@ -153,31 +154,30 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
                            provides_absolute_measurements_, this->sensorID,
                            fixedstates, distorter_));
 
-  meas->makeFromSensorReading(msg, msg->header.stamp.toSec() - delay_);
+  meas->MakeFromSensorReading(msg, msg->header.stamp.toSec() - delay_);
 
   z_p_ = meas->z_p_;  //store this for the init procedure
   z_q_ = meas->z_q_;
 
-  this->manager_.msf_core_->addMeasurement(meas);
+  this->manager_.msf_core_->AddMeasurement(meas);
 }
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
-void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(
+void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
     const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg) {
 
-  this->sequenceWatchDog(msg->header.seq,
+  this->SequenceWatchDog(msg->header.seq,
                          subPoseWithCovarianceStamped_.getTopic());
   MSF_INFO_STREAM_ONCE(
       "*** pose sensor got first measurement from topic "
           << this->topic_namespace_ << "/"
           << subPoseWithCovarianceStamped_.getTopic() << " ***");
   ProcessPoseMeasurement(msg);
-
 }
 
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
-void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(
+void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
     const geometry_msgs::TransformStampedConstPtr & msg) {
-  this->sequenceWatchDog(msg->header.seq, subTransformStamped_.getTopic());
+  this->SequenceWatchDog(msg->header.seq, subTransformStamped_.getTopic());
   MSF_INFO_STREAM_ONCE(
       "*** pose sensor got first measurement from topic "
           << this->topic_namespace_ << "/" << subTransformStamped_.getTopic()
@@ -201,7 +201,7 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(
     return;
   }
 
-  // Fixed covariance will be set in measurement class -> makeFromSensorReadingImpl.
+  // Fixed covariance will be set in measurement class -> MakeFromSensorReadingImpl.
   pose->header = msg->header;
 
   pose->pose.pose.position.x = msg->transform.translation.x;
@@ -217,9 +217,9 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(
 }
 
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
-void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(
+void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
     const geometry_msgs::PoseStampedConstPtr & msg) {
-  this->sequenceWatchDog(msg->header.seq, subPoseStamped_.getTopic());
+  this->SequenceWatchDog(msg->header.seq, subPoseStamped_.getTopic());
   MSF_INFO_STREAM_ONCE(
       "*** pose sensor got first measurement from topic "
           << this->topic_namespace_ << "/" << subPoseStamped_.getTopic()
@@ -237,7 +237,7 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::measurementCallback(
     return;
   }
 
-  // Fixed covariance will be set in measurement class -> makeFromSensorReadingImpl.
+  // Fixed covariance will be set in measurement class -> MakeFromSensorReadingImpl.
 
   pose->header = msg->header;
 

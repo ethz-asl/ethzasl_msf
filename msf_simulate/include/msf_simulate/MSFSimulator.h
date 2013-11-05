@@ -66,9 +66,9 @@ void MSFSimulator::getMotion(MotionVector& motion_out) {
     msf_updates::EKFStatePtr state(new msf_updates::EKFState);
 
     //copy simulated values to state variable
-    state->set<msf_updates::StateDefinition::p>(mavstate.p);
-    state->set<msf_updates::StateDefinition::v>(mavstate.v);
-    state->set<msf_updates::StateDefinition::q>(mavstate.q);
+    state->Set<msf_updates::StateDefinition::p>(mavstate.p);
+    state->Set<msf_updates::StateDefinition::v>(mavstate.v);
+    state->Set<msf_updates::StateDefinition::q>(mavstate.q);
     state->time = dt * i;
 
     //create noise

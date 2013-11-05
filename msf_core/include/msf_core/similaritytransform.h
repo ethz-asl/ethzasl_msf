@@ -24,7 +24,7 @@
 #include <Eigen/Geometry>
 #include <limits>
 
-#include <msf_core/msf_types.hpp>
+#include <msf_core/msf_types.h>
 #include <msf_core/eigen_utils.h>
 
 /// Defines the start row and col for the covariance entries in
@@ -41,12 +41,12 @@ enum {
 namespace msf_core {
 
 /// Converts a geometry_msgs::Point to an Eigen Vector3d.
-inline Vector3 geometry_msgsToEigen(const geometry_msgs::Point & p) {
+inline Vector3 GeometryMsgsToEigen(const geometry_msgs::Point & p) {
   return (Vector3() << p.x, p.y, p.z).finished();
 }
 
 /// Converts a geometry_msgs::Quaternion to an Eigen::Quaterniond.
-inline Eigen::Quaterniond geometry_msgsToEigen(
+inline Eigen::Quaterniond GeometryMsgsToEigen(
     const geometry_msgs::Quaternion & q) {
   return Eigen::Quaterniond(q.w, q.x, q.y, q.z);
 }
@@ -62,7 +62,7 @@ inline Eigen::Quaterniond geometry_msgsToEigen(
  * and geometry_msgs::cov::q \endcode .
  * \return 3x3 Eigen::Matrix covariance block.
  */
-inline Matrix3 geometry_msgsCovBlockToEigen(
+inline Matrix3 GeometryMsgsCovBlockToEigen(
     const geometry_msgs::PoseWithCovariance::_covariance_type & gcov,
     int start_row, int start_col) {
   Eigen::Map<const Matrix6> cov(gcov.data());
@@ -81,7 +81,7 @@ inline Matrix3 geometry_msgsCovBlockToEigen(
  * and geometry_msgs::cov::q \endcode
  */
 template<class Derived>
-inline void eigenCovBlockToGeometry_msgs(
+inline void EigenCovBlockToGeometryMsgs(
     geometry_msgs::PoseWithCovariance::_covariance_type & gcov,
     const Eigen::MatrixBase<Derived> &ecov, int start_row, int start_col) {
   EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(Derived, 3, 3)
@@ -95,7 +95,7 @@ inline void eigenCovBlockToGeometry_msgs(
 
 /// Converts any eigen vector with 3 elements to a geometry_msgs::Point.
 template<class Derived>
-inline geometry_msgs::Point eigenToGeometry_msgs(
+inline geometry_msgs::Point EigenToGeometryMsgs(
     const Eigen::MatrixBase<Derived> & p) {
   EIGEN_STATIC_ASSERT_VECTOR_ONLY (Derived);
   assert(p.size() == 3);
@@ -108,7 +108,7 @@ inline geometry_msgs::Point eigenToGeometry_msgs(
 }
 
 /// Converts an Eigen::Quaterniond to a geometry_msgs::Quaternion.
-inline geometry_msgs::Quaternion eigenToGeometry_msgs(
+inline geometry_msgs::Quaternion EigenToGeometryMsgs(
     const Eigen::Quaterniond & q) {
   geometry_msgs::Quaternion _q;
   _q.w = q.w();
@@ -133,10 +133,10 @@ class From6DoF {
  public:
   From6DoF();
   /// Adds a pair of measurements. No other computation is performed.
-  void addMeasurement(const PosePair & measurement);
+  void AddMeasurement(const PosePair & measurement);
 
   /// Adds a pair of measurements. No other computation is performed.
-  void addMeasurement(const Pose & pose1, const Pose & pose2);
+  void AddMeasurement(const Pose & pose1, const Pose & pose2);
 
   /**
    * \brief computes the average similarity transform
@@ -148,7 +148,7 @@ class From6DoF {
    * \param[in] eps in case of badly posed problems, eps can be set for the
    * Moore-Penrose pseudo inverse
    */
-  bool compute(Pose & pose, double *scale = nullptr , double *cond = nullptr ,
+  bool Compute(Pose & pose, double *scale = nullptr , double *cond = nullptr ,
                double eps = std::numeric_limits<double>::epsilon() * 4 * 4);
  private:
   PosePairVector measurements_;

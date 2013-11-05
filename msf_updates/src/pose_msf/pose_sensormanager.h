@@ -53,17 +53,17 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
     pose_handler_.reset(
         new PoseSensorHandler_T(*this, "", "pose_sensor", distortmeas));
 
-    addHandler(pose_handler_);
+    AddHandler(pose_handler_);
 
     reconf_server_.reset(new ReconfigureServer(pnh));
-    ReconfigureServer::CallbackType f = boost::bind(&PoseSensorManager::config,
+    ReconfigureServer::CallbackType f = boost::bind(&PoseSensorManager::Config,
                                                     this, _1, _2);
     reconf_server_->setCallback(f);
   }
   virtual ~PoseSensorManager() {
   }
 
-  virtual const Config_T& getcfg() {
+  virtual const Config_T& Getcfg() {
     return config_;
   }
 
@@ -77,20 +77,20 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
   /**
    * \brief Dynamic reconfigure callback.
    */
-  virtual void config(Config_T &config, uint32_t level) {
+  virtual void Config(Config_T &config, uint32_t level) {
     config_ = config;
-    pose_handler_->setNoises(config.pose_noise_meas_p,
+    pose_handler_->SetNoises(config.pose_noise_meas_p,
                              config.pose_noise_meas_q);
-    pose_handler_->setDelay(config.pose_delay);
+    pose_handler_->SetDelay(config.pose_delay);
     if ((level & msf_updates::SinglePoseSensor_INIT_FILTER)
         && config.core_init_filter == true) {
-      init(config.pose_initial_scale);
+      Init(config.pose_initial_scale);
       config.core_init_filter = false;
     }
     // Init call with "set height" checkbox.
     if ((level & msf_updates::SinglePoseSensor_SET_HEIGHT)
         && config.core_set_height == true) {
-      Eigen::Matrix<double, 3, 1> p = pose_handler_->getPositionMeasurement();
+      Eigen::Matrix<double, 3, 1> p = pose_handler_->GetPositionMeasurement();
       if (p.norm() == 0) {
         MSF_WARN_STREAM(
             "No measurements received yet to initialize position. Height init "
@@ -98,12 +98,12 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
         return;
       }
       double scale = p[2] / config.core_height;
-      init(scale);
+      Init(scale);
       config.core_set_height = false;
     }
   }
 
-  void init(double scale) const {
+  void Init(double scale) const {
     Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ic, p_vc, p_wv;
     Eigen::Quaternion<double> q, q_wv, q_ic, q_cv;
     msf_core::MSF_Core<EKFState_T>::ErrorStateCov P;
@@ -122,8 +122,8 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
 
     P.setZero();  // Error state covariance; if zero, a default initialization in msf_core is used
 
-    p_vc = pose_handler_->getPositionMeasurement();
-    q_cv = pose_handler_->getAttitudeMeasurement();
+    p_vc = pose_handler_->GetPositionMeasurement();
+    q_cv = pose_handler_->GetAttitudeMeasurement();
 
     MSF_INFO_STREAM(
         "initial measurement pos:["<<p_vc.transpose()<<"] orientation: "<<STREAMQUAT(q_cv));
@@ -163,40 +163,40 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
     shared_ptr < msf_core::MSF_InitMeasurement<EKFState_T>
         > meas(new msf_core::MSF_InitMeasurement<EKFState_T>(true));
 
-    meas->setStateInitValue<StateDefinition_T::p>(p);
-    meas->setStateInitValue<StateDefinition_T::v>(v);
-    meas->setStateInitValue<StateDefinition_T::q>(q);
-    meas->setStateInitValue<StateDefinition_T::b_w>(b_w);
-    meas->setStateInitValue<StateDefinition_T::b_a>(b_a);
-    meas->setStateInitValue<StateDefinition_T::L>(
+    meas->SetStateInitValue<StateDefinition_T::p>(p);
+    meas->SetStateInitValue<StateDefinition_T::v>(v);
+    meas->SetStateInitValue<StateDefinition_T::q>(q);
+    meas->SetStateInitValue<StateDefinition_T::b_w>(b_w);
+    meas->SetStateInitValue<StateDefinition_T::b_a>(b_a);
+    meas->SetStateInitValue<StateDefinition_T::L>(
         Eigen::Matrix<double, 1, 1>::Constant(scale));
-    meas->setStateInitValue<StateDefinition_T::q_wv>(q_wv);
-    meas->setStateInitValue<StateDefinition_T::p_wv>(p_wv);
-    meas->setStateInitValue<StateDefinition_T::q_ic>(q_ic);
-    meas->setStateInitValue<StateDefinition_T::p_ic>(p_ic);
+    meas->SetStateInitValue<StateDefinition_T::q_wv>(q_wv);
+    meas->SetStateInitValue<StateDefinition_T::p_wv>(p_wv);
+    meas->SetStateInitValue<StateDefinition_T::q_ic>(q_ic);
+    meas->SetStateInitValue<StateDefinition_T::p_ic>(p_ic);
 
-    setP(meas->get_P());  // Call my set P function.
-    meas->get_w_m() = w_m;
-    meas->get_a_m() = a_m;
+    SetStateCovariance(meas->GetStateCovariance());  // Call my set P function.
+    meas->Getw_m() = w_m;
+    meas->Geta_m() = a_m;
     meas->time = ros::Time::now().toSec();
 
     // Call initialization in core.
-    msf_core_->init(meas);
+    msf_core_->Init(meas);
 
   }
 
   // Prior to this call, all states are initialized to zero/identity.
-  virtual void resetState(EKFState_T& state) const {
+  virtual void ResetState(EKFState_T& state) const {
     //set scale to 1
     Eigen::Matrix<double, 1, 1> scale;
     scale << 1.0;
-    state.set < StateDefinition_T::L > (scale);
+    state.Set < StateDefinition_T::L > (scale);
   }
-  virtual void initState(EKFState_T& state) const {
+  virtual void InitState(EKFState_T& state) const {
     UNUSED(state);
   }
 
-  virtual void calculateQAuxiliaryStates(EKFState_T& state, double dt) const {
+  virtual void CalculateQAuxiliaryStates(EKFState_T& state, double dt) const {
     const msf_core::Vector3 nqwvv = msf_core::Vector3::Constant(
         config_.pose_noise_q_wv);
     const msf_core::Vector3 npwvv = msf_core::Vector3::Constant(
@@ -210,19 +210,19 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
 
     // Compute the blockwise Q values and store them with the states,
     // these then get copied by the core to the correct places in Qd.
-    state.getQBlock<StateDefinition_T::L>() = (dt * n_L.cwiseProduct(n_L))
+    state.GetQBlock<StateDefinition_T::L>() = (dt * n_L.cwiseProduct(n_L))
         .asDiagonal();
-    state.getQBlock<StateDefinition_T::q_wv>() =
+    state.GetQBlock<StateDefinition_T::q_wv>() =
         (dt * nqwvv.cwiseProduct(nqwvv)).asDiagonal();
-    state.getQBlock<StateDefinition_T::p_wv>() =
+    state.GetQBlock<StateDefinition_T::p_wv>() =
         (dt * npwvv.cwiseProduct(npwvv)).asDiagonal();
-    state.getQBlock<StateDefinition_T::q_ic>() =
+    state.GetQBlock<StateDefinition_T::q_ic>() =
         (dt * nqicv.cwiseProduct(nqicv)).asDiagonal();
-    state.getQBlock<StateDefinition_T::p_ic>() =
+    state.GetQBlock<StateDefinition_T::p_ic>() =
         (dt * npicv.cwiseProduct(npicv)).asDiagonal();
   }
 
-  virtual void setP(
+  virtual void SetStateCovariance(
       Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,
           EKFState_T::nErrorStatesAtCompileTime>& P) const {
     UNUSED(P);
@@ -230,12 +230,12 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
     // rest.
   }
 
-  virtual void augmentCorrectionVector(
+  virtual void AugmentCorrectionVector(
       Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, 1>& correction) const {
     UNUSED(correction);
   }
 
-  virtual void sanityCheckCorrection(
+  virtual void SanityCheckCorrection(
       EKFState_T& delaystate,
       const EKFState_T& buffstate,
       Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, 1>& correction) const {
@@ -243,13 +243,13 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
     UNUSED(correction);
 
     const EKFState_T& state = delaystate;
-    if (state.get<StateDefinition_T::L>()(0) < 0) {
+    if (state.Get<StateDefinition_T::L>()(0) < 0) {
       MSF_WARN_STREAM_THROTTLE(
-          1, "Negative scale detected: " << state.get<StateDefinition_T::L>()(0)
+          1, "Negative scale detected: " << state.Get<StateDefinition_T::L>()(0)
           << ". Correcting to 0.1");
       Eigen::Matrix<double, 1, 1> L_;
       L_ << 0.1;
-      delaystate.set < StateDefinition_T::L > (L_);
+      delaystate.Set < StateDefinition_T::L > (L_);
     }
   }
 };
