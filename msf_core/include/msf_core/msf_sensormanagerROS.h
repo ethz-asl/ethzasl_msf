@@ -77,7 +77,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
         &MSF_SensorManagerROS::Config, this, _1, _2);
     reconfServer_->setCallback(f);
 
-    pnh.param("GetDataPlaybackStatus", this->GetDataPlaybackStatus_, false);
+    pnh.param("GetDataPlaybackStatus", this->data_playback_, false);
 
     ros::NodeHandle nh("msf_core");
 
@@ -222,7 +222,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
     // Prevent junk being sent to the external state propagation when data
     // playback is (accidentally) on.
     if (pubCorrect_.getNumSubscribers() > 0) {
-      if (this->GetDataPlaybackStatus_) {
+      if (this->data_playback_) {
         for (int i = 0; i < HLI_EKF_STATE_SIZE; ++i) {
           msgCorrect_.state[i] = 0;
         }

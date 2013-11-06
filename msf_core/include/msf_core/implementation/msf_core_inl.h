@@ -38,7 +38,7 @@
 namespace msf_core {
 template<typename EKFState_T>
 MSF_Core<EKFState_T>::MSF_Core(const MSF_SensorManager<EKFState_T>& GetUserCalc)
-    : GetUserCalc_(GetUserCalc) {  // The interface for the user to customize EKF
+    : usercalc_(GetUserCalc) {  // The interface for the user to customize EKF
   // interna, DO ABSOLUTELY NOT USE THIS POINTER INSIDE THIS CTOR!!
 
   // Set the output precision for numeric values.
@@ -92,7 +92,7 @@ void MSF_Core<EKFState_T>::SetPCore(
 
 template<typename EKFState_T>
 const MSF_SensorManager<EKFState_T>& MSF_Core<EKFState_T>::GetUserCalc() const {
-  return GetUserCalc_;
+  return usercalc_;
 }
 
 template<typename EKFState_T>
@@ -185,7 +185,7 @@ void MSF_Core<EKFState_T>::ProcessIMU(
   PropagatePOneStep();
   timer_PropCov.Stop();
 
-  GetUserCalc_.PublishStateAfterPropagation(currentState);
+  usercalc_.PublishStateAfterPropagation(currentState);
 
   // Making sure we have sufficient states to apply measurements to.
   if (stateBuffer_.Size() > 3)
@@ -223,7 +223,7 @@ void MSF_Core<EKFState_T>::ProcessExternallyPropagatedState(
 //  }
 
   // TODO(slynen): not broken, revert back when it_last_IMU->second from above is fixed
-  shared_ptr<EKFState_T> lastState = stateBuffer_.getLast();//it_last_IMU->second;
+  shared_ptr<EKFState_T> lastState = stateBuffer_.GetLast();//it_last_IMU->second;
   if (lastState->time == -1) {
     MSF_WARN_STREAM_THROTTLE(2, "StateCallback: closest state is invalid\n");
     return;  // Early abort.
@@ -446,11 +446,11 @@ void MSF_Core<EKFState_T>::PredictProcessCovariance(
   }
 
   // Noises.
-  const Vector3 nav = Vector3::Constant(GetUserCalc_.GetParamNoiseAcc());
-  const Vector3 nbav = Vector3::Constant(GetUserCalc_.GetParamNoiseAccbias());
+  const Vector3 nav = Vector3::Constant(usercalc_.GetParamNoiseAcc());
+  const Vector3 nbav = Vector3::Constant(usercalc_.GetParamNoiseAccbias());
 
-  const Vector3 nwv = Vector3::Constant(GetUserCalc_.GetParamNoiseGyr());
-  const Vector3 nbwv = Vector3::Constant(GetUserCalc_.GetParamNoiseGyrbias());
+  const Vector3 nwv = Vector3::Constant(usercalc_.GetParamNoiseGyr());
+  const Vector3 nbwv = Vector3::Constant(usercalc_.GetParamNoiseGyrbias());
 
   // Bias corrected IMU readings.
   const Vector3 ew = state_new->w_m
@@ -519,7 +519,7 @@ void MSF_Core<EKFState_T>::PredictProcessCovariance(
   // Call user Q calc to fill in the blocks of auxiliary states.
   // TODO optim: make state Q-blocks map respective parts of Q using Eigen Map,
   // avoids copy.
-  GetUserCalc_.CalculateQAuxiliaryStates(*state_new, dt);
+  usercalc_.CalculateQAuxiliaryStates(*state_new, dt);
 
   // Now copy the userdefined blocks to Qd.
   boost::fusion::for_each(
@@ -578,7 +578,7 @@ void MSF_Core<EKFState_T>::Init(
 
   // Echo params.
   MSF_INFO_STREAM(
-      "Core parameters: "<<std::endl << "\tfixed_bias:\t" << GetUserCalc_.GetParamFixedBias() << std::endl << "\tfuzzythres:\t" << GetUserCalc_.GetParamFuzzyTrackingThreshold() << std::endl << "\tnoise_acc:\t" << GetUserCalc_.GetParamNoiseAcc() << std::endl << "\tnoise_accbias:\t" << GetUserCalc_.GetParamNoiseAccbias() << std::endl << "\tnoise_gyr:\t" << GetUserCalc_.GetParamNoiseGyr() << std::endl << "\tnoise_gyrbias:\t" << GetUserCalc_.GetParamNoiseGyrbias() << std::endl);
+      "Core parameters: "<<std::endl << "\tfixed_bias:\t" << usercalc_.GetParamFixedBias() << std::endl << "\tfuzzythres:\t" << usercalc_.GetParamFuzzyTrackingThreshold() << std::endl << "\tnoise_acc:\t" << usercalc_.GetParamNoiseAcc() << std::endl << "\tnoise_accbias:\t" << usercalc_.GetParamNoiseAccbias() << std::endl << "\tnoise_gyr:\t" << usercalc_.GetParamNoiseGyr() << std::endl << "\tnoise_gyrbias:\t" << usercalc_.GetParamNoiseGyrbias() << std::endl);
 
   MSF_INFO_STREAM("Core init with state: " << std::endl << state->Print());
   initialized_ = true;
@@ -694,7 +694,7 @@ void MSF_Core<EKFState_T>::AddMeasurement(
 
   PropPToState(latestState);  // Get the latest covariance.
 
-  GetUserCalc_.PublishStateAfterUpdate(latestState);
+  usercalc_.PublishStateAfterUpdate(latestState);
 }
 
 template<typename EKFState_T>
@@ -828,10 +828,10 @@ bool MSF_Core<EKFState_T>::ApplyCorrection(shared_ptr<EKFState_T>& delaystate,
     return false;
 
   // Give the user the possibility to fix some states.
-  GetUserCalc_.AugmentCorrectionVector(correction);
+  usercalc_.AugmentCorrectionVector(correction);
 
   // Now augment core states.
-  if (GetUserCalc_.GetParamFixedBias()) {
+  if (usercalc_.GetParamFixedBias()) {
     typedef typename msf_tmp::GetEnumStateType<StateSequence_T,
         StateDefinition_T::b_a>::value b_a_type;
     typedef typename msf_tmp::GetEnumStateType<StateSequence_T,
@@ -874,7 +874,7 @@ bool MSF_Core<EKFState_T>::ApplyCorrection(shared_ptr<EKFState_T>& delaystate,
   delaystate->Correct(correction);
 
   // Allow the user to sanity check the new state.
-  GetUserCalc_.SanityCheckCorrection(*delaystate, buffstate, correction);
+  usercalc_.SanityCheckCorrection(*delaystate, buffstate, correction);
 
   // TODO(slynen): Allow multiple fuzzy tracking states at the same time.
   isfuzzyState_ |= fuzzyTracker_.Check(delaystate, buffstate, fuzzythres);

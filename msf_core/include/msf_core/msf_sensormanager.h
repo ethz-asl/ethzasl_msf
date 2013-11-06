@@ -51,7 +51,7 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
    * for log replay, when the external prediction is not available or should be
    * done on the host.
    */
-  bool GetDataPlaybackStatus_;
+  bool data_playback_;
 
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -61,7 +61,7 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
   MSF_SensorManager();
 
   bool GetDataPlaybackStatus() {
-    return GetDataPlaybackStatus_;
+    return data_playback_;
   }
 
   virtual ~MSF_SensorManager() {

@@ -191,7 +191,7 @@ class MSF_Core {
   // states.
   CheckFuzzyTracking<EKFState_T, nonDriftingStateType> fuzzyTracker_;
   /// A class which provides methods for customization of several calculations.
-  const MSF_SensorManager<EKFState_T>& GetUserCalc_;
+  const MSF_SensorManager<EKFState_T>& usercalc_;
 
   /**
    * \brief Applies the correction.

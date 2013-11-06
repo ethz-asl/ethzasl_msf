@@ -223,7 +223,7 @@ class SortedContainer {
     if (stateList.empty()) {
       MSF_WARN_STREAM("Requested the first object before time " << statetime <<
         "but the container is empty");
-      return getInvalid();
+      return GetInvalid();
     }
     if (it == stateList.begin()) {
       return it->second;

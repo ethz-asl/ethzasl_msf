@@ -28,12 +28,12 @@ class GPSConversion {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
   GPSConversion();
-  void InitReference(const double & latitude, const double & longitude,
-                     const double & altitude);
-  msf_core::Vector3 WGS84ToECEF(const double & latitude,
-                                const double & longitude,
-                                const double & altitude) const;
-  msf_core::Vector3 ECEFToENU(const msf_core::Vector3 & ecef) const;
+  void InitReference(const double& latitude, const double& longitude,
+                     const double& altitude);
+  msf_core::Vector3 WGS84ToECEF(const double& latitude,
+                                const double& longitude,
+                                const double& altitude) const;
+  msf_core::Vector3 ECEFToENU(const msf_core::Vector3& ecef) const;
   void AdjustReference(double z_corr);
 };
 }  // namespace msf_core
