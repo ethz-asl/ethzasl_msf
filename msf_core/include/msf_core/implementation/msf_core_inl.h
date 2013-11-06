@@ -213,12 +213,17 @@ void MSF_Core<EKFState_T>::ProcessExternallyPropagatedState(
   if (!initialized_)
     return;
 
-  // Get the closest state and check validity.
-  if (it_last_IMU == stateBuffer_.GetIteratorEnd()) {
-    it_last_IMU = stateBuffer_.GetIteratorClosestBefore(msg_stamp);
-  }
+  // fast method to get last_IMU is broken
+  // TODO(slynen): fix iterator setting for state callback
 
-  shared_ptr<EKFState_T> lastState = it_last_IMU->second;
+//  // Get the closest state and check validity.
+//  if (it_last_IMU == stateBuffer_.getIteratorEnd()) {
+//    it_last_IMU = stateBuffer_.getIteratorClosestBefore(msg_stamp);
+//    assert(!(it_last_IMU == stateBuffer_.getIteratorEnd()));
+//  }
+
+  // TODO(slynen): not broken, revert back when it_last_IMU->second from above is fixed
+  shared_ptr<EKFState_T> lastState = stateBuffer_.getLast();//it_last_IMU->second;
   if (lastState->time == -1) {
     MSF_WARN_STREAM_THROTTLE(2, "StateCallback: closest state is invalid\n");
     return;  // Early abort.

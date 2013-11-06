@@ -91,7 +91,9 @@ class SortedContainer {
         std::pair<double, shared_ptr<T> >(value->time, value));
     if (!itpr.second) {
       MSF_WARN_STREAM(
-          "Wanted to insert a value to the sorted container at time " << std::fixed << std::setprecision(9) << value->time << " but the map already contained a value at this time. discarding.");
+          "Wanted to insert a value to the sorted container at time " <<
+          std::fixed << std::setprecision(9) << value->time <<
+          " but the map already contained a value at this time. discarding.");
     }
     return itpr.first;
   }
@@ -130,7 +132,8 @@ class SortedContainer {
     if (it == stateList.end()) {  // There is no value in the map with this time.
       if (warnIfNotExistant)
         MSF_WARN_STREAM(
-            "GetIteratorAtValue(state): Could not find value for time " << std::fixed << std::setprecision(9) << value->time);
+            "getIteratorAtValue(state): Could not find value for time " <<
+            std::fixed << std::setprecision(9) << value->time);
       it = stateList.lower_bound(value->time);
     }
     return it;
@@ -148,7 +151,8 @@ class SortedContainer {
     if (it == stateList.end()) {  //there is no value in the map with this time
       if (warnIfNotExistant)
         MSF_WARN_STREAM(
-            "GetIteratorAtValue(double): Could not find value for time " << std::fixed << std::setprecision(9) << time);
+            "getIteratorAtValue(double): Could not find value for time " <<
+            std::fixed << std::setprecision(9) << time);
       it = stateList.lower_bound(time);
     }
     return it;
@@ -165,7 +169,6 @@ class SortedContainer {
     --it;
     return it;
   }
-  ;
 
   /**
    * \brief Returns the iterator closest after a specific time instant.
@@ -174,9 +177,9 @@ class SortedContainer {
    */
   inline typename ListT::iterator GetIteratorClosestAfter(
       const double& statetime) {
-    return stateList.upper_bound(statetime);
+    typename ListT::iterator it = stateList.upper_bound(statetime);
+    return it;
   }
-  ;
 
   /**
    * \brief Returns the iterator closest to a specific time instant.
@@ -217,6 +220,11 @@ class SortedContainer {
    */
   inline shared_ptr<T>& GetClosestBefore(const double& statetime) {
     typename ListT::iterator it = stateList.lower_bound(statetime);
+    if (stateList.empty()) {
+      MSF_WARN_STREAM("Requested the first object before time " << statetime <<
+        "but the container is empty");
+      return getInvalid();
+    }
     if (it == stateList.begin()) {
       return it->second;
     }
@@ -341,7 +349,7 @@ class SortedContainer {
       std::stringstream ss;
       ss << "Wanted to update a states/measurements time, but could not find "
               "the old state, for which the time was asked to be updated. time "
-         << std::fixed << std::setprecision(9) << timeOld << std::endl;
+          << std::fixed << std::setprecision(9) << timeOld << std::endl;
 
       ss << "Map: " << std::endl;
       for (typename ListT::iterator it2 = stateList.begin();
