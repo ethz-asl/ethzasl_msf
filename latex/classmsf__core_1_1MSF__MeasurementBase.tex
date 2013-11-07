@@ -19,26 +19,22 @@ Inheritance diagram for msf\-\_\-core\-:\-:M\-S\-F\-\_\-\-Measurement\-Base$<$ E
 \subsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{classmsf__core_1_1MSF__MeasurementBase_a415d8c321cebf22510cce29f69a3b22f}{E\-I\-G\-E\-N\-\_\-\-M\-A\-K\-E\-\_\-\-A\-L\-I\-G\-N\-E\-D\-\_\-\-O\-P\-E\-R\-A\-T\-O\-R\-\_\-\-N\-E\-W {\bfseries M\-S\-F\-\_\-\-Measurement\-Base} (bool isabsolute\-Measurement, int sensor\-I\-D)}\label{classmsf__core_1_1MSF__MeasurementBase_a415d8c321cebf22510cce29f69a3b22f}
-
+E\-I\-G\-E\-N\-\_\-\-M\-A\-K\-E\-\_\-\-A\-L\-I\-G\-N\-E\-D\-\_\-\-O\-P\-E\-R\-A\-T\-O\-R\-\_\-\-N\-E\-W \hyperlink{classmsf__core_1_1MSF__MeasurementBase_a415d8c321cebf22510cce29f69a3b22f}{M\-S\-F\-\_\-\-Measurement\-Base} (bool isabsolute\-Measurement, int sensor\-I\-D)
 \item 
-\hypertarget{classmsf__core_1_1MSF__MeasurementBase_ac1c4001e0c61b7cd2b551c0adeae7109}{virtual void \hyperlink{classmsf__core_1_1MSF__MeasurementBase_ac1c4001e0c61b7cd2b551c0adeae7109}{apply} (shared\-\_\-ptr$<$ E\-K\-F\-State\-\_\-\-T $>$ state\-With\-Covariance, \hyperlink{classmsf__core_1_1MSF__Core}{M\-S\-F\-\_\-\-Core}$<$ E\-K\-F\-State\-\_\-\-T $>$ \&core)=0}\label{classmsf__core_1_1MSF__MeasurementBase_ac1c4001e0c61b7cd2b551c0adeae7109}
-
-\begin{DoxyCompactList}\small\item\em The method called by the msf\-\_\-core to apply the measurement represented by this object. \end{DoxyCompactList}\item 
-\hypertarget{classmsf__core_1_1MSF__MeasurementBase_a6a711d7ed976c0aed497efc1b8fbe3e7}{virtual std\-::string {\bfseries type} ()=0}\label{classmsf__core_1_1MSF__MeasurementBase_a6a711d7ed976c0aed497efc1b8fbe3e7}
-
+virtual \hyperlink{classmsf__core_1_1MSF__MeasurementBase_a259e1cfacc40e58e7c1ed768bcadb54b}{$\sim$\-M\-S\-F\-\_\-\-Measurement\-Base} ()
+\item 
+virtual void \hyperlink{classmsf__core_1_1MSF__MeasurementBase_ac1c4001e0c61b7cd2b551c0adeae7109}{apply} (shared\-\_\-ptr$<$ E\-K\-F\-State\-\_\-\-T $>$ state\-With\-Covariance, \hyperlink{classmsf__core_1_1MSF__Core}{M\-S\-F\-\_\-\-Core}$<$ E\-K\-F\-State\-\_\-\-T $>$ \&core)=0
+\begin{DoxyCompactList}\small\item\em The method called by the \hyperlink{namespacemsf__core}{msf\-\_\-core} to apply the measurement represented by this object. \end{DoxyCompactList}\item 
+virtual std\-::string \hyperlink{classmsf__core_1_1MSF__MeasurementBase_a6a711d7ed976c0aed497efc1b8fbe3e7}{type} ()=0
 \end{DoxyCompactItemize}
 \subsection*{Public Attributes}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{classmsf__core_1_1MSF__MeasurementBase_afad7c30029f47cea027415c04301dc48}{int {\bfseries sensor\-I\-D\-\_\-}}\label{classmsf__core_1_1MSF__MeasurementBase_afad7c30029f47cea027415c04301dc48}
-
+int \hyperlink{classmsf__core_1_1MSF__MeasurementBase_afad7c30029f47cea027415c04301dc48}{sensor\-I\-D\-\_\-}
 \item 
-\hypertarget{classmsf__core_1_1MSF__MeasurementBase_ad1ea7c4d392ecd3d894280283c04757a}{bool {\bfseries isabsolute\-\_\-}}\label{classmsf__core_1_1MSF__MeasurementBase_ad1ea7c4d392ecd3d894280283c04757a}
-
+bool \hyperlink{classmsf__core_1_1MSF__MeasurementBase_ad1ea7c4d392ecd3d894280283c04757a}{isabsolute\-\_\-}
 \item 
-\hypertarget{classmsf__core_1_1MSF__MeasurementBase_a48b55b129f13afbed86db1b0543562db}{double \hyperlink{classmsf__core_1_1MSF__MeasurementBase_a48b55b129f13afbed86db1b0543562db}{time}}\label{classmsf__core_1_1MSF__MeasurementBase_a48b55b129f13afbed86db1b0543562db}
-
+double \hyperlink{classmsf__core_1_1MSF__MeasurementBase_a48b55b129f13afbed86db1b0543562db}{time}
 \begin{DoxyCompactList}\small\item\em The time\-\_\- this measurement was taken. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Protected Member Functions}
 \begin{DoxyCompactItemize}
@@ -51,12 +47,37 @@ void \hyperlink{classmsf__core_1_1MSF__MeasurementBase_ade8ddcc9ef64571451560079
 \end{DoxyCompactItemize}
 
 
-\subsection{Detailed Description}
-\subsubsection*{template$<$typename E\-K\-F\-State\-\_\-\-T$>$class msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base$<$ E\-K\-F\-State\-\_\-\-T $>$}
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classmsf__core_1_1MSF__MeasurementBase_a415d8c321cebf22510cce29f69a3b22f}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base}!M\-S\-F\-\_\-\-Measurement\-Base@{M\-S\-F\-\_\-\-Measurement\-Base}}
+\index{M\-S\-F\-\_\-\-Measurement\-Base@{M\-S\-F\-\_\-\-Measurement\-Base}!msf_core::MSF_MeasurementBase@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base}}
+\subsubsection[{M\-S\-F\-\_\-\-Measurement\-Base}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T $>$ {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::{\bf M\-S\-F\-\_\-\-Measurement\-Base} (
+\begin{DoxyParamCaption}
+\item[{bool}]{isabsolute\-Measurement, }
+\item[{int}]{sensor\-I\-D}
+\end{DoxyParamCaption}
+)}}\label{classmsf__core_1_1MSF__MeasurementBase_a415d8c321cebf22510cce29f69a3b22f}
+\hypertarget{classmsf__core_1_1MSF__MeasurementBase_a259e1cfacc40e58e7c1ed768bcadb54b}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base}!$\sim$\-M\-S\-F\-\_\-\-Measurement\-Base@{$\sim$\-M\-S\-F\-\_\-\-Measurement\-Base}}
+\index{$\sim$\-M\-S\-F\-\_\-\-Measurement\-Base@{$\sim$\-M\-S\-F\-\_\-\-Measurement\-Base}!msf_core::MSF_MeasurementBase@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base}}
+\subsubsection[{$\sim$\-M\-S\-F\-\_\-\-Measurement\-Base}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T$>$ virtual {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::$\sim${\bf M\-S\-F\-\_\-\-Measurement\-Base} (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{classmsf__core_1_1MSF__MeasurementBase_a259e1cfacc40e58e7c1ed768bcadb54b}
 
-The base class for all measurement types. These are the objects provided to the E\-K\-F core to be applied in correct order to the states. 
 
 \subsection{Member Function Documentation}
+\hypertarget{classmsf__core_1_1MSF__MeasurementBase_ac1c4001e0c61b7cd2b551c0adeae7109}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base}!apply@{apply}}
+\index{apply@{apply}!msf_core::MSF_MeasurementBase@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base}}
+\subsubsection[{apply}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T$>$ virtual void {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::apply (
+\begin{DoxyParamCaption}
+\item[{shared\-\_\-ptr$<$ E\-K\-F\-State\-\_\-\-T $>$}]{state\-With\-Covariance, }
+\item[{{\bf M\-S\-F\-\_\-\-Core}$<$ E\-K\-F\-State\-\_\-\-T $>$ \&}]{core}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classmsf__core_1_1MSF__MeasurementBase_ac1c4001e0c61b7cd2b551c0adeae7109}
+
+
+Implemented in \hyperlink{classmsf__core_1_1MSF__InitMeasurement_a7b92f1e55007491bec20273f6cc25ba6}{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Init\-Measurement$<$ E\-K\-F\-State\-\_\-\-T $>$}.
+
 \hypertarget{classmsf__core_1_1MSF__MeasurementBase_a569c0772641a11d707349aab9dc0da7e}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base}!calculate\-And\-Apply\-Correction@{calculate\-And\-Apply\-Correction}}
 \index{calculate\-And\-Apply\-Correction@{calculate\-And\-Apply\-Correction}!msf_core::MSF_MeasurementBase@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base}}
 \subsubsection[{calculate\-And\-Apply\-Correction}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T $>$ template$<$class H\-\_\-type , class Res\-\_\-type , class R\-\_\-type $>$ void {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::calculate\-And\-Apply\-Correction (
@@ -92,9 +113,32 @@ Correction from E\-K\-F update. \hypertarget{classmsf__core_1_1MSF__MeasurementB
 \item[{const Eigen\-::\-Matrix\-Base$<$ R\-\_\-type $>$ \&}]{R}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [protected]}}}\label{classmsf__core_1_1MSF__MeasurementBase_a5b9db1020711ae6b5ba4e877dd03fa42}
-Correction from E\-K\-F update. 
+Correction from E\-K\-F update. \hypertarget{classmsf__core_1_1MSF__MeasurementBase_a6a711d7ed976c0aed497efc1b8fbe3e7}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base}!type@{type}}
+\index{type@{type}!msf_core::MSF_MeasurementBase@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base}}
+\subsubsection[{type}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T$>$ virtual std\-::string {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::type (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classmsf__core_1_1MSF__MeasurementBase_a6a711d7ed976c0aed497efc1b8fbe3e7}
+
+
+Implemented in \hyperlink{classmsf__core_1_1MSF__InitMeasurement_a6ade2a1ba88e5f26de2125258e4c5238}{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Init\-Measurement$<$ E\-K\-F\-State\-\_\-\-T $>$}, and \hyperlink{classmsf__core_1_1MSF__InvalidMeasurement_abe3df54c608c49a3a26905b5d953713a}{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Invalid\-Measurement$<$ E\-K\-F\-State\-\_\-\-T $>$}.
+
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classmsf__core_1_1MSF__MeasurementBase_ad1ea7c4d392ecd3d894280283c04757a}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base}!isabsolute\-\_\-@{isabsolute\-\_\-}}
+\index{isabsolute\-\_\-@{isabsolute\-\_\-}!msf_core::MSF_MeasurementBase@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base}}
+\subsubsection[{isabsolute\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T$>$ bool {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::isabsolute\-\_\-}}\label{classmsf__core_1_1MSF__MeasurementBase_ad1ea7c4d392ecd3d894280283c04757a}
+\hypertarget{classmsf__core_1_1MSF__MeasurementBase_afad7c30029f47cea027415c04301dc48}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base}!sensor\-I\-D\-\_\-@{sensor\-I\-D\-\_\-}}
+\index{sensor\-I\-D\-\_\-@{sensor\-I\-D\-\_\-}!msf_core::MSF_MeasurementBase@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base}}
+\subsubsection[{sensor\-I\-D\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T$>$ int {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::sensor\-I\-D\-\_\-}}\label{classmsf__core_1_1MSF__MeasurementBase_afad7c30029f47cea027415c04301dc48}
+\hypertarget{classmsf__core_1_1MSF__MeasurementBase_a48b55b129f13afbed86db1b0543562db}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base}!time@{time}}
+\index{time@{time}!msf_core::MSF_MeasurementBase@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base}}
+\subsubsection[{time}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T$>$ double {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::time}}\label{classmsf__core_1_1MSF__MeasurementBase_a48b55b129f13afbed86db1b0543562db}
+
 
 The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
 \item 
-msf\-\_\-core/include/msf\-\_\-core/msf\-\_\-measurement.\-h\item 
-msf\-\_\-core/include/msf\-\_\-core/implementation/msf\-\_\-measurement.\-hpp\end{DoxyCompactItemize}
+msf\-\_\-core/include/msf\-\_\-core/\hyperlink{msf__measurement_8h}{msf\-\_\-measurement.\-h}\item 
+msf\-\_\-core/include/msf\-\_\-core/implementation/\hyperlink{msf__measurement_8hpp}{msf\-\_\-measurement.\-hpp}\end{DoxyCompactItemize}

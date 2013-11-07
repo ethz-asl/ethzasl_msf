@@ -19,33 +19,34 @@ Inheritance diagram for msf\-\_\-core\-:\-:M\-S\-F\-\_\-\-Measurement$<$ T, R\-M
 \subsection*{Public Types}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{classmsf__core_1_1MSF__Measurement_ab102d2c17bef09be28cb1403017992b6}{typedef T {\bfseries Measurement\-\_\-type}}\label{classmsf__core_1_1MSF__Measurement_ab102d2c17bef09be28cb1403017992b6}
-
+typedef T \hyperlink{classmsf__core_1_1MSF__Measurement_ab102d2c17bef09be28cb1403017992b6}{Measurement\-\_\-type}
 \item 
-\hypertarget{classmsf__core_1_1MSF__Measurement_afa4f826dadcfd129a50330f078a8dbf8}{typedef boost\-::shared\-\_\-ptr$<$ T \\*
-const  $>$ {\bfseries Measurement\-\_\-ptr}}\label{classmsf__core_1_1MSF__Measurement_afa4f826dadcfd129a50330f078a8dbf8}
-
+typedef boost\-::shared\-\_\-ptr$<$ T \\*
+const  $>$ \hyperlink{classmsf__core_1_1MSF__Measurement_afa4f826dadcfd129a50330f078a8dbf8}{Measurement\-\_\-ptr}
 \end{DoxyCompactItemize}
 \subsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{classmsf__core_1_1MSF__Measurement_a33143412cbcabec0c16e1c6ad82641d0}{{\bfseries M\-S\-F\-\_\-\-Measurement} (bool is\-Absolute\-Measurement, int sensor\-I\-D)}\label{classmsf__core_1_1MSF__Measurement_a33143412cbcabec0c16e1c6ad82641d0}
-
+\hyperlink{classmsf__core_1_1MSF__Measurement_a33143412cbcabec0c16e1c6ad82641d0}{M\-S\-F\-\_\-\-Measurement} (bool is\-Absolute\-Measurement, int sensor\-I\-D)
 \item 
-\hypertarget{classmsf__core_1_1MSF__Measurement_a345b17105929ac6c70a0a5d21e281a5c}{void {\bfseries make\-From\-Sensor\-Reading} (const boost\-::shared\-\_\-ptr$<$ T const  $>$ reading, double timestamp)}\label{classmsf__core_1_1MSF__Measurement_a345b17105929ac6c70a0a5d21e281a5c}
-
+virtual \hyperlink{classmsf__core_1_1MSF__Measurement_a922f76000be4c759fb5b0cfa294e2593}{$\sim$\-M\-S\-F\-\_\-\-Measurement} ()
+\item 
+void \hyperlink{classmsf__core_1_1MSF__Measurement_a345b17105929ac6c70a0a5d21e281a5c}{make\-From\-Sensor\-Reading} (const boost\-::shared\-\_\-ptr$<$ T const  $>$ reading, double timestamp)
 \end{DoxyCompactItemize}
 \subsection*{Public Attributes}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{classmsf__core_1_1MSF__Measurement_a481fa3230f73f28a8489223311c3033f}{{\bfseries E\-I\-G\-E\-N\-\_\-\-M\-A\-K\-E\-\_\-\-A\-L\-I\-G\-N\-E\-D\-\_\-\-O\-P\-E\-R\-A\-T\-O\-R\-\_\-\-N\-E\-W}}\label{classmsf__core_1_1MSF__Measurement_a481fa3230f73f28a8489223311c3033f}
-
+\hyperlink{classmsf__core_1_1MSF__Measurement_a481fa3230f73f28a8489223311c3033f}{E\-I\-G\-E\-N\-\_\-\-M\-A\-K\-E\-\_\-\-A\-L\-I\-G\-N\-E\-D\-\_\-\-O\-P\-E\-R\-A\-T\-O\-R\-\_\-\-N\-E\-W}
 \end{DoxyCompactItemize}
 \subsection*{Protected Attributes}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{classmsf__core_1_1MSF__Measurement_a20fcacb533df8a1e6ae4fad4a3eb06ec}{R\-M\-A\-T\-\_\-\-T {\bfseries R\-\_\-}}\label{classmsf__core_1_1MSF__Measurement_a20fcacb533df8a1e6ae4fad4a3eb06ec}
-
+R\-M\-A\-T\-\_\-\-T \hyperlink{classmsf__core_1_1MSF__Measurement_a20fcacb533df8a1e6ae4fad4a3eb06ec}{R\-\_\-}
+\end{DoxyCompactItemize}
+\subsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual void \hyperlink{classmsf__core_1_1MSF__Measurement_a46f5283b196c6a7a34b9aa8ff85c8358}{make\-From\-Sensor\-Reading\-Impl} (const boost\-::shared\-\_\-ptr$<$ T const  $>$ reading)=0
 \end{DoxyCompactItemize}
 \subsection*{Additional Inherited Members}
 
@@ -53,13 +54,65 @@ const  $>$ {\bfseries Measurement\-\_\-ptr}}\label{classmsf__core_1_1MSF__Measur
 \subsection{Detailed Description}
 \subsubsection*{template$<$typename T, typename R\-M\-A\-T\-\_\-\-T, typename E\-K\-F\-State\-\_\-\-T$>$class msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement$<$ T, R\-M\-A\-T\-\_\-\-T, E\-K\-F\-State\-\_\-\-T $>$}
 
-The class for sensor based measurements which we want to apply to a state in the update routine of the E\-K\-F. This calls the apply correction method of the E\-K\-F core. 
-
 \begin{DoxyNote}{Note}
 Provides an abstract N\-V\-I to create measurements from sensor readings. 
 \end{DoxyNote}
 
 
+\subsection{Member Typedef Documentation}
+\hypertarget{classmsf__core_1_1MSF__Measurement_afa4f826dadcfd129a50330f078a8dbf8}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement}!Measurement\-\_\-ptr@{Measurement\-\_\-ptr}}
+\index{Measurement\-\_\-ptr@{Measurement\-\_\-ptr}!msf_core::MSF_Measurement@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement}}
+\subsubsection[{Measurement\-\_\-ptr}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T , typename R\-M\-A\-T\-\_\-\-T , typename E\-K\-F\-State\-\_\-\-T $>$ typedef boost\-::shared\-\_\-ptr$<$T const$>$ {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement}$<$ T, R\-M\-A\-T\-\_\-\-T, E\-K\-F\-State\-\_\-\-T $>$\-::{\bf Measurement\-\_\-ptr}}}\label{classmsf__core_1_1MSF__Measurement_afa4f826dadcfd129a50330f078a8dbf8}
+\hypertarget{classmsf__core_1_1MSF__Measurement_ab102d2c17bef09be28cb1403017992b6}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement}!Measurement\-\_\-type@{Measurement\-\_\-type}}
+\index{Measurement\-\_\-type@{Measurement\-\_\-type}!msf_core::MSF_Measurement@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement}}
+\subsubsection[{Measurement\-\_\-type}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T , typename R\-M\-A\-T\-\_\-\-T , typename E\-K\-F\-State\-\_\-\-T $>$ typedef T {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement}$<$ T, R\-M\-A\-T\-\_\-\-T, E\-K\-F\-State\-\_\-\-T $>$\-::{\bf Measurement\-\_\-type}}}\label{classmsf__core_1_1MSF__Measurement_ab102d2c17bef09be28cb1403017992b6}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classmsf__core_1_1MSF__Measurement_a33143412cbcabec0c16e1c6ad82641d0}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement}!M\-S\-F\-\_\-\-Measurement@{M\-S\-F\-\_\-\-Measurement}}
+\index{M\-S\-F\-\_\-\-Measurement@{M\-S\-F\-\_\-\-Measurement}!msf_core::MSF_Measurement@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement}}
+\subsubsection[{M\-S\-F\-\_\-\-Measurement}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T , typename R\-M\-A\-T\-\_\-\-T , typename E\-K\-F\-State\-\_\-\-T $>$ {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement}$<$ T, R\-M\-A\-T\-\_\-\-T, E\-K\-F\-State\-\_\-\-T $>$\-::{\bf M\-S\-F\-\_\-\-Measurement} (
+\begin{DoxyParamCaption}
+\item[{bool}]{is\-Absolute\-Measurement, }
+\item[{int}]{sensor\-I\-D}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classmsf__core_1_1MSF__Measurement_a33143412cbcabec0c16e1c6ad82641d0}
+\hypertarget{classmsf__core_1_1MSF__Measurement_a922f76000be4c759fb5b0cfa294e2593}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement}!$\sim$\-M\-S\-F\-\_\-\-Measurement@{$\sim$\-M\-S\-F\-\_\-\-Measurement}}
+\index{$\sim$\-M\-S\-F\-\_\-\-Measurement@{$\sim$\-M\-S\-F\-\_\-\-Measurement}!msf_core::MSF_Measurement@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement}}
+\subsubsection[{$\sim$\-M\-S\-F\-\_\-\-Measurement}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T , typename R\-M\-A\-T\-\_\-\-T , typename E\-K\-F\-State\-\_\-\-T $>$ virtual {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement}$<$ T, R\-M\-A\-T\-\_\-\-T, E\-K\-F\-State\-\_\-\-T $>$\-::$\sim${\bf M\-S\-F\-\_\-\-Measurement} (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{classmsf__core_1_1MSF__Measurement_a922f76000be4c759fb5b0cfa294e2593}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classmsf__core_1_1MSF__Measurement_a345b17105929ac6c70a0a5d21e281a5c}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement}!make\-From\-Sensor\-Reading@{make\-From\-Sensor\-Reading}}
+\index{make\-From\-Sensor\-Reading@{make\-From\-Sensor\-Reading}!msf_core::MSF_Measurement@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement}}
+\subsubsection[{make\-From\-Sensor\-Reading}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T , typename R\-M\-A\-T\-\_\-\-T , typename E\-K\-F\-State\-\_\-\-T $>$ void {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement}$<$ T, R\-M\-A\-T\-\_\-\-T, E\-K\-F\-State\-\_\-\-T $>$\-::make\-From\-Sensor\-Reading (
+\begin{DoxyParamCaption}
+\item[{const boost\-::shared\-\_\-ptr$<$ T const  $>$}]{reading, }
+\item[{double}]{timestamp}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classmsf__core_1_1MSF__Measurement_a345b17105929ac6c70a0a5d21e281a5c}
+\hypertarget{classmsf__core_1_1MSF__Measurement_a46f5283b196c6a7a34b9aa8ff85c8358}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement}!make\-From\-Sensor\-Reading\-Impl@{make\-From\-Sensor\-Reading\-Impl}}
+\index{make\-From\-Sensor\-Reading\-Impl@{make\-From\-Sensor\-Reading\-Impl}!msf_core::MSF_Measurement@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement}}
+\subsubsection[{make\-From\-Sensor\-Reading\-Impl}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T , typename R\-M\-A\-T\-\_\-\-T , typename E\-K\-F\-State\-\_\-\-T $>$ virtual void {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement}$<$ T, R\-M\-A\-T\-\_\-\-T, E\-K\-F\-State\-\_\-\-T $>$\-::make\-From\-Sensor\-Reading\-Impl (
+\begin{DoxyParamCaption}
+\item[{const boost\-::shared\-\_\-ptr$<$ T const  $>$}]{reading}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}, {\ttfamily [pure virtual]}}}\label{classmsf__core_1_1MSF__Measurement_a46f5283b196c6a7a34b9aa8ff85c8358}
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classmsf__core_1_1MSF__Measurement_a481fa3230f73f28a8489223311c3033f}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement}!E\-I\-G\-E\-N\-\_\-\-M\-A\-K\-E\-\_\-\-A\-L\-I\-G\-N\-E\-D\-\_\-\-O\-P\-E\-R\-A\-T\-O\-R\-\_\-\-N\-E\-W@{E\-I\-G\-E\-N\-\_\-\-M\-A\-K\-E\-\_\-\-A\-L\-I\-G\-N\-E\-D\-\_\-\-O\-P\-E\-R\-A\-T\-O\-R\-\_\-\-N\-E\-W}}
+\index{E\-I\-G\-E\-N\-\_\-\-M\-A\-K\-E\-\_\-\-A\-L\-I\-G\-N\-E\-D\-\_\-\-O\-P\-E\-R\-A\-T\-O\-R\-\_\-\-N\-E\-W@{E\-I\-G\-E\-N\-\_\-\-M\-A\-K\-E\-\_\-\-A\-L\-I\-G\-N\-E\-D\-\_\-\-O\-P\-E\-R\-A\-T\-O\-R\-\_\-\-N\-E\-W}!msf_core::MSF_Measurement@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement}}
+\subsubsection[{E\-I\-G\-E\-N\-\_\-\-M\-A\-K\-E\-\_\-\-A\-L\-I\-G\-N\-E\-D\-\_\-\-O\-P\-E\-R\-A\-T\-O\-R\-\_\-\-N\-E\-W}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T , typename R\-M\-A\-T\-\_\-\-T , typename E\-K\-F\-State\-\_\-\-T $>$ {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement}$<$ T, R\-M\-A\-T\-\_\-\-T, E\-K\-F\-State\-\_\-\-T $>$\-::E\-I\-G\-E\-N\-\_\-\-M\-A\-K\-E\-\_\-\-A\-L\-I\-G\-N\-E\-D\-\_\-\-O\-P\-E\-R\-A\-T\-O\-R\-\_\-\-N\-E\-W}}\label{classmsf__core_1_1MSF__Measurement_a481fa3230f73f28a8489223311c3033f}
+\hypertarget{classmsf__core_1_1MSF__Measurement_a20fcacb533df8a1e6ae4fad4a3eb06ec}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement}!R\-\_\-@{R\-\_\-}}
+\index{R\-\_\-@{R\-\_\-}!msf_core::MSF_Measurement@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement}}
+\subsubsection[{R\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T , typename R\-M\-A\-T\-\_\-\-T , typename E\-K\-F\-State\-\_\-\-T $>$ R\-M\-A\-T\-\_\-\-T {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement}$<$ T, R\-M\-A\-T\-\_\-\-T, E\-K\-F\-State\-\_\-\-T $>$\-::R\-\_\-\hspace{0.3cm}{\ttfamily [protected]}}}\label{classmsf__core_1_1MSF__Measurement_a20fcacb533df8a1e6ae4fad4a3eb06ec}
+
+
 The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
 \item 
-msf\-\_\-core/include/msf\-\_\-core/msf\-\_\-measurement.\-h\end{DoxyCompactItemize}
+msf\-\_\-core/include/msf\-\_\-core/\hyperlink{msf__measurement_8h}{msf\-\_\-measurement.\-h}\end{DoxyCompactItemize}

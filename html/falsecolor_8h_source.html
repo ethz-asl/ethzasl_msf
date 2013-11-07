@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>msf - modular sensor fusion: msf_core/include/msf_core/falsecolor.h Source File</title>
+<title>ethzasl-msf - Modular Sensor Fusion: msf_core/include/msf_core/falsecolor.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">msf - modular sensor fusion
+   <div id="projectname">ethzasl-msf - Modular Sensor Fusion
    </div>
    <div id="projectbrief">Time delay compensated single and multi sensor fusion framework based on an EKF</div>
   </td>
@@ -61,6 +61,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="files.html"><span>File&#160;List</span></a></li>
+      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
     </ul>
   </div>
 <!-- window showing the filter options -->
@@ -68,7 +69,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -87,7 +88,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">falsecolor.h</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
+<a href="falsecolor_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * Copyright (C) 2012-2013 Simon Lynen, ASL, ETH Zurich, Switzerland</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> * You can contact the author at &lt;slynen at ethz dot ch&gt;</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> *</span></div>
@@ -107,37 +108,37 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define FALSECOLOR_H_</span></div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00020"></a><span class="lineno"><a class="code" href="structcolor.html">   20</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structcolor.html">color</a> {</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> rgbBlue;</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> rgbGreen;</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> rgbRed;</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  <a class="code" href="structcolor.html">color</a>() {</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    rgbBlue = rgbGreen = rgbRed = 0;</div>
+<div class="line"><a name="l00021"></a><span class="lineno"><a class="code" href="structcolor.html#aafc5982901c82342e14ffa4051b4cc69">   21</a></span>&#160;  <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> <a class="code" href="structcolor.html#aafc5982901c82342e14ffa4051b4cc69">rgbBlue</a>;</div>
+<div class="line"><a name="l00022"></a><span class="lineno"><a class="code" href="structcolor.html#acb9158eaf99c44902c7fb7b33cc4c55c">   22</a></span>&#160;  <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> <a class="code" href="structcolor.html#acb9158eaf99c44902c7fb7b33cc4c55c">rgbGreen</a>;</div>
+<div class="line"><a name="l00023"></a><span class="lineno"><a class="code" href="structcolor.html#acbe14f26a6eb30162279a5309a77721d">   23</a></span>&#160;  <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> <a class="code" href="structcolor.html#acbe14f26a6eb30162279a5309a77721d">rgbRed</a>;</div>
+<div class="line"><a name="l00024"></a><span class="lineno"><a class="code" href="structcolor.html#a63dd058746471367c67a834af926b1b2">   24</a></span>&#160;  <a class="code" href="structcolor.html#a63dd058746471367c67a834af926b1b2">color</a>() {</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <a class="code" href="structcolor.html#aafc5982901c82342e14ffa4051b4cc69">rgbBlue</a> = <a class="code" href="structcolor.html#acb9158eaf99c44902c7fb7b33cc4c55c">rgbGreen</a> = <a class="code" href="structcolor.html#acbe14f26a6eb30162279a5309a77721d">rgbRed</a> = 0;</div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  }</div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;};</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;</div>
 <div class="line"><a name="l00029"></a><span class="lineno"><a class="code" href="structpalette.html">   29</a></span>&#160;<span class="keyword">struct </span><a class="code" href="structpalette.html">palette</a> {</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  <span class="keyword">enum</span> palettetypes {</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    Linear_red_palettes,</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    GammaLog_red_palettes,</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    Inversion_red_palette,</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    Linear_palettes,</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    GammaLog_palettes,</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    Inversion_palette,</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    False_color_palette1,</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    False_color_palette2,</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    False_color_palette3,</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    False_color_palette4</div>
+<div class="line"><a name="l00030"></a><span class="lineno"><a class="code" href="structpalette.html#a36a379b3f92c8aebabe2074a6f4a0349">   30</a></span>&#160;  <span class="keyword">enum</span> <a class="code" href="structpalette.html#a36a379b3f92c8aebabe2074a6f4a0349">palettetypes</a> {</div>
+<div class="line"><a name="l00031"></a><span class="lineno"><a class="code" href="structpalette.html#a36a379b3f92c8aebabe2074a6f4a0349aa638215b2f2b858665cf6d3e32c6da25">   31</a></span>&#160;    <a class="code" href="structpalette.html#a36a379b3f92c8aebabe2074a6f4a0349aa638215b2f2b858665cf6d3e32c6da25">Linear_red_palettes</a>,</div>
+<div class="line"><a name="l00032"></a><span class="lineno"><a class="code" href="structpalette.html#a36a379b3f92c8aebabe2074a6f4a0349a0b937de41bb254e2ef45769ef8912d82">   32</a></span>&#160;    <a class="code" href="structpalette.html#a36a379b3f92c8aebabe2074a6f4a0349a0b937de41bb254e2ef45769ef8912d82">GammaLog_red_palettes</a>,</div>
+<div class="line"><a name="l00033"></a><span class="lineno"><a class="code" href="structpalette.html#a36a379b3f92c8aebabe2074a6f4a0349abfa67394269763a4a69e26ba9fd1f9d6">   33</a></span>&#160;    <a class="code" href="structpalette.html#a36a379b3f92c8aebabe2074a6f4a0349abfa67394269763a4a69e26ba9fd1f9d6">Inversion_red_palette</a>,</div>
+<div class="line"><a name="l00034"></a><span class="lineno"><a class="code" href="structpalette.html#a36a379b3f92c8aebabe2074a6f4a0349a620a9481a7c6cf6a01e4fa6b34372382">   34</a></span>&#160;    <a class="code" href="structpalette.html#a36a379b3f92c8aebabe2074a6f4a0349a620a9481a7c6cf6a01e4fa6b34372382">Linear_palettes</a>,</div>
+<div class="line"><a name="l00035"></a><span class="lineno"><a class="code" href="structpalette.html#a36a379b3f92c8aebabe2074a6f4a0349a806c35cb775afcd09b4ce61158bd7a90">   35</a></span>&#160;    <a class="code" href="structpalette.html#a36a379b3f92c8aebabe2074a6f4a0349a806c35cb775afcd09b4ce61158bd7a90">GammaLog_palettes</a>,</div>
+<div class="line"><a name="l00036"></a><span class="lineno"><a class="code" href="structpalette.html#a36a379b3f92c8aebabe2074a6f4a0349adad07363e06e1c53f34465a700244610">   36</a></span>&#160;    <a class="code" href="structpalette.html#a36a379b3f92c8aebabe2074a6f4a0349adad07363e06e1c53f34465a700244610">Inversion_palette</a>,</div>
+<div class="line"><a name="l00037"></a><span class="lineno"><a class="code" href="structpalette.html#a36a379b3f92c8aebabe2074a6f4a0349afb202b06fbdc8012d979ef6d63542da6">   37</a></span>&#160;    <a class="code" href="structpalette.html#a36a379b3f92c8aebabe2074a6f4a0349afb202b06fbdc8012d979ef6d63542da6">False_color_palette1</a>,</div>
+<div class="line"><a name="l00038"></a><span class="lineno"><a class="code" href="structpalette.html#a36a379b3f92c8aebabe2074a6f4a0349a4970eb811717df651727e708db35c6b3">   38</a></span>&#160;    <a class="code" href="structpalette.html#a36a379b3f92c8aebabe2074a6f4a0349a4970eb811717df651727e708db35c6b3">False_color_palette2</a>,</div>
+<div class="line"><a name="l00039"></a><span class="lineno"><a class="code" href="structpalette.html#a36a379b3f92c8aebabe2074a6f4a0349a9cecb4d863448cd193e6622c2f132eb1">   39</a></span>&#160;    <a class="code" href="structpalette.html#a36a379b3f92c8aebabe2074a6f4a0349a9cecb4d863448cd193e6622c2f132eb1">False_color_palette3</a>,</div>
+<div class="line"><a name="l00040"></a><span class="lineno"><a class="code" href="structpalette.html#a36a379b3f92c8aebabe2074a6f4a0349a731f14daf6f08287bf4d9b604be9e50c">   40</a></span>&#160;    <a class="code" href="structpalette.html#a36a379b3f92c8aebabe2074a6f4a0349a731f14daf6f08287bf4d9b604be9e50c">False_color_palette4</a></div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  };</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  <a class="code" href="structcolor.html">color</a> colors[256];</div>
+<div class="line"><a name="l00042"></a><span class="lineno"><a class="code" href="structpalette.html#aa1a2941bd65472f07de5e54bcf36678b">   42</a></span>&#160;  <a class="code" href="structcolor.html">color</a> <a class="code" href="structpalette.html#aa1a2941bd65472f07de5e54bcf36678b">colors</a>[256];</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;};</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<a class="code" href="structpalette.html">palette</a> GetPalette(palette::palettetypes pal);</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<a class="code" href="structpalette.html">palette</a> <a class="code" href="falsecolor_8cc.html#ac5b0c15fffbae4e03391db6d106bb830">GetPalette</a>(<a class="code" href="structpalette.html#a36a379b3f92c8aebabe2074a6f4a0349">palette::palettetypes</a> pal);</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor">#endif  // FALSECOLOR_H_</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Nov 6 2013 21:53:35 for msf - modular sensor fusion by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 6 2013 22:06:47 for ethzasl-msf - Modular Sensor Fusion by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

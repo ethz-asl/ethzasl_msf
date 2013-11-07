@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>msf - modular sensor fusion: msf_core::SortedContainer&lt; T, PrototypeInvalidT &gt; Class Template Reference</title>
+<title>ethzasl-msf - Modular Sensor Fusion: msf_core::SortedContainer&lt; T, PrototypeInvalidT &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">msf - modular sensor fusion
+   <div id="projectname">ethzasl-msf - Modular Sensor Fusion
    </div>
    <div id="projectbrief">Time delay compensated single and multi sensor fusion framework based on an EKF</div>
   </td>
@@ -71,7 +71,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -82,52 +82,48 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><b>msf_core</b></li><li class="navelem"><a class="el" href="classmsf__core_1_1SortedContainer.html">SortedContainer</a></li>  </ul>
+<li class="navelem"><a class="el" href="namespacemsf__core.html">msf_core</a></li><li class="navelem"><a class="el" href="classmsf__core_1_1SortedContainer.html">SortedContainer</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
   <div class="summary">
 <a href="classmsf__core_1_1SortedContainer-members.html">List of all members</a> &#124;
 <a href="#pub-types">Public Types</a> &#124;
-<a href="#pub-methods">Public Member Functions</a>  </div>
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pri-types">Private Types</a> &#124;
+<a href="#pri-attribs">Private Attributes</a>  </div>
   <div class="headertitle">
 <div class="title">msf_core::SortedContainer&lt; T, PrototypeInvalidT &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
 <p>Manages a sorted container with strict less than ordering used to store state and measurement objects which can then be queried for closest states/measurements to a given time instant.  
- <a href="classmsf__core_1_1SortedContainer.html#details">More...</a></p>
+</p>
 
 <p><code>#include &lt;<a class="el" href="msf__sortedContainer_8h_source.html">msf_sortedContainer.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a0dd7e9676bf540e11f526a8ac16da06b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0dd7e9676bf540e11f526a8ac16da06b"></a>
-typedef shared_ptr&lt; T &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>Ptr_T</b></td></tr>
-<tr class="memitem:ac060dafe3a40d73ef6d35f4be7e0213e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac060dafe3a40d73ef6d35f4be7e0213e"></a>
-typedef ListT::iterator&#160;</td><td class="memItemRight" valign="bottom"><b>iterator_T</b></td></tr>
+<tr class="memitem:a0dd7e9676bf540e11f526a8ac16da06b"><td class="memItemLeft" align="right" valign="top">typedef shared_ptr&lt; T &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1SortedContainer.html#a0dd7e9676bf540e11f526a8ac16da06b">Ptr_T</a></td></tr>
+<tr class="memitem:ac060dafe3a40d73ef6d35f4be7e0213e"><td class="memItemLeft" align="right" valign="top">typedef ListT::iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1SortedContainer.html#ac060dafe3a40d73ef6d35f4be7e0213e">iterator_T</a></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a92fa629150b579414169ce689fa2f168"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1SortedContainer.html#a92fa629150b579414169ce689fa2f168">SortedContainer</a> ()</td></tr>
 <tr class="memitem:a9c72942ce59c634559fe7e226b6ab302"><td class="memItemLeft" align="right" valign="top">shared_ptr&lt; T &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1SortedContainer.html#a9c72942ce59c634559fe7e226b6ab302">getInvalid</a> ()</td></tr>
 <tr class="memdesc:a9c72942ce59c634559fe7e226b6ab302"><td class="mdescLeft">&#160;</td><td class="mdescRight">To be called to signal that a request could not be satisfied.  <a href="#a9c72942ce59c634559fe7e226b6ab302"></a><br/></td></tr>
-<tr class="memitem:aea65ad1ff460ab46445b433ea3db49b1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aea65ad1ff460ab46445b433ea3db49b1"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1SortedContainer.html#aea65ad1ff460ab46445b433ea3db49b1">clear</a> ()</td></tr>
-<tr class="memdesc:aea65ad1ff460ab46445b433ea3db49b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears the internal container, dropping all the contents. <br/></td></tr>
+<tr class="memitem:aea65ad1ff460ab46445b433ea3db49b1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1SortedContainer.html#aea65ad1ff460ab46445b433ea3db49b1">clear</a> ()</td></tr>
+<tr class="memdesc:aea65ad1ff460ab46445b433ea3db49b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears the internal container, dropping all the contents.  <a href="#aea65ad1ff460ab46445b433ea3db49b1"></a><br/></td></tr>
 <tr class="memitem:af51c989973b49002e737190cec67b6b4"><td class="memItemLeft" align="right" valign="top">ListT::size_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1SortedContainer.html#af51c989973b49002e737190cec67b6b4">size</a> ()</td></tr>
 <tr class="memdesc:af51c989973b49002e737190cec67b6b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the internal container.  <a href="#af51c989973b49002e737190cec67b6b4"></a><br/></td></tr>
-<tr class="memitem:a8e6ef89431cbcac53439b580a7b8706c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8e6ef89431cbcac53439b580a7b8706c"></a>
-ListT::iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1SortedContainer.html#a8e6ef89431cbcac53439b580a7b8706c">insert</a> (const shared_ptr&lt; T &gt; &amp;value)</td></tr>
-<tr class="memdesc:a8e6ef89431cbcac53439b580a7b8706c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Insert an object to the internal container to the position not violating the internal strict less than ordering by time. <br/></td></tr>
-<tr class="memitem:a66c37f04293ec2b3e2fae69ff2ac498e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a66c37f04293ec2b3e2fae69ff2ac498e"></a>
-ListT::iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1SortedContainer.html#a66c37f04293ec2b3e2fae69ff2ac498e">getIteratorBegin</a> ()</td></tr>
-<tr class="memdesc:a66c37f04293ec2b3e2fae69ff2ac498e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the iterator at the beginning of the internal container. <br/></td></tr>
-<tr class="memitem:a17fa1667d94905e8def74a65002907ed"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a17fa1667d94905e8def74a65002907ed"></a>
-ListT::iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1SortedContainer.html#a17fa1667d94905e8def74a65002907ed">getIteratorBeforeBegin</a> ()</td></tr>
-<tr class="memdesc:a17fa1667d94905e8def74a65002907ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the iterator before the beginning of the internal container. <br/></td></tr>
-<tr class="memitem:af1b1597192ac889cc918d8516cd6345c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af1b1597192ac889cc918d8516cd6345c"></a>
-ListT::iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1SortedContainer.html#af1b1597192ac889cc918d8516cd6345c">getIteratorEnd</a> ()</td></tr>
-<tr class="memdesc:af1b1597192ac889cc918d8516cd6345c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the iterator at the end of the internal container. <br/></td></tr>
+<tr class="memitem:a8e6ef89431cbcac53439b580a7b8706c"><td class="memItemLeft" align="right" valign="top">ListT::iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1SortedContainer.html#a8e6ef89431cbcac53439b580a7b8706c">insert</a> (const shared_ptr&lt; T &gt; &amp;value)</td></tr>
+<tr class="memdesc:a8e6ef89431cbcac53439b580a7b8706c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Insert an object to the internal container to the position not violating the internal strict less than ordering by time.  <a href="#a8e6ef89431cbcac53439b580a7b8706c"></a><br/></td></tr>
+<tr class="memitem:a66c37f04293ec2b3e2fae69ff2ac498e"><td class="memItemLeft" align="right" valign="top">ListT::iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1SortedContainer.html#a66c37f04293ec2b3e2fae69ff2ac498e">getIteratorBegin</a> ()</td></tr>
+<tr class="memdesc:a66c37f04293ec2b3e2fae69ff2ac498e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the iterator at the beginning of the internal container.  <a href="#a66c37f04293ec2b3e2fae69ff2ac498e"></a><br/></td></tr>
+<tr class="memitem:a17fa1667d94905e8def74a65002907ed"><td class="memItemLeft" align="right" valign="top">ListT::iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1SortedContainer.html#a17fa1667d94905e8def74a65002907ed">getIteratorBeforeBegin</a> ()</td></tr>
+<tr class="memdesc:a17fa1667d94905e8def74a65002907ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the iterator before the beginning of the internal container.  <a href="#a17fa1667d94905e8def74a65002907ed"></a><br/></td></tr>
+<tr class="memitem:af1b1597192ac889cc918d8516cd6345c"><td class="memItemLeft" align="right" valign="top">ListT::iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1SortedContainer.html#af1b1597192ac889cc918d8516cd6345c">getIteratorEnd</a> ()</td></tr>
+<tr class="memdesc:af1b1597192ac889cc918d8516cd6345c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the iterator at the end of the internal container.  <a href="#af1b1597192ac889cc918d8516cd6345c"></a><br/></td></tr>
 <tr class="memitem:a3ca27ff6fae8916a88a6690b9c8365a9"><td class="memItemLeft" align="right" valign="top">ListT::iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1SortedContainer.html#a3ca27ff6fae8916a88a6690b9c8365a9">getIteratorAtValue</a> (const shared_ptr&lt; T &gt; &amp;value, bool warnIfNotExistant=true)</td></tr>
 <tr class="memdesc:a3ca27ff6fae8916a88a6690b9c8365a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the iterator at the specific time instant of the supplied object or an invalid object if the request cannot be satisfied.  <a href="#a3ca27ff6fae8916a88a6690b9c8365a9"></a><br/></td></tr>
 <tr class="memitem:a727a60e4eb00ab45b2a39c8c069d2fcf"><td class="memItemLeft" align="right" valign="top">ListT::iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1SortedContainer.html#a727a60e4eb00ab45b2a39c8c069d2fcf">getIteratorAtValue</a> (const double &amp;time, bool warnIfNotExistant=true)</td></tr>
@@ -156,13 +152,122 @@ ListT::iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 <tr class="memdesc:a7e4c594bb1aec9d6d4d8fb73e7baff9a"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function updates the time of an object in the container this function effectively changes the map ordering, so the previous iterators are invalidated the attribute unused can be eliminated for non gcc compilers, its just a little more verbose in cases where the updated value is not used.  <a href="#a7e4c594bb1aec9d6d4d8fb73e7baff9a"></a><br/></td></tr>
 <tr class="memitem:a7cecf8583999a5b457e04d5ef781dc5d"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1SortedContainer.html#a7cecf8583999a5b457e04d5ef781dc5d">echoBufferContentTimes</a> ()</td></tr>
 <tr class="memdesc:a7cecf8583999a5b457e04d5ef781dc5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Debug output the contents of the container in a human readable time format.  <a href="#a7cecf8583999a5b457e04d5ef781dc5d"></a><br/></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2><a name="pri-types"></a>
+Private Types</h2></td></tr>
+<tr class="memitem:abb7bb5ff6c1a1916b8c7e48a50953919"><td class="memItemLeft" align="right" valign="top">typedef std::map&lt; double, <a class="el" href="classmsf__core_1_1SortedContainer.html#a0dd7e9676bf540e11f526a8ac16da06b">Ptr_T</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1SortedContainer.html#abb7bb5ff6c1a1916b8c7e48a50953919">ListT</a></td></tr>
+<tr class="memdesc:abb7bb5ff6c1a1916b8c7e48a50953919"><td class="mdescLeft">&#160;</td><td class="mdescRight">The container type in which to store the data.  <a href="#abb7bb5ff6c1a1916b8c7e48a50953919"></a><br/></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2><a name="pri-attribs"></a>
+Private Attributes</h2></td></tr>
+<tr class="memitem:af9bdeecb0097b80a202d5edd044ffda4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmsf__core_1_1SortedContainer.html#abb7bb5ff6c1a1916b8c7e48a50953919">ListT</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1SortedContainer.html#af9bdeecb0097b80a202d5edd044ffda4">stateList</a></td></tr>
+<tr class="memdesc:af9bdeecb0097b80a202d5edd044ffda4"><td class="mdescLeft">&#160;</td><td class="mdescRight">The container in which all the data is stored.  <a href="#af9bdeecb0097b80a202d5edd044ffda4"></a><br/></td></tr>
+<tr class="memitem:a60a2f66705f0a77095e763f7dbe2e265"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmsf__core_1_1SortedContainer.html#a0dd7e9676bf540e11f526a8ac16da06b">Ptr_T</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1SortedContainer.html#a60a2f66705f0a77095e763f7dbe2e265">invalid</a></td></tr>
+<tr class="memdesc:a60a2f66705f0a77095e763f7dbe2e265"><td class="mdescLeft">&#160;</td><td class="mdescRight">A object to signal requests which cannot be satisfied.  <a href="#a60a2f66705f0a77095e763f7dbe2e265"></a><br/></td></tr>
 </table>
-<a name="details" id="details"></a><h2>Detailed Description</h2>
-<div class="textblock"><h3>template&lt;typename T, typename PrototypeInvalidT = T&gt;<br/>
-class msf_core::SortedContainer&lt; T, PrototypeInvalidT &gt;</h3>
+<h2>Member Typedef Documentation</h2>
+<a class="anchor" id="ac060dafe3a40d73ef6d35f4be7e0213e"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T, typename PrototypeInvalidT = T&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef ListT::iterator <a class="el" href="classmsf__core_1_1SortedContainer.html">msf_core::SortedContainer</a>&lt; T, PrototypeInvalidT &gt;::<a class="el" href="classmsf__core_1_1SortedContainer.html#ac060dafe3a40d73ef6d35f4be7e0213e">iterator_T</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
-<p>Manages a sorted container with strict less than ordering used to store state and measurement objects which can then be queried for closest states/measurements to a given time instant. </p>
-</div><h2>Member Function Documentation</h2>
+</div>
+</div>
+<a class="anchor" id="abb7bb5ff6c1a1916b8c7e48a50953919"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T, typename PrototypeInvalidT = T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef std::map&lt;double, <a class="el" href="classmsf__core_1_1SortedContainer.html#a0dd7e9676bf540e11f526a8ac16da06b">Ptr_T</a>&gt; <a class="el" href="classmsf__core_1_1SortedContainer.html">msf_core::SortedContainer</a>&lt; T, PrototypeInvalidT &gt;::<a class="el" href="classmsf__core_1_1SortedContainer.html#abb7bb5ff6c1a1916b8c7e48a50953919">ListT</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a0dd7e9676bf540e11f526a8ac16da06b"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T, typename PrototypeInvalidT = T&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef shared_ptr&lt;T&gt; <a class="el" href="classmsf__core_1_1SortedContainer.html">msf_core::SortedContainer</a>&lt; T, PrototypeInvalidT &gt;::<a class="el" href="classmsf__core_1_1SortedContainer.html#a0dd7e9676bf540e11f526a8ac16da06b">Ptr_T</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2>Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="a92fa629150b579414169ce689fa2f168"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T, typename PrototypeInvalidT = T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classmsf__core_1_1SortedContainer.html">msf_core::SortedContainer</a>&lt; T, PrototypeInvalidT &gt;::<a class="el" href="classmsf__core_1_1SortedContainer.html">SortedContainer</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2>Member Function Documentation</h2>
+<a class="anchor" id="aea65ad1ff460ab46445b433ea3db49b1"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T, typename PrototypeInvalidT = T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classmsf__core_1_1SortedContainer.html">msf_core::SortedContainer</a>&lt; T, PrototypeInvalidT &gt;::clear </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <a class="anchor" id="aa2e690d22ea362eeb281ce30a96751d5"></a>
 <div class="memitem">
 <div class="memproto">
@@ -186,8 +291,6 @@ template&lt;typename T, typename PrototypeInvalidT = T&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-
-<p>Clears all objects having a time stamp older than the supplied time in seconds. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">time</td><td>The maximum age of states in the container. </td></tr>
@@ -220,8 +323,6 @@ template&lt;typename T, typename PrototypeInvalidT = T&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-
-<p>Debug output the contents of the container in a human readable time format. </p>
 <dl class="section return"><dt>Returns</dt><dd>String of the buffer contents with line breaks after every entry. </dd></dl>
 
 </div>
@@ -249,8 +350,6 @@ template&lt;typename T, typename PrototypeInvalidT = T&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-
-<p>Returns a pointer to the closest to a specific time instant. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">time</td><td>The time where we want to get the value at. </td></tr>
@@ -284,8 +383,6 @@ template&lt;typename T, typename PrototypeInvalidT = T&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-
-<p>Returns a pointer to the closest after a specific time instant or an invalid object if the request cannot be satisfied. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">time</td><td>The time where we want to get the value at </td></tr>
@@ -319,8 +416,6 @@ template&lt;typename T, typename PrototypeInvalidT = T&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-
-<p>Returns a pointer to the closest object before a specific time instant. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Time</td><td>the time where we want to get the value at. </td></tr>
@@ -353,8 +448,6 @@ template&lt;typename T, typename PrototypeInvalidT = T&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-
-<p>Returns a pointer to the first object in the container or an invalid object if the container is empty. </p>
 <dl class="section return"><dt>Returns</dt><dd>shared pointer of the object. </dd></dl>
 
 </div>
@@ -381,8 +474,6 @@ template&lt;typename T, typename PrototypeInvalidT = T&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-
-<p>To be called to signal that a request could not be satisfied. </p>
 <dl class="section return"><dt>Returns</dt><dd>an object of the "invalid" type </dd></dl>
 
 </div>
@@ -420,8 +511,6 @@ template&lt;typename T, typename PrototypeInvalidT = T&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-
-<p>Returns the iterator at the specific time instant of the supplied object or an invalid object if the request cannot be satisfied. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">value</td><td>The value to get the iterator for. </td></tr>
@@ -465,8 +554,6 @@ template&lt;typename T, typename PrototypeInvalidT = T&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-
-<p>Returns the iterator at a specific time instant or an invalid object if the request cannot be satisfied. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">time</td><td>The time where we want to get an iterator at. </td></tr>
@@ -474,6 +561,56 @@ template&lt;typename T, typename PrototypeInvalidT = T&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>iterator. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a17fa1667d94905e8def74a65002907ed"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T, typename PrototypeInvalidT = T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">ListT::iterator <a class="el" href="classmsf__core_1_1SortedContainer.html">msf_core::SortedContainer</a>&lt; T, PrototypeInvalidT &gt;::getIteratorBeforeBegin </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a66c37f04293ec2b3e2fae69ff2ac498e"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T, typename PrototypeInvalidT = T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">ListT::iterator <a class="el" href="classmsf__core_1_1SortedContainer.html">msf_core::SortedContainer</a>&lt; T, PrototypeInvalidT &gt;::getIteratorBegin </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
 
 </div>
 </div>
@@ -500,8 +637,6 @@ template&lt;typename T, typename PrototypeInvalidT = T&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-
-<p>Returns the iterator closest to a specific time instant. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">time</td><td>The time where we want to get an iterator at. </td></tr>
@@ -535,8 +670,6 @@ template&lt;typename T, typename PrototypeInvalidT = T&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-
-<p>Returns the iterator closest after a specific time instant. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">time</td><td>The time where we want to get an iterator at. </td></tr>
@@ -570,8 +703,6 @@ template&lt;typename T, typename PrototypeInvalidT = T&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-
-<p>Returns the iterator closest before a specific time instant. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">time</td><td>The time where we want to get an iterator at. </td></tr>
@@ -579,6 +710,31 @@ template&lt;typename T, typename PrototypeInvalidT = T&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>iterator. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="af1b1597192ac889cc918d8516cd6345c"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T, typename PrototypeInvalidT = T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">ListT::iterator <a class="el" href="classmsf__core_1_1SortedContainer.html">msf_core::SortedContainer</a>&lt; T, PrototypeInvalidT &gt;::getIteratorEnd </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
 
 </div>
 </div>
@@ -604,8 +760,6 @@ template&lt;typename T, typename PrototypeInvalidT = T&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-
-<p>Returns a pointer to the last object in the container or an invalid object if the container is empty. </p>
 <dl class="section return"><dt>Returns</dt><dd>shared pointer of the object. </dd></dl>
 
 </div>
@@ -633,8 +787,6 @@ template&lt;typename T, typename PrototypeInvalidT = T&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-
-<p>Returns a pointer to the object at a specific time instant or an invalid object if the request cannot be satisfied. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">time</td><td>The time where we want to get the value at. </td></tr>
@@ -642,6 +794,32 @@ template&lt;typename T, typename PrototypeInvalidT = T&gt; </div>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>shared pointer of the object. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a8e6ef89431cbcac53439b580a7b8706c"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T, typename PrototypeInvalidT = T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">ListT::iterator <a class="el" href="classmsf__core_1_1SortedContainer.html">msf_core::SortedContainer</a>&lt; T, PrototypeInvalidT &gt;::insert </td>
+          <td>(</td>
+          <td class="paramtype">const shared_ptr&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>value</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
 
 </div>
 </div>
@@ -667,8 +845,6 @@ template&lt;typename T, typename PrototypeInvalidT = T&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-
-<p>Returns the size of the internal container. </p>
 <dl class="section return"><dt>Returns</dt><dd>Size of the container. </dd></dl>
 
 </div>
@@ -706,8 +882,6 @@ template&lt;typename T, typename PrototypeInvalidT = T&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-
-<p>This function updates the time of an object in the container this function effectively changes the map ordering, so the previous iterators are invalidated the attribute unused can be eliminated for non gcc compilers, its just a little more verbose in cases where the updated value is not used. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">timeOld</td><td>The time of the value to update. </td></tr>
@@ -719,13 +893,58 @@ template&lt;typename T, typename PrototypeInvalidT = T&gt; </div>
 
 </div>
 </div>
+<h2>Member Data Documentation</h2>
+<a class="anchor" id="a60a2f66705f0a77095e763f7dbe2e265"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T, typename PrototypeInvalidT = T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classmsf__core_1_1SortedContainer.html#a0dd7e9676bf540e11f526a8ac16da06b">Ptr_T</a> <a class="el" href="classmsf__core_1_1SortedContainer.html">msf_core::SortedContainer</a>&lt; T, PrototypeInvalidT &gt;::invalid</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="af9bdeecb0097b80a202d5edd044ffda4"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T, typename PrototypeInvalidT = T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classmsf__core_1_1SortedContainer.html#abb7bb5ff6c1a1916b8c7e48a50953919">ListT</a> <a class="el" href="classmsf__core_1_1SortedContainer.html">msf_core::SortedContainer</a>&lt; T, PrototypeInvalidT &gt;::stateList</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li>msf_core/include/msf_core/<a class="el" href="msf__sortedContainer_8h_source.html">msf_sortedContainer.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Nov 6 2013 21:53:36 for msf - modular sensor fusion by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 6 2013 22:06:48 for ethzasl-msf - Modular Sensor Fusion by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

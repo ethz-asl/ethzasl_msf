@@ -1,0 +1,48 @@
+\hypertarget{msf__sortedContainer_8h}{\section{msf\-\_\-core/include/msf\-\_\-core/msf\-\_\-sorted\-Container.h File Reference}
+\label{msf__sortedContainer_8h}\index{msf\-\_\-core/include/msf\-\_\-core/msf\-\_\-sorted\-Container.\-h@{msf\-\_\-core/include/msf\-\_\-core/msf\-\_\-sorted\-Container.\-h}}
+}
+{\ttfamily \#include $<$msf\-\_\-core/msf\-\_\-types.\-hpp$>$}\\*
+{\ttfamily \#include $<$msf\-\_\-core/msf\-\_\-tools.\-h$>$}\\*
+{\ttfamily \#include $<$msf\-\_\-core/msf\-\_\-macros.\-h$>$}\\*
+{\ttfamily \#include $<$iomanip$>$}\\*
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classmsf__core_1_1SortedContainer}{msf\-\_\-core\-::\-Sorted\-Container$<$ T, Prototype\-Invalid\-T $>$}
+\begin{DoxyCompactList}\small\item\em Manages a sorted container with strict less than ordering used to store state and measurement objects which can then be queried for closest states/measurements to a given time instant. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \hyperlink{namespacemsf__core}{msf\-\_\-core}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{msf__sortedContainer_8h_ab496ccada10ba71d431c6ddd113240c0}{C\-H\-E\-C\-K\-\_\-\-I\-N\-\_\-\-B\-O\-U\-N\-D\-S}(iterator, container)
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{msf__sortedContainer_8h_ab496ccada10ba71d431c6ddd113240c0}{\index{msf\-\_\-sorted\-Container.\-h@{msf\-\_\-sorted\-Container.\-h}!C\-H\-E\-C\-K\-\_\-\-I\-N\-\_\-\-B\-O\-U\-N\-D\-S@{C\-H\-E\-C\-K\-\_\-\-I\-N\-\_\-\-B\-O\-U\-N\-D\-S}}
+\index{C\-H\-E\-C\-K\-\_\-\-I\-N\-\_\-\-B\-O\-U\-N\-D\-S@{C\-H\-E\-C\-K\-\_\-\-I\-N\-\_\-\-B\-O\-U\-N\-D\-S}!msf_sortedContainer.h@{msf\-\_\-sorted\-Container.\-h}}
+\subsubsection[{C\-H\-E\-C\-K\-\_\-\-I\-N\-\_\-\-B\-O\-U\-N\-D\-S}]{\setlength{\rightskip}{0pt plus 5cm}\#define C\-H\-E\-C\-K\-\_\-\-I\-N\-\_\-\-B\-O\-U\-N\-D\-S(
+\begin{DoxyParamCaption}
+\item[{}]{iterator, }
+\item[{}]{container}
+\end{DoxyParamCaption}
+)}}\label{msf__sortedContainer_8h_ab496ccada10ba71d431c6ddd113240c0}
+{\bfseries Value\-:}
+\begin{DoxyCode}
+\textcolor{keywordflow}{do} \{ \(\backslash\)
+             decltype(iterator) \_\_it = it; \(\backslash\)
+             ++\_\_it; \(\backslash\)
+             if (\_\_it == container.begin()) \{ \(\backslash\)
+               MSF\_ERROR\_STREAM(\textcolor{stringliteral}{"Iterator out of bounds (begin) "} << \(\backslash\)
+                 \_\_FILE\_\_ << \textcolor{stringliteral}{":"} << \_\_LINE\_\_); \(\backslash\)
+             \} \(\backslash\)
+             if (iterator == container.end()) \{ \(\backslash\)
+               MSF\_ERROR\_STREAM(\textcolor{stringliteral}{"Iterator out of bounds (end) "} << \(\backslash\)
+                 \_\_FILE\_\_ << \textcolor{stringliteral}{":"} << \_\_LINE\_\_); \(\backslash\)
+             \} \(\backslash\)
+           \} \textcolor{keywordflow}{while}(0);
+\end{DoxyCode}

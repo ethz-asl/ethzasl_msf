@@ -13,28 +13,77 @@ Find the best nontemporal drifting state in the full state vector at compile tim
 \subsection*{Public Types}
 \begin{DoxyCompactItemize}
 \item 
-enum \{ {\bfseries value}
+enum \{ \hyperlink{structmsf__tmp_1_1IndexOfBestNonTemporalDriftingState_a8fc0a3f5c71a072f984cc9ad318ae803a83c8cb635dce2b45676d6997c1ee9a6f}{value}
  \}
 \item 
-\hypertarget{structmsf__tmp_1_1IndexOfBestNonTemporalDriftingState_a9f25e8cd8a466ed4bc97cd51b6a953e0}{typedef \\*
+typedef \\*
 boost\-::fusion\-::result\-\_\-of\-::begin\\*
-$<$ Sequence const  $>$\-::type {\bfseries First}}\label{structmsf__tmp_1_1IndexOfBestNonTemporalDriftingState_a9f25e8cd8a466ed4bc97cd51b6a953e0}
-
+$<$ Sequence const  $>$\-::type \hyperlink{structmsf__tmp_1_1IndexOfBestNonTemporalDriftingState_a9f25e8cd8a466ed4bc97cd51b6a953e0}{First}
 \item 
-\hypertarget{structmsf__tmp_1_1IndexOfBestNonTemporalDriftingState_a66dd8d7ca1fbe97b50c94896293c952f}{typedef \\*
+typedef \\*
 boost\-::fusion\-::result\-\_\-of\-::end\\*
-$<$ Sequence const  $>$\-::type {\bfseries Last}}\label{structmsf__tmp_1_1IndexOfBestNonTemporalDriftingState_a66dd8d7ca1fbe97b50c94896293c952f}
-
+$<$ Sequence const  $>$\-::type \hyperlink{structmsf__tmp_1_1IndexOfBestNonTemporalDriftingState_a66dd8d7ca1fbe97b50c94896293c952f}{Last}
+\end{DoxyCompactItemize}
+\subsection*{Private Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ \hyperlink{structmsf__tmp_1_1IndexOfBestNonTemporalDriftingState_a5e3192e8bb76fae3485111504cb775cba9540152cd0cc657b1e5bfd4086b0005f}{bestindex} =  -\/1
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{structmsf__tmp_1_1IndexOfBestNonTemporalDriftingState_ac45a91feef3e1c46195e14d44e7deef7}{static\-\_\-assert} (\hyperlink{structmsf__tmp_1_1CheckCorrectIndexing}{Check\-Correct\-Indexing}$<$ Sequence $>$\-::indexingerrors==0,\char`\"{}The \char`\"{}\char`\"{}indexing of the state vector is not the same as in the enum,\char`\"{}\char`\"{} but this must be the same\char`\"{})
 \end{DoxyCompactItemize}
 
 
 \subsection{Detailed Description}
 \subsubsection*{template$<$typename Sequence$>$struct msf\-\_\-tmp\-::\-Index\-Of\-Best\-Non\-Temporal\-Drifting\-State$<$ Sequence $>$}
 
-Find the best nontemporal drifting state in the full state vector at compile time. 
-
 The goal of this tmp code is to find the best nontemporal drifting state in the full state vector at compile time. We therefore search the state variable list for states that the user has marked as non temporal drifting. If furthermore prefer quaternions over euclidean states. This function will return -\/1 if no suitable state has been found. 
+
+\subsection{Member Typedef Documentation}
+\hypertarget{structmsf__tmp_1_1IndexOfBestNonTemporalDriftingState_a9f25e8cd8a466ed4bc97cd51b6a953e0}{\index{msf\-\_\-tmp\-::\-Index\-Of\-Best\-Non\-Temporal\-Drifting\-State@{msf\-\_\-tmp\-::\-Index\-Of\-Best\-Non\-Temporal\-Drifting\-State}!First@{First}}
+\index{First@{First}!msf_tmp::IndexOfBestNonTemporalDriftingState@{msf\-\_\-tmp\-::\-Index\-Of\-Best\-Non\-Temporal\-Drifting\-State}}
+\subsubsection[{First}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Sequence $>$ typedef boost\-::fusion\-::result\-\_\-of\-::begin$<$Sequence const$>$\-::type {\bf msf\-\_\-tmp\-::\-Index\-Of\-Best\-Non\-Temporal\-Drifting\-State}$<$ Sequence $>$\-::{\bf First}}}\label{structmsf__tmp_1_1IndexOfBestNonTemporalDriftingState_a9f25e8cd8a466ed4bc97cd51b6a953e0}
+\hypertarget{structmsf__tmp_1_1IndexOfBestNonTemporalDriftingState_a66dd8d7ca1fbe97b50c94896293c952f}{\index{msf\-\_\-tmp\-::\-Index\-Of\-Best\-Non\-Temporal\-Drifting\-State@{msf\-\_\-tmp\-::\-Index\-Of\-Best\-Non\-Temporal\-Drifting\-State}!Last@{Last}}
+\index{Last@{Last}!msf_tmp::IndexOfBestNonTemporalDriftingState@{msf\-\_\-tmp\-::\-Index\-Of\-Best\-Non\-Temporal\-Drifting\-State}}
+\subsubsection[{Last}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Sequence $>$ typedef boost\-::fusion\-::result\-\_\-of\-::end$<$Sequence const$>$\-::type {\bf msf\-\_\-tmp\-::\-Index\-Of\-Best\-Non\-Temporal\-Drifting\-State}$<$ Sequence $>$\-::{\bf Last}}}\label{structmsf__tmp_1_1IndexOfBestNonTemporalDriftingState_a66dd8d7ca1fbe97b50c94896293c952f}
+
+
+\subsection{Member Enumeration Documentation}
+\hypertarget{structmsf__tmp_1_1IndexOfBestNonTemporalDriftingState_a5e3192e8bb76fae3485111504cb775cb}{\subsubsection[{anonymous enum}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Sequence $>$ anonymous enum\hspace{0.3cm}{\ttfamily [private]}}}\label{structmsf__tmp_1_1IndexOfBestNonTemporalDriftingState_a5e3192e8bb76fae3485111504cb775cb}
+\begin{Desc}
+\item[Enumerator\-: ]\par
+\begin{description}
+\index{bestindex@{bestindex}!msf\-\_\-tmp\-::\-Index\-Of\-Best\-Non\-Temporal\-Drifting\-State@{msf\-\_\-tmp\-::\-Index\-Of\-Best\-Non\-Temporal\-Drifting\-State}}\index{msf\-\_\-tmp\-::\-Index\-Of\-Best\-Non\-Temporal\-Drifting\-State@{msf\-\_\-tmp\-::\-Index\-Of\-Best\-Non\-Temporal\-Drifting\-State}!bestindex@{bestindex}}\item[{\em 
+\hypertarget{structmsf__tmp_1_1IndexOfBestNonTemporalDriftingState_a5e3192e8bb76fae3485111504cb775cba9540152cd0cc657b1e5bfd4086b0005f}{bestindex}\label{structmsf__tmp_1_1IndexOfBestNonTemporalDriftingState_a5e3192e8bb76fae3485111504cb775cba9540152cd0cc657b1e5bfd4086b0005f}
+}]\end{description}
+\end{Desc}
+
+\hypertarget{structmsf__tmp_1_1IndexOfBestNonTemporalDriftingState_a8fc0a3f5c71a072f984cc9ad318ae803}{\subsubsection[{anonymous enum}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Sequence $>$ anonymous enum}}\label{structmsf__tmp_1_1IndexOfBestNonTemporalDriftingState_a8fc0a3f5c71a072f984cc9ad318ae803}
+\begin{Desc}
+\item[Enumerator\-: ]\par
+\begin{description}
+\index{value@{value}!msf\-\_\-tmp\-::\-Index\-Of\-Best\-Non\-Temporal\-Drifting\-State@{msf\-\_\-tmp\-::\-Index\-Of\-Best\-Non\-Temporal\-Drifting\-State}}\index{msf\-\_\-tmp\-::\-Index\-Of\-Best\-Non\-Temporal\-Drifting\-State@{msf\-\_\-tmp\-::\-Index\-Of\-Best\-Non\-Temporal\-Drifting\-State}!value@{value}}\item[{\em 
+\hypertarget{structmsf__tmp_1_1IndexOfBestNonTemporalDriftingState_a8fc0a3f5c71a072f984cc9ad318ae803a83c8cb635dce2b45676d6997c1ee9a6f}{value}\label{structmsf__tmp_1_1IndexOfBestNonTemporalDriftingState_a8fc0a3f5c71a072f984cc9ad318ae803a83c8cb635dce2b45676d6997c1ee9a6f}
+}]\end{description}
+\end{Desc}
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{structmsf__tmp_1_1IndexOfBestNonTemporalDriftingState_ac45a91feef3e1c46195e14d44e7deef7}{\index{msf\-\_\-tmp\-::\-Index\-Of\-Best\-Non\-Temporal\-Drifting\-State@{msf\-\_\-tmp\-::\-Index\-Of\-Best\-Non\-Temporal\-Drifting\-State}!static\-\_\-assert@{static\-\_\-assert}}
+\index{static\-\_\-assert@{static\-\_\-assert}!msf_tmp::IndexOfBestNonTemporalDriftingState@{msf\-\_\-tmp\-::\-Index\-Of\-Best\-Non\-Temporal\-Drifting\-State}}
+\subsubsection[{static\-\_\-assert}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Sequence $>$ {\bf msf\-\_\-tmp\-::\-Index\-Of\-Best\-Non\-Temporal\-Drifting\-State}$<$ Sequence $>$\-::static\-\_\-assert (
+\begin{DoxyParamCaption}
+\item[{{\bf Check\-Correct\-Indexing}$<$ Sequence $>$\-::indexingerrors}]{ = {\ttfamily =0}, }
+\item[{\char`\"{}The \char`\"{}\char`\"{}indexing of the state vector is not the same as in the}]{enum, }
+\item[{\char`\"{}\char`\"{}but this must be the same\char`\"{}}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{structmsf__tmp_1_1IndexOfBestNonTemporalDriftingState_ac45a91feef3e1c46195e14d44e7deef7}
+
 
 The documentation for this struct was generated from the following file\-:\begin{DoxyCompactItemize}
 \item 
-msf\-\_\-core/include/msf\-\_\-core/msf\-\_\-tmp.\-h\end{DoxyCompactItemize}
+msf\-\_\-core/include/msf\-\_\-core/\hyperlink{msf__tmp_8h}{msf\-\_\-tmp.\-h}\end{DoxyCompactItemize}

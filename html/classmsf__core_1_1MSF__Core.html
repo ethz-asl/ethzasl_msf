@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>msf - modular sensor fusion: msf_core::MSF_Core&lt; EKFState_T &gt; Class Template Reference</title>
+<title>ethzasl-msf - Modular Sensor Fusion: msf_core::MSF_Core&lt; EKFState_T &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">msf - modular sensor fusion
+   <div id="projectname">ethzasl-msf - Modular Sensor Fusion
    </div>
    <div id="projectbrief">Time delay compensated single and multi sensor fusion framework based on an EKF</div>
   </td>
@@ -71,7 +71,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -82,7 +82,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><b>msf_core</b></li><li class="navelem"><a class="el" href="classmsf__core_1_1MSF__Core.html">MSF_Core</a></li>  </ul>
+<li class="navelem"><a class="el" href="namespacemsf__core.html">msf_core</a></li><li class="navelem"><a class="el" href="classmsf__core_1_1MSF__Core.html">MSF_Core</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -91,6 +91,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="#pri-types">Private Types</a> &#124;
+<a href="#pri-methods">Private Member Functions</a> &#124;
+<a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="#friends">Friends</a>  </div>
   <div class="headertitle">
 <div class="title">msf_core::MSF_Core&lt; EKFState_T &gt; Class Template Reference</div>  </div>
@@ -98,7 +101,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="contents">
 
 <p>The core class of the EKF Does propagation of state and covariance but also applying measurements and managing states and measurements in lists sorted by time stamp.  
- <a href="classmsf__core_1_1MSF__Core.html#details">More...</a></p>
+</p>
 
 <p><code>#include &lt;<a class="el" href="msf__core_8h_source.html">msf_core.h</a>&gt;</code></p>
 <table class="memberdecls">
@@ -107,34 +110,28 @@ Public Types</h2></td></tr>
 <tr class="memitem:a2bca35a2fba08b2fd5cc9963acc9c505"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom">{ <a class="el" href="classmsf__core_1_1MSF__Core.html#a2bca35a2fba08b2fd5cc9963acc9c505afd5aaa703aae2fc6f022eec724b358f6">nErrorStatesAtCompileTime</a> =  EKFState_T::nErrorStatesAtCompileTime, 
 <a class="el" href="classmsf__core_1_1MSF__Core.html#a2bca35a2fba08b2fd5cc9963acc9c505af1d75af5cfbf0cb1e0e9b04c5d944d6e">nStatesAtCompileTime</a> =  EKFState_T::nStatesAtCompileTime
  }</td></tr>
-<tr class="memitem:ace7a0e25e3945f3e84a6b16f72d1f1dd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ace7a0e25e3945f3e84a6b16f72d1f1dd"></a>
-typedef <br class="typebreak"/>
-EKFState_T::StateDefinition_T&#160;</td><td class="memItemRight" valign="bottom"><b>StateDefinition_T</b></td></tr>
-<tr class="memitem:af8de96f8f0a8677c79c12563f86b26d3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af8de96f8f0a8677c79c12563f86b26d3"></a>
-typedef EKFState_T::StateSequence_T&#160;</td><td class="memItemRight" valign="bottom"><b>StateSequence_T</b></td></tr>
-<tr class="memitem:a01a15136971c11456e539f00b88fbf1a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a01a15136971c11456e539f00b88fbf1a"></a>
-typedef Eigen::Matrix&lt; double, <br class="typebreak"/>
+<tr class="memitem:ace7a0e25e3945f3e84a6b16f72d1f1dd"><td class="memItemLeft" align="right" valign="top">typedef <br class="typebreak"/>
+EKFState_T::StateDefinition_T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#ace7a0e25e3945f3e84a6b16f72d1f1dd">StateDefinition_T</a></td></tr>
+<tr class="memitem:af8de96f8f0a8677c79c12563f86b26d3"><td class="memItemLeft" align="right" valign="top">typedef EKFState_T::StateSequence_T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#af8de96f8f0a8677c79c12563f86b26d3">StateSequence_T</a></td></tr>
+<tr class="memitem:a01a15136971c11456e539f00b88fbf1a"><td class="memItemLeft" align="right" valign="top">typedef Eigen::Matrix&lt; double, <br class="typebreak"/>
 <a class="el" href="classmsf__core_1_1MSF__Core.html#a2bca35a2fba08b2fd5cc9963acc9c505afd5aaa703aae2fc6f022eec724b358f6">nErrorStatesAtCompileTime</a>, 1 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#a01a15136971c11456e539f00b88fbf1a">ErrorState</a></td></tr>
-<tr class="memdesc:a01a15136971c11456e539f00b88fbf1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The error state type. <br/></td></tr>
-<tr class="memitem:ad9b84aa4937f3c8354045b5c97ba2dcc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad9b84aa4937f3c8354045b5c97ba2dcc"></a>
-typedef Eigen::Matrix&lt; double, <br class="typebreak"/>
+<tr class="memdesc:a01a15136971c11456e539f00b88fbf1a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The error state type.  <a href="#a01a15136971c11456e539f00b88fbf1a"></a><br/></td></tr>
+<tr class="memitem:ad9b84aa4937f3c8354045b5c97ba2dcc"><td class="memItemLeft" align="right" valign="top">typedef Eigen::Matrix&lt; double, <br class="typebreak"/>
 <a class="el" href="classmsf__core_1_1MSF__Core.html#a2bca35a2fba08b2fd5cc9963acc9c505afd5aaa703aae2fc6f022eec724b358f6">nErrorStatesAtCompileTime</a>, <br class="typebreak"/>
 <a class="el" href="classmsf__core_1_1MSF__Core.html#a2bca35a2fba08b2fd5cc9963acc9c505afd5aaa703aae2fc6f022eec724b358f6">nErrorStatesAtCompileTime</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#ad9b84aa4937f3c8354045b5c97ba2dcc">ErrorStateCov</a></td></tr>
-<tr class="memdesc:ad9b84aa4937f3c8354045b5c97ba2dcc"><td class="mdescLeft">&#160;</td><td class="mdescRight">The error state covariance type. <br/></td></tr>
-<tr class="memitem:a71db0f8ef9e865ef4d85b7365f01388d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a71db0f8ef9e865ef4d85b7365f01388d"></a>
-typedef <br class="typebreak"/>
+<tr class="memdesc:ad9b84aa4937f3c8354045b5c97ba2dcc"><td class="mdescLeft">&#160;</td><td class="mdescRight">The error state covariance type.  <a href="#ad9b84aa4937f3c8354045b5c97ba2dcc"></a><br/></td></tr>
+<tr class="memitem:a71db0f8ef9e865ef4d85b7365f01388d"><td class="memItemLeft" align="right" valign="top">typedef <br class="typebreak"/>
 <a class="el" href="classmsf__core_1_1SortedContainer.html">msf_core::SortedContainer</a><br class="typebreak"/>
 &lt; EKFState_T &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#a71db0f8ef9e865ef4d85b7365f01388d">StateBuffer_T</a></td></tr>
-<tr class="memdesc:a71db0f8ef9e865ef4d85b7365f01388d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of the state buffer containing all the states. <br/></td></tr>
-<tr class="memitem:abbdace8623ce8be7c430f6f7dad6b6fa"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abbdace8623ce8be7c430f6f7dad6b6fa"></a>
-typedef <br class="typebreak"/>
+<tr class="memdesc:a71db0f8ef9e865ef4d85b7365f01388d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of the state buffer containing all the states.  <a href="#a71db0f8ef9e865ef4d85b7365f01388d"></a><br/></td></tr>
+<tr class="memitem:abbdace8623ce8be7c430f6f7dad6b6fa"><td class="memItemLeft" align="right" valign="top">typedef <br class="typebreak"/>
 <a class="el" href="classmsf__core_1_1SortedContainer.html">msf_core::SortedContainer</a><br class="typebreak"/>
 &lt; typename <br class="typebreak"/>
 <a class="el" href="classmsf__core_1_1MSF__MeasurementBase.html">msf_core::MSF_MeasurementBase</a><br class="typebreak"/>
 &lt; EKFState_T &gt;, typename <br class="typebreak"/>
 <a class="el" href="classmsf__core_1_1MSF__InvalidMeasurement.html">msf_core::MSF_InvalidMeasurement</a><br class="typebreak"/>
 &lt; EKFState_T &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#abbdace8623ce8be7c430f6f7dad6b6fa">measurementBufferT</a></td></tr>
-<tr class="memdesc:abbdace8623ce8be7c430f6f7dad6b6fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of the measurement buffer containing all the measurements. <br/></td></tr>
+<tr class="memdesc:abbdace8623ce8be7c430f6f7dad6b6fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of the measurement buffer containing all the measurements.  <a href="#abbdace8623ce8be7c430f6f7dad6b6fa"></a><br/></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -144,49 +141,201 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a68e27c538b3c7a255d1b5260ca00b52e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the filter with the values of the given measurement, other init values from other sensors can be passed in as "measurement" using the initMeasurement structs.  <a href="#a68e27c538b3c7a255d1b5260ca00b52e"></a><br/></td></tr>
 <tr class="memitem:acc5117f9c7f79d9114a63033cbdeb9cb"><td class="memItemLeft" align="right" valign="top">shared_ptr&lt; EKFState_T &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#acc5117f9c7f79d9114a63033cbdeb9cb">getClosestState</a> (double tstamp)</td></tr>
 <tr class="memdesc:acc5117f9c7f79d9114a63033cbdeb9cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds the closest state to the requested time in the internal state.  <a href="#acc5117f9c7f79d9114a63033cbdeb9cb"></a><br/></td></tr>
-<tr class="memitem:af7d1cc22cc28fd4ccabda47cd2ff5888"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af7d1cc22cc28fd4ccabda47cd2ff5888"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#af7d1cc22cc28fd4ccabda47cd2ff5888">getAccumF_SC</a> (const shared_ptr&lt; EKFState_T &gt; &amp;state_old, const shared_ptr&lt; EKFState_T &gt; &amp;state_new, Eigen::Matrix&lt; double, <a class="el" href="classmsf__core_1_1MSF__Core.html#a2bca35a2fba08b2fd5cc9963acc9c505afd5aaa703aae2fc6f022eec724b358f6">nErrorStatesAtCompileTime</a>, <a class="el" href="classmsf__core_1_1MSF__Core.html#a2bca35a2fba08b2fd5cc9963acc9c505afd5aaa703aae2fc6f022eec724b358f6">nErrorStatesAtCompileTime</a> &gt; &amp;F)</td></tr>
-<tr class="memdesc:af7d1cc22cc28fd4ccabda47cd2ff5888"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the accumulated dynamic matrix between two states. <br/></td></tr>
-<tr class="memitem:a9c6b7908fbc66dd2aebb2f08e7c0c4ff"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9c6b7908fbc66dd2aebb2f08e7c0c4ff"></a>
-shared_ptr<br class="typebreak"/>
+<tr class="memitem:af7d1cc22cc28fd4ccabda47cd2ff5888"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#af7d1cc22cc28fd4ccabda47cd2ff5888">getAccumF_SC</a> (const shared_ptr&lt; EKFState_T &gt; &amp;state_old, const shared_ptr&lt; EKFState_T &gt; &amp;state_new, Eigen::Matrix&lt; double, <a class="el" href="classmsf__core_1_1MSF__Core.html#a2bca35a2fba08b2fd5cc9963acc9c505afd5aaa703aae2fc6f022eec724b358f6">nErrorStatesAtCompileTime</a>, <a class="el" href="classmsf__core_1_1MSF__Core.html#a2bca35a2fba08b2fd5cc9963acc9c505afd5aaa703aae2fc6f022eec724b358f6">nErrorStatesAtCompileTime</a> &gt; &amp;F)</td></tr>
+<tr class="memdesc:af7d1cc22cc28fd4ccabda47cd2ff5888"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the accumulated dynamic matrix between two states.  <a href="#af7d1cc22cc28fd4ccabda47cd2ff5888"></a><br/></td></tr>
+<tr class="memitem:a9c6b7908fbc66dd2aebb2f08e7c0c4ff"><td class="memItemLeft" align="right" valign="top">shared_ptr<br class="typebreak"/>
 &lt; <a class="el" href="classmsf__core_1_1MSF__MeasurementBase.html">msf_core::MSF_MeasurementBase</a><br class="typebreak"/>
 &lt; EKFState_T &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#a9c6b7908fbc66dd2aebb2f08e7c0c4ff">getPreviousMeasurement</a> (double time, int sensorID)</td></tr>
-<tr class="memdesc:a9c6b7908fbc66dd2aebb2f08e7c0c4ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns previous measurement of the same type. <br/></td></tr>
+<tr class="memdesc:a9c6b7908fbc66dd2aebb2f08e7c0c4ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns previous measurement of the same type.  <a href="#a9c6b7908fbc66dd2aebb2f08e7c0c4ff"></a><br/></td></tr>
 <tr class="memitem:a759141ac2b7e8722e2c32a28490654fb"><td class="memItemLeft" align="right" valign="top">shared_ptr&lt; EKFState_T &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#a759141ac2b7e8722e2c32a28490654fb">getStateAtTime</a> (double tstamp)</td></tr>
 <tr class="memdesc:a759141ac2b7e8722e2c32a28490654fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finds the state at the requested time in the internal state.  <a href="#a759141ac2b7e8722e2c32a28490654fb"></a><br/></td></tr>
 <tr class="memitem:aef8ea1eb9aedc8c196d4cc9a8411f77a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#aef8ea1eb9aedc8c196d4cc9a8411f77a">predictProcessCovariance</a> (shared_ptr&lt; EKFState_T &gt; &amp;state_old, shared_ptr&lt; EKFState_T &gt; &amp;state_new)</td></tr>
 <tr class="memdesc:aef8ea1eb9aedc8c196d4cc9a8411f77a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Propagates the error state covariance.  <a href="#aef8ea1eb9aedc8c196d4cc9a8411f77a"></a><br/></td></tr>
 <tr class="memitem:a37342ed8ed1b25628ca423b20c95c9e0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#a37342ed8ed1b25628ca423b20c95c9e0">propagateState</a> (shared_ptr&lt; EKFState_T &gt; &amp;state_old, shared_ptr&lt; EKFState_T &gt; &amp;state_new)</td></tr>
 <tr class="memdesc:a37342ed8ed1b25628ca423b20c95c9e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Propagates the state with given dt.  <a href="#a37342ed8ed1b25628ca423b20c95c9e0"></a><br/></td></tr>
-<tr class="memitem:ac5cd6f27e1965b7416bb4b847c72c2e6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac5cd6f27e1965b7416bb4b847c72c2e6"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#ac5cd6f27e1965b7416bb4b847c72c2e6">CleanUpBuffers</a> ()</td></tr>
-<tr class="memdesc:ac5cd6f27e1965b7416bb4b847c72c2e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delete very old states and measurements from the buffers to free memory. <br/></td></tr>
+<tr class="memitem:ac5cd6f27e1965b7416bb4b847c72c2e6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#ac5cd6f27e1965b7416bb4b847c72c2e6">CleanUpBuffers</a> ()</td></tr>
+<tr class="memdesc:ac5cd6f27e1965b7416bb4b847c72c2e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delete very old states and measurements from the buffers to free memory.  <a href="#ac5cd6f27e1965b7416bb4b847c72c2e6"></a><br/></td></tr>
 <tr class="memitem:a5f520250e12d56a8950f4fc355e58d69"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#a5f520250e12d56a8950f4fc355e58d69">setPCore</a> (Eigen::Matrix&lt; double, EKFState_T::nErrorStatesAtCompileTime, EKFState_T::nErrorStatesAtCompileTime &gt; &amp;P)</td></tr>
 <tr class="memdesc:a5f520250e12d56a8950f4fc355e58d69"><td class="mdescLeft">&#160;</td><td class="mdescRight">sets the covariance matrix of the core states to simulated values.  <a href="#a5f520250e12d56a8950f4fc355e58d69"></a><br/></td></tr>
-<tr class="memitem:ad55343b1396263b7a1f2b5599d0fc4e0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#ad55343b1396263b7a1f2b5599d0fc4e0">MSF_Core</a> (const <a class="el" href="classmsf__core_1_1MSF__SensorManager.html">MSF_SensorManager</a>&lt; EKFState_T &gt; &amp;usercalc)</td></tr>
+<tr class="memitem:ad55343b1396263b7a1f2b5599d0fc4e0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#ad55343b1396263b7a1f2b5599d0fc4e0">MSF_Core</a> (const <a class="el" href="classmsf__core_1_1MSF__SensorManager.html">MSF_SensorManager</a>&lt; EKFState_T &gt; &amp;<a class="el" href="classmsf__core_1_1MSF__Core.html#a4685230ba43fd684aaf6d6b891c29fca">usercalc</a>)</td></tr>
 <tr class="memdesc:ad55343b1396263b7a1f2b5599d0fc4e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ctor takes a pointer to an object which does the user defined calculations and provides interfaces for initialization etc.  <a href="#ad55343b1396263b7a1f2b5599d0fc4e0"></a><br/></td></tr>
-<tr class="memitem:a4685230ba43fd684aaf6d6b891c29fca"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4685230ba43fd684aaf6d6b891c29fca"></a>
-const <a class="el" href="classmsf__core_1_1MSF__SensorManager.html">MSF_SensorManager</a><br class="typebreak"/>
-&lt; EKFState_T &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>usercalc</b> () const </td></tr>
+<tr class="memitem:ad90237464018c6270b3d15d79957ed52"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#ad90237464018c6270b3d15d79957ed52">~MSF_Core</a> ()</td></tr>
+<tr class="memitem:a4685230ba43fd684aaf6d6b891c29fca"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classmsf__core_1_1MSF__SensorManager.html">MSF_SensorManager</a><br class="typebreak"/>
+&lt; EKFState_T &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#a4685230ba43fd684aaf6d6b891c29fca">usercalc</a> () const </td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:aad8769aeb9efa04de99604dd397a47a8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aad8769aeb9efa04de99604dd397a47a8"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>EIGEN_MAKE_ALIGNED_OPERATOR_NEW</b></td></tr>
+<tr class="memitem:aad8769aeb9efa04de99604dd397a47a8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#aad8769aeb9efa04de99604dd397a47a8">EIGEN_MAKE_ALIGNED_OPERATOR_NEW</a></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2><a name="pri-types"></a>
+Private Types</h2></td></tr>
+<tr class="memitem:a97cd21e5127e09c53545d64df0b7035f"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom">{ <a class="el" href="classmsf__core_1_1MSF__Core.html#a97cd21e5127e09c53545d64df0b7035fad2798ed0416110329db910b456f60f2c">indexOfStateWithoutTemporalDrift</a>
+ }</td></tr>
+<tr class="memdesc:a97cd21e5127e09c53545d64df0b7035f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the index of the best state having no temporal drift at compile time.  <a href="classmsf__core_1_1MSF__Core.html#a97cd21e5127e09c53545d64df0b7035f">More...</a><br/></td></tr>
+<tr class="memitem:aca5d903b57559980415221fa95f5f32b"><td class="memItemLeft" align="right" valign="top">typedef <br class="typebreak"/>
+msf_tmp::getEnumStateType<br class="typebreak"/>
+&lt; <a class="el" href="classmsf__core_1_1MSF__Core.html#af8de96f8f0a8677c79c12563f86b26d3">StateSequence_T</a>, <br class="typebreak"/>
+<a class="el" href="classmsf__core_1_1MSF__Core.html#a97cd21e5127e09c53545d64df0b7035fad2798ed0416110329db910b456f60f2c">indexOfStateWithoutTemporalDrift</a> &gt;<br class="typebreak"/>
+::value&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#aca5d903b57559980415221fa95f5f32b">nonDriftingStateType</a></td></tr>
+<tr class="memdesc:aca5d903b57559980415221fa95f5f32b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns void type for invalid types.  <a href="#aca5d903b57559980415221fa95f5f32b"></a><br/></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2><a name="pri-methods"></a>
+Private Member Functions</h2></td></tr>
+<tr class="memitem:aefec8d3cb1724a5a4457361efa61662e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#aefec8d3cb1724a5a4457361efa61662e">applyCorrection</a> (shared_ptr&lt; EKFState_T &gt; &amp;delaystate, <a class="el" href="classmsf__core_1_1MSF__Core.html#a01a15136971c11456e539f00b88fbf1a">ErrorState</a> &amp;correction, double fuzzythres=0.1)</td></tr>
+<tr class="memdesc:aefec8d3cb1724a5a4457361efa61662e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies the correction.  <a href="#aefec8d3cb1724a5a4457361efa61662e"></a><br/></td></tr>
+<tr class="memitem:addb4f7a2baa6665058a78ede22253dba"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#addb4f7a2baa6665058a78ede22253dba">propPToState</a> (shared_ptr&lt; EKFState_T &gt; &amp;state)</td></tr>
+<tr class="memdesc:addb4f7a2baa6665058a78ede22253dba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Propagate covariance to a given state in time.  <a href="#addb4f7a2baa6665058a78ede22253dba"></a><br/></td></tr>
+<tr class="memitem:ac71be253d04e72ea07dcb7fd0cd6c118"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#ac71be253d04e72ea07dcb7fd0cd6c118">process_imu</a> (const msf_core::Vector3 &amp;linear_acceleration, const msf_core::Vector3 &amp;angular_velocity, const double &amp;msg_stamp, size_t msg_seq)</td></tr>
+<tr class="memdesc:ac71be253d04e72ea07dcb7fd0cd6c118"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function gets called on incoming imu messages and then performs the state prediction internally. Only use this OR stateCallback by remapping the topics accordingly.  <a href="#ac71be253d04e72ea07dcb7fd0cd6c118"></a><br/></td></tr>
+<tr class="memitem:ab02c0a51189519d1ba29485a61ba4d3d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#ab02c0a51189519d1ba29485a61ba4d3d">process_extstate</a> (const msf_core::Vector3 &amp;linear_acceleration, const msf_core::Vector3 &amp;angular_velocity, const msf_core::Vector3 &amp;p, const msf_core::Vector3 &amp;v, const <a class="el" href="namespacemsf__core.html#a044c525dd7800e2e2f4bb86fc565a7c7">msf_core::Quaternion</a> &amp;q, bool is_already_propagated, const double &amp;msg_stamp, size_t msg_seq)</td></tr>
+<tr class="memdesc:ab02c0a51189519d1ba29485a61ba4d3d"><td class="mdescLeft">&#160;</td><td class="mdescRight">External state propagation:  <a href="#ab02c0a51189519d1ba29485a61ba4d3d"></a><br/></td></tr>
+<tr class="memitem:ad0af95ac637bdea27aafd45355ca58cb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#ad0af95ac637bdea27aafd45355ca58cb">propagatePOneStep</a> ()</td></tr>
+<tr class="memdesc:ad0af95ac637bdea27aafd45355ca58cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Propagates P by one step to distribute processing load.  <a href="#ad0af95ac637bdea27aafd45355ca58cb"></a><br/></td></tr>
+<tr class="memitem:a85803157429d5602e70294378ee49273"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#a85803157429d5602e70294378ee49273">handlePendingMeasurements</a> ()</td></tr>
+<tr class="memdesc:a85803157429d5602e70294378ee49273"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks the queue of measurements to be applied in the future.  <a href="#a85803157429d5602e70294378ee49273"></a><br/></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2><a name="pri-attribs"></a>
+Private Attributes</h2></td></tr>
+<tr class="memitem:a1432cacae3165725ebef0094fc5e5389"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmsf__core_1_1MSF__Core.html#a71db0f8ef9e865ef4d85b7365f01388d">StateBuffer_T</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#a1432cacae3165725ebef0094fc5e5389">stateBuffer_</a></td></tr>
+<tr class="memdesc:a1432cacae3165725ebef0094fc5e5389"><td class="mdescLeft">&#160;</td><td class="mdescRight">EKF buffer containing pretty much all info needed at time t. Sorted by t.  <a href="#a1432cacae3165725ebef0094fc5e5389"></a><br/></td></tr>
+<tr class="memitem:a3e1a3bbacae4dbb01bb0d3f9d415870e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmsf__core_1_1MSF__Core.html#abbdace8623ce8be7c430f6f7dad6b6fa">measurementBufferT</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#a3e1a3bbacae4dbb01bb0d3f9d415870e">MeasurementBuffer_</a></td></tr>
+<tr class="memdesc:a3e1a3bbacae4dbb01bb0d3f9d415870e"><td class="mdescLeft">&#160;</td><td class="mdescRight">EKF Measurements and init values sorted by t asc.  <a href="#a3e1a3bbacae4dbb01bb0d3f9d415870e"></a><br/></td></tr>
+<tr class="memitem:a71ec97d583c23110fb4224888183094d"><td class="memItemLeft" align="right" valign="top">std::queue&lt; shared_ptr<br class="typebreak"/>
+&lt; <a class="el" href="classmsf__core_1_1MSF__MeasurementBase.html">MSF_MeasurementBase</a><br class="typebreak"/>
+&lt; EKFState_T &gt; &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#a71ec97d583c23110fb4224888183094d">queueFutureMeasurements_</a></td></tr>
+<tr class="memdesc:a71ec97d583c23110fb4224888183094d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Buffer for measurements to apply in future.  <a href="#a71ec97d583c23110fb4224888183094d"></a><br/></td></tr>
+<tr class="memitem:a24258a549bce8e83b9f551261a603139"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#a24258a549bce8e83b9f551261a603139">time_P_propagated</a></td></tr>
+<tr class="memdesc:a24258a549bce8e83b9f551261a603139"><td class="mdescLeft">&#160;</td><td class="mdescRight">Last time stamp where we have a valid propagation.  <a href="#a24258a549bce8e83b9f551261a603139"></a><br/></td></tr>
+<tr class="memitem:a55c7abe519e665bd97feabf4b0584067"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmsf__core_1_1SortedContainer.html#ac060dafe3a40d73ef6d35f4be7e0213e">StateBuffer_T::iterator_T</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#a55c7abe519e665bd97feabf4b0584067">it_last_IMU</a></td></tr>
+<tr class="memdesc:a55c7abe519e665bd97feabf4b0584067"><td class="mdescLeft">&#160;</td><td class="mdescRight">Last time stamp where we have a valid state.  <a href="#a55c7abe519e665bd97feabf4b0584067"></a><br/></td></tr>
+<tr class="memitem:a703900170cc427768a4699b4b98bed53"><td class="memItemLeft" align="right" valign="top">Eigen::Matrix&lt; double, 3, 1 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#a703900170cc427768a4699b4b98bed53">g_</a></td></tr>
+<tr class="memdesc:a703900170cc427768a4699b4b98bed53"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gravity vector.  <a href="#a703900170cc427768a4699b4b98bed53"></a><br/></td></tr>
+<tr class="memitem:a18790ea445cf51f8c5845dafcc2b4cb8"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#a18790ea445cf51f8c5845dafcc2b4cb8">initialized_</a></td></tr>
+<tr class="memdesc:a18790ea445cf51f8c5845dafcc2b4cb8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is the filter initialized, so that we can propagate the state?  <a href="#a18790ea445cf51f8c5845dafcc2b4cb8"></a><br/></td></tr>
+<tr class="memitem:a545ca557edba6ceb0cdb31adfe0df709"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#a545ca557edba6ceb0cdb31adfe0df709">predictionMade_</a></td></tr>
+<tr class="memdesc:a545ca557edba6ceb0cdb31adfe0df709"><td class="mdescLeft">&#160;</td><td class="mdescRight">Is there a state prediction, so we can apply measurements?  <a href="#a545ca557edba6ceb0cdb31adfe0df709"></a><br/></td></tr>
+<tr class="memitem:ad2feab0ef759136b599cc249049b833f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#ad2feab0ef759136b599cc249049b833f">isfuzzyState_</a></td></tr>
+<tr class="memdesc:ad2feab0ef759136b599cc249049b833f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Was the filter pushed to fuzzy state by a measurement?  <a href="#ad2feab0ef759136b599cc249049b833f"></a><br/></td></tr>
+<tr class="memitem:a757f4815128ba065125141c533f143ff"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmsf__core_1_1CheckFuzzyTracking.html">CheckFuzzyTracking</a>&lt; EKFState_T, <br class="typebreak"/>
+<a class="el" href="classmsf__core_1_1MSF__Core.html#aca5d903b57559980415221fa95f5f32b">nonDriftingStateType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#a757f4815128ba065125141c533f143ff">fuzzyTracker_</a></td></tr>
+<tr class="memdesc:a757f4815128ba065125141c533f143ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Watch dog to determine fuzzy tracking by observing non temporal drifting.  <a href="#a757f4815128ba065125141c533f143ff"></a><br/></td></tr>
+<tr class="memitem:a77d5808555e74796738c6053be4ac1a9"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="classmsf__core_1_1MSF__SensorManager.html">MSF_SensorManager</a><br class="typebreak"/>
+&lt; EKFState_T &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#a77d5808555e74796738c6053be4ac1a9">usercalc_</a></td></tr>
+<tr class="memdesc:a77d5808555e74796738c6053be4ac1a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">A class which provides methods for customization of several calculations.  <a href="#a77d5808555e74796738c6053be4ac1a9"></a><br/></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="friends"></a>
 Friends</h2></td></tr>
-<tr class="memitem:a096bb61133872bdd266587ce54e931e6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a096bb61133872bdd266587ce54e931e6"></a>
-class&#160;</td><td class="memItemRight" valign="bottom"><b>MSF_MeasurementBase&lt; EKFState_T &gt;</b></td></tr>
-<tr class="memitem:a868b4fae6ec6ad5b5ae95d1980ac1704"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a868b4fae6ec6ad5b5ae95d1980ac1704"></a>
-class&#160;</td><td class="memItemRight" valign="bottom"><b>IMUHandler&lt; EKFState_T &gt;</b></td></tr>
+<tr class="memitem:a096bb61133872bdd266587ce54e931e6"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#a096bb61133872bdd266587ce54e931e6">MSF_MeasurementBase&lt; EKFState_T &gt;</a></td></tr>
+<tr class="memitem:a868b4fae6ec6ad5b5ae95d1980ac1704"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Core.html#a868b4fae6ec6ad5b5ae95d1980ac1704">IMUHandler&lt; EKFState_T &gt;</a></td></tr>
 </table>
-<a name="details" id="details"></a><h2>Detailed Description</h2>
-<div class="textblock"><h3>template&lt;typename EKFState_T&gt;<br/>
-class msf_core::MSF_Core&lt; EKFState_T &gt;</h3>
+<h2>Member Typedef Documentation</h2>
+<a class="anchor" id="a01a15136971c11456e539f00b88fbf1a"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef Eigen::Matrix&lt;double, <a class="el" href="classmsf__core_1_1MSF__Core.html#a2bca35a2fba08b2fd5cc9963acc9c505afd5aaa703aae2fc6f022eec724b358f6">nErrorStatesAtCompileTime</a>, 1&gt; <a class="el" href="classmsf__core_1_1MSF__Core.html">msf_core::MSF_Core</a>&lt; EKFState_T &gt;::<a class="el" href="classmsf__core_1_1MSF__Core.html#a01a15136971c11456e539f00b88fbf1a">ErrorState</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
-<p>The core class of the EKF Does propagation of state and covariance but also applying measurements and managing states and measurements in lists sorted by time stamp. </p>
-</div><h2>Member Enumeration Documentation</h2>
+</div>
+</div>
+<a class="anchor" id="ad9b84aa4937f3c8354045b5c97ba2dcc"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef Eigen::Matrix&lt;double, <a class="el" href="classmsf__core_1_1MSF__Core.html#a2bca35a2fba08b2fd5cc9963acc9c505afd5aaa703aae2fc6f022eec724b358f6">nErrorStatesAtCompileTime</a>, <a class="el" href="classmsf__core_1_1MSF__Core.html#a2bca35a2fba08b2fd5cc9963acc9c505afd5aaa703aae2fc6f022eec724b358f6">nErrorStatesAtCompileTime</a>&gt; <a class="el" href="classmsf__core_1_1MSF__Core.html">msf_core::MSF_Core</a>&lt; EKFState_T &gt;::<a class="el" href="classmsf__core_1_1MSF__Core.html#ad9b84aa4937f3c8354045b5c97ba2dcc">ErrorStateCov</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="abbdace8623ce8be7c430f6f7dad6b6fa"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="classmsf__core_1_1SortedContainer.html">msf_core::SortedContainer</a>&lt; typename <a class="el" href="classmsf__core_1_1MSF__MeasurementBase.html">msf_core::MSF_MeasurementBase</a>&lt;EKFState_T&gt;, typename <a class="el" href="classmsf__core_1_1MSF__InvalidMeasurement.html">msf_core::MSF_InvalidMeasurement</a>&lt;EKFState_T&gt; &gt; <a class="el" href="classmsf__core_1_1MSF__Core.html">msf_core::MSF_Core</a>&lt; EKFState_T &gt;::<a class="el" href="classmsf__core_1_1MSF__Core.html#abbdace8623ce8be7c430f6f7dad6b6fa">measurementBufferT</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aca5d903b57559980415221fa95f5f32b"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef msf_tmp::getEnumStateType&lt;<a class="el" href="classmsf__core_1_1MSF__Core.html#af8de96f8f0a8677c79c12563f86b26d3">StateSequence_T</a>, <a class="el" href="classmsf__core_1_1MSF__Core.html#a97cd21e5127e09c53545d64df0b7035fad2798ed0416110329db910b456f60f2c">indexOfStateWithoutTemporalDrift</a>&gt;::value <a class="el" href="classmsf__core_1_1MSF__Core.html">msf_core::MSF_Core</a>&lt; EKFState_T &gt;::<a class="el" href="classmsf__core_1_1MSF__Core.html#aca5d903b57559980415221fa95f5f32b">nonDriftingStateType</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a71db0f8ef9e865ef4d85b7365f01388d"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="classmsf__core_1_1SortedContainer.html">msf_core::SortedContainer</a>&lt;EKFState_T&gt; <a class="el" href="classmsf__core_1_1MSF__Core.html">msf_core::MSF_Core</a>&lt; EKFState_T &gt;::<a class="el" href="classmsf__core_1_1MSF__Core.html#a71db0f8ef9e865ef4d85b7365f01388d">StateBuffer_T</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ace7a0e25e3945f3e84a6b16f72d1f1dd"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef EKFState_T::StateDefinition_T <a class="el" href="classmsf__core_1_1MSF__Core.html">msf_core::MSF_Core</a>&lt; EKFState_T &gt;::<a class="el" href="classmsf__core_1_1MSF__Core.html#ace7a0e25e3945f3e84a6b16f72d1f1dd">StateDefinition_T</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="af8de96f8f0a8677c79c12563f86b26d3"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef EKFState_T::StateSequence_T <a class="el" href="classmsf__core_1_1MSF__Core.html">msf_core::MSF_Core</a>&lt; EKFState_T &gt;::<a class="el" href="classmsf__core_1_1MSF__Core.html#af8de96f8f0a8677c79c12563f86b26d3">StateSequence_T</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2>Member Enumeration Documentation</h2>
 <a class="anchor" id="a2bca35a2fba08b2fd5cc9963acc9c505"></a>
 <div class="memitem">
 <div class="memproto">
@@ -211,6 +360,34 @@ template&lt;typename EKFState_T&gt; </div>
 
 </div>
 </div>
+<a class="anchor" id="a97cd21e5127e09c53545d64df0b7035f"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">anonymous enum</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl><dt><b>Enumerator: </b></dt><dd><table border="0" cellspacing="2" cellpadding="0">
+<tr><td valign="top"><em><a class="anchor" id="a97cd21e5127e09c53545d64df0b7035fad2798ed0416110329db910b456f60f2c"></a>indexOfStateWithoutTemporalDrift</em>&nbsp;</td><td>
+</td></tr>
+</table>
+</dd>
+</dl>
+
+</div>
+</div>
 <h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="ad55343b1396263b7a1f2b5599d0fc4e0"></a>
 <div class="memitem">
@@ -227,14 +404,29 @@ template&lt;typename EKFState_T &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Ctor takes a pointer to an object which does the user defined calculations and provides interfaces for initialization etc. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">usercalc</td><td>The class providing the user defined calculations DO ABSOLUTELY NOT USE THIS REFERENCE INSIDE THIS CTOR!! </td></tr>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a class="anchor" id="ad90237464018c6270b3d15d79957ed52"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classmsf__core_1_1MSF__Core.html">msf_core::MSF_Core</a>&lt; EKFState_T &gt;::~<a class="el" href="classmsf__core_1_1MSF__Core.html">MSF_Core</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
 </div>
 </div>
@@ -254,14 +446,113 @@ template&lt;typename EKFState_T &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Add a sensor measurement or an init measurement to the internal queue and apply it to the state. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Measurement</td><td>the measurement to add to the internal measurement queue. </td></tr>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a class="anchor" id="aefec8d3cb1724a5a4457361efa61662e"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classmsf__core_1_1MSF__Core.html">msf_core::MSF_Core</a>&lt; EKFState_T &gt;::applyCorrection </td>
+          <td>(</td>
+          <td class="paramtype">shared_ptr&lt; EKFState_T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>delaystate</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classmsf__core_1_1MSF__Core.html#a01a15136971c11456e539f00b88fbf1a">ErrorState</a> &amp;&#160;</td>
+          <td class="paramname"><em>correction</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>fuzzythres</em> = <code>0.1</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">delaystate</td><td>The state to apply the correction on. </td></tr>
+    <tr><td class="paramname">correction</td><td>The correction vector. </td></tr>
+    <tr><td class="paramname">fuzzythres</td><td>The error of the non temporal drifting state allowed before fuzzy tracking will be triggered. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ac5cd6f27e1965b7416bb4b847c72c2e6"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classmsf__core_1_1MSF__Core.html">msf_core::MSF_Core</a>&lt; EKFState_T &gt;::CleanUpBuffers </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="af7d1cc22cc28fd4ccabda47cd2ff5888"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classmsf__core_1_1MSF__Core.html">msf_core::MSF_Core</a>&lt; EKFState_T &gt;::getAccumF_SC </td>
+          <td>(</td>
+          <td class="paramtype">const shared_ptr&lt; EKFState_T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>state_old</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const shared_ptr&lt; EKFState_T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>state_new</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Eigen::Matrix&lt; double, <a class="el" href="classmsf__core_1_1MSF__Core.html#a2bca35a2fba08b2fd5cc9963acc9c505afd5aaa703aae2fc6f022eec724b358f6">nErrorStatesAtCompileTime</a>, <a class="el" href="classmsf__core_1_1MSF__Core.html#a2bca35a2fba08b2fd5cc9963acc9c505afd5aaa703aae2fc6f022eec724b358f6">nErrorStatesAtCompileTime</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>F</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
 </div>
 </div>
@@ -280,14 +571,40 @@ template&lt;typename EKFState_T &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Finds the closest state to the requested time in the internal state. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">tstamp</td><td>The time stamp to find the closest state to. </td></tr>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a class="anchor" id="a9c6b7908fbc66dd2aebb2f08e7c0c4ff"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">shared_ptr&lt; <a class="el" href="classmsf__core_1_1MSF__MeasurementBase.html">msf_core::MSF_MeasurementBase</a>&lt; EKFState_T &gt; &gt; <a class="el" href="classmsf__core_1_1MSF__Core.html">msf_core::MSF_Core</a>&lt; EKFState_T &gt;::getPreviousMeasurement </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>time</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>sensorID</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
 </div>
 </div>
@@ -306,14 +623,37 @@ template&lt;typename EKFState_T &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Finds the state at the requested time in the internal state. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">tstamp</td><td>The time stamp to find the state to. </td></tr>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a class="anchor" id="a85803157429d5602e70294378ee49273"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classmsf__core_1_1MSF__Core.html">msf_core::MSF_Core</a>&lt; EKFState_T &gt;::handlePendingMeasurements </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
 
 </div>
 </div>
@@ -332,8 +672,6 @@ template&lt;typename EKFState_T &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Initializes the filter with the values of the given measurement, other init values from other sensors can be passed in as "measurement" using the initMeasurement structs. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">Measurement</td><td>a measurement containing initial values for the state </td></tr>
@@ -368,8 +706,6 @@ template&lt;typename EKFState_T &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Propagates the error state covariance. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">state_old</td><td>The state to propagate the covariance from. </td></tr>
@@ -377,6 +713,166 @@ template&lt;typename EKFState_T &gt; </div>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a class="anchor" id="ab02c0a51189519d1ba29485a61ba4d3d"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classmsf__core_1_1MSF__Core.html">msf_core::MSF_Core</a>&lt; EKFState_T &gt;::process_extstate </td>
+          <td>(</td>
+          <td class="paramtype">const msf_core::Vector3 &amp;&#160;</td>
+          <td class="paramname"><em>linear_acceleration</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const msf_core::Vector3 &amp;&#160;</td>
+          <td class="paramname"><em>angular_velocity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const msf_core::Vector3 &amp;&#160;</td>
+          <td class="paramname"><em>p</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const msf_core::Vector3 &amp;&#160;</td>
+          <td class="paramname"><em>v</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespacemsf__core.html#a044c525dd7800e2e2f4bb86fc565a7c7">msf_core::Quaternion</a> &amp;&#160;</td>
+          <td class="paramname"><em>q</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>is_already_propagated</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double &amp;&#160;</td>
+          <td class="paramname"><em>msg_stamp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>msg_seq</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>This function gets called when state prediction is performed externally, e.g. by asctec_mav_framework. Msg has to be the latest predicted state. Only use this OR imuCallback by remapping the topics accordingly. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">msg</td><td>The state message from the external propagation. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See Also</dt><dd>{imuCallback} </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ac71be253d04e72ea07dcb7fd0cd6c118"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classmsf__core_1_1MSF__Core.html">msf_core::MSF_Core</a>&lt; EKFState_T &gt;::process_imu </td>
+          <td>(</td>
+          <td class="paramtype">const msf_core::Vector3 &amp;&#160;</td>
+          <td class="paramname"><em>linear_acceleration</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const msf_core::Vector3 &amp;&#160;</td>
+          <td class="paramname"><em>angular_velocity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double &amp;&#160;</td>
+          <td class="paramname"><em>msg_stamp</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>msg_seq</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">msg</td><td>The imu ros message. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>See Also</dt><dd>{stateCallback} </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ad0af95ac637bdea27aafd45355ca58cb"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classmsf__core_1_1MSF__Core.html">msf_core::MSF_Core</a>&lt; EKFState_T &gt;::propagatePOneStep </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
 
 </div>
 </div>
@@ -405,12 +901,42 @@ template&lt;typename EKFState_T &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Propagates the state with given dt. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">state_old</td><td>The state to propagate from. </td></tr>
     <tr><td class="paramname">state_new</td><td>The state to propagate to. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="addb4f7a2baa6665058a78ede22253dba"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classmsf__core_1_1MSF__Core.html">msf_core::MSF_Core</a>&lt; EKFState_T &gt;::propPToState </td>
+          <td>(</td>
+          <td class="paramtype">shared_ptr&lt; EKFState_T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>state</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">State</td><td>the state to propagate to from the last propagated time. </td></tr>
   </table>
   </dd>
 </dl>
@@ -432,14 +958,331 @@ template&lt;typename EKFState_T &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>sets the covariance matrix of the core states to simulated values. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">P</td><td>the error state covariance Matrix to fill. </td></tr>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a class="anchor" id="a4685230ba43fd684aaf6d6b891c29fca"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classmsf__core_1_1MSF__SensorManager.html">MSF_SensorManager</a>&lt; EKFState_T &gt; &amp; <a class="el" href="classmsf__core_1_1MSF__Core.html">msf_core::MSF_Core</a>&lt; EKFState_T &gt;::usercalc </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2>Friends And Related Function Documentation</h2>
+<a class="anchor" id="a868b4fae6ec6ad5b5ae95d1980ac1704"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">friend class <a class="el" href="classmsf__core_1_1IMUHandler.html">IMUHandler</a>&lt; EKFState_T &gt;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a096bb61133872bdd266587ce54e931e6"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">friend class <a class="el" href="classmsf__core_1_1MSF__MeasurementBase.html">MSF_MeasurementBase</a>&lt; EKFState_T &gt;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2>Member Data Documentation</h2>
+<a class="anchor" id="aad8769aeb9efa04de99604dd397a47a8"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classmsf__core_1_1MSF__Core.html">msf_core::MSF_Core</a>&lt; EKFState_T &gt;::EIGEN_MAKE_ALIGNED_OPERATOR_NEW</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a757f4815128ba065125141c533f143ff"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classmsf__core_1_1CheckFuzzyTracking.html">CheckFuzzyTracking</a>&lt;EKFState_T, <a class="el" href="classmsf__core_1_1MSF__Core.html#aca5d903b57559980415221fa95f5f32b">nonDriftingStateType</a>&gt; <a class="el" href="classmsf__core_1_1MSF__Core.html">msf_core::MSF_Core</a>&lt; EKFState_T &gt;::fuzzyTracker_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a703900170cc427768a4699b4b98bed53"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Eigen::Matrix&lt;double, 3, 1&gt; <a class="el" href="classmsf__core_1_1MSF__Core.html">msf_core::MSF_Core</a>&lt; EKFState_T &gt;::g_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a18790ea445cf51f8c5845dafcc2b4cb8"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classmsf__core_1_1MSF__Core.html">msf_core::MSF_Core</a>&lt; EKFState_T &gt;::initialized_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ad2feab0ef759136b599cc249049b833f"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classmsf__core_1_1MSF__Core.html">msf_core::MSF_Core</a>&lt; EKFState_T &gt;::isfuzzyState_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a55c7abe519e665bd97feabf4b0584067"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classmsf__core_1_1SortedContainer.html#ac060dafe3a40d73ef6d35f4be7e0213e">StateBuffer_T::iterator_T</a> <a class="el" href="classmsf__core_1_1MSF__Core.html">msf_core::MSF_Core</a>&lt; EKFState_T &gt;::it_last_IMU</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a3e1a3bbacae4dbb01bb0d3f9d415870e"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classmsf__core_1_1MSF__Core.html#abbdace8623ce8be7c430f6f7dad6b6fa">measurementBufferT</a> <a class="el" href="classmsf__core_1_1MSF__Core.html">msf_core::MSF_Core</a>&lt; EKFState_T &gt;::MeasurementBuffer_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a545ca557edba6ceb0cdb31adfe0df709"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classmsf__core_1_1MSF__Core.html">msf_core::MSF_Core</a>&lt; EKFState_T &gt;::predictionMade_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a71ec97d583c23110fb4224888183094d"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::queue&lt;shared_ptr&lt;<a class="el" href="classmsf__core_1_1MSF__MeasurementBase.html">MSF_MeasurementBase</a>&lt;EKFState_T&gt; &gt; &gt; <a class="el" href="classmsf__core_1_1MSF__Core.html">msf_core::MSF_Core</a>&lt; EKFState_T &gt;::queueFutureMeasurements_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a1432cacae3165725ebef0094fc5e5389"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classmsf__core_1_1MSF__Core.html#a71db0f8ef9e865ef4d85b7365f01388d">StateBuffer_T</a> <a class="el" href="classmsf__core_1_1MSF__Core.html">msf_core::MSF_Core</a>&lt; EKFState_T &gt;::stateBuffer_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a24258a549bce8e83b9f551261a603139"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double <a class="el" href="classmsf__core_1_1MSF__Core.html">msf_core::MSF_Core</a>&lt; EKFState_T &gt;::time_P_propagated</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a77d5808555e74796738c6053be4ac1a9"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="classmsf__core_1_1MSF__SensorManager.html">MSF_SensorManager</a>&lt;EKFState_T&gt;&amp; <a class="el" href="classmsf__core_1_1MSF__Core.html">msf_core::MSF_Core</a>&lt; EKFState_T &gt;::usercalc_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
 
 </div>
 </div>
@@ -450,7 +1293,7 @@ template&lt;typename EKFState_T &gt; </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Nov 6 2013 21:53:35 for msf - modular sensor fusion by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 6 2013 22:06:47 for ethzasl-msf - Modular Sensor Fusion by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

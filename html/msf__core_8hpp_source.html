@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>msf - modular sensor fusion: msf_core/include/msf_core/implementation/msf_core.hpp Source File</title>
+<title>ethzasl-msf - Modular Sensor Fusion: msf_core/include/msf_core/implementation/msf_core.hpp Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">msf - modular sensor fusion
+   <div id="projectname">ethzasl-msf - Modular Sensor Fusion
    </div>
    <div id="projectbrief">Time delay compensated single and multi sensor fusion framework based on an EKF</div>
   </td>
@@ -61,6 +61,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="files.html"><span>File&#160;List</span></a></li>
+      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
     </ul>
   </div>
 <!-- window showing the filter options -->
@@ -68,7 +69,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -87,7 +88,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">msf_core.hpp</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
+<a href="msf__core_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * Copyright (C) 2012-2013 Simon Lynen, ASL, ETH Zurich, Switzerland</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> * You can contact the author at &lt;slynen at ethz dot ch&gt;</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> * Copyright (C) 2011-2012 Stephan Weiss, ASL, ETH Zurich, Switzerland</span></div>
@@ -113,13 +114,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &lt;vector&gt;</span></div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;</div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#include &lt;msf_timing/Timer.h&gt;</span></div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">#include &lt;msf_core/implementation/calcQCore.h&gt;</span></div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">#include &lt;msf_core/eigen_utils.h&gt;</span></div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">#include &lt;msf_core/msf_sensormanager.h&gt;</span></div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">#include &lt;msf_core/msf_tools.h&gt;</span></div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">#include &lt;msf_core/msf_measurement.h&gt;</span></div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor">#include &lt;msf_core/falsecolor.h&gt;</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">#include &lt;msf_core/msf_types.hpp&gt;</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="calcQCore_8h.html">msf_core/implementation/calcQCore.h</a>&gt;</span></div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="eigen__utils_8h.html">msf_core/eigen_utils.h</a>&gt;</span></div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="msf__sensormanager_8h.html">msf_core/msf_sensormanager.h</a>&gt;</span></div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="msf__tools_8h.html">msf_core/msf_tools.h</a>&gt;</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="msf__measurement_8h.html">msf_core/msf_measurement.h</a>&gt;</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="falsecolor_8h.html">msf_core/falsecolor.h</a>&gt;</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="msf__types_8hpp.html">msf_core/msf_types.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;</div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="keyword">namespace </span>msf_core {</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> EKFState_T&gt;</div>
@@ -128,17 +129,17 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  <span class="comment">// interna, DO ABSOLUTELY NOT USE THIS POINTER INSIDE THIS CTOR!!</span></div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <span class="comment">// Set the output precision for numeric values.</span></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  std::setprecision(NUMERIC_PREC);</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  initialized_ = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  predictionMade_ = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  isfuzzyState_ = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  g_ &lt;&lt; 0, 0, 9.80834;  <span class="comment">// At 47.37 lat (Zurich).</span></div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  time_P_propagated = 0;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  it_last_IMU = stateBuffer_.<a class="code" href="classmsf__core_1_1SortedContainer.html#af1b1597192ac889cc918d8516cd6345c" title="Returns the iterator at the end of the internal container.">getIteratorEnd</a>();</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  std::setprecision(<a class="code" href="msf__macros_8h.html#ad3b6dfb41f49e999485ba160b60819e6">NUMERIC_PREC</a>);</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  <a class="code" href="classmsf__core_1_1MSF__Core.html#a18790ea445cf51f8c5845dafcc2b4cb8" title="Is the filter initialized, so that we can propagate the state?">initialized_</a> = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <a class="code" href="classmsf__core_1_1MSF__Core.html#a545ca557edba6ceb0cdb31adfe0df709" title="Is there a state prediction, so we can apply measurements?">predictionMade_</a> = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <a class="code" href="classmsf__core_1_1MSF__Core.html#ad2feab0ef759136b599cc249049b833f" title="Was the filter pushed to fuzzy state by a measurement?">isfuzzyState_</a> = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  <a class="code" href="classmsf__core_1_1MSF__Core.html#a703900170cc427768a4699b4b98bed53" title="Gravity vector.">g_</a> &lt;&lt; 0, 0, 9.80834;  <span class="comment">// At 47.37 lat (Zurich).</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  <a class="code" href="classmsf__core_1_1MSF__Core.html#a24258a549bce8e83b9f551261a603139" title="Last time stamp where we have a valid propagation.">time_P_propagated</a> = 0;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  <a class="code" href="classmsf__core_1_1MSF__Core.html#a55c7abe519e665bd97feabf4b0584067" title="Last time stamp where we have a valid state.">it_last_IMU</a> = <a class="code" href="classmsf__core_1_1MSF__Core.html#a1432cacae3165725ebef0094fc5e5389" title="EKF buffer containing pretty much all info needed at time t. Sorted by t.">stateBuffer_</a>.<a class="code" href="classmsf__core_1_1SortedContainer.html#af1b1597192ac889cc918d8516cd6345c" title="Returns the iterator at the end of the internal container.">getIteratorEnd</a>();</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;}</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> EKFState_T&gt;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<a class="code" href="classmsf__core_1_1MSF__Core.html" title="The core class of the EKF Does propagation of state and covariance but also applying measurements and...">MSF_Core&lt;EKFState_T&gt;::~MSF_Core</a>() {</div>
+<div class="line"><a name="l00052"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__Core.html#ad90237464018c6270b3d15d79957ed52">   52</a></span>&#160;<a class="code" href="classmsf__core_1_1MSF__Core.html#ad90237464018c6270b3d15d79957ed52">MSF_Core&lt;EKFState_T&gt;::~MSF_Core</a>() {</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;}</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> EKFState_T&gt;</div>
@@ -177,12 +178,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;}</div>
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> EKFState_T&gt;</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="keyword">const</span> <a class="code" href="classmsf__core_1_1MSF__SensorManager.html" title="A manager for a given sensor set. Handlers for individual sensors (camera/vicon etc.) are registered with this class as handlers of particular sensors. This class also owns the EKF core instance and handles the initialization of the filter.">MSF_SensorManager&lt;EKFState_T&gt;</a>&amp; <a class="code" href="classmsf__core_1_1MSF__Core.html" title="The core class of the EKF Does propagation of state and covariance but also applying measurements and...">MSF_Core&lt;EKFState_T&gt;::usercalc</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00091"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__Core.html#a4685230ba43fd684aaf6d6b891c29fca">   91</a></span>&#160;<span class="keyword">const</span> <a class="code" href="classmsf__core_1_1MSF__SensorManager.html" title="A manager for a given sensor set. Handlers for individual sensors (camera/vicon etc.) are registered with this class as handlers of particular sensors. This class also owns the EKF core instance and handles the initialization of the filter.">MSF_SensorManager&lt;EKFState_T&gt;</a>&amp; <a class="code" href="classmsf__core_1_1MSF__Core.html#a4685230ba43fd684aaf6d6b891c29fca">MSF_Core&lt;EKFState_T&gt;::usercalc</a>()<span class="keyword"> const </span>{</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  <span class="keywordflow">return</span> usercalc_;</div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;}</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;</div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> EKFState_T&gt;</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="keywordtype">void</span> MSF_Core&lt;EKFState_T&gt;::process_imu(</div>
+<div class="line"><a name="l00096"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__Core.html#ac71be253d04e72ea07dcb7fd0cd6c118">   96</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classmsf__core_1_1MSF__Core.html#ac71be253d04e72ea07dcb7fd0cd6c118" title="This function gets called on incoming imu messages and then performs the state prediction internally...">MSF_Core&lt;EKFState_T&gt;::process_imu</a>(</div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    <span class="keyword">const</span> msf_core::Vector3&amp; linear_acceleration,</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <span class="keyword">const</span> msf_core::Vector3&amp; angular_velocity, <span class="keyword">const</span> <span class="keywordtype">double</span>&amp; msg_stamp,</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    <span class="keywordtype">size_t</span> msg_seq) {</div>
@@ -200,7 +201,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;</div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;  msf_timing::DebugTimer timer_PropPrepare(<span class="stringliteral">&quot;PropPrepare&quot;</span>);</div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;  <span class="keywordflow">if</span> (lastState-&gt;time == -1) {</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    MSF_WARN_STREAM_THROTTLE(</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <a class="code" href="msf__macros_8h.html#a51b3004c146da17dcb8a35a4168bad47">MSF_WARN_STREAM_THROTTLE</a>(</div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;        2, __FUNCTION__&lt;&lt;<span class="stringliteral">&quot;ImuCallback: closest state is invalid\n&quot;</span>);</div>
 <div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <span class="keywordflow">return</span>;  <span class="comment">// Early abort.</span></div>
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;  }</div>
@@ -213,9 +214,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;  <span class="keywordflow">if</span> (currentState-&gt;time - lastState-&gt;time &lt; -0.01 &amp;&amp; predictionMade_) {</div>
 <div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    initialized_ = <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    predictionMade_ = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    MSF_ERROR_STREAM(</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    <a class="code" href="msf__macros_8h.html#a852413224a5d3e667616aa295266ecaf">MSF_ERROR_STREAM</a>(</div>
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;        __FUNCTION__&lt;&lt;<span class="stringliteral">&quot;latest IMU message was out of order by a too large amount, &quot;</span></div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;        <span class="stringliteral">&quot;resetting EKF: last-state-time: &quot;</span> &lt;&lt; msf_core::timehuman(lastState-&gt;time) &lt;&lt; <span class="stringliteral">&quot; &quot;</span>&lt;&lt; <span class="stringliteral">&quot;current-imu-time: &quot;</span>&lt;&lt; msf_core::timehuman(currentState-&gt;time));</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;        <span class="stringliteral">&quot;resetting EKF: last-state-time: &quot;</span> &lt;&lt; <a class="code" href="namespacemsf__core.html#aee980177ac4429201472c20bb8b04612">msf_core::timehuman</a>(lastState-&gt;time) &lt;&lt; <span class="stringliteral">&quot; &quot;</span>&lt;&lt; <span class="stringliteral">&quot;current-imu-time: &quot;</span>&lt;&lt; <a class="code" href="namespacemsf__core.html#aee980177ac4429201472c20bb8b04612">msf_core::timehuman</a>(currentState-&gt;time));</div>
 <div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <span class="keywordflow">return</span>;</div>
 <div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;  }</div>
 <div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;</div>
@@ -232,7 +233,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;  <span class="keywordflow">else</span> {</div>
 <div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    <span class="comment">// Try to get the state before the current time.</span></div>
 <div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    if (lastState-&gt;time == -1) {</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;      MSF_WARN_STREAM(</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;      <a class="code" href="msf__macros_8h.html#a48a90912747b87b3c148944f408d7652">MSF_WARN_STREAM</a>(</div>
 <div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;          <span class="stringliteral">&quot;Accelerometer readings had a spike, but no prior state was in the &quot;</span></div>
 <div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;          <span class="stringliteral">&quot;buffer to take cleaner measurements from&quot;</span>);</div>
 <div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;      <span class="keywordflow">return</span>;</div>
@@ -241,12 +242,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;  }</div>
 <div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;  <span class="keywordflow">if</span> (!predictionMade_) {</div>
 <div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    <span class="keywordflow">if</span> (lastState-&gt;time == -1) {</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;      MSF_WARN_STREAM(<span class="stringliteral">&quot;Wanted to compare prediction time offset to last state, &quot;</span></div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;      <a class="code" href="msf__macros_8h.html#a48a90912747b87b3c148944f408d7652">MSF_WARN_STREAM</a>(<span class="stringliteral">&quot;Wanted to compare prediction time offset to last state, &quot;</span></div>
 <div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;      <span class="stringliteral">&quot;but no prior state was in the buffer to take cleaner measurements from&quot;</span>);</div>
 <div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;      <span class="keywordflow">return</span>;</div>
 <div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    }</div>
 <div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    <span class="keywordflow">if</span> (fabs(currentState-&gt;time - lastState-&gt;time) &gt; 0.1) {</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;      MSF_WARN_STREAM_THROTTLE(</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;      <a class="code" href="msf__macros_8h.html#a51b3004c146da17dcb8a35a4168bad47">MSF_WARN_STREAM_THROTTLE</a>(</div>
 <div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;          2, <span class="stringliteral">&quot;large time-gap re-initializing to last state\n&quot;</span>);</div>
 <div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;      <span class="keyword">typename</span> StateBuffer_T::Ptr_T tmp = stateBuffer_.updateTime(</div>
 <div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;          lastState-&gt;time, currentState-&gt;time);</div>
@@ -256,7 +257,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;  }</div>
 <div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;</div>
 <div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;  <span class="keywordflow">if</span> (lastState-&gt;time == -1) {</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    MSF_WARN_STREAM(</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    <a class="code" href="msf__macros_8h.html#a48a90912747b87b3c148944f408d7652">MSF_WARN_STREAM</a>(</div>
 <div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;        <span class="stringliteral">&quot;Wanted to propagate state, but no valid prior state could be found in &quot;</span></div>
 <div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;        <span class="stringliteral">&quot;the buffer&quot;</span>);</div>
 <div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    <span class="keywordflow">return</span>;</div>
@@ -290,10 +291,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;}</div>
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;</div>
 <div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> EKFState_T&gt;</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;<span class="keywordtype">void</span> MSF_Core&lt;EKFState_T&gt;::process_extstate(</div>
+<div class="line"><a name="l00204"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__Core.html#ab02c0a51189519d1ba29485a61ba4d3d">  204</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classmsf__core_1_1MSF__Core.html" title="The core class of the EKF Does propagation of state and covariance but also applying measurements and...">MSF_Core&lt;EKFState_T&gt;::process_extstate</a>(</div>
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    <span class="keyword">const</span> msf_core::Vector3&amp; linear_acceleration,</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    <span class="keyword">const</span> msf_core::Vector3&amp; angular_velocity, <span class="keyword">const</span> msf_core::Vector3&amp; p,</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    <span class="keyword">const</span> msf_core::Vector3&amp; v, <span class="keyword">const</span> msf_core::Quaternion&amp; q,</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    <span class="keyword">const</span> msf_core::Vector3&amp; angular_velocity, <span class="keyword">const</span> msf_core::Vector3&amp; <a class="code" href="namespacegeometry__msgs_1_1cov.html#a39ced537b52c13c965a0ccdfe23f4dd1a564e84fef1216ef14d3dbf7ed94cb357">p</a>,</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    <span class="keyword">const</span> msf_core::Vector3&amp; <a class="code" href="namespacemsf__updates.html#a2812be4bf8c439845faf79dd4860835aafabe93e027092b8207af346d3d0c7a2a">v</a>, <span class="keyword">const</span> <a class="code" href="namespacemsf__core.html#a044c525dd7800e2e2f4bb86fc565a7c7">msf_core::Quaternion</a>&amp; <a class="code" href="namespacegeometry__msgs_1_1cov.html#a39ced537b52c13c965a0ccdfe23f4dd1a45bc9ae177afeb4ed8e0a975dc10b8e8">q</a>,</div>
 <div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    <span class="keywordtype">bool</span> is_already_propagated, <span class="keyword">const</span> <span class="keywordtype">double</span>&amp; msg_stamp, <span class="keywordtype">size_t</span> msg_seq) {</div>
 <div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;</div>
 <div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;  <span class="keywordflow">if</span> (!initialized_)</div>
@@ -311,7 +312,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;  <span class="comment">// TODO(slynen): not broken, revert back when it_last_IMU-&gt;second from above is fixed</span></div>
 <div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;  shared_ptr&lt;EKFState_T&gt; lastState = stateBuffer_.getLast();<span class="comment">//it_last_IMU-&gt;second;</span></div>
 <div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;  <span class="keywordflow">if</span> (lastState-&gt;time == -1) {</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    MSF_WARN_STREAM_THROTTLE(2, <span class="stringliteral">&quot;StateCallback: closest state is invalid\n&quot;</span>);</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    <a class="code" href="msf__macros_8h.html#a51b3004c146da17dcb8a35a4168bad47">MSF_WARN_STREAM_THROTTLE</a>(2, <span class="stringliteral">&quot;StateCallback: closest state is invalid\n&quot;</span>);</div>
 <div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    <span class="keywordflow">return</span>;  <span class="comment">// Early abort.</span></div>
 <div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;  }</div>
 <div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;</div>
@@ -333,16 +334,16 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;</div>
 <div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;  if (!predictionMade_) {</div>
 <div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;    <span class="keywordflow">if</span> (fabs(currentState-&gt;time - lastState-&gt;time) &gt; 5) {</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;      <span class="keyword">typename</span> StateBuffer_T::Ptr_T tmp = stateBuffer_.updateTime(</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;      <span class="keyword">typename</span> <a class="code" href="classmsf__core_1_1SortedContainer.html#a0dd7e9676bf540e11f526a8ac16da06b">StateBuffer_T::Ptr_T</a> tmp = stateBuffer_.updateTime(</div>
 <div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;          lastState-&gt;time, currentState-&gt;time);</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;      MSF_WARN_STREAM_THROTTLE(</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;      <a class="code" href="msf__macros_8h.html#a51b3004c146da17dcb8a35a4168bad47">MSF_WARN_STREAM_THROTTLE</a>(</div>
 <div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;          2,</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;          <span class="stringliteral">&quot;large time-gap re-initializing to last state: &quot;</span> &lt;&lt; msf_core::timehuman(tmp-&gt;time));</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;          <span class="stringliteral">&quot;large time-gap re-initializing to last state: &quot;</span> &lt;&lt; <a class="code" href="namespacemsf__core.html#aee980177ac4429201472c20bb8b04612">msf_core::timehuman</a>(tmp-&gt;time));</div>
 <div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;      <span class="keywordflow">return</span>;  <span class="comment">// Early abort (if timegap too big).</span></div>
 <div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    }</div>
 <div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;  }</div>
 <div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;  <span class="keywordtype">bool</span> isnumeric = checkForNumeric(</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;  <span class="keywordtype">bool</span> isnumeric = <a class="code" href="eigen__utils_8h.html#ad367eee96655c3fd3f2fdf03ba0bb62f" title="Debug output to check misbehavior of Eigen.">checkForNumeric</a>(</div>
 <div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;      currentState-&gt;template get&lt;StateDefinition_T::p&gt;(),</div>
 <div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;      <span class="stringliteral">&quot;before prediction p&quot;</span>);</div>
 <div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;</div>
@@ -364,9 +365,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;</div>
 <div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;  propagatePOneStep();</div>
 <div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;  isnumeric = checkForNumeric(</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;  isnumeric = <a class="code" href="eigen__utils_8h.html#ad367eee96655c3fd3f2fdf03ba0bb62f" title="Debug output to check misbehavior of Eigen.">checkForNumeric</a>(</div>
 <div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;      currentState-&gt;template get&lt;StateDefinition_T::p&gt;(), <span class="stringliteral">&quot;prediction p&quot;</span>);</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;  isnumeric = checkForNumeric(currentState-&gt;P, <span class="stringliteral">&quot;prediction done P&quot;</span>);</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;  isnumeric = <a class="code" href="eigen__utils_8h.html#ad367eee96655c3fd3f2fdf03ba0bb62f" title="Debug output to check misbehavior of Eigen.">checkForNumeric</a>(currentState-&gt;P, <span class="stringliteral">&quot;prediction done P&quot;</span>);</div>
 <div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;</div>
 <div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;  <span class="comment">// Clean reset of state and measurement buffer, before we start propagation.</span></div>
 <div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;  <span class="keywordflow">if</span> (!predictionMade_) {</div>
@@ -389,7 +390,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;}</div>
 <div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;</div>
 <div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> EKFState_T&gt;</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;<span class="keywordtype">void</span> MSF_Core&lt;EKFState_T&gt;::handlePendingMeasurements() {</div>
+<div class="line"><a name="l00303"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__Core.html#a85803157429d5602e70294378ee49273">  303</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classmsf__core_1_1MSF__Core.html" title="The core class of the EKF Does propagation of state and covariance but also applying measurements and...">MSF_Core&lt;EKFState_T&gt;::handlePendingMeasurements</a>() {</div>
 <div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;  <span class="keywordflow">if</span> (queueFutureMeasurements_.empty())</div>
 <div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;    <span class="keywordflow">return</span>;</div>
 <div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;  shared_ptr&lt;MSF_MeasurementBase&lt;EKFState_T&gt; &gt; meas = queueFutureMeasurements_</div>
@@ -428,9 +429,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;      - state_new-&gt;template get&lt;StateDefinition_T::b_a&gt;();</div>
 <div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;  <span class="keyword">const</span> Vector3 eaold = state_old-&gt;a_m</div>
 <div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;      - state_old-&gt;template get&lt;StateDefinition_T::b_a&gt;();</div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;  <span class="keyword">const</span> Matrix4 Omega = omegaMatJPL(ew);</div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;  <span class="keyword">const</span> Matrix4 OmegaOld = omegaMatJPL(ewold);</div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;  Matrix4 OmegaMean = omegaMatJPL((ew + ewold) / 2);</div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;  <span class="keyword">const</span> Matrix4 Omega = <a class="code" href="eigen__utils_8h.html#a3779bdde122cc4a653434817ae174a75" title="Returns a matrix with angular velocities used for quaternion derivatives/.">omegaMatJPL</a>(ew);</div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;  <span class="keyword">const</span> Matrix4 OmegaOld = <a class="code" href="eigen__utils_8h.html#a3779bdde122cc4a653434817ae174a75" title="Returns a matrix with angular velocities used for quaternion derivatives/.">omegaMatJPL</a>(ewold);</div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;  Matrix4 OmegaMean = <a class="code" href="eigen__utils_8h.html#a3779bdde122cc4a653434817ae174a75" title="Returns a matrix with angular velocities used for quaternion derivatives/.">omegaMatJPL</a>((ew + ewold) / 2);</div>
 <div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;</div>
 <div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;  <span class="comment">// Zero order quaternion integration.</span></div>
 <div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;  <span class="comment">// cur_state.q_ = (Eigen::Matrix&lt;double,4,4&gt;::Identity() +</span></div>
@@ -469,12 +470,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;}</div>
 <div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;</div>
 <div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> EKFState_T&gt;</div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;<span class="keywordtype">void</span> <a class="code" href="classmsf__core_1_1MSF__Core.html" title="The core class of the EKF Does propagation of state and covariance but also applying measurements and...">MSF_Core&lt;EKFState_T&gt;::propagatePOneStep</a>() {</div>
+<div class="line"><a name="l00383"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__Core.html#ad0af95ac637bdea27aafd45355ca58cb">  383</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classmsf__core_1_1MSF__Core.html" title="The core class of the EKF Does propagation of state and covariance but also applying measurements and...">MSF_Core&lt;EKFState_T&gt;::propagatePOneStep</a>() {</div>
 <div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;  <span class="comment">// Also propagate the covariance one step further, to distribute the</span></div>
 <div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;  <span class="comment">// processing load over time.</span></div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;  <span class="keyword">typename</span> StateBuffer_T::iterator_T stateIteratorPLastPropagated = stateBuffer_</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;  <span class="keyword">typename</span> <a class="code" href="classmsf__core_1_1SortedContainer.html#ac060dafe3a40d73ef6d35f4be7e0213e">StateBuffer_T::iterator_T</a> stateIteratorPLastPropagated = stateBuffer_</div>
 <div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;      .getIteratorAtValue(time_P_propagated, <span class="keyword">false</span>);</div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;  <span class="keyword">typename</span> StateBuffer_T::iterator_T stateIteratorPLastPropagatedNext =</div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;  <span class="keyword">typename</span> <a class="code" href="classmsf__core_1_1SortedContainer.html#ac060dafe3a40d73ef6d35f4be7e0213e">StateBuffer_T::iterator_T</a> stateIteratorPLastPropagatedNext =</div>
 <div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;      stateIteratorPLastPropagated;</div>
 <div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;</div>
 <div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;  ++stateIteratorPLastPropagatedNext;</div>
@@ -484,15 +485,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;    predictProcessCovariance(stateIteratorPLastPropagated-&gt;second,</div>
 <div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;                             stateIteratorPLastPropagatedNext-&gt;second);</div>
 <div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;</div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;    <span class="keywordflow">if</span> (!checkForNumeric(</div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;    <span class="keywordflow">if</span> (!<a class="code" href="eigen__utils_8h.html#ad367eee96655c3fd3f2fdf03ba0bb62f" title="Debug output to check misbehavior of Eigen.">checkForNumeric</a>(</div>
 <div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;        stateIteratorPLastPropagatedNext-&gt;second</div>
 <div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;            -&gt;template get&lt;StateDefinition_T::p&gt;(),</div>
 <div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;        <span class="stringliteral">&quot;prediction p&quot;</span>)) {</div>
-<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;      MSF_WARN_STREAM(</div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;      <a class="code" href="msf__macros_8h.html#a48a90912747b87b3c148944f408d7652">MSF_WARN_STREAM</a>(</div>
 <div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;          <span class="stringliteral">&quot;prop state from:\t&quot;</span>&lt;&lt; stateIteratorPLastPropagated-&gt;second-&gt;toEigenVector());</div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;      MSF_WARN_STREAM(</div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;      <a class="code" href="msf__macros_8h.html#a48a90912747b87b3c148944f408d7652">MSF_WARN_STREAM</a>(</div>
 <div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;          <span class="stringliteral">&quot;prop state to:\t&quot;</span>&lt;&lt; stateIteratorPLastPropagatedNext-&gt;second-&gt;toEigenVector());</div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;      MSF_ERROR_STREAM(__FUNCTION__&lt;&lt;<span class="stringliteral">&quot; Resetting EKF&quot;</span>);</div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;      <a class="code" href="msf__macros_8h.html#a852413224a5d3e667616aa295266ecaf">MSF_ERROR_STREAM</a>(__FUNCTION__&lt;&lt;<span class="stringliteral">&quot; Resetting EKF&quot;</span>);</div>
 <div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;      predictionMade_ = initialized_ = <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;    }</div>
 <div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;  }</div>
@@ -504,9 +505,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;    <span class="keyword">const</span> shared_ptr&lt;EKFState_T&gt;&amp; state_new,</div>
 <div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;    Eigen::Matrix&lt;<span class="keywordtype">double</span>, <a class="code" href="classmsf__core_1_1MSF__Core.html" title="The core class of the EKF Does propagation of state and covariance but also applying measurements and...">MSF_Core&lt;EKFState_T&gt;::nErrorStatesAtCompileTime</a>,</div>
 <div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;        <a class="code" href="classmsf__core_1_1MSF__Core.html" title="The core class of the EKF Does propagation of state and covariance but also applying measurements and...">MSF_Core&lt;EKFState_T&gt;::nErrorStatesAtCompileTime</a>&gt;&amp; F) {</div>
-<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;  <span class="keyword">typename</span> StateBuffer_T::iterator_T it = stateBuffer_.getIteratorAtValue(</div>
+<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;  <span class="keyword">typename</span> <a class="code" href="classmsf__core_1_1SortedContainer.html#ac060dafe3a40d73ef6d35f4be7e0213e">StateBuffer_T::iterator_T</a> it = stateBuffer_.getIteratorAtValue(</div>
 <div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;      state_old);</div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;  <span class="keyword">typename</span> StateBuffer_T::iterator_T itend = stateBuffer_.getIteratorAtValue(</div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;  <span class="keyword">typename</span> <a class="code" href="classmsf__core_1_1SortedContainer.html#ac060dafe3a40d73ef6d35f4be7e0213e">StateBuffer_T::iterator_T</a> itend = stateBuffer_.getIteratorAtValue(</div>
 <div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;      state_new);</div>
 <div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;  <span class="keyword">typedef</span> Eigen::Matrix&lt;double, MSF_Core&lt;EKFState_T&gt;::nErrorStatesAtCompileTime,</div>
 <div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;      <a class="code" href="classmsf__core_1_1MSF__Core.html" title="The core class of the EKF Does propagation of state and covariance but also applying measurements and...">MSF_Core&lt;EKFState_T&gt;::nErrorStatesAtCompileTime</a>&gt; F_type;</div>
@@ -523,7 +524,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;  <span class="keywordtype">double</span> dt = state_new-&gt;time - state_old-&gt;time;</div>
 <div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;</div>
 <div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;  <span class="keywordflow">if</span> (dt &lt;= 0) {</div>
-<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;    MSF_WARN_STREAM_THROTTLE(</div>
+<div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;    <a class="code" href="msf__macros_8h.html#a51b3004c146da17dcb8a35a4168bad47">MSF_WARN_STREAM_THROTTLE</a>(</div>
 <div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;        1, <span class="stringliteral">&quot;Requested cov prop between two states that where &quot;</span>&lt;&lt;dt&lt;&lt;<span class="stringliteral">&quot; &quot;</span></div>
 <div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;        <span class="stringliteral">&quot;seconds apart. Rejecting&quot;</span>);</div>
 <div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;    <span class="keywordflow">return</span>;</div>
@@ -542,8 +543,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00453"></a><span class="lineno">  453</span>&#160;  <span class="keyword">const</span> Vector3 ea = state_new-&gt;a_m</div>
 <div class="line"><a name="l00454"></a><span class="lineno">  454</span>&#160;      - state_new-&gt;template get&lt;StateDefinition_T::b_a&gt;();</div>
 <div class="line"><a name="l00455"></a><span class="lineno">  455</span>&#160;</div>
-<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;  <span class="keyword">const</span> Matrix3 a_sk = skew(ea);</div>
-<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;  <span class="keyword">const</span> Matrix3 w_sk = skew(ew);</div>
+<div class="line"><a name="l00456"></a><span class="lineno">  456</span>&#160;  <span class="keyword">const</span> Matrix3 a_sk = <a class="code" href="eigen__utils_8h.html#ab83eee591e35d90699bd0b65e6e3bf2c" title="Returns the 3D cross product skew symmetric matrix of a given 3D vector.">skew</a>(ea);</div>
+<div class="line"><a name="l00457"></a><span class="lineno">  457</span>&#160;  <span class="keyword">const</span> Matrix3 w_sk = <a class="code" href="eigen__utils_8h.html#ab83eee591e35d90699bd0b65e6e3bf2c" title="Returns the 3D cross product skew symmetric matrix of a given 3D vector.">skew</a>(ew);</div>
 <div class="line"><a name="l00458"></a><span class="lineno">  458</span>&#160;  <span class="keyword">const</span> Matrix3 eye3 = Eigen::Matrix&lt;double, 3, 3&gt;::Identity();</div>
 <div class="line"><a name="l00459"></a><span class="lineno">  459</span>&#160;</div>
 <div class="line"><a name="l00460"></a><span class="lineno">  460</span>&#160;  <span class="keyword">const</span> Matrix3 C_eq = state_new-&gt;template get&lt;StateDefinition_T::q&gt;().toRotationMatrix();</div>
@@ -570,16 +571,16 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00481"></a><span class="lineno">  481</span>&#160;  <span class="keyword">typename</span> EKFState_T::F_type&amp; Fd = state_old-&gt;Fd;</div>
 <div class="line"><a name="l00482"></a><span class="lineno">  482</span>&#160;</div>
 <div class="line"><a name="l00483"></a><span class="lineno">  483</span>&#160;  <span class="keyword">enum</span> {</div>
-<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;    idxstartcorr_p = <a class="code" href="structmsf__tmp_1_1getStartIndexInCorrection.html" title="Compute start indices in the correction vector of a given type.">msf_tmp::getStartIndexInCorrection</a>&lt;StateSequence_T,</div>
-<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;        StateDefinition_T::p&gt;::value,</div>
+<div class="line"><a name="l00484"></a><span class="lineno">  484</span>&#160;    idxstartcorr_p = <a class="code" href="structmsf__tmp_1_1getStartIndexInCorrection.html" title="Compute start indices in the correction vector of a given type.">msf_tmp::getStartIndexInCorrection</a>&lt;<a class="code" href="classmsf__core_1_1MSF__Core.html#af8de96f8f0a8677c79c12563f86b26d3">StateSequence_T</a>,</div>
+<div class="line"><a name="l00485"></a><span class="lineno">  485</span>&#160;        <a class="code" href="namespacegeometry__msgs_1_1cov.html#a39ced537b52c13c965a0ccdfe23f4dd1a564e84fef1216ef14d3dbf7ed94cb357">StateDefinition_T::p</a>&gt;::value,</div>
 <div class="line"><a name="l00486"></a><span class="lineno">  486</span>&#160;    idxstartcorr_v = <a class="code" href="structmsf__tmp_1_1getStartIndexInCorrection.html" title="Compute start indices in the correction vector of a given type.">msf_tmp::getStartIndexInCorrection</a>&lt;StateSequence_T,</div>
-<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;        StateDefinition_T::v&gt;::value,</div>
+<div class="line"><a name="l00487"></a><span class="lineno">  487</span>&#160;        <a class="code" href="namespacemsf__updates.html#a2812be4bf8c439845faf79dd4860835aafabe93e027092b8207af346d3d0c7a2a">StateDefinition_T::v</a>&gt;::value,</div>
 <div class="line"><a name="l00488"></a><span class="lineno">  488</span>&#160;    idxstartcorr_q = <a class="code" href="structmsf__tmp_1_1getStartIndexInCorrection.html" title="Compute start indices in the correction vector of a given type.">msf_tmp::getStartIndexInCorrection</a>&lt;StateSequence_T,</div>
-<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;        StateDefinition_T::q&gt;::value,</div>
+<div class="line"><a name="l00489"></a><span class="lineno">  489</span>&#160;        <a class="code" href="namespacegeometry__msgs_1_1cov.html#a39ced537b52c13c965a0ccdfe23f4dd1a45bc9ae177afeb4ed8e0a975dc10b8e8">StateDefinition_T::q</a>&gt;::value,</div>
 <div class="line"><a name="l00490"></a><span class="lineno">  490</span>&#160;    idxstartcorr_b_w = <a class="code" href="structmsf__tmp_1_1getStartIndexInCorrection.html" title="Compute start indices in the correction vector of a given type.">msf_tmp::getStartIndexInCorrection</a>&lt;StateSequence_T,</div>
-<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;        StateDefinition_T::b_w&gt;::value,</div>
+<div class="line"><a name="l00491"></a><span class="lineno">  491</span>&#160;        <a class="code" href="namespacemsf__updates.html#a2812be4bf8c439845faf79dd4860835aabbf62a274b16a30c8b67ae21e33e3401">StateDefinition_T::b_w</a>&gt;::value,</div>
 <div class="line"><a name="l00492"></a><span class="lineno">  492</span>&#160;    idxstartcorr_b_a = <a class="code" href="structmsf__tmp_1_1getStartIndexInCorrection.html" title="Compute start indices in the correction vector of a given type.">msf_tmp::getStartIndexInCorrection</a>&lt;StateSequence_T,</div>
-<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;        StateDefinition_T::b_a&gt;::value</div>
+<div class="line"><a name="l00493"></a><span class="lineno">  493</span>&#160;        <a class="code" href="namespacemsf__updates.html#a2812be4bf8c439845faf79dd4860835aa8bcbd2489f13e68689957a66c107816b">StateDefinition_T::b_a</a>&gt;::value</div>
 <div class="line"><a name="l00494"></a><span class="lineno">  494</span>&#160;  };</div>
 <div class="line"><a name="l00495"></a><span class="lineno">  495</span>&#160;</div>
 <div class="line"><a name="l00496"></a><span class="lineno">  496</span>&#160;  Fd.template block&lt;3, 3&gt;(idxstartcorr_p, idxstartcorr_v) = dt * eye3;</div>
@@ -658,13 +659,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;  <span class="comment">// Will be set upon first IMU message.</span></div>
 <div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160;  time_P_propagated = state-&gt;time;</div>
 <div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160;</div>
-<div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160;  MSF_INFO_STREAM(<span class="stringliteral">&quot;Initializing msf_core (built: &quot;</span> &lt;&lt;__DATE__&lt;&lt;<span class="stringliteral">&quot;)&quot;</span>);</div>
+<div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160;  <a class="code" href="msf__macros_8h.html#a8e22e1ef301caaac18cef911ef9c3c0a">MSF_INFO_STREAM</a>(<span class="stringliteral">&quot;Initializing msf_core (built: &quot;</span> &lt;&lt;__DATE__&lt;&lt;<span class="stringliteral">&quot;)&quot;</span>);</div>
 <div class="line"><a name="l00573"></a><span class="lineno">  573</span>&#160;</div>
 <div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160;  <span class="comment">// Echo params.</span></div>
-<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;  MSF_INFO_STREAM(</div>
+<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;  <a class="code" href="msf__macros_8h.html#a8e22e1ef301caaac18cef911ef9c3c0a">MSF_INFO_STREAM</a>(</div>
 <div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160;      <span class="stringliteral">&quot;Core parameters: &quot;</span>&lt;&lt;std::endl &lt;&lt; <span class="stringliteral">&quot;\tfixed_bias:\t&quot;</span> &lt;&lt; usercalc_.getParam_fixed_bias() &lt;&lt; std::endl &lt;&lt; <span class="stringliteral">&quot;\tfuzzythres:\t&quot;</span> &lt;&lt; usercalc_.getParam_fuzzythres() &lt;&lt; std::endl &lt;&lt; <span class="stringliteral">&quot;\tnoise_acc:\t&quot;</span> &lt;&lt; usercalc_.getParam_noise_acc() &lt;&lt; std::endl &lt;&lt; <span class="stringliteral">&quot;\tnoise_accbias:\t&quot;</span> &lt;&lt; usercalc_.getParam_noise_accbias() &lt;&lt; std::endl &lt;&lt; <span class="stringliteral">&quot;\tnoise_gyr:\t&quot;</span> &lt;&lt; usercalc_.getParam_noise_gyr() &lt;&lt; std::endl &lt;&lt; <span class="stringliteral">&quot;\tnoise_gyrbias:\t&quot;</span> &lt;&lt; usercalc_.getParam_noise_gyrbias() &lt;&lt; std::endl);</div>
 <div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;</div>
-<div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160;  MSF_INFO_STREAM(<span class="stringliteral">&quot;Core init with state: &quot;</span> &lt;&lt; std::endl &lt;&lt; state-&gt;print());</div>
+<div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160;  <a class="code" href="msf__macros_8h.html#a8e22e1ef301caaac18cef911ef9c3c0a">MSF_INFO_STREAM</a>(<span class="stringliteral">&quot;Core init with state: &quot;</span> &lt;&lt; std::endl &lt;&lt; state-&gt;print());</div>
 <div class="line"><a name="l00579"></a><span class="lineno">  579</span>&#160;  initialized_ = <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160;</div>
 <div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160;  msf_timing::Timing::Print(std::cout);</div>
@@ -687,23 +688,23 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;  }</div>
 <div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;  <span class="comment">// Check if there is still a state in the buffer for this message (too old).</span></div>
 <div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;  <span class="keywordflow">if</span> (measurement-&gt;time &lt; stateBuffer_.getFirst()-&gt;time) {</div>
-<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;    MSF_WARN_STREAM(</div>
+<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;    <a class="code" href="msf__macros_8h.html#a48a90912747b87b3c148944f408d7652">MSF_WARN_STREAM</a>(</div>
 <div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;        <span class="stringliteral">&quot;You tried to give me a measurement which is too far in the past. Are &quot;</span></div>
 <div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;        <span class="stringliteral">&quot;you sure your clocks are synced and delays compensated correctly? &quot;</span></div>
-<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;        <span class="stringliteral">&quot;[measurement: &quot;</span>&lt;&lt;timehuman(measurement-&gt;time)&lt;&lt;<span class="stringliteral">&quot; (s) first state in &quot;</span></div>
-<div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;            <span class="stringliteral">&quot;buffer: &quot;</span>&lt;&lt;timehuman(stateBuffer_.getFirst()-&gt;time)&lt;&lt;<span class="stringliteral">&quot; (s)]&quot;</span>);</div>
+<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;        <span class="stringliteral">&quot;[measurement: &quot;</span>&lt;&lt;<a class="code" href="namespacemsf__core.html#aee980177ac4429201472c20bb8b04612">timehuman</a>(measurement-&gt;time)&lt;&lt;<span class="stringliteral">&quot; (s) first state in &quot;</span></div>
+<div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;            <span class="stringliteral">&quot;buffer: &quot;</span>&lt;&lt;<a class="code" href="namespacemsf__core.html#aee980177ac4429201472c20bb8b04612">timehuman</a>(stateBuffer_.getFirst()-&gt;time)&lt;&lt;<span class="stringliteral">&quot; (s)]&quot;</span>);</div>
 <div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;    <span class="keywordflow">return</span>;  <span class="comment">// Reject measurements too far in the past.</span></div>
 <div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160;  }</div>
 <div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;</div>
 <div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160;  <span class="comment">// Add this measurement to the buffer and get an iterator to it.</span></div>
-<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;  <span class="keyword">typename</span> measurementBufferT::iterator_T it_meas = MeasurementBuffer_.insert(</div>
+<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;  <span class="keyword">typename</span> <a class="code" href="classmsf__core_1_1SortedContainer.html#ac060dafe3a40d73ef6d35f4be7e0213e">measurementBufferT::iterator_T</a> it_meas = MeasurementBuffer_.insert(</div>
 <div class="line"><a name="l00611"></a><span class="lineno">  611</span>&#160;      measurement);</div>
 <div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160;  <span class="comment">// Get an iterator the the end of the measurement buffer.</span></div>
-<div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160;  <span class="keyword">typename</span> measurementBufferT::iterator_T it_meas_end = MeasurementBuffer_</div>
+<div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160;  <span class="keyword">typename</span> <a class="code" href="classmsf__core_1_1SortedContainer.html#ac060dafe3a40d73ef6d35f4be7e0213e">measurementBufferT::iterator_T</a> it_meas_end = MeasurementBuffer_</div>
 <div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160;      .getIteratorEnd();</div>
 <div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160;</div>
 <div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160;  <span class="comment">// No propagation if no update is applied.</span></div>
-<div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;  <span class="keyword">typename</span> StateBuffer_T::iterator_T it_curr = stateBuffer_.getIteratorEnd();</div>
+<div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;  <span class="keyword">typename</span> <a class="code" href="classmsf__core_1_1SortedContainer.html#ac060dafe3a40d73ef6d35f4be7e0213e">StateBuffer_T::iterator_T</a> it_curr = stateBuffer_.getIteratorEnd();</div>
 <div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;</div>
 <div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160;  <span class="keywordtype">bool</span> appliedOne = <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;</div>
@@ -718,7 +719,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160;    shared_ptr&lt;EKFState_T&gt; state = getClosestState(it_meas-&gt;second-&gt;time);  <span class="comment">// Propagates covariance to state.</span></div>
 <div class="line"><a name="l00630"></a><span class="lineno">  630</span>&#160;    timer_meas_get_state.Stop();</div>
 <div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160;    <span class="keywordflow">if</span> (state-&gt;time &lt;= 0) {</div>
-<div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160;      MSF_ERROR_STREAM_THROTTLE(</div>
+<div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160;      <a class="code" href="msf__macros_8h.html#ad56352f3b184be6c66dff96b442a3db1">MSF_ERROR_STREAM_THROTTLE</a>(</div>
 <div class="line"><a name="l00633"></a><span class="lineno">  633</span>&#160;          1, __FUNCTION__&lt;&lt; <span class="stringliteral">&quot; getClosestState returned an invalid state&quot;</span>);</div>
 <div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160;      <span class="keywordflow">continue</span>;</div>
 <div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160;    }</div>
@@ -732,8 +733,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;    <span class="comment">// measurements. Propagate from current state.</span></div>
 <div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;    it_curr = stateBuffer_.getIteratorAtValue(state);</div>
 <div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;</div>
-<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;    <span class="keyword">typename</span> StateBuffer_T::iterator_T it_end;</div>
-<div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;    <span class="keyword">typename</span> measurementBufferT::iterator_T it_nextmeas = it_meas;</div>
+<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;    <span class="keyword">typename</span> <a class="code" href="classmsf__core_1_1SortedContainer.html#ac060dafe3a40d73ef6d35f4be7e0213e">StateBuffer_T::iterator_T</a> it_end;</div>
+<div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;    <span class="keyword">typename</span> <a class="code" href="classmsf__core_1_1SortedContainer.html#ac060dafe3a40d73ef6d35f4be7e0213e">measurementBufferT::iterator_T</a> it_nextmeas = it_meas;</div>
 <div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;    ++it_nextmeas;  <span class="comment">// The next measurement in the list.</span></div>
 <div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;    <span class="comment">// That was the last measurement, so propagate state to now.</span></div>
 <div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160;    <span class="keywordflow">if</span> (it_nextmeas == it_meas_end) {</div>
@@ -746,7 +747,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160;      }</div>
 <div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160;    }</div>
 <div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160;</div>
-<div class="line"><a name="l00660"></a><span class="lineno">  660</span>&#160;    <span class="keyword">typename</span> StateBuffer_T::iterator_T it_next = it_curr;</div>
+<div class="line"><a name="l00660"></a><span class="lineno">  660</span>&#160;    <span class="keyword">typename</span> <a class="code" href="classmsf__core_1_1SortedContainer.html#ac060dafe3a40d73ef6d35f4be7e0213e">StateBuffer_T::iterator_T</a> it_next = it_curr;</div>
 <div class="line"><a name="l00661"></a><span class="lineno">  661</span>&#160;    ++it_next;</div>
 <div class="line"><a name="l00662"></a><span class="lineno">  662</span>&#160;</div>
 <div class="line"><a name="l00663"></a><span class="lineno">  663</span>&#160;    msf_timing::DebugTimer timer_prop_state_after_meas(</div>
@@ -755,7 +756,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00666"></a><span class="lineno">  666</span>&#160;    <span class="comment">// Propagate to selected state.</span></div>
 <div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160;        &amp;&amp; it_next-&gt;second-&gt;time != -1; ++it_curr, ++it_next) {</div>
 <div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160;      <span class="keywordflow">if</span> (it_curr-&gt;second == it_next-&gt;second) {</div>
-<div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160;        MSF_ERROR_STREAM(__FUNCTION__&lt;&lt; <span class="stringliteral">&quot; propagation : it_curr points to same &quot;</span></div>
+<div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160;        <a class="code" href="msf__macros_8h.html#a852413224a5d3e667616aa295266ecaf">MSF_ERROR_STREAM</a>(__FUNCTION__&lt;&lt; <span class="stringliteral">&quot; propagation : it_curr points to same &quot;</span></div>
 <div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160;        <span class="stringliteral">&quot;state as it_next. This must not happen.&quot;</span>);</div>
 <div class="line"><a name="l00671"></a><span class="lineno">  671</span>&#160;        <span class="keywordflow">continue</span>;</div>
 <div class="line"><a name="l00672"></a><span class="lineno">  672</span>&#160;      }</div>
@@ -769,7 +770,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00680"></a><span class="lineno">  680</span>&#160;  }</div>
 <div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160;</div>
 <div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;  <span class="keywordflow">if</span> (!appliedOne) {</div>
-<div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160;    MSF_ERROR_STREAM(<span class="stringliteral">&quot;No measurement was applied, this should not happen.&quot;</span>);</div>
+<div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160;    <a class="code" href="msf__macros_8h.html#a852413224a5d3e667616aa295266ecaf">MSF_ERROR_STREAM</a>(<span class="stringliteral">&quot;No measurement was applied, this should not happen.&quot;</span>);</div>
 <div class="line"><a name="l00684"></a><span class="lineno">  684</span>&#160;    <span class="keywordflow">return</span>;</div>
 <div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160;  }</div>
 <div class="line"><a name="l00686"></a><span class="lineno">  686</span>&#160;</div>
@@ -784,21 +785,21 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> EKFState_T&gt;</div>
 <div class="line"><a name="l00696"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__Core.html#a9c6b7908fbc66dd2aebb2f08e7c0c4ff">  696</a></span>&#160;shared_ptr&lt;msf_core::MSF_MeasurementBase&lt;EKFState_T&gt; &gt; <a class="code" href="classmsf__core_1_1MSF__Core.html" title="The core class of the EKF Does propagation of state and covariance but also applying measurements and...">MSF_Core&lt;EKFState_T&gt;::getPreviousMeasurement</a>(</div>
 <div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160;    <span class="keywordtype">double</span> time, <span class="keywordtype">int</span> sensorID) {</div>
-<div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;  <span class="keyword">typename</span> measurementBufferT::iterator_T it = MeasurementBuffer_</div>
+<div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;  <span class="keyword">typename</span> <a class="code" href="classmsf__core_1_1SortedContainer.html#ac060dafe3a40d73ef6d35f4be7e0213e">measurementBufferT::iterator_T</a> it = MeasurementBuffer_</div>
 <div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160;      .getIteratorAtValue(time);</div>
 <div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160;  <span class="keywordflow">if</span> (it-&gt;second-&gt;time != time) {</div>
-<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160;    MSF_WARN_STREAM(<span class="stringliteral">&quot;getPreviousMeasurement: Error invalid iterator at value&quot;</span>);</div>
+<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160;    <a class="code" href="msf__macros_8h.html#a48a90912747b87b3c148944f408d7652">MSF_WARN_STREAM</a>(<span class="stringliteral">&quot;getPreviousMeasurement: Error invalid iterator at value&quot;</span>);</div>
 <div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160;    <span class="keywordflow">return</span> MeasurementBuffer_.getInvalid();</div>
 <div class="line"><a name="l00703"></a><span class="lineno">  703</span>&#160;  }</div>
 <div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160;  --it;</div>
-<div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160;  <span class="keyword">typename</span> measurementBufferT::iterator_T itbeforebegin = MeasurementBuffer_</div>
+<div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160;  <span class="keyword">typename</span> <a class="code" href="classmsf__core_1_1SortedContainer.html#ac060dafe3a40d73ef6d35f4be7e0213e">measurementBufferT::iterator_T</a> itbeforebegin = MeasurementBuffer_</div>
 <div class="line"><a name="l00706"></a><span class="lineno">  706</span>&#160;      .getIteratorBeforeBegin();</div>
 <div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160;  <span class="keywordflow">while</span> (it != itbeforebegin</div>
 <div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160;      &amp;&amp; (it-&gt;second-&gt;time != time &amp;&amp; it-&gt;second-&gt;sensorID_ != sensorID)) {</div>
 <div class="line"><a name="l00709"></a><span class="lineno">  709</span>&#160;    --it;</div>
 <div class="line"><a name="l00710"></a><span class="lineno">  710</span>&#160;  }</div>
 <div class="line"><a name="l00711"></a><span class="lineno">  711</span>&#160;  <span class="keywordflow">if</span> (it == itbeforebegin) {</div>
-<div class="line"><a name="l00712"></a><span class="lineno">  712</span>&#160;    MSF_WARN_STREAM(<span class="stringliteral">&quot;getPreviousMeasurement: Error hit before begin&quot;</span>);</div>
+<div class="line"><a name="l00712"></a><span class="lineno">  712</span>&#160;    <a class="code" href="msf__macros_8h.html#a48a90912747b87b3c148944f408d7652">MSF_WARN_STREAM</a>(<span class="stringliteral">&quot;getPreviousMeasurement: Error hit before begin&quot;</span>);</div>
 <div class="line"><a name="l00713"></a><span class="lineno">  713</span>&#160;    <span class="keywordflow">return</span> MeasurementBuffer_.getInvalid();</div>
 <div class="line"><a name="l00714"></a><span class="lineno">  714</span>&#160;  }</div>
 <div class="line"><a name="l00715"></a><span class="lineno">  715</span>&#160;  <span class="keywordflow">return</span> it-&gt;second;</div>
@@ -814,15 +815,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00725"></a><span class="lineno">  725</span>&#160;</div>
 <div class="line"><a name="l00726"></a><span class="lineno">  726</span>&#160;  <span class="keywordtype">double</span> timenow = tstamp;  <span class="comment">// Delay compensated by sensor handler.</span></div>
 <div class="line"><a name="l00727"></a><span class="lineno">  727</span>&#160;</div>
-<div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160;  <span class="keyword">typename</span> StateBuffer_T::iterator_T it = stateBuffer_.getIteratorClosest(</div>
+<div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160;  <span class="keyword">typename</span> <a class="code" href="classmsf__core_1_1SortedContainer.html#ac060dafe3a40d73ef6d35f4be7e0213e">StateBuffer_T::iterator_T</a> it = stateBuffer_.getIteratorClosest(</div>
 <div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160;      timenow);</div>
 <div class="line"><a name="l00730"></a><span class="lineno">  730</span>&#160;</div>
 <div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;  shared_ptr&lt;EKFState_T&gt; closestState = it-&gt;second;</div>
 <div class="line"><a name="l00732"></a><span class="lineno">  732</span>&#160;  <span class="comment">// Check if the state really is close to the requested time.</span></div>
 <div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;  <span class="comment">// With the new buffer this might not be given.</span></div>
 <div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160;  <span class="keywordflow">if</span> (closestState-&gt;time == -1 || fabs(closestState-&gt;time - timenow) &gt; 0.1) {</div>
-<div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160;    MSF_ERROR_STREAM(</div>
-<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;        __FUNCTION__&lt;&lt; <span class="stringliteral">&quot; Requested closest state to &quot;</span>&lt;&lt;timehuman(timenow)&lt;&lt;<span class="stringliteral">&quot; but &quot;</span></div>
+<div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160;    <a class="code" href="msf__macros_8h.html#a852413224a5d3e667616aa295266ecaf">MSF_ERROR_STREAM</a>(</div>
+<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;        __FUNCTION__&lt;&lt; <span class="stringliteral">&quot; Requested closest state to &quot;</span>&lt;&lt;<a class="code" href="namespacemsf__core.html#aee980177ac4429201472c20bb8b04612">timehuman</a>(timenow)&lt;&lt;<span class="stringliteral">&quot; but &quot;</span></div>
 <div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;        <span class="stringliteral">&quot;there was no suitable state in the map&quot;</span>);</div>
 <div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160;    <span class="comment">// Not enough predictions made yet to apply measurement (too far in past).</span></div>
 <div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160;    <span class="keywordflow">return</span> stateBuffer_.getInvalid();</div>
@@ -874,7 +875,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00785"></a><span class="lineno">  785</span>&#160;  propPToState(closestState);</div>
 <div class="line"><a name="l00786"></a><span class="lineno">  786</span>&#160;</div>
 <div class="line"><a name="l00787"></a><span class="lineno">  787</span>&#160;  <span class="keywordflow">if</span> (!closestState-&gt;checkStateForNumeric()) {</div>
-<div class="line"><a name="l00788"></a><span class="lineno">  788</span>&#160;    MSF_ERROR_STREAM(</div>
+<div class="line"><a name="l00788"></a><span class="lineno">  788</span>&#160;    <a class="code" href="msf__macros_8h.html#a852413224a5d3e667616aa295266ecaf">MSF_ERROR_STREAM</a>(</div>
 <div class="line"><a name="l00789"></a><span class="lineno">  789</span>&#160;        __FUNCTION__&lt;&lt; <span class="stringliteral">&quot; State interpolation: interpolated state is invalid (nan)&quot;</span>);</div>
 <div class="line"><a name="l00790"></a><span class="lineno">  790</span>&#160;    <span class="keywordflow">return</span> stateBuffer_.getInvalid();  <span class="comment">// Early abort.</span></div>
 <div class="line"><a name="l00791"></a><span class="lineno">  791</span>&#160;  }</div>
@@ -889,11 +890,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00800"></a><span class="lineno">  800</span>&#160;}</div>
 <div class="line"><a name="l00801"></a><span class="lineno">  801</span>&#160;</div>
 <div class="line"><a name="l00802"></a><span class="lineno">  802</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> EKFState_T&gt;</div>
-<div class="line"><a name="l00803"></a><span class="lineno">  803</span>&#160;<span class="keywordtype">void</span> <a class="code" href="classmsf__core_1_1MSF__Core.html" title="The core class of the EKF Does propagation of state and covariance but also applying measurements and...">MSF_Core&lt;EKFState_T&gt;::propPToState</a>(shared_ptr&lt;EKFState_T&gt;&amp; state) {</div>
+<div class="line"><a name="l00803"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__Core.html#addb4f7a2baa6665058a78ede22253dba">  803</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classmsf__core_1_1MSF__Core.html" title="The core class of the EKF Does propagation of state and covariance but also applying measurements and...">MSF_Core&lt;EKFState_T&gt;::propPToState</a>(shared_ptr&lt;EKFState_T&gt;&amp; state) {</div>
 <div class="line"><a name="l00804"></a><span class="lineno">  804</span>&#160;  <span class="comment">// Propagate cov matrix until the current states time.</span></div>
-<div class="line"><a name="l00805"></a><span class="lineno">  805</span>&#160;  <span class="keyword">typename</span> StateBuffer_T::iterator_T it = stateBuffer_.getIteratorAtValue(</div>
+<div class="line"><a name="l00805"></a><span class="lineno">  805</span>&#160;  <span class="keyword">typename</span> <a class="code" href="classmsf__core_1_1SortedContainer.html#ac060dafe3a40d73ef6d35f4be7e0213e">StateBuffer_T::iterator_T</a> it = stateBuffer_.getIteratorAtValue(</div>
 <div class="line"><a name="l00806"></a><span class="lineno">  806</span>&#160;      time_P_propagated, <span class="keyword">false</span>);</div>
-<div class="line"><a name="l00807"></a><span class="lineno">  807</span>&#160;  <span class="keyword">typename</span> StateBuffer_T::iterator_T itMinus = it;</div>
+<div class="line"><a name="l00807"></a><span class="lineno">  807</span>&#160;  <span class="keyword">typename</span> <a class="code" href="classmsf__core_1_1SortedContainer.html#ac060dafe3a40d73ef6d35f4be7e0213e">StateBuffer_T::iterator_T</a> itMinus = it;</div>
 <div class="line"><a name="l00808"></a><span class="lineno">  808</span>&#160;  ++it;</div>
 <div class="line"><a name="l00809"></a><span class="lineno">  809</span>&#160;  <span class="comment">// Until we reached the current state or the end of the state list.</span></div>
 <div class="line"><a name="l00810"></a><span class="lineno">  810</span>&#160;  <span class="keywordflow">for</span> (; it != stateBuffer_.getIteratorEnd() &amp;&amp; it-&gt;second-&gt;time &lt;= state-&gt;time;</div>
@@ -903,8 +904,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00814"></a><span class="lineno">  814</span>&#160;}</div>
 <div class="line"><a name="l00815"></a><span class="lineno">  815</span>&#160;</div>
 <div class="line"><a name="l00816"></a><span class="lineno">  816</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> EKFState_T&gt;</div>
-<div class="line"><a name="l00817"></a><span class="lineno">  817</span>&#160;<span class="keywordtype">bool</span> MSF_Core&lt;EKFState_T&gt;::applyCorrection(shared_ptr&lt;EKFState_T&gt;&amp; delaystate,</div>
-<div class="line"><a name="l00818"></a><span class="lineno">  818</span>&#160;                                           ErrorState &amp; correction,</div>
+<div class="line"><a name="l00817"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__Core.html#aefec8d3cb1724a5a4457361efa61662e">  817</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classmsf__core_1_1MSF__Core.html" title="The core class of the EKF Does propagation of state and covariance but also applying measurements and...">MSF_Core&lt;EKFState_T&gt;::applyCorrection</a>(shared_ptr&lt;EKFState_T&gt;&amp; delaystate,</div>
+<div class="line"><a name="l00818"></a><span class="lineno">  818</span>&#160;                                           <a class="code" href="classmsf__core_1_1MSF__Core.html#a01a15136971c11456e539f00b88fbf1a" title="The error state type.">ErrorState</a> &amp; correction,</div>
 <div class="line"><a name="l00819"></a><span class="lineno">  819</span>&#160;                                           <span class="keywordtype">double</span> fuzzythres) {</div>
 <div class="line"><a name="l00820"></a><span class="lineno">  820</span>&#160;</div>
 <div class="line"><a name="l00821"></a><span class="lineno">  821</span>&#160;  <span class="keywordflow">if</span> (!initialized_ || !predictionMade_)</div>
@@ -915,10 +916,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00826"></a><span class="lineno">  826</span>&#160;</div>
 <div class="line"><a name="l00827"></a><span class="lineno">  827</span>&#160;  <span class="comment">// Now augment core states.</span></div>
 <div class="line"><a name="l00828"></a><span class="lineno">  828</span>&#160;  <span class="keywordflow">if</span> (usercalc_.getParam_fixed_bias()) {</div>
-<div class="line"><a name="l00829"></a><span class="lineno">  829</span>&#160;    <span class="keyword">typedef</span> <span class="keyword">typename</span> msf_tmp::getEnumStateType&lt;StateSequence_T,</div>
-<div class="line"><a name="l00830"></a><span class="lineno">  830</span>&#160;        StateDefinition_T::b_a&gt;::value b_a_type;</div>
+<div class="line"><a name="l00829"></a><span class="lineno">  829</span>&#160;    <span class="keyword">typedef</span> <span class="keyword">typename</span> msf_tmp::getEnumStateType&lt;<a class="code" href="classmsf__core_1_1MSF__Core.html#af8de96f8f0a8677c79c12563f86b26d3">StateSequence_T</a>,</div>
+<div class="line"><a name="l00830"></a><span class="lineno">  830</span>&#160;        <a class="code" href="namespacemsf__updates.html#a2812be4bf8c439845faf79dd4860835aa8bcbd2489f13e68689957a66c107816b">StateDefinition_T::b_a</a>&gt;::value b_a_type;</div>
 <div class="line"><a name="l00831"></a><span class="lineno">  831</span>&#160;    <span class="keyword">typedef</span> <span class="keyword">typename</span> msf_tmp::getEnumStateType&lt;StateSequence_T,</div>
-<div class="line"><a name="l00832"></a><span class="lineno">  832</span>&#160;        StateDefinition_T::b_w&gt;::value b_w_type;</div>
+<div class="line"><a name="l00832"></a><span class="lineno">  832</span>&#160;        <a class="code" href="namespacemsf__updates.html#a2812be4bf8c439845faf79dd4860835aabbf62a274b16a30c8b67ae21e33e3401">StateDefinition_T::b_w</a>&gt;::value b_w_type;</div>
 <div class="line"><a name="l00833"></a><span class="lineno">  833</span>&#160;</div>
 <div class="line"><a name="l00834"></a><span class="lineno">  834</span>&#160;    <span class="keyword">enum</span> {</div>
 <div class="line"><a name="l00835"></a><span class="lineno">  835</span>&#160;      indexOfState_b_a = <a class="code" href="structmsf__tmp_1_1getStartIndex.html" title="Compute start indices in the correction/state vector of a given type.">msf_tmp::getStartIndex</a>&lt;StateSequence_T, b_a_type,</div>
@@ -964,7 +965,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00875"></a><span class="lineno">  875</span>&#160;</div>
 <div class="line"><a name="l00876"></a><span class="lineno">  876</span>&#160;  <span class="comment">// No publishing and propagation here, because this might not be the last</span></div>
 <div class="line"><a name="l00877"></a><span class="lineno">  877</span>&#160;  <span class="comment">// update we have to apply.</span></div>
-<div class="line"><a name="l00878"></a><span class="lineno">  878</span>&#160;  checkForNumeric(correction, <span class="stringliteral">&quot;update&quot;</span>);</div>
+<div class="line"><a name="l00878"></a><span class="lineno">  878</span>&#160;  <a class="code" href="eigen__utils_8h.html#ad367eee96655c3fd3f2fdf03ba0bb62f" title="Debug output to check misbehavior of Eigen.">checkForNumeric</a>(correction, <span class="stringliteral">&quot;update&quot;</span>);</div>
 <div class="line"><a name="l00879"></a><span class="lineno">  879</span>&#160;</div>
 <div class="line"><a name="l00880"></a><span class="lineno">  880</span>&#160;  <span class="comment">// Set time latest propagated, we need to repropagate at least from here.</span></div>
 <div class="line"><a name="l00881"></a><span class="lineno">  881</span>&#160;  time_P_propagated = delaystate-&gt;time;</div>
@@ -975,7 +976,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Nov 6 2013 21:53:35 for msf - modular sensor fusion by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 6 2013 22:06:47 for ethzasl-msf - Modular Sensor Fusion by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

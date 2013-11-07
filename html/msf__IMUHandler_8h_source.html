@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>msf - modular sensor fusion: msf_core/include/msf_core/msf_IMUHandler.h Source File</title>
+<title>ethzasl-msf - Modular Sensor Fusion: msf_core/include/msf_core/msf_IMUHandler.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">msf - modular sensor fusion
+   <div id="projectname">ethzasl-msf - Modular Sensor Fusion
    </div>
    <div id="projectbrief">Time delay compensated single and multi sensor fusion framework based on an EKF</div>
   </td>
@@ -61,6 +61,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="files.html"><span>File&#160;List</span></a></li>
+      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
     </ul>
   </div>
 <!-- window showing the filter options -->
@@ -68,7 +69,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -87,7 +88,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">msf_IMUHandler.h</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
+<a href="msf__IMUHandler_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * Copyright (C) 2012-2013 Simon Lynen, ASL, ETH Zurich, Switzerland</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> * You can contact the author at &lt;slynen at ethz dot ch&gt;</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> *</span></div>
@@ -106,37 +107,37 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="preprocessor">#ifndef MSF_IMU_HANDLER_H_</span></div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define MSF_IMU_HANDLER_H_</span></div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &lt;msf_core/msf_sensorhandler.h&gt;</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="msf__sensorhandler_8h.html">msf_core/msf_sensorhandler.h</a>&gt;</span></div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;</div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="keyword">namespace </span>msf_core {</div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> EKFState_T&gt;</div>
 <div class="line"><a name="l00025"></a><span class="lineno"><a class="code" href="classmsf__core_1_1IMUHandler.html">   25</a></span>&#160;<span class="keyword">class </span><a class="code" href="classmsf__core_1_1IMUHandler.html">IMUHandler</a> : <span class="keyword">public</span> <a class="code" href="classmsf__core_1_1SensorHandler.html" title="Handles a sensor driver which provides the sensor readings.">SensorHandler</a>&lt;EKFState_T&gt; {</div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; <span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  shared_ptr&lt;MSF_Core&lt;EKFState_T&gt; &gt; core_;</div>
+<div class="line"><a name="l00027"></a><span class="lineno"><a class="code" href="classmsf__core_1_1IMUHandler.html#ae109422ae1b1ed7833bde860c71a9491">   27</a></span>&#160;  shared_ptr&lt;MSF_Core&lt;EKFState_T&gt; &gt; <a class="code" href="classmsf__core_1_1IMUHandler.html#ae109422ae1b1ed7833bde860c71a9491">core_</a>;</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <a class="code" href="classmsf__core_1_1IMUHandler.html">IMUHandler</a>(<a class="code" href="classmsf__core_1_1MSF__SensorManager.html" title="A manager for a given sensor set. Handlers for individual sensors (camera/vicon etc.) are registered with this class as handlers of particular sensors. This class also owns the EKF core instance and handles the initialization of the filter.">MSF_SensorManager&lt;EKFState_T&gt;</a>&amp; mng,</div>
+<div class="line"><a name="l00029"></a><span class="lineno"><a class="code" href="classmsf__core_1_1IMUHandler.html#a41084ec0130edd4c1b2934defbd19fb4">   29</a></span>&#160;  <a class="code" href="classmsf__core_1_1IMUHandler.html#a41084ec0130edd4c1b2934defbd19fb4">IMUHandler</a>(<a class="code" href="classmsf__core_1_1MSF__SensorManager.html" title="A manager for a given sensor set. Handlers for individual sensors (camera/vicon etc.) are registered with this class as handlers of particular sensors. This class also owns the EKF core instance and handles the initialization of the filter.">MSF_SensorManager&lt;EKFState_T&gt;</a>&amp; mng,</div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;             <span class="keyword">const</span> std::string&amp; topic_namespace,</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;             <span class="keyword">const</span> std::string&amp; parameternamespace)</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;      : <a class="code" href="classmsf__core_1_1SensorHandler.html" title="Handles a sensor driver which provides the sensor readings.">SensorHandler&lt;EKFState_T&gt;</a>(mng, topic_namespace, parameternamespace) {</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    core_ = mng.<a class="code" href="classmsf__core_1_1MSF__SensorManager.html#ad08942e66e76a572cd6425b79e653fd2" title="The ekf core instance.">msf_core_</a>;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;      : <a class="code" href="classmsf__core_1_1SensorHandler.html" title="Handles a sensor driver which provides the sensor readings.">SensorHandler</a>&lt;EKFState_T&gt;(mng, topic_namespace, parameternamespace) {</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <a class="code" href="classmsf__core_1_1IMUHandler.html#ae109422ae1b1ed7833bde860c71a9491">core_</a> = mng.<a class="code" href="classmsf__core_1_1MSF__SensorManager.html#ad08942e66e76a572cd6425b79e653fd2" title="The ekf core instance.">msf_core_</a>;</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  }</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  <span class="keyword">virtual</span> ~<a class="code" href="classmsf__core_1_1IMUHandler.html">IMUHandler</a>() {</div>
+<div class="line"><a name="l00035"></a><span class="lineno"><a class="code" href="classmsf__core_1_1IMUHandler.html#a35cd9d86a2178b9ad85f00ebd598baa8">   35</a></span>&#160;  <span class="keyword">virtual</span> <a class="code" href="classmsf__core_1_1IMUHandler.html#a35cd9d86a2178b9ad85f00ebd598baa8">~IMUHandler</a>() {</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  }</div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  ;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">bool</span> initialize() = 0;</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  <span class="keywordtype">void</span> process_imu(<span class="keyword">const</span> msf_core::Vector3&amp; linear_acceleration,</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="classmsf__core_1_1IMUHandler.html#aa343ee8a9375a7c3ecf9a980cf0bc82d">initialize</a>() = 0;</div>
+<div class="line"><a name="l00039"></a><span class="lineno"><a class="code" href="classmsf__core_1_1IMUHandler.html#a6b977a9a49ea5d91c5c61cb063169535">   39</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classmsf__core_1_1IMUHandler.html#a6b977a9a49ea5d91c5c61cb063169535">process_imu</a>(<span class="keyword">const</span> msf_core::Vector3&amp; linear_acceleration,</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;                   <span class="keyword">const</span> msf_core::Vector3&amp; angular_velocity,</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;                   <span class="keyword">const</span> <span class="keywordtype">double</span>&amp; msg_stamp, <span class="keywordtype">size_t</span> msg_seq) {</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    core_-&gt;process_imu(linear_acceleration, angular_velocity, msg_stamp,</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <a class="code" href="classmsf__core_1_1IMUHandler.html#ae109422ae1b1ed7833bde860c71a9491">core_</a>-&gt;process_imu(linear_acceleration, angular_velocity, msg_stamp,</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;                       msg_seq);</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  }</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <span class="keywordtype">void</span> process_state(<span class="keyword">const</span> msf_core::Vector3&amp; linear_acceleration,</div>
+<div class="line"><a name="l00045"></a><span class="lineno"><a class="code" href="classmsf__core_1_1IMUHandler.html#a46cd980264fb5369147c575a31f1dcb2">   45</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classmsf__core_1_1IMUHandler.html#a46cd980264fb5369147c575a31f1dcb2">process_state</a>(<span class="keyword">const</span> msf_core::Vector3&amp; linear_acceleration,</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;                     <span class="keyword">const</span> msf_core::Vector3&amp; angular_velocity,</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;                     <span class="keyword">const</span> msf_core::Vector3&amp; p, <span class="keyword">const</span> msf_core::Vector3&amp; v,</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;                     <span class="keyword">const</span> msf_core::Quaternion&amp; q, <span class="keywordtype">bool</span> is_already_propagated,</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;                     <span class="keyword">const</span> msf_core::Vector3&amp; <a class="code" href="namespacegeometry__msgs_1_1cov.html#a39ced537b52c13c965a0ccdfe23f4dd1a564e84fef1216ef14d3dbf7ed94cb357">p</a>, <span class="keyword">const</span> msf_core::Vector3&amp; <a class="code" href="namespacemsf__updates.html#a2812be4bf8c439845faf79dd4860835aafabe93e027092b8207af346d3d0c7a2a">v</a>,</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;                     <span class="keyword">const</span> <a class="code" href="namespacemsf__core.html#a044c525dd7800e2e2f4bb86fc565a7c7">msf_core::Quaternion</a>&amp; <a class="code" href="namespacegeometry__msgs_1_1cov.html#a39ced537b52c13c965a0ccdfe23f4dd1a45bc9ae177afeb4ed8e0a975dc10b8e8">q</a>, <span class="keywordtype">bool</span> is_already_propagated,</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;                     <span class="keyword">const</span> <span class="keywordtype">double</span>&amp; msg_stamp, <span class="keywordtype">size_t</span> msg_seq) {</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    core_-&gt;process_extstate(linear_acceleration, angular_velocity, p, v, q,</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <a class="code" href="classmsf__core_1_1IMUHandler.html#ae109422ae1b1ed7833bde860c71a9491">core_</a>-&gt;process_extstate(linear_acceleration, angular_velocity, p, v, q,</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;                            is_already_propagated, msg_stamp, msg_seq);</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  }</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;};</div>
@@ -146,7 +147,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Nov 6 2013 21:53:35 for msf - modular sensor fusion by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 6 2013 22:06:47 for ethzasl-msf - Modular Sensor Fusion by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

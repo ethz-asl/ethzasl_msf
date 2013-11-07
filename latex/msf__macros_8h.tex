@@ -1,0 +1,310 @@
+\hypertarget{msf__macros_8h}{\section{msf\-\_\-core/include/msf\-\_\-core/msf\-\_\-macros.h File Reference}
+\label{msf__macros_8h}\index{msf\-\_\-core/include/msf\-\_\-core/msf\-\_\-macros.\-h@{msf\-\_\-core/include/msf\-\_\-core/msf\-\_\-macros.\-h}}
+}
+{\ttfamily \#include $<$chrono$>$}\\*
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{msf__macros_8h_ad3b6dfb41f49e999485ba160b60819e6}{N\-U\-M\-E\-R\-I\-C\-\_\-\-P\-R\-E\-C}~4
+\item 
+\#define \hyperlink{msf__macros_8h_a2d2af1048de7b1510994ffd3bc32aacc}{U\-N\-U\-S\-E\-D\-P\-A\-R\-A\-M}(x)~x
+\item 
+\#define \hyperlink{msf__macros_8h_a86d500a34c624c2cae56bc25a31b12f3}{U\-N\-U\-S\-E\-D}(x)~(void)x;
+\item 
+\#define \hyperlink{msf__macros_8h_a47112f19d1bc98ba2bdfb2f1cd3d2c65}{S\-T\-R\-E\-A\-M\-Q\-U\-A\-T}(q)
+\item 
+\#define \hyperlink{msf__macros_8h_af7e8592d0a634bd3642e9fd508ea8022}{D\-E\-G2\-R\-A\-D}~(M\-\_\-\-P\-I/180.\-0)
+\item 
+\#define \hyperlink{msf__macros_8h_a1de58160514e33783f7bb0643a1ea3e0}{M\-S\-F\-\_\-\-L\-I\-K\-E\-L\-Y}(x)~\-\_\-\-\_\-builtin\-\_\-expect((x),1)
+\item 
+\#define \hyperlink{msf__macros_8h_a9ca64ccf03396106e000eafc5c03c497}{M\-S\-F\-\_\-\-U\-N\-L\-I\-K\-E\-L\-Y}(x)~\-\_\-\-\_\-builtin\-\_\-expect((x),0)
+\item 
+\#define \hyperlink{msf__macros_8h_a8e22e1ef301caaac18cef911ef9c3c0a}{M\-S\-F\-\_\-\-I\-N\-F\-O\-\_\-\-S\-T\-R\-E\-A\-M}(x)~std\-::cerr$<$$<$\char`\"{}\textbackslash{}033\mbox{[}0;0m\mbox{[}\-I\-N\-F\-O\mbox{]} \char`\"{}$<$$<$x$<$$<$\char`\"{}\textbackslash{}033\mbox{[}0;0m\char`\"{}$<$$<$std\-::endl;
+\item 
+\#define \hyperlink{msf__macros_8h_a48a90912747b87b3c148944f408d7652}{M\-S\-F\-\_\-\-W\-A\-R\-N\-\_\-\-S\-T\-R\-E\-A\-M}(x)~std\-::cerr$<$$<$\char`\"{}\textbackslash{}033\mbox{[}0;33m\mbox{[}\-W\-A\-R\-N\mbox{]} \char`\"{}$<$$<$x$<$$<$\char`\"{}\textbackslash{}033\mbox{[}0;0m\char`\"{}$<$$<$std\-::endl;
+\item 
+\#define \hyperlink{msf__macros_8h_a852413224a5d3e667616aa295266ecaf}{M\-S\-F\-\_\-\-E\-R\-R\-O\-R\-\_\-\-S\-T\-R\-E\-A\-M}(x)~std\-::cerr$<$$<$\char`\"{}\textbackslash{}033\mbox{[}1;31m\mbox{[}\-E\-R\-R\-O\-R\mbox{]} \char`\"{}$<$$<$x$<$$<$\char`\"{}\textbackslash{}033\mbox{[}0;0m\char`\"{}$<$$<$std\-::endl;
+\item 
+\#define \hyperlink{msf__macros_8h_a391177a1f95a78417a3926667d575f6c}{M\-S\-F\-\_\-\-I\-N\-F\-O\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-O\-N\-C\-E}(x)
+\item 
+\#define \hyperlink{msf__macros_8h_a698949dea73495d742233519f3002fea}{M\-S\-F\-\_\-\-W\-A\-R\-N\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-O\-N\-C\-E}(x)
+\item 
+\#define \hyperlink{msf__macros_8h_ac1398dc1f1f1f9569ffca77a28aaff20}{M\-S\-F\-\_\-\-E\-R\-R\-O\-R\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-O\-N\-C\-E}(x)
+\item 
+\#define \hyperlink{msf__macros_8h_a5718f6bf203c21d93d9622f17119f8bf}{M\-S\-F\-\_\-\-L\-O\-G\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-T\-H\-R\-O\-T\-T\-L\-E}(rate, x)
+\item 
+\#define \hyperlink{msf__macros_8h_a51b3004c146da17dcb8a35a4168bad47}{M\-S\-F\-\_\-\-W\-A\-R\-N\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-T\-H\-R\-O\-T\-T\-L\-E}(rate, x)
+\item 
+\#define \hyperlink{msf__macros_8h_ad56352f3b184be6c66dff96b442a3db1}{M\-S\-F\-\_\-\-E\-R\-R\-O\-R\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-T\-H\-R\-O\-T\-T\-L\-E}(rate, x)
+\item 
+\#define \hyperlink{msf__macros_8h_a71b74ab88da05f0977c03b02323bf065}{M\-S\-F\-\_\-\-I\-N\-F\-O\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-C\-O\-N\-D}(cond, x)
+\item 
+\#define \hyperlink{msf__macros_8h_a727c36ed33ce7dc9dd6a6e1577b94670}{M\-S\-F\-\_\-\-W\-A\-R\-N\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-C\-O\-N\-D}(cond, x)
+\item 
+\#define \hyperlink{msf__macros_8h_a5237d4348bf9d678e62ae4ede54fb863}{M\-S\-F\-\_\-\-E\-R\-R\-O\-R\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-C\-O\-N\-D}(cond, x)
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{msf__macros_8h_af7e8592d0a634bd3642e9fd508ea8022}{\index{msf\-\_\-macros.\-h@{msf\-\_\-macros.\-h}!D\-E\-G2\-R\-A\-D@{D\-E\-G2\-R\-A\-D}}
+\index{D\-E\-G2\-R\-A\-D@{D\-E\-G2\-R\-A\-D}!msf_macros.h@{msf\-\_\-macros.\-h}}
+\subsubsection[{D\-E\-G2\-R\-A\-D}]{\setlength{\rightskip}{0pt plus 5cm}\#define D\-E\-G2\-R\-A\-D~(M\-\_\-\-P\-I/180.\-0)}}\label{msf__macros_8h_af7e8592d0a634bd3642e9fd508ea8022}
+\hypertarget{msf__macros_8h_a852413224a5d3e667616aa295266ecaf}{\index{msf\-\_\-macros.\-h@{msf\-\_\-macros.\-h}!M\-S\-F\-\_\-\-E\-R\-R\-O\-R\-\_\-\-S\-T\-R\-E\-A\-M@{M\-S\-F\-\_\-\-E\-R\-R\-O\-R\-\_\-\-S\-T\-R\-E\-A\-M}}
+\index{M\-S\-F\-\_\-\-E\-R\-R\-O\-R\-\_\-\-S\-T\-R\-E\-A\-M@{M\-S\-F\-\_\-\-E\-R\-R\-O\-R\-\_\-\-S\-T\-R\-E\-A\-M}!msf_macros.h@{msf\-\_\-macros.\-h}}
+\subsubsection[{M\-S\-F\-\_\-\-E\-R\-R\-O\-R\-\_\-\-S\-T\-R\-E\-A\-M}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\-S\-F\-\_\-\-E\-R\-R\-O\-R\-\_\-\-S\-T\-R\-E\-A\-M(
+\begin{DoxyParamCaption}
+\item[{}]{x}
+\end{DoxyParamCaption}
+)~std\-::cerr$<$$<$\char`\"{}\textbackslash{}033\mbox{[}1;31m\mbox{[}\-E\-R\-R\-O\-R\mbox{]} \char`\"{}$<$$<$x$<$$<$\char`\"{}\textbackslash{}033\mbox{[}0;0m\char`\"{}$<$$<$std\-::endl;}}\label{msf__macros_8h_a852413224a5d3e667616aa295266ecaf}
+\hypertarget{msf__macros_8h_a5237d4348bf9d678e62ae4ede54fb863}{\index{msf\-\_\-macros.\-h@{msf\-\_\-macros.\-h}!M\-S\-F\-\_\-\-E\-R\-R\-O\-R\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-C\-O\-N\-D@{M\-S\-F\-\_\-\-E\-R\-R\-O\-R\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-C\-O\-N\-D}}
+\index{M\-S\-F\-\_\-\-E\-R\-R\-O\-R\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-C\-O\-N\-D@{M\-S\-F\-\_\-\-E\-R\-R\-O\-R\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-C\-O\-N\-D}!msf_macros.h@{msf\-\_\-macros.\-h}}
+\subsubsection[{M\-S\-F\-\_\-\-E\-R\-R\-O\-R\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-C\-O\-N\-D}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\-S\-F\-\_\-\-E\-R\-R\-O\-R\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-C\-O\-N\-D(
+\begin{DoxyParamCaption}
+\item[{}]{cond, }
+\item[{}]{x}
+\end{DoxyParamCaption}
+)}}\label{msf__macros_8h_a5237d4348bf9d678e62ae4ede54fb863}
+{\bfseries Value\-:}
+\begin{DoxyCode}
+\textcolor{keywordflow}{do} \(\backslash\)
+    \{  \(\backslash\)
+      if (\hyperlink{msf__macros_8h_a9ca64ccf03396106e000eafc5c03c497}{MSF\_UNLIKELY}(cond)) \(\backslash\)
+      \{ \(\backslash\)
+        MSF\_ERROR\_STREAM(x); \(\backslash\)
+      \} \(\backslash\)
+    \} \textcolor{keywordflow}{while}(0)
+\end{DoxyCode}
+\hypertarget{msf__macros_8h_ac1398dc1f1f1f9569ffca77a28aaff20}{\index{msf\-\_\-macros.\-h@{msf\-\_\-macros.\-h}!M\-S\-F\-\_\-\-E\-R\-R\-O\-R\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-O\-N\-C\-E@{M\-S\-F\-\_\-\-E\-R\-R\-O\-R\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-O\-N\-C\-E}}
+\index{M\-S\-F\-\_\-\-E\-R\-R\-O\-R\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-O\-N\-C\-E@{M\-S\-F\-\_\-\-E\-R\-R\-O\-R\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-O\-N\-C\-E}!msf_macros.h@{msf\-\_\-macros.\-h}}
+\subsubsection[{M\-S\-F\-\_\-\-E\-R\-R\-O\-R\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-O\-N\-C\-E}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\-S\-F\-\_\-\-E\-R\-R\-O\-R\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-O\-N\-C\-E(
+\begin{DoxyParamCaption}
+\item[{}]{x}
+\end{DoxyParamCaption}
+)}}\label{msf__macros_8h_ac1398dc1f1f1f9569ffca77a28aaff20}
+{\bfseries Value\-:}
+\begin{DoxyCode}
+\textcolor{keywordflow}{do} \(\backslash\)
+    \{ \(\backslash\)
+      static \textcolor{keywordtype}{bool} \_\_log\_stream\_once\_\_hit\_\_ = \textcolor{keyword}{false}; \(\backslash\)
+      if (\hyperlink{msf__macros_8h_a9ca64ccf03396106e000eafc5c03c497}{MSF\_UNLIKELY}(!\_\_log\_stream\_once\_\_hit\_\_)) \(\backslash\)
+      \{ \(\backslash\)
+        \_\_log\_stream\_once\_\_hit\_\_ = \textcolor{keyword}{true}; \(\backslash\)
+        MSF\_ERROR\_STREAM(x); \(\backslash\)
+      \} \(\backslash\)
+    \} \textcolor{keywordflow}{while}(0)
+\end{DoxyCode}
+\hypertarget{msf__macros_8h_ad56352f3b184be6c66dff96b442a3db1}{\index{msf\-\_\-macros.\-h@{msf\-\_\-macros.\-h}!M\-S\-F\-\_\-\-E\-R\-R\-O\-R\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-T\-H\-R\-O\-T\-T\-L\-E@{M\-S\-F\-\_\-\-E\-R\-R\-O\-R\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-T\-H\-R\-O\-T\-T\-L\-E}}
+\index{M\-S\-F\-\_\-\-E\-R\-R\-O\-R\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-T\-H\-R\-O\-T\-T\-L\-E@{M\-S\-F\-\_\-\-E\-R\-R\-O\-R\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-T\-H\-R\-O\-T\-T\-L\-E}!msf_macros.h@{msf\-\_\-macros.\-h}}
+\subsubsection[{M\-S\-F\-\_\-\-E\-R\-R\-O\-R\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-T\-H\-R\-O\-T\-T\-L\-E}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\-S\-F\-\_\-\-E\-R\-R\-O\-R\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-T\-H\-R\-O\-T\-T\-L\-E(
+\begin{DoxyParamCaption}
+\item[{}]{rate, }
+\item[{}]{x}
+\end{DoxyParamCaption}
+)}}\label{msf__macros_8h_ad56352f3b184be6c66dff96b442a3db1}
+{\bfseries Value\-:}
+\begin{DoxyCode}
+\textcolor{keywordflow}{do} \(\backslash\)
+    \{ \(\backslash\)
+      static \textcolor{keywordtype}{double} \_\_log\_stream\_throttle\_\_last\_hit\_\_ = 0.0; \(\backslash\)
+      std::chrono::time\_point<std::chrono::system\_clock> 
+      \_\_log\_stream\_throttle\_\_now\_\_ = \(\backslash\)
+      std::chrono::system\_clock::now(); \(\backslash\)
+      if (\hyperlink{msf__macros_8h_a9ca64ccf03396106e000eafc5c03c497}{MSF\_UNLIKELY}(\_\_log\_stream\_throttle\_\_last\_hit\_\_ + rate <= 
+      \(\backslash\)
+        std::chrono::duration\_cast<std::chrono::seconds>(\(\backslash\)
+        \_\_log\_stream\_throttle\_\_now\_\_.time\_since\_epoch()).count())) \(\backslash\)
+      \{ \(\backslash\)
+        \_\_log\_stream\_throttle\_\_last\_hit\_\_ = \(\backslash\)
+        std::chrono::duration\_cast<std::chrono::seconds>\(\backslash\)
+        (\_\_log\_stream\_throttle\_\_now\_\_.time\_since\_epoch()).count(); \(\backslash\)
+        MSF\_ERROR\_STREAM(x); \(\backslash\)
+      \} \(\backslash\)
+    \} \textcolor{keywordflow}{while}(0)
+\end{DoxyCode}
+\hypertarget{msf__macros_8h_a8e22e1ef301caaac18cef911ef9c3c0a}{\index{msf\-\_\-macros.\-h@{msf\-\_\-macros.\-h}!M\-S\-F\-\_\-\-I\-N\-F\-O\-\_\-\-S\-T\-R\-E\-A\-M@{M\-S\-F\-\_\-\-I\-N\-F\-O\-\_\-\-S\-T\-R\-E\-A\-M}}
+\index{M\-S\-F\-\_\-\-I\-N\-F\-O\-\_\-\-S\-T\-R\-E\-A\-M@{M\-S\-F\-\_\-\-I\-N\-F\-O\-\_\-\-S\-T\-R\-E\-A\-M}!msf_macros.h@{msf\-\_\-macros.\-h}}
+\subsubsection[{M\-S\-F\-\_\-\-I\-N\-F\-O\-\_\-\-S\-T\-R\-E\-A\-M}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\-S\-F\-\_\-\-I\-N\-F\-O\-\_\-\-S\-T\-R\-E\-A\-M(
+\begin{DoxyParamCaption}
+\item[{}]{x}
+\end{DoxyParamCaption}
+)~std\-::cerr$<$$<$\char`\"{}\textbackslash{}033\mbox{[}0;0m\mbox{[}\-I\-N\-F\-O\mbox{]} \char`\"{}$<$$<$x$<$$<$\char`\"{}\textbackslash{}033\mbox{[}0;0m\char`\"{}$<$$<$std\-::endl;}}\label{msf__macros_8h_a8e22e1ef301caaac18cef911ef9c3c0a}
+\hypertarget{msf__macros_8h_a71b74ab88da05f0977c03b02323bf065}{\index{msf\-\_\-macros.\-h@{msf\-\_\-macros.\-h}!M\-S\-F\-\_\-\-I\-N\-F\-O\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-C\-O\-N\-D@{M\-S\-F\-\_\-\-I\-N\-F\-O\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-C\-O\-N\-D}}
+\index{M\-S\-F\-\_\-\-I\-N\-F\-O\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-C\-O\-N\-D@{M\-S\-F\-\_\-\-I\-N\-F\-O\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-C\-O\-N\-D}!msf_macros.h@{msf\-\_\-macros.\-h}}
+\subsubsection[{M\-S\-F\-\_\-\-I\-N\-F\-O\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-C\-O\-N\-D}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\-S\-F\-\_\-\-I\-N\-F\-O\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-C\-O\-N\-D(
+\begin{DoxyParamCaption}
+\item[{}]{cond, }
+\item[{}]{x}
+\end{DoxyParamCaption}
+)}}\label{msf__macros_8h_a71b74ab88da05f0977c03b02323bf065}
+{\bfseries Value\-:}
+\begin{DoxyCode}
+\textcolor{keywordflow}{do} \(\backslash\)
+    \{  \(\backslash\)
+      if (\hyperlink{msf__macros_8h_a9ca64ccf03396106e000eafc5c03c497}{MSF\_UNLIKELY}(cond)) \(\backslash\)
+      \{ \(\backslash\)
+        MSF\_INFO\_STREAM(x); \(\backslash\)
+      \} \(\backslash\)
+    \} \textcolor{keywordflow}{while}(0)
+\end{DoxyCode}
+\hypertarget{msf__macros_8h_a391177a1f95a78417a3926667d575f6c}{\index{msf\-\_\-macros.\-h@{msf\-\_\-macros.\-h}!M\-S\-F\-\_\-\-I\-N\-F\-O\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-O\-N\-C\-E@{M\-S\-F\-\_\-\-I\-N\-F\-O\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-O\-N\-C\-E}}
+\index{M\-S\-F\-\_\-\-I\-N\-F\-O\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-O\-N\-C\-E@{M\-S\-F\-\_\-\-I\-N\-F\-O\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-O\-N\-C\-E}!msf_macros.h@{msf\-\_\-macros.\-h}}
+\subsubsection[{M\-S\-F\-\_\-\-I\-N\-F\-O\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-O\-N\-C\-E}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\-S\-F\-\_\-\-I\-N\-F\-O\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-O\-N\-C\-E(
+\begin{DoxyParamCaption}
+\item[{}]{x}
+\end{DoxyParamCaption}
+)}}\label{msf__macros_8h_a391177a1f95a78417a3926667d575f6c}
+{\bfseries Value\-:}
+\begin{DoxyCode}
+\textcolor{keywordflow}{do} \(\backslash\)
+    \{ \(\backslash\)
+      static \textcolor{keywordtype}{bool} \_\_log\_stream\_once\_\_hit\_\_ = \textcolor{keyword}{false}; \(\backslash\)
+      if (\hyperlink{msf__macros_8h_a9ca64ccf03396106e000eafc5c03c497}{MSF\_UNLIKELY}(!\_\_log\_stream\_once\_\_hit\_\_)) \(\backslash\)
+      \{ \(\backslash\)
+        \_\_log\_stream\_once\_\_hit\_\_ = \textcolor{keyword}{true}; \(\backslash\)
+        MSF\_INFO\_STREAM(x); \(\backslash\)
+      \} \(\backslash\)
+    \} \textcolor{keywordflow}{while}(0)
+\end{DoxyCode}
+\hypertarget{msf__macros_8h_a1de58160514e33783f7bb0643a1ea3e0}{\index{msf\-\_\-macros.\-h@{msf\-\_\-macros.\-h}!M\-S\-F\-\_\-\-L\-I\-K\-E\-L\-Y@{M\-S\-F\-\_\-\-L\-I\-K\-E\-L\-Y}}
+\index{M\-S\-F\-\_\-\-L\-I\-K\-E\-L\-Y@{M\-S\-F\-\_\-\-L\-I\-K\-E\-L\-Y}!msf_macros.h@{msf\-\_\-macros.\-h}}
+\subsubsection[{M\-S\-F\-\_\-\-L\-I\-K\-E\-L\-Y}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\-S\-F\-\_\-\-L\-I\-K\-E\-L\-Y(
+\begin{DoxyParamCaption}
+\item[{}]{x}
+\end{DoxyParamCaption}
+)~\-\_\-\-\_\-builtin\-\_\-expect((x),1)}}\label{msf__macros_8h_a1de58160514e33783f7bb0643a1ea3e0}
+\hypertarget{msf__macros_8h_a5718f6bf203c21d93d9622f17119f8bf}{\index{msf\-\_\-macros.\-h@{msf\-\_\-macros.\-h}!M\-S\-F\-\_\-\-L\-O\-G\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-T\-H\-R\-O\-T\-T\-L\-E@{M\-S\-F\-\_\-\-L\-O\-G\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-T\-H\-R\-O\-T\-T\-L\-E}}
+\index{M\-S\-F\-\_\-\-L\-O\-G\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-T\-H\-R\-O\-T\-T\-L\-E@{M\-S\-F\-\_\-\-L\-O\-G\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-T\-H\-R\-O\-T\-T\-L\-E}!msf_macros.h@{msf\-\_\-macros.\-h}}
+\subsubsection[{M\-S\-F\-\_\-\-L\-O\-G\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-T\-H\-R\-O\-T\-T\-L\-E}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\-S\-F\-\_\-\-L\-O\-G\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-T\-H\-R\-O\-T\-T\-L\-E(
+\begin{DoxyParamCaption}
+\item[{}]{rate, }
+\item[{}]{x}
+\end{DoxyParamCaption}
+)}}\label{msf__macros_8h_a5718f6bf203c21d93d9622f17119f8bf}
+{\bfseries Value\-:}
+\begin{DoxyCode}
+\textcolor{keywordflow}{do} \(\backslash\)
+    \{ \(\backslash\)
+      static \textcolor{keywordtype}{double} \_\_log\_stream\_throttle\_\_last\_hit\_\_ = 0.0; \(\backslash\)
+      std::chrono::time\_point<std::chrono::system\_clock> 
+      \_\_log\_stream\_throttle\_\_now\_\_ = \(\backslash\)
+          std::chrono::system\_clock::now(); \(\backslash\)
+      if (\hyperlink{msf__macros_8h_a9ca64ccf03396106e000eafc5c03c497}{MSF\_UNLIKELY}(\_\_log\_stream\_throttle\_\_last\_hit\_\_ + rate <= 
+      \(\backslash\)
+         std::chrono::duration\_cast<std::chrono::seconds>( \(\backslash\)
+         \_\_log\_stream\_throttle\_\_now\_\_.time\_since\_epoch()).count())) \(\backslash\)
+      \{ \(\backslash\)
+        \_\_log\_stream\_throttle\_\_last\_hit\_\_ = std::chrono::duration\_cast< \(\backslash\)
+        std::chrono::seconds>(\_\_log\_stream\_throttle\_\_now\_\_.time\_since\_epoch()).
+      count(); \(\backslash\)
+        MSF\_INFO\_STREAM(x); \(\backslash\)
+      \} \(\backslash\)
+    \} \textcolor{keywordflow}{while}(0)
+\end{DoxyCode}
+\hypertarget{msf__macros_8h_a9ca64ccf03396106e000eafc5c03c497}{\index{msf\-\_\-macros.\-h@{msf\-\_\-macros.\-h}!M\-S\-F\-\_\-\-U\-N\-L\-I\-K\-E\-L\-Y@{M\-S\-F\-\_\-\-U\-N\-L\-I\-K\-E\-L\-Y}}
+\index{M\-S\-F\-\_\-\-U\-N\-L\-I\-K\-E\-L\-Y@{M\-S\-F\-\_\-\-U\-N\-L\-I\-K\-E\-L\-Y}!msf_macros.h@{msf\-\_\-macros.\-h}}
+\subsubsection[{M\-S\-F\-\_\-\-U\-N\-L\-I\-K\-E\-L\-Y}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\-S\-F\-\_\-\-U\-N\-L\-I\-K\-E\-L\-Y(
+\begin{DoxyParamCaption}
+\item[{}]{x}
+\end{DoxyParamCaption}
+)~\-\_\-\-\_\-builtin\-\_\-expect((x),0)}}\label{msf__macros_8h_a9ca64ccf03396106e000eafc5c03c497}
+\hypertarget{msf__macros_8h_a48a90912747b87b3c148944f408d7652}{\index{msf\-\_\-macros.\-h@{msf\-\_\-macros.\-h}!M\-S\-F\-\_\-\-W\-A\-R\-N\-\_\-\-S\-T\-R\-E\-A\-M@{M\-S\-F\-\_\-\-W\-A\-R\-N\-\_\-\-S\-T\-R\-E\-A\-M}}
+\index{M\-S\-F\-\_\-\-W\-A\-R\-N\-\_\-\-S\-T\-R\-E\-A\-M@{M\-S\-F\-\_\-\-W\-A\-R\-N\-\_\-\-S\-T\-R\-E\-A\-M}!msf_macros.h@{msf\-\_\-macros.\-h}}
+\subsubsection[{M\-S\-F\-\_\-\-W\-A\-R\-N\-\_\-\-S\-T\-R\-E\-A\-M}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\-S\-F\-\_\-\-W\-A\-R\-N\-\_\-\-S\-T\-R\-E\-A\-M(
+\begin{DoxyParamCaption}
+\item[{}]{x}
+\end{DoxyParamCaption}
+)~std\-::cerr$<$$<$\char`\"{}\textbackslash{}033\mbox{[}0;33m\mbox{[}\-W\-A\-R\-N\mbox{]} \char`\"{}$<$$<$x$<$$<$\char`\"{}\textbackslash{}033\mbox{[}0;0m\char`\"{}$<$$<$std\-::endl;}}\label{msf__macros_8h_a48a90912747b87b3c148944f408d7652}
+\hypertarget{msf__macros_8h_a727c36ed33ce7dc9dd6a6e1577b94670}{\index{msf\-\_\-macros.\-h@{msf\-\_\-macros.\-h}!M\-S\-F\-\_\-\-W\-A\-R\-N\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-C\-O\-N\-D@{M\-S\-F\-\_\-\-W\-A\-R\-N\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-C\-O\-N\-D}}
+\index{M\-S\-F\-\_\-\-W\-A\-R\-N\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-C\-O\-N\-D@{M\-S\-F\-\_\-\-W\-A\-R\-N\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-C\-O\-N\-D}!msf_macros.h@{msf\-\_\-macros.\-h}}
+\subsubsection[{M\-S\-F\-\_\-\-W\-A\-R\-N\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-C\-O\-N\-D}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\-S\-F\-\_\-\-W\-A\-R\-N\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-C\-O\-N\-D(
+\begin{DoxyParamCaption}
+\item[{}]{cond, }
+\item[{}]{x}
+\end{DoxyParamCaption}
+)}}\label{msf__macros_8h_a727c36ed33ce7dc9dd6a6e1577b94670}
+{\bfseries Value\-:}
+\begin{DoxyCode}
+\textcolor{keywordflow}{do} \(\backslash\)
+    \{  \(\backslash\)
+      if (\hyperlink{msf__macros_8h_a9ca64ccf03396106e000eafc5c03c497}{MSF\_UNLIKELY}(cond)) \(\backslash\)
+      \{ \(\backslash\)
+        MSF\_WARN\_STREAM(x); \(\backslash\)
+      \} \(\backslash\)
+    \} \textcolor{keywordflow}{while}(0)
+\end{DoxyCode}
+\hypertarget{msf__macros_8h_a698949dea73495d742233519f3002fea}{\index{msf\-\_\-macros.\-h@{msf\-\_\-macros.\-h}!M\-S\-F\-\_\-\-W\-A\-R\-N\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-O\-N\-C\-E@{M\-S\-F\-\_\-\-W\-A\-R\-N\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-O\-N\-C\-E}}
+\index{M\-S\-F\-\_\-\-W\-A\-R\-N\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-O\-N\-C\-E@{M\-S\-F\-\_\-\-W\-A\-R\-N\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-O\-N\-C\-E}!msf_macros.h@{msf\-\_\-macros.\-h}}
+\subsubsection[{M\-S\-F\-\_\-\-W\-A\-R\-N\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-O\-N\-C\-E}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\-S\-F\-\_\-\-W\-A\-R\-N\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-O\-N\-C\-E(
+\begin{DoxyParamCaption}
+\item[{}]{x}
+\end{DoxyParamCaption}
+)}}\label{msf__macros_8h_a698949dea73495d742233519f3002fea}
+{\bfseries Value\-:}
+\begin{DoxyCode}
+\textcolor{keywordflow}{do} \(\backslash\)
+    \{ \(\backslash\)
+      static \textcolor{keywordtype}{bool} \_\_log\_stream\_once\_\_hit\_\_ = \textcolor{keyword}{false}; \(\backslash\)
+      if (\hyperlink{msf__macros_8h_a9ca64ccf03396106e000eafc5c03c497}{MSF\_UNLIKELY}(!\_\_log\_stream\_once\_\_hit\_\_)) \(\backslash\)
+      \{ \(\backslash\)
+        \_\_log\_stream\_once\_\_hit\_\_ = \textcolor{keyword}{true}; \(\backslash\)
+        MSF\_WARN\_STREAM(x); \(\backslash\)
+      \} \(\backslash\)
+    \} \textcolor{keywordflow}{while}(0)
+\end{DoxyCode}
+\hypertarget{msf__macros_8h_a51b3004c146da17dcb8a35a4168bad47}{\index{msf\-\_\-macros.\-h@{msf\-\_\-macros.\-h}!M\-S\-F\-\_\-\-W\-A\-R\-N\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-T\-H\-R\-O\-T\-T\-L\-E@{M\-S\-F\-\_\-\-W\-A\-R\-N\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-T\-H\-R\-O\-T\-T\-L\-E}}
+\index{M\-S\-F\-\_\-\-W\-A\-R\-N\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-T\-H\-R\-O\-T\-T\-L\-E@{M\-S\-F\-\_\-\-W\-A\-R\-N\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-T\-H\-R\-O\-T\-T\-L\-E}!msf_macros.h@{msf\-\_\-macros.\-h}}
+\subsubsection[{M\-S\-F\-\_\-\-W\-A\-R\-N\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-T\-H\-R\-O\-T\-T\-L\-E}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\-S\-F\-\_\-\-W\-A\-R\-N\-\_\-\-S\-T\-R\-E\-A\-M\-\_\-\-T\-H\-R\-O\-T\-T\-L\-E(
+\begin{DoxyParamCaption}
+\item[{}]{rate, }
+\item[{}]{x}
+\end{DoxyParamCaption}
+)}}\label{msf__macros_8h_a51b3004c146da17dcb8a35a4168bad47}
+{\bfseries Value\-:}
+\begin{DoxyCode}
+\textcolor{keywordflow}{do} \(\backslash\)
+    \{ \(\backslash\)
+      static \textcolor{keywordtype}{double} \_\_log\_stream\_throttle\_\_last\_hit\_\_ = 0.0; \(\backslash\)
+      std::chrono::time\_point<std::chrono::system\_clock> 
+      \_\_log\_stream\_throttle\_\_now\_\_ = \(\backslash\)
+      std::chrono::system\_clock::now(); \(\backslash\)
+      if (\hyperlink{msf__macros_8h_a9ca64ccf03396106e000eafc5c03c497}{MSF\_UNLIKELY}(\_\_log\_stream\_throttle\_\_last\_hit\_\_ + rate <= 
+      \(\backslash\)
+        std::chrono::duration\_cast<std::chrono::seconds>( \(\backslash\)
+        \_\_log\_stream\_throttle\_\_now\_\_.time\_since\_epoch()).count())) \(\backslash\)
+      \{ \(\backslash\)
+        \_\_log\_stream\_throttle\_\_last\_hit\_\_ = \(\backslash\)
+        std::chrono::duration\_cast<std::chrono::seconds>( \(\backslash\)
+        \_\_log\_stream\_throttle\_\_now\_\_.time\_since\_epoch()).count(); \(\backslash\)
+        MSF\_WARN\_STREAM(x); \(\backslash\)
+      \} \(\backslash\)
+    \} \textcolor{keywordflow}{while}(0)
+\end{DoxyCode}
+\hypertarget{msf__macros_8h_ad3b6dfb41f49e999485ba160b60819e6}{\index{msf\-\_\-macros.\-h@{msf\-\_\-macros.\-h}!N\-U\-M\-E\-R\-I\-C\-\_\-\-P\-R\-E\-C@{N\-U\-M\-E\-R\-I\-C\-\_\-\-P\-R\-E\-C}}
+\index{N\-U\-M\-E\-R\-I\-C\-\_\-\-P\-R\-E\-C@{N\-U\-M\-E\-R\-I\-C\-\_\-\-P\-R\-E\-C}!msf_macros.h@{msf\-\_\-macros.\-h}}
+\subsubsection[{N\-U\-M\-E\-R\-I\-C\-\_\-\-P\-R\-E\-C}]{\setlength{\rightskip}{0pt plus 5cm}\#define N\-U\-M\-E\-R\-I\-C\-\_\-\-P\-R\-E\-C~4}}\label{msf__macros_8h_ad3b6dfb41f49e999485ba160b60819e6}
+\hypertarget{msf__macros_8h_a47112f19d1bc98ba2bdfb2f1cd3d2c65}{\index{msf\-\_\-macros.\-h@{msf\-\_\-macros.\-h}!S\-T\-R\-E\-A\-M\-Q\-U\-A\-T@{S\-T\-R\-E\-A\-M\-Q\-U\-A\-T}}
+\index{S\-T\-R\-E\-A\-M\-Q\-U\-A\-T@{S\-T\-R\-E\-A\-M\-Q\-U\-A\-T}!msf_macros.h@{msf\-\_\-macros.\-h}}
+\subsubsection[{S\-T\-R\-E\-A\-M\-Q\-U\-A\-T}]{\setlength{\rightskip}{0pt plus 5cm}\#define S\-T\-R\-E\-A\-M\-Q\-U\-A\-T(
+\begin{DoxyParamCaption}
+\item[{}]{q}
+\end{DoxyParamCaption}
+)}}\label{msf__macros_8h_a47112f19d1bc98ba2bdfb2f1cd3d2c65}
+{\bfseries Value\-:}
+\begin{DoxyCode}
+\textcolor{stringliteral}{"["}<<std::setprecision(3)<<(\hyperlink{namespacegeometry__msgs_1_1cov_a39ced537b52c13c965a0ccdfe23f4dd1a45bc9ae177afeb4ed8e0a975dc10b8e8}{q}).w()<<\textcolor{stringliteral}{", "}<<(\hyperlink{namespacegeometry__msgs_1_1cov_a39ced537b52c13c965a0ccdfe23f4dd1a45bc9ae177afeb4ed8e0a975dc10b8e8}{q}).x()<<\textcolor{stringliteral}{", "}<< \(\backslash\)
+    (\hyperlink{namespacegeometry__msgs_1_1cov_a39ced537b52c13c965a0ccdfe23f4dd1a45bc9ae177afeb4ed8e0a975dc10b8e8}{q}).y()<<\textcolor{stringliteral}{", "}<<(\hyperlink{namespacegeometry__msgs_1_1cov_a39ced537b52c13c965a0ccdfe23f4dd1a45bc9ae177afeb4ed8e0a975dc10b8e8}{q}).z()<<std::setprecision(\hyperlink{msf__macros_8h_ad3b6dfb41f49e999485ba160b60819e6}{NUMERIC\_PREC})<<\textcolor{stringliteral}{"]"}
+\end{DoxyCode}
+\hypertarget{msf__macros_8h_a86d500a34c624c2cae56bc25a31b12f3}{\index{msf\-\_\-macros.\-h@{msf\-\_\-macros.\-h}!U\-N\-U\-S\-E\-D@{U\-N\-U\-S\-E\-D}}
+\index{U\-N\-U\-S\-E\-D@{U\-N\-U\-S\-E\-D}!msf_macros.h@{msf\-\_\-macros.\-h}}
+\subsubsection[{U\-N\-U\-S\-E\-D}]{\setlength{\rightskip}{0pt plus 5cm}\#define U\-N\-U\-S\-E\-D(
+\begin{DoxyParamCaption}
+\item[{}]{x}
+\end{DoxyParamCaption}
+)~(void)x;}}\label{msf__macros_8h_a86d500a34c624c2cae56bc25a31b12f3}
+\hypertarget{msf__macros_8h_a2d2af1048de7b1510994ffd3bc32aacc}{\index{msf\-\_\-macros.\-h@{msf\-\_\-macros.\-h}!U\-N\-U\-S\-E\-D\-P\-A\-R\-A\-M@{U\-N\-U\-S\-E\-D\-P\-A\-R\-A\-M}}
+\index{U\-N\-U\-S\-E\-D\-P\-A\-R\-A\-M@{U\-N\-U\-S\-E\-D\-P\-A\-R\-A\-M}!msf_macros.h@{msf\-\_\-macros.\-h}}
+\subsubsection[{U\-N\-U\-S\-E\-D\-P\-A\-R\-A\-M}]{\setlength{\rightskip}{0pt plus 5cm}\#define U\-N\-U\-S\-E\-D\-P\-A\-R\-A\-M(
+\begin{DoxyParamCaption}
+\item[{}]{x}
+\end{DoxyParamCaption}
+)~x}}\label{msf__macros_8h_a2d2af1048de7b1510994ffd3bc32aacc}

@@ -1,0 +1,26 @@
+\hypertarget{msf__measurement_8h}{\section{msf\-\_\-core/include/msf\-\_\-core/msf\-\_\-measurement.h File Reference}
+\label{msf__measurement_8h}\index{msf\-\_\-core/include/msf\-\_\-core/msf\-\_\-measurement.\-h@{msf\-\_\-core/include/msf\-\_\-core/msf\-\_\-measurement.\-h}}
+}
+{\ttfamily \#include $<$Eigen/\-Dense$>$}\\*
+{\ttfamily \#include $<$boost/shared\-\_\-ptr.\-hpp$>$}\\*
+{\ttfamily \#include $<$msf\-\_\-core/msf\-\_\-fwds.\-h$>$}\\*
+{\ttfamily \#include $<$msf\-\_\-core/msf\-\_\-types.\-hpp$>$}\\*
+{\ttfamily \#include $<$msf\-\_\-core/implementation/msf\-\_\-measurement.\-hpp$>$}\\*
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classmsf__core_1_1MSF__MeasurementBase}{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base$<$ E\-K\-F\-State\-\_\-\-T $>$}
+\begin{DoxyCompactList}\small\item\em The base class for all measurement types. These are the objects provided to the E\-K\-F core to be applied in correct order to the states. \end{DoxyCompactList}\item 
+class \hyperlink{classmsf__core_1_1MSF__InvalidMeasurement}{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Invalid\-Measurement$<$ E\-K\-F\-State\-\_\-\-T $>$}
+\begin{DoxyCompactList}\small\item\em An invalid measurement needed for the measurement container to report if something went wrong. \end{DoxyCompactList}\item 
+class \hyperlink{classmsf__core_1_1MSF__Measurement}{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement$<$ T, R\-M\-A\-T\-\_\-\-T, E\-K\-F\-State\-\_\-\-T $>$}
+\begin{DoxyCompactList}\small\item\em The class for sensor based measurements which we want to apply to a state in the update routine of the E\-K\-F. This calls the apply correction method of the E\-K\-F core. \end{DoxyCompactList}\item 
+class \hyperlink{classmsf__core_1_1MSF__InitMeasurement}{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Init\-Measurement$<$ E\-K\-F\-State\-\_\-\-T $>$}
+\begin{DoxyCompactList}\small\item\em A measurement to be send to initialize parts of or the full E\-K\-F state this can especially be used to split the initialization of the E\-K\-F between multiple sensors which init different parts of the state. \end{DoxyCompactList}\item 
+class \hyperlink{classmsf__core_1_1sortMeasurements}{msf\-\_\-core\-::sort\-Measurements$<$ E\-K\-F\-State\-\_\-\-T $>$}
+\begin{DoxyCompactList}\small\item\em A comparator to sort measurements by time. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \hyperlink{namespacemsf__core}{msf\-\_\-core}
+\end{DoxyCompactItemize}

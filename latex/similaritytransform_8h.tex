@@ -1,0 +1,59 @@
+\hypertarget{similaritytransform_8h}{\section{msf\-\_\-core/include/msf\-\_\-core/similaritytransform.h File Reference}
+\label{similaritytransform_8h}\index{msf\-\_\-core/include/msf\-\_\-core/similaritytransform.\-h@{msf\-\_\-core/include/msf\-\_\-core/similaritytransform.\-h}}
+}
+{\ttfamily \#include $<$vector$>$}\\*
+{\ttfamily \#include $<$utility$>$}\\*
+{\ttfamily \#include $<$geometry\-\_\-msgs/\-Pose\-With\-Covariance.\-h$>$}\\*
+{\ttfamily \#include $<$Eigen/\-Core$>$}\\*
+{\ttfamily \#include $<$Eigen/\-Geometry$>$}\\*
+{\ttfamily \#include $<$limits$>$}\\*
+{\ttfamily \#include $<$msf\-\_\-core/msf\-\_\-types.\-hpp$>$}\\*
+{\ttfamily \#include $<$msf\-\_\-core/eigen\-\_\-utils.\-h$>$}\\*
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classmsf__core_1_1similarity__transform_1_1From6DoF}{msf\-\_\-core\-::similarity\-\_\-transform\-::\-From6\-Do\-F}
+\begin{DoxyCompactList}\small\item\em Computes the average similarity transform (rotation, position, scale) between two sets of 6 Do\-F poses. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \hyperlink{namespacegeometry__msgs}{geometry\-\_\-msgs}
+\begin{DoxyCompactList}\small\item\em Defines the start row and col for the covariance entries in. \end{DoxyCompactList}\item 
+namespace \hyperlink{namespacegeometry__msgs_1_1cov}{geometry\-\_\-msgs\-::cov}
+\item 
+namespace \hyperlink{namespacemsf__core}{msf\-\_\-core}
+\item 
+namespace \hyperlink{namespacemsf__core_1_1similarity__transform}{msf\-\_\-core\-::similarity\-\_\-transform}
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \\*
+geometry\-\_\-msgs\-::\-Pose\-With\-Covariance \hyperlink{namespacemsf__core_1_1similarity__transform_a7ecde3e7b02bda457b404fc49b03179f}{msf\-\_\-core\-::similarity\-\_\-transform\-::\-Pose}
+\item 
+typedef std\-::pair$<$ Pose, Pose $>$ \hyperlink{namespacemsf__core_1_1similarity__transform_aaf333aba3d1f81a96f7294f05f311590}{msf\-\_\-core\-::similarity\-\_\-transform\-::\-Pose\-Pair}
+\item 
+typedef std\-::vector$<$ Pose\-Pair $>$ \hyperlink{namespacemsf__core_1_1similarity__transform_aa03b1c4b07f85bede2f9cad021e3df7a}{msf\-\_\-core\-::similarity\-\_\-transform\-::\-Pose\-Pair\-Vector}
+\end{DoxyCompactItemize}
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ \hyperlink{namespacegeometry__msgs_1_1cov_a39ced537b52c13c965a0ccdfe23f4dd1a564e84fef1216ef14d3dbf7ed94cb357}{geometry\-\_\-msgs\-::cov\-::p} =  0, 
+\hyperlink{namespacegeometry__msgs_1_1cov_a39ced537b52c13c965a0ccdfe23f4dd1a45bc9ae177afeb4ed8e0a975dc10b8e8}{geometry\-\_\-msgs\-::cov\-::q} =  3
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+Vector3 \hyperlink{namespacemsf__core_a531123cfe2ad9131a453087bc974e6dd}{msf\-\_\-core\-::geometry\-\_\-msgs\-To\-Eigen} (const geometry\-\_\-msgs\-::\-Point \&p)
+\begin{DoxyCompactList}\small\item\em Converts a geometry\-\_\-msgs\-::\-Point to an Eigen Vector3d. \end{DoxyCompactList}\item 
+Eigen\-::\-Quaterniond \hyperlink{namespacemsf__core_a3430943bc018ba721de751a9fcdb8462}{msf\-\_\-core\-::geometry\-\_\-msgs\-To\-Eigen} (const geometry\-\_\-msgs\-::\-Quaternion \&q)
+\begin{DoxyCompactList}\small\item\em Converts a geometry\-\_\-msgs\-::\-Quaternion to an Eigen\-::\-Quaterniond. \end{DoxyCompactList}\item 
+Matrix3 \hyperlink{namespacemsf__core_a3b1572f4facb6f46c2b154cb1fd7372c}{msf\-\_\-core\-::geometry\-\_\-msgs\-Cov\-Block\-To\-Eigen} (const geometry\-\_\-msgs\-::\-Pose\-With\-Covariance\-::\-\_\-covariance\-\_\-type \&gcov, int start\-\_\-row, int start\-\_\-col)
+\begin{DoxyCompactList}\small\item\em Returns a 3x3 covariance block entry from a geometry\-\_\-msgs\-::\-Pose\-With\-Covariance\-::covariance array. \end{DoxyCompactList}\item 
+{\footnotesize template$<$class Derived $>$ }\\void \hyperlink{namespacemsf__core_aa55165dedfc79ffa6f95b337d2e8b1eb}{msf\-\_\-core\-::eigen\-Cov\-Block\-To\-Geometry\-\_\-msgs} (geometry\-\_\-msgs\-::\-Pose\-With\-Covariance\-::\-\_\-covariance\-\_\-type \&gcov, const Eigen\-::\-Matrix\-Base$<$ Derived $>$ \&ecov, int start\-\_\-row, int start\-\_\-col)
+\begin{DoxyCompactList}\small\item\em Fills a 3x3 covariance block entry of a geometry\-\_\-msgs\-::\-Pose\-With\-Covariance\-::covariance array from an Eigen 3x3 matrix. \end{DoxyCompactList}\item 
+{\footnotesize template$<$class Derived $>$ }\\geometry\-\_\-msgs\-::\-Point \hyperlink{namespacemsf__core_ae9e9826a3cf9d0a0d29cb0d3b2c2f37c}{msf\-\_\-core\-::eigen\-To\-Geometry\-\_\-msgs} (const Eigen\-::\-Matrix\-Base$<$ Derived $>$ \&p)
+\begin{DoxyCompactList}\small\item\em Converts any eigen vector with 3 elements to a geometry\-\_\-msgs\-::\-Point. \end{DoxyCompactList}\item 
+geometry\-\_\-msgs\-::\-Quaternion \hyperlink{namespacemsf__core_aa2c20e862db8f30eb976ba797bacff2c}{msf\-\_\-core\-::eigen\-To\-Geometry\-\_\-msgs} (const Eigen\-::\-Quaterniond \&q)
+\begin{DoxyCompactList}\small\item\em Converts an Eigen\-::\-Quaterniond to a geometry\-\_\-msgs\-::\-Quaternion. \end{DoxyCompactList}\end{DoxyCompactItemize}

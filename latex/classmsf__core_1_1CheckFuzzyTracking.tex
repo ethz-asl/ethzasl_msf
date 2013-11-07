@@ -1,20 +1,63 @@
 \hypertarget{classmsf__core_1_1CheckFuzzyTracking}{\section{msf\-\_\-core\-:\-:Check\-Fuzzy\-Tracking$<$ E\-K\-F\-State\-\_\-\-T, N\-O\-N\-T\-E\-M\-P\-O\-R\-A\-L\-D\-R\-I\-F\-T\-I\-N\-G\-T\-Y\-P\-E $>$ Class Template Reference}
 \label{classmsf__core_1_1CheckFuzzyTracking}\index{msf\-\_\-core\-::\-Check\-Fuzzy\-Tracking$<$ E\-K\-F\-State\-\_\-\-T, N\-O\-N\-T\-E\-M\-P\-O\-R\-A\-L\-D\-R\-I\-F\-T\-I\-N\-G\-T\-Y\-P\-E $>$@{msf\-\_\-core\-::\-Check\-Fuzzy\-Tracking$<$ E\-K\-F\-State\-\_\-\-T, N\-O\-N\-T\-E\-M\-P\-O\-R\-A\-L\-D\-R\-I\-F\-T\-I\-N\-G\-T\-Y\-P\-E $>$}}
 }
+
+
+{\ttfamily \#include $<$msf\-\_\-check\-Fuzzy\-Tracking.\-h$>$}
+
 \subsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{classmsf__core_1_1CheckFuzzyTracking_a68609f438370a3c2a39e81f3d996ef9a}{void {\bfseries reset} ()}\label{classmsf__core_1_1CheckFuzzyTracking_a68609f438370a3c2a39e81f3d996ef9a}
-
+void \hyperlink{classmsf__core_1_1CheckFuzzyTracking_a68609f438370a3c2a39e81f3d996ef9a}{reset} ()
+\item 
+\hyperlink{classmsf__core_1_1CheckFuzzyTracking_a557431eef7d40a22877807c9b5ab2523}{Check\-Fuzzy\-Tracking} ()
 \item 
 bool \hyperlink{classmsf__core_1_1CheckFuzzyTracking_a3ab7f56a13cc8b8a80c1a97b9be9e8ad}{check} (shared\-\_\-ptr$<$ E\-K\-F\-State\-\_\-\-T $>$ delaystate, E\-K\-F\-State\-\_\-\-T \&buffstate, double fuzzythres)
 \end{DoxyCompactItemize}
 \subsection*{Public Attributes}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{classmsf__core_1_1CheckFuzzyTracking_ae9cbaa66c0aca9cf4264d3017b46a785}{{\bfseries E\-I\-G\-E\-N\-\_\-\-M\-A\-K\-E\-\_\-\-A\-L\-I\-G\-N\-E\-D\-\_\-\-O\-P\-E\-R\-A\-T\-O\-R\-\_\-\-N\-E\-W}}\label{classmsf__core_1_1CheckFuzzyTracking_ae9cbaa66c0aca9cf4264d3017b46a785}
-
+\hyperlink{classmsf__core_1_1CheckFuzzyTracking_ae9cbaa66c0aca9cf4264d3017b46a785}{E\-I\-G\-E\-N\-\_\-\-M\-A\-K\-E\-\_\-\-A\-L\-I\-G\-N\-E\-D\-\_\-\-O\-P\-E\-R\-A\-T\-O\-R\-\_\-\-N\-E\-W}
 \end{DoxyCompactItemize}
+\subsection*{Private Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ \hyperlink{classmsf__core_1_1CheckFuzzyTracking_a6f126748326deeb3a587c1a1941989ebaf79d708cc771616ae3aa19084acb2d77}{qbuff\-Rows\-At\-Compiletime}, 
+\hyperlink{classmsf__core_1_1CheckFuzzyTracking_a6f126748326deeb3a587c1a1941989eba61c3173392a55f3aaef6cd896f33ab10}{n\-Buff\-\_\-} =  30
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{classmsf__core_1_1CheckFuzzyTracking_af51abec3e790879abe78802742a6eb00}{nontemporaldrifting\-\_\-inittimer\-\_\-}
+\begin{DoxyCompactList}\small\item\em A counter for fuzzy tracking detection. \end{DoxyCompactList}\item 
+Eigen\-::\-Matrix$<$ double, \hyperlink{classmsf__core_1_1CheckFuzzyTracking_a6f126748326deeb3a587c1a1941989eba61c3173392a55f3aaef6cd896f33ab10}{n\-Buff\-\_\-}, \\*
+\hyperlink{classmsf__core_1_1CheckFuzzyTracking_a6f126748326deeb3a587c1a1941989ebaf79d708cc771616ae3aa19084acb2d77}{qbuff\-Rows\-At\-Compiletime} $>$ \hyperlink{classmsf__core_1_1CheckFuzzyTracking_af1c7c576c8731d752a72d4e75f0a6078}{qbuff\-\_\-}
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Enumeration Documentation}
+\hypertarget{classmsf__core_1_1CheckFuzzyTracking_a6f126748326deeb3a587c1a1941989eb}{\subsubsection[{anonymous enum}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T, typename N\-O\-N\-T\-E\-M\-P\-O\-R\-A\-L\-D\-R\-I\-F\-T\-I\-N\-G\-T\-Y\-P\-E$>$ anonymous enum\hspace{0.3cm}{\ttfamily [private]}}}\label{classmsf__core_1_1CheckFuzzyTracking_a6f126748326deeb3a587c1a1941989eb}
+\begin{Desc}
+\item[Enumerator\-: ]\par
+\begin{description}
+\index{qbuff\-Rows\-At\-Compiletime@{qbuff\-Rows\-At\-Compiletime}!msf\-\_\-core\-::\-Check\-Fuzzy\-Tracking@{msf\-\_\-core\-::\-Check\-Fuzzy\-Tracking}}\index{msf\-\_\-core\-::\-Check\-Fuzzy\-Tracking@{msf\-\_\-core\-::\-Check\-Fuzzy\-Tracking}!qbuff\-Rows\-At\-Compiletime@{qbuff\-Rows\-At\-Compiletime}}\item[{\em 
+\hypertarget{classmsf__core_1_1CheckFuzzyTracking_a6f126748326deeb3a587c1a1941989ebaf79d708cc771616ae3aa19084acb2d77}{qbuff\-Rows\-At\-Compiletime}\label{classmsf__core_1_1CheckFuzzyTracking_a6f126748326deeb3a587c1a1941989ebaf79d708cc771616ae3aa19084acb2d77}
+}]\index{n\-Buff\-\_\-@{n\-Buff\-\_\-}!msf\-\_\-core\-::\-Check\-Fuzzy\-Tracking@{msf\-\_\-core\-::\-Check\-Fuzzy\-Tracking}}\index{msf\-\_\-core\-::\-Check\-Fuzzy\-Tracking@{msf\-\_\-core\-::\-Check\-Fuzzy\-Tracking}!n\-Buff\-\_\-@{n\-Buff\-\_\-}}\item[{\em 
+\hypertarget{classmsf__core_1_1CheckFuzzyTracking_a6f126748326deeb3a587c1a1941989eba61c3173392a55f3aaef6cd896f33ab10}{n\-Buff\-\_\-}\label{classmsf__core_1_1CheckFuzzyTracking_a6f126748326deeb3a587c1a1941989eba61c3173392a55f3aaef6cd896f33ab10}
+}]Buffer size for median non drifting state values. \end{description}
+\end{Desc}
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classmsf__core_1_1CheckFuzzyTracking_a557431eef7d40a22877807c9b5ab2523}{\index{msf\-\_\-core\-::\-Check\-Fuzzy\-Tracking@{msf\-\_\-core\-::\-Check\-Fuzzy\-Tracking}!Check\-Fuzzy\-Tracking@{Check\-Fuzzy\-Tracking}}
+\index{Check\-Fuzzy\-Tracking@{Check\-Fuzzy\-Tracking}!msf_core::CheckFuzzyTracking@{msf\-\_\-core\-::\-Check\-Fuzzy\-Tracking}}
+\subsubsection[{Check\-Fuzzy\-Tracking}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T, typename N\-O\-N\-T\-E\-M\-P\-O\-R\-A\-L\-D\-R\-I\-F\-T\-I\-N\-G\-T\-Y\-P\-E$>$ {\bf msf\-\_\-core\-::\-Check\-Fuzzy\-Tracking}$<$ E\-K\-F\-State\-\_\-\-T, N\-O\-N\-T\-E\-M\-P\-O\-R\-A\-L\-D\-R\-I\-F\-T\-I\-N\-G\-T\-Y\-P\-E $>$\-::{\bf Check\-Fuzzy\-Tracking} (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classmsf__core_1_1CheckFuzzyTracking_a557431eef7d40a22877807c9b5ab2523}
 
 
 \subsection{Member Function Documentation}
@@ -29,8 +72,27 @@ bool \hyperlink{classmsf__core_1_1CheckFuzzyTracking_a3ab7f56a13cc8b8a80c1a97b9b
 )\hspace{0.3cm}{\ttfamily [inline]}}}\label{classmsf__core_1_1CheckFuzzyTracking_a3ab7f56a13cc8b8a80c1a97b9be9e8ad}
 Error state length.
 
-Complete state length. 
+Complete state length. \hypertarget{classmsf__core_1_1CheckFuzzyTracking_a68609f438370a3c2a39e81f3d996ef9a}{\index{msf\-\_\-core\-::\-Check\-Fuzzy\-Tracking@{msf\-\_\-core\-::\-Check\-Fuzzy\-Tracking}!reset@{reset}}
+\index{reset@{reset}!msf_core::CheckFuzzyTracking@{msf\-\_\-core\-::\-Check\-Fuzzy\-Tracking}}
+\subsubsection[{reset}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T, typename N\-O\-N\-T\-E\-M\-P\-O\-R\-A\-L\-D\-R\-I\-F\-T\-I\-N\-G\-T\-Y\-P\-E$>$ void {\bf msf\-\_\-core\-::\-Check\-Fuzzy\-Tracking}$<$ E\-K\-F\-State\-\_\-\-T, N\-O\-N\-T\-E\-M\-P\-O\-R\-A\-L\-D\-R\-I\-F\-T\-I\-N\-G\-T\-Y\-P\-E $>$\-::reset (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classmsf__core_1_1CheckFuzzyTracking_a68609f438370a3c2a39e81f3d996ef9a}
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classmsf__core_1_1CheckFuzzyTracking_ae9cbaa66c0aca9cf4264d3017b46a785}{\index{msf\-\_\-core\-::\-Check\-Fuzzy\-Tracking@{msf\-\_\-core\-::\-Check\-Fuzzy\-Tracking}!E\-I\-G\-E\-N\-\_\-\-M\-A\-K\-E\-\_\-\-A\-L\-I\-G\-N\-E\-D\-\_\-\-O\-P\-E\-R\-A\-T\-O\-R\-\_\-\-N\-E\-W@{E\-I\-G\-E\-N\-\_\-\-M\-A\-K\-E\-\_\-\-A\-L\-I\-G\-N\-E\-D\-\_\-\-O\-P\-E\-R\-A\-T\-O\-R\-\_\-\-N\-E\-W}}
+\index{E\-I\-G\-E\-N\-\_\-\-M\-A\-K\-E\-\_\-\-A\-L\-I\-G\-N\-E\-D\-\_\-\-O\-P\-E\-R\-A\-T\-O\-R\-\_\-\-N\-E\-W@{E\-I\-G\-E\-N\-\_\-\-M\-A\-K\-E\-\_\-\-A\-L\-I\-G\-N\-E\-D\-\_\-\-O\-P\-E\-R\-A\-T\-O\-R\-\_\-\-N\-E\-W}!msf_core::CheckFuzzyTracking@{msf\-\_\-core\-::\-Check\-Fuzzy\-Tracking}}
+\subsubsection[{E\-I\-G\-E\-N\-\_\-\-M\-A\-K\-E\-\_\-\-A\-L\-I\-G\-N\-E\-D\-\_\-\-O\-P\-E\-R\-A\-T\-O\-R\-\_\-\-N\-E\-W}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T, typename N\-O\-N\-T\-E\-M\-P\-O\-R\-A\-L\-D\-R\-I\-F\-T\-I\-N\-G\-T\-Y\-P\-E$>$ {\bf msf\-\_\-core\-::\-Check\-Fuzzy\-Tracking}$<$ E\-K\-F\-State\-\_\-\-T, N\-O\-N\-T\-E\-M\-P\-O\-R\-A\-L\-D\-R\-I\-F\-T\-I\-N\-G\-T\-Y\-P\-E $>$\-::E\-I\-G\-E\-N\-\_\-\-M\-A\-K\-E\-\_\-\-A\-L\-I\-G\-N\-E\-D\-\_\-\-O\-P\-E\-R\-A\-T\-O\-R\-\_\-\-N\-E\-W}}\label{classmsf__core_1_1CheckFuzzyTracking_ae9cbaa66c0aca9cf4264d3017b46a785}
+\hypertarget{classmsf__core_1_1CheckFuzzyTracking_af51abec3e790879abe78802742a6eb00}{\index{msf\-\_\-core\-::\-Check\-Fuzzy\-Tracking@{msf\-\_\-core\-::\-Check\-Fuzzy\-Tracking}!nontemporaldrifting\-\_\-inittimer\-\_\-@{nontemporaldrifting\-\_\-inittimer\-\_\-}}
+\index{nontemporaldrifting\-\_\-inittimer\-\_\-@{nontemporaldrifting\-\_\-inittimer\-\_\-}!msf_core::CheckFuzzyTracking@{msf\-\_\-core\-::\-Check\-Fuzzy\-Tracking}}
+\subsubsection[{nontemporaldrifting\-\_\-inittimer\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T, typename N\-O\-N\-T\-E\-M\-P\-O\-R\-A\-L\-D\-R\-I\-F\-T\-I\-N\-G\-T\-Y\-P\-E$>$ int {\bf msf\-\_\-core\-::\-Check\-Fuzzy\-Tracking}$<$ E\-K\-F\-State\-\_\-\-T, N\-O\-N\-T\-E\-M\-P\-O\-R\-A\-L\-D\-R\-I\-F\-T\-I\-N\-G\-T\-Y\-P\-E $>$\-::nontemporaldrifting\-\_\-inittimer\-\_\-\hspace{0.3cm}{\ttfamily [private]}}}\label{classmsf__core_1_1CheckFuzzyTracking_af51abec3e790879abe78802742a6eb00}
+\hypertarget{classmsf__core_1_1CheckFuzzyTracking_af1c7c576c8731d752a72d4e75f0a6078}{\index{msf\-\_\-core\-::\-Check\-Fuzzy\-Tracking@{msf\-\_\-core\-::\-Check\-Fuzzy\-Tracking}!qbuff\-\_\-@{qbuff\-\_\-}}
+\index{qbuff\-\_\-@{qbuff\-\_\-}!msf_core::CheckFuzzyTracking@{msf\-\_\-core\-::\-Check\-Fuzzy\-Tracking}}
+\subsubsection[{qbuff\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T, typename N\-O\-N\-T\-E\-M\-P\-O\-R\-A\-L\-D\-R\-I\-F\-T\-I\-N\-G\-T\-Y\-P\-E$>$ Eigen\-::\-Matrix$<$double, {\bf n\-Buff\-\_\-}, {\bf qbuff\-Rows\-At\-Compiletime}$>$ {\bf msf\-\_\-core\-::\-Check\-Fuzzy\-Tracking}$<$ E\-K\-F\-State\-\_\-\-T, N\-O\-N\-T\-E\-M\-P\-O\-R\-A\-L\-D\-R\-I\-F\-T\-I\-N\-G\-T\-Y\-P\-E $>$\-::qbuff\-\_\-\hspace{0.3cm}{\ttfamily [private]}}}\label{classmsf__core_1_1CheckFuzzyTracking_af1c7c576c8731d752a72d4e75f0a6078}
+
 
 The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
 \item 
-msf\-\_\-core/include/msf\-\_\-core/msf\-\_\-check\-Fuzzy\-Tracking.\-h\end{DoxyCompactItemize}
+msf\-\_\-core/include/msf\-\_\-core/\hyperlink{msf__checkFuzzyTracking_8h}{msf\-\_\-check\-Fuzzy\-Tracking.\-h}\end{DoxyCompactItemize}

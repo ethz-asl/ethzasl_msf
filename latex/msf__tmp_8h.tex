@@ -1,0 +1,90 @@
+\hypertarget{msf__tmp_8h}{\section{msf\-\_\-core/include/msf\-\_\-core/msf\-\_\-tmp.h File Reference}
+\label{msf__tmp_8h}\index{msf\-\_\-core/include/msf\-\_\-core/msf\-\_\-tmp.\-h@{msf\-\_\-core/include/msf\-\_\-core/msf\-\_\-tmp.\-h}}
+}
+{\ttfamily \#include $<$msf\-\_\-core/msf\-\_\-fwds.\-h$>$}\\*
+{\ttfamily \#include $<$msf\-\_\-core/msf\-\_\-typetraits.\-hpp$>$}\\*
+{\ttfamily \#include $<$msf\-\_\-core/eigen\-\_\-utils.\-h$>$}\\*
+{\ttfamily \#include $<$Eigen/\-Dense$>$}\\*
+{\ttfamily \#include $<$Eigen/\-Core$>$}\\*
+{\ttfamily \#include $<$sstream$>$}\\*
+{\ttfamily \#include $<$iostream$>$}\\*
+{\ttfamily \#include $<$iomanip$>$}\\*
+{\ttfamily \#include $<$boost/lexical\-\_\-cast.\-hpp$>$}\\*
+{\ttfamily \#include $<$boost/preprocessor/punctuation/comma.\-hpp$>$}\\*
+{\ttfamily \#include $<$boost/fusion/include/vector.\-hpp$>$}\\*
+{\ttfamily \#include $<$boost/fusion/include/size.\-hpp$>$}\\*
+{\ttfamily \#include $<$boost/fusion/include/at\-\_\-c.\-hpp$>$}\\*
+{\ttfamily \#include $<$boost/fusion/include/at.\-hpp$>$}\\*
+{\ttfamily \#include $<$boost/fusion/include/for\-\_\-each.\-hpp$>$}\\*
+{\ttfamily \#include $<$boost/fusion/include/equal\-\_\-to.\-hpp$>$}\\*
+{\ttfamily \#include $<$boost/fusion/include/begin.\-hpp$>$}\\*
+{\ttfamily \#include $<$boost/fusion/include/end.\-hpp$>$}\\*
+{\ttfamily \#include $<$boost/fusion/include/next.\-hpp$>$}\\*
+{\ttfamily \#include $<$boost/mpl/bool.\-hpp$>$}\\*
+{\ttfamily \#include $<$boost/fusion/include/at\-\_\-key.\-hpp$>$}\\*
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structmsf__tmp_1_1overflow}{msf\-\_\-tmp\-::overflow$<$ size $>$}
+\begin{DoxyCompactList}\small\item\em Output a compile time constant by overflowing a char, producing a warning. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1echoStateVarType_3_01const_01msf__core_1_1StateVar__T_3_01Eigen_1_1Matrix_3_01f7a55ffb559c20f31cb06a2ee67f7cdd}{msf\-\_\-tmp\-::echo\-State\-Var\-Type$<$ const msf\-\_\-core\-::\-State\-Var\-\_\-\-T$<$ Eigen\-::\-Matrix$<$ double, N, 1 $>$, N\-A\-M\-E, S\-T\-A\-T\-E\-\_\-\-T, O\-P\-T\-I\-O\-N\-S $>$ \& $>$}
+\begin{DoxyCompactList}\small\item\em Runtime output of state\-Variable types for const ref eigen matrices. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1echoStateVarType_3_01const_01msf__core_1_1StateVar__T_3_01Eigen_1_1Quaterniond7114362e0351fe52a4a010b178818803}{msf\-\_\-tmp\-::echo\-State\-Var\-Type$<$ const msf\-\_\-core\-::\-State\-Var\-\_\-\-T$<$ Eigen\-::\-Quaterniond, N\-A\-M\-E, S\-T\-A\-T\-E\-\_\-\-T, O\-P\-T\-I\-O\-N\-S $>$ \& $>$}
+\begin{DoxyCompactList}\small\item\em Runtime output of state\-Variable types for const ref eigen quaternions. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1echoStateVarType_3_01msf__core_1_1StateVar__T_3_01Eigen_1_1Matrix_3_01double_0de9def0e1695f00da0e5db77a247f121}{msf\-\_\-tmp\-::echo\-State\-Var\-Type$<$ msf\-\_\-core\-::\-State\-Var\-\_\-\-T$<$ Eigen\-::\-Matrix$<$ double, N, 1 $>$, N\-A\-M\-E, S\-T\-A\-T\-E\-\_\-\-T, O\-P\-T\-I\-O\-N\-S $>$ $>$}
+\begin{DoxyCompactList}\small\item\em Runtime output of state\-Variable types for eigen matrices. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1echoStateVarType_3_01msf__core_1_1StateVar__T_3_01Eigen_1_1Quaterniond_00_01NAd8d0cc57ae8a4161cb849186069681d6}{msf\-\_\-tmp\-::echo\-State\-Var\-Type$<$ msf\-\_\-core\-::\-State\-Var\-\_\-\-T$<$ Eigen\-::\-Quaterniond, N\-A\-M\-E, S\-T\-A\-T\-E\-\_\-\-T, O\-P\-T\-I\-O\-N\-S $>$ $>$}
+\begin{DoxyCompactList}\small\item\em Runtime output of state\-Variable types for eigen matrices. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1CheckCorrectIndexing}{msf\-\_\-tmp\-::\-Check\-Correct\-Indexing$<$ Sequence $>$}
+\begin{DoxyCompactList}\small\item\em Checks whether the ordering in the vector is the same as in the enum this ordering is something that strictly must not change. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1IndexOfBestNonTemporalDriftingState}{msf\-\_\-tmp\-::\-Index\-Of\-Best\-Non\-Temporal\-Drifting\-State$<$ Sequence $>$}
+\begin{DoxyCompactList}\small\item\em Find the best nontemporal drifting state in the full state vector at compile time. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1CountStates}{msf\-\_\-tmp\-::\-Count\-States$<$ Sequence, Counter $>$}
+\begin{DoxyCompactList}\small\item\em Returns the number of doubles in the state/correction state depending on the counter type supplied. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1getStartIndex}{msf\-\_\-tmp\-::get\-Start\-Index$<$ Sequence, State\-Var\-T, Counter $>$}
+\begin{DoxyCompactList}\small\item\em Compute start indices in the correction/state vector of a given type. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1getStartIndexInCorrection}{msf\-\_\-tmp\-::get\-Start\-Index\-In\-Correction$<$ Sequence, State\-Enum $>$}
+\begin{DoxyCompactList}\small\item\em Compute start indices in the correction vector of a given type. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1resetState}{msf\-\_\-tmp\-::reset\-State}
+\begin{DoxyCompactList}\small\item\em Reset the E\-K\-F state in a boost fusion unrolled call. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1copyInitStates}{msf\-\_\-tmp\-::copy\-Init\-States$<$ state\-Var\-T $>$}
+\begin{DoxyCompactList}\small\item\em Copy states from previous to current states, for which there is no propagation in a boost fusion unrolled call. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1copyNonPropagationStates}{msf\-\_\-tmp\-::copy\-Non\-Propagation\-States$<$ state\-Var\-T $>$}
+\begin{DoxyCompactList}\small\item\em Copy states from previous to current states, for which there is no propagation. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1copyQBlocksFromAuxiliaryStatesToQ}{msf\-\_\-tmp\-::copy\-Q\-Blocks\-From\-Auxiliary\-States\-To\-Q$<$ state\-List\-\_\-\-T $>$}
+\begin{DoxyCompactList}\small\item\em Copy the user calculated values in the Q-\/blocks to the main Q matrix. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1correctState}{msf\-\_\-tmp\-::correct\-State$<$ T, state\-List\-\_\-\-T $>$}
+\begin{DoxyCompactList}\small\item\em Apply E\-K\-F corrections depending on the state\-Var type. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1CoreStatetoDoubleArray}{msf\-\_\-tmp\-::\-Core\-Stateto\-Double\-Array$<$ T, state\-List\-\_\-\-T $>$}
+\begin{DoxyCompactList}\small\item\em Copies the values of the single state vars to the double array provided. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1GetIndicesInErrorState}{msf\-\_\-tmp\-::\-Get\-Indices\-In\-Error\-State$<$ T, state\-List\-\_\-\-T $>$}
+\begin{DoxyCompactList}\small\item\em Copies pairs of statename and index in correction vector to S\-T\-L container of pairs or tuples. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1getStateIndexInState}{msf\-\_\-tmp\-::get\-State\-Index\-In\-State$<$ state\-Vector\-\_\-\-T, I\-N\-D\-E\-X $>$}
+\begin{DoxyCompactList}\small\item\em Return the index of a given state variable number in the state matrices. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1getStateIndexInErrorState}{msf\-\_\-tmp\-::get\-State\-Index\-In\-Error\-State$<$ state\-Vector\-\_\-\-T, I\-N\-D\-E\-X $>$}
+\begin{DoxyCompactList}\small\item\em Return the index of a given state variable number in the error state matrices. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1FullStatetoString}{msf\-\_\-tmp\-::\-Full\-Stateto\-String$<$ S\-T\-R\-E\-A\-M, state\-List\-\_\-\-T $>$}
+\begin{DoxyCompactList}\small\item\em Copies the values of the single state vars to the string provided. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1FullStatetoDoubleArray}{msf\-\_\-tmp\-::\-Full\-Stateto\-Double\-Array$<$ T, state\-List\-\_\-\-T $>$}
+\begin{DoxyCompactList}\small\item\em Copies the values of the single state vars to the double array provided. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \hyperlink{namespacemsf__tmp}{msf\-\_\-tmp}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{msf__tmp_8h_a82aed586e2f879ce29b52ad5deed238e}{F\-U\-S\-I\-O\-N\-\_\-\-M\-A\-X\-\_\-\-V\-E\-C\-T\-O\-R\-\_\-\-S\-I\-Z\-E}~15
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$int V\-A\-L\-U\-E$>$ }\\void \hyperlink{namespacemsf__tmp_a6c98ecc04a7a60f92952735c99765f78}{msf\-\_\-tmp\-::echo\-Compile\-Time\-Constant} ()
+\begin{DoxyCompactList}\small\item\em Output a compile time constant. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{msf__tmp_8h_a82aed586e2f879ce29b52ad5deed238e}{\index{msf\-\_\-tmp.\-h@{msf\-\_\-tmp.\-h}!F\-U\-S\-I\-O\-N\-\_\-\-M\-A\-X\-\_\-\-V\-E\-C\-T\-O\-R\-\_\-\-S\-I\-Z\-E@{F\-U\-S\-I\-O\-N\-\_\-\-M\-A\-X\-\_\-\-V\-E\-C\-T\-O\-R\-\_\-\-S\-I\-Z\-E}}
+\index{F\-U\-S\-I\-O\-N\-\_\-\-M\-A\-X\-\_\-\-V\-E\-C\-T\-O\-R\-\_\-\-S\-I\-Z\-E@{F\-U\-S\-I\-O\-N\-\_\-\-M\-A\-X\-\_\-\-V\-E\-C\-T\-O\-R\-\_\-\-S\-I\-Z\-E}!msf_tmp.h@{msf\-\_\-tmp.\-h}}
+\subsubsection[{F\-U\-S\-I\-O\-N\-\_\-\-M\-A\-X\-\_\-\-V\-E\-C\-T\-O\-R\-\_\-\-S\-I\-Z\-E}]{\setlength{\rightskip}{0pt plus 5cm}\#define F\-U\-S\-I\-O\-N\-\_\-\-M\-A\-X\-\_\-\-V\-E\-C\-T\-O\-R\-\_\-\-S\-I\-Z\-E~15}}\label{msf__tmp_8h_a82aed586e2f879ce29b52ad5deed238e}

@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>msf - modular sensor fusion: msf_core::MSF_InitMeasurement&lt; EKFState_T &gt; Class Template Reference</title>
+<title>ethzasl-msf - Modular Sensor Fusion: msf_core::MSF_InitMeasurement&lt; EKFState_T &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">msf - modular sensor fusion
+   <div id="projectname">ethzasl-msf - Modular Sensor Fusion
    </div>
    <div id="projectbrief">Time delay compensated single and multi sensor fusion framework based on an EKF</div>
   </td>
@@ -71,7 +71,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -82,20 +82,22 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><b>msf_core</b></li><li class="navelem"><a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html">MSF_InitMeasurement</a></li>  </ul>
+<li class="navelem"><a class="el" href="namespacemsf__core.html">msf_core</a></li><li class="navelem"><a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html">MSF_InitMeasurement</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
   <div class="summary">
 <a href="classmsf__core_1_1MSF__InitMeasurement-members.html">List of all members</a> &#124;
-<a href="#pub-methods">Public Member Functions</a>  </div>
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pri-types">Private Types</a> &#124;
+<a href="#pri-attribs">Private Attributes</a>  </div>
   <div class="headertitle">
 <div class="title">msf_core::MSF_InitMeasurement&lt; EKFState_T &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
 <p>A measurement to be send to initialize parts of or the full EKF state this can especially be used to split the initialization of the EKF between multiple sensors which init different parts of the state.  
- <a href="classmsf__core_1_1MSF__InitMeasurement.html#details">More...</a></p>
+</p>
 
 <p><code>#include &lt;<a class="el" href="msf__measurement_8h_source.html">msf_measurement.h</a>&gt;</code></p>
 <div class="dynheader">
@@ -110,51 +112,50 @@ Inheritance diagram for msf_core::MSF_InitMeasurement&lt; EKFState_T &gt;:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aaa7c4e7ea351aae40daa3ce32fb37e58"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aaa7c4e7ea351aae40daa3ce32fb37e58"></a>
-EIGEN_MAKE_ALIGNED_OPERATOR_NEW&#160;</td><td class="memItemRight" valign="bottom"><b>MSF_InitMeasurement</b> (bool ContainsInitialSensorReadings)</td></tr>
-<tr class="memitem:a6ade2a1ba88e5f26de2125258e4c5238"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6ade2a1ba88e5f26de2125258e4c5238"></a>
-virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><b>type</b> ()</td></tr>
-<tr class="memitem:a19cc3b1efefda7694cca93d1bae441f5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a19cc3b1efefda7694cca93d1bae441f5"></a>
-EKFState_T::P_type &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>get_P</b> ()</td></tr>
-<tr class="memitem:af0c9a4a740bc019d8a6a223d469bb42f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af0c9a4a740bc019d8a6a223d469bb42f"></a>
-Eigen::Matrix&lt; double, 3, 1 &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html#af0c9a4a740bc019d8a6a223d469bb42f">get_w_m</a> ()</td></tr>
-<tr class="memdesc:af0c9a4a740bc019d8a6a223d469bb42f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the gyro measurement. <br/></td></tr>
-<tr class="memitem:a4c2c7250787e58868c9fc9596ed4c217"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4c2c7250787e58868c9fc9596ed4c217"></a>
-Eigen::Matrix&lt; double, 3, 1 &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html#a4c2c7250787e58868c9fc9596ed4c217">get_a_m</a> ()</td></tr>
-<tr class="memdesc:a4c2c7250787e58868c9fc9596ed4c217"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the acceleration measurment. <br/></td></tr>
-<tr class="memitem:a972bcf6e09e13c96849b528c926b3a33"><td class="memTemplParams" colspan="2"><a class="anchor" id="a972bcf6e09e13c96849b528c926b3a33"></a>
-template&lt;int INDEX, typename T &gt; </td></tr>
+<tr class="memitem:aaa7c4e7ea351aae40daa3ce32fb37e58"><td class="memItemLeft" align="right" valign="top">EIGEN_MAKE_ALIGNED_OPERATOR_NEW&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html#aaa7c4e7ea351aae40daa3ce32fb37e58">MSF_InitMeasurement</a> (bool ContainsInitialSensorReadings)</td></tr>
+<tr class="memitem:a54cf10c917a3960d7e0e14164a18348b"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html#a54cf10c917a3960d7e0e14164a18348b">~MSF_InitMeasurement</a> ()</td></tr>
+<tr class="memitem:a6ade2a1ba88e5f26de2125258e4c5238"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html#a6ade2a1ba88e5f26de2125258e4c5238">type</a> ()</td></tr>
+<tr class="memitem:a19cc3b1efefda7694cca93d1bae441f5"><td class="memItemLeft" align="right" valign="top">EKFState_T::P_type &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html#a19cc3b1efefda7694cca93d1bae441f5">get_P</a> ()</td></tr>
+<tr class="memitem:af0c9a4a740bc019d8a6a223d469bb42f"><td class="memItemLeft" align="right" valign="top">Eigen::Matrix&lt; double, 3, 1 &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html#af0c9a4a740bc019d8a6a223d469bb42f">get_w_m</a> ()</td></tr>
+<tr class="memdesc:af0c9a4a740bc019d8a6a223d469bb42f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the gyro measurement.  <a href="#af0c9a4a740bc019d8a6a223d469bb42f"></a><br/></td></tr>
+<tr class="memitem:a4c2c7250787e58868c9fc9596ed4c217"><td class="memItemLeft" align="right" valign="top">Eigen::Matrix&lt; double, 3, 1 &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html#a4c2c7250787e58868c9fc9596ed4c217">get_a_m</a> ()</td></tr>
+<tr class="memdesc:a4c2c7250787e58868c9fc9596ed4c217"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the acceleration measurment.  <a href="#a4c2c7250787e58868c9fc9596ed4c217"></a><br/></td></tr>
+<tr class="memitem:a972bcf6e09e13c96849b528c926b3a33"><td class="memTemplParams" colspan="2">template&lt;int INDEX, typename T &gt; </td></tr>
 <tr class="memitem:a972bcf6e09e13c96849b528c926b3a33"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html#a972bcf6e09e13c96849b528c926b3a33">setStateInitValue</a> (const T &amp;initvalue)</td></tr>
-<tr class="memdesc:a972bcf6e09e13c96849b528c926b3a33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the flag that the state variable at index INDEX has init values for the state. <br/></td></tr>
-<tr class="memitem:aa95a1f961bac237267d133035a113728"><td class="memTemplParams" colspan="2"><a class="anchor" id="aa95a1f961bac237267d133035a113728"></a>
-template&lt;int INDEX&gt; </td></tr>
+<tr class="memdesc:a972bcf6e09e13c96849b528c926b3a33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the flag that the state variable at index INDEX has init values for the state.  <a href="#a972bcf6e09e13c96849b528c926b3a33"></a><br/></td></tr>
+<tr class="memitem:aa95a1f961bac237267d133035a113728"><td class="memTemplParams" colspan="2">template&lt;int INDEX&gt; </td></tr>
 <tr class="memitem:aa95a1f961bac237267d133035a113728"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html#aa95a1f961bac237267d133035a113728">resetStateInitValue</a> ()</td></tr>
-<tr class="memdesc:aa95a1f961bac237267d133035a113728"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the flag that the state variable at index INDEX has init values for the state. <br/></td></tr>
-<tr class="memitem:acd59df20e43b7151b1549b1a43a93511"><td class="memTemplParams" colspan="2"><a class="anchor" id="acd59df20e43b7151b1549b1a43a93511"></a>
-template&lt;int INDEX&gt; </td></tr>
+<tr class="memdesc:aa95a1f961bac237267d133035a113728"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the flag that the state variable at index INDEX has init values for the state.  <a href="#aa95a1f961bac237267d133035a113728"></a><br/></td></tr>
+<tr class="memitem:acd59df20e43b7151b1549b1a43a93511"><td class="memTemplParams" colspan="2">template&lt;int INDEX&gt; </td></tr>
 <tr class="memitem:acd59df20e43b7151b1549b1a43a93511"><td class="memTemplItemLeft" align="right" valign="top">const <a class="el" href="structmsf__tmp_1_1StripReference.html">msf_tmp::StripReference</a><br class="typebreak"/>
 &lt; typename <br class="typebreak"/>
 boost::fusion::result_of::at_c<br class="typebreak"/>
-&lt; StateSequence_T, INDEX &gt;<br class="typebreak"/>
-::type &gt;::result_t::value_t &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html#acd59df20e43b7151b1549b1a43a93511">getStateInitValue</a> () const </td></tr>
-<tr class="memdesc:acd59df20e43b7151b1549b1a43a93511"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the value stored in this object to initialize a state variable at index INDEX. <br/></td></tr>
-<tr class="memitem:a7b92f1e55007491bec20273f6cc25ba6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7b92f1e55007491bec20273f6cc25ba6"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html#a7b92f1e55007491bec20273f6cc25ba6">apply</a> (shared_ptr&lt; EKFState_T &gt; stateWithCovariance, <a class="el" href="classmsf__core_1_1MSF__Core.html">MSF_Core</a>&lt; EKFState_T &gt; &amp;core)</td></tr>
-<tr class="memdesc:a7b92f1e55007491bec20273f6cc25ba6"><td class="mdescLeft">&#160;</td><td class="mdescRight">The method called by the msf_core to apply the measurement represented by this object. <br/></td></tr>
+&lt; <a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html#ad7fbcb406d4386f3a3088ecf8eb17585">StateSequence_T</a>, INDEX &gt;<br class="typebreak"/>
+::<a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html#a6ade2a1ba88e5f26de2125258e4c5238">type</a> &gt;::result_t::value_t &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html#acd59df20e43b7151b1549b1a43a93511">getStateInitValue</a> () const </td></tr>
+<tr class="memdesc:acd59df20e43b7151b1549b1a43a93511"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the value stored in this object to initialize a state variable at index INDEX.  <a href="#acd59df20e43b7151b1549b1a43a93511"></a><br/></td></tr>
+<tr class="memitem:a7b92f1e55007491bec20273f6cc25ba6"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html#a7b92f1e55007491bec20273f6cc25ba6">apply</a> (shared_ptr&lt; EKFState_T &gt; stateWithCovariance, <a class="el" href="classmsf__core_1_1MSF__Core.html">MSF_Core</a>&lt; EKFState_T &gt; &amp;core)</td></tr>
+<tr class="memdesc:a7b92f1e55007491bec20273f6cc25ba6"><td class="mdescLeft">&#160;</td><td class="mdescRight">The method called by the <a class="el" href="namespacemsf__core.html">msf_core</a> to apply the measurement represented by this object.  <a href="#a7b92f1e55007491bec20273f6cc25ba6"></a><br/></td></tr>
 <tr class="inherit_header pub_methods_classmsf__core_1_1MSF__MeasurementBase"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classmsf__core_1_1MSF__MeasurementBase')"><img src="closed.png" alt="-"/>&nbsp;Public Member Functions inherited from <a class="el" href="classmsf__core_1_1MSF__MeasurementBase.html">msf_core::MSF_MeasurementBase< EKFState_T ></a></td></tr>
-<tr class="memitem:a415d8c321cebf22510cce29f69a3b22f inherit pub_methods_classmsf__core_1_1MSF__MeasurementBase"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a415d8c321cebf22510cce29f69a3b22f"></a>
-EIGEN_MAKE_ALIGNED_OPERATOR_NEW&#160;</td><td class="memItemRight" valign="bottom"><b>MSF_MeasurementBase</b> (bool isabsoluteMeasurement, int sensorID)</td></tr>
+<tr class="memitem:a415d8c321cebf22510cce29f69a3b22f inherit pub_methods_classmsf__core_1_1MSF__MeasurementBase"><td class="memItemLeft" align="right" valign="top">EIGEN_MAKE_ALIGNED_OPERATOR_NEW&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__MeasurementBase.html#a415d8c321cebf22510cce29f69a3b22f">MSF_MeasurementBase</a> (bool isabsoluteMeasurement, int sensorID)</td></tr>
+<tr class="memitem:a259e1cfacc40e58e7c1ed768bcadb54b inherit pub_methods_classmsf__core_1_1MSF__MeasurementBase"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__MeasurementBase.html#a259e1cfacc40e58e7c1ed768bcadb54b">~MSF_MeasurementBase</a> ()</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2><a name="pri-types"></a>
+Private Types</h2></td></tr>
+<tr class="memitem:ad7fbcb406d4386f3a3088ecf8eb17585"><td class="memItemLeft" align="right" valign="top">typedef EKFState_T::StateSequence_T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html#ad7fbcb406d4386f3a3088ecf8eb17585">StateSequence_T</a></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2><a name="pri-attribs"></a>
+Private Attributes</h2></td></tr>
+<tr class="memitem:a3eec8952562e2632f9c6f1b23ee49aec"><td class="memItemLeft" align="right" valign="top">EKFState_T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html#a3eec8952562e2632f9c6f1b23ee49aec">InitState</a></td></tr>
+<tr class="memitem:a8dfcbfdee2b01e6afd0a2160b613acfa"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html#a8dfcbfdee2b01e6afd0a2160b613acfa">ContainsInitialSensorReadings_</a></td></tr>
+<tr class="memdesc:a8dfcbfdee2b01e6afd0a2160b613acfa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flag whether this measurement contains initial sensor readings.  <a href="#a8dfcbfdee2b01e6afd0a2160b613acfa"></a><br/></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
 <tr class="inherit_header pub_attribs_classmsf__core_1_1MSF__MeasurementBase"><td colspan="2" onclick="javascript:toggleInherit('pub_attribs_classmsf__core_1_1MSF__MeasurementBase')"><img src="closed.png" alt="-"/>&nbsp;Public Attributes inherited from <a class="el" href="classmsf__core_1_1MSF__MeasurementBase.html">msf_core::MSF_MeasurementBase< EKFState_T ></a></td></tr>
-<tr class="memitem:afad7c30029f47cea027415c04301dc48 inherit pub_attribs_classmsf__core_1_1MSF__MeasurementBase"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afad7c30029f47cea027415c04301dc48"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>sensorID_</b></td></tr>
-<tr class="memitem:ad1ea7c4d392ecd3d894280283c04757a inherit pub_attribs_classmsf__core_1_1MSF__MeasurementBase"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad1ea7c4d392ecd3d894280283c04757a"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>isabsolute_</b></td></tr>
-<tr class="memitem:a48b55b129f13afbed86db1b0543562db inherit pub_attribs_classmsf__core_1_1MSF__MeasurementBase"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a48b55b129f13afbed86db1b0543562db"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__MeasurementBase.html#a48b55b129f13afbed86db1b0543562db">time</a></td></tr>
-<tr class="memdesc:a48b55b129f13afbed86db1b0543562db inherit pub_attribs_classmsf__core_1_1MSF__MeasurementBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The time_ this measurement was taken. <br/></td></tr>
+<tr class="memitem:afad7c30029f47cea027415c04301dc48 inherit pub_attribs_classmsf__core_1_1MSF__MeasurementBase"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__MeasurementBase.html#afad7c30029f47cea027415c04301dc48">sensorID_</a></td></tr>
+<tr class="memitem:ad1ea7c4d392ecd3d894280283c04757a inherit pub_attribs_classmsf__core_1_1MSF__MeasurementBase"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__MeasurementBase.html#ad1ea7c4d392ecd3d894280283c04757a">isabsolute_</a></td></tr>
+<tr class="memitem:a48b55b129f13afbed86db1b0543562db inherit pub_attribs_classmsf__core_1_1MSF__MeasurementBase"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__MeasurementBase.html#a48b55b129f13afbed86db1b0543562db">time</a></td></tr>
+<tr class="memdesc:a48b55b129f13afbed86db1b0543562db inherit pub_attribs_classmsf__core_1_1MSF__MeasurementBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The time_ this measurement was taken.  <a href="#a48b55b129f13afbed86db1b0543562db"></a><br/></td></tr>
 <tr class="inherit_header pro_methods_classmsf__core_1_1MSF__MeasurementBase"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classmsf__core_1_1MSF__MeasurementBase')"><img src="closed.png" alt="-"/>&nbsp;Protected Member Functions inherited from <a class="el" href="classmsf__core_1_1MSF__MeasurementBase.html">msf_core::MSF_MeasurementBase< EKFState_T ></a></td></tr>
 <tr class="memitem:a569c0772641a11d707349aab9dc0da7e inherit pro_methods_classmsf__core_1_1MSF__MeasurementBase"><td class="memTemplParams" colspan="2">template&lt;class H_type , class Res_type , class R_type &gt; </td></tr>
 <tr class="memitem:a569c0772641a11d707349aab9dc0da7e"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__MeasurementBase.html#a569c0772641a11d707349aab9dc0da7e">calculateAndApplyCorrection</a> (shared_ptr&lt; EKFState_T &gt; state, <a class="el" href="classmsf__core_1_1MSF__Core.html">MSF_Core</a>&lt; EKFState_T &gt; &amp;core, const Eigen::MatrixBase&lt; H_type &gt; &amp;H, const Eigen::MatrixBase&lt; Res_type &gt; &amp;residual, const Eigen::MatrixBase&lt; R_type &gt; &amp;R)</td></tr>
@@ -162,19 +163,358 @@ double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cl
 <tr class="memitem:a5b9db1020711ae6b5ba4e877dd03fa42 inherit pro_methods_classmsf__core_1_1MSF__MeasurementBase"><td class="memTemplParams" colspan="2">template&lt;class H_type , class Res_type , class R_type &gt; </td></tr>
 <tr class="memitem:a5b9db1020711ae6b5ba4e877dd03fa42"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__MeasurementBase.html#a5b9db1020711ae6b5ba4e877dd03fa42">calculateAndApplyCorrectionRelative</a> (shared_ptr&lt; EKFState_T &gt; state_old, shared_ptr&lt; EKFState_T &gt; state_new, <a class="el" href="classmsf__core_1_1MSF__Core.html">MSF_Core</a>&lt; EKFState_T &gt; &amp;core, const Eigen::MatrixBase&lt; H_type &gt; &amp;H_old, const Eigen::MatrixBase&lt; H_type &gt; &amp;H_new, const Eigen::MatrixBase&lt; Res_type &gt; &amp;residual, const Eigen::MatrixBase&lt; R_type &gt; &amp;R)</td></tr>
 </table>
-<a name="details" id="details"></a><h2>Detailed Description</h2>
-<div class="textblock"><h3>template&lt;typename EKFState_T&gt;<br/>
-class msf_core::MSF_InitMeasurement&lt; EKFState_T &gt;</h3>
+<h2>Member Typedef Documentation</h2>
+<a class="anchor" id="ad7fbcb406d4386f3a3088ecf8eb17585"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef EKFState_T::StateSequence_T <a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html">msf_core::MSF_InitMeasurement</a>&lt; EKFState_T &gt;::<a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html#ad7fbcb406d4386f3a3088ecf8eb17585">StateSequence_T</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
 
-<p>A measurement to be send to initialize parts of or the full EKF state this can especially be used to split the initialization of the EKF between multiple sensors which init different parts of the state. </p>
-</div><hr/>The documentation for this class was generated from the following files:<ul>
+</div>
+</div>
+<h2>Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="aaa7c4e7ea351aae40daa3ce32fb37e58"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">EIGEN_MAKE_ALIGNED_OPERATOR_NEW <a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html">msf_core::MSF_InitMeasurement</a>&lt; EKFState_T &gt;::<a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html">MSF_InitMeasurement</a> </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>ContainsInitialSensorReadings</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a54cf10c917a3960d7e0e14164a18348b"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html">msf_core::MSF_InitMeasurement</a>&lt; EKFState_T &gt;::~<a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html">MSF_InitMeasurement</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2>Member Function Documentation</h2>
+<a class="anchor" id="a7b92f1e55007491bec20273f6cc25ba6"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html">msf_core::MSF_InitMeasurement</a>&lt; EKFState_T &gt;::apply </td>
+          <td>(</td>
+          <td class="paramtype">shared_ptr&lt; EKFState_T &gt;&#160;</td>
+          <td class="paramname"><em>stateWithCovariance</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classmsf__core_1_1MSF__Core.html">MSF_Core</a>&lt; EKFState_T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>core</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implements <a class="el" href="classmsf__core_1_1MSF__MeasurementBase.html#ac1c4001e0c61b7cd2b551c0adeae7109">msf_core::MSF_MeasurementBase&lt; EKFState_T &gt;</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a4c2c7250787e58868c9fc9596ed4c217"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Eigen::Matrix&lt;double, 3, 1&gt;&amp; <a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html">msf_core::MSF_InitMeasurement</a>&lt; EKFState_T &gt;::get_a_m </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a19cc3b1efefda7694cca93d1bae441f5"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">EKFState_T::P_type&amp; <a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html">msf_core::MSF_InitMeasurement</a>&lt; EKFState_T &gt;::get_P </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="af0c9a4a740bc019d8a6a223d469bb42f"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Eigen::Matrix&lt;double, 3, 1&gt;&amp; <a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html">msf_core::MSF_InitMeasurement</a>&lt; EKFState_T &gt;::get_w_m </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="acd59df20e43b7151b1549b1a43a93511"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T &gt; </div>
+<div class="memtemplate">
+template&lt;int INDEX&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="structmsf__tmp_1_1StripReference.html">msf_tmp::StripReference</a>&lt;typename boost::fusion::result_of::at_c &lt;<a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html#ad7fbcb406d4386f3a3088ecf8eb17585">StateSequence_T</a>, INDEX &gt;::<a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html#a6ade2a1ba88e5f26de2125258e4c5238">type</a>&gt;::result_t::value_t&amp; <a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html">msf_core::MSF_InitMeasurement</a>&lt; EKFState_T &gt;::getStateInitValue </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aa95a1f961bac237267d133035a113728"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T &gt; </div>
+<div class="memtemplate">
+template&lt;int INDEX&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html">msf_core::MSF_InitMeasurement</a>&lt; EKFState_T &gt;::resetStateInitValue </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a972bcf6e09e13c96849b528c926b3a33"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T &gt; </div>
+<div class="memtemplate">
+template&lt;int INDEX, typename T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html">msf_core::MSF_InitMeasurement</a>&lt; EKFState_T &gt;::setStateInitValue </td>
+          <td>(</td>
+          <td class="paramtype">const T &amp;&#160;</td>
+          <td class="paramname"><em>initvalue</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a6ade2a1ba88e5f26de2125258e4c5238"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual std::string <a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html">msf_core::MSF_InitMeasurement</a>&lt; EKFState_T &gt;::type </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implements <a class="el" href="classmsf__core_1_1MSF__MeasurementBase.html#a6a711d7ed976c0aed497efc1b8fbe3e7">msf_core::MSF_MeasurementBase&lt; EKFState_T &gt;</a>.</p>
+
+</div>
+</div>
+<h2>Member Data Documentation</h2>
+<a class="anchor" id="a8dfcbfdee2b01e6afd0a2160b613acfa"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html">msf_core::MSF_InitMeasurement</a>&lt; EKFState_T &gt;::ContainsInitialSensorReadings_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a3eec8952562e2632f9c6f1b23ee49aec"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">EKFState_T <a class="el" href="classmsf__core_1_1MSF__InitMeasurement.html">msf_core::MSF_InitMeasurement</a>&lt; EKFState_T &gt;::InitState</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Values for initialization of the state. </p>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following files:<ul>
 <li>msf_core/include/msf_core/<a class="el" href="msf__measurement_8h_source.html">msf_measurement.h</a></li>
 <li>msf_core/include/msf_core/implementation/<a class="el" href="msf__measurement_8hpp_source.html">msf_measurement.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Nov 6 2013 21:53:36 for msf - modular sensor fusion by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 6 2013 22:06:48 for ethzasl-msf - Modular Sensor Fusion by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

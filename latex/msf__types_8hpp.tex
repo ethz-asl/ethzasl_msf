@@ -1,0 +1,37 @@
+\hypertarget{msf__types_8hpp}{\section{msf\-\_\-core/include/msf\-\_\-core/msf\-\_\-types.hpp File Reference}
+\label{msf__types_8hpp}\index{msf\-\_\-core/include/msf\-\_\-core/msf\-\_\-types.\-hpp@{msf\-\_\-core/include/msf\-\_\-core/msf\-\_\-types.\-hpp}}
+}
+{\ttfamily \#include $<$Eigen/\-Dense$>$}\\*
+{\ttfamily \#include $<$type\-\_\-traits$>$}\\*
+{\ttfamily \#include $<$boost/shared\-\_\-ptr.\-hpp$>$}\\*
+{\ttfamily \#include $<$memory$>$}\\*
+\subsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \hyperlink{namespacemsf__core}{msf\-\_\-core}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{msf__types_8hpp_aee10cac1b67903510800c23d12a71606}{M\-S\-F\-\_\-\-M\-A\-K\-E\-\_\-\-E\-I\-G\-E\-N\-\_\-\-T\-Y\-P\-E\-S}(D\-I\-M\-E\-N\-S\-I\-O\-N)
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef Eigen\-::\-Quaternion$<$ double $>$ \hyperlink{namespacemsf__core_a044c525dd7800e2e2f4bb86fc565a7c7}{msf\-\_\-core\-::\-Quaternion}
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{msf__types_8hpp_aee10cac1b67903510800c23d12a71606}{\index{msf\-\_\-types.\-hpp@{msf\-\_\-types.\-hpp}!M\-S\-F\-\_\-\-M\-A\-K\-E\-\_\-\-E\-I\-G\-E\-N\-\_\-\-T\-Y\-P\-E\-S@{M\-S\-F\-\_\-\-M\-A\-K\-E\-\_\-\-E\-I\-G\-E\-N\-\_\-\-T\-Y\-P\-E\-S}}
+\index{M\-S\-F\-\_\-\-M\-A\-K\-E\-\_\-\-E\-I\-G\-E\-N\-\_\-\-T\-Y\-P\-E\-S@{M\-S\-F\-\_\-\-M\-A\-K\-E\-\_\-\-E\-I\-G\-E\-N\-\_\-\-T\-Y\-P\-E\-S}!msf_types.hpp@{msf\-\_\-types.\-hpp}}
+\subsubsection[{M\-S\-F\-\_\-\-M\-A\-K\-E\-\_\-\-E\-I\-G\-E\-N\-\_\-\-T\-Y\-P\-E\-S}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\-S\-F\-\_\-\-M\-A\-K\-E\-\_\-\-E\-I\-G\-E\-N\-\_\-\-T\-Y\-P\-E\-S(
+\begin{DoxyParamCaption}
+\item[{}]{D\-I\-M\-E\-N\-S\-I\-O\-N}
+\end{DoxyParamCaption}
+)}}\label{msf__types_8hpp_aee10cac1b67903510800c23d12a71606}
+{\bfseries Value\-:}
+\begin{DoxyCode}
+\textcolor{keyword}{typedef} Eigen::Matrix<double, DIMENSION, DIMENSION> Matrix##DIMENSION; \(\backslash\)
+    typedef Eigen::Matrix<double, DIMENSION, 1> Vector##DIMENSION;
+\end{DoxyCode}

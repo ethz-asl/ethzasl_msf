@@ -1,0 +1,99 @@
+\hypertarget{eigen__utils_8h}{\section{msf\-\_\-core/include/msf\-\_\-core/eigen\-\_\-utils.h File Reference}
+\label{eigen__utils_8h}\index{msf\-\_\-core/include/msf\-\_\-core/eigen\-\_\-utils.\-h@{msf\-\_\-core/include/msf\-\_\-core/eigen\-\_\-utils.\-h}}
+}
+{\ttfamily \#include $<$Eigen/\-Dense$>$}\\*
+{\ttfamily \#include $<$Eigen/\-Geometry$>$}\\*
+{\ttfamily \#include $<$iostream$>$}\\*
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$class Derived $>$ }\\Eigen\-::\-Matrix$<$ typename \\*
+Derived\-::\-Scalar, 3, 3 $>$ \hyperlink{eigen__utils_8h_ab83eee591e35d90699bd0b65e6e3bf2c}{skew} (const Eigen\-::\-Matrix\-Base$<$ Derived $>$ \&vec)
+\begin{DoxyCompactList}\small\item\em Returns the 3\-D cross product skew symmetric matrix of a given 3\-D vector. \end{DoxyCompactList}\item 
+{\footnotesize template$<$class Derived $>$ }\\Eigen\-::\-Matrix$<$ typename \\*
+Derived\-::\-Scalar, 4, 4 $>$ \hyperlink{eigen__utils_8h_a3779bdde122cc4a653434817ae174a75}{omega\-Mat\-J\-P\-L} (const Eigen\-::\-Matrix\-Base$<$ Derived $>$ \&vec)
+\begin{DoxyCompactList}\small\item\em Returns a matrix with angular velocities used for quaternion derivatives/. \end{DoxyCompactList}\item 
+{\footnotesize template$<$class Derived $>$ }\\Eigen\-::\-Matrix$<$ typename \\*
+Derived\-::\-Scalar, 4, 4 $>$ \hyperlink{eigen__utils_8h_a84a8fae07931d6cf6127f06077b9f12a}{omega\-Mat\-Hamilton} (const Eigen\-::\-Matrix\-Base$<$ Derived $>$ \&vec)
+\begin{DoxyCompactList}\small\item\em Returns a matrix with angular velocities used for quaternion derivatives/. \end{DoxyCompactList}\item 
+{\footnotesize template$<$class Derived $>$ }\\Eigen\-::\-Matrix$<$ typename \\*
+Derived\-::\-Scalar, 4, 3 $>$ \hyperlink{eigen__utils_8h_a5df51b3e527ace7f4819364312d4572c}{xi\-Mat} (const Eigen\-::\-Matrix\-Base$<$ Derived $>$ \&q\-\_\-vec)
+\begin{DoxyCompactList}\small\item\em Returns a matrix to compute error quaternions. \end{DoxyCompactList}\item 
+{\footnotesize template$<$class Derived $>$ }\\Eigen\-::\-Quaternion$<$ typename \\*
+Derived\-::\-Scalar $>$ \hyperlink{eigen__utils_8h_a5d046b4745ed62af442bb1d67a9a31c7}{quaternion\-From\-Small\-Angle} (const Eigen\-::\-Matrix\-Base$<$ Derived $>$ \&theta)
+\begin{DoxyCompactList}\small\item\em Computes a quaternion from the 3-\/element small angle approximation theta. \end{DoxyCompactList}\item 
+{\footnotesize template$<$class D $>$ }\\bool \hyperlink{eigen__utils_8h_ad367eee96655c3fd3f2fdf03ba0bb62f}{check\-For\-Numeric} (const Eigen\-::\-Matrix\-Base$<$ D $>$ \&mat, const std\-::string \&info)
+\begin{DoxyCompactList}\small\item\em Debug output to check misbehavior of Eigen. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{eigen__utils_8h_ad367eee96655c3fd3f2fdf03ba0bb62f}{\index{eigen\-\_\-utils.\-h@{eigen\-\_\-utils.\-h}!check\-For\-Numeric@{check\-For\-Numeric}}
+\index{check\-For\-Numeric@{check\-For\-Numeric}!eigen_utils.h@{eigen\-\_\-utils.\-h}}
+\subsubsection[{check\-For\-Numeric}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class D $>$ bool check\-For\-Numeric (
+\begin{DoxyParamCaption}
+\item[{const Eigen\-::\-Matrix\-Base$<$ D $>$ \&}]{mat, }
+\item[{const std\-::string \&}]{info}
+\end{DoxyParamCaption}
+)}}\label{eigen__utils_8h_ad367eee96655c3fd3f2fdf03ba0bb62f}
+\hypertarget{eigen__utils_8h_a84a8fae07931d6cf6127f06077b9f12a}{\index{eigen\-\_\-utils.\-h@{eigen\-\_\-utils.\-h}!omega\-Mat\-Hamilton@{omega\-Mat\-Hamilton}}
+\index{omega\-Mat\-Hamilton@{omega\-Mat\-Hamilton}!eigen_utils.h@{eigen\-\_\-utils.\-h}}
+\subsubsection[{omega\-Mat\-Hamilton}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Derived $>$ Eigen\-::\-Matrix$<$typename Derived\-::\-Scalar, 4, 4$>$ omega\-Mat\-Hamilton (
+\begin{DoxyParamCaption}
+\item[{const Eigen\-::\-Matrix\-Base$<$ Derived $>$ \&}]{vec}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{eigen__utils_8h_a84a8fae07931d6cf6127f06077b9f12a}
+The quaternion to be multiplied with this matrix has to be in the order x y z w !!! 
+\begin{DoxyParams}{Parameters}
+{\em vec} & 3\-D vector with angular velocities \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+4x4 Matrix for multiplication with the quaternion 
+\end{DoxyReturn}
+\hypertarget{eigen__utils_8h_a3779bdde122cc4a653434817ae174a75}{\index{eigen\-\_\-utils.\-h@{eigen\-\_\-utils.\-h}!omega\-Mat\-J\-P\-L@{omega\-Mat\-J\-P\-L}}
+\index{omega\-Mat\-J\-P\-L@{omega\-Mat\-J\-P\-L}!eigen_utils.h@{eigen\-\_\-utils.\-h}}
+\subsubsection[{omega\-Mat\-J\-P\-L}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Derived $>$ Eigen\-::\-Matrix$<$typename Derived\-::\-Scalar, 4, 4$>$ omega\-Mat\-J\-P\-L (
+\begin{DoxyParamCaption}
+\item[{const Eigen\-::\-Matrix\-Base$<$ Derived $>$ \&}]{vec}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{eigen__utils_8h_a3779bdde122cc4a653434817ae174a75}
+The quaternion to be multiplied with this matrix has to be in the order x y z w !!! 
+\begin{DoxyParams}{Parameters}
+{\em vec} & 3\-D vector with angular velocities. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+4x4 matrix for multiplication with the quaternion. 
+\end{DoxyReturn}
+\hypertarget{eigen__utils_8h_a5d046b4745ed62af442bb1d67a9a31c7}{\index{eigen\-\_\-utils.\-h@{eigen\-\_\-utils.\-h}!quaternion\-From\-Small\-Angle@{quaternion\-From\-Small\-Angle}}
+\index{quaternion\-From\-Small\-Angle@{quaternion\-From\-Small\-Angle}!eigen_utils.h@{eigen\-\_\-utils.\-h}}
+\subsubsection[{quaternion\-From\-Small\-Angle}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Derived $>$ Eigen\-::\-Quaternion$<$typename Derived\-::\-Scalar$>$ quaternion\-From\-Small\-Angle (
+\begin{DoxyParamCaption}
+\item[{const Eigen\-::\-Matrix\-Base$<$ Derived $>$ \&}]{theta}
+\end{DoxyParamCaption}
+)}}\label{eigen__utils_8h_a5d046b4745ed62af442bb1d67a9a31c7}
+\hypertarget{eigen__utils_8h_ab83eee591e35d90699bd0b65e6e3bf2c}{\index{eigen\-\_\-utils.\-h@{eigen\-\_\-utils.\-h}!skew@{skew}}
+\index{skew@{skew}!eigen_utils.h@{eigen\-\_\-utils.\-h}}
+\subsubsection[{skew}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Derived $>$ Eigen\-::\-Matrix$<$typename Derived\-::\-Scalar, 3, 3$>$ skew (
+\begin{DoxyParamCaption}
+\item[{const Eigen\-::\-Matrix\-Base$<$ Derived $>$ \&}]{vec}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{eigen__utils_8h_ab83eee591e35d90699bd0b65e6e3bf2c}
+\hypertarget{eigen__utils_8h_a5df51b3e527ace7f4819364312d4572c}{\index{eigen\-\_\-utils.\-h@{eigen\-\_\-utils.\-h}!xi\-Mat@{xi\-Mat}}
+\index{xi\-Mat@{xi\-Mat}!eigen_utils.h@{eigen\-\_\-utils.\-h}}
+\subsubsection[{xi\-Mat}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Derived $>$ Eigen\-::\-Matrix$<$typename Derived\-::\-Scalar, 4, 3$>$ xi\-Mat (
+\begin{DoxyParamCaption}
+\item[{const Eigen\-::\-Matrix\-Base$<$ Derived $>$ \&}]{q\-\_\-vec}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{eigen__utils_8h_a5df51b3e527ace7f4819364312d4572c}
+
+\begin{DoxyParams}{Parameters}
+{\em q\-\_\-vec} & 4\-D vector containing the quaternion's coefficients in the order x y z w. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+4x3 matrix for error quaternion computation \begin{DoxyVerb}Xi = [ w*I + skew([x y z])]  ; dq = [ Xi q]^T * q
+[     -[x y z]       ]
+\end{DoxyVerb}
+ 
+\end{DoxyReturn}

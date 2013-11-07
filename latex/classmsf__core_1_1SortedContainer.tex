@@ -13,33 +13,28 @@ Manages a sorted container with strict less than ordering used to store state an
 \subsection*{Public Types}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{classmsf__core_1_1SortedContainer_a0dd7e9676bf540e11f526a8ac16da06b}{typedef shared\-\_\-ptr$<$ T $>$ {\bfseries Ptr\-\_\-\-T}}\label{classmsf__core_1_1SortedContainer_a0dd7e9676bf540e11f526a8ac16da06b}
-
+typedef shared\-\_\-ptr$<$ T $>$ \hyperlink{classmsf__core_1_1SortedContainer_a0dd7e9676bf540e11f526a8ac16da06b}{Ptr\-\_\-\-T}
 \item 
-\hypertarget{classmsf__core_1_1SortedContainer_ac060dafe3a40d73ef6d35f4be7e0213e}{typedef List\-T\-::iterator {\bfseries iterator\-\_\-\-T}}\label{classmsf__core_1_1SortedContainer_ac060dafe3a40d73ef6d35f4be7e0213e}
-
+typedef List\-T\-::iterator \hyperlink{classmsf__core_1_1SortedContainer_ac060dafe3a40d73ef6d35f4be7e0213e}{iterator\-\_\-\-T}
 \end{DoxyCompactItemize}
 \subsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
+\hyperlink{classmsf__core_1_1SortedContainer_a92fa629150b579414169ce689fa2f168}{Sorted\-Container} ()
+\item 
 shared\-\_\-ptr$<$ T $>$ \& \hyperlink{classmsf__core_1_1SortedContainer_a9c72942ce59c634559fe7e226b6ab302}{get\-Invalid} ()
 \begin{DoxyCompactList}\small\item\em To be called to signal that a request could not be satisfied. \end{DoxyCompactList}\item 
-\hypertarget{classmsf__core_1_1SortedContainer_aea65ad1ff460ab46445b433ea3db49b1}{void \hyperlink{classmsf__core_1_1SortedContainer_aea65ad1ff460ab46445b433ea3db49b1}{clear} ()}\label{classmsf__core_1_1SortedContainer_aea65ad1ff460ab46445b433ea3db49b1}
-
+void \hyperlink{classmsf__core_1_1SortedContainer_aea65ad1ff460ab46445b433ea3db49b1}{clear} ()
 \begin{DoxyCompactList}\small\item\em Clears the internal container, dropping all the contents. \end{DoxyCompactList}\item 
 List\-T\-::size\-\_\-type \hyperlink{classmsf__core_1_1SortedContainer_af51c989973b49002e737190cec67b6b4}{size} ()
 \begin{DoxyCompactList}\small\item\em Returns the size of the internal container. \end{DoxyCompactList}\item 
-\hypertarget{classmsf__core_1_1SortedContainer_a8e6ef89431cbcac53439b580a7b8706c}{List\-T\-::iterator \hyperlink{classmsf__core_1_1SortedContainer_a8e6ef89431cbcac53439b580a7b8706c}{insert} (const shared\-\_\-ptr$<$ T $>$ \&value)}\label{classmsf__core_1_1SortedContainer_a8e6ef89431cbcac53439b580a7b8706c}
-
+List\-T\-::iterator \hyperlink{classmsf__core_1_1SortedContainer_a8e6ef89431cbcac53439b580a7b8706c}{insert} (const shared\-\_\-ptr$<$ T $>$ \&value)
 \begin{DoxyCompactList}\small\item\em Insert an object to the internal container to the position not violating the internal strict less than ordering by time. \end{DoxyCompactList}\item 
-\hypertarget{classmsf__core_1_1SortedContainer_a66c37f04293ec2b3e2fae69ff2ac498e}{List\-T\-::iterator \hyperlink{classmsf__core_1_1SortedContainer_a66c37f04293ec2b3e2fae69ff2ac498e}{get\-Iterator\-Begin} ()}\label{classmsf__core_1_1SortedContainer_a66c37f04293ec2b3e2fae69ff2ac498e}
-
+List\-T\-::iterator \hyperlink{classmsf__core_1_1SortedContainer_a66c37f04293ec2b3e2fae69ff2ac498e}{get\-Iterator\-Begin} ()
 \begin{DoxyCompactList}\small\item\em Returns the iterator at the beginning of the internal container. \end{DoxyCompactList}\item 
-\hypertarget{classmsf__core_1_1SortedContainer_a17fa1667d94905e8def74a65002907ed}{List\-T\-::iterator \hyperlink{classmsf__core_1_1SortedContainer_a17fa1667d94905e8def74a65002907ed}{get\-Iterator\-Before\-Begin} ()}\label{classmsf__core_1_1SortedContainer_a17fa1667d94905e8def74a65002907ed}
-
+List\-T\-::iterator \hyperlink{classmsf__core_1_1SortedContainer_a17fa1667d94905e8def74a65002907ed}{get\-Iterator\-Before\-Begin} ()
 \begin{DoxyCompactList}\small\item\em Returns the iterator before the beginning of the internal container. \end{DoxyCompactList}\item 
-\hypertarget{classmsf__core_1_1SortedContainer_af1b1597192ac889cc918d8516cd6345c}{List\-T\-::iterator \hyperlink{classmsf__core_1_1SortedContainer_af1b1597192ac889cc918d8516cd6345c}{get\-Iterator\-End} ()}\label{classmsf__core_1_1SortedContainer_af1b1597192ac889cc918d8516cd6345c}
-
+List\-T\-::iterator \hyperlink{classmsf__core_1_1SortedContainer_af1b1597192ac889cc918d8516cd6345c}{get\-Iterator\-End} ()
 \begin{DoxyCompactList}\small\item\em Returns the iterator at the end of the internal container. \end{DoxyCompactList}\item 
 List\-T\-::iterator \hyperlink{classmsf__core_1_1SortedContainer_a3ca27ff6fae8916a88a6690b9c8365a9}{get\-Iterator\-At\-Value} (const shared\-\_\-ptr$<$ T $>$ \&value, bool warn\-If\-Not\-Existant=true)
 \begin{DoxyCompactList}\small\item\em Returns the iterator at the specific time instant of the supplied object or an invalid object if the request cannot be satisfied. \end{DoxyCompactList}\item 
@@ -69,14 +64,50 @@ shared\-\_\-ptr$<$ T $>$ \hyperlink{classmsf__core_1_1SortedContainer_a7e4c594bb
 \begin{DoxyCompactList}\small\item\em This function updates the time of an object in the container this function effectively changes the map ordering, so the previous iterators are invalidated the attribute unused can be eliminated for non gcc compilers, its just a little more verbose in cases where the updated value is not used. \end{DoxyCompactList}\item 
 std\-::string \hyperlink{classmsf__core_1_1SortedContainer_a7cecf8583999a5b457e04d5ef781dc5d}{echo\-Buffer\-Content\-Times} ()
 \begin{DoxyCompactList}\small\item\em Debug output the contents of the container in a human readable time format. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef std\-::map$<$ double, \hyperlink{classmsf__core_1_1SortedContainer_a0dd7e9676bf540e11f526a8ac16da06b}{Ptr\-\_\-\-T} $>$ \hyperlink{classmsf__core_1_1SortedContainer_abb7bb5ff6c1a1916b8c7e48a50953919}{List\-T}
+\begin{DoxyCompactList}\small\item\em The container type in which to store the data. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classmsf__core_1_1SortedContainer_abb7bb5ff6c1a1916b8c7e48a50953919}{List\-T} \hyperlink{classmsf__core_1_1SortedContainer_af9bdeecb0097b80a202d5edd044ffda4}{state\-List}
+\begin{DoxyCompactList}\small\item\em The container in which all the data is stored. \end{DoxyCompactList}\item 
+\hyperlink{classmsf__core_1_1SortedContainer_a0dd7e9676bf540e11f526a8ac16da06b}{Ptr\-\_\-\-T} \hyperlink{classmsf__core_1_1SortedContainer_a60a2f66705f0a77095e763f7dbe2e265}{invalid}
+\begin{DoxyCompactList}\small\item\em A object to signal requests which cannot be satisfied. \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
-\subsection{Detailed Description}
-\subsubsection*{template$<$typename T, typename Prototype\-Invalid\-T = T$>$class msf\-\_\-core\-::\-Sorted\-Container$<$ T, Prototype\-Invalid\-T $>$}
+\subsection{Member Typedef Documentation}
+\hypertarget{classmsf__core_1_1SortedContainer_ac060dafe3a40d73ef6d35f4be7e0213e}{\index{msf\-\_\-core\-::\-Sorted\-Container@{msf\-\_\-core\-::\-Sorted\-Container}!iterator\-\_\-\-T@{iterator\-\_\-\-T}}
+\index{iterator\-\_\-\-T@{iterator\-\_\-\-T}!msf_core::SortedContainer@{msf\-\_\-core\-::\-Sorted\-Container}}
+\subsubsection[{iterator\-\_\-\-T}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T, typename Prototype\-Invalid\-T = T$>$ typedef List\-T\-::iterator {\bf msf\-\_\-core\-::\-Sorted\-Container}$<$ T, Prototype\-Invalid\-T $>$\-::{\bf iterator\-\_\-\-T}}}\label{classmsf__core_1_1SortedContainer_ac060dafe3a40d73ef6d35f4be7e0213e}
+\hypertarget{classmsf__core_1_1SortedContainer_abb7bb5ff6c1a1916b8c7e48a50953919}{\index{msf\-\_\-core\-::\-Sorted\-Container@{msf\-\_\-core\-::\-Sorted\-Container}!List\-T@{List\-T}}
+\index{List\-T@{List\-T}!msf_core::SortedContainer@{msf\-\_\-core\-::\-Sorted\-Container}}
+\subsubsection[{List\-T}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T, typename Prototype\-Invalid\-T = T$>$ typedef std\-::map$<$double, {\bf Ptr\-\_\-\-T}$>$ {\bf msf\-\_\-core\-::\-Sorted\-Container}$<$ T, Prototype\-Invalid\-T $>$\-::{\bf List\-T}\hspace{0.3cm}{\ttfamily [private]}}}\label{classmsf__core_1_1SortedContainer_abb7bb5ff6c1a1916b8c7e48a50953919}
+\hypertarget{classmsf__core_1_1SortedContainer_a0dd7e9676bf540e11f526a8ac16da06b}{\index{msf\-\_\-core\-::\-Sorted\-Container@{msf\-\_\-core\-::\-Sorted\-Container}!Ptr\-\_\-\-T@{Ptr\-\_\-\-T}}
+\index{Ptr\-\_\-\-T@{Ptr\-\_\-\-T}!msf_core::SortedContainer@{msf\-\_\-core\-::\-Sorted\-Container}}
+\subsubsection[{Ptr\-\_\-\-T}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T, typename Prototype\-Invalid\-T = T$>$ typedef shared\-\_\-ptr$<$T$>$ {\bf msf\-\_\-core\-::\-Sorted\-Container}$<$ T, Prototype\-Invalid\-T $>$\-::{\bf Ptr\-\_\-\-T}}}\label{classmsf__core_1_1SortedContainer_a0dd7e9676bf540e11f526a8ac16da06b}
 
-Manages a sorted container with strict less than ordering used to store state and measurement objects which can then be queried for closest states/measurements to a given time instant. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classmsf__core_1_1SortedContainer_a92fa629150b579414169ce689fa2f168}{\index{msf\-\_\-core\-::\-Sorted\-Container@{msf\-\_\-core\-::\-Sorted\-Container}!Sorted\-Container@{Sorted\-Container}}
+\index{Sorted\-Container@{Sorted\-Container}!msf_core::SortedContainer@{msf\-\_\-core\-::\-Sorted\-Container}}
+\subsubsection[{Sorted\-Container}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T, typename Prototype\-Invalid\-T = T$>$ {\bf msf\-\_\-core\-::\-Sorted\-Container}$<$ T, Prototype\-Invalid\-T $>$\-::{\bf Sorted\-Container} (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classmsf__core_1_1SortedContainer_a92fa629150b579414169ce689fa2f168}
+
 
 \subsection{Member Function Documentation}
+\hypertarget{classmsf__core_1_1SortedContainer_aea65ad1ff460ab46445b433ea3db49b1}{\index{msf\-\_\-core\-::\-Sorted\-Container@{msf\-\_\-core\-::\-Sorted\-Container}!clear@{clear}}
+\index{clear@{clear}!msf_core::SortedContainer@{msf\-\_\-core\-::\-Sorted\-Container}}
+\subsubsection[{clear}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T, typename Prototype\-Invalid\-T = T$>$ void {\bf msf\-\_\-core\-::\-Sorted\-Container}$<$ T, Prototype\-Invalid\-T $>$\-::clear (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classmsf__core_1_1SortedContainer_aea65ad1ff460ab46445b433ea3db49b1}
 \hypertarget{classmsf__core_1_1SortedContainer_aa2e690d22ea362eeb281ce30a96751d5}{\index{msf\-\_\-core\-::\-Sorted\-Container@{msf\-\_\-core\-::\-Sorted\-Container}!clear\-Older\-Than@{clear\-Older\-Than}}
 \index{clear\-Older\-Than@{clear\-Older\-Than}!msf_core::SortedContainer@{msf\-\_\-core\-::\-Sorted\-Container}}
 \subsubsection[{clear\-Older\-Than}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T, typename Prototype\-Invalid\-T = T$>$ void {\bf msf\-\_\-core\-::\-Sorted\-Container}$<$ T, Prototype\-Invalid\-T $>$\-::clear\-Older\-Than (
@@ -84,10 +115,6 @@ Manages a sorted container with strict less than ordering used to store state an
 \item[{double}]{age}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}}}\label{classmsf__core_1_1SortedContainer_aa2e690d22ea362eeb281ce30a96751d5}
-
-
-Clears all objects having a time stamp older than the supplied time in seconds. 
-
 
 \begin{DoxyParams}{Parameters}
 {\em time} & The maximum age of states in the container. \\
@@ -103,10 +130,6 @@ shared pointer of the object.
 {}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}}}\label{classmsf__core_1_1SortedContainer_a7cecf8583999a5b457e04d5ef781dc5d}
-
-
-Debug output the contents of the container in a human readable time format. 
-
 \begin{DoxyReturn}{Returns}
 String of the buffer contents with line breaks after every entry. 
 \end{DoxyReturn}
@@ -117,10 +140,6 @@ String of the buffer contents with line breaks after every entry.
 \item[{const double \&}]{statetime}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}}}\label{classmsf__core_1_1SortedContainer_ab262e5e5904b047df44110c1d05babdc}
-
-
-Returns a pointer to the closest to a specific time instant. 
-
 
 \begin{DoxyParams}{Parameters}
 {\em time} & The time where we want to get the value at. \\
@@ -137,10 +156,6 @@ shared pointer of the object.
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}}}\label{classmsf__core_1_1SortedContainer_a1bf7a97e06b2dd5bc2b6588dcb6799b8}
 
-
-Returns a pointer to the closest after a specific time instant or an invalid object if the request cannot be satisfied. 
-
-
 \begin{DoxyParams}{Parameters}
 {\em time} & The time where we want to get the value at \\
 \hline
@@ -156,10 +171,6 @@ shared pointer of the object.
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}}}\label{classmsf__core_1_1SortedContainer_ad027825ff0a1360acbe6b9c60f708cd9}
 
-
-Returns a pointer to the closest object before a specific time instant. 
-
-
 \begin{DoxyParams}{Parameters}
 {\em Time} & the time where we want to get the value at. \\
 \hline
@@ -174,10 +185,6 @@ shared pointer of the object.
 {}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}}}\label{classmsf__core_1_1SortedContainer_a7cce297c5a4bbf80d617741fe3dc902e}
-
-
-Returns a pointer to the first object in the container or an invalid object if the container is empty. 
-
 \begin{DoxyReturn}{Returns}
 shared pointer of the object. 
 \end{DoxyReturn}
@@ -188,10 +195,6 @@ shared pointer of the object.
 {}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}}}\label{classmsf__core_1_1SortedContainer_a9c72942ce59c634559fe7e226b6ab302}
-
-
-To be called to signal that a request could not be satisfied. 
-
 \begin{DoxyReturn}{Returns}
 an object of the \char`\"{}invalid\char`\"{} type 
 \end{DoxyReturn}
@@ -203,10 +206,6 @@ an object of the \char`\"{}invalid\char`\"{} type
 \item[{bool}]{warn\-If\-Not\-Existant = {\ttfamily true}}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}}}\label{classmsf__core_1_1SortedContainer_a3ca27ff6fae8916a88a6690b9c8365a9}
-
-
-Returns the iterator at the specific time instant of the supplied object or an invalid object if the request cannot be satisfied. 
-
 
 \begin{DoxyParams}{Parameters}
 {\em value} & The value to get the iterator for. \\
@@ -224,10 +223,6 @@ iterator.
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}}}\label{classmsf__core_1_1SortedContainer_a727a60e4eb00ab45b2a39c8c069d2fcf}
 
-
-Returns the iterator at a specific time instant or an invalid object if the request cannot be satisfied. 
-
-
 \begin{DoxyParams}{Parameters}
 {\em time} & The time where we want to get an iterator at. \\
 \hline
@@ -235,6 +230,20 @@ Returns the iterator at a specific time instant or an invalid object if the requ
 \begin{DoxyReturn}{Returns}
 iterator. 
 \end{DoxyReturn}
+\hypertarget{classmsf__core_1_1SortedContainer_a17fa1667d94905e8def74a65002907ed}{\index{msf\-\_\-core\-::\-Sorted\-Container@{msf\-\_\-core\-::\-Sorted\-Container}!get\-Iterator\-Before\-Begin@{get\-Iterator\-Before\-Begin}}
+\index{get\-Iterator\-Before\-Begin@{get\-Iterator\-Before\-Begin}!msf_core::SortedContainer@{msf\-\_\-core\-::\-Sorted\-Container}}
+\subsubsection[{get\-Iterator\-Before\-Begin}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T, typename Prototype\-Invalid\-T = T$>$ List\-T\-::iterator {\bf msf\-\_\-core\-::\-Sorted\-Container}$<$ T, Prototype\-Invalid\-T $>$\-::get\-Iterator\-Before\-Begin (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classmsf__core_1_1SortedContainer_a17fa1667d94905e8def74a65002907ed}
+\hypertarget{classmsf__core_1_1SortedContainer_a66c37f04293ec2b3e2fae69ff2ac498e}{\index{msf\-\_\-core\-::\-Sorted\-Container@{msf\-\_\-core\-::\-Sorted\-Container}!get\-Iterator\-Begin@{get\-Iterator\-Begin}}
+\index{get\-Iterator\-Begin@{get\-Iterator\-Begin}!msf_core::SortedContainer@{msf\-\_\-core\-::\-Sorted\-Container}}
+\subsubsection[{get\-Iterator\-Begin}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T, typename Prototype\-Invalid\-T = T$>$ List\-T\-::iterator {\bf msf\-\_\-core\-::\-Sorted\-Container}$<$ T, Prototype\-Invalid\-T $>$\-::get\-Iterator\-Begin (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classmsf__core_1_1SortedContainer_a66c37f04293ec2b3e2fae69ff2ac498e}
 \hypertarget{classmsf__core_1_1SortedContainer_a64ce9fdfdd6220f78187e7270f689f02}{\index{msf\-\_\-core\-::\-Sorted\-Container@{msf\-\_\-core\-::\-Sorted\-Container}!get\-Iterator\-Closest@{get\-Iterator\-Closest}}
 \index{get\-Iterator\-Closest@{get\-Iterator\-Closest}!msf_core::SortedContainer@{msf\-\_\-core\-::\-Sorted\-Container}}
 \subsubsection[{get\-Iterator\-Closest}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T, typename Prototype\-Invalid\-T = T$>$ List\-T\-::iterator {\bf msf\-\_\-core\-::\-Sorted\-Container}$<$ T, Prototype\-Invalid\-T $>$\-::get\-Iterator\-Closest (
@@ -242,10 +251,6 @@ iterator.
 \item[{const double \&}]{statetime}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}}}\label{classmsf__core_1_1SortedContainer_a64ce9fdfdd6220f78187e7270f689f02}
-
-
-Returns the iterator closest to a specific time instant. 
-
 
 \begin{DoxyParams}{Parameters}
 {\em time} & The time where we want to get an iterator at. \\
@@ -262,10 +267,6 @@ iterator.
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}}}\label{classmsf__core_1_1SortedContainer_a3c1f848e9874f9bdc4ab12645e699fcf}
 
-
-Returns the iterator closest after a specific time instant. 
-
-
 \begin{DoxyParams}{Parameters}
 {\em time} & The time where we want to get an iterator at. \\
 \hline
@@ -281,10 +282,6 @@ iterator.
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}}}\label{classmsf__core_1_1SortedContainer_a4cbd2aeae2f6dde2dfd0dceea4a8e928}
 
-
-Returns the iterator closest before a specific time instant. 
-
-
 \begin{DoxyParams}{Parameters}
 {\em time} & The time where we want to get an iterator at. \\
 \hline
@@ -292,6 +289,13 @@ Returns the iterator closest before a specific time instant.
 \begin{DoxyReturn}{Returns}
 iterator. 
 \end{DoxyReturn}
+\hypertarget{classmsf__core_1_1SortedContainer_af1b1597192ac889cc918d8516cd6345c}{\index{msf\-\_\-core\-::\-Sorted\-Container@{msf\-\_\-core\-::\-Sorted\-Container}!get\-Iterator\-End@{get\-Iterator\-End}}
+\index{get\-Iterator\-End@{get\-Iterator\-End}!msf_core::SortedContainer@{msf\-\_\-core\-::\-Sorted\-Container}}
+\subsubsection[{get\-Iterator\-End}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T, typename Prototype\-Invalid\-T = T$>$ List\-T\-::iterator {\bf msf\-\_\-core\-::\-Sorted\-Container}$<$ T, Prototype\-Invalid\-T $>$\-::get\-Iterator\-End (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classmsf__core_1_1SortedContainer_af1b1597192ac889cc918d8516cd6345c}
 \hypertarget{classmsf__core_1_1SortedContainer_ada83f9baa4b17b5816975b1e67354ff1}{\index{msf\-\_\-core\-::\-Sorted\-Container@{msf\-\_\-core\-::\-Sorted\-Container}!get\-Last@{get\-Last}}
 \index{get\-Last@{get\-Last}!msf_core::SortedContainer@{msf\-\_\-core\-::\-Sorted\-Container}}
 \subsubsection[{get\-Last}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T, typename Prototype\-Invalid\-T = T$>$ shared\-\_\-ptr$<$T$>$\& {\bf msf\-\_\-core\-::\-Sorted\-Container}$<$ T, Prototype\-Invalid\-T $>$\-::get\-Last (
@@ -299,10 +303,6 @@ iterator.
 {}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}}}\label{classmsf__core_1_1SortedContainer_ada83f9baa4b17b5816975b1e67354ff1}
-
-
-Returns a pointer to the last object in the container or an invalid object if the container is empty. 
-
 \begin{DoxyReturn}{Returns}
 shared pointer of the object. 
 \end{DoxyReturn}
@@ -314,10 +314,6 @@ shared pointer of the object.
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}}}\label{classmsf__core_1_1SortedContainer_aa0de5fa4d79a266a36556b67252a7d34}
 
-
-Returns a pointer to the object at a specific time instant or an invalid object if the request cannot be satisfied. 
-
-
 \begin{DoxyParams}{Parameters}
 {\em time} & The time where we want to get the value at. \\
 \hline
@@ -325,6 +321,13 @@ Returns a pointer to the object at a specific time instant or an invalid object 
 \begin{DoxyReturn}{Returns}
 shared pointer of the object. 
 \end{DoxyReturn}
+\hypertarget{classmsf__core_1_1SortedContainer_a8e6ef89431cbcac53439b580a7b8706c}{\index{msf\-\_\-core\-::\-Sorted\-Container@{msf\-\_\-core\-::\-Sorted\-Container}!insert@{insert}}
+\index{insert@{insert}!msf_core::SortedContainer@{msf\-\_\-core\-::\-Sorted\-Container}}
+\subsubsection[{insert}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T, typename Prototype\-Invalid\-T = T$>$ List\-T\-::iterator {\bf msf\-\_\-core\-::\-Sorted\-Container}$<$ T, Prototype\-Invalid\-T $>$\-::insert (
+\begin{DoxyParamCaption}
+\item[{const shared\-\_\-ptr$<$ T $>$ \&}]{value}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classmsf__core_1_1SortedContainer_a8e6ef89431cbcac53439b580a7b8706c}
 \hypertarget{classmsf__core_1_1SortedContainer_af51c989973b49002e737190cec67b6b4}{\index{msf\-\_\-core\-::\-Sorted\-Container@{msf\-\_\-core\-::\-Sorted\-Container}!size@{size}}
 \index{size@{size}!msf_core::SortedContainer@{msf\-\_\-core\-::\-Sorted\-Container}}
 \subsubsection[{size}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T, typename Prototype\-Invalid\-T = T$>$ List\-T\-::size\-\_\-type {\bf msf\-\_\-core\-::\-Sorted\-Container}$<$ T, Prototype\-Invalid\-T $>$\-::size (
@@ -332,10 +335,6 @@ shared pointer of the object.
 {}
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}}}\label{classmsf__core_1_1SortedContainer_af51c989973b49002e737190cec67b6b4}
-
-
-Returns the size of the internal container. 
-
 \begin{DoxyReturn}{Returns}
 Size of the container. 
 \end{DoxyReturn}
@@ -348,10 +347,6 @@ Size of the container.
 \end{DoxyParamCaption}
 )\hspace{0.3cm}{\ttfamily [inline]}}}\label{classmsf__core_1_1SortedContainer_a7e4c594bb1aec9d6d4d8fb73e7baff9a}
 
-
-This function updates the time of an object in the container this function effectively changes the map ordering, so the previous iterators are invalidated the attribute unused can be eliminated for non gcc compilers, its just a little more verbose in cases where the updated value is not used. 
-
-
 \begin{DoxyParams}{Parameters}
 {\em time\-Old} & The time of the value to update. \\
 \hline
@@ -363,6 +358,15 @@ shared pointer of the object.
 \end{DoxyReturn}
 
 
+\subsection{Member Data Documentation}
+\hypertarget{classmsf__core_1_1SortedContainer_a60a2f66705f0a77095e763f7dbe2e265}{\index{msf\-\_\-core\-::\-Sorted\-Container@{msf\-\_\-core\-::\-Sorted\-Container}!invalid@{invalid}}
+\index{invalid@{invalid}!msf_core::SortedContainer@{msf\-\_\-core\-::\-Sorted\-Container}}
+\subsubsection[{invalid}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T, typename Prototype\-Invalid\-T = T$>$ {\bf Ptr\-\_\-\-T} {\bf msf\-\_\-core\-::\-Sorted\-Container}$<$ T, Prototype\-Invalid\-T $>$\-::invalid\hspace{0.3cm}{\ttfamily [private]}}}\label{classmsf__core_1_1SortedContainer_a60a2f66705f0a77095e763f7dbe2e265}
+\hypertarget{classmsf__core_1_1SortedContainer_af9bdeecb0097b80a202d5edd044ffda4}{\index{msf\-\_\-core\-::\-Sorted\-Container@{msf\-\_\-core\-::\-Sorted\-Container}!state\-List@{state\-List}}
+\index{state\-List@{state\-List}!msf_core::SortedContainer@{msf\-\_\-core\-::\-Sorted\-Container}}
+\subsubsection[{state\-List}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename T, typename Prototype\-Invalid\-T = T$>$ {\bf List\-T} {\bf msf\-\_\-core\-::\-Sorted\-Container}$<$ T, Prototype\-Invalid\-T $>$\-::state\-List\hspace{0.3cm}{\ttfamily [private]}}}\label{classmsf__core_1_1SortedContainer_af9bdeecb0097b80a202d5edd044ffda4}
+
+
 The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
 \item 
-msf\-\_\-core/include/msf\-\_\-core/msf\-\_\-sorted\-Container.\-h\end{DoxyCompactItemize}
+msf\-\_\-core/include/msf\-\_\-core/\hyperlink{msf__sortedContainer_8h}{msf\-\_\-sorted\-Container.\-h}\end{DoxyCompactItemize}

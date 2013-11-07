@@ -1,0 +1,216 @@
+\hypertarget{classmsf__position__sensor_1_1PositionSensorManager}{\section{msf\-\_\-position\-\_\-sensor\-:\-:Position\-Sensor\-Manager Class Reference}
+\label{classmsf__position__sensor_1_1PositionSensorManager}\index{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}}
+}
+
+
+{\ttfamily \#include $<$position\-\_\-sensormanager.\-h$>$}
+
+Inheritance diagram for msf\-\_\-position\-\_\-sensor\-:\-:Position\-Sensor\-Manager\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=4.000000cm]{classmsf__position__sensor_1_1PositionSensorManager}
+\end{center}
+\end{figure}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \hyperlink{namespacemsf__updates_a03b0801c76b7400623b00ad4d28f9bcc}{msf\-\_\-updates\-::\-E\-K\-F\-State} \hyperlink{classmsf__position__sensor_1_1PositionSensorManager_abf67877833d9fa2ce0afda2fd8f92bae}{E\-K\-F\-State\-\_\-\-T}
+\item 
+typedef \hyperlink{structmsf__core_1_1GenericState__T_a75fe70f7c7517dbf7d4c91b75b08a1dd}{E\-K\-F\-State\-\_\-\-T\-::\-State\-Sequence\-\_\-\-T} \hyperlink{classmsf__position__sensor_1_1PositionSensorManager_a644958b0af6bb4808907ac8b3b661caf}{State\-Sequence\-\_\-\-T}
+\item 
+typedef \\*
+\hyperlink{structmsf__core_1_1GenericState__T_a9a7d65b0325658ab07b81960a3ed4604}{E\-K\-F\-State\-\_\-\-T\-::\-State\-Definition\-\_\-\-T} \hyperlink{classmsf__position__sensor_1_1PositionSensorManager_a1fde9f23ab4df16520ec13102262d04c}{State\-Definition\-\_\-\-T}
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classmsf__position__sensor_1_1PositionSensorManager_a047ff1426cf128cf8c61487a7d765c87}{Position\-Sensor\-Manager} (ros\-::\-Node\-Handle pnh=ros\-::\-Node\-Handle(\char`\"{}$\sim$/position\-\_\-sensor\char`\"{}))
+\item 
+virtual \hyperlink{classmsf__position__sensor_1_1PositionSensorManager_a7c282ca8b842e9187dec16d8b674d118}{$\sim$\-Position\-Sensor\-Manager} ()
+\item 
+virtual const \hyperlink{namespacemsf__position__sensor_a888f7a67abc78bbe9b927b35f1e05933}{Config\-\_\-\-T} \& \hyperlink{classmsf__position__sensor_1_1PositionSensorManager_a84eee4a7b42865f19a29b7ae13bb7dd8}{getcfg} ()
+\end{DoxyCompactItemize}
+\subsection*{Private Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef Position\-Sensor\-Handler\\*
+$<$ msf\-\_\-updates\-::position\-\_\-measurement\-::\-Position\-Measurement, \\*
+\hyperlink{classmsf__position__sensor_1_1PositionSensorManager}{Position\-Sensor\-Manager} $>$ \hyperlink{classmsf__position__sensor_1_1PositionSensorManager_afd8d00f9745db7b1b5290f0613ca0eca}{Position\-Sensor\-Handler\-\_\-\-T}
+\end{DoxyCompactItemize}
+\subsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual void \hyperlink{classmsf__position__sensor_1_1PositionSensorManager_a8b242142a587c267b4a4220e24b136b3}{config} (\hyperlink{namespacemsf__position__sensor_a888f7a67abc78bbe9b927b35f1e05933}{Config\-\_\-\-T} \&config, uint32\-\_\-t level)
+\begin{DoxyCompactList}\small\item\em Dynamic reconfigure callback. \end{DoxyCompactList}\item 
+void \hyperlink{classmsf__position__sensor_1_1PositionSensorManager_a1034ec051667d770b2e86631bada4d05}{init} (double scale) const 
+\item 
+virtual void \hyperlink{classmsf__position__sensor_1_1PositionSensorManager_ad7e6810e0ebc1b1ee1f029080b34e8b4}{reset\-State} (\hyperlink{classmsf__position__sensor_1_1PositionSensorManager_abf67877833d9fa2ce0afda2fd8f92bae}{E\-K\-F\-State\-\_\-\-T} \&state) const 
+\item 
+virtual void \hyperlink{classmsf__position__sensor_1_1PositionSensorManager_afbd44a81602a8370a5ec44a401114372}{init\-State} (\hyperlink{classmsf__position__sensor_1_1PositionSensorManager_abf67877833d9fa2ce0afda2fd8f92bae}{E\-K\-F\-State\-\_\-\-T} \&state) const 
+\item 
+virtual void \hyperlink{classmsf__position__sensor_1_1PositionSensorManager_a7def456966acfe1862a3b7fdb6a68101}{calculate\-Q\-Auxiliary\-States} (\hyperlink{classmsf__position__sensor_1_1PositionSensorManager_abf67877833d9fa2ce0afda2fd8f92bae}{E\-K\-F\-State\-\_\-\-T} \&state, double dt) const 
+\item 
+virtual void \hyperlink{classmsf__position__sensor_1_1PositionSensorManager_a3549ffdef05143caacad3f35e035cb2b}{set\-P} (Eigen\-::\-Matrix$<$ double, \hyperlink{structmsf__core_1_1GenericState__T_a20545d9aacd8f84bc1a97a873310cd5fab0136c5805e4e8d75677885fcaad5901}{E\-K\-F\-State\-\_\-\-T\-::n\-Error\-States\-At\-Compile\-Time}, \hyperlink{structmsf__core_1_1GenericState__T_a20545d9aacd8f84bc1a97a873310cd5fab0136c5805e4e8d75677885fcaad5901}{E\-K\-F\-State\-\_\-\-T\-::n\-Error\-States\-At\-Compile\-Time} $>$ \&P) const 
+\item 
+virtual void \hyperlink{classmsf__position__sensor_1_1PositionSensorManager_a22981e68f5f28831ca793f787005b6d3}{augment\-Correction\-Vector} (Eigen\-::\-Matrix$<$ double, \hyperlink{structmsf__core_1_1GenericState__T_a20545d9aacd8f84bc1a97a873310cd5fab0136c5805e4e8d75677885fcaad5901}{E\-K\-F\-State\-\_\-\-T\-::n\-Error\-States\-At\-Compile\-Time}, 1 $>$ \&correction) const 
+\item 
+virtual void \hyperlink{classmsf__position__sensor_1_1PositionSensorManager_a93258c3d736a4d38119eba66a4e7dbfa}{sanity\-Check\-Correction} (\hyperlink{classmsf__position__sensor_1_1PositionSensorManager_abf67877833d9fa2ce0afda2fd8f92bae}{E\-K\-F\-State\-\_\-\-T} \&delaystate, const \hyperlink{classmsf__position__sensor_1_1PositionSensorManager_abf67877833d9fa2ce0afda2fd8f92bae}{E\-K\-F\-State\-\_\-\-T} \&buffstate, Eigen\-::\-Matrix$<$ double, \hyperlink{structmsf__core_1_1GenericState__T_a20545d9aacd8f84bc1a97a873310cd5fab0136c5805e4e8d75677885fcaad5901}{E\-K\-F\-State\-\_\-\-T\-::n\-Error\-States\-At\-Compile\-Time}, 1 $>$ \&correction) const 
+\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+shared\-\_\-ptr\\*
+$<$ \hyperlink{classmsf__core_1_1IMUHandler__ROS}{msf\-\_\-core\-::\-I\-M\-U\-Handler\-\_\-\-R\-O\-S}\\*
+$<$ \hyperlink{namespacemsf__updates_a03b0801c76b7400623b00ad4d28f9bcc}{msf\-\_\-updates\-::\-E\-K\-F\-State} $>$ $>$ \hyperlink{classmsf__position__sensor_1_1PositionSensorManager_a30614404706e5332a0b7d43b7329fa40}{imu\-\_\-handler\-\_\-}
+\item 
+shared\-\_\-ptr\\*
+$<$ \hyperlink{classmsf__position__sensor_1_1PositionSensorManager_afd8d00f9745db7b1b5290f0613ca0eca}{Position\-Sensor\-Handler\-\_\-\-T} $>$ \hyperlink{classmsf__position__sensor_1_1PositionSensorManager_a7611c68c92ee71eef980ae0195894900}{position\-\_\-handler\-\_\-}
+\item 
+\hyperlink{namespacemsf__position__sensor_a888f7a67abc78bbe9b927b35f1e05933}{Config\-\_\-\-T} \hyperlink{classmsf__position__sensor_1_1PositionSensorManager_ab750ec8335fa617ce51e7e90d1f8e8ad}{config\-\_\-}
+\item 
+\hyperlink{namespacemsf__position__sensor_a62920eb4890a10e8224aa5ef62bb56a2}{Reconfigure\-Server\-Ptr} \hyperlink{classmsf__position__sensor_1_1PositionSensorManager_a722e3be8a48e1ac92050679569442a12}{reconf\-\_\-server\-\_\-}
+\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classmsf__position__sensor_1_1PositionSensorManager_a17946aaee62098cb22d79fb7001fe003}{Position\-Sensor\-Handler$<$ msf\-\_\-updates\-::position\-\_\-measurement\-::\-Position\-Measurement, Position\-Sensor\-Manager $>$}
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Member Typedef Documentation}
+\hypertarget{classmsf__position__sensor_1_1PositionSensorManager_abf67877833d9fa2ce0afda2fd8f92bae}{\index{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}!E\-K\-F\-State\-\_\-\-T@{E\-K\-F\-State\-\_\-\-T}}
+\index{E\-K\-F\-State\-\_\-\-T@{E\-K\-F\-State\-\_\-\-T}!msf_position_sensor::PositionSensorManager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}}
+\subsubsection[{E\-K\-F\-State\-\_\-\-T}]{\setlength{\rightskip}{0pt plus 5cm}typedef {\bf msf\-\_\-updates\-::\-E\-K\-F\-State} {\bf msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager\-::\-E\-K\-F\-State\-\_\-\-T}}}\label{classmsf__position__sensor_1_1PositionSensorManager_abf67877833d9fa2ce0afda2fd8f92bae}
+\hypertarget{classmsf__position__sensor_1_1PositionSensorManager_afd8d00f9745db7b1b5290f0613ca0eca}{\index{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}!Position\-Sensor\-Handler\-\_\-\-T@{Position\-Sensor\-Handler\-\_\-\-T}}
+\index{Position\-Sensor\-Handler\-\_\-\-T@{Position\-Sensor\-Handler\-\_\-\-T}!msf_position_sensor::PositionSensorManager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}}
+\subsubsection[{Position\-Sensor\-Handler\-\_\-\-T}]{\setlength{\rightskip}{0pt plus 5cm}typedef Position\-Sensor\-Handler$<$ msf\-\_\-updates\-::position\-\_\-measurement\-::\-Position\-Measurement, {\bf Position\-Sensor\-Manager}$>$ {\bf msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager\-::\-Position\-Sensor\-Handler\-\_\-\-T}\hspace{0.3cm}{\ttfamily [private]}}}\label{classmsf__position__sensor_1_1PositionSensorManager_afd8d00f9745db7b1b5290f0613ca0eca}
+\hypertarget{classmsf__position__sensor_1_1PositionSensorManager_a1fde9f23ab4df16520ec13102262d04c}{\index{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}!State\-Definition\-\_\-\-T@{State\-Definition\-\_\-\-T}}
+\index{State\-Definition\-\_\-\-T@{State\-Definition\-\_\-\-T}!msf_position_sensor::PositionSensorManager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}}
+\subsubsection[{State\-Definition\-\_\-\-T}]{\setlength{\rightskip}{0pt plus 5cm}typedef {\bf E\-K\-F\-State\-\_\-\-T\-::\-State\-Definition\-\_\-\-T} {\bf msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager\-::\-State\-Definition\-\_\-\-T}}}\label{classmsf__position__sensor_1_1PositionSensorManager_a1fde9f23ab4df16520ec13102262d04c}
+\hypertarget{classmsf__position__sensor_1_1PositionSensorManager_a644958b0af6bb4808907ac8b3b661caf}{\index{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}!State\-Sequence\-\_\-\-T@{State\-Sequence\-\_\-\-T}}
+\index{State\-Sequence\-\_\-\-T@{State\-Sequence\-\_\-\-T}!msf_position_sensor::PositionSensorManager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}}
+\subsubsection[{State\-Sequence\-\_\-\-T}]{\setlength{\rightskip}{0pt plus 5cm}typedef {\bf E\-K\-F\-State\-\_\-\-T\-::\-State\-Sequence\-\_\-\-T} {\bf msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager\-::\-State\-Sequence\-\_\-\-T}}}\label{classmsf__position__sensor_1_1PositionSensorManager_a644958b0af6bb4808907ac8b3b661caf}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classmsf__position__sensor_1_1PositionSensorManager_a047ff1426cf128cf8c61487a7d765c87}{\index{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}!Position\-Sensor\-Manager@{Position\-Sensor\-Manager}}
+\index{Position\-Sensor\-Manager@{Position\-Sensor\-Manager}!msf_position_sensor::PositionSensorManager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}}
+\subsubsection[{Position\-Sensor\-Manager}]{\setlength{\rightskip}{0pt plus 5cm}msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager\-::\-Position\-Sensor\-Manager (
+\begin{DoxyParamCaption}
+\item[{ros\-::\-Node\-Handle}]{pnh = {\ttfamily ros\-:\-:NodeHandle(\char`\"{}$\sim$/position\-\_\-sensor\char`\"{})}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classmsf__position__sensor_1_1PositionSensorManager_a047ff1426cf128cf8c61487a7d765c87}
+\hypertarget{classmsf__position__sensor_1_1PositionSensorManager_a7c282ca8b842e9187dec16d8b674d118}{\index{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}!$\sim$\-Position\-Sensor\-Manager@{$\sim$\-Position\-Sensor\-Manager}}
+\index{$\sim$\-Position\-Sensor\-Manager@{$\sim$\-Position\-Sensor\-Manager}!msf_position_sensor::PositionSensorManager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}}
+\subsubsection[{$\sim$\-Position\-Sensor\-Manager}]{\setlength{\rightskip}{0pt plus 5cm}virtual msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager\-::$\sim$\-Position\-Sensor\-Manager (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{classmsf__position__sensor_1_1PositionSensorManager_a7c282ca8b842e9187dec16d8b674d118}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classmsf__position__sensor_1_1PositionSensorManager_a22981e68f5f28831ca793f787005b6d3}{\index{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}!augment\-Correction\-Vector@{augment\-Correction\-Vector}}
+\index{augment\-Correction\-Vector@{augment\-Correction\-Vector}!msf_position_sensor::PositionSensorManager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}}
+\subsubsection[{augment\-Correction\-Vector}]{\setlength{\rightskip}{0pt plus 5cm}virtual void msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager\-::augment\-Correction\-Vector (
+\begin{DoxyParamCaption}
+\item[{Eigen\-::\-Matrix$<$ double, {\bf E\-K\-F\-State\-\_\-\-T\-::n\-Error\-States\-At\-Compile\-Time}, 1 $>$ \&}]{correction}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [private]}, {\ttfamily [virtual]}}}\label{classmsf__position__sensor_1_1PositionSensorManager_a22981e68f5f28831ca793f787005b6d3}
+\hypertarget{classmsf__position__sensor_1_1PositionSensorManager_a7def456966acfe1862a3b7fdb6a68101}{\index{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}!calculate\-Q\-Auxiliary\-States@{calculate\-Q\-Auxiliary\-States}}
+\index{calculate\-Q\-Auxiliary\-States@{calculate\-Q\-Auxiliary\-States}!msf_position_sensor::PositionSensorManager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}}
+\subsubsection[{calculate\-Q\-Auxiliary\-States}]{\setlength{\rightskip}{0pt plus 5cm}virtual void msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager\-::calculate\-Q\-Auxiliary\-States (
+\begin{DoxyParamCaption}
+\item[{{\bf E\-K\-F\-State\-\_\-\-T} \&}]{state, }
+\item[{double}]{dt}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [private]}, {\ttfamily [virtual]}}}\label{classmsf__position__sensor_1_1PositionSensorManager_a7def456966acfe1862a3b7fdb6a68101}
+\hypertarget{classmsf__position__sensor_1_1PositionSensorManager_a8b242142a587c267b4a4220e24b136b3}{\index{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}!config@{config}}
+\index{config@{config}!msf_position_sensor::PositionSensorManager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}}
+\subsubsection[{config}]{\setlength{\rightskip}{0pt plus 5cm}virtual void msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager\-::config (
+\begin{DoxyParamCaption}
+\item[{{\bf Config\-\_\-\-T} \&}]{config, }
+\item[{uint32\-\_\-t}]{level}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [private]}, {\ttfamily [virtual]}}}\label{classmsf__position__sensor_1_1PositionSensorManager_a8b242142a587c267b4a4220e24b136b3}
+\hypertarget{classmsf__position__sensor_1_1PositionSensorManager_a84eee4a7b42865f19a29b7ae13bb7dd8}{\index{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}!getcfg@{getcfg}}
+\index{getcfg@{getcfg}!msf_position_sensor::PositionSensorManager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}}
+\subsubsection[{getcfg}]{\setlength{\rightskip}{0pt plus 5cm}virtual const {\bf Config\-\_\-\-T}\& msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager\-::getcfg (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{classmsf__position__sensor_1_1PositionSensorManager_a84eee4a7b42865f19a29b7ae13bb7dd8}
+\hypertarget{classmsf__position__sensor_1_1PositionSensorManager_a1034ec051667d770b2e86631bada4d05}{\index{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}!init@{init}}
+\index{init@{init}!msf_position_sensor::PositionSensorManager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}}
+\subsubsection[{init}]{\setlength{\rightskip}{0pt plus 5cm}void msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager\-::init (
+\begin{DoxyParamCaption}
+\item[{double}]{scale}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [private]}}}\label{classmsf__position__sensor_1_1PositionSensorManager_a1034ec051667d770b2e86631bada4d05}
+Gravity.
+
+Bias gyroscopes.
+
+Bias accelerometer.
+
+Robot velocity (I\-M\-U centered).
+
+Initial angular velocity.
+
+Initial acceleration. \hypertarget{classmsf__position__sensor_1_1PositionSensorManager_afbd44a81602a8370a5ec44a401114372}{\index{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}!init\-State@{init\-State}}
+\index{init\-State@{init\-State}!msf_position_sensor::PositionSensorManager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}}
+\subsubsection[{init\-State}]{\setlength{\rightskip}{0pt plus 5cm}virtual void msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager\-::init\-State (
+\begin{DoxyParamCaption}
+\item[{{\bf E\-K\-F\-State\-\_\-\-T} \&}]{state}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [private]}, {\ttfamily [virtual]}}}\label{classmsf__position__sensor_1_1PositionSensorManager_afbd44a81602a8370a5ec44a401114372}
+\hypertarget{classmsf__position__sensor_1_1PositionSensorManager_ad7e6810e0ebc1b1ee1f029080b34e8b4}{\index{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}!reset\-State@{reset\-State}}
+\index{reset\-State@{reset\-State}!msf_position_sensor::PositionSensorManager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}}
+\subsubsection[{reset\-State}]{\setlength{\rightskip}{0pt plus 5cm}virtual void msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager\-::reset\-State (
+\begin{DoxyParamCaption}
+\item[{{\bf E\-K\-F\-State\-\_\-\-T} \&}]{state}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [private]}, {\ttfamily [virtual]}}}\label{classmsf__position__sensor_1_1PositionSensorManager_ad7e6810e0ebc1b1ee1f029080b34e8b4}
+\hypertarget{classmsf__position__sensor_1_1PositionSensorManager_a93258c3d736a4d38119eba66a4e7dbfa}{\index{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}!sanity\-Check\-Correction@{sanity\-Check\-Correction}}
+\index{sanity\-Check\-Correction@{sanity\-Check\-Correction}!msf_position_sensor::PositionSensorManager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}}
+\subsubsection[{sanity\-Check\-Correction}]{\setlength{\rightskip}{0pt plus 5cm}virtual void msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager\-::sanity\-Check\-Correction (
+\begin{DoxyParamCaption}
+\item[{{\bf E\-K\-F\-State\-\_\-\-T} \&}]{delaystate, }
+\item[{const {\bf E\-K\-F\-State\-\_\-\-T} \&}]{buffstate, }
+\item[{Eigen\-::\-Matrix$<$ double, {\bf E\-K\-F\-State\-\_\-\-T\-::n\-Error\-States\-At\-Compile\-Time}, 1 $>$ \&}]{correction}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [private]}, {\ttfamily [virtual]}}}\label{classmsf__position__sensor_1_1PositionSensorManager_a93258c3d736a4d38119eba66a4e7dbfa}
+\hypertarget{classmsf__position__sensor_1_1PositionSensorManager_a3549ffdef05143caacad3f35e035cb2b}{\index{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}!set\-P@{set\-P}}
+\index{set\-P@{set\-P}!msf_position_sensor::PositionSensorManager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}}
+\subsubsection[{set\-P}]{\setlength{\rightskip}{0pt plus 5cm}virtual void msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager\-::set\-P (
+\begin{DoxyParamCaption}
+\item[{Eigen\-::\-Matrix$<$ double, {\bf E\-K\-F\-State\-\_\-\-T\-::n\-Error\-States\-At\-Compile\-Time}, {\bf E\-K\-F\-State\-\_\-\-T\-::n\-Error\-States\-At\-Compile\-Time} $>$ \&}]{P}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [private]}, {\ttfamily [virtual]}}}\label{classmsf__position__sensor_1_1PositionSensorManager_a3549ffdef05143caacad3f35e035cb2b}
+
+
+\subsection{Friends And Related Function Documentation}
+\hypertarget{classmsf__position__sensor_1_1PositionSensorManager_a17946aaee62098cb22d79fb7001fe003}{\index{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}!Position\-Sensor\-Handler$<$ msf\-\_\-updates\-::position\-\_\-measurement\-::\-Position\-Measurement, Position\-Sensor\-Manager $>$@{Position\-Sensor\-Handler$<$ msf\-\_\-updates\-::position\-\_\-measurement\-::\-Position\-Measurement, Position\-Sensor\-Manager $>$}}
+\index{Position\-Sensor\-Handler$<$ msf\-\_\-updates\-::position\-\_\-measurement\-::\-Position\-Measurement, Position\-Sensor\-Manager $>$@{Position\-Sensor\-Handler$<$ msf\-\_\-updates\-::position\-\_\-measurement\-::\-Position\-Measurement, Position\-Sensor\-Manager $>$}!msf_position_sensor::PositionSensorManager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}}
+\subsubsection[{Position\-Sensor\-Handler$<$ msf\-\_\-updates\-::position\-\_\-measurement\-::\-Position\-Measurement, Position\-Sensor\-Manager $>$}]{\setlength{\rightskip}{0pt plus 5cm}friend class Position\-Sensor\-Handler$<$ msf\-\_\-updates\-::position\-\_\-measurement\-::\-Position\-Measurement,{\bf Position\-Sensor\-Manager} $>$\hspace{0.3cm}{\ttfamily [friend]}}}\label{classmsf__position__sensor_1_1PositionSensorManager_a17946aaee62098cb22d79fb7001fe003}
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classmsf__position__sensor_1_1PositionSensorManager_ab750ec8335fa617ce51e7e90d1f8e8ad}{\index{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}!config\-\_\-@{config\-\_\-}}
+\index{config\-\_\-@{config\-\_\-}!msf_position_sensor::PositionSensorManager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}}
+\subsubsection[{config\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Config\-\_\-\-T} msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager\-::config\-\_\-\hspace{0.3cm}{\ttfamily [private]}}}\label{classmsf__position__sensor_1_1PositionSensorManager_ab750ec8335fa617ce51e7e90d1f8e8ad}
+\hypertarget{classmsf__position__sensor_1_1PositionSensorManager_a30614404706e5332a0b7d43b7329fa40}{\index{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}!imu\-\_\-handler\-\_\-@{imu\-\_\-handler\-\_\-}}
+\index{imu\-\_\-handler\-\_\-@{imu\-\_\-handler\-\_\-}!msf_position_sensor::PositionSensorManager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}}
+\subsubsection[{imu\-\_\-handler\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}shared\-\_\-ptr$<${\bf msf\-\_\-core\-::\-I\-M\-U\-Handler\-\_\-\-R\-O\-S}$<${\bf msf\-\_\-updates\-::\-E\-K\-F\-State}$>$ $>$ msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager\-::imu\-\_\-handler\-\_\-\hspace{0.3cm}{\ttfamily [private]}}}\label{classmsf__position__sensor_1_1PositionSensorManager_a30614404706e5332a0b7d43b7329fa40}
+\hypertarget{classmsf__position__sensor_1_1PositionSensorManager_a7611c68c92ee71eef980ae0195894900}{\index{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}!position\-\_\-handler\-\_\-@{position\-\_\-handler\-\_\-}}
+\index{position\-\_\-handler\-\_\-@{position\-\_\-handler\-\_\-}!msf_position_sensor::PositionSensorManager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}}
+\subsubsection[{position\-\_\-handler\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}shared\-\_\-ptr$<${\bf Position\-Sensor\-Handler\-\_\-\-T}$>$ msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager\-::position\-\_\-handler\-\_\-\hspace{0.3cm}{\ttfamily [private]}}}\label{classmsf__position__sensor_1_1PositionSensorManager_a7611c68c92ee71eef980ae0195894900}
+\hypertarget{classmsf__position__sensor_1_1PositionSensorManager_a722e3be8a48e1ac92050679569442a12}{\index{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}!reconf\-\_\-server\-\_\-@{reconf\-\_\-server\-\_\-}}
+\index{reconf\-\_\-server\-\_\-@{reconf\-\_\-server\-\_\-}!msf_position_sensor::PositionSensorManager@{msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager}}
+\subsubsection[{reconf\-\_\-server\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Reconfigure\-Server\-Ptr} msf\-\_\-position\-\_\-sensor\-::\-Position\-Sensor\-Manager\-::reconf\-\_\-server\-\_\-\hspace{0.3cm}{\ttfamily [private]}}}\label{classmsf__position__sensor_1_1PositionSensorManager_a722e3be8a48e1ac92050679569442a12}
+
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+msf\-\_\-updates/src/position\-\_\-msf/\hyperlink{position__sensormanager_8h}{position\-\_\-sensormanager.\-h}\end{DoxyCompactItemize}

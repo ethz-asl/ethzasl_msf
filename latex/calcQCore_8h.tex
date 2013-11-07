@@ -1,0 +1,28 @@
+\hypertarget{calcQCore_8h}{\section{msf\-\_\-core/include/msf\-\_\-core/implementation/calc\-Q\-Core.h File Reference}
+\label{calcQCore_8h}\index{msf\-\_\-core/include/msf\-\_\-core/implementation/calc\-Q\-Core.\-h@{msf\-\_\-core/include/msf\-\_\-core/implementation/calc\-Q\-Core.\-h}}
+}
+{\ttfamily \#include $<$Eigen/\-Eigen$>$}\\*
+{\ttfamily \#include $<$msf\-\_\-core/msf\-\_\-core.\-h$>$}\\*
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$typename State\-Sequence\-\_\-\-T , typename State\-Definition\-\_\-\-T , class Derived , class Derived\-Q $>$ }\\void \hyperlink{calcQCore_8h_a983661755d022c64a02d122894d1c4ce}{calc\-\_\-\-Q\-Core} (const double dt, const Eigen\-::\-Quaternion$<$ double $>$ \&q, const Eigen\-::\-Matrix\-Base$<$ Derived $>$ \&ew, const Eigen\-::\-Matrix\-Base$<$ Derived $>$ \&ea, const Eigen\-::\-Matrix\-Base$<$ Derived $>$ \&n\-\_\-a, const Eigen\-::\-Matrix\-Base$<$ Derived $>$ \&n\-\_\-ba, const Eigen\-::\-Matrix\-Base$<$ Derived $>$ \&n\-\_\-w, const Eigen\-::\-Matrix\-Base$<$ Derived $>$ \&n\-\_\-bw, Eigen\-::\-Matrix\-Base$<$ Derived\-Q $>$ \&Qd)
+\begin{DoxyCompactList}\small\item\em Calculate the observation covariance matrix for the core states. The user has the possibility to set the blocks of Q for user defined states. The E\-K\-F core calls the respective user defined function. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{calcQCore_8h_a983661755d022c64a02d122894d1c4ce}{\index{calc\-Q\-Core.\-h@{calc\-Q\-Core.\-h}!calc\-\_\-\-Q\-Core@{calc\-\_\-\-Q\-Core}}
+\index{calc\-\_\-\-Q\-Core@{calc\-\_\-\-Q\-Core}!calcQCore.h@{calc\-Q\-Core.\-h}}
+\subsubsection[{calc\-\_\-\-Q\-Core}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename State\-Sequence\-\_\-\-T , typename State\-Definition\-\_\-\-T , class Derived , class Derived\-Q $>$ void calc\-\_\-\-Q\-Core (
+\begin{DoxyParamCaption}
+\item[{const double}]{dt, }
+\item[{const Eigen\-::\-Quaternion$<$ double $>$ \&}]{q, }
+\item[{const Eigen\-::\-Matrix\-Base$<$ Derived $>$ \&}]{ew, }
+\item[{const Eigen\-::\-Matrix\-Base$<$ Derived $>$ \&}]{ea, }
+\item[{const Eigen\-::\-Matrix\-Base$<$ Derived $>$ \&}]{n\-\_\-a, }
+\item[{const Eigen\-::\-Matrix\-Base$<$ Derived $>$ \&}]{n\-\_\-ba, }
+\item[{const Eigen\-::\-Matrix\-Base$<$ Derived $>$ \&}]{n\-\_\-w, }
+\item[{const Eigen\-::\-Matrix\-Base$<$ Derived $>$ \&}]{n\-\_\-bw, }
+\item[{Eigen\-::\-Matrix\-Base$<$ Derived\-Q $>$ \&}]{Qd}
+\end{DoxyParamCaption}
+)}}\label{calcQCore_8h_a983661755d022c64a02d122894d1c4ce}

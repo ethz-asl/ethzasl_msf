@@ -1,29 +1,95 @@
 \hypertarget{classmsf__core_1_1GPSConversion}{\section{msf\-\_\-core\-:\-:G\-P\-S\-Conversion Class Reference}
 \label{classmsf__core_1_1GPSConversion}\index{msf\-\_\-core\-::\-G\-P\-S\-Conversion@{msf\-\_\-core\-::\-G\-P\-S\-Conversion}}
 }
+
+
+{\ttfamily \#include $<$gps\-\_\-conversion.\-h$>$}
+
 \subsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{classmsf__core_1_1GPSConversion_a5d4b6af72d1dbbf6f948ca39b020e6cd}{void {\bfseries init\-Reference} (const double \&latitude, const double \&longitude, const double \&altitude)}\label{classmsf__core_1_1GPSConversion_a5d4b6af72d1dbbf6f948ca39b020e6cd}
-
+\hyperlink{classmsf__core_1_1GPSConversion_ac849380a60706295bd7c33396ae7a239}{G\-P\-S\-Conversion} ()
 \item 
-\hypertarget{classmsf__core_1_1GPSConversion_aeecd648087a584921a2372156b948b54}{msf\-\_\-core\-::\-Vector3 {\bfseries wgs84\-To\-Ecef} (const double \&latitude, const double \&longitude, const double \&altitude) const }\label{classmsf__core_1_1GPSConversion_aeecd648087a584921a2372156b948b54}
-
+void \hyperlink{classmsf__core_1_1GPSConversion_a5d4b6af72d1dbbf6f948ca39b020e6cd}{init\-Reference} (const double \&latitude, const double \&longitude, const double \&altitude)
 \item 
-\hypertarget{classmsf__core_1_1GPSConversion_aa4a4410a1b149d99b41a6865034ba1d7}{msf\-\_\-core\-::\-Vector3 {\bfseries ecef\-To\-Enu} (const msf\-\_\-core\-::\-Vector3 \&ecef) const }\label{classmsf__core_1_1GPSConversion_aa4a4410a1b149d99b41a6865034ba1d7}
-
+msf\-\_\-core\-::\-Vector3 \hyperlink{classmsf__core_1_1GPSConversion_aeecd648087a584921a2372156b948b54}{wgs84\-To\-Ecef} (const double \&latitude, const double \&longitude, const double \&altitude) const 
 \item 
-\hypertarget{classmsf__core_1_1GPSConversion_ae1c380b419236d93c266c89db9ba5a43}{void {\bfseries adjust\-Reference} (double z\-\_\-corr)}\label{classmsf__core_1_1GPSConversion_ae1c380b419236d93c266c89db9ba5a43}
-
+msf\-\_\-core\-::\-Vector3 \hyperlink{classmsf__core_1_1GPSConversion_aa4a4410a1b149d99b41a6865034ba1d7}{ecef\-To\-Enu} (const msf\-\_\-core\-::\-Vector3 \&ecef) const 
+\item 
+void \hyperlink{classmsf__core_1_1GPSConversion_ae1c380b419236d93c266c89db9ba5a43}{adjust\-Reference} (double z\-\_\-corr)
 \end{DoxyCompactItemize}
 \subsection*{Public Attributes}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{classmsf__core_1_1GPSConversion_a5e8ca97d7f7c277ffba2dee4ebbc5092}{{\bfseries E\-I\-G\-E\-N\-\_\-\-M\-A\-K\-E\-\_\-\-A\-L\-I\-G\-N\-E\-D\-\_\-\-O\-P\-E\-R\-A\-T\-O\-R\-\_\-\-N\-E\-W}}\label{classmsf__core_1_1GPSConversion_a5e8ca97d7f7c277ffba2dee4ebbc5092}
-
+\hyperlink{classmsf__core_1_1GPSConversion_a5e8ca97d7f7c277ffba2dee4ebbc5092}{E\-I\-G\-E\-N\-\_\-\-M\-A\-K\-E\-\_\-\-A\-L\-I\-G\-N\-E\-D\-\_\-\-O\-P\-E\-R\-A\-T\-O\-R\-\_\-\-N\-E\-W}
+\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{namespacemsf__core_a044c525dd7800e2e2f4bb86fc565a7c7}{msf\-\_\-core\-::\-Quaternion} \hyperlink{classmsf__core_1_1GPSConversion_a0e9c31df90370cecca9b220472883c0f}{ecef\-\_\-ref\-\_\-orientation\-\_\-}
+\item 
+msf\-\_\-core\-::\-Vector3 \hyperlink{classmsf__core_1_1GPSConversion_a618282a287b69c4704ac6191185c6ef2}{ecef\-\_\-ref\-\_\-point\-\_\-}
 \end{DoxyCompactItemize}
 
 
-The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classmsf__core_1_1GPSConversion_ac849380a60706295bd7c33396ae7a239}{\index{msf\-\_\-core\-::\-G\-P\-S\-Conversion@{msf\-\_\-core\-::\-G\-P\-S\-Conversion}!G\-P\-S\-Conversion@{G\-P\-S\-Conversion}}
+\index{G\-P\-S\-Conversion@{G\-P\-S\-Conversion}!msf_core::GPSConversion@{msf\-\_\-core\-::\-G\-P\-S\-Conversion}}
+\subsubsection[{G\-P\-S\-Conversion}]{\setlength{\rightskip}{0pt plus 5cm}msf\-\_\-core\-::\-G\-P\-S\-Conversion\-::\-G\-P\-S\-Conversion (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classmsf__core_1_1GPSConversion_ac849380a60706295bd7c33396ae7a239}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classmsf__core_1_1GPSConversion_ae1c380b419236d93c266c89db9ba5a43}{\index{msf\-\_\-core\-::\-G\-P\-S\-Conversion@{msf\-\_\-core\-::\-G\-P\-S\-Conversion}!adjust\-Reference@{adjust\-Reference}}
+\index{adjust\-Reference@{adjust\-Reference}!msf_core::GPSConversion@{msf\-\_\-core\-::\-G\-P\-S\-Conversion}}
+\subsubsection[{adjust\-Reference}]{\setlength{\rightskip}{0pt plus 5cm}void msf\-\_\-core\-::\-G\-P\-S\-Conversion\-::adjust\-Reference (
+\begin{DoxyParamCaption}
+\item[{double}]{z\-\_\-corr}
+\end{DoxyParamCaption}
+)}}\label{classmsf__core_1_1GPSConversion_ae1c380b419236d93c266c89db9ba5a43}
+\hypertarget{classmsf__core_1_1GPSConversion_aa4a4410a1b149d99b41a6865034ba1d7}{\index{msf\-\_\-core\-::\-G\-P\-S\-Conversion@{msf\-\_\-core\-::\-G\-P\-S\-Conversion}!ecef\-To\-Enu@{ecef\-To\-Enu}}
+\index{ecef\-To\-Enu@{ecef\-To\-Enu}!msf_core::GPSConversion@{msf\-\_\-core\-::\-G\-P\-S\-Conversion}}
+\subsubsection[{ecef\-To\-Enu}]{\setlength{\rightskip}{0pt plus 5cm}msf\-\_\-core\-::\-Vector3 msf\-\_\-core\-::\-G\-P\-S\-Conversion\-::ecef\-To\-Enu (
+\begin{DoxyParamCaption}
+\item[{const msf\-\_\-core\-::\-Vector3 \&}]{ecef}
+\end{DoxyParamCaption}
+) const}}\label{classmsf__core_1_1GPSConversion_aa4a4410a1b149d99b41a6865034ba1d7}
+\hypertarget{classmsf__core_1_1GPSConversion_a5d4b6af72d1dbbf6f948ca39b020e6cd}{\index{msf\-\_\-core\-::\-G\-P\-S\-Conversion@{msf\-\_\-core\-::\-G\-P\-S\-Conversion}!init\-Reference@{init\-Reference}}
+\index{init\-Reference@{init\-Reference}!msf_core::GPSConversion@{msf\-\_\-core\-::\-G\-P\-S\-Conversion}}
+\subsubsection[{init\-Reference}]{\setlength{\rightskip}{0pt plus 5cm}void msf\-\_\-core\-::\-G\-P\-S\-Conversion\-::init\-Reference (
+\begin{DoxyParamCaption}
+\item[{const double \&}]{latitude, }
+\item[{const double \&}]{longitude, }
+\item[{const double \&}]{altitude}
+\end{DoxyParamCaption}
+)}}\label{classmsf__core_1_1GPSConversion_a5d4b6af72d1dbbf6f948ca39b020e6cd}
+\hypertarget{classmsf__core_1_1GPSConversion_aeecd648087a584921a2372156b948b54}{\index{msf\-\_\-core\-::\-G\-P\-S\-Conversion@{msf\-\_\-core\-::\-G\-P\-S\-Conversion}!wgs84\-To\-Ecef@{wgs84\-To\-Ecef}}
+\index{wgs84\-To\-Ecef@{wgs84\-To\-Ecef}!msf_core::GPSConversion@{msf\-\_\-core\-::\-G\-P\-S\-Conversion}}
+\subsubsection[{wgs84\-To\-Ecef}]{\setlength{\rightskip}{0pt plus 5cm}msf\-\_\-core\-::\-Vector3 msf\-\_\-core\-::\-G\-P\-S\-Conversion\-::wgs84\-To\-Ecef (
+\begin{DoxyParamCaption}
+\item[{const double \&}]{latitude, }
+\item[{const double \&}]{longitude, }
+\item[{const double \&}]{altitude}
+\end{DoxyParamCaption}
+) const}}\label{classmsf__core_1_1GPSConversion_aeecd648087a584921a2372156b948b54}
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classmsf__core_1_1GPSConversion_a0e9c31df90370cecca9b220472883c0f}{\index{msf\-\_\-core\-::\-G\-P\-S\-Conversion@{msf\-\_\-core\-::\-G\-P\-S\-Conversion}!ecef\-\_\-ref\-\_\-orientation\-\_\-@{ecef\-\_\-ref\-\_\-orientation\-\_\-}}
+\index{ecef\-\_\-ref\-\_\-orientation\-\_\-@{ecef\-\_\-ref\-\_\-orientation\-\_\-}!msf_core::GPSConversion@{msf\-\_\-core\-::\-G\-P\-S\-Conversion}}
+\subsubsection[{ecef\-\_\-ref\-\_\-orientation\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}{\bf msf\-\_\-core\-::\-Quaternion} msf\-\_\-core\-::\-G\-P\-S\-Conversion\-::ecef\-\_\-ref\-\_\-orientation\-\_\-\hspace{0.3cm}{\ttfamily [private]}}}\label{classmsf__core_1_1GPSConversion_a0e9c31df90370cecca9b220472883c0f}
+\hypertarget{classmsf__core_1_1GPSConversion_a618282a287b69c4704ac6191185c6ef2}{\index{msf\-\_\-core\-::\-G\-P\-S\-Conversion@{msf\-\_\-core\-::\-G\-P\-S\-Conversion}!ecef\-\_\-ref\-\_\-point\-\_\-@{ecef\-\_\-ref\-\_\-point\-\_\-}}
+\index{ecef\-\_\-ref\-\_\-point\-\_\-@{ecef\-\_\-ref\-\_\-point\-\_\-}!msf_core::GPSConversion@{msf\-\_\-core\-::\-G\-P\-S\-Conversion}}
+\subsubsection[{ecef\-\_\-ref\-\_\-point\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}msf\-\_\-core\-::\-Vector3 msf\-\_\-core\-::\-G\-P\-S\-Conversion\-::ecef\-\_\-ref\-\_\-point\-\_\-\hspace{0.3cm}{\ttfamily [private]}}}\label{classmsf__core_1_1GPSConversion_a618282a287b69c4704ac6191185c6ef2}
+\hypertarget{classmsf__core_1_1GPSConversion_a5e8ca97d7f7c277ffba2dee4ebbc5092}{\index{msf\-\_\-core\-::\-G\-P\-S\-Conversion@{msf\-\_\-core\-::\-G\-P\-S\-Conversion}!E\-I\-G\-E\-N\-\_\-\-M\-A\-K\-E\-\_\-\-A\-L\-I\-G\-N\-E\-D\-\_\-\-O\-P\-E\-R\-A\-T\-O\-R\-\_\-\-N\-E\-W@{E\-I\-G\-E\-N\-\_\-\-M\-A\-K\-E\-\_\-\-A\-L\-I\-G\-N\-E\-D\-\_\-\-O\-P\-E\-R\-A\-T\-O\-R\-\_\-\-N\-E\-W}}
+\index{E\-I\-G\-E\-N\-\_\-\-M\-A\-K\-E\-\_\-\-A\-L\-I\-G\-N\-E\-D\-\_\-\-O\-P\-E\-R\-A\-T\-O\-R\-\_\-\-N\-E\-W@{E\-I\-G\-E\-N\-\_\-\-M\-A\-K\-E\-\_\-\-A\-L\-I\-G\-N\-E\-D\-\_\-\-O\-P\-E\-R\-A\-T\-O\-R\-\_\-\-N\-E\-W}!msf_core::GPSConversion@{msf\-\_\-core\-::\-G\-P\-S\-Conversion}}
+\subsubsection[{E\-I\-G\-E\-N\-\_\-\-M\-A\-K\-E\-\_\-\-A\-L\-I\-G\-N\-E\-D\-\_\-\-O\-P\-E\-R\-A\-T\-O\-R\-\_\-\-N\-E\-W}]{\setlength{\rightskip}{0pt plus 5cm}msf\-\_\-core\-::\-G\-P\-S\-Conversion\-::\-E\-I\-G\-E\-N\-\_\-\-M\-A\-K\-E\-\_\-\-A\-L\-I\-G\-N\-E\-D\-\_\-\-O\-P\-E\-R\-A\-T\-O\-R\-\_\-\-N\-E\-W}}\label{classmsf__core_1_1GPSConversion_a5e8ca97d7f7c277ffba2dee4ebbc5092}
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
 \item 
-msf\-\_\-core/include/msf\-\_\-core/gps\-\_\-conversion.\-h\end{DoxyCompactItemize}
+msf\-\_\-core/include/msf\-\_\-core/\hyperlink{gps__conversion_8h}{gps\-\_\-conversion.\-h}\item 
+msf\-\_\-core/src/lib/\hyperlink{gps__conversion_8cc}{gps\-\_\-conversion.\-cc}\end{DoxyCompactItemize}

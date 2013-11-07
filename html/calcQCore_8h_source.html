@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>msf - modular sensor fusion: msf_core/include/msf_core/implementation/calcQCore.h Source File</title>
+<title>ethzasl-msf - Modular Sensor Fusion: msf_core/include/msf_core/implementation/calcQCore.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">msf - modular sensor fusion
+   <div id="projectname">ethzasl-msf - Modular Sensor Fusion
    </div>
    <div id="projectbrief">Time delay compensated single and multi sensor fusion framework based on an EKF</div>
   </td>
@@ -61,6 +61,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="files.html"><span>File&#160;List</span></a></li>
+      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
     </ul>
   </div>
 <!-- window showing the filter options -->
@@ -68,7 +69,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -87,7 +88,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">calcQCore.h</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
+<a href="calcQCore_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * Copyright (C) 2011-2012 Stephan Weiss, ASL, ETH Zurich, Switzerland</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> * You can contact the author at &lt;stephan dot weiss at ieee dot org&gt;</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> *</span></div>
@@ -107,11 +108,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define CALCQ_H_</span></div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &lt;Eigen/Eigen&gt;</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &lt;msf_core/msf_core.h&gt;</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="msf__core_8h.html">msf_core/msf_core.h</a>&gt;</span></div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> StateSequence_T, <span class="keyword">typename</span> StateDefinition_T, <span class="keyword">class </span>Derived,</div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keyword">class </span>DerivedQ&gt;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keywordtype">void</span> calc_QCore(<span class="keyword">const</span> <span class="keywordtype">double</span> dt, <span class="keyword">const</span> Eigen::Quaternion&lt;double&gt; &amp; q,</div>
+<div class="line"><a name="l00030"></a><span class="lineno"><a class="code" href="calcQCore_8h.html#a983661755d022c64a02d122894d1c4ce">   30</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="calcQCore_8h.html#a983661755d022c64a02d122894d1c4ce" title="Calculate the observation covariance matrix for the core states. The user has the possibility to set ...">calc_QCore</a>(<span class="keyword">const</span> <span class="keywordtype">double</span> dt, <span class="keyword">const</span> Eigen::Quaternion&lt;double&gt; &amp; <a class="code" href="namespacegeometry__msgs_1_1cov.html#a39ced537b52c13c965a0ccdfe23f4dd1a45bc9ae177afeb4ed8e0a975dc10b8e8">q</a>,</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;                <span class="keyword">const</span> Eigen::MatrixBase&lt;Derived&gt; &amp; ew,</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;                <span class="keyword">const</span> Eigen::MatrixBase&lt;Derived&gt; &amp; ea,</div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;                <span class="keyword">const</span> Eigen::MatrixBase&lt;Derived&gt; &amp; n_a,</div>
@@ -464,15 +465,15 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;</div>
 <div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;  <span class="keyword">enum</span> {</div>
 <div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;    idxstartcorr_p = <a class="code" href="structmsf__tmp_1_1getStartIndexInCorrection.html" title="Compute start indices in the correction vector of a given type.">msf_tmp::getStartIndexInCorrection</a>&lt;StateSequence_T,</div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;        StateDefinition_T::p&gt;::value,</div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;        <a class="code" href="namespacegeometry__msgs_1_1cov.html#a39ced537b52c13c965a0ccdfe23f4dd1a564e84fef1216ef14d3dbf7ed94cb357">StateDefinition_T::p</a>&gt;::value,</div>
 <div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;    idxstartcorr_v = <a class="code" href="structmsf__tmp_1_1getStartIndexInCorrection.html" title="Compute start indices in the correction vector of a given type.">msf_tmp::getStartIndexInCorrection</a>&lt;StateSequence_T,</div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;        StateDefinition_T::v&gt;::value,</div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;        <a class="code" href="namespacemsf__updates.html#a2812be4bf8c439845faf79dd4860835aafabe93e027092b8207af346d3d0c7a2a">StateDefinition_T::v</a>&gt;::value,</div>
 <div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;    idxstartcorr_q = <a class="code" href="structmsf__tmp_1_1getStartIndexInCorrection.html" title="Compute start indices in the correction vector of a given type.">msf_tmp::getStartIndexInCorrection</a>&lt;StateSequence_T,</div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;        StateDefinition_T::q&gt;::value,</div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;        <a class="code" href="namespacegeometry__msgs_1_1cov.html#a39ced537b52c13c965a0ccdfe23f4dd1a45bc9ae177afeb4ed8e0a975dc10b8e8">StateDefinition_T::q</a>&gt;::value,</div>
 <div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;    idxstartcorr_b_w = <a class="code" href="structmsf__tmp_1_1getStartIndexInCorrection.html" title="Compute start indices in the correction vector of a given type.">msf_tmp::getStartIndexInCorrection</a>&lt;StateSequence_T,</div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;        StateDefinition_T::b_w&gt;::value,</div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;        <a class="code" href="namespacemsf__updates.html#a2812be4bf8c439845faf79dd4860835aabbf62a274b16a30c8b67ae21e33e3401">StateDefinition_T::b_w</a>&gt;::value,</div>
 <div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;    idxstartcorr_b_a = <a class="code" href="structmsf__tmp_1_1getStartIndexInCorrection.html" title="Compute start indices in the correction vector of a given type.">msf_tmp::getStartIndexInCorrection</a>&lt;StateSequence_T,</div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;        StateDefinition_T::b_a&gt;::value</div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;        <a class="code" href="namespacemsf__updates.html#a2812be4bf8c439845faf79dd4860835aa8bcbd2489f13e68689957a66c107816b">StateDefinition_T::b_a</a>&gt;::value</div>
 <div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;  };</div>
 <div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;</div>
 <div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;  Qd(idxstartcorr_p + 0, idxstartcorr_p + 0) = dt * t343 * t347 * t361</div>
@@ -809,7 +810,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Nov 6 2013 21:53:35 for msf - modular sensor fusion by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 6 2013 22:06:47 for ethzasl-msf - Modular Sensor Fusion by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

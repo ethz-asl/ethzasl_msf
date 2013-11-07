@@ -1,6 +1,10 @@
 \hypertarget{classmsf__core_1_1IMUHandler}{\section{msf\-\_\-core\-:\-:I\-M\-U\-Handler$<$ E\-K\-F\-State\-\_\-\-T $>$ Class Template Reference}
 \label{classmsf__core_1_1IMUHandler}\index{msf\-\_\-core\-::\-I\-M\-U\-Handler$<$ E\-K\-F\-State\-\_\-\-T $>$@{msf\-\_\-core\-::\-I\-M\-U\-Handler$<$ E\-K\-F\-State\-\_\-\-T $>$}}
 }
+
+
+{\ttfamily \#include $<$msf\-\_\-\-I\-M\-U\-Handler.\-h$>$}
+
 Inheritance diagram for msf\-\_\-core\-:\-:I\-M\-U\-Handler$<$ E\-K\-F\-State\-\_\-\-T $>$\-:\begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -10,28 +14,88 @@ Inheritance diagram for msf\-\_\-core\-:\-:I\-M\-U\-Handler$<$ E\-K\-F\-State\-\
 \subsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{classmsf__core_1_1IMUHandler_a41084ec0130edd4c1b2934defbd19fb4}{{\bfseries I\-M\-U\-Handler} (\hyperlink{classmsf__core_1_1MSF__SensorManager}{M\-S\-F\-\_\-\-Sensor\-Manager}$<$ E\-K\-F\-State\-\_\-\-T $>$ \&mng, const std\-::string \&topic\-\_\-namespace, const std\-::string \&parameternamespace)}\label{classmsf__core_1_1IMUHandler_a41084ec0130edd4c1b2934defbd19fb4}
-
+\hyperlink{classmsf__core_1_1IMUHandler_a41084ec0130edd4c1b2934defbd19fb4}{I\-M\-U\-Handler} (\hyperlink{classmsf__core_1_1MSF__SensorManager}{M\-S\-F\-\_\-\-Sensor\-Manager}$<$ E\-K\-F\-State\-\_\-\-T $>$ \&mng, const std\-::string \&topic\-\_\-namespace, const std\-::string \&parameternamespace)
 \item 
-\hypertarget{classmsf__core_1_1IMUHandler_aa343ee8a9375a7c3ecf9a980cf0bc82d}{virtual bool {\bfseries initialize} ()=0}\label{classmsf__core_1_1IMUHandler_aa343ee8a9375a7c3ecf9a980cf0bc82d}
-
+virtual \hyperlink{classmsf__core_1_1IMUHandler_a35cd9d86a2178b9ad85f00ebd598baa8}{$\sim$\-I\-M\-U\-Handler} ()
 \item 
-\hypertarget{classmsf__core_1_1IMUHandler_a6b977a9a49ea5d91c5c61cb063169535}{void {\bfseries process\-\_\-imu} (const msf\-\_\-core\-::\-Vector3 \&linear\-\_\-acceleration, const msf\-\_\-core\-::\-Vector3 \&angular\-\_\-velocity, const double \&msg\-\_\-stamp, size\-\_\-t msg\-\_\-seq)}\label{classmsf__core_1_1IMUHandler_a6b977a9a49ea5d91c5c61cb063169535}
-
+virtual bool \hyperlink{classmsf__core_1_1IMUHandler_aa343ee8a9375a7c3ecf9a980cf0bc82d}{initialize} ()=0
 \item 
-\hypertarget{classmsf__core_1_1IMUHandler_a46cd980264fb5369147c575a31f1dcb2}{void {\bfseries process\-\_\-state} (const msf\-\_\-core\-::\-Vector3 \&linear\-\_\-acceleration, const msf\-\_\-core\-::\-Vector3 \&angular\-\_\-velocity, const msf\-\_\-core\-::\-Vector3 \&p, const msf\-\_\-core\-::\-Vector3 \&v, const msf\-\_\-core\-::\-Quaternion \&q, bool is\-\_\-already\-\_\-propagated, const double \&msg\-\_\-stamp, size\-\_\-t msg\-\_\-seq)}\label{classmsf__core_1_1IMUHandler_a46cd980264fb5369147c575a31f1dcb2}
-
+void \hyperlink{classmsf__core_1_1IMUHandler_a6b977a9a49ea5d91c5c61cb063169535}{process\-\_\-imu} (const msf\-\_\-core\-::\-Vector3 \&linear\-\_\-acceleration, const msf\-\_\-core\-::\-Vector3 \&angular\-\_\-velocity, const double \&msg\-\_\-stamp, size\-\_\-t msg\-\_\-seq)
+\item 
+void \hyperlink{classmsf__core_1_1IMUHandler_a46cd980264fb5369147c575a31f1dcb2}{process\-\_\-state} (const msf\-\_\-core\-::\-Vector3 \&linear\-\_\-acceleration, const msf\-\_\-core\-::\-Vector3 \&angular\-\_\-velocity, const msf\-\_\-core\-::\-Vector3 \&p, const msf\-\_\-core\-::\-Vector3 \&v, const \hyperlink{namespacemsf__core_a044c525dd7800e2e2f4bb86fc565a7c7}{msf\-\_\-core\-::\-Quaternion} \&q, bool is\-\_\-already\-\_\-propagated, const double \&msg\-\_\-stamp, size\-\_\-t msg\-\_\-seq)
 \end{DoxyCompactItemize}
 \subsection*{Protected Attributes}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{classmsf__core_1_1IMUHandler_ae109422ae1b1ed7833bde860c71a9491}{shared\-\_\-ptr$<$ \hyperlink{classmsf__core_1_1MSF__Core}{M\-S\-F\-\_\-\-Core}\\*
-$<$ E\-K\-F\-State\-\_\-\-T $>$ $>$ {\bfseries core\-\_\-}}\label{classmsf__core_1_1IMUHandler_ae109422ae1b1ed7833bde860c71a9491}
-
+shared\-\_\-ptr$<$ \hyperlink{classmsf__core_1_1MSF__Core}{M\-S\-F\-\_\-\-Core}\\*
+$<$ E\-K\-F\-State\-\_\-\-T $>$ $>$ \hyperlink{classmsf__core_1_1IMUHandler_ae109422ae1b1ed7833bde860c71a9491}{core\-\_\-}
 \end{DoxyCompactItemize}
 \subsection*{Additional Inherited Members}
 
 
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classmsf__core_1_1IMUHandler_a41084ec0130edd4c1b2934defbd19fb4}{\index{msf\-\_\-core\-::\-I\-M\-U\-Handler@{msf\-\_\-core\-::\-I\-M\-U\-Handler}!I\-M\-U\-Handler@{I\-M\-U\-Handler}}
+\index{I\-M\-U\-Handler@{I\-M\-U\-Handler}!msf_core::IMUHandler@{msf\-\_\-core\-::\-I\-M\-U\-Handler}}
+\subsubsection[{I\-M\-U\-Handler}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T $>$ {\bf msf\-\_\-core\-::\-I\-M\-U\-Handler}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::{\bf I\-M\-U\-Handler} (
+\begin{DoxyParamCaption}
+\item[{{\bf M\-S\-F\-\_\-\-Sensor\-Manager}$<$ E\-K\-F\-State\-\_\-\-T $>$ \&}]{mng, }
+\item[{const std\-::string \&}]{topic\-\_\-namespace, }
+\item[{const std\-::string \&}]{parameternamespace}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classmsf__core_1_1IMUHandler_a41084ec0130edd4c1b2934defbd19fb4}
+\hypertarget{classmsf__core_1_1IMUHandler_a35cd9d86a2178b9ad85f00ebd598baa8}{\index{msf\-\_\-core\-::\-I\-M\-U\-Handler@{msf\-\_\-core\-::\-I\-M\-U\-Handler}!$\sim$\-I\-M\-U\-Handler@{$\sim$\-I\-M\-U\-Handler}}
+\index{$\sim$\-I\-M\-U\-Handler@{$\sim$\-I\-M\-U\-Handler}!msf_core::IMUHandler@{msf\-\_\-core\-::\-I\-M\-U\-Handler}}
+\subsubsection[{$\sim$\-I\-M\-U\-Handler}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T $>$ virtual {\bf msf\-\_\-core\-::\-I\-M\-U\-Handler}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::$\sim${\bf I\-M\-U\-Handler} (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{classmsf__core_1_1IMUHandler_a35cd9d86a2178b9ad85f00ebd598baa8}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classmsf__core_1_1IMUHandler_aa343ee8a9375a7c3ecf9a980cf0bc82d}{\index{msf\-\_\-core\-::\-I\-M\-U\-Handler@{msf\-\_\-core\-::\-I\-M\-U\-Handler}!initialize@{initialize}}
+\index{initialize@{initialize}!msf_core::IMUHandler@{msf\-\_\-core\-::\-I\-M\-U\-Handler}}
+\subsubsection[{initialize}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T $>$ virtual bool {\bf msf\-\_\-core\-::\-I\-M\-U\-Handler}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::initialize (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classmsf__core_1_1IMUHandler_aa343ee8a9375a7c3ecf9a980cf0bc82d}
+
+
+Implemented in \hyperlink{classmsf__core_1_1IMUHandler__ROS_ad620c283be06fad82e81903fc527564a}{msf\-\_\-core\-::\-I\-M\-U\-Handler\-\_\-\-R\-O\-S$<$ E\-K\-F\-State\-\_\-\-T $>$}.
+
+\hypertarget{classmsf__core_1_1IMUHandler_a6b977a9a49ea5d91c5c61cb063169535}{\index{msf\-\_\-core\-::\-I\-M\-U\-Handler@{msf\-\_\-core\-::\-I\-M\-U\-Handler}!process\-\_\-imu@{process\-\_\-imu}}
+\index{process\-\_\-imu@{process\-\_\-imu}!msf_core::IMUHandler@{msf\-\_\-core\-::\-I\-M\-U\-Handler}}
+\subsubsection[{process\-\_\-imu}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T $>$ void {\bf msf\-\_\-core\-::\-I\-M\-U\-Handler}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::process\-\_\-imu (
+\begin{DoxyParamCaption}
+\item[{const msf\-\_\-core\-::\-Vector3 \&}]{linear\-\_\-acceleration, }
+\item[{const msf\-\_\-core\-::\-Vector3 \&}]{angular\-\_\-velocity, }
+\item[{const double \&}]{msg\-\_\-stamp, }
+\item[{size\-\_\-t}]{msg\-\_\-seq}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classmsf__core_1_1IMUHandler_a6b977a9a49ea5d91c5c61cb063169535}
+\hypertarget{classmsf__core_1_1IMUHandler_a46cd980264fb5369147c575a31f1dcb2}{\index{msf\-\_\-core\-::\-I\-M\-U\-Handler@{msf\-\_\-core\-::\-I\-M\-U\-Handler}!process\-\_\-state@{process\-\_\-state}}
+\index{process\-\_\-state@{process\-\_\-state}!msf_core::IMUHandler@{msf\-\_\-core\-::\-I\-M\-U\-Handler}}
+\subsubsection[{process\-\_\-state}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T $>$ void {\bf msf\-\_\-core\-::\-I\-M\-U\-Handler}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::process\-\_\-state (
+\begin{DoxyParamCaption}
+\item[{const msf\-\_\-core\-::\-Vector3 \&}]{linear\-\_\-acceleration, }
+\item[{const msf\-\_\-core\-::\-Vector3 \&}]{angular\-\_\-velocity, }
+\item[{const msf\-\_\-core\-::\-Vector3 \&}]{p, }
+\item[{const msf\-\_\-core\-::\-Vector3 \&}]{v, }
+\item[{const {\bf msf\-\_\-core\-::\-Quaternion} \&}]{q, }
+\item[{bool}]{is\-\_\-already\-\_\-propagated, }
+\item[{const double \&}]{msg\-\_\-stamp, }
+\item[{size\-\_\-t}]{msg\-\_\-seq}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classmsf__core_1_1IMUHandler_a46cd980264fb5369147c575a31f1dcb2}
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classmsf__core_1_1IMUHandler_ae109422ae1b1ed7833bde860c71a9491}{\index{msf\-\_\-core\-::\-I\-M\-U\-Handler@{msf\-\_\-core\-::\-I\-M\-U\-Handler}!core\-\_\-@{core\-\_\-}}
+\index{core\-\_\-@{core\-\_\-}!msf_core::IMUHandler@{msf\-\_\-core\-::\-I\-M\-U\-Handler}}
+\subsubsection[{core\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T $>$ shared\-\_\-ptr$<${\bf M\-S\-F\-\_\-\-Core}$<$E\-K\-F\-State\-\_\-\-T$>$ $>$ {\bf msf\-\_\-core\-::\-I\-M\-U\-Handler}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::core\-\_\-\hspace{0.3cm}{\ttfamily [protected]}}}\label{classmsf__core_1_1IMUHandler_ae109422ae1b1ed7833bde860c71a9491}
+
+
 The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
 \item 
-msf\-\_\-core/include/msf\-\_\-core/msf\-\_\-\-I\-M\-U\-Handler.\-h\end{DoxyCompactItemize}
+msf\-\_\-core/include/msf\-\_\-core/\hyperlink{msf__IMUHandler_8h}{msf\-\_\-\-I\-M\-U\-Handler.\-h}\end{DoxyCompactItemize}

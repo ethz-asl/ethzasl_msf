@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>msf - modular sensor fusion: msf_core::MSF_Measurement&lt; T, RMAT_T, EKFState_T &gt; Class Template Reference</title>
+<title>ethzasl-msf - Modular Sensor Fusion: msf_core::MSF_Measurement&lt; T, RMAT_T, EKFState_T &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">msf - modular sensor fusion
+   <div id="projectname">ethzasl-msf - Modular Sensor Fusion
    </div>
    <div id="projectbrief">Time delay compensated single and multi sensor fusion framework based on an EKF</div>
   </td>
@@ -71,7 +71,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -82,7 +82,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><b>msf_core</b></li><li class="navelem"><a class="el" href="classmsf__core_1_1MSF__Measurement.html">MSF_Measurement</a></li>  </ul>
+<li class="navelem"><a class="el" href="namespacemsf__core.html">msf_core</a></li><li class="navelem"><a class="el" href="classmsf__core_1_1MSF__Measurement.html">MSF_Measurement</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -91,7 +91,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
-<a href="#pro-attribs">Protected Attributes</a>  </div>
+<a href="#pro-attribs">Protected Attributes</a> &#124;
+<a href="#pri-methods">Private Member Functions</a>  </div>
   <div class="headertitle">
 <div class="title">msf_core::MSF_Measurement&lt; T, RMAT_T, EKFState_T &gt; Class Template Reference</div>  </div>
 </div><!--header-->
@@ -113,44 +114,38 @@ Inheritance diagram for msf_core::MSF_Measurement&lt; T, RMAT_T, EKFState_T &gt;
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:ab102d2c17bef09be28cb1403017992b6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab102d2c17bef09be28cb1403017992b6"></a>
-typedef T&#160;</td><td class="memItemRight" valign="bottom"><b>Measurement_type</b></td></tr>
-<tr class="memitem:afa4f826dadcfd129a50330f078a8dbf8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afa4f826dadcfd129a50330f078a8dbf8"></a>
-typedef boost::shared_ptr&lt; T <br class="typebreak"/>
-const  &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>Measurement_ptr</b></td></tr>
+<tr class="memitem:ab102d2c17bef09be28cb1403017992b6"><td class="memItemLeft" align="right" valign="top">typedef T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Measurement.html#ab102d2c17bef09be28cb1403017992b6">Measurement_type</a></td></tr>
+<tr class="memitem:afa4f826dadcfd129a50330f078a8dbf8"><td class="memItemLeft" align="right" valign="top">typedef boost::shared_ptr&lt; T <br class="typebreak"/>
+const  &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Measurement.html#afa4f826dadcfd129a50330f078a8dbf8">Measurement_ptr</a></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a33143412cbcabec0c16e1c6ad82641d0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a33143412cbcabec0c16e1c6ad82641d0"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>MSF_Measurement</b> (bool isAbsoluteMeasurement, int sensorID)</td></tr>
-<tr class="memitem:a345b17105929ac6c70a0a5d21e281a5c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a345b17105929ac6c70a0a5d21e281a5c"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>makeFromSensorReading</b> (const boost::shared_ptr&lt; T const  &gt; reading, double timestamp)</td></tr>
+<tr class="memitem:a33143412cbcabec0c16e1c6ad82641d0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Measurement.html#a33143412cbcabec0c16e1c6ad82641d0">MSF_Measurement</a> (bool isAbsoluteMeasurement, int sensorID)</td></tr>
+<tr class="memitem:a922f76000be4c759fb5b0cfa294e2593"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Measurement.html#a922f76000be4c759fb5b0cfa294e2593">~MSF_Measurement</a> ()</td></tr>
+<tr class="memitem:a345b17105929ac6c70a0a5d21e281a5c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Measurement.html#a345b17105929ac6c70a0a5d21e281a5c">makeFromSensorReading</a> (const boost::shared_ptr&lt; T const  &gt; reading, double timestamp)</td></tr>
 <tr class="inherit_header pub_methods_classmsf__core_1_1MSF__MeasurementBase"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classmsf__core_1_1MSF__MeasurementBase')"><img src="closed.png" alt="-"/>&nbsp;Public Member Functions inherited from <a class="el" href="classmsf__core_1_1MSF__MeasurementBase.html">msf_core::MSF_MeasurementBase< EKFState_T ></a></td></tr>
-<tr class="memitem:a415d8c321cebf22510cce29f69a3b22f inherit pub_methods_classmsf__core_1_1MSF__MeasurementBase"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a415d8c321cebf22510cce29f69a3b22f"></a>
-EIGEN_MAKE_ALIGNED_OPERATOR_NEW&#160;</td><td class="memItemRight" valign="bottom"><b>MSF_MeasurementBase</b> (bool isabsoluteMeasurement, int sensorID)</td></tr>
-<tr class="memitem:ac1c4001e0c61b7cd2b551c0adeae7109 inherit pub_methods_classmsf__core_1_1MSF__MeasurementBase"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac1c4001e0c61b7cd2b551c0adeae7109"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__MeasurementBase.html#ac1c4001e0c61b7cd2b551c0adeae7109">apply</a> (shared_ptr&lt; EKFState_T &gt; stateWithCovariance, <a class="el" href="classmsf__core_1_1MSF__Core.html">MSF_Core</a>&lt; EKFState_T &gt; &amp;core)=0</td></tr>
-<tr class="memdesc:ac1c4001e0c61b7cd2b551c0adeae7109 inherit pub_methods_classmsf__core_1_1MSF__MeasurementBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The method called by the msf_core to apply the measurement represented by this object. <br/></td></tr>
-<tr class="memitem:a6a711d7ed976c0aed497efc1b8fbe3e7 inherit pub_methods_classmsf__core_1_1MSF__MeasurementBase"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6a711d7ed976c0aed497efc1b8fbe3e7"></a>
-virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><b>type</b> ()=0</td></tr>
+<tr class="memitem:a415d8c321cebf22510cce29f69a3b22f inherit pub_methods_classmsf__core_1_1MSF__MeasurementBase"><td class="memItemLeft" align="right" valign="top">EIGEN_MAKE_ALIGNED_OPERATOR_NEW&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__MeasurementBase.html#a415d8c321cebf22510cce29f69a3b22f">MSF_MeasurementBase</a> (bool isabsoluteMeasurement, int sensorID)</td></tr>
+<tr class="memitem:a259e1cfacc40e58e7c1ed768bcadb54b inherit pub_methods_classmsf__core_1_1MSF__MeasurementBase"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__MeasurementBase.html#a259e1cfacc40e58e7c1ed768bcadb54b">~MSF_MeasurementBase</a> ()</td></tr>
+<tr class="memitem:ac1c4001e0c61b7cd2b551c0adeae7109 inherit pub_methods_classmsf__core_1_1MSF__MeasurementBase"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__MeasurementBase.html#ac1c4001e0c61b7cd2b551c0adeae7109">apply</a> (shared_ptr&lt; EKFState_T &gt; stateWithCovariance, <a class="el" href="classmsf__core_1_1MSF__Core.html">MSF_Core</a>&lt; EKFState_T &gt; &amp;core)=0</td></tr>
+<tr class="memdesc:ac1c4001e0c61b7cd2b551c0adeae7109 inherit pub_methods_classmsf__core_1_1MSF__MeasurementBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The method called by the <a class="el" href="namespacemsf__core.html">msf_core</a> to apply the measurement represented by this object.  <a href="#ac1c4001e0c61b7cd2b551c0adeae7109"></a><br/></td></tr>
+<tr class="memitem:a6a711d7ed976c0aed497efc1b8fbe3e7 inherit pub_methods_classmsf__core_1_1MSF__MeasurementBase"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__MeasurementBase.html#a6a711d7ed976c0aed497efc1b8fbe3e7">type</a> ()=0</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a481fa3230f73f28a8489223311c3033f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a481fa3230f73f28a8489223311c3033f"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>EIGEN_MAKE_ALIGNED_OPERATOR_NEW</b></td></tr>
+<tr class="memitem:a481fa3230f73f28a8489223311c3033f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Measurement.html#a481fa3230f73f28a8489223311c3033f">EIGEN_MAKE_ALIGNED_OPERATOR_NEW</a></td></tr>
 <tr class="inherit_header pub_attribs_classmsf__core_1_1MSF__MeasurementBase"><td colspan="2" onclick="javascript:toggleInherit('pub_attribs_classmsf__core_1_1MSF__MeasurementBase')"><img src="closed.png" alt="-"/>&nbsp;Public Attributes inherited from <a class="el" href="classmsf__core_1_1MSF__MeasurementBase.html">msf_core::MSF_MeasurementBase< EKFState_T ></a></td></tr>
-<tr class="memitem:afad7c30029f47cea027415c04301dc48 inherit pub_attribs_classmsf__core_1_1MSF__MeasurementBase"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afad7c30029f47cea027415c04301dc48"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>sensorID_</b></td></tr>
-<tr class="memitem:ad1ea7c4d392ecd3d894280283c04757a inherit pub_attribs_classmsf__core_1_1MSF__MeasurementBase"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad1ea7c4d392ecd3d894280283c04757a"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>isabsolute_</b></td></tr>
-<tr class="memitem:a48b55b129f13afbed86db1b0543562db inherit pub_attribs_classmsf__core_1_1MSF__MeasurementBase"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a48b55b129f13afbed86db1b0543562db"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__MeasurementBase.html#a48b55b129f13afbed86db1b0543562db">time</a></td></tr>
-<tr class="memdesc:a48b55b129f13afbed86db1b0543562db inherit pub_attribs_classmsf__core_1_1MSF__MeasurementBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The time_ this measurement was taken. <br/></td></tr>
+<tr class="memitem:afad7c30029f47cea027415c04301dc48 inherit pub_attribs_classmsf__core_1_1MSF__MeasurementBase"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__MeasurementBase.html#afad7c30029f47cea027415c04301dc48">sensorID_</a></td></tr>
+<tr class="memitem:ad1ea7c4d392ecd3d894280283c04757a inherit pub_attribs_classmsf__core_1_1MSF__MeasurementBase"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__MeasurementBase.html#ad1ea7c4d392ecd3d894280283c04757a">isabsolute_</a></td></tr>
+<tr class="memitem:a48b55b129f13afbed86db1b0543562db inherit pub_attribs_classmsf__core_1_1MSF__MeasurementBase"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__MeasurementBase.html#a48b55b129f13afbed86db1b0543562db">time</a></td></tr>
+<tr class="memdesc:a48b55b129f13afbed86db1b0543562db inherit pub_attribs_classmsf__core_1_1MSF__MeasurementBase"><td class="mdescLeft">&#160;</td><td class="mdescRight">The time_ this measurement was taken.  <a href="#a48b55b129f13afbed86db1b0543562db"></a><br/></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
-<tr class="memitem:a20fcacb533df8a1e6ae4fad4a3eb06ec"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a20fcacb533df8a1e6ae4fad4a3eb06ec"></a>
-RMAT_T&#160;</td><td class="memItemRight" valign="bottom"><b>R_</b></td></tr>
+<tr class="memitem:a20fcacb533df8a1e6ae4fad4a3eb06ec"><td class="memItemLeft" align="right" valign="top">RMAT_T&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Measurement.html#a20fcacb533df8a1e6ae4fad4a3eb06ec">R_</a></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2><a name="pri-methods"></a>
+Private Member Functions</h2></td></tr>
+<tr class="memitem:a46f5283b196c6a7a34b9aa8ff85c8358"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1MSF__Measurement.html#a46f5283b196c6a7a34b9aa8ff85c8358">makeFromSensorReadingImpl</a> (const boost::shared_ptr&lt; T const  &gt; reading)=0</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
@@ -165,15 +160,205 @@ Additional Inherited Members</h2></td></tr>
 <div class="textblock"><h3>template&lt;typename T, typename RMAT_T, typename EKFState_T&gt;<br/>
 class msf_core::MSF_Measurement&lt; T, RMAT_T, EKFState_T &gt;</h3>
 
-<p>The class for sensor based measurements which we want to apply to a state in the update routine of the EKF. This calls the apply correction method of the EKF core. </p>
 <dl class="section note"><dt>Note</dt><dd>Provides an abstract NVI to create measurements from sensor readings. </dd></dl>
-</div><hr/>The documentation for this class was generated from the following file:<ul>
+</div><h2>Member Typedef Documentation</h2>
+<a class="anchor" id="afa4f826dadcfd129a50330f078a8dbf8"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T , typename RMAT_T , typename EKFState_T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef boost::shared_ptr&lt;T const&gt; <a class="el" href="classmsf__core_1_1MSF__Measurement.html">msf_core::MSF_Measurement</a>&lt; T, RMAT_T, EKFState_T &gt;::<a class="el" href="classmsf__core_1_1MSF__Measurement.html#afa4f826dadcfd129a50330f078a8dbf8">Measurement_ptr</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ab102d2c17bef09be28cb1403017992b6"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T , typename RMAT_T , typename EKFState_T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef T <a class="el" href="classmsf__core_1_1MSF__Measurement.html">msf_core::MSF_Measurement</a>&lt; T, RMAT_T, EKFState_T &gt;::<a class="el" href="classmsf__core_1_1MSF__Measurement.html#ab102d2c17bef09be28cb1403017992b6">Measurement_type</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2>Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="a33143412cbcabec0c16e1c6ad82641d0"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T , typename RMAT_T , typename EKFState_T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classmsf__core_1_1MSF__Measurement.html">msf_core::MSF_Measurement</a>&lt; T, RMAT_T, EKFState_T &gt;::<a class="el" href="classmsf__core_1_1MSF__Measurement.html">MSF_Measurement</a> </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>isAbsoluteMeasurement</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>sensorID</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a922f76000be4c759fb5b0cfa294e2593"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T , typename RMAT_T , typename EKFState_T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="classmsf__core_1_1MSF__Measurement.html">msf_core::MSF_Measurement</a>&lt; T, RMAT_T, EKFState_T &gt;::~<a class="el" href="classmsf__core_1_1MSF__Measurement.html">MSF_Measurement</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2>Member Function Documentation</h2>
+<a class="anchor" id="a345b17105929ac6c70a0a5d21e281a5c"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T , typename RMAT_T , typename EKFState_T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classmsf__core_1_1MSF__Measurement.html">msf_core::MSF_Measurement</a>&lt; T, RMAT_T, EKFState_T &gt;::makeFromSensorReading </td>
+          <td>(</td>
+          <td class="paramtype">const boost::shared_ptr&lt; T const  &gt;&#160;</td>
+          <td class="paramname"><em>reading</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>timestamp</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a46f5283b196c6a7a34b9aa8ff85c8358"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T , typename RMAT_T , typename EKFState_T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void <a class="el" href="classmsf__core_1_1MSF__Measurement.html">msf_core::MSF_Measurement</a>&lt; T, RMAT_T, EKFState_T &gt;::makeFromSensorReadingImpl </td>
+          <td>(</td>
+          <td class="paramtype">const boost::shared_ptr&lt; T const  &gt;&#160;</td>
+          <td class="paramname"><em>reading</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span><span class="mlabel">pure virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2>Member Data Documentation</h2>
+<a class="anchor" id="a481fa3230f73f28a8489223311c3033f"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T , typename RMAT_T , typename EKFState_T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classmsf__core_1_1MSF__Measurement.html">msf_core::MSF_Measurement</a>&lt; T, RMAT_T, EKFState_T &gt;::EIGEN_MAKE_ALIGNED_OPERATOR_NEW</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a20fcacb533df8a1e6ae4fad4a3eb06ec"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T , typename RMAT_T , typename EKFState_T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">RMAT_T <a class="el" href="classmsf__core_1_1MSF__Measurement.html">msf_core::MSF_Measurement</a>&lt; T, RMAT_T, EKFState_T &gt;::R_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following file:<ul>
 <li>msf_core/include/msf_core/<a class="el" href="msf__measurement_8h_source.html">msf_measurement.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Nov 6 2013 21:53:35 for msf - modular sensor fusion by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 6 2013 22:06:48 for ethzasl-msf - Modular Sensor Fusion by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

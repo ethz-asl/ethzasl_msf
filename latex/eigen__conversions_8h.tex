@@ -1,0 +1,23 @@
+\hypertarget{eigen__conversions_8h}{\section{msf\-\_\-core/include/msf\-\_\-core/eigen\-\_\-conversions.h File Reference}
+\label{eigen__conversions_8h}\index{msf\-\_\-core/include/msf\-\_\-core/eigen\-\_\-conversions.\-h@{msf\-\_\-core/include/msf\-\_\-core/eigen\-\_\-conversions.\-h}}
+}
+{\ttfamily \#include $<$Eigen/\-Dense$>$}\\*
+{\ttfamily \#include $<$Eigen/\-Geometry$>$}\\*
+{\ttfamily \#include $<$geometry\-\_\-msgs/\-Quaternion.\-h$>$}\\*
+{\ttfamily \#include $<$geometry\-\_\-msgs/\-Point.\-h$>$}\\*
+\subsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \hyperlink{namespaceeigen__conversions}{eigen\-\_\-conversions}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$class Scalar $>$ }\\void \hyperlink{namespaceeigen__conversions_adbf4e3b639a8f2024e965bd986e86197}{eigen\-\_\-conversions\-::quaternion\-To\-Msg} (const Eigen\-::\-Quaternion$<$ Scalar $>$ \&q\-\_\-in, geometry\-\_\-msgs\-::\-Quaternion \&q\-\_\-out)
+\begin{DoxyCompactList}\small\item\em Copies eigen quaternion to geometry\-\_\-msgs/quaternion. \end{DoxyCompactList}\item 
+{\footnotesize template$<$class Scalar $>$ }\\geometry\-\_\-msgs\-::\-Quaternion \hyperlink{namespaceeigen__conversions_ad0e3d903601fdea34507ed43652796f5}{eigen\-\_\-conversions\-::quaternion\-To\-Msg} (const Eigen\-::\-Quaternion$<$ Scalar $>$ \&q\-\_\-in)
+\begin{DoxyCompactList}\small\item\em Copies eigen quaternion to geometry\-\_\-msgs/quaternion. \end{DoxyCompactList}\item 
+{\footnotesize template$<$class Derived , class Point $>$ }\\void \hyperlink{namespaceeigen__conversions_a2e7baf949ffe127d7d8b67b674e04ee7}{eigen\-\_\-conversions\-::vector3d\-To\-Point} (const Eigen\-::\-Matrix\-Base$<$ Derived $>$ \&vec, Point \&point)
+\begin{DoxyCompactList}\small\item\em Copies an eigen 3d vector to a 3d Point struct. point has to have members x,y,z! \end{DoxyCompactList}\item 
+{\footnotesize template$<$class Derived , class Point $>$ }\\Point \hyperlink{namespaceeigen__conversions_adc9edb3b9e4232c9d973b1b33a280136}{eigen\-\_\-conversions\-::vector3d\-To\-Point} (const Eigen\-::\-Matrix\-Base$<$ Derived $>$ \&vec)
+\begin{DoxyCompactList}\small\item\em Copies an eigen 3d vector to a 3d Point struct. point has to have members x,y,z! \end{DoxyCompactList}\end{DoxyCompactItemize}

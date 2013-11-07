@@ -1,0 +1,38 @@
+\hypertarget{msf__sensormanagerROS_8h}{\section{msf\-\_\-core/include/msf\-\_\-core/msf\-\_\-sensormanager\-R\-O\-S.h File Reference}
+\label{msf__sensormanagerROS_8h}\index{msf\-\_\-core/include/msf\-\_\-core/msf\-\_\-sensormanager\-R\-O\-S.\-h@{msf\-\_\-core/include/msf\-\_\-core/msf\-\_\-sensormanager\-R\-O\-S.\-h}}
+}
+{\ttfamily \#include $<$ros/ros.\-h$>$}\\*
+{\ttfamily \#include $<$dynamic\-\_\-reconfigure/server.\-h$>$}\\*
+{\ttfamily \#include $<$sensor\-\_\-fusion\-\_\-comm/\-Double\-Array\-Stamped.\-h$>$}\\*
+{\ttfamily \#include $<$sensor\-\_\-fusion\-\_\-comm/\-Ext\-State.\-h$>$}\\*
+{\ttfamily \#include $<$sensor\-\_\-fusion\-\_\-comm/\-Ext\-Ekf.\-h$>$}\\*
+{\ttfamily \#include $<$geometry\-\_\-msgs/\-Pose\-With\-Covariance\-Stamped.\-h$>$}\\*
+{\ttfamily \#include $<$sensor\-\_\-msgs/\-Imu.\-h$>$}\\*
+{\ttfamily \#include $<$asctec\-\_\-hl\-\_\-comm/mav\-\_\-imu.\-h$>$}\\*
+{\ttfamily \#include $<$tf/transform\-\_\-broadcaster.\-h$>$}\\*
+{\ttfamily \#include $<$msf\-\_\-core/\-M\-S\-F\-\_\-\-Core\-Config.\-h$>$}\\*
+{\ttfamily \#include $<$msf\-\_\-core/msf\-\_\-sensormanager.\-h$>$}\\*
+{\ttfamily \#include $<$msf\-\_\-core/msf\-\_\-types.\-hpp$>$}\\*
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{structmsf__core_1_1MSF__SensorManagerROS}{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S$<$ E\-K\-F\-State\-\_\-\-T $>$}
+\begin{DoxyCompactList}\small\item\em Abstract class defining user configurable calculations for the \hyperlink{namespacemsf__core}{msf\-\_\-core} with R\-O\-S interfaces. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \hyperlink{namespacemsf__core}{msf\-\_\-core}
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \\*
+dynamic\-\_\-reconfigure\-::\-Server\\*
+$<$ msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Core\-Config $>$ \hyperlink{namespacemsf__core_a1f60c4e359e82d9ad14dd135769ccc1a}{msf\-\_\-core\-::\-Reconfigure\-Server}
+\end{DoxyCompactItemize}
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ \hyperlink{namespacemsf__core_a9aeda07a4bea09a1939516f18f299e16acb10c2fbf0037699227a1378aa886fe4}{msf\-\_\-core\-::\-H\-L\-I\-\_\-\-E\-K\-F\-\_\-\-S\-T\-A\-T\-E\-\_\-\-S\-I\-Z\-E} =  16
+ \}
+\end{DoxyCompactItemize}

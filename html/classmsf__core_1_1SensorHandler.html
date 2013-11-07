@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>msf - modular sensor fusion: msf_core::SensorHandler&lt; EKFState_T &gt; Class Template Reference</title>
+<title>ethzasl-msf - Modular Sensor Fusion: msf_core::SensorHandler&lt; EKFState_T &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">msf - modular sensor fusion
+   <div id="projectname">ethzasl-msf - Modular Sensor Fusion
    </div>
    <div id="projectbrief">Time delay compensated single and multi sensor fusion framework based on an EKF</div>
   </td>
@@ -71,7 +71,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -82,7 +82,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><b>msf_core</b></li><li class="navelem"><a class="el" href="classmsf__core_1_1SensorHandler.html">SensorHandler</a></li>  </ul>
+<li class="navelem"><a class="el" href="namespacemsf__core.html">msf_core</a></li><li class="navelem"><a class="el" href="classmsf__core_1_1SensorHandler.html">SensorHandler</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -92,6 +92,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
+<a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="#friends">Friends</a>  </div>
   <div class="headertitle">
 <div class="title">msf_core::SensorHandler&lt; EKFState_T &gt; Class Template Reference</div>  </div>
@@ -99,7 +100,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="contents">
 
 <p>Handles a sensor driver which provides the sensor readings.  
- <a href="classmsf__core_1_1SensorHandler.html#details">More...</a></p>
+</p>
 
 <p><code>#include &lt;<a class="el" href="msf__sensorhandler_8h_source.html">msf_sensorhandler.h</a>&gt;</code></p>
 <div class="dynheader">
@@ -115,49 +116,319 @@ Inheritance diagram for msf_core::SensorHandler&lt; EKFState_T &gt;:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aba1cd2f28ff92d5005ab7ad006e20023"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aba1cd2f28ff92d5005ab7ad006e20023"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>SensorHandler</b> (<a class="el" href="classmsf__core_1_1MSF__SensorManager.html">MSF_SensorManager</a>&lt; EKFState_T &gt; &amp;mng, const std::string &amp;topic_namespace, const std::string &amp;parameternamespace)</td></tr>
+<tr class="memitem:aba1cd2f28ff92d5005ab7ad006e20023"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1SensorHandler.html#aba1cd2f28ff92d5005ab7ad006e20023">SensorHandler</a> (<a class="el" href="classmsf__core_1_1MSF__SensorManager.html">MSF_SensorManager</a>&lt; EKFState_T &gt; &amp;mng, const std::string &amp;topic_namespace, const std::string &amp;parameternamespace)</td></tr>
+<tr class="memitem:a6f939c564fe67ed9ada1f93ebff2927c"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1SensorHandler.html#a6f939c564fe67ed9ada1f93ebff2927c">~SensorHandler</a> ()</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:ab25601f461c0c7e0e898f8eb200ec2b6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab25601f461c0c7e0e898f8eb200ec2b6"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>EIGEN_MAKE_ALIGNED_OPERATOR_NEW</b></td></tr>
+<tr class="memitem:ab25601f461c0c7e0e898f8eb200ec2b6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1SensorHandler.html#ab25601f461c0c7e0e898f8eb200ec2b6">EIGEN_MAKE_ALIGNED_OPERATOR_NEW</a></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:acf0819310dd6421128da97a216523036"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acf0819310dd6421128da97a216523036"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setSensorID</b> (int ID)</td></tr>
-<tr class="memitem:a96a37204ef5281f0cc195f22c211563e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a96a37204ef5281f0cc195f22c211563e"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>sequenceWatchDog</b> (size_t seq, const std::string &amp;topic)</td></tr>
+<tr class="memitem:acf0819310dd6421128da97a216523036"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1SensorHandler.html#acf0819310dd6421128da97a216523036">setSensorID</a> (int ID)</td></tr>
+<tr class="memitem:a96a37204ef5281f0cc195f22c211563e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1SensorHandler.html#a96a37204ef5281f0cc195f22c211563e">sequenceWatchDog</a> (size_t seq, const std::string &amp;topic)</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
-<tr class="memitem:aa5b9c6d345c1d2d809f7d53a0c212bf4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa5b9c6d345c1d2d809f7d53a0c212bf4"></a>
-<a class="el" href="classmsf__core_1_1MSF__SensorManager.html">MSF_SensorManager</a>&lt; EKFState_T &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>manager_</b></td></tr>
-<tr class="memitem:ab6b02c25292da4a56ff7ebf3edb1b17b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab6b02c25292da4a56ff7ebf3edb1b17b"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>sensorID</b></td></tr>
-<tr class="memitem:a7795149ef5cef567fcc049bbc888c9ed"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7795149ef5cef567fcc049bbc888c9ed"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><b>topic_namespace_</b></td></tr>
-<tr class="memitem:a1be62365d3ce3c6cbfcca2e4e453790f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1be62365d3ce3c6cbfcca2e4e453790f"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><b>parameternamespace_</b></td></tr>
+<tr class="memitem:aa5b9c6d345c1d2d809f7d53a0c212bf4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmsf__core_1_1MSF__SensorManager.html">MSF_SensorManager</a>&lt; EKFState_T &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1SensorHandler.html#aa5b9c6d345c1d2d809f7d53a0c212bf4">manager_</a></td></tr>
+<tr class="memitem:ab6b02c25292da4a56ff7ebf3edb1b17b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1SensorHandler.html#ab6b02c25292da4a56ff7ebf3edb1b17b">sensorID</a></td></tr>
+<tr class="memitem:a7795149ef5cef567fcc049bbc888c9ed"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1SensorHandler.html#a7795149ef5cef567fcc049bbc888c9ed">topic_namespace_</a></td></tr>
+<tr class="memitem:a1be62365d3ce3c6cbfcca2e4e453790f"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1SensorHandler.html#a1be62365d3ce3c6cbfcca2e4e453790f">parameternamespace_</a></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2><a name="pri-attribs"></a>
+Private Attributes</h2></td></tr>
+<tr class="memitem:adb00f558be66d868552f258495b5abb2"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1SensorHandler.html#adb00f558be66d868552f258495b5abb2">lastseq_</a></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="friends"></a>
 Friends</h2></td></tr>
-<tr class="memitem:a8af2d8b87c3570c0ee69b7e0f4ea5077"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8af2d8b87c3570c0ee69b7e0f4ea5077"></a>
-class&#160;</td><td class="memItemRight" valign="bottom"><b>MSF_SensorManager&lt; EKFState_T &gt;</b></td></tr>
+<tr class="memitem:a8af2d8b87c3570c0ee69b7e0f4ea5077"><td class="memItemLeft" align="right" valign="top">class&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1SensorHandler.html#a8af2d8b87c3570c0ee69b7e0f4ea5077">MSF_SensorManager&lt; EKFState_T &gt;</a></td></tr>
 </table>
-<a name="details" id="details"></a><h2>Detailed Description</h2>
-<div class="textblock"><h3>template&lt;typename EKFState_T&gt;<br/>
-class msf_core::SensorHandler&lt; EKFState_T &gt;</h3>
+<h2>Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="aba1cd2f28ff92d5005ab7ad006e20023"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classmsf__core_1_1SensorHandler.html">msf_core::SensorHandler</a>&lt; EKFState_T &gt;::<a class="el" href="classmsf__core_1_1SensorHandler.html">SensorHandler</a> </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classmsf__core_1_1MSF__SensorManager.html">MSF_SensorManager</a>&lt; EKFState_T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>mng</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>topic_namespace</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>parameternamespace</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
 
-<p>Handles a sensor driver which provides the sensor readings. </p>
-</div><hr/>The documentation for this class was generated from the following file:<ul>
+</div>
+</div>
+<a class="anchor" id="a6f939c564fe67ed9ada1f93ebff2927c"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="classmsf__core_1_1SensorHandler.html">msf_core::SensorHandler</a>&lt; EKFState_T &gt;::~<a class="el" href="classmsf__core_1_1SensorHandler.html">SensorHandler</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2>Member Function Documentation</h2>
+<a class="anchor" id="a96a37204ef5281f0cc195f22c211563e"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classmsf__core_1_1SensorHandler.html">msf_core::SensorHandler</a>&lt; EKFState_T &gt;::sequenceWatchDog </td>
+          <td>(</td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>seq</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>topic</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="acf0819310dd6421128da97a216523036"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classmsf__core_1_1SensorHandler.html">msf_core::SensorHandler</a>&lt; EKFState_T &gt;::setSensorID </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ID</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2>Friends And Related Function Documentation</h2>
+<a class="anchor" id="a8af2d8b87c3570c0ee69b7e0f4ea5077"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">friend class <a class="el" href="classmsf__core_1_1MSF__SensorManager.html">MSF_SensorManager</a>&lt; EKFState_T &gt;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2>Member Data Documentation</h2>
+<a class="anchor" id="ab25601f461c0c7e0e898f8eb200ec2b6"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classmsf__core_1_1SensorHandler.html">msf_core::SensorHandler</a>&lt; EKFState_T &gt;::EIGEN_MAKE_ALIGNED_OPERATOR_NEW</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="adb00f558be66d868552f258495b5abb2"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int <a class="el" href="classmsf__core_1_1SensorHandler.html">msf_core::SensorHandler</a>&lt; EKFState_T &gt;::lastseq_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aa5b9c6d345c1d2d809f7d53a0c212bf4"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classmsf__core_1_1MSF__SensorManager.html">MSF_SensorManager</a>&lt;EKFState_T&gt;&amp; <a class="el" href="classmsf__core_1_1SensorHandler.html">msf_core::SensorHandler</a>&lt; EKFState_T &gt;::manager_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a1be62365d3ce3c6cbfcca2e4e453790f"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string <a class="el" href="classmsf__core_1_1SensorHandler.html">msf_core::SensorHandler</a>&lt; EKFState_T &gt;::parameternamespace_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="ab6b02c25292da4a56ff7ebf3edb1b17b"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int <a class="el" href="classmsf__core_1_1SensorHandler.html">msf_core::SensorHandler</a>&lt; EKFState_T &gt;::sensorID</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a7795149ef5cef567fcc049bbc888c9ed"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename EKFState_T &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string <a class="el" href="classmsf__core_1_1SensorHandler.html">msf_core::SensorHandler</a>&lt; EKFState_T &gt;::topic_namespace_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following file:<ul>
 <li>msf_core/include/msf_core/<a class="el" href="msf__sensorhandler_8h_source.html">msf_sensorhandler.h</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Nov 6 2013 21:53:36 for msf - modular sensor fusion by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 6 2013 22:06:48 for ethzasl-msf - Modular Sensor Fusion by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

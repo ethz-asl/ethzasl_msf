@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>msf - modular sensor fusion: msf_core/include/msf_core/similaritytransform.h Source File</title>
+<title>ethzasl-msf - Modular Sensor Fusion: msf_core/include/msf_core/similaritytransform.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">msf - modular sensor fusion
+   <div id="projectname">ethzasl-msf - Modular Sensor Fusion
    </div>
    <div id="projectbrief">Time delay compensated single and multi sensor fusion framework based on an EKF</div>
   </td>
@@ -61,6 +61,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="files.html"><span>File&#160;List</span></a></li>
+      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
     </ul>
   </div>
 <!-- window showing the filter options -->
@@ -68,7 +69,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -87,7 +88,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">similaritytransform.h</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
+<a href="similaritytransform_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * Copyright (c) 2012, Markus Achtelik, ASL, ETH Zurich, Switzerland</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> * You can contact the author at &lt;acmarkus at ethz dot ch&gt;</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> *</span></div>
@@ -113,31 +114,31 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &lt;Eigen/Geometry&gt;</span></div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &lt;limits&gt;</span></div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">#include &lt;msf_core/msf_types.hpp&gt;</span></div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">#include &lt;msf_core/eigen_utils.h&gt;</span></div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="msf__types_8hpp.html">msf_core/msf_types.hpp</a>&gt;</span></div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="eigen__utils_8h.html">msf_core/eigen_utils.h</a>&gt;</span></div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="comment">//  geometry_msgs::PoseWithCovariance.</span></div>
 <div class="line"><a name="l00032"></a><span class="lineno"><a class="code" href="namespacegeometry__msgs.html">   32</a></span>&#160;<span class="keyword">namespace </span>geometry_msgs {</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keyword">namespace </span>cov {</div>
+<div class="line"><a name="l00033"></a><span class="lineno"><a class="code" href="namespacegeometry__msgs_1_1cov.html">   33</a></span>&#160;<span class="keyword">namespace </span>cov {</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="keyword">enum</span> {</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  p = 0,</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  q = 3</div>
+<div class="line"><a name="l00035"></a><span class="lineno"><a class="code" href="namespacegeometry__msgs_1_1cov.html#a39ced537b52c13c965a0ccdfe23f4dd1a564e84fef1216ef14d3dbf7ed94cb357">   35</a></span>&#160;  <a class="code" href="namespacegeometry__msgs_1_1cov.html#a39ced537b52c13c965a0ccdfe23f4dd1a564e84fef1216ef14d3dbf7ed94cb357">p</a> = 0,</div>
+<div class="line"><a name="l00036"></a><span class="lineno"><a class="code" href="namespacegeometry__msgs_1_1cov.html#a39ced537b52c13c965a0ccdfe23f4dd1a45bc9ae177afeb4ed8e0a975dc10b8e8">   36</a></span>&#160;  <a class="code" href="namespacegeometry__msgs_1_1cov.html#a39ced537b52c13c965a0ccdfe23f4dd1a45bc9ae177afeb4ed8e0a975dc10b8e8">q</a> = 3</div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;};</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;}</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;}</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="keyword">namespace </span>msf_core {</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="keyword">inline</span> Vector3 geometry_msgsToEigen(<span class="keyword">const</span> geometry_msgs::Point &amp; p) {</div>
+<div class="line"><a name="l00044"></a><span class="lineno"><a class="code" href="namespacemsf__core.html#a531123cfe2ad9131a453087bc974e6dd">   44</a></span>&#160;<span class="keyword">inline</span> Vector3 <a class="code" href="namespacemsf__core.html#a531123cfe2ad9131a453087bc974e6dd" title="Converts a geometry_msgs::Point to an Eigen Vector3d.">geometry_msgsToEigen</a>(<span class="keyword">const</span> geometry_msgs::Point &amp; <a class="code" href="namespacegeometry__msgs_1_1cov.html#a39ced537b52c13c965a0ccdfe23f4dd1a564e84fef1216ef14d3dbf7ed94cb357">p</a>) {</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <span class="keywordflow">return</span> (Vector3() &lt;&lt; p.x, p.y, p.z).finished();</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;}</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="keyword">inline</span> Eigen::Quaterniond geometry_msgsToEigen(</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keyword">const</span> geometry_msgs::Quaternion &amp; q) {</div>
+<div class="line"><a name="l00049"></a><span class="lineno"><a class="code" href="namespacemsf__core.html#a3430943bc018ba721de751a9fcdb8462">   49</a></span>&#160;<span class="keyword">inline</span> Eigen::Quaterniond <a class="code" href="namespacemsf__core.html#a531123cfe2ad9131a453087bc974e6dd" title="Converts a geometry_msgs::Point to an Eigen Vector3d.">geometry_msgsToEigen</a>(</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keyword">const</span> <a class="code" href="namespacemsf__core.html#a044c525dd7800e2e2f4bb86fc565a7c7">geometry_msgs::Quaternion</a> &amp; <a class="code" href="namespacegeometry__msgs_1_1cov.html#a39ced537b52c13c965a0ccdfe23f4dd1a45bc9ae177afeb4ed8e0a975dc10b8e8">q</a>) {</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  <span class="keywordflow">return</span> Eigen::Quaterniond(q.w, q.x, q.y, q.z);</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;}</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="keyword">inline</span> Matrix3 geometry_msgsCovBlockToEigen(</div>
+<div class="line"><a name="l00065"></a><span class="lineno"><a class="code" href="namespacemsf__core.html#a3b1572f4facb6f46c2b154cb1fd7372c">   65</a></span>&#160;<span class="keyword">inline</span> Matrix3 <a class="code" href="namespacemsf__core.html#a3b1572f4facb6f46c2b154cb1fd7372c" title="Returns a 3x3 covariance block entry from a geometry_msgs::PoseWithCovariance::covariance array...">geometry_msgsCovBlockToEigen</a>(</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <span class="keyword">const</span> geometry_msgs::PoseWithCovariance::_covariance_type &amp; gcov,</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="keywordtype">int</span> start_row, <span class="keywordtype">int</span> start_col) {</div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  Eigen::Map&lt;const Matrix6&gt; cov(gcov.data());</div>
@@ -145,7 +146,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;}</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;</div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> Derived&gt;</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> eigenCovBlockToGeometry_msgs(</div>
+<div class="line"><a name="l00084"></a><span class="lineno"><a class="code" href="namespacemsf__core.html#aa55165dedfc79ffa6f95b337d2e8b1eb">   84</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="namespacemsf__core.html#aa55165dedfc79ffa6f95b337d2e8b1eb" title="Fills a 3x3 covariance block entry of a geometry_msgs::PoseWithCovariance::covariance array from an E...">eigenCovBlockToGeometry_msgs</a>(</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    geometry_msgs::PoseWithCovariance::_covariance_type &amp; gcov,</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    <span class="keyword">const</span> Eigen::MatrixBase&lt;Derived&gt; &amp;ecov, <span class="keywordtype">int</span> start_row, <span class="keywordtype">int</span> start_col) {</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(Derived, 3, 3)</div>
@@ -153,13 +154,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;  _gcov.block&lt;3, 3&gt;(start_row, start_col) = ecov;</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;  <span class="comment">// Off diagonal entries --&gt; we need to copy it to the opposite off-diagonal</span></div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  <span class="comment">// as well.</span></div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  if (start_row != start_col)</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;  <span class="keywordflow">if</span> (start_row != start_col)</div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    _gcov.block&lt;3, 3&gt;(start_col, start_row) = ecov.transpose();</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;}</div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;template&lt;class Derived&gt;</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;inline geometry_msgs::Point eigenToGeometry_msgs(</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    const Eigen::MatrixBase&lt;Derived&gt; &amp; p) {</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> Derived&gt;</div>
+<div class="line"><a name="l00098"></a><span class="lineno"><a class="code" href="namespacemsf__core.html#ae9e9826a3cf9d0a0d29cb0d3b2c2f37c">   98</a></span>&#160;<span class="keyword">inline</span> geometry_msgs::Point <a class="code" href="namespacemsf__core.html#ae9e9826a3cf9d0a0d29cb0d3b2c2f37c" title="Converts any eigen vector with 3 elements to a geometry_msgs::Point.">eigenToGeometry_msgs</a>(</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    <span class="keyword">const</span> Eigen::MatrixBase&lt;Derived&gt; &amp; <a class="code" href="namespacegeometry__msgs_1_1cov.html#a39ced537b52c13c965a0ccdfe23f4dd1a564e84fef1216ef14d3dbf7ed94cb357">p</a>) {</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;  EIGEN_STATIC_ASSERT_VECTOR_ONLY (Derived);</div>
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;  assert(p.size() == 3);</div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;</div>
@@ -170,9 +171,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;  <span class="keywordflow">return</span> _p;</div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;}</div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;<span class="keyword">inline</span> geometry_msgs::Quaternion eigenToGeometry_msgs(</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <span class="keyword">const</span> Eigen::Quaterniond &amp; q) {</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;  geometry_msgs::Quaternion _q;</div>
+<div class="line"><a name="l00111"></a><span class="lineno"><a class="code" href="namespacemsf__core.html#aa2c20e862db8f30eb976ba797bacff2c">  111</a></span>&#160;<span class="keyword">inline</span> <a class="code" href="namespacemsf__core.html#a044c525dd7800e2e2f4bb86fc565a7c7">geometry_msgs::Quaternion</a> <a class="code" href="namespacemsf__core.html#ae9e9826a3cf9d0a0d29cb0d3b2c2f37c" title="Converts any eigen vector with 3 elements to a geometry_msgs::Point.">eigenToGeometry_msgs</a>(</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <span class="keyword">const</span> Eigen::Quaterniond &amp; <a class="code" href="namespacegeometry__msgs_1_1cov.html#a39ced537b52c13c965a0ccdfe23f4dd1a45bc9ae177afeb4ed8e0a975dc10b8e8">q</a>) {</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;  <a class="code" href="namespacemsf__core.html#a044c525dd7800e2e2f4bb86fc565a7c7">geometry_msgs::Quaternion</a> _q;</div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;  _q.w = q.w();</div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  _q.x = q.x();</div>
 <div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  _q.y = q.y();</div>
@@ -182,21 +183,21 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;</div>
 <div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;<span class="keyword">namespace </span>similarity_transform {</div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;<span class="keyword">typedef</span> geometry_msgs::PoseWithCovariance Pose;</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;<span class="keyword">typedef</span> std::pair&lt;Pose, Pose&gt; PosePair;</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;<span class="keyword">typedef</span> std::vector&lt;PosePair&gt; PosePairVector;</div>
+<div class="line"><a name="l00123"></a><span class="lineno"><a class="code" href="namespacemsf__core_1_1similarity__transform.html#a7ecde3e7b02bda457b404fc49b03179f">  123</a></span>&#160;<span class="keyword">typedef</span> geometry_msgs::PoseWithCovariance <a class="code" href="namespacemsf__core_1_1similarity__transform.html#a7ecde3e7b02bda457b404fc49b03179f">Pose</a>;</div>
+<div class="line"><a name="l00124"></a><span class="lineno"><a class="code" href="namespacemsf__core_1_1similarity__transform.html#aaf333aba3d1f81a96f7294f05f311590">  124</a></span>&#160;<span class="keyword">typedef</span> std::pair&lt;Pose, Pose&gt; <a class="code" href="namespacemsf__core_1_1similarity__transform.html#aaf333aba3d1f81a96f7294f05f311590">PosePair</a>;</div>
+<div class="line"><a name="l00125"></a><span class="lineno"><a class="code" href="namespacemsf__core_1_1similarity__transform.html#aa03b1c4b07f85bede2f9cad021e3df7a">  125</a></span>&#160;<span class="keyword">typedef</span> std::vector&lt;PosePair&gt; <a class="code" href="namespacemsf__core_1_1similarity__transform.html#aa03b1c4b07f85bede2f9cad021e3df7a">PosePairVector</a>;</div>
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;</div>
 <div class="line"><a name="l00132"></a><span class="lineno"><a class="code" href="classmsf__core_1_1similarity__transform_1_1From6DoF.html">  132</a></span>&#160;<span class="keyword">class </span><a class="code" href="classmsf__core_1_1similarity__transform_1_1From6DoF.html" title="Computes the average similarity transform (rotation, position, scale) between two sets of 6 DoF poses...">From6DoF</a> {</div>
 <div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160; <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;  <a class="code" href="classmsf__core_1_1similarity__transform_1_1From6DoF.html" title="Computes the average similarity transform (rotation, position, scale) between two sets of 6 DoF poses...">From6DoF</a>();</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classmsf__core_1_1similarity__transform_1_1From6DoF.html#a842474c8de6308fd9805f96eb8069954" title="Adds a pair of measurements. No other computation is performed.">addMeasurement</a>(<span class="keyword">const</span> PosePair &amp; measurement);</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;  <a class="code" href="classmsf__core_1_1similarity__transform_1_1From6DoF.html#a984951e002da11503c88e88927450d0b">From6DoF</a>();</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classmsf__core_1_1similarity__transform_1_1From6DoF.html#a842474c8de6308fd9805f96eb8069954" title="Adds a pair of measurements. No other computation is performed.">addMeasurement</a>(<span class="keyword">const</span> <a class="code" href="namespacemsf__core_1_1similarity__transform.html#aaf333aba3d1f81a96f7294f05f311590">PosePair</a> &amp; measurement);</div>
 <div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classmsf__core_1_1similarity__transform_1_1From6DoF.html#a842474c8de6308fd9805f96eb8069954" title="Adds a pair of measurements. No other computation is performed.">addMeasurement</a>(<span class="keyword">const</span> Pose &amp; pose1, <span class="keyword">const</span> Pose &amp; pose2);</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classmsf__core_1_1similarity__transform_1_1From6DoF.html#a842474c8de6308fd9805f96eb8069954" title="Adds a pair of measurements. No other computation is performed.">addMeasurement</a>(<span class="keyword">const</span> <a class="code" href="namespacemsf__core_1_1similarity__transform.html#a7ecde3e7b02bda457b404fc49b03179f">Pose</a> &amp; pose1, <span class="keyword">const</span> <a class="code" href="namespacemsf__core_1_1similarity__transform.html#a7ecde3e7b02bda457b404fc49b03179f">Pose</a> &amp; pose2);</div>
 <div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="classmsf__core_1_1similarity__transform_1_1From6DoF.html#ae5e680668d31c2b4522bbf1a3aafdfb1" title="computes the average similarity transform the transform is computed between the previously added sets...">compute</a>(Pose &amp; pose, <span class="keywordtype">double</span> *scale = <span class="keyword">nullptr</span> , <span class="keywordtype">double</span> *cond = <span class="keyword">nullptr</span> ,</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="classmsf__core_1_1similarity__transform_1_1From6DoF.html#ae5e680668d31c2b4522bbf1a3aafdfb1" title="computes the average similarity transform the transform is computed between the previously added sets...">compute</a>(<a class="code" href="namespacemsf__core_1_1similarity__transform.html#a7ecde3e7b02bda457b404fc49b03179f">Pose</a> &amp; pose, <span class="keywordtype">double</span> *scale = <span class="keyword">nullptr</span> , <span class="keywordtype">double</span> *cond = <span class="keyword">nullptr</span> ,</div>
 <div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;               <span class="keywordtype">double</span> eps = std::numeric_limits&lt;double&gt;::epsilon() * 4 * 4);</div>
 <div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160; <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;  PosePairVector measurements_;</div>
+<div class="line"><a name="l00154"></a><span class="lineno"><a class="code" href="classmsf__core_1_1similarity__transform_1_1From6DoF.html#a6d0b9c325a47c79fa4d81c9cbc2b25f3">  154</a></span>&#160;  <a class="code" href="namespacemsf__core_1_1similarity__transform.html#aa03b1c4b07f85bede2f9cad021e3df7a">PosePairVector</a> <a class="code" href="classmsf__core_1_1similarity__transform_1_1From6DoF.html#a6d0b9c325a47c79fa4d81c9cbc2b25f3">measurements_</a>;</div>
 <div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;};</div>
 <div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;}</div>
 <div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;}  <span class="comment">// namespace msf_core</span></div>
@@ -204,7 +205,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Nov 6 2013 21:53:35 for msf - modular sensor fusion by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 6 2013 22:06:47 for ethzasl-msf - Modular Sensor Fusion by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>msf - modular sensor fusion: msf_core/include/msf_core/msf_macros.h Source File</title>
+<title>ethzasl-msf - Modular Sensor Fusion: msf_core/include/msf_core/msf_macros.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">msf - modular sensor fusion
+   <div id="projectname">ethzasl-msf - Modular Sensor Fusion
    </div>
    <div id="projectbrief">Time delay compensated single and multi sensor fusion framework based on an EKF</div>
   </td>
@@ -61,6 +61,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="files.html"><span>File&#160;List</span></a></li>
+      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
     </ul>
   </div>
 <!-- window showing the filter options -->
@@ -68,7 +69,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -87,7 +88,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">msf_macros.h</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
+<a href="msf__macros_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * Copyright (C) 2012-2013 Simon Lynen, ASL, ETH Zurich, Switzerland</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> * You can contact the author at &lt;slynen at ethz dot ch&gt;</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> *</span></div>
@@ -107,7 +108,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define MSF_MACROS_H_</span></div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#ifndef NUMERIC_PREC</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define NUMERIC_PREC 4 // Number of decimal places.</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno"><a class="code" href="msf__macros_8h.html#ad3b6dfb41f49e999485ba160b60819e6">   21</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define NUMERIC_PREC 4 // Number of decimal places.</span></div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#ifdef UNUSEDPARAM</span></div>
@@ -116,28 +117,28 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#elif defined(__LCLINT__)</span></div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor"></span><span class="preprocessor"># define UNUSEDPARAM(x) </span><span class="comment">/*@unused@*/</span><span class="preprocessor"> x</span></div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#else</span></div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor"></span><span class="preprocessor"># define UNUSEDPARAM(x) x</span></div>
+<div class="line"><a name="l00030"></a><span class="lineno"><a class="code" href="msf__macros_8h.html#a2d2af1048de7b1510994ffd3bc32aacc">   30</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor"># define UNUSEDPARAM(x) x</span></div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">#ifndef UNUSED</span></div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="preprocessor"></span><span class="preprocessor"># define UNUSED(x) (void)x;</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno"><a class="code" href="msf__macros_8h.html#a86d500a34c624c2cae56bc25a31b12f3">   34</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor"># define UNUSED(x) (void)x;</span></div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="preprocessor">#ifndef STREAMQUAT</span></div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define STREAMQUAT(q) &quot;[&quot;&lt;&lt;std::setprecision(3)&lt;&lt;(q).w()&lt;&lt;&quot;, &quot;&lt;&lt;(q).x()&lt;&lt;&quot;, &quot;&lt;&lt; \</span></div>
+<div class="line"><a name="l00038"></a><span class="lineno"><a class="code" href="msf__macros_8h.html#a47112f19d1bc98ba2bdfb2f1cd3d2c65">   38</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define STREAMQUAT(q) &quot;[&quot;&lt;&lt;std::setprecision(3)&lt;&lt;(q).w()&lt;&lt;&quot;, &quot;&lt;&lt;(q).x()&lt;&lt;&quot;, &quot;&lt;&lt; \</span></div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="preprocessor">    (q).y()&lt;&lt;&quot;, &quot;&lt;&lt;(q).z()&lt;&lt;std::setprecision(NUMERIC_PREC)&lt;&lt;&quot;]&quot;</span></div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="preprocessor">#ifndef DEG2RAD</span></div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define DEG2RAD (M_PI/180.0)</span></div>
+<div class="line"><a name="l00043"></a><span class="lineno"><a class="code" href="msf__macros_8h.html#af7e8592d0a634bd3642e9fd508ea8022">   43</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define DEG2RAD (M_PI/180.0)</span></div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor">#ifdef WIN32</span></div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define MSF_LIKELY(x)       (x)</span></div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define MSF_UNLIKELY(x)     (x)</span></div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#else</span></div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define MSF_LIKELY(x)       __builtin_expect((x),1)</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define MSF_UNLIKELY(x)     __builtin_expect((x),0)</span></div>
+<div class="line"><a name="l00050"></a><span class="lineno"><a class="code" href="msf__macros_8h.html#a1de58160514e33783f7bb0643a1ea3e0">   50</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define MSF_LIKELY(x)       __builtin_expect((x),1)</span></div>
+<div class="line"><a name="l00051"></a><span class="lineno"><a class="code" href="msf__macros_8h.html#a9ca64ccf03396106e000eafc5c03c497">   51</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define MSF_UNLIKELY(x)     __builtin_expect((x),0)</span></div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="preprocessor">#ifdef ROS_PACKAGE_NAME // Use ROS if it is available.</span></div>
@@ -163,18 +164,18 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;<span class="comment">// Adapted from rosconsole.</span></div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="comment">//Copyright (c) 2008, Willow Garage, Inc.</span></div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="preprocessor">#ifndef MSF_INFO_STREAM</span></div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define MSF_INFO_STREAM(x) std::cerr&lt;&lt;&quot;\033[0;0m[INFO] &quot;&lt;&lt;x&lt;&lt;&quot;\033[0;0m&quot;&lt;&lt;std::endl;</span></div>
+<div class="line"><a name="l00077"></a><span class="lineno"><a class="code" href="msf__macros_8h.html#a8e22e1ef301caaac18cef911ef9c3c0a">   77</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define MSF_INFO_STREAM(x) std::cerr&lt;&lt;&quot;\033[0;0m[INFO] &quot;&lt;&lt;x&lt;&lt;&quot;\033[0;0m&quot;&lt;&lt;std::endl;</span></div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="preprocessor">#ifndef MSF_WARN_STREAM</span></div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define MSF_WARN_STREAM(x) std::cerr&lt;&lt;&quot;\033[0;33m[WARN] &quot;&lt;&lt;x&lt;&lt;&quot;\033[0;0m&quot;&lt;&lt;std::endl;</span></div>
+<div class="line"><a name="l00081"></a><span class="lineno"><a class="code" href="msf__macros_8h.html#a48a90912747b87b3c148944f408d7652">   81</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define MSF_WARN_STREAM(x) std::cerr&lt;&lt;&quot;\033[0;33m[WARN] &quot;&lt;&lt;x&lt;&lt;&quot;\033[0;0m&quot;&lt;&lt;std::endl;</span></div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="preprocessor"></span></div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="preprocessor">#ifndef MSF_ERROR_STREAM</span></div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define MSF_ERROR_STREAM(x) std::cerr&lt;&lt;&quot;\033[1;31m[ERROR] &quot;&lt;&lt;x&lt;&lt;&quot;\033[0;0m&quot;&lt;&lt;std::endl;</span></div>
+<div class="line"><a name="l00085"></a><span class="lineno"><a class="code" href="msf__macros_8h.html#a852413224a5d3e667616aa295266ecaf">   85</a></span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define MSF_ERROR_STREAM(x) std::cerr&lt;&lt;&quot;\033[1;31m[ERROR] &quot;&lt;&lt;x&lt;&lt;&quot;\033[0;0m&quot;&lt;&lt;std::endl;</span></div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="preprocessor">#define MSF_INFO_STREAM_ONCE(x) \</span></div>
+<div class="line"><a name="l00088"></a><span class="lineno"><a class="code" href="msf__macros_8h.html#a391177a1f95a78417a3926667d575f6c">   88</a></span>&#160;<span class="preprocessor">#define MSF_INFO_STREAM_ONCE(x) \</span></div>
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="preprocessor">    do \</span></div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="preprocessor">    { \</span></div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="preprocessor">      static bool __log_stream_once__hit__ = false; \</span></div>
@@ -185,7 +186,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;<span class="preprocessor">      } \</span></div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;<span class="preprocessor">    } while(0)</span></div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;<span class="preprocessor">#define MSF_WARN_STREAM_ONCE(x) \</span></div>
+<div class="line"><a name="l00099"></a><span class="lineno"><a class="code" href="msf__macros_8h.html#a698949dea73495d742233519f3002fea">   99</a></span>&#160;<span class="preprocessor">#define MSF_WARN_STREAM_ONCE(x) \</span></div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;<span class="preprocessor">    do \</span></div>
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;<span class="preprocessor">    { \</span></div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;<span class="preprocessor">      static bool __log_stream_once__hit__ = false; \</span></div>
@@ -196,7 +197,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="preprocessor">      } \</span></div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;<span class="preprocessor">    } while(0)</span></div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;<span class="preprocessor">#define MSF_ERROR_STREAM_ONCE(x) \</span></div>
+<div class="line"><a name="l00110"></a><span class="lineno"><a class="code" href="msf__macros_8h.html#ac1398dc1f1f1f9569ffca77a28aaff20">  110</a></span>&#160;<span class="preprocessor">#define MSF_ERROR_STREAM_ONCE(x) \</span></div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;<span class="preprocessor">    do \</span></div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="preprocessor">    { \</span></div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="preprocessor">      static bool __log_stream_once__hit__ = false; \</span></div>
@@ -207,7 +208,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;<span class="preprocessor">      } \</span></div>
 <div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;<span class="preprocessor">    } while(0)</span></div>
 <div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;<span class="preprocessor">#define MSF_LOG_STREAM_THROTTLE(rate, x) \</span></div>
+<div class="line"><a name="l00121"></a><span class="lineno"><a class="code" href="msf__macros_8h.html#a5718f6bf203c21d93d9622f17119f8bf">  121</a></span>&#160;<span class="preprocessor">#define MSF_LOG_STREAM_THROTTLE(rate, x) \</span></div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;<span class="preprocessor">    do \</span></div>
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;<span class="preprocessor">    { \</span></div>
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;<span class="preprocessor">      static double __log_stream_throttle__last_hit__ = 0.0; \</span></div>
@@ -223,7 +224,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;<span class="preprocessor">      } \</span></div>
 <div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;<span class="preprocessor">    } while(0)</span></div>
 <div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;<span class="preprocessor">#define MSF_WARN_STREAM_THROTTLE(rate, x) \</span></div>
+<div class="line"><a name="l00137"></a><span class="lineno"><a class="code" href="msf__macros_8h.html#a51b3004c146da17dcb8a35a4168bad47">  137</a></span>&#160;<span class="preprocessor">#define MSF_WARN_STREAM_THROTTLE(rate, x) \</span></div>
 <div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;<span class="preprocessor">    do \</span></div>
 <div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;<span class="preprocessor">    { \</span></div>
 <div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;<span class="preprocessor">      static double __log_stream_throttle__last_hit__ = 0.0; \</span></div>
@@ -240,7 +241,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;<span class="preprocessor">      } \</span></div>
 <div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;<span class="preprocessor">    } while(0)</span></div>
 <div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;<span class="preprocessor">#define MSF_ERROR_STREAM_THROTTLE(rate, x) \</span></div>
+<div class="line"><a name="l00154"></a><span class="lineno"><a class="code" href="msf__macros_8h.html#ad56352f3b184be6c66dff96b442a3db1">  154</a></span>&#160;<span class="preprocessor">#define MSF_ERROR_STREAM_THROTTLE(rate, x) \</span></div>
 <div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;<span class="preprocessor">    do \</span></div>
 <div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;<span class="preprocessor">    { \</span></div>
 <div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;<span class="preprocessor">      static double __log_stream_throttle__last_hit__ = 0.0; \</span></div>
@@ -257,7 +258,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;<span class="preprocessor">      } \</span></div>
 <div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;<span class="preprocessor">    } while(0)</span></div>
 <div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;<span class="preprocessor">#define MSF_INFO_STREAM_COND(cond, x) \</span></div>
+<div class="line"><a name="l00171"></a><span class="lineno"><a class="code" href="msf__macros_8h.html#a71b74ab88da05f0977c03b02323bf065">  171</a></span>&#160;<span class="preprocessor">#define MSF_INFO_STREAM_COND(cond, x) \</span></div>
 <div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;<span class="preprocessor">    do \</span></div>
 <div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;<span class="preprocessor">    {  \</span></div>
 <div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;<span class="preprocessor">      if (MSF_UNLIKELY(cond)) \</span></div>
@@ -266,7 +267,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;<span class="preprocessor">      } \</span></div>
 <div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;<span class="preprocessor">    } while(0)</span></div>
 <div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;<span class="preprocessor">#define MSF_WARN_STREAM_COND(cond, x) \</span></div>
+<div class="line"><a name="l00180"></a><span class="lineno"><a class="code" href="msf__macros_8h.html#a727c36ed33ce7dc9dd6a6e1577b94670">  180</a></span>&#160;<span class="preprocessor">#define MSF_WARN_STREAM_COND(cond, x) \</span></div>
 <div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;<span class="preprocessor">    do \</span></div>
 <div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;<span class="preprocessor">    {  \</span></div>
 <div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;<span class="preprocessor">      if (MSF_UNLIKELY(cond)) \</span></div>
@@ -275,7 +276,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;<span class="preprocessor">      } \</span></div>
 <div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;<span class="preprocessor">    } while(0)</span></div>
 <div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;<span class="preprocessor"></span></div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;<span class="preprocessor">#define MSF_ERROR_STREAM_COND(cond, x) \</span></div>
+<div class="line"><a name="l00189"></a><span class="lineno"><a class="code" href="msf__macros_8h.html#a5237d4348bf9d678e62ae4ede54fb863">  189</a></span>&#160;<span class="preprocessor">#define MSF_ERROR_STREAM_COND(cond, x) \</span></div>
 <div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;<span class="preprocessor">    do \</span></div>
 <div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;<span class="preprocessor">    {  \</span></div>
 <div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;<span class="preprocessor">      if (MSF_UNLIKELY(cond)) \</span></div>
@@ -289,7 +290,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Nov 6 2013 21:53:35 for msf - modular sensor fusion by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 6 2013 22:06:47 for ethzasl-msf - Modular Sensor Fusion by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

@@ -3,7 +3,7 @@
 }
 
 
-Abstract class defining user configurable calculations for the msf\-\_\-core with R\-O\-S interfaces.  
+Abstract class defining user configurable calculations for the \hyperlink{namespacemsf__core}{msf\-\_\-core} with R\-O\-S interfaces.  
 
 
 
@@ -19,62 +19,203 @@ Inheritance diagram for msf\-\_\-core\-:\-:M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\
 \subsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a1d665e46ae9945ab6a129575c4400bd3}{E\-I\-G\-E\-N\-\_\-\-M\-A\-K\-E\-\_\-\-A\-L\-I\-G\-N\-E\-D\-\_\-\-O\-P\-E\-R\-A\-T\-O\-R\-\_\-\-N\-E\-W {\bfseries M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S} (ros\-::\-Node\-Handle pnh=ros\-::\-Node\-Handle(\char`\"{}$\sim$core\char`\"{}))}\label{structmsf__core_1_1MSF__SensorManagerROS_a1d665e46ae9945ab6a129575c4400bd3}
-
+E\-I\-G\-E\-N\-\_\-\-M\-A\-K\-E\-\_\-\-A\-L\-I\-G\-N\-E\-D\-\_\-\-O\-P\-E\-R\-A\-T\-O\-R\-\_\-\-N\-E\-W \hyperlink{structmsf__core_1_1MSF__SensorManagerROS_a1d665e46ae9945ab6a129575c4400bd3}{M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S} (ros\-::\-Node\-Handle pnh=ros\-::\-Node\-Handle(\char`\"{}$\sim$core\char`\"{}))
 \item 
-\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a092e5cecd4d0586303c0412e55959603}{virtual void \hyperlink{structmsf__core_1_1MSF__SensorManagerROS_a092e5cecd4d0586303c0412e55959603}{core\-Config} (msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Core\-Config \&config, uint32\-\_\-t level)}\label{structmsf__core_1_1MSF__SensorManagerROS_a092e5cecd4d0586303c0412e55959603}
-
+virtual \hyperlink{structmsf__core_1_1MSF__SensorManagerROS_a8bc5f186d4c8c36e5462aeca24cce391}{$\sim$\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S} ()
+\item 
+virtual void \hyperlink{structmsf__core_1_1MSF__SensorManagerROS_a092e5cecd4d0586303c0412e55959603}{core\-Config} (msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Core\-Config \&config, uint32\-\_\-t level)
 \begin{DoxyCompactList}\small\item\em Gets called by the internal callback caller. \end{DoxyCompactList}\item 
-\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a05d1f96502e2733ac5d9810f4dd55706}{void \hyperlink{structmsf__core_1_1MSF__SensorManagerROS_a05d1f96502e2733ac5d9810f4dd55706}{Config} (msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Core\-Config \&config, uint32\-\_\-t level)}\label{structmsf__core_1_1MSF__SensorManagerROS_a05d1f96502e2733ac5d9810f4dd55706}
-
+void \hyperlink{structmsf__core_1_1MSF__SensorManagerROS_a05d1f96502e2733ac5d9810f4dd55706}{Config} (msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Core\-Config \&config, uint32\-\_\-t level)
 \begin{DoxyCompactList}\small\item\em Gets called by dynamic reconfigure and calls all registered callbacks in callbacks\-\_\-. \end{DoxyCompactList}\item 
-\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a4b28905e8303ca5d74a2711c6483329c}{void {\bfseries set\-H\-L\-State\-Buffer} (const sensor\-\_\-fusion\-\_\-comm\-::\-Ext\-Ekf \&msg)}\label{structmsf__core_1_1MSF__SensorManagerROS_a4b28905e8303ca5d74a2711c6483329c}
-
+void \hyperlink{structmsf__core_1_1MSF__SensorManagerROS_a4b28905e8303ca5d74a2711c6483329c}{set\-H\-L\-State\-Buffer} (const sensor\-\_\-fusion\-\_\-comm\-::\-Ext\-Ekf \&msg)
 \item 
-\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a25e296341f9628b7e0c5616d09b1830b}{virtual bool {\bfseries get\-Param\-\_\-fixed\-\_\-bias} () const }\label{structmsf__core_1_1MSF__SensorManagerROS_a25e296341f9628b7e0c5616d09b1830b}
-
+virtual bool \hyperlink{structmsf__core_1_1MSF__SensorManagerROS_a25e296341f9628b7e0c5616d09b1830b}{get\-Param\-\_\-fixed\-\_\-bias} () const 
 \item 
-\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a8832a1f48d484a04120c32bf1ffa2b63}{virtual double {\bfseries get\-Param\-\_\-noise\-\_\-acc} () const }\label{structmsf__core_1_1MSF__SensorManagerROS_a8832a1f48d484a04120c32bf1ffa2b63}
-
+virtual double \hyperlink{structmsf__core_1_1MSF__SensorManagerROS_a8832a1f48d484a04120c32bf1ffa2b63}{get\-Param\-\_\-noise\-\_\-acc} () const 
 \item 
-\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a73d7709e65b947e02a8080b65c6d3e7a}{virtual double {\bfseries get\-Param\-\_\-noise\-\_\-accbias} () const }\label{structmsf__core_1_1MSF__SensorManagerROS_a73d7709e65b947e02a8080b65c6d3e7a}
-
+virtual double \hyperlink{structmsf__core_1_1MSF__SensorManagerROS_a73d7709e65b947e02a8080b65c6d3e7a}{get\-Param\-\_\-noise\-\_\-accbias} () const 
 \item 
-\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_aedf81899b9210ba2d869f1b66f4e6ee0}{virtual double {\bfseries get\-Param\-\_\-noise\-\_\-gyr} () const }\label{structmsf__core_1_1MSF__SensorManagerROS_aedf81899b9210ba2d869f1b66f4e6ee0}
-
+virtual double \hyperlink{structmsf__core_1_1MSF__SensorManagerROS_aedf81899b9210ba2d869f1b66f4e6ee0}{get\-Param\-\_\-noise\-\_\-gyr} () const 
 \item 
-\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a5dad5d6ad078af02bf85ca5edd871a0b}{virtual double {\bfseries get\-Param\-\_\-noise\-\_\-gyrbias} () const }\label{structmsf__core_1_1MSF__SensorManagerROS_a5dad5d6ad078af02bf85ca5edd871a0b}
-
+virtual double \hyperlink{structmsf__core_1_1MSF__SensorManagerROS_a5dad5d6ad078af02bf85ca5edd871a0b}{get\-Param\-\_\-noise\-\_\-gyrbias} () const 
 \item 
-\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a40d9507b8a2a513b70078583c4851995}{virtual double {\bfseries get\-Param\-\_\-fuzzythres} () const }\label{structmsf__core_1_1MSF__SensorManagerROS_a40d9507b8a2a513b70078583c4851995}
-
+virtual double \hyperlink{structmsf__core_1_1MSF__SensorManagerROS_a40d9507b8a2a513b70078583c4851995}{get\-Param\-\_\-fuzzythres} () const 
 \item 
 virtual void \hyperlink{structmsf__core_1_1MSF__SensorManagerROS_abde229602f1aeb393a2aad30ef413e12}{publish\-State\-Initial} (const shared\-\_\-ptr$<$ E\-K\-F\-State\-\_\-\-T $>$ \&state) const 
 \item 
-\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_abcf566a97988f986deb36b5c7b2d8248}{virtual void {\bfseries publish\-State\-After\-Propagation} (const shared\-\_\-ptr$<$ E\-K\-F\-State\-\_\-\-T $>$ \&state) const }\label{structmsf__core_1_1MSF__SensorManagerROS_abcf566a97988f986deb36b5c7b2d8248}
-
+virtual void \hyperlink{structmsf__core_1_1MSF__SensorManagerROS_abcf566a97988f986deb36b5c7b2d8248}{publish\-State\-After\-Propagation} (const shared\-\_\-ptr$<$ E\-K\-F\-State\-\_\-\-T $>$ \&state) const 
 \item 
-\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a612d69d5e10b3d6de0eed6e4c6720afa}{virtual void {\bfseries publish\-State\-After\-Update} (const shared\-\_\-ptr$<$ E\-K\-F\-State\-\_\-\-T $>$ \&state) const }\label{structmsf__core_1_1MSF__SensorManagerROS_a612d69d5e10b3d6de0eed6e4c6720afa}
-
+virtual void \hyperlink{structmsf__core_1_1MSF__SensorManagerROS_a612d69d5e10b3d6de0eed6e4c6720afa}{publish\-State\-After\-Update} (const shared\-\_\-ptr$<$ E\-K\-F\-State\-\_\-\-T $>$ \&state) const 
 \end{DoxyCompactItemize}
 \subsection*{Protected Attributes}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_aa35b7b94cdf025302d7f980f2e68f413}{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Core\-Config \hyperlink{structmsf__core_1_1MSF__SensorManagerROS_aa35b7b94cdf025302d7f980f2e68f413}{config\-\_\-}}\label{structmsf__core_1_1MSF__SensorManagerROS_aa35b7b94cdf025302d7f980f2e68f413}
-
+msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Core\-Config \hyperlink{structmsf__core_1_1MSF__SensorManagerROS_aa35b7b94cdf025302d7f980f2e68f413}{config\-\_\-}
 \begin{DoxyCompactList}\small\item\em Dynamic reconfigure config. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef \\*
+E\-K\-F\-State\-\_\-\-T\-::\-State\-Definition\-\_\-\-T \hyperlink{structmsf__core_1_1MSF__SensorManagerROS_ad964f1aec73a553dd897068561b1400a}{State\-Definition\-\_\-\-T}
+\item 
+typedef E\-K\-F\-State\-\_\-\-T\-::\-State\-Sequence\-\_\-\-T \hyperlink{structmsf__core_1_1MSF__SensorManagerROS_a292181458fad0c2db275b101e5e5fd03}{State\-Sequence\-\_\-\-T}
+\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{namespacemsf__core_a1f60c4e359e82d9ad14dd135769ccc1a}{Reconfigure\-Server} $\ast$ \hyperlink{structmsf__core_1_1MSF__SensorManagerROS_a87c60917114e5ce7a56d5caf7e5e7a3f}{reconf\-Server\-\_\-}
+\begin{DoxyCompactList}\small\item\em Dynamic reconfigure server. \end{DoxyCompactList}\item 
+ros\-::\-Publisher \hyperlink{structmsf__core_1_1MSF__SensorManagerROS_a2b01bf34569f618f6f9a31d1c34123f9}{pub\-State\-\_\-}
+\begin{DoxyCompactList}\small\item\em Publishes all states of the filter. \end{DoxyCompactList}\item 
+ros\-::\-Publisher \hyperlink{structmsf__core_1_1MSF__SensorManagerROS_ad3d00c7d8863b92121fec8444aac5d91}{pub\-Pose\-\_\-}
+\begin{DoxyCompactList}\small\item\em Publishes 6\-Do\-F pose output. \end{DoxyCompactList}\item 
+ros\-::\-Publisher \hyperlink{structmsf__core_1_1MSF__SensorManagerROS_ac013b12b8951c8e9b1b3fb6ff6bbf289}{pub\-Pose\-After\-Update\-\_\-}
+\begin{DoxyCompactList}\small\item\em Publishes 6\-Do\-F pose output after the update has been applied. \end{DoxyCompactList}\item 
+ros\-::\-Publisher \hyperlink{structmsf__core_1_1MSF__SensorManagerROS_ac6a25bec7426aaae9111d9d1ae097bdf}{pub\-Pose\-Crtl\-\_\-}
+\begin{DoxyCompactList}\small\item\em Publishes 6\-Do\-F pose including velocity output. \end{DoxyCompactList}\item 
+ros\-::\-Publisher \hyperlink{structmsf__core_1_1MSF__SensorManagerROS_aae63fa68f54e56e710fa60e19d15824b}{pub\-Correct\-\_\-}
+\begin{DoxyCompactList}\small\item\em Publishes corrections for external state propagation. \end{DoxyCompactList}\item 
+tf\-::\-Transform\-Broadcaster \hyperlink{structmsf__core_1_1MSF__SensorManagerROS_a7c53a1122c69aaf132cec3c8d81fe8e5}{tf\-\_\-broadcaster\-\_\-}
+\item 
+sensor\-\_\-fusion\-\_\-comm\-::\-Ext\-Ekf \hyperlink{structmsf__core_1_1MSF__SensorManagerROS_a9e4a65a73177768fa50a3fe4f67b1fd7}{hl\-\_\-state\-\_\-buf\-\_\-}
+\begin{DoxyCompactList}\small\item\em Buffer to store external propagation data. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Additional Inherited Members}
 
 
-\subsection{Detailed Description}
-\subsubsection*{template$<$typename E\-K\-F\-State\-\_\-\-T$>$class msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S$<$ E\-K\-F\-State\-\_\-\-T $>$}
+\subsection{Member Typedef Documentation}
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_ad964f1aec73a553dd897068561b1400a}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}!State\-Definition\-\_\-\-T@{State\-Definition\-\_\-\-T}}
+\index{State\-Definition\-\_\-\-T@{State\-Definition\-\_\-\-T}!msf_core::MSF_SensorManagerROS@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}}
+\subsubsection[{State\-Definition\-\_\-\-T}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T$>$ typedef E\-K\-F\-State\-\_\-\-T\-::\-State\-Definition\-\_\-\-T {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::{\bf State\-Definition\-\_\-\-T}\hspace{0.3cm}{\ttfamily [private]}}}\label{structmsf__core_1_1MSF__SensorManagerROS_ad964f1aec73a553dd897068561b1400a}
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a292181458fad0c2db275b101e5e5fd03}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}!State\-Sequence\-\_\-\-T@{State\-Sequence\-\_\-\-T}}
+\index{State\-Sequence\-\_\-\-T@{State\-Sequence\-\_\-\-T}!msf_core::MSF_SensorManagerROS@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}}
+\subsubsection[{State\-Sequence\-\_\-\-T}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T$>$ typedef E\-K\-F\-State\-\_\-\-T\-::\-State\-Sequence\-\_\-\-T {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::{\bf State\-Sequence\-\_\-\-T}\hspace{0.3cm}{\ttfamily [private]}}}\label{structmsf__core_1_1MSF__SensorManagerROS_a292181458fad0c2db275b101e5e5fd03}
 
-Abstract class defining user configurable calculations for the msf\-\_\-core with R\-O\-S interfaces. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a1d665e46ae9945ab6a129575c4400bd3}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}!M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S@{M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}}
+\index{M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S@{M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}!msf_core::MSF_SensorManagerROS@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}}
+\subsubsection[{M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T$>$ E\-I\-G\-E\-N\-\_\-\-M\-A\-K\-E\-\_\-\-A\-L\-I\-G\-N\-E\-D\-\_\-\-O\-P\-E\-R\-A\-T\-O\-R\-\_\-\-N\-E\-W {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::{\bf M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S} (
+\begin{DoxyParamCaption}
+\item[{ros\-::\-Node\-Handle}]{pnh = {\ttfamily ros\-:\-:NodeHandle(\char`\"{}$\sim$core\char`\"{})}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{structmsf__core_1_1MSF__SensorManagerROS_a1d665e46ae9945ab6a129575c4400bd3}
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a8bc5f186d4c8c36e5462aeca24cce391}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}!$\sim$\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S@{$\sim$\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}}
+\index{$\sim$\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S@{$\sim$\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}!msf_core::MSF_SensorManagerROS@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}}
+\subsubsection[{$\sim$\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T$>$ virtual {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::$\sim${\bf M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S} (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{structmsf__core_1_1MSF__SensorManagerROS_a8bc5f186d4c8c36e5462aeca24cce391}
+
 
 \subsection{Member Function Documentation}
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a05d1f96502e2733ac5d9810f4dd55706}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}!Config@{Config}}
+\index{Config@{Config}!msf_core::MSF_SensorManagerROS@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}}
+\subsubsection[{Config}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T$>$ void {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::Config (
+\begin{DoxyParamCaption}
+\item[{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Core\-Config \&}]{config, }
+\item[{uint32\-\_\-t}]{level}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{structmsf__core_1_1MSF__SensorManagerROS_a05d1f96502e2733ac5d9810f4dd55706}
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a092e5cecd4d0586303c0412e55959603}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}!core\-Config@{core\-Config}}
+\index{core\-Config@{core\-Config}!msf_core::MSF_SensorManagerROS@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}}
+\subsubsection[{core\-Config}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T$>$ virtual void {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::core\-Config (
+\begin{DoxyParamCaption}
+\item[{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Core\-Config \&}]{config, }
+\item[{uint32\-\_\-t}]{level}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{structmsf__core_1_1MSF__SensorManagerROS_a092e5cecd4d0586303c0412e55959603}
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a25e296341f9628b7e0c5616d09b1830b}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}!get\-Param\-\_\-fixed\-\_\-bias@{get\-Param\-\_\-fixed\-\_\-bias}}
+\index{get\-Param\-\_\-fixed\-\_\-bias@{get\-Param\-\_\-fixed\-\_\-bias}!msf_core::MSF_SensorManagerROS@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}}
+\subsubsection[{get\-Param\-\_\-fixed\-\_\-bias}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T$>$ virtual bool {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::get\-Param\-\_\-fixed\-\_\-bias (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{structmsf__core_1_1MSF__SensorManagerROS_a25e296341f9628b7e0c5616d09b1830b}
+
+
+Implements \hyperlink{classmsf__core_1_1MSF__SensorManager_a5eb7188dea0d2aa231732199fd06b988}{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager$<$ E\-K\-F\-State\-\_\-\-T $>$}.
+
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a40d9507b8a2a513b70078583c4851995}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}!get\-Param\-\_\-fuzzythres@{get\-Param\-\_\-fuzzythres}}
+\index{get\-Param\-\_\-fuzzythres@{get\-Param\-\_\-fuzzythres}!msf_core::MSF_SensorManagerROS@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}}
+\subsubsection[{get\-Param\-\_\-fuzzythres}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T$>$ virtual double {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::get\-Param\-\_\-fuzzythres (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{structmsf__core_1_1MSF__SensorManagerROS_a40d9507b8a2a513b70078583c4851995}
+
+
+Implements \hyperlink{classmsf__core_1_1MSF__SensorManager_ab4498922d3d876ed9c4c5eeb7e090529}{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager$<$ E\-K\-F\-State\-\_\-\-T $>$}.
+
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a8832a1f48d484a04120c32bf1ffa2b63}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}!get\-Param\-\_\-noise\-\_\-acc@{get\-Param\-\_\-noise\-\_\-acc}}
+\index{get\-Param\-\_\-noise\-\_\-acc@{get\-Param\-\_\-noise\-\_\-acc}!msf_core::MSF_SensorManagerROS@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}}
+\subsubsection[{get\-Param\-\_\-noise\-\_\-acc}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T$>$ virtual double {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::get\-Param\-\_\-noise\-\_\-acc (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{structmsf__core_1_1MSF__SensorManagerROS_a8832a1f48d484a04120c32bf1ffa2b63}
+
+
+Implements \hyperlink{classmsf__core_1_1MSF__SensorManager_a647bebf2feecd2929f58d6b4c8b3b319}{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager$<$ E\-K\-F\-State\-\_\-\-T $>$}.
+
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a73d7709e65b947e02a8080b65c6d3e7a}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}!get\-Param\-\_\-noise\-\_\-accbias@{get\-Param\-\_\-noise\-\_\-accbias}}
+\index{get\-Param\-\_\-noise\-\_\-accbias@{get\-Param\-\_\-noise\-\_\-accbias}!msf_core::MSF_SensorManagerROS@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}}
+\subsubsection[{get\-Param\-\_\-noise\-\_\-accbias}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T$>$ virtual double {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::get\-Param\-\_\-noise\-\_\-accbias (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{structmsf__core_1_1MSF__SensorManagerROS_a73d7709e65b947e02a8080b65c6d3e7a}
+
+
+Implements \hyperlink{classmsf__core_1_1MSF__SensorManager_a7e7342acff24a4b5c5817903b2c8dfda}{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager$<$ E\-K\-F\-State\-\_\-\-T $>$}.
+
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_aedf81899b9210ba2d869f1b66f4e6ee0}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}!get\-Param\-\_\-noise\-\_\-gyr@{get\-Param\-\_\-noise\-\_\-gyr}}
+\index{get\-Param\-\_\-noise\-\_\-gyr@{get\-Param\-\_\-noise\-\_\-gyr}!msf_core::MSF_SensorManagerROS@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}}
+\subsubsection[{get\-Param\-\_\-noise\-\_\-gyr}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T$>$ virtual double {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::get\-Param\-\_\-noise\-\_\-gyr (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{structmsf__core_1_1MSF__SensorManagerROS_aedf81899b9210ba2d869f1b66f4e6ee0}
+
+
+Implements \hyperlink{classmsf__core_1_1MSF__SensorManager_ae7b3b5a203fe118961ecdf28b49bfaa9}{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager$<$ E\-K\-F\-State\-\_\-\-T $>$}.
+
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a5dad5d6ad078af02bf85ca5edd871a0b}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}!get\-Param\-\_\-noise\-\_\-gyrbias@{get\-Param\-\_\-noise\-\_\-gyrbias}}
+\index{get\-Param\-\_\-noise\-\_\-gyrbias@{get\-Param\-\_\-noise\-\_\-gyrbias}!msf_core::MSF_SensorManagerROS@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}}
+\subsubsection[{get\-Param\-\_\-noise\-\_\-gyrbias}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T$>$ virtual double {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::get\-Param\-\_\-noise\-\_\-gyrbias (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{structmsf__core_1_1MSF__SensorManagerROS_a5dad5d6ad078af02bf85ca5edd871a0b}
+
+
+Implements \hyperlink{classmsf__core_1_1MSF__SensorManager_a8a5c694d3c6e5bd5bf4724269613bcb6}{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager$<$ E\-K\-F\-State\-\_\-\-T $>$}.
+
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_abcf566a97988f986deb36b5c7b2d8248}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}!publish\-State\-After\-Propagation@{publish\-State\-After\-Propagation}}
+\index{publish\-State\-After\-Propagation@{publish\-State\-After\-Propagation}!msf_core::MSF_SensorManagerROS@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}}
+\subsubsection[{publish\-State\-After\-Propagation}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T$>$ virtual void {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::publish\-State\-After\-Propagation (
+\begin{DoxyParamCaption}
+\item[{const shared\-\_\-ptr$<$ E\-K\-F\-State\-\_\-\-T $>$ \&}]{state}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{structmsf__core_1_1MSF__SensorManagerROS_abcf566a97988f986deb36b5c7b2d8248}
+
+
+Implements \hyperlink{classmsf__core_1_1MSF__SensorManager_a431f5b517c39fd9b2168857ae9513f8b}{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager$<$ E\-K\-F\-State\-\_\-\-T $>$}.
+
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a612d69d5e10b3d6de0eed6e4c6720afa}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}!publish\-State\-After\-Update@{publish\-State\-After\-Update}}
+\index{publish\-State\-After\-Update@{publish\-State\-After\-Update}!msf_core::MSF_SensorManagerROS@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}}
+\subsubsection[{publish\-State\-After\-Update}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T$>$ virtual void {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::publish\-State\-After\-Update (
+\begin{DoxyParamCaption}
+\item[{const shared\-\_\-ptr$<$ E\-K\-F\-State\-\_\-\-T $>$ \&}]{state}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{structmsf__core_1_1MSF__SensorManagerROS_a612d69d5e10b3d6de0eed6e4c6720afa}
+
+
+Implements \hyperlink{classmsf__core_1_1MSF__SensorManager_abbce1dfe246d7c58ec94529d70c862e5}{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager$<$ E\-K\-F\-State\-\_\-\-T $>$}.
+
 \hypertarget{structmsf__core_1_1MSF__SensorManagerROS_abde229602f1aeb393a2aad30ef413e12}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}!publish\-State\-Initial@{publish\-State\-Initial}}
 \index{publish\-State\-Initial@{publish\-State\-Initial}!msf_core::MSF_SensorManagerROS@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}}
-\subsubsection[{publish\-State\-Initial}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T $>$ virtual void {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::publish\-State\-Initial (
+\subsubsection[{publish\-State\-Initial}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T$>$ virtual void {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::publish\-State\-Initial (
 \begin{DoxyParamCaption}
 \item[{const shared\-\_\-ptr$<$ E\-K\-F\-State\-\_\-\-T $>$ \&}]{state}
 \end{DoxyParamCaption}
@@ -88,8 +229,45 @@ This functions get called by the core to publish data to external middlewares li
 
 Implements \hyperlink{classmsf__core_1_1MSF__SensorManager_ad851fff1bceaeb6696ef79a4792a317a}{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager$<$ E\-K\-F\-State\-\_\-\-T $>$}.
 
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a4b28905e8303ca5d74a2711c6483329c}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}!set\-H\-L\-State\-Buffer@{set\-H\-L\-State\-Buffer}}
+\index{set\-H\-L\-State\-Buffer@{set\-H\-L\-State\-Buffer}!msf_core::MSF_SensorManagerROS@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}}
+\subsubsection[{set\-H\-L\-State\-Buffer}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T$>$ void {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::set\-H\-L\-State\-Buffer (
+\begin{DoxyParamCaption}
+\item[{const sensor\-\_\-fusion\-\_\-comm\-::\-Ext\-Ekf \&}]{msg}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{structmsf__core_1_1MSF__SensorManagerROS_a4b28905e8303ca5d74a2711c6483329c}
+
+
+\subsection{Member Data Documentation}
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_aa35b7b94cdf025302d7f980f2e68f413}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}!config\-\_\-@{config\-\_\-}}
+\index{config\-\_\-@{config\-\_\-}!msf_core::MSF_SensorManagerROS@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}}
+\subsubsection[{config\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T$>$ msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Core\-Config {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::config\-\_\-\hspace{0.3cm}{\ttfamily [protected]}}}\label{structmsf__core_1_1MSF__SensorManagerROS_aa35b7b94cdf025302d7f980f2e68f413}
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a9e4a65a73177768fa50a3fe4f67b1fd7}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}!hl\-\_\-state\-\_\-buf\-\_\-@{hl\-\_\-state\-\_\-buf\-\_\-}}
+\index{hl\-\_\-state\-\_\-buf\-\_\-@{hl\-\_\-state\-\_\-buf\-\_\-}!msf_core::MSF_SensorManagerROS@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}}
+\subsubsection[{hl\-\_\-state\-\_\-buf\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T$>$ sensor\-\_\-fusion\-\_\-comm\-::\-Ext\-Ekf {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::hl\-\_\-state\-\_\-buf\-\_\-\hspace{0.3cm}{\ttfamily [private]}}}\label{structmsf__core_1_1MSF__SensorManagerROS_a9e4a65a73177768fa50a3fe4f67b1fd7}
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_aae63fa68f54e56e710fa60e19d15824b}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}!pub\-Correct\-\_\-@{pub\-Correct\-\_\-}}
+\index{pub\-Correct\-\_\-@{pub\-Correct\-\_\-}!msf_core::MSF_SensorManagerROS@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}}
+\subsubsection[{pub\-Correct\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T$>$ ros\-::\-Publisher {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::pub\-Correct\-\_\-\hspace{0.3cm}{\ttfamily [private]}}}\label{structmsf__core_1_1MSF__SensorManagerROS_aae63fa68f54e56e710fa60e19d15824b}
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_ad3d00c7d8863b92121fec8444aac5d91}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}!pub\-Pose\-\_\-@{pub\-Pose\-\_\-}}
+\index{pub\-Pose\-\_\-@{pub\-Pose\-\_\-}!msf_core::MSF_SensorManagerROS@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}}
+\subsubsection[{pub\-Pose\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T$>$ ros\-::\-Publisher {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::pub\-Pose\-\_\-\hspace{0.3cm}{\ttfamily [private]}}}\label{structmsf__core_1_1MSF__SensorManagerROS_ad3d00c7d8863b92121fec8444aac5d91}
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_ac013b12b8951c8e9b1b3fb6ff6bbf289}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}!pub\-Pose\-After\-Update\-\_\-@{pub\-Pose\-After\-Update\-\_\-}}
+\index{pub\-Pose\-After\-Update\-\_\-@{pub\-Pose\-After\-Update\-\_\-}!msf_core::MSF_SensorManagerROS@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}}
+\subsubsection[{pub\-Pose\-After\-Update\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T$>$ ros\-::\-Publisher {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::pub\-Pose\-After\-Update\-\_\-\hspace{0.3cm}{\ttfamily [private]}}}\label{structmsf__core_1_1MSF__SensorManagerROS_ac013b12b8951c8e9b1b3fb6ff6bbf289}
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_ac6a25bec7426aaae9111d9d1ae097bdf}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}!pub\-Pose\-Crtl\-\_\-@{pub\-Pose\-Crtl\-\_\-}}
+\index{pub\-Pose\-Crtl\-\_\-@{pub\-Pose\-Crtl\-\_\-}!msf_core::MSF_SensorManagerROS@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}}
+\subsubsection[{pub\-Pose\-Crtl\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T$>$ ros\-::\-Publisher {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::pub\-Pose\-Crtl\-\_\-\hspace{0.3cm}{\ttfamily [private]}}}\label{structmsf__core_1_1MSF__SensorManagerROS_ac6a25bec7426aaae9111d9d1ae097bdf}
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a2b01bf34569f618f6f9a31d1c34123f9}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}!pub\-State\-\_\-@{pub\-State\-\_\-}}
+\index{pub\-State\-\_\-@{pub\-State\-\_\-}!msf_core::MSF_SensorManagerROS@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}}
+\subsubsection[{pub\-State\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T$>$ ros\-::\-Publisher {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::pub\-State\-\_\-\hspace{0.3cm}{\ttfamily [private]}}}\label{structmsf__core_1_1MSF__SensorManagerROS_a2b01bf34569f618f6f9a31d1c34123f9}
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a87c60917114e5ce7a56d5caf7e5e7a3f}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}!reconf\-Server\-\_\-@{reconf\-Server\-\_\-}}
+\index{reconf\-Server\-\_\-@{reconf\-Server\-\_\-}!msf_core::MSF_SensorManagerROS@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}}
+\subsubsection[{reconf\-Server\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T$>$ {\bf Reconfigure\-Server}$\ast$ {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::reconf\-Server\-\_\-\hspace{0.3cm}{\ttfamily [private]}}}\label{structmsf__core_1_1MSF__SensorManagerROS_a87c60917114e5ce7a56d5caf7e5e7a3f}
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a7c53a1122c69aaf132cec3c8d81fe8e5}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}!tf\-\_\-broadcaster\-\_\-@{tf\-\_\-broadcaster\-\_\-}}
+\index{tf\-\_\-broadcaster\-\_\-@{tf\-\_\-broadcaster\-\_\-}!msf_core::MSF_SensorManagerROS@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}}
+\subsubsection[{tf\-\_\-broadcaster\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T$>$ tf\-::\-Transform\-Broadcaster {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::tf\-\_\-broadcaster\-\_\-\hspace{0.3cm}{\ttfamily [mutable]}, {\ttfamily [private]}}}\label{structmsf__core_1_1MSF__SensorManagerROS_a7c53a1122c69aaf132cec3c8d81fe8e5}
 
 
 The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
 \item 
-msf\-\_\-core/include/msf\-\_\-core/msf\-\_\-sensormanager\-R\-O\-S.\-h\end{DoxyCompactItemize}
+msf\-\_\-core/include/msf\-\_\-core/\hyperlink{msf__sensormanagerROS_8h}{msf\-\_\-sensormanager\-R\-O\-S.\-h}\end{DoxyCompactItemize}

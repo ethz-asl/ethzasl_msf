@@ -1,0 +1,135 @@
+\hypertarget{namespacemsf__tmp}{\section{msf\-\_\-tmp Namespace Reference}
+\label{namespacemsf__tmp}\index{msf\-\_\-tmp@{msf\-\_\-tmp}}
+}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structmsf__tmp_1_1overflow}{overflow}
+\begin{DoxyCompactList}\small\item\em Output a compile time constant by overflowing a char, producing a warning. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1echoStateVarType_3_01const_01msf__core_1_1StateVar__T_3_01Eigen_1_1Matrix_3_01f7a55ffb559c20f31cb06a2ee67f7cdd}{echo\-State\-Var\-Type$<$ const msf\-\_\-core\-::\-State\-Var\-\_\-\-T$<$ Eigen\-::\-Matrix$<$ double, N, 1 $>$, N\-A\-M\-E, S\-T\-A\-T\-E\-\_\-\-T, O\-P\-T\-I\-O\-N\-S $>$ \& $>$}
+\begin{DoxyCompactList}\small\item\em Runtime output of state\-Variable types for const ref eigen matrices. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1echoStateVarType_3_01const_01msf__core_1_1StateVar__T_3_01Eigen_1_1Quaterniond7114362e0351fe52a4a010b178818803}{echo\-State\-Var\-Type$<$ const msf\-\_\-core\-::\-State\-Var\-\_\-\-T$<$ Eigen\-::\-Quaterniond, N\-A\-M\-E, S\-T\-A\-T\-E\-\_\-\-T, O\-P\-T\-I\-O\-N\-S $>$ \& $>$}
+\begin{DoxyCompactList}\small\item\em Runtime output of state\-Variable types for const ref eigen quaternions. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1echoStateVarType_3_01msf__core_1_1StateVar__T_3_01Eigen_1_1Matrix_3_01double_0de9def0e1695f00da0e5db77a247f121}{echo\-State\-Var\-Type$<$ msf\-\_\-core\-::\-State\-Var\-\_\-\-T$<$ Eigen\-::\-Matrix$<$ double, N, 1 $>$, N\-A\-M\-E, S\-T\-A\-T\-E\-\_\-\-T, O\-P\-T\-I\-O\-N\-S $>$ $>$}
+\begin{DoxyCompactList}\small\item\em Runtime output of state\-Variable types for eigen matrices. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1echoStateVarType_3_01msf__core_1_1StateVar__T_3_01Eigen_1_1Quaterniond_00_01NAd8d0cc57ae8a4161cb849186069681d6}{echo\-State\-Var\-Type$<$ msf\-\_\-core\-::\-State\-Var\-\_\-\-T$<$ Eigen\-::\-Quaterniond, N\-A\-M\-E, S\-T\-A\-T\-E\-\_\-\-T, O\-P\-T\-I\-O\-N\-S $>$ $>$}
+\begin{DoxyCompactList}\small\item\em Runtime output of state\-Variable types for eigen matrices. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1CheckCorrectIndexing}{Check\-Correct\-Indexing}
+\begin{DoxyCompactList}\small\item\em Checks whether the ordering in the vector is the same as in the enum this ordering is something that strictly must not change. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1IndexOfBestNonTemporalDriftingState}{Index\-Of\-Best\-Non\-Temporal\-Drifting\-State}
+\begin{DoxyCompactList}\small\item\em Find the best nontemporal drifting state in the full state vector at compile time. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1CountStates}{Count\-States}
+\begin{DoxyCompactList}\small\item\em Returns the number of doubles in the state/correction state depending on the counter type supplied. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1getStartIndex}{get\-Start\-Index}
+\begin{DoxyCompactList}\small\item\em Compute start indices in the correction/state vector of a given type. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1getStartIndexInCorrection}{get\-Start\-Index\-In\-Correction}
+\begin{DoxyCompactList}\small\item\em Compute start indices in the correction vector of a given type. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1resetState}{reset\-State}
+\begin{DoxyCompactList}\small\item\em Reset the E\-K\-F state in a boost fusion unrolled call. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1copyInitStates}{copy\-Init\-States}
+\begin{DoxyCompactList}\small\item\em Copy states from previous to current states, for which there is no propagation in a boost fusion unrolled call. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1copyNonPropagationStates}{copy\-Non\-Propagation\-States}
+\begin{DoxyCompactList}\small\item\em Copy states from previous to current states, for which there is no propagation. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1copyQBlocksFromAuxiliaryStatesToQ}{copy\-Q\-Blocks\-From\-Auxiliary\-States\-To\-Q}
+\begin{DoxyCompactList}\small\item\em Copy the user calculated values in the Q-\/blocks to the main Q matrix. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1correctState}{correct\-State}
+\begin{DoxyCompactList}\small\item\em Apply E\-K\-F corrections depending on the state\-Var type. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1CoreStatetoDoubleArray}{Core\-Stateto\-Double\-Array}
+\begin{DoxyCompactList}\small\item\em Copies the values of the single state vars to the double array provided. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1GetIndicesInErrorState}{Get\-Indices\-In\-Error\-State}
+\begin{DoxyCompactList}\small\item\em Copies pairs of statename and index in correction vector to S\-T\-L container of pairs or tuples. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1getStateIndexInState}{get\-State\-Index\-In\-State}
+\begin{DoxyCompactList}\small\item\em Return the index of a given state variable number in the state matrices. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1getStateIndexInErrorState}{get\-State\-Index\-In\-Error\-State}
+\begin{DoxyCompactList}\small\item\em Return the index of a given state variable number in the error state matrices. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1FullStatetoString}{Full\-Stateto\-String}
+\begin{DoxyCompactList}\small\item\em Copies the values of the single state vars to the string provided. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1FullStatetoDoubleArray}{Full\-Stateto\-Double\-Array}
+\begin{DoxyCompactList}\small\item\em Copies the values of the single state vars to the double array provided. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__tmp_1_1SameType}{Same\-Type}
+\item 
+struct \hyperlink{structmsf__tmp_1_1SameType_3_01T_00_01T_01_4}{Same\-Type$<$ T, T $>$}
+\item 
+struct \hyperlink{structmsf__tmp_1_1StripReference}{Strip\-Reference}
+\item 
+struct \hyperlink{structmsf__tmp_1_1StripReference_3_01T_01_6_01_4}{Strip\-Reference$<$ T \& $>$}
+\item 
+struct \hyperlink{structmsf__tmp_1_1StripReference_3_01const_01T_01_4}{Strip\-Reference$<$ const T $>$}
+\item 
+struct \hyperlink{structmsf__tmp_1_1StripReference_3_01const_01T_01_6_01_4}{Strip\-Reference$<$ const T \& $>$}
+\item 
+struct \hyperlink{structmsf__tmp_1_1StripConstReference}{Strip\-Const\-Reference}
+\item 
+struct \hyperlink{structmsf__tmp_1_1StripConstReference_3_01T_01_6_01_4}{Strip\-Const\-Reference$<$ T \& $>$}
+\item 
+struct \hyperlink{structmsf__tmp_1_1StripConstReference_3_01const_01T_01_6_01_4}{Strip\-Const\-Reference$<$ const T \& $>$}
+\item 
+struct \hyperlink{structmsf__tmp_1_1StripConstReference_3_01const_01T_01_4}{Strip\-Const\-Reference$<$ const T $>$}
+\item 
+struct \hyperlink{structmsf__tmp_1_1StripConstPtr}{Strip\-Const\-Ptr}
+\item 
+struct \hyperlink{structmsf__tmp_1_1StripConstPtr_3_01T_01_5_01_4}{Strip\-Const\-Ptr$<$ T $\ast$ $>$}
+\item 
+struct \hyperlink{structmsf__tmp_1_1StripConstPtr_3_01const_01T_01_5_01_4}{Strip\-Const\-Ptr$<$ const T $\ast$ $>$}
+\item 
+struct \hyperlink{structmsf__tmp_1_1StripConstPtr_3_01const_01T_01_4}{Strip\-Const\-Ptr$<$ const T $>$}
+\item 
+struct \hyperlink{structmsf__tmp_1_1AddReference}{Add\-Reference}
+\item 
+struct \hyperlink{structmsf__tmp_1_1AddReference_3_01T_01_6_01_4}{Add\-Reference$<$ T \& $>$}
+\item 
+struct \hyperlink{structmsf__tmp_1_1AddReference_3_01const_01T_01_4}{Add\-Reference$<$ const T $>$}
+\item 
+struct \hyperlink{structmsf__tmp_1_1AddReference_3_01const_01T_01_6_01_4}{Add\-Reference$<$ const T \& $>$}
+\item 
+struct \hyperlink{structmsf__tmp_1_1AddConstReference}{Add\-Const\-Reference}
+\item 
+struct \hyperlink{structmsf__tmp_1_1AddConstReference_3_01T_01_6_01_4}{Add\-Const\-Reference$<$ T \& $>$}
+\item 
+struct \hyperlink{structmsf__tmp_1_1AddConstReference_3_01const_01T_01_4}{Add\-Const\-Reference$<$ const T $>$}
+\item 
+struct \hyperlink{structmsf__tmp_1_1AddConstReference_3_01const_01T_01_6_01_4}{Add\-Const\-Reference$<$ const T \& $>$}
+\item 
+struct \hyperlink{structmsf__tmp_1_1AddPtr}{Add\-Ptr}
+\item 
+struct \hyperlink{structmsf__tmp_1_1AddPtr_3_01T_01_5_01_4}{Add\-Ptr$<$ T $\ast$ $>$}
+\item 
+struct \hyperlink{structmsf__tmp_1_1AddPtr_3_01const_01T_01_4}{Add\-Ptr$<$ const T $>$}
+\item 
+struct \hyperlink{structmsf__tmp_1_1AddPtr_3_01const_01T_01_5_01_4}{Add\-Ptr$<$ const T $\ast$ $>$}
+\item 
+struct \hyperlink{structmsf__tmp_1_1AddConstPtr}{Add\-Const\-Ptr}
+\item 
+struct \hyperlink{structmsf__tmp_1_1AddConstPtr_3_01T_01_5_01_4}{Add\-Const\-Ptr$<$ T $\ast$ $>$}
+\item 
+struct \hyperlink{structmsf__tmp_1_1AddConstPtr_3_01const_01T_01_4}{Add\-Const\-Ptr$<$ const T $>$}
+\item 
+struct \hyperlink{structmsf__tmp_1_1AddConstPtr_3_01const_01T_01_5_01_4}{Add\-Const\-Ptr$<$ const T $\ast$ $>$}
+\item 
+struct \hyperlink{structmsf__tmp_1_1IsReferenceType}{Is\-Reference\-Type}
+\item 
+struct \hyperlink{structmsf__tmp_1_1IsReferenceType_3_01T_01_6_01_4}{Is\-Reference\-Type$<$ T \& $>$}
+\item 
+struct \hyperlink{structmsf__tmp_1_1IsReferenceType_3_01const_01T_01_6_01_4}{Is\-Reference\-Type$<$ const T \& $>$}
+\item 
+struct \hyperlink{structmsf__tmp_1_1IsPointerType}{Is\-Pointer\-Type}
+\item 
+struct \hyperlink{structmsf__tmp_1_1IsPointerType_3_01T_01_5_01_4}{Is\-Pointer\-Type$<$ T $\ast$ $>$}
+\item 
+struct \hyperlink{structmsf__tmp_1_1IsPointerType_3_01const_01T_01_5_01_4}{Is\-Pointer\-Type$<$ const T $\ast$ $>$}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$int V\-A\-L\-U\-E$>$ }\\void \hyperlink{namespacemsf__tmp_a6c98ecc04a7a60f92952735c99765f78}{echo\-Compile\-Time\-Constant} ()
+\begin{DoxyCompactList}\small\item\em Output a compile time constant. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{namespacemsf__tmp_a6c98ecc04a7a60f92952735c99765f78}{\index{msf\-\_\-tmp@{msf\-\_\-tmp}!echo\-Compile\-Time\-Constant@{echo\-Compile\-Time\-Constant}}
+\index{echo\-Compile\-Time\-Constant@{echo\-Compile\-Time\-Constant}!msf_tmp@{msf\-\_\-tmp}}
+\subsubsection[{echo\-Compile\-Time\-Constant}]{\setlength{\rightskip}{0pt plus 5cm}template$<$int V\-A\-L\-U\-E$>$ void msf\-\_\-tmp\-::echo\-Compile\-Time\-Constant (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{namespacemsf__tmp_a6c98ecc04a7a60f92952735c99765f78}

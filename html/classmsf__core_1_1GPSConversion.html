@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>msf - modular sensor fusion: msf_core::GPSConversion Class Reference</title>
+<title>ethzasl-msf - Modular Sensor Fusion: msf_core::GPSConversion Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">msf - modular sensor fusion
+   <div id="projectname">ethzasl-msf - Modular Sensor Fusion
    </div>
    <div id="projectbrief">Time delay compensated single and multi sensor fusion framework based on an EKF</div>
   </td>
@@ -71,7 +71,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -82,42 +82,213 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><b>msf_core</b></li><li class="navelem"><a class="el" href="classmsf__core_1_1GPSConversion.html">GPSConversion</a></li>  </ul>
+<li class="navelem"><a class="el" href="namespacemsf__core.html">msf_core</a></li><li class="navelem"><a class="el" href="classmsf__core_1_1GPSConversion.html">GPSConversion</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
   <div class="summary">
 <a href="classmsf__core_1_1GPSConversion-members.html">List of all members</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pub-attribs">Public Attributes</a>  </div>
+<a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="#pri-attribs">Private Attributes</a>  </div>
   <div class="headertitle">
 <div class="title">msf_core::GPSConversion Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p><code>#include &lt;<a class="el" href="gps__conversion_8h_source.html">gps_conversion.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a5d4b6af72d1dbbf6f948ca39b020e6cd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5d4b6af72d1dbbf6f948ca39b020e6cd"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>initReference</b> (const double &amp;latitude, const double &amp;longitude, const double &amp;altitude)</td></tr>
-<tr class="memitem:aeecd648087a584921a2372156b948b54"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aeecd648087a584921a2372156b948b54"></a>
-msf_core::Vector3&#160;</td><td class="memItemRight" valign="bottom"><b>wgs84ToEcef</b> (const double &amp;latitude, const double &amp;longitude, const double &amp;altitude) const </td></tr>
-<tr class="memitem:aa4a4410a1b149d99b41a6865034ba1d7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa4a4410a1b149d99b41a6865034ba1d7"></a>
-msf_core::Vector3&#160;</td><td class="memItemRight" valign="bottom"><b>ecefToEnu</b> (const msf_core::Vector3 &amp;ecef) const </td></tr>
-<tr class="memitem:ae1c380b419236d93c266c89db9ba5a43"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae1c380b419236d93c266c89db9ba5a43"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>adjustReference</b> (double z_corr)</td></tr>
+<tr class="memitem:ac849380a60706295bd7c33396ae7a239"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1GPSConversion.html#ac849380a60706295bd7c33396ae7a239">GPSConversion</a> ()</td></tr>
+<tr class="memitem:a5d4b6af72d1dbbf6f948ca39b020e6cd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1GPSConversion.html#a5d4b6af72d1dbbf6f948ca39b020e6cd">initReference</a> (const double &amp;latitude, const double &amp;longitude, const double &amp;altitude)</td></tr>
+<tr class="memitem:aeecd648087a584921a2372156b948b54"><td class="memItemLeft" align="right" valign="top">msf_core::Vector3&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1GPSConversion.html#aeecd648087a584921a2372156b948b54">wgs84ToEcef</a> (const double &amp;latitude, const double &amp;longitude, const double &amp;altitude) const </td></tr>
+<tr class="memitem:aa4a4410a1b149d99b41a6865034ba1d7"><td class="memItemLeft" align="right" valign="top">msf_core::Vector3&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1GPSConversion.html#aa4a4410a1b149d99b41a6865034ba1d7">ecefToEnu</a> (const msf_core::Vector3 &amp;ecef) const </td></tr>
+<tr class="memitem:ae1c380b419236d93c266c89db9ba5a43"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1GPSConversion.html#ae1c380b419236d93c266c89db9ba5a43">adjustReference</a> (double z_corr)</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a5e8ca97d7f7c277ffba2dee4ebbc5092"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5e8ca97d7f7c277ffba2dee4ebbc5092"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>EIGEN_MAKE_ALIGNED_OPERATOR_NEW</b></td></tr>
+<tr class="memitem:a5e8ca97d7f7c277ffba2dee4ebbc5092"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1GPSConversion.html#a5e8ca97d7f7c277ffba2dee4ebbc5092">EIGEN_MAKE_ALIGNED_OPERATOR_NEW</a></td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2><a name="pri-attribs"></a>
+Private Attributes</h2></td></tr>
+<tr class="memitem:a0e9c31df90370cecca9b220472883c0f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacemsf__core.html#a044c525dd7800e2e2f4bb86fc565a7c7">msf_core::Quaternion</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1GPSConversion.html#a0e9c31df90370cecca9b220472883c0f">ecef_ref_orientation_</a></td></tr>
+<tr class="memitem:a618282a287b69c4704ac6191185c6ef2"><td class="memItemLeft" align="right" valign="top">msf_core::Vector3&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmsf__core_1_1GPSConversion.html#a618282a287b69c4704ac6191185c6ef2">ecef_ref_point_</a></td></tr>
 </table>
-<hr/>The documentation for this class was generated from the following file:<ul>
+<h2>Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="ac849380a60706295bd7c33396ae7a239"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">msf_core::GPSConversion::GPSConversion </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2>Member Function Documentation</h2>
+<a class="anchor" id="ae1c380b419236d93c266c89db9ba5a43"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void msf_core::GPSConversion::adjustReference </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>z_corr</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aa4a4410a1b149d99b41a6865034ba1d7"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">msf_core::Vector3 msf_core::GPSConversion::ecefToEnu </td>
+          <td>(</td>
+          <td class="paramtype">const msf_core::Vector3 &amp;&#160;</td>
+          <td class="paramname"><em>ecef</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a5d4b6af72d1dbbf6f948ca39b020e6cd"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void msf_core::GPSConversion::initReference </td>
+          <td>(</td>
+          <td class="paramtype">const double &amp;&#160;</td>
+          <td class="paramname"><em>latitude</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double &amp;&#160;</td>
+          <td class="paramname"><em>longitude</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double &amp;&#160;</td>
+          <td class="paramname"><em>altitude</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="aeecd648087a584921a2372156b948b54"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">msf_core::Vector3 msf_core::GPSConversion::wgs84ToEcef </td>
+          <td>(</td>
+          <td class="paramtype">const double &amp;&#160;</td>
+          <td class="paramname"><em>latitude</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double &amp;&#160;</td>
+          <td class="paramname"><em>longitude</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const double &amp;&#160;</td>
+          <td class="paramname"><em>altitude</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<h2>Member Data Documentation</h2>
+<a class="anchor" id="a0e9c31df90370cecca9b220472883c0f"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespacemsf__core.html#a044c525dd7800e2e2f4bb86fc565a7c7">msf_core::Quaternion</a> msf_core::GPSConversion::ecef_ref_orientation_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a618282a287b69c4704ac6191185c6ef2"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">msf_core::Vector3 msf_core::GPSConversion::ecef_ref_point_</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a class="anchor" id="a5e8ca97d7f7c277ffba2dee4ebbc5092"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">msf_core::GPSConversion::EIGEN_MAKE_ALIGNED_OPERATOR_NEW</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following files:<ul>
 <li>msf_core/include/msf_core/<a class="el" href="gps__conversion_8h_source.html">gps_conversion.h</a></li>
+<li>msf_core/src/lib/<a class="el" href="gps__conversion_8cc.html">gps_conversion.cc</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Nov 6 2013 21:53:35 for msf - modular sensor fusion by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 6 2013 22:06:47 for ethzasl-msf - Modular Sensor Fusion by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

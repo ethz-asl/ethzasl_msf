@@ -1,0 +1,47 @@
+\hypertarget{namespaceeigen__conversions}{\section{eigen\-\_\-conversions Namespace Reference}
+\label{namespaceeigen__conversions}\index{eigen\-\_\-conversions@{eigen\-\_\-conversions}}
+}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$class Scalar $>$ }\\void \hyperlink{namespaceeigen__conversions_adbf4e3b639a8f2024e965bd986e86197}{quaternion\-To\-Msg} (const Eigen\-::\-Quaternion$<$ Scalar $>$ \&q\-\_\-in, geometry\-\_\-msgs\-::\-Quaternion \&q\-\_\-out)
+\begin{DoxyCompactList}\small\item\em Copies eigen quaternion to geometry\-\_\-msgs/quaternion. \end{DoxyCompactList}\item 
+{\footnotesize template$<$class Scalar $>$ }\\geometry\-\_\-msgs\-::\-Quaternion \hyperlink{namespaceeigen__conversions_ad0e3d903601fdea34507ed43652796f5}{quaternion\-To\-Msg} (const Eigen\-::\-Quaternion$<$ Scalar $>$ \&q\-\_\-in)
+\begin{DoxyCompactList}\small\item\em Copies eigen quaternion to geometry\-\_\-msgs/quaternion. \end{DoxyCompactList}\item 
+{\footnotesize template$<$class Derived , class Point $>$ }\\void \hyperlink{namespaceeigen__conversions_a2e7baf949ffe127d7d8b67b674e04ee7}{vector3d\-To\-Point} (const Eigen\-::\-Matrix\-Base$<$ Derived $>$ \&vec, Point \&point)
+\begin{DoxyCompactList}\small\item\em Copies an eigen 3d vector to a 3d Point struct. point has to have members x,y,z! \end{DoxyCompactList}\item 
+{\footnotesize template$<$class Derived , class Point $>$ }\\Point \hyperlink{namespaceeigen__conversions_adc9edb3b9e4232c9d973b1b33a280136}{vector3d\-To\-Point} (const Eigen\-::\-Matrix\-Base$<$ Derived $>$ \&vec)
+\begin{DoxyCompactList}\small\item\em Copies an eigen 3d vector to a 3d Point struct. point has to have members x,y,z! \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{namespaceeigen__conversions_adbf4e3b639a8f2024e965bd986e86197}{\index{eigen\-\_\-conversions@{eigen\-\_\-conversions}!quaternion\-To\-Msg@{quaternion\-To\-Msg}}
+\index{quaternion\-To\-Msg@{quaternion\-To\-Msg}!eigen_conversions@{eigen\-\_\-conversions}}
+\subsubsection[{quaternion\-To\-Msg}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Scalar $>$ void eigen\-\_\-conversions\-::quaternion\-To\-Msg (
+\begin{DoxyParamCaption}
+\item[{const Eigen\-::\-Quaternion$<$ Scalar $>$ \&}]{q\-\_\-in, }
+\item[{geometry\-\_\-msgs\-::\-Quaternion \&}]{q\-\_\-out}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{namespaceeigen__conversions_adbf4e3b639a8f2024e965bd986e86197}
+\hypertarget{namespaceeigen__conversions_ad0e3d903601fdea34507ed43652796f5}{\index{eigen\-\_\-conversions@{eigen\-\_\-conversions}!quaternion\-To\-Msg@{quaternion\-To\-Msg}}
+\index{quaternion\-To\-Msg@{quaternion\-To\-Msg}!eigen_conversions@{eigen\-\_\-conversions}}
+\subsubsection[{quaternion\-To\-Msg}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Scalar $>$ geometry\-\_\-msgs\-::\-Quaternion eigen\-\_\-conversions\-::quaternion\-To\-Msg (
+\begin{DoxyParamCaption}
+\item[{const Eigen\-::\-Quaternion$<$ Scalar $>$ \&}]{q\-\_\-in}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{namespaceeigen__conversions_ad0e3d903601fdea34507ed43652796f5}
+\hypertarget{namespaceeigen__conversions_a2e7baf949ffe127d7d8b67b674e04ee7}{\index{eigen\-\_\-conversions@{eigen\-\_\-conversions}!vector3d\-To\-Point@{vector3d\-To\-Point}}
+\index{vector3d\-To\-Point@{vector3d\-To\-Point}!eigen_conversions@{eigen\-\_\-conversions}}
+\subsubsection[{vector3d\-To\-Point}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Derived , class Point $>$ void eigen\-\_\-conversions\-::vector3d\-To\-Point (
+\begin{DoxyParamCaption}
+\item[{const Eigen\-::\-Matrix\-Base$<$ Derived $>$ \&}]{vec, }
+\item[{Point \&}]{point}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{namespaceeigen__conversions_a2e7baf949ffe127d7d8b67b674e04ee7}
+\hypertarget{namespaceeigen__conversions_adc9edb3b9e4232c9d973b1b33a280136}{\index{eigen\-\_\-conversions@{eigen\-\_\-conversions}!vector3d\-To\-Point@{vector3d\-To\-Point}}
+\index{vector3d\-To\-Point@{vector3d\-To\-Point}!eigen_conversions@{eigen\-\_\-conversions}}
+\subsubsection[{vector3d\-To\-Point}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Derived , class Point $>$ Point eigen\-\_\-conversions\-::vector3d\-To\-Point (
+\begin{DoxyParamCaption}
+\item[{const Eigen\-::\-Matrix\-Base$<$ Derived $>$ \&}]{vec}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{namespaceeigen__conversions_adc9edb3b9e4232c9d973b1b33a280136}

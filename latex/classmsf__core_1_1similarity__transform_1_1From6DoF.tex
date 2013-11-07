@@ -13,34 +13,57 @@ Computes the average similarity transform (rotation, position, scale) between tw
 \subsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{classmsf__core_1_1similarity__transform_1_1From6DoF_a842474c8de6308fd9805f96eb8069954}{void \hyperlink{classmsf__core_1_1similarity__transform_1_1From6DoF_a842474c8de6308fd9805f96eb8069954}{add\-Measurement} (const Pose\-Pair \&measurement)}\label{classmsf__core_1_1similarity__transform_1_1From6DoF_a842474c8de6308fd9805f96eb8069954}
-
+\hyperlink{classmsf__core_1_1similarity__transform_1_1From6DoF_a984951e002da11503c88e88927450d0b}{From6\-Do\-F} ()
+\item 
+void \hyperlink{classmsf__core_1_1similarity__transform_1_1From6DoF_a842474c8de6308fd9805f96eb8069954}{add\-Measurement} (const \hyperlink{namespacemsf__core_1_1similarity__transform_aaf333aba3d1f81a96f7294f05f311590}{Pose\-Pair} \&measurement)
 \begin{DoxyCompactList}\small\item\em Adds a pair of measurements. No other computation is performed. \end{DoxyCompactList}\item 
-\hypertarget{classmsf__core_1_1similarity__transform_1_1From6DoF_ac03ed87bcf4b8a7dc9aefb0ec22f5f17}{void \hyperlink{classmsf__core_1_1similarity__transform_1_1From6DoF_ac03ed87bcf4b8a7dc9aefb0ec22f5f17}{add\-Measurement} (const Pose \&pose1, const Pose \&pose2)}\label{classmsf__core_1_1similarity__transform_1_1From6DoF_ac03ed87bcf4b8a7dc9aefb0ec22f5f17}
-
+void \hyperlink{classmsf__core_1_1similarity__transform_1_1From6DoF_ac03ed87bcf4b8a7dc9aefb0ec22f5f17}{add\-Measurement} (const \hyperlink{namespacemsf__core_1_1similarity__transform_a7ecde3e7b02bda457b404fc49b03179f}{Pose} \&pose1, const \hyperlink{namespacemsf__core_1_1similarity__transform_a7ecde3e7b02bda457b404fc49b03179f}{Pose} \&pose2)
 \begin{DoxyCompactList}\small\item\em Adds a pair of measurements. No other computation is performed. \end{DoxyCompactList}\item 
-bool \hyperlink{classmsf__core_1_1similarity__transform_1_1From6DoF_ae5e680668d31c2b4522bbf1a3aafdfb1}{compute} (Pose \&pose, double $\ast$scale=nullptr, double $\ast$cond=nullptr, double eps=std\-::numeric\-\_\-limits$<$ double $>$\-::epsilon()$\ast$4 $\ast$4)
+bool \hyperlink{classmsf__core_1_1similarity__transform_1_1From6DoF_ae5e680668d31c2b4522bbf1a3aafdfb1}{compute} (\hyperlink{namespacemsf__core_1_1similarity__transform_a7ecde3e7b02bda457b404fc49b03179f}{Pose} \&pose, double $\ast$scale=nullptr, double $\ast$cond=nullptr, double eps=std\-::numeric\-\_\-limits$<$ double $>$\-::epsilon()$\ast$4 $\ast$4)
 \begin{DoxyCompactList}\small\item\em computes the average similarity transform the transform is computed between the previously added sets of poses. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{namespacemsf__core_1_1similarity__transform_aa03b1c4b07f85bede2f9cad021e3df7a}{Pose\-Pair\-Vector} \hyperlink{classmsf__core_1_1similarity__transform_1_1From6DoF_a6d0b9c325a47c79fa4d81c9cbc2b25f3}{measurements\-\_\-}
+\end{DoxyCompactItemize}
 
 
-\subsection{Detailed Description}
-Computes the average similarity transform (rotation, position, scale) between two sets of 6 Do\-F poses. 
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classmsf__core_1_1similarity__transform_1_1From6DoF_a984951e002da11503c88e88927450d0b}{\index{msf\-\_\-core\-::similarity\-\_\-transform\-::\-From6\-Do\-F@{msf\-\_\-core\-::similarity\-\_\-transform\-::\-From6\-Do\-F}!From6\-Do\-F@{From6\-Do\-F}}
+\index{From6\-Do\-F@{From6\-Do\-F}!msf_core::similarity_transform::From6DoF@{msf\-\_\-core\-::similarity\-\_\-transform\-::\-From6\-Do\-F}}
+\subsubsection[{From6\-Do\-F}]{\setlength{\rightskip}{0pt plus 5cm}msf\-\_\-core\-::similarity\-\_\-transform\-::\-From6\-Do\-F\-::\-From6\-Do\-F (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classmsf__core_1_1similarity__transform_1_1From6DoF_a984951e002da11503c88e88927450d0b}
+
 
 \subsection{Member Function Documentation}
+\hypertarget{classmsf__core_1_1similarity__transform_1_1From6DoF_a842474c8de6308fd9805f96eb8069954}{\index{msf\-\_\-core\-::similarity\-\_\-transform\-::\-From6\-Do\-F@{msf\-\_\-core\-::similarity\-\_\-transform\-::\-From6\-Do\-F}!add\-Measurement@{add\-Measurement}}
+\index{add\-Measurement@{add\-Measurement}!msf_core::similarity_transform::From6DoF@{msf\-\_\-core\-::similarity\-\_\-transform\-::\-From6\-Do\-F}}
+\subsubsection[{add\-Measurement}]{\setlength{\rightskip}{0pt plus 5cm}void msf\-\_\-core\-::similarity\-\_\-transform\-::\-From6\-Do\-F\-::add\-Measurement (
+\begin{DoxyParamCaption}
+\item[{const {\bf Pose\-Pair} \&}]{measurement}
+\end{DoxyParamCaption}
+)}}\label{classmsf__core_1_1similarity__transform_1_1From6DoF_a842474c8de6308fd9805f96eb8069954}
+\hypertarget{classmsf__core_1_1similarity__transform_1_1From6DoF_ac03ed87bcf4b8a7dc9aefb0ec22f5f17}{\index{msf\-\_\-core\-::similarity\-\_\-transform\-::\-From6\-Do\-F@{msf\-\_\-core\-::similarity\-\_\-transform\-::\-From6\-Do\-F}!add\-Measurement@{add\-Measurement}}
+\index{add\-Measurement@{add\-Measurement}!msf_core::similarity_transform::From6DoF@{msf\-\_\-core\-::similarity\-\_\-transform\-::\-From6\-Do\-F}}
+\subsubsection[{add\-Measurement}]{\setlength{\rightskip}{0pt plus 5cm}void msf\-\_\-core\-::similarity\-\_\-transform\-::\-From6\-Do\-F\-::add\-Measurement (
+\begin{DoxyParamCaption}
+\item[{const {\bf Pose} \&}]{pose1, }
+\item[{const {\bf Pose} \&}]{pose2}
+\end{DoxyParamCaption}
+)}}\label{classmsf__core_1_1similarity__transform_1_1From6DoF_ac03ed87bcf4b8a7dc9aefb0ec22f5f17}
 \hypertarget{classmsf__core_1_1similarity__transform_1_1From6DoF_ae5e680668d31c2b4522bbf1a3aafdfb1}{\index{msf\-\_\-core\-::similarity\-\_\-transform\-::\-From6\-Do\-F@{msf\-\_\-core\-::similarity\-\_\-transform\-::\-From6\-Do\-F}!compute@{compute}}
 \index{compute@{compute}!msf_core::similarity_transform::From6DoF@{msf\-\_\-core\-::similarity\-\_\-transform\-::\-From6\-Do\-F}}
 \subsubsection[{compute}]{\setlength{\rightskip}{0pt plus 5cm}bool msf\-\_\-core\-::similarity\-\_\-transform\-::\-From6\-Do\-F\-::compute (
 \begin{DoxyParamCaption}
-\item[{Pose \&}]{pose, }
+\item[{{\bf Pose} \&}]{pose, }
 \item[{double $\ast$}]{scale = {\ttfamily nullptr}, }
 \item[{double $\ast$}]{cond = {\ttfamily nullptr}, }
 \item[{double}]{eps = {\ttfamily std\-:\-:numeric\-\_\-limits$<$double$>$\-:\-:epsilon()~$\ast$~4~$\ast$~4}}
 \end{DoxyParamCaption}
 )}}\label{classmsf__core_1_1similarity__transform_1_1From6DoF_ae5e680668d31c2b4522bbf1a3aafdfb1}
-
-
-computes the average similarity transform the transform is computed between the previously added sets of poses. 
-
 
 \begin{DoxyParams}[1]{Parameters}
 \mbox{\tt out}  & {\em pose} & resulting position / orientation \\
@@ -54,7 +77,13 @@ computes the average similarity transform the transform is computed between the 
 \end{DoxyParams}
 
 
+\subsection{Member Data Documentation}
+\hypertarget{classmsf__core_1_1similarity__transform_1_1From6DoF_a6d0b9c325a47c79fa4d81c9cbc2b25f3}{\index{msf\-\_\-core\-::similarity\-\_\-transform\-::\-From6\-Do\-F@{msf\-\_\-core\-::similarity\-\_\-transform\-::\-From6\-Do\-F}!measurements\-\_\-@{measurements\-\_\-}}
+\index{measurements\-\_\-@{measurements\-\_\-}!msf_core::similarity_transform::From6DoF@{msf\-\_\-core\-::similarity\-\_\-transform\-::\-From6\-Do\-F}}
+\subsubsection[{measurements\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Pose\-Pair\-Vector} msf\-\_\-core\-::similarity\-\_\-transform\-::\-From6\-Do\-F\-::measurements\-\_\-\hspace{0.3cm}{\ttfamily [private]}}}\label{classmsf__core_1_1similarity__transform_1_1From6DoF_a6d0b9c325a47c79fa4d81c9cbc2b25f3}
+
+
 The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
 \item 
-msf\-\_\-core/include/msf\-\_\-core/similaritytransform.\-h\item 
-msf\-\_\-core/src/similaritytransform.\-cc\end{DoxyCompactItemize}
+msf\-\_\-core/include/msf\-\_\-core/\hyperlink{similaritytransform_8h}{similaritytransform.\-h}\item 
+msf\-\_\-core/src/\hyperlink{similaritytransform_8cc}{similaritytransform.\-cc}\end{DoxyCompactItemize}

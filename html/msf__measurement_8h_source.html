@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
-<title>msf - modular sensor fusion: msf_core/include/msf_core/msf_measurement.h Source File</title>
+<title>ethzasl-msf - Modular Sensor Fusion: msf_core/include/msf_core/msf_measurement.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -21,7 +21,7 @@
  <tbody>
  <tr style="height: 56px;">
   <td style="padding-left: 0.5em;">
-   <div id="projectname">msf - modular sensor fusion
+   <div id="projectname">ethzasl-msf - Modular Sensor Fusion
    </div>
    <div id="projectbrief">Time delay compensated single and multi sensor fusion framework based on an EKF</div>
   </td>
@@ -61,6 +61,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
       <li><a href="files.html"><span>File&#160;List</span></a></li>
+      <li><a href="globals.html"><span>File&#160;Members</span></a></li>
     </ul>
   </div>
 <!-- window showing the filter options -->
@@ -68,7 +69,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Enumerator</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Namespaces</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Files</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(5)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(6)"><span class="SelectionMark">&#160;</span>Typedefs</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(7)"><span class="SelectionMark">&#160;</span>Enumerations</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(8)"><span class="SelectionMark">&#160;</span>Enumerator</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(9)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(10)"><span class="SelectionMark">&#160;</span>Macros</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -87,7 +88,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">msf_measurement.h</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
+<a href="msf__measurement_8h.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">/*</span></div>
 <div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="comment"> * Copyright (C) 2012-2013 Simon Lynen, ASL, ETH Zurich, Switzerland</span></div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment"> * You can contact the author at &lt;slynen at ethz dot ch&gt;</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment"> *</span></div>
@@ -109,22 +110,22 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="preprocessor">#include &lt;Eigen/Dense&gt;</span></div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="preprocessor">#include &lt;boost/shared_ptr.hpp&gt;</span></div>
 <div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &lt;msf_core/msf_fwds.h&gt;</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &lt;msf_core/msf_types.hpp&gt;</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="msf__fwds_8h.html">msf_core/msf_fwds.h</a>&gt;</span></div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="msf__types_8hpp.html">msf_core/msf_types.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;</div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">namespace </span>msf_core {</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> EKFState_T&gt;</div>
 <div class="line"><a name="l00033"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__MeasurementBase.html">   33</a></span>&#160;<span class="keyword">class </span><a class="code" href="classmsf__core_1_1MSF__MeasurementBase.html" title="The base class for all measurement types. These are the objects provided to the EKF core to be applie...">MSF_MeasurementBase</a> {</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; <span class="keyword">public</span>:</div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  EIGEN_MAKE_ALIGNED_OPERATOR_NEW</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <a class="code" href="classmsf__core_1_1MSF__MeasurementBase.html" title="The base class for all measurement types. These are the objects provided to the EKF core to be applie...">MSF_MeasurementBase</a>(<span class="keywordtype">bool</span> isabsoluteMeasurement, <span class="keywordtype">int</span> sensorID);</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;  <span class="keyword">virtual</span> ~MSF_MeasurementBase() {</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;  <a class="code" href="classmsf__core_1_1MSF__MeasurementBase.html#a415d8c321cebf22510cce29f69a3b22f">MSF_MeasurementBase</a>(<span class="keywordtype">bool</span> isabsoluteMeasurement, <span class="keywordtype">int</span> sensorID);</div>
+<div class="line"><a name="l00037"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__MeasurementBase.html#a259e1cfacc40e58e7c1ed768bcadb54b">   37</a></span>&#160;  <span class="keyword">virtual</span> <a class="code" href="classmsf__core_1_1MSF__MeasurementBase.html#a259e1cfacc40e58e7c1ed768bcadb54b">~MSF_MeasurementBase</a>() {</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  }</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classmsf__core_1_1MSF__MeasurementBase.html#ac1c4001e0c61b7cd2b551c0adeae7109" title="The method called by the msf_core to apply the measurement represented by this object.">apply</a>(shared_ptr&lt;EKFState_T&gt; stateWithCovariance,</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;                     <a class="code" href="classmsf__core_1_1MSF__Core.html" title="The core class of the EKF Does propagation of state and covariance but also applying measurements and...">MSF_Core&lt;EKFState_T&gt;</a>&amp; core) = 0;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <span class="keyword">virtual</span> std::string type() = 0;</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;  <span class="keywordtype">int</span> sensorID_;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  <span class="keywordtype">bool</span> isabsolute_;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <span class="keyword">virtual</span> std::string <a class="code" href="classmsf__core_1_1MSF__MeasurementBase.html#a6a711d7ed976c0aed497efc1b8fbe3e7">type</a>() = 0;</div>
+<div class="line"><a name="l00046"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__MeasurementBase.html#afad7c30029f47cea027415c04301dc48">   46</a></span>&#160;  <span class="keywordtype">int</span> <a class="code" href="classmsf__core_1_1MSF__MeasurementBase.html#afad7c30029f47cea027415c04301dc48">sensorID_</a>;</div>
+<div class="line"><a name="l00047"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__MeasurementBase.html#ad1ea7c4d392ecd3d894280283c04757a">   47</a></span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="classmsf__core_1_1MSF__MeasurementBase.html#ad1ea7c4d392ecd3d894280283c04757a">isabsolute_</a>;</div>
 <div class="line"><a name="l00048"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__MeasurementBase.html#a48b55b129f13afbed86db1b0543562db">   48</a></span>&#160;  <span class="keywordtype">double</span> <a class="code" href="classmsf__core_1_1MSF__MeasurementBase.html#a48b55b129f13afbed86db1b0543562db" title="The time_ this measurement was taken.">time</a>;  </div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; <span class="keyword">protected</span>:</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;  <span class="keyword">template</span>&lt;<span class="keyword">class</span> H_type, <span class="keyword">class</span> Res_type, <span class="keyword">class</span> R_type&gt;</div>
@@ -153,59 +154,59 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> EKFState_T&gt;</div>
 <div class="line"><a name="l00082"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__InvalidMeasurement.html">   82</a></span>&#160;<span class="keyword">class </span><a class="code" href="classmsf__core_1_1MSF__InvalidMeasurement.html" title="An invalid measurement needed for the measurement container to report if something went wrong...">MSF_InvalidMeasurement</a> : <span class="keyword">public</span> <a class="code" href="classmsf__core_1_1MSF__MeasurementBase.html" title="The base class for all measurement types. These are the objects provided to the EKF core to be applie...">MSF_MeasurementBase</a>&lt;EKFState_T&gt; {</div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160; <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">void</span> apply(shared_ptr&lt;EKFState_T&gt; UNUSEDPARAM(stateWithCovariance),</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;                     <a class="code" href="classmsf__core_1_1MSF__Core.html" title="The core class of the EKF Does propagation of state and covariance but also applying measurements and...">MSF_Core&lt;EKFState_T&gt;</a>&amp; UNUSEDPARAM(core)) {</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    MSF_ERROR_STREAM(</div>
+<div class="line"><a name="l00084"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__InvalidMeasurement.html#aa86e5b98f45256afded1bf30391dcce2">   84</a></span>&#160;  <a class="code" href="classmsf__core_1_1MSF__InvalidMeasurement.html#aa86e5b98f45256afded1bf30391dcce2">EIGEN_MAKE_ALIGNED_OPERATOR_NEW</a>;</div>
+<div class="line"><a name="l00085"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__InvalidMeasurement.html#a47d514cedc4596c60d0f0949d61200cf">   85</a></span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classmsf__core_1_1MSF__InvalidMeasurement.html#a47d514cedc4596c60d0f0949d61200cf">apply</a>(shared_ptr&lt;EKFState_T&gt; <a class="code" href="msf__macros_8h.html#a2d2af1048de7b1510994ffd3bc32aacc">UNUSEDPARAM</a>(stateWithCovariance),</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;                     <a class="code" href="classmsf__core_1_1MSF__Core.html" title="The core class of the EKF Does propagation of state and covariance but also applying measurements and...">MSF_Core&lt;EKFState_T&gt;</a>&amp; <a class="code" href="msf__macros_8h.html#a2d2af1048de7b1510994ffd3bc32aacc">UNUSEDPARAM</a>(core)) {</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <a class="code" href="msf__macros_8h.html#a852413224a5d3e667616aa295266ecaf">MSF_ERROR_STREAM</a>(</div>
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;        <span class="stringliteral">&quot;Called apply() on an MSF_InvalidMeasurement object. This should never &quot;</span></div>
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        <span class="stringliteral">&quot;happen.&quot;</span>);</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;  }</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  <span class="keyword">virtual</span> std::string type() {</div>
+<div class="line"><a name="l00091"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__InvalidMeasurement.html#abe3df54c608c49a3a26905b5d953713a">   91</a></span>&#160;  <span class="keyword">virtual</span> std::string <a class="code" href="classmsf__core_1_1MSF__InvalidMeasurement.html#abe3df54c608c49a3a26905b5d953713a">type</a>() {</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    <span class="keywordflow">return</span> <span class="stringliteral">&quot;invalid&quot;</span>;</div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;  }</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  <a class="code" href="classmsf__core_1_1MSF__InvalidMeasurement.html" title="An invalid measurement needed for the measurement container to report if something went wrong...">MSF_InvalidMeasurement</a>()</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;      : <a class="code" href="classmsf__core_1_1MSF__MeasurementBase.html" title="The base class for all measurement types. These are the objects provided to the EKF core to be applie...">MSF_MeasurementBase&lt;EKFState_T&gt;</a>(<span class="keyword">true</span>, -1) {</div>
+<div class="line"><a name="l00094"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__InvalidMeasurement.html#a9de779048641efba62e57011cb54f060">   94</a></span>&#160;  <a class="code" href="classmsf__core_1_1MSF__InvalidMeasurement.html#a9de779048641efba62e57011cb54f060">MSF_InvalidMeasurement</a>()</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;      : <a class="code" href="classmsf__core_1_1MSF__MeasurementBase.html" title="The base class for all measurement types. These are the objects provided to the EKF core to be applie...">MSF_MeasurementBase</a>&lt;EKFState_T&gt;(true, -1) {</div>
 <div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;  }</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;  <span class="keyword">virtual</span> ~<a class="code" href="classmsf__core_1_1MSF__InvalidMeasurement.html" title="An invalid measurement needed for the measurement container to report if something went wrong...">MSF_InvalidMeasurement</a>() {</div>
+<div class="line"><a name="l00097"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__InvalidMeasurement.html#aad62066f23c196f38607f66278dd0eac">   97</a></span>&#160;  <span class="keyword">virtual</span> <a class="code" href="classmsf__core_1_1MSF__InvalidMeasurement.html#aad62066f23c196f38607f66278dd0eac">~MSF_InvalidMeasurement</a>() {</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  }</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;};</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;</div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> T, <span class="keyword">typename</span> RMAT_T, <span class="keyword">typename</span> EKFState_T&gt;</div>
 <div class="line"><a name="l00108"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__Measurement.html">  108</a></span>&#160;<span class="keyword">class </span><a class="code" href="classmsf__core_1_1MSF__Measurement.html" title="The class for sensor based measurements which we want to apply to a state in the update routine of th...">MSF_Measurement</a> : <span class="keyword">public</span> <a class="code" href="classmsf__core_1_1MSF__MeasurementBase.html" title="The base class for all measurement types. These are the objects provided to the EKF core to be applie...">MSF_MeasurementBase</a>&lt;EKFState_T&gt; {</div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160; <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">void</span> makeFromSensorReadingImpl(</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classmsf__core_1_1MSF__Measurement.html#a46f5283b196c6a7a34b9aa8ff85c8358">makeFromSensorReadingImpl</a>(</div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;      <span class="keyword">const</span> boost::shared_ptr&lt;T const&gt; reading) = 0;</div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160; <span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;  RMAT_T R_;</div>
+<div class="line"><a name="l00113"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__Measurement.html#a20fcacb533df8a1e6ae4fad4a3eb06ec">  113</a></span>&#160;  RMAT_T <a class="code" href="classmsf__core_1_1MSF__Measurement.html#a20fcacb533df8a1e6ae4fad4a3eb06ec">R_</a>;</div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160; <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;  <span class="keyword">typedef</span> T Measurement_type;</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;  <span class="keyword">typedef</span> boost::shared_ptr&lt;T const&gt; Measurement_ptr;</div>
+<div class="line"><a name="l00115"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__Measurement.html#a481fa3230f73f28a8489223311c3033f">  115</a></span>&#160;  <a class="code" href="classmsf__core_1_1MSF__Measurement.html#a481fa3230f73f28a8489223311c3033f">EIGEN_MAKE_ALIGNED_OPERATOR_NEW</a>;</div>
+<div class="line"><a name="l00116"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__Measurement.html#ab102d2c17bef09be28cb1403017992b6">  116</a></span>&#160;  <span class="keyword">typedef</span> T <a class="code" href="classmsf__core_1_1MSF__Measurement.html#ab102d2c17bef09be28cb1403017992b6">Measurement_type</a>;</div>
+<div class="line"><a name="l00117"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__Measurement.html#afa4f826dadcfd129a50330f078a8dbf8">  117</a></span>&#160;  <span class="keyword">typedef</span> boost::shared_ptr&lt;T const&gt; <a class="code" href="classmsf__core_1_1MSF__Measurement.html#afa4f826dadcfd129a50330f078a8dbf8">Measurement_ptr</a>;</div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  <a class="code" href="classmsf__core_1_1MSF__Measurement.html" title="The class for sensor based measurements which we want to apply to a state in the update routine of th...">MSF_Measurement</a>(<span class="keywordtype">bool</span> isAbsoluteMeasurement, <span class="keywordtype">int</span> sensorID)</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;      : <a class="code" href="classmsf__core_1_1MSF__MeasurementBase.html" title="The base class for all measurement types. These are the objects provided to the EKF core to be applie...">MSF_MeasurementBase&lt;EKFState_T&gt;</a>(isAbsoluteMeasurement, sensorID) {</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    R_.setZero();</div>
+<div class="line"><a name="l00119"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__Measurement.html#a33143412cbcabec0c16e1c6ad82641d0">  119</a></span>&#160;  <a class="code" href="classmsf__core_1_1MSF__Measurement.html#a33143412cbcabec0c16e1c6ad82641d0">MSF_Measurement</a>(<span class="keywordtype">bool</span> isAbsoluteMeasurement, <span class="keywordtype">int</span> sensorID)</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;      : <a class="code" href="classmsf__core_1_1MSF__MeasurementBase.html" title="The base class for all measurement types. These are the objects provided to the EKF core to be applie...">MSF_MeasurementBase</a>&lt;EKFState_T&gt;(isAbsoluteMeasurement, sensorID) {</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <a class="code" href="classmsf__core_1_1MSF__Measurement.html#a20fcacb533df8a1e6ae4fad4a3eb06ec">R_</a>.setZero();</div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;  }</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;  <span class="keyword">virtual</span> ~<a class="code" href="classmsf__core_1_1MSF__Measurement.html" title="The class for sensor based measurements which we want to apply to a state in the update routine of th...">MSF_Measurement</a>() {</div>
+<div class="line"><a name="l00123"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__Measurement.html#a922f76000be4c759fb5b0cfa294e2593">  123</a></span>&#160;  <span class="keyword">virtual</span> <a class="code" href="classmsf__core_1_1MSF__Measurement.html#a922f76000be4c759fb5b0cfa294e2593">~MSF_Measurement</a>() {</div>
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;  }</div>
 <div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;  ;</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;  <span class="keywordtype">void</span> makeFromSensorReading(<span class="keyword">const</span> boost::shared_ptr&lt;T const&gt; reading,</div>
+<div class="line"><a name="l00126"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__Measurement.html#a345b17105929ac6c70a0a5d21e281a5c">  126</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classmsf__core_1_1MSF__Measurement.html#a345b17105929ac6c70a0a5d21e281a5c">makeFromSensorReading</a>(<span class="keyword">const</span> boost::shared_ptr&lt;T const&gt; reading,</div>
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;                             <span class="keywordtype">double</span> timestamp) {</div>
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    this-&gt;<a class="code" href="classmsf__core_1_1MSF__MeasurementBase.html#a48b55b129f13afbed86db1b0543562db" title="The time_ this measurement was taken.">time</a> = timestamp;</div>
 <div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    makeFromSensorReadingImpl(reading);</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <a class="code" href="classmsf__core_1_1MSF__Measurement.html#a46f5283b196c6a7a34b9aa8ff85c8358">makeFromSensorReadingImpl</a>(reading);</div>
 <div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;</div>
 <div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <span class="comment">// Check whether the user has set R.</span></div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    <span class="keywordflow">if</span> (R_.minCoeff() == 0.0 &amp;&amp; R_.maxCoeff() == 0.0) {</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;      MSF_WARN_STREAM_THROTTLE(</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    <span class="keywordflow">if</span> (<a class="code" href="classmsf__core_1_1MSF__Measurement.html#a20fcacb533df8a1e6ae4fad4a3eb06ec">R_</a>.minCoeff() == 0.0 &amp;&amp; <a class="code" href="classmsf__core_1_1MSF__Measurement.html#a20fcacb533df8a1e6ae4fad4a3eb06ec">R_</a>.maxCoeff() == 0.0) {</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;      <a class="code" href="msf__macros_8h.html#a51b3004c146da17dcb8a35a4168bad47">MSF_WARN_STREAM_THROTTLE</a>(</div>
 <div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;          2,</div>
 <div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;          <span class="stringliteral">&quot;The measurement covariance matrix seems to be not set for the current &quot;</span></div>
 <div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;          <span class="stringliteral">&quot;measurement. Please double check!&quot;</span>);</div>
 <div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    }</div>
 <div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; R_.RowsAtCompileTime; ++i) {</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;      <span class="keywordflow">if</span> (R_(i, i) == 0.0) {</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;        MSF_WARN_STREAM_THROTTLE(</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code" href="classmsf__core_1_1MSF__Measurement.html#a20fcacb533df8a1e6ae4fad4a3eb06ec">R_</a>.RowsAtCompileTime; ++i) {</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;      <span class="keywordflow">if</span> (<a class="code" href="classmsf__core_1_1MSF__Measurement.html#a20fcacb533df8a1e6ae4fad4a3eb06ec">R_</a>(i, i) == 0.0) {</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;        <a class="code" href="msf__macros_8h.html#a51b3004c146da17dcb8a35a4168bad47">MSF_WARN_STREAM_THROTTLE</a>(</div>
 <div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;            2,</div>
 <div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;            <span class="stringliteral">&quot;The measurement covariance matrix has some diagonal elements set to &quot;</span></div>
 <div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;            <span class="stringliteral">&quot;zero. Please double check!&quot;</span>);</div>
@@ -218,49 +219,49 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> EKFState_T&gt;</div>
 <div class="line"><a name="l00158"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html">  158</a></span>&#160;<span class="keyword">class </span><a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html" title="A measurement to be send to initialize parts of or the full EKF state this can especially be used to ...">MSF_InitMeasurement</a> : <span class="keyword">public</span> <a class="code" href="classmsf__core_1_1MSF__MeasurementBase.html" title="The base class for all measurement types. These are the objects provided to the EKF core to be applie...">MSF_MeasurementBase</a>&lt;EKFState_T&gt; {</div>
 <div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160; <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;  EKFState_T InitState;  </div>
+<div class="line"><a name="l00160"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html#a3eec8952562e2632f9c6f1b23ee49aec">  160</a></span>&#160;  EKFState_T <a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html#a3eec8952562e2632f9c6f1b23ee49aec">InitState</a>;  </div>
 <div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;  <span class="keywordtype">bool</span> ContainsInitialSensorReadings_;</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;  <span class="keyword">typedef</span> <span class="keyword">typename</span> EKFState_T::StateSequence_T StateSequence_T;</div>
+<div class="line"><a name="l00162"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html#a8dfcbfdee2b01e6afd0a2160b613acfa">  162</a></span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html#a8dfcbfdee2b01e6afd0a2160b613acfa" title="Flag whether this measurement contains initial sensor readings.">ContainsInitialSensorReadings_</a>;</div>
+<div class="line"><a name="l00163"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html#ad7fbcb406d4386f3a3088ecf8eb17585">  163</a></span>&#160;  <span class="keyword">typedef</span> <span class="keyword">typename</span> EKFState_T::StateSequence_T <a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html#ad7fbcb406d4386f3a3088ecf8eb17585">StateSequence_T</a>;</div>
 <div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160; <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;  EIGEN_MAKE_ALIGNED_OPERATOR_NEW <a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html" title="A measurement to be send to initialize parts of or the full EKF state this can especially be used to ...">MSF_InitMeasurement</a>(</div>
+<div class="line"><a name="l00165"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html#aaa7c4e7ea351aae40daa3ce32fb37e58">  165</a></span>&#160;  EIGEN_MAKE_ALIGNED_OPERATOR_NEW <a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html#aaa7c4e7ea351aae40daa3ce32fb37e58">MSF_InitMeasurement</a>(</div>
 <div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;      <span class="keywordtype">bool</span> ContainsInitialSensorReadings)</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;      : <a class="code" href="classmsf__core_1_1MSF__MeasurementBase.html" title="The base class for all measurement types. These are the objects provided to the EKF core to be applie...">MSF_MeasurementBase&lt;EKFState_T&gt;</a>(<span class="keyword">true</span>, -1) {</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    ContainsInitialSensorReadings_ = ContainsInitialSensorReadings;</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;      : <a class="code" href="classmsf__core_1_1MSF__MeasurementBase.html" title="The base class for all measurement types. These are the objects provided to the EKF core to be applie...">MSF_MeasurementBase</a>&lt;EKFState_T&gt;(true, -1) {</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html#a8dfcbfdee2b01e6afd0a2160b613acfa" title="Flag whether this measurement contains initial sensor readings.">ContainsInitialSensorReadings_</a> = ContainsInitialSensorReadings;</div>
 <div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    this-&gt;<a class="code" href="classmsf__core_1_1MSF__MeasurementBase.html#a48b55b129f13afbed86db1b0543562db" title="The time_ this measurement was taken.">time</a> = ros::Time::now().toSec();</div>
 <div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;  }</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;  <span class="keyword">virtual</span> ~MSF_InitMeasurement() {</div>
+<div class="line"><a name="l00171"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html#a54cf10c917a3960d7e0e14164a18348b">  171</a></span>&#160;  <span class="keyword">virtual</span> <a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html#a54cf10c917a3960d7e0e14164a18348b">~MSF_InitMeasurement</a>() {</div>
 <div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;  }</div>
 <div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;  ;</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;  <span class="keyword">virtual</span> std::string type() {</div>
+<div class="line"><a name="l00174"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html#a6ade2a1ba88e5f26de2125258e4c5238">  174</a></span>&#160;  <span class="keyword">virtual</span> std::string <a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html#a6ade2a1ba88e5f26de2125258e4c5238">type</a>() {</div>
 <div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    <span class="keywordflow">return</span> <span class="stringliteral">&quot;init&quot;</span>;</div>
 <div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;  }</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;  <span class="keyword">typename</span> EKFState_T::P_type&amp; get_P() {</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    <span class="keywordflow">return</span> InitState.P;</div>
+<div class="line"><a name="l00177"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html#a19cc3b1efefda7694cca93d1bae441f5">  177</a></span>&#160;  <span class="keyword">typename</span> EKFState_T::P_type&amp; <a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html#a19cc3b1efefda7694cca93d1bae441f5">get_P</a>() {</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html#a3eec8952562e2632f9c6f1b23ee49aec">InitState</a>.P;</div>
 <div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;  }</div>
 <div class="line"><a name="l00183"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html#af0c9a4a740bc019d8a6a223d469bb42f">  183</a></span>&#160;  Eigen::Matrix&lt;double, 3, 1&gt;&amp; <a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html#af0c9a4a740bc019d8a6a223d469bb42f" title="Get the gyro measurement.">get_w_m</a>() {</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    <span class="keywordflow">return</span> InitState.w_m;</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html#a3eec8952562e2632f9c6f1b23ee49aec">InitState</a>.w_m;</div>
 <div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;  }</div>
 <div class="line"><a name="l00189"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html#a4c2c7250787e58868c9fc9596ed4c217">  189</a></span>&#160;  Eigen::Matrix&lt;double, 3, 1&gt;&amp; <a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html#a4c2c7250787e58868c9fc9596ed4c217" title="Get the acceleration measurment.">get_a_m</a>() {</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    <span class="keywordflow">return</span> InitState.a_m;</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html#a3eec8952562e2632f9c6f1b23ee49aec">InitState</a>.a_m;</div>
 <div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;  }</div>
 <div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;</div>
 <div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;  <span class="keyword">template</span>&lt;<span class="keywordtype">int</span> INDEX, <span class="keyword">typename</span> T&gt;</div>
 <div class="line"><a name="l00198"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html#a972bcf6e09e13c96849b528c926b3a33">  198</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html#a972bcf6e09e13c96849b528c926b3a33" title="Set the flag that the state variable at index INDEX has init values for the state.">setStateInitValue</a>(<span class="keyword">const</span> T&amp; initvalue) {</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    InitState.template getStateVar&lt;INDEX&gt;().state_ = initvalue;</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    InitState.template getStateVar&lt;INDEX&gt;().hasResetValue = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    <a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html#a3eec8952562e2632f9c6f1b23ee49aec">InitState</a>.template getStateVar&lt;INDEX&gt;().state_ = initvalue;</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    <a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html#a3eec8952562e2632f9c6f1b23ee49aec">InitState</a>.template getStateVar&lt;INDEX&gt;().hasResetValue = <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;  }</div>
 <div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;</div>
 <div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;  <span class="keyword">template</span>&lt;<span class="keywordtype">int</span> INDEX&gt;</div>
 <div class="line"><a name="l00208"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html#aa95a1f961bac237267d133035a113728">  208</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html#aa95a1f961bac237267d133035a113728" title="Reset the flag that the state variable at index INDEX has init values for the state.">resetStateInitValue</a>() {</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    InitState.template get&lt;INDEX&gt;().hasResetValue = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    <a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html#a3eec8952562e2632f9c6f1b23ee49aec">InitState</a>.template get&lt;INDEX&gt;().hasResetValue = <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;  }</div>
 <div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;</div>
 <div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;  <span class="keyword">template</span>&lt;<span class="keywordtype">int</span> INDEX&gt;</div>
 <div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;  <span class="keyword">const</span> <span class="keyword">typename</span> <a class="code" href="structmsf__tmp_1_1StripReference.html">msf_tmp::StripReference</a>&lt;<span class="keyword">typename</span> boost::fusion::result_of::at_c</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;  &lt;StateSequence_T, INDEX &gt;::type&gt;::result_t::value_t&amp;</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;  &lt;<a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html#ad7fbcb406d4386f3a3088ecf8eb17585">StateSequence_T</a>, INDEX &gt;<a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html#a6ade2a1ba88e5f26de2125258e4c5238">::type</a>&gt;::result_t::value_t&amp;</div>
 <div class="line"><a name="l00219"></a><span class="lineno"><a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html#acd59df20e43b7151b1549b1a43a93511">  219</a></span>&#160;  <a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html#acd59df20e43b7151b1549b1a43a93511" title="Get the value stored in this object to initialize a state variable at index INDEX.">getStateInitValue</a>()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    <span class="keywordflow">return</span> InitState.template get&lt;INDEX&gt;();</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html#a3eec8952562e2632f9c6f1b23ee49aec">InitState</a>.template get&lt;INDEX&gt;();</div>
 <div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;  }</div>
 <div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;</div>
 <div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classmsf__core_1_1MSF__InitMeasurement.html#a7b92f1e55007491bec20273f6cc25ba6" title="The method called by the msf_core to apply the measurement represented by this object.">apply</a>(shared_ptr&lt;EKFState_T&gt; stateWithCovariance, <a class="code" href="classmsf__core_1_1MSF__Core.html" title="The core class of the EKF Does propagation of state and covariance but also applying measurements and...">MSF_Core&lt;EKFState_T&gt;</a>&amp; core);</div>
@@ -277,13 +278,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;</div>
 <div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;}</div>
 <div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;<span class="preprocessor">#include &lt;msf_core/implementation/msf_measurement.hpp&gt;</span></div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="msf__measurement_8hpp.html">msf_core/implementation/msf_measurement.hpp</a>&gt;</span></div>
 <div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;</div>
 <div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;<span class="preprocessor">#endif  // MEASUREMENT_H_</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Nov 6 2013 21:53:35 for msf - modular sensor fusion by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 6 2013 22:06:47 for ethzasl-msf - Modular Sensor Fusion by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.1.2
 </small></address>

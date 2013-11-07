@@ -1,0 +1,29 @@
+\hypertarget{msf__state_8h}{\section{msf\-\_\-core/include/msf\-\_\-core/msf\-\_\-state.h File Reference}
+\label{msf__state_8h}\index{msf\-\_\-core/include/msf\-\_\-core/msf\-\_\-state.\-h@{msf\-\_\-core/include/msf\-\_\-core/msf\-\_\-state.\-h}}
+}
+{\ttfamily \#include $<$msf\-\_\-core/msf\-\_\-types.\-hpp$>$}\\*
+{\ttfamily \#include $<$msf\-\_\-core/msf\-\_\-tmp.\-h$>$}\\*
+{\ttfamily \#include $<$msf\-\_\-core/msf\-\_\-statevisitor.\-h$>$}\\*
+{\ttfamily \#include $<$Eigen/\-Dense$>$}\\*
+{\ttfamily \#include $<$Eigen/\-Geometry$>$}\\*
+{\ttfamily \#include $<$vector$>$}\\*
+{\ttfamily \#include $<$utility$>$}\\*
+{\ttfamily \#include $<$msf\-\_\-core/eigen\-\_\-conversions.\-h$>$}\\*
+{\ttfamily \#include $<$sensor\-\_\-fusion\-\_\-comm/\-Ext\-State.\-h$>$}\\*
+{\ttfamily \#include $<$sensor\-\_\-fusion\-\_\-comm/\-Double\-Array\-Stamped.\-h$>$}\\*
+{\ttfamily \#include $<$geometry\-\_\-msgs/\-Pose\-With\-Covariance\-Stamped.\-h$>$}\\*
+{\ttfamily \#include $<$msf\-\_\-core/implementation/msf\-\_\-state\-\_\-.\-hpp$>$}\\*
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structmsf__core_1_1StateVar__T}{msf\-\_\-core\-::\-State\-Var\-\_\-\-T$<$ type\-\_\-\-T, name\-\_\-\-T, S\-T\-A\-T\-E\-T\-Y\-P\-E, O\-P\-T\-I\-O\-N\-S $>$}
+\begin{DoxyCompactList}\small\item\em A state variable with a name as specified in the state name enum. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__core_1_1GenericState__T}{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T$<$ State\-Seq\-\_\-\-T, State\-Def\-\_\-\-T $>$}
+\begin{DoxyCompactList}\small\item\em The state vector containing all the state variables for this E\-K\-F configuration. \end{DoxyCompactList}\item 
+class \hyperlink{classmsf__core_1_1sortStates}{msf\-\_\-core\-::sort\-States$<$ state\-Sequence\-\_\-\-T, state\-Definition\-\_\-\-T $>$}
+\begin{DoxyCompactList}\small\item\em Comparator for the state objects. sorts by time asc. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \hyperlink{namespacemsf__core}{msf\-\_\-core}
+\end{DoxyCompactItemize}

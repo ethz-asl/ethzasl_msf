@@ -1,0 +1,247 @@
+\hypertarget{namespacemsf__core}{\section{msf\-\_\-core Namespace Reference}
+\label{namespacemsf__core}\index{msf\-\_\-core@{msf\-\_\-core}}
+}
+\subsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+namespace \hyperlink{namespacemsf__core_1_1similarity__transform}{similarity\-\_\-transform}
+\end{DoxyCompactItemize}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classmsf__core_1_1GPSConversion}{G\-P\-S\-Conversion}
+\item 
+class \hyperlink{classmsf__core_1_1CheckFuzzyTracking}{Check\-Fuzzy\-Tracking}
+\item 
+class \hyperlink{classmsf__core_1_1CheckFuzzyTracking_3_01EKFState__T_00_01mpl___1_1void___01_4}{Check\-Fuzzy\-Tracking$<$ E\-K\-F\-State\-\_\-\-T, mpl\-\_\-\-::void\-\_\- $>$}
+\item 
+class \hyperlink{classmsf__core_1_1MSF__Core}{M\-S\-F\-\_\-\-Core}
+\begin{DoxyCompactList}\small\item\em The core class of the E\-K\-F Does propagation of state and covariance but also applying measurements and managing states and measurements in lists sorted by time stamp. \end{DoxyCompactList}\item 
+class \hyperlink{classmsf__core_1_1IMUHandler}{I\-M\-U\-Handler}
+\item 
+class \hyperlink{classmsf__core_1_1IMUHandler__ROS}{I\-M\-U\-Handler\-\_\-\-R\-O\-S}
+\item 
+class \hyperlink{classmsf__core_1_1MSF__MeasurementBase}{M\-S\-F\-\_\-\-Measurement\-Base}
+\begin{DoxyCompactList}\small\item\em The base class for all measurement types. These are the objects provided to the E\-K\-F core to be applied in correct order to the states. \end{DoxyCompactList}\item 
+class \hyperlink{classmsf__core_1_1MSF__InvalidMeasurement}{M\-S\-F\-\_\-\-Invalid\-Measurement}
+\begin{DoxyCompactList}\small\item\em An invalid measurement needed for the measurement container to report if something went wrong. \end{DoxyCompactList}\item 
+class \hyperlink{classmsf__core_1_1MSF__Measurement}{M\-S\-F\-\_\-\-Measurement}
+\begin{DoxyCompactList}\small\item\em The class for sensor based measurements which we want to apply to a state in the update routine of the E\-K\-F. This calls the apply correction method of the E\-K\-F core. \end{DoxyCompactList}\item 
+class \hyperlink{classmsf__core_1_1MSF__InitMeasurement}{M\-S\-F\-\_\-\-Init\-Measurement}
+\begin{DoxyCompactList}\small\item\em A measurement to be send to initialize parts of or the full E\-K\-F state this can especially be used to split the initialization of the E\-K\-F between multiple sensors which init different parts of the state. \end{DoxyCompactList}\item 
+class \hyperlink{classmsf__core_1_1sortMeasurements}{sort\-Measurements}
+\begin{DoxyCompactList}\small\item\em A comparator to sort measurements by time. \end{DoxyCompactList}\item 
+class \hyperlink{classmsf__core_1_1SensorHandler}{Sensor\-Handler}
+\begin{DoxyCompactList}\small\item\em Handles a sensor driver which provides the sensor readings. \end{DoxyCompactList}\item 
+class \hyperlink{classmsf__core_1_1MSF__SensorManager}{M\-S\-F\-\_\-\-Sensor\-Manager}
+\begin{DoxyCompactList}\small\item\em A manager for a given sensor set. Handlers for individual sensors (camera/vicon etc.) are registered with this class as handlers of particular sensors. This class also owns the E\-K\-F core instance and handles the initialization of the filter. \end{DoxyCompactList}\item 
+class \hyperlink{structmsf__core_1_1MSF__SensorManagerROS}{M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}
+\begin{DoxyCompactList}\small\item\em Abstract class defining user configurable calculations for the \hyperlink{namespacemsf__core}{msf\-\_\-core} with R\-O\-S interfaces. \end{DoxyCompactList}\item 
+class \hyperlink{classmsf__core_1_1SortedContainer}{Sorted\-Container}
+\begin{DoxyCompactList}\small\item\em Manages a sorted container with strict less than ordering used to store state and measurement objects which can then be queried for closest states/measurements to a given time instant. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__core_1_1StateVar__T}{State\-Var\-\_\-\-T}
+\begin{DoxyCompactList}\small\item\em A state variable with a name as specified in the state name enum. \end{DoxyCompactList}\item 
+struct \hyperlink{structmsf__core_1_1GenericState__T}{Generic\-State\-\_\-\-T}
+\begin{DoxyCompactList}\small\item\em The state vector containing all the state variables for this E\-K\-F configuration. \end{DoxyCompactList}\item 
+class \hyperlink{classmsf__core_1_1sortStates}{sort\-States}
+\begin{DoxyCompactList}\small\item\em Comparator for the state objects. sorts by time asc. \end{DoxyCompactList}\item 
+class \hyperlink{classmsf__core_1_1StateVisitor}{State\-Visitor}
+\begin{DoxyCompactList}\small\item\em Visitor pattern to allow the user to set state init values. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \\*
+dynamic\-\_\-reconfigure\-::\-Server\\*
+$<$ msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Core\-Config $>$ \hyperlink{namespacemsf__core_a1f60c4e359e82d9ad14dd135769ccc1a}{Reconfigure\-Server}
+\item 
+typedef Eigen\-::\-Quaternion$<$ double $>$ \hyperlink{namespacemsf__core_a044c525dd7800e2e2f4bb86fc565a7c7}{Quaternion}
+\end{DoxyCompactItemize}
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ \hyperlink{namespacemsf__core_a7250e8c11f743373771fc229011ae788a0c9bb148eede8a7954b42003c28db10b}{Core\-State\-With\-Propagation}, 
+\hyperlink{namespacemsf__core_a7250e8c11f743373771fc229011ae788adeecad6ca6b649385e01284db731a939}{Core\-State\-Without\-Propagation}, 
+\hyperlink{namespacemsf__core_a7250e8c11f743373771fc229011ae788a8c6eab374d267866f8dd37afe9f13598}{Auxiliary}, 
+\hyperlink{namespacemsf__core_a7250e8c11f743373771fc229011ae788aa6011035f76e9b286df13b28730529f4}{Auxiliary\-Non\-Temporal\-Drifting}
+ \}
+\item 
+enum \{ \hyperlink{namespacemsf__core_a5556ef5ed137371baee7e5781d6adf19ae4114cf2d14f44cd24e8ac5aef8b5278}{none} =  0x0, 
+\hyperlink{namespacemsf__core_a5556ef5ed137371baee7e5781d6adf19ad901bb385d01dfd28356ca12451ac791}{correction\-Multiplicative} =  0x1
+ \}
+\item 
+enum \{ \hyperlink{namespacemsf__core_a9aeda07a4bea09a1939516f18f299e16acb10c2fbf0037699227a1378aa886fe4}{H\-L\-I\-\_\-\-E\-K\-F\-\_\-\-S\-T\-A\-T\-E\-\_\-\-S\-I\-Z\-E} =  16
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+double \hyperlink{namespacemsf__core_aee980177ac4429201472c20bb8b04612}{timehuman} (double val)
+\item 
+{\footnotesize template$<$typename D $>$ }\\Eigen\-::\-Matrix\-Base$<$ D $>$\-::Scalar \hyperlink{namespacemsf__core_aa8485fa93cf8a65a20cf609a6ec40f56}{get\-Median} (const Eigen\-::\-Matrix\-Base$<$ D $>$ \&data)
+\item 
+Vector3 \hyperlink{namespacemsf__core_a531123cfe2ad9131a453087bc974e6dd}{geometry\-\_\-msgs\-To\-Eigen} (const geometry\-\_\-msgs\-::\-Point \&p)
+\begin{DoxyCompactList}\small\item\em Converts a geometry\-\_\-msgs\-::\-Point to an Eigen Vector3d. \end{DoxyCompactList}\item 
+Eigen\-::\-Quaterniond \hyperlink{namespacemsf__core_a3430943bc018ba721de751a9fcdb8462}{geometry\-\_\-msgs\-To\-Eigen} (const geometry\-\_\-msgs\-::\-Quaternion \&q)
+\begin{DoxyCompactList}\small\item\em Converts a geometry\-\_\-msgs\-::\-Quaternion to an Eigen\-::\-Quaterniond. \end{DoxyCompactList}\item 
+Matrix3 \hyperlink{namespacemsf__core_a3b1572f4facb6f46c2b154cb1fd7372c}{geometry\-\_\-msgs\-Cov\-Block\-To\-Eigen} (const geometry\-\_\-msgs\-::\-Pose\-With\-Covariance\-::\-\_\-covariance\-\_\-type \&gcov, int start\-\_\-row, int start\-\_\-col)
+\begin{DoxyCompactList}\small\item\em Returns a 3x3 covariance block entry from a geometry\-\_\-msgs\-::\-Pose\-With\-Covariance\-::covariance array. \end{DoxyCompactList}\item 
+{\footnotesize template$<$class Derived $>$ }\\void \hyperlink{namespacemsf__core_aa55165dedfc79ffa6f95b337d2e8b1eb}{eigen\-Cov\-Block\-To\-Geometry\-\_\-msgs} (geometry\-\_\-msgs\-::\-Pose\-With\-Covariance\-::\-\_\-covariance\-\_\-type \&gcov, const Eigen\-::\-Matrix\-Base$<$ Derived $>$ \&ecov, int start\-\_\-row, int start\-\_\-col)
+\begin{DoxyCompactList}\small\item\em Fills a 3x3 covariance block entry of a geometry\-\_\-msgs\-::\-Pose\-With\-Covariance\-::covariance array from an Eigen 3x3 matrix. \end{DoxyCompactList}\item 
+{\footnotesize template$<$class Derived $>$ }\\geometry\-\_\-msgs\-::\-Point \hyperlink{namespacemsf__core_ae9e9826a3cf9d0a0d29cb0d3b2c2f37c}{eigen\-To\-Geometry\-\_\-msgs} (const Eigen\-::\-Matrix\-Base$<$ Derived $>$ \&p)
+\begin{DoxyCompactList}\small\item\em Converts any eigen vector with 3 elements to a geometry\-\_\-msgs\-::\-Point. \end{DoxyCompactList}\item 
+geometry\-\_\-msgs\-::\-Quaternion \hyperlink{namespacemsf__core_aa2c20e862db8f30eb976ba797bacff2c}{eigen\-To\-Geometry\-\_\-msgs} (const Eigen\-::\-Quaterniond \&q)
+\begin{DoxyCompactList}\small\item\em Converts an Eigen\-::\-Quaterniond to a geometry\-\_\-msgs\-::\-Quaternion. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Typedef Documentation}
+\hypertarget{namespacemsf__core_a044c525dd7800e2e2f4bb86fc565a7c7}{\index{msf\-\_\-core@{msf\-\_\-core}!Quaternion@{Quaternion}}
+\index{Quaternion@{Quaternion}!msf_core@{msf\-\_\-core}}
+\subsubsection[{Quaternion}]{\setlength{\rightskip}{0pt plus 5cm}typedef Eigen\-::\-Quaternion$<$double$>$ {\bf msf\-\_\-core\-::\-Quaternion}}}\label{namespacemsf__core_a044c525dd7800e2e2f4bb86fc565a7c7}
+\hypertarget{namespacemsf__core_a1f60c4e359e82d9ad14dd135769ccc1a}{\index{msf\-\_\-core@{msf\-\_\-core}!Reconfigure\-Server@{Reconfigure\-Server}}
+\index{Reconfigure\-Server@{Reconfigure\-Server}!msf_core@{msf\-\_\-core}}
+\subsubsection[{Reconfigure\-Server}]{\setlength{\rightskip}{0pt plus 5cm}typedef dynamic\-\_\-reconfigure\-::\-Server$<$msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Core\-Config$>$ {\bf msf\-\_\-core\-::\-Reconfigure\-Server}}}\label{namespacemsf__core_a1f60c4e359e82d9ad14dd135769ccc1a}
+
+
+\subsection{Enumeration Type Documentation}
+\hypertarget{namespacemsf__core_a7250e8c11f743373771fc229011ae788}{\subsubsection[{anonymous enum}]{\setlength{\rightskip}{0pt plus 5cm}anonymous enum}}\label{namespacemsf__core_a7250e8c11f743373771fc229011ae788}
+\begin{Desc}
+\item[Enumerator\-: ]\par
+\begin{description}
+\index{Core\-State\-With\-Propagation@{Core\-State\-With\-Propagation}!msf\-\_\-core@{msf\-\_\-core}}\index{msf\-\_\-core@{msf\-\_\-core}!Core\-State\-With\-Propagation@{Core\-State\-With\-Propagation}}\item[{\em 
+\hypertarget{namespacemsf__core_a7250e8c11f743373771fc229011ae788a0c9bb148eede8a7954b42003c28db10b}{Core\-State\-With\-Propagation}\label{namespacemsf__core_a7250e8c11f743373771fc229011ae788a0c9bb148eede8a7954b42003c28db10b}
+}]\index{Core\-State\-Without\-Propagation@{Core\-State\-Without\-Propagation}!msf\-\_\-core@{msf\-\_\-core}}\index{msf\-\_\-core@{msf\-\_\-core}!Core\-State\-Without\-Propagation@{Core\-State\-Without\-Propagation}}\item[{\em 
+\hypertarget{namespacemsf__core_a7250e8c11f743373771fc229011ae788adeecad6ca6b649385e01284db731a939}{Core\-State\-Without\-Propagation}\label{namespacemsf__core_a7250e8c11f743373771fc229011ae788adeecad6ca6b649385e01284db731a939}
+}]\index{Auxiliary@{Auxiliary}!msf\-\_\-core@{msf\-\_\-core}}\index{msf\-\_\-core@{msf\-\_\-core}!Auxiliary@{Auxiliary}}\item[{\em 
+\hypertarget{namespacemsf__core_a7250e8c11f743373771fc229011ae788a8c6eab374d267866f8dd37afe9f13598}{Auxiliary}\label{namespacemsf__core_a7250e8c11f743373771fc229011ae788a8c6eab374d267866f8dd37afe9f13598}
+}]\index{Auxiliary\-Non\-Temporal\-Drifting@{Auxiliary\-Non\-Temporal\-Drifting}!msf\-\_\-core@{msf\-\_\-core}}\index{msf\-\_\-core@{msf\-\_\-core}!Auxiliary\-Non\-Temporal\-Drifting@{Auxiliary\-Non\-Temporal\-Drifting}}\item[{\em 
+\hypertarget{namespacemsf__core_a7250e8c11f743373771fc229011ae788aa6011035f76e9b286df13b28730529f4}{Auxiliary\-Non\-Temporal\-Drifting}\label{namespacemsf__core_a7250e8c11f743373771fc229011ae788aa6011035f76e9b286df13b28730529f4}
+}]\end{description}
+\end{Desc}
+
+\hypertarget{namespacemsf__core_a5556ef5ed137371baee7e5781d6adf19}{\subsubsection[{anonymous enum}]{\setlength{\rightskip}{0pt plus 5cm}anonymous enum}}\label{namespacemsf__core_a5556ef5ed137371baee7e5781d6adf19}
+\begin{Desc}
+\item[Enumerator\-: ]\par
+\begin{description}
+\index{none@{none}!msf\-\_\-core@{msf\-\_\-core}}\index{msf\-\_\-core@{msf\-\_\-core}!none@{none}}\item[{\em 
+\hypertarget{namespacemsf__core_a5556ef5ed137371baee7e5781d6adf19ae4114cf2d14f44cd24e8ac5aef8b5278}{none}\label{namespacemsf__core_a5556ef5ed137371baee7e5781d6adf19ae4114cf2d14f44cd24e8ac5aef8b5278}
+}]\index{correction\-Multiplicative@{correction\-Multiplicative}!msf\-\_\-core@{msf\-\_\-core}}\index{msf\-\_\-core@{msf\-\_\-core}!correction\-Multiplicative@{correction\-Multiplicative}}\item[{\em 
+\hypertarget{namespacemsf__core_a5556ef5ed137371baee7e5781d6adf19ad901bb385d01dfd28356ca12451ac791}{correction\-Multiplicative}\label{namespacemsf__core_a5556ef5ed137371baee7e5781d6adf19ad901bb385d01dfd28356ca12451ac791}
+}]\end{description}
+\end{Desc}
+
+\hypertarget{namespacemsf__core_a9aeda07a4bea09a1939516f18f299e16}{\subsubsection[{anonymous enum}]{\setlength{\rightskip}{0pt plus 5cm}anonymous enum}}\label{namespacemsf__core_a9aeda07a4bea09a1939516f18f299e16}
+\begin{Desc}
+\item[Enumerator\-: ]\par
+\begin{description}
+\index{H\-L\-I\-\_\-\-E\-K\-F\-\_\-\-S\-T\-A\-T\-E\-\_\-\-S\-I\-Z\-E@{H\-L\-I\-\_\-\-E\-K\-F\-\_\-\-S\-T\-A\-T\-E\-\_\-\-S\-I\-Z\-E}!msf\-\_\-core@{msf\-\_\-core}}\index{msf\-\_\-core@{msf\-\_\-core}!H\-L\-I\-\_\-\-E\-K\-F\-\_\-\-S\-T\-A\-T\-E\-\_\-\-S\-I\-Z\-E@{H\-L\-I\-\_\-\-E\-K\-F\-\_\-\-S\-T\-A\-T\-E\-\_\-\-S\-I\-Z\-E}}\item[{\em 
+\hypertarget{namespacemsf__core_a9aeda07a4bea09a1939516f18f299e16acb10c2fbf0037699227a1378aa886fe4}{H\-L\-I\-\_\-\-E\-K\-F\-\_\-\-S\-T\-A\-T\-E\-\_\-\-S\-I\-Z\-E}\label{namespacemsf__core_a9aeda07a4bea09a1939516f18f299e16acb10c2fbf0037699227a1378aa886fe4}
+}]Number of states exchanged with external propagation. \end{description}
+\end{Desc}
+
+
+
+\subsection{Function Documentation}
+\hypertarget{namespacemsf__core_aa55165dedfc79ffa6f95b337d2e8b1eb}{\index{msf\-\_\-core@{msf\-\_\-core}!eigen\-Cov\-Block\-To\-Geometry\-\_\-msgs@{eigen\-Cov\-Block\-To\-Geometry\-\_\-msgs}}
+\index{eigen\-Cov\-Block\-To\-Geometry\-\_\-msgs@{eigen\-Cov\-Block\-To\-Geometry\-\_\-msgs}!msf_core@{msf\-\_\-core}}
+\subsubsection[{eigen\-Cov\-Block\-To\-Geometry\-\_\-msgs}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Derived $>$ void msf\-\_\-core\-::eigen\-Cov\-Block\-To\-Geometry\-\_\-msgs (
+\begin{DoxyParamCaption}
+\item[{geometry\-\_\-msgs\-::\-Pose\-With\-Covariance\-::\-\_\-covariance\-\_\-type \&}]{gcov, }
+\item[{const Eigen\-::\-Matrix\-Base$<$ Derived $>$ \&}]{ecov, }
+\item[{int}]{start\-\_\-row, }
+\item[{int}]{start\-\_\-col}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{namespacemsf__core_aa55165dedfc79ffa6f95b337d2e8b1eb}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em gcov} & the geometry\-\_\-msgs\-::\-Pose\-With\-Covariance\-::covariance array to get the block from \\
+\hline
+\mbox{\tt in}  & {\em ecov} & 3x3 Eigen\-::\-Matrix covariance block \\
+\hline
+\mbox{\tt in}  & {\em start\-\_\-row} & start row of the block; use 
+\begin{DoxyCode}
+ \hyperlink{namespacegeometry__msgs_1_1cov_a39ced537b52c13c965a0ccdfe23f4dd1a564e84fef1216ef14d3dbf7ed94cb357}{geometry\_msgs::cov::p}
+and \hyperlink{namespacegeometry__msgs_1_1cov_a39ced537b52c13c965a0ccdfe23f4dd1a45bc9ae177afeb4ed8e0a975dc10b8e8}{geometry\_msgs::cov::q} 
+\end{DoxyCode}
+ \\
+\hline
+\mbox{\tt in}  & {\em start\-\_\-col} & start column of the block; use 
+\begin{DoxyCode}
+ \hyperlink{namespacegeometry__msgs_1_1cov_a39ced537b52c13c965a0ccdfe23f4dd1a564e84fef1216ef14d3dbf7ed94cb357}{geometry\_msgs::cov::p}
+and \hyperlink{namespacegeometry__msgs_1_1cov_a39ced537b52c13c965a0ccdfe23f4dd1a45bc9ae177afeb4ed8e0a975dc10b8e8}{geometry\_msgs::cov::q} 
+\end{DoxyCode}
+ \\
+\hline
+\end{DoxyParams}
+\hypertarget{namespacemsf__core_ae9e9826a3cf9d0a0d29cb0d3b2c2f37c}{\index{msf\-\_\-core@{msf\-\_\-core}!eigen\-To\-Geometry\-\_\-msgs@{eigen\-To\-Geometry\-\_\-msgs}}
+\index{eigen\-To\-Geometry\-\_\-msgs@{eigen\-To\-Geometry\-\_\-msgs}!msf_core@{msf\-\_\-core}}
+\subsubsection[{eigen\-To\-Geometry\-\_\-msgs}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Derived $>$ geometry\-\_\-msgs\-::\-Point msf\-\_\-core\-::eigen\-To\-Geometry\-\_\-msgs (
+\begin{DoxyParamCaption}
+\item[{const Eigen\-::\-Matrix\-Base$<$ Derived $>$ \&}]{p}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{namespacemsf__core_ae9e9826a3cf9d0a0d29cb0d3b2c2f37c}
+\hypertarget{namespacemsf__core_aa2c20e862db8f30eb976ba797bacff2c}{\index{msf\-\_\-core@{msf\-\_\-core}!eigen\-To\-Geometry\-\_\-msgs@{eigen\-To\-Geometry\-\_\-msgs}}
+\index{eigen\-To\-Geometry\-\_\-msgs@{eigen\-To\-Geometry\-\_\-msgs}!msf_core@{msf\-\_\-core}}
+\subsubsection[{eigen\-To\-Geometry\-\_\-msgs}]{\setlength{\rightskip}{0pt plus 5cm}geometry\-\_\-msgs\-::\-Quaternion msf\-\_\-core\-::eigen\-To\-Geometry\-\_\-msgs (
+\begin{DoxyParamCaption}
+\item[{const Eigen\-::\-Quaterniond \&}]{q}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{namespacemsf__core_aa2c20e862db8f30eb976ba797bacff2c}
+\hypertarget{namespacemsf__core_a3b1572f4facb6f46c2b154cb1fd7372c}{\index{msf\-\_\-core@{msf\-\_\-core}!geometry\-\_\-msgs\-Cov\-Block\-To\-Eigen@{geometry\-\_\-msgs\-Cov\-Block\-To\-Eigen}}
+\index{geometry\-\_\-msgs\-Cov\-Block\-To\-Eigen@{geometry\-\_\-msgs\-Cov\-Block\-To\-Eigen}!msf_core@{msf\-\_\-core}}
+\subsubsection[{geometry\-\_\-msgs\-Cov\-Block\-To\-Eigen}]{\setlength{\rightskip}{0pt plus 5cm}Matrix3 msf\-\_\-core\-::geometry\-\_\-msgs\-Cov\-Block\-To\-Eigen (
+\begin{DoxyParamCaption}
+\item[{const geometry\-\_\-msgs\-::\-Pose\-With\-Covariance\-::\-\_\-covariance\-\_\-type \&}]{gcov, }
+\item[{int}]{start\-\_\-row, }
+\item[{int}]{start\-\_\-col}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{namespacemsf__core_a3b1572f4facb6f46c2b154cb1fd7372c}
+
+\begin{DoxyParams}{Parameters}
+{\em gcov} & the geometry\-\_\-msgs\-::\-Pose\-With\-Covariance\-::covariance array to get the block from. \\
+\hline
+{\em start\-\_\-row} & start row of the block; use 
+\begin{DoxyCode}
+ \hyperlink{namespacegeometry__msgs_1_1cov_a39ced537b52c13c965a0ccdfe23f4dd1a564e84fef1216ef14d3dbf7ed94cb357}{geometry\_msgs::cov::p} and
+\hyperlink{namespacegeometry__msgs_1_1cov_a39ced537b52c13c965a0ccdfe23f4dd1a45bc9ae177afeb4ed8e0a975dc10b8e8}{geometry\_msgs::cov::q} 
+\end{DoxyCode}
+ . \\
+\hline
+{\em start\-\_\-col} & start column of the block; use 
+\begin{DoxyCode}
+ \hyperlink{namespacegeometry__msgs_1_1cov_a39ced537b52c13c965a0ccdfe23f4dd1a564e84fef1216ef14d3dbf7ed94cb357}{geometry\_msgs::cov::p}
+and \hyperlink{namespacegeometry__msgs_1_1cov_a39ced537b52c13c965a0ccdfe23f4dd1a45bc9ae177afeb4ed8e0a975dc10b8e8}{geometry\_msgs::cov::q} 
+\end{DoxyCode}
+ . \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+3x3 Eigen\-::\-Matrix covariance block. 
+\end{DoxyReturn}
+\hypertarget{namespacemsf__core_a531123cfe2ad9131a453087bc974e6dd}{\index{msf\-\_\-core@{msf\-\_\-core}!geometry\-\_\-msgs\-To\-Eigen@{geometry\-\_\-msgs\-To\-Eigen}}
+\index{geometry\-\_\-msgs\-To\-Eigen@{geometry\-\_\-msgs\-To\-Eigen}!msf_core@{msf\-\_\-core}}
+\subsubsection[{geometry\-\_\-msgs\-To\-Eigen}]{\setlength{\rightskip}{0pt plus 5cm}Vector3 msf\-\_\-core\-::geometry\-\_\-msgs\-To\-Eigen (
+\begin{DoxyParamCaption}
+\item[{const geometry\-\_\-msgs\-::\-Point \&}]{p}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{namespacemsf__core_a531123cfe2ad9131a453087bc974e6dd}
+\hypertarget{namespacemsf__core_a3430943bc018ba721de751a9fcdb8462}{\index{msf\-\_\-core@{msf\-\_\-core}!geometry\-\_\-msgs\-To\-Eigen@{geometry\-\_\-msgs\-To\-Eigen}}
+\index{geometry\-\_\-msgs\-To\-Eigen@{geometry\-\_\-msgs\-To\-Eigen}!msf_core@{msf\-\_\-core}}
+\subsubsection[{geometry\-\_\-msgs\-To\-Eigen}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\-::\-Quaterniond msf\-\_\-core\-::geometry\-\_\-msgs\-To\-Eigen (
+\begin{DoxyParamCaption}
+\item[{const geometry\-\_\-msgs\-::\-Quaternion \&}]{q}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{namespacemsf__core_a3430943bc018ba721de751a9fcdb8462}
+\hypertarget{namespacemsf__core_aa8485fa93cf8a65a20cf609a6ec40f56}{\index{msf\-\_\-core@{msf\-\_\-core}!get\-Median@{get\-Median}}
+\index{get\-Median@{get\-Median}!msf_core@{msf\-\_\-core}}
+\subsubsection[{get\-Median}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename D $>$ Eigen\-::\-Matrix\-Base$<$D$>$\-::Scalar msf\-\_\-core\-::get\-Median (
+\begin{DoxyParamCaption}
+\item[{const Eigen\-::\-Matrix\-Base$<$ D $>$ \&}]{data}
+\end{DoxyParamCaption}
+)}}\label{namespacemsf__core_aa8485fa93cf8a65a20cf609a6ec40f56}
+\hypertarget{namespacemsf__core_aee980177ac4429201472c20bb8b04612}{\index{msf\-\_\-core@{msf\-\_\-core}!timehuman@{timehuman}}
+\index{timehuman@{timehuman}!msf_core@{msf\-\_\-core}}
+\subsubsection[{timehuman}]{\setlength{\rightskip}{0pt plus 5cm}double msf\-\_\-core\-::timehuman (
+\begin{DoxyParamCaption}
+\item[{double}]{val}
+\end{DoxyParamCaption}
+)}}\label{namespacemsf__core_aee980177ac4429201472c20bb8b04612}
