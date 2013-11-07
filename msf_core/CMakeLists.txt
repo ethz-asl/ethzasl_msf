@@ -31,6 +31,7 @@ catkin_package(
 
 add_library(msf_core src/lib/msf_tools.cc src/lib/falsecolor.cc src/lib/gps_conversion.cc)
 target_link_libraries(msf_core ${catkin_LIBRARIES})
+add_dependencies(msf_core ${PROJECT_NAME}_gencfg) 
 
 add_library(similaritytransform src/similaritytransform.cc)
 target_link_libraries(similaritytransform ${catkin_LIBRARIES})
