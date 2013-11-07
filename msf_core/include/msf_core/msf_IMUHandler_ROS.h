@@ -43,16 +43,13 @@ class IMUHandler_ROS : public IMUHandler<EKFState_T> {
                              &IMUHandler_ROS::StateCallback, this);
   }
 
-  virtual ~IMUHandler_ROS() {
-  }
-  ;
+  virtual ~IMUHandler_ROS() { }
 
   void StateCallback(const sensor_fusion_comm::ExtEkfConstPtr & msg) {
-
     static_cast<MSF_SensorManagerROS<EKFState_T>&>(this->manager_)
         .SetHLControllerStateBuffer(*msg);
 
-    //get the imu values
+    // Get the imu values.
     msf_core::Vector3 linacc;
     linacc << msg->linear_acceleration.x, msg->linear_acceleration.y, msg
         ->linear_acceleration.z;
@@ -62,7 +59,7 @@ class IMUHandler_ROS : public IMUHandler<EKFState_T> {
         ->angular_velocity.z;
 
     int32_t flag = msg->flag;
-    //make sure we tell the HL to ignore if data playback is on
+    // Make sure we tell the HL to ignore if data playback is on.
     if (this->manager_.GetDataPlaybackStatus())
       flag = sensor_fusion_comm::ExtEkf::ignore_state;
 
@@ -73,7 +70,7 @@ class IMUHandler_ROS : public IMUHandler<EKFState_T> {
           "before prediction p,v,q");
     }
 
-    //get the propagated states
+    // Get the propagated states.
     msf_core::Vector3 p, v;
     msf_core::Quaternion q;
 
@@ -95,7 +92,6 @@ class IMUHandler_ROS : public IMUHandler<EKFState_T> {
   }
 
   void IMUCallbackAsctec(const asctec_hl_comm::mav_imuConstPtr & msg) {
-
     msf_core::Vector3 linacc;
     linacc << msg->acceleration.x, msg->acceleration.y, msg->acceleration.z;
 
@@ -105,7 +101,6 @@ class IMUHandler_ROS : public IMUHandler<EKFState_T> {
 
     this->ProcessIMU(linacc, angvel, msg->header.stamp.toSec(),
                       msg->header.seq);
-
   }
 
   void IMUCallback(const sensor_msgs::ImuConstPtr & msg) {

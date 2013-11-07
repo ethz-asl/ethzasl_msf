@@ -40,7 +40,6 @@ struct PoseMeasurement : public PoseMeasurementBase {
   typedef Measurement_t::Measurement_ptr measptr_t;
 
   virtual void MakeFromSensorReadingImpl(measptr_t msg) {
-
     Eigen::Matrix<double, nMeasurements,
         msf_core::MSF_Core<msf_updates::EKFState>::nErrorStatesAtCompileTime> H_old;
     Eigen::Matrix<double, nMeasurements, 1> r_old;
@@ -65,17 +64,12 @@ struct PoseMeasurement : public PoseMeasurementBase {
       tlast = time;
     }
 
-    if (fixed_covariance_)  // Take fix covariance from reconfigure GUI.
-    {
-
+    if (fixed_covariance_) {  // Take fix covariance from reconfigure GUI.
       const double s_zp = n_zp_ * n_zp_;
       const double s_zq = n_zq_ * n_zq_;
-      R_ =
-          (Eigen::Matrix<double, nMeasurements, 1>() << s_zp, s_zp, s_zp, s_zq, s_zq, s_zq, 1e-6)
-              .finished().asDiagonal();
-
+      R_ = (Eigen::Matrix<double, nMeasurements, 1>() <<
+          s_zp, s_zp, s_zp, s_zq, s_zq, s_zq, 1e-6).finished().asDiagonal();
     } else {  // Take covariance from sensor.
-
       R_.block<6, 6>(0, 0) = Eigen::Matrix<double, 6, 6>(
           &msg->pose.covariance[0]);
 
@@ -85,7 +79,7 @@ struct PoseMeasurement : public PoseMeasurementBase {
           "the pose sensor is not positive definite: "<<(R_.block<6, 6>(0, 0)));
       }
 
-      //clear cross-correlations between q and p
+      // Clear cross-correlations between q and p.
       R_.block<3, 3>(0, 3) = Eigen::Matrix<double, 3, 3>::Zero();
       R_.block<3, 3>(3, 0) = Eigen::Matrix<double, 3, 3>::Zero();
       R_(6, 6) = 1e-6;  // q_wv yaw-measurement noise
@@ -110,9 +104,9 @@ struct PoseMeasurement : public PoseMeasurementBase {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  Eigen::Quaternion<double> z_q_;  /// attitude measurement camera seen from world
-  Eigen::Matrix<double, 3, 1> z_p_;  /// position measurement camera seen from world
-  double n_zp_, n_zq_;  /// position and attitude measurement noise
+  Eigen::Quaternion<double> z_q_;  /// Attitude measurement camera seen from world.
+  Eigen::Matrix<double, 3, 1> z_p_;  /// Position measurement camera seen from world.
+  double n_zp_, n_zq_;  /// Position and attitude measurement noise.
 
   bool measurement_world_sensor_;
   bool fixed_covariance_;
@@ -276,14 +270,14 @@ struct PoseMeasurement : public PoseMeasurementBase {
 
       CalculateH(state_nonconst_new, H_new);
 
-      // get rotation matrices
+      // Get rotation matrices.
       Eigen::Matrix<double, 3, 3> C_wv = state.Get<StateDefinition_T::q_wv>()
           .conjugate().toRotationMatrix();
       Eigen::Matrix<double, 3, 3> C_q = state.Get<StateDefinition_T::q>()
           .conjugate().toRotationMatrix();
 
       // Construct residuals.
-      // Position
+      // Position.
       r_old.block<3, 1>(0, 0) = z_p_
           - (C_wv.transpose()
               * (-state.Get<StateDefinition_T::p_wv>()
@@ -321,9 +315,7 @@ struct PoseMeasurement : public PoseMeasurementBase {
       // Call update step in base class.
       this->CalculateAndApplyCorrection(state_nonconst_new, core, H_new, r_old,
                                         R_);
-
     } else {
-
       // Init variables: Get previous measurement.
       shared_ptr < msf_core::MSF_MeasurementBase<EKFState_T> > prevmeas_base =
           core.GetPreviousMeasurement(this->time, this->sensorID_);
@@ -375,14 +367,14 @@ struct PoseMeasurement : public PoseMeasurementBase {
       Eigen::Matrix<double, 3, 3> C_wv_old, C_wv_new;
       Eigen::Matrix<double, 3, 3> C_q_old, C_q_new;
 
-      C_wv_new = state_new.Get<StateDefinition_T::q_wv>().conjugate()
-          .toRotationMatrix();
-      C_q_new = state_new.Get<StateDefinition_T::q>().conjugate()
-          .toRotationMatrix();
-      C_wv_old = state_old.Get<StateDefinition_T::q_wv>().conjugate()
-          .toRotationMatrix();
-      C_q_old = state_old.Get<StateDefinition_T::q>().conjugate()
-          .toRotationMatrix();
+      C_wv_new =
+          state_new.Get<StateDefinition_T::q_wv>().conjugate().toRotationMatrix();
+      C_q_new =
+          state_new.Get<StateDefinition_T::q>().conjugate().toRotationMatrix();
+      C_wv_old =
+          state_old.Get<StateDefinition_T::q_wv>().conjugate().toRotationMatrix();
+      C_q_old =
+          state_old.Get<StateDefinition_T::q>().conjugate().toRotationMatrix();
 
       // Construct residuals.
       // Position:

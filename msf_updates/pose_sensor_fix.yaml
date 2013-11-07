@@ -1,5 +1,5 @@
 
-GetDataPlaybackStatus: true
+data_playback: true
 
 core/core_fixed_bias: false
 

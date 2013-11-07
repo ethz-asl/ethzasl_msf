@@ -72,7 +72,6 @@ class PoseSensorHandler : public msf_core::SensorHandler<
   //setters for configure values
   void SetNoises(double n_zp, double n_zq);
   void SetDelay(double delay);
-
 };
 }
 #include "implementation/pose_sensorhandler.hpp"

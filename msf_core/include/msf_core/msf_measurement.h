@@ -120,13 +120,10 @@ class MSF_Measurement : public MSF_MeasurementBase<EKFState_T> {
       : MSF_MeasurementBase<EKFState_T>(isAbsoluteMeasurement, sensorID) {
     R_.setZero();
   }
-  virtual ~MSF_Measurement() {
-  }
-  ;
+  virtual ~MSF_Measurement() { }
   void MakeFromSensorReading(const boost::shared_ptr<T const> reading,
                              double timestamp) {
     this->time = timestamp;
-
     MakeFromSensorReadingImpl(reading);
 
     // Check whether the user has set R.

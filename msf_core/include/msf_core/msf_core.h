@@ -29,7 +29,6 @@
 #include <msf_core/msf_checkFuzzyTracking.h>
 
 namespace msf_core {
-
 template<typename EKFState_T>
 class MSF_SensorManager;
 template<typename EKFState_T>
@@ -153,7 +152,6 @@ class MSF_Core {
   const MSF_SensorManager<EKFState_T>& GetUserCalc() const;
 
  private:
-
   /**
    * \brief Get the index of the best state having no temporal drift at compile
    * time.

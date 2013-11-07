@@ -113,8 +113,7 @@ void AngleSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
   this->manager_.msf_core_->AddMeasurement(meas);
 }
 
-// ### distance sensor implementation
-
+// Distance sensor implementation:
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 DistanceSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::DistanceSensorHandler(
     MANAGER_TYPE& meas, std::string topic_namespace,
@@ -176,8 +175,7 @@ void DistanceSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
       "Your state has more than 32 variables. "
       "The code needs to be changed here to have a larger variable to mark the fixed_states");  //do not exceed the 32 bits of int
 
-  if (!use_fixed_covariance_ /*&& msg->covariance[0] == 0*/)  // take covariance from sensor
-  {
+  if (!use_fixed_covariance_) {
     ROS_WARN_STREAM_THROTTLE(
         2,
         "Provided message type without covariance but set fixed_covariance=false at the same time. Discarding message.");
@@ -204,5 +202,4 @@ void DistanceSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
 
   this->manager_.msf_core_->AddMeasurement(meas);
 }
-
-}
+}  // namespace msf_spherical_position

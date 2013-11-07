@@ -55,8 +55,7 @@ struct AngleMeasurement : public AngleMeasurementBase {
     // Get measurement.
     z_a_ << msg->point.x, msg->point.y;
 
-    if (fixed_covariance_)   //  Take fix covariance from reconfigure GUI.
-    {
+    if (fixed_covariance_) {   //  Take fix covariance from reconfigure GUI.
       const double s_zp = n_za_ * n_za_;
       R_ = (Eigen::Matrix<double, N_ANGLE_MEASUREMENTS, 1>() << s_zp, s_zp)
           .finished().asDiagonal();
@@ -80,15 +79,13 @@ struct AngleMeasurement : public AngleMeasurementBase {
   typedef msf_updates::EKFState EKFState_T;
   typedef EKFState_T::StateSequence_T StateSequence_T;
   typedef EKFState_T::StateDefinition_T StateDefinition_T;
-  virtual ~AngleMeasurement() {
-  }
+  virtual ~AngleMeasurement() { }
   AngleMeasurement(double n_za, bool fixed_covariance,
                    bool isabsoluteMeasurement, int sensorID, int fixedstates)
       : AngleMeasurementBase(isabsoluteMeasurement, sensorID),
         n_za_(n_za),
         fixed_covariance_(fixed_covariance),
-        fixedstates_(fixedstates) {
-  }
+        fixedstates_(fixedstates) { }
   virtual std::string Type() {
     return "angle";
   }
@@ -247,7 +244,6 @@ struct AngleMeasurement : public AngleMeasurementBase {
    */
   virtual void Apply(boost::shared_ptr<EKFState_T> state_nonconst_new,
                      msf_core::MSF_Core<EKFState_T>& core) {
-
     if (isabsolute_) {  // Does this measurement refer to an absolute measurement,
       // or is is just relative to the last measurement.
       const EKFState_T& state = *state_nonconst_new;  // Get a const ref, so we can read core states.
@@ -308,8 +304,8 @@ struct AngleMeasurement : public AngleMeasurementBase {
       }
 
       // Call update step in base class.
-      this->CalculateAndApplyCorrection(state_nonconst_new, core, H_new, r_old,
-                                        R_);
+      this->CalculateAndApplyCorrection(
+          state_nonconst_new, core, H_new, r_old, R_);
 
     } else {
       ROS_ERROR_STREAM_THROTTLE(
@@ -332,7 +328,6 @@ struct DistanceMeasurement : public DistanceMeasurementBase {
   typedef Measurement_t::Measurement_ptr measptr_t;
 
   virtual void MakeFromSensorReadingImpl(measptr_t msg) {
-
     Eigen::Matrix<double, N_DISTANCE_MEASUREMENTS,
         msf_core::MSF_Core<msf_updates::EKFState>::nErrorStatesAtCompileTime> H_old;
     Eigen::Matrix<double, N_DISTANCE_MEASUREMENTS, 1> r_old;
@@ -363,15 +358,13 @@ struct DistanceMeasurement : public DistanceMeasurementBase {
   typedef msf_updates::EKFState EKFState_T;
   typedef EKFState_T::StateSequence_T StateSequence_T;
   typedef EKFState_T::StateDefinition_T StateDefinition_T;
-  virtual ~DistanceMeasurement() {
-  }
+  virtual ~DistanceMeasurement() { }
   DistanceMeasurement(double n_zd, bool fixed_covariance,
                       bool isabsoluteMeasurement, int sensorID, int fixedstates)
       : DistanceMeasurementBase(isabsoluteMeasurement, sensorID),
         n_zd_(n_zd),
         fixed_covariance_(fixed_covariance),
-        fixedstates_(fixedstates) {
-  }
+        fixedstates_(fixedstates) { }
   virtual std::string Type() {
     return "distance";
   }
@@ -457,7 +450,6 @@ struct DistanceMeasurement : public DistanceMeasurementBase {
     H.block<1, 3>(0, idxstartcorr_p_) = dz_dp;
     H.block<1, 3>(0, idxstartcorr_q_) = dz_dq;
     H.block<1, 3>(0, idxstartcorr_p_pi_) = dz_dp_ip;
-
   }
 
   /**
@@ -511,9 +503,8 @@ struct DistanceMeasurement : public DistanceMeasurementBase {
       }
 
       // Call update step in base class.
-      this->CalculateAndApplyCorrection(state_nonconst_new, core, H_new, r_old,
-                                        R_);
-
+      this->CalculateAndApplyCorrection(
+          state_nonconst_new, core, H_new, r_old, R_);
     } else {
       ROS_ERROR_STREAM_THROTTLE(
           1,

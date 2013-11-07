@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
   const double s_p = 0.1;
   const double s_q = 1e-2;
 
-  // the pose we want to estimate
+  // The pose we want to estimate.
   Vector3 p(Vector3::Random());
   Eigen::Quaterniond q(Eigen::Matrix<double, 4, 1>::Random());
   q.normalize();
@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
   std::cout << "Real pose: \n\tp: " << p.transpose() << "\n\tq(x y z w): "
       << q.coeffs().transpose() << std::endl;
 
-  // generate a set of measurements
+  // Generate a set of measurements.
   for (int i = 0; i < N; i++) {
     Vector3 p1;
     p1 = p + Vector3::Random() * 0.1 + Vector3(3, 4, 5);
@@ -47,7 +47,6 @@ int main(int argc, char** argv) {
     Eigen::Quaterniond q_noise(Eigen::Quaterniond::Identity());
     q_noise.coeffs() += Eigen::Matrix<double, 4, 1>::Random() * s_q;
     q_noise.normalize();
-    //std::cout<<"q_n: "<<q_noise.coeffs().transpose()<<" "<<q_noise.norm()<<std::endl;
     q2 = q2 * q_noise;
 
     similarity_transform::Pose P1;
@@ -57,12 +56,10 @@ int main(int argc, char** argv) {
     P2.pose.position = EigenToGeometryMsgs(p2);
     P2.pose.orientation = EigenToGeometryMsgs(q2);
 
-    //std::cout<<"pose: \n\tp: "<<p1.transpose()<<"\tq: "<<q1.coeffs().transpose()<<std::endl;
-
     T.AddMeasurement(P1, P2);
   }
 
-  // estimate pose
+  // Estimate pose.
   similarity_transform::Pose Pd;
   double cond;
   double _scale;
@@ -80,12 +77,12 @@ int main(int argc, char** argv) {
       << std::abs(1.0 - scale / _scale) * 100 << "%\tcond: " << cond
       << std::endl;
 
-  // Xi matrix test
+  // Xi matrix test.
   std::cout << "\n#####\ntest Xi: \n"
       << XiMat(q.coeffs()).transpose() * q.coeffs() << "\nshould be all 0"
       << std::endl;
 
-  // block writing test
+  // Block writing test.
   similarity_transform::Pose::_covariance_type cov;
   for (int r = 0; r < 6; r++)
     for (int c = 0; c < 6; c++)
@@ -108,7 +105,7 @@ int main(int argc, char** argv) {
   Matrix3 covq;
   covq << 21, 22, 23, 22, 24, 25, 23, 25, 26;
   Eigen::Matrix<double, 4, 4> covpq;
-  covpq << 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16;  // just for fun a bigger one to test blocks
+  covpq << 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16;
   std::cout << "\ncovp:\n" << covp << "\ncovq:\n" << covq
       << "\ncovpq (we will only take the block starting at 1,1):\n" << covpq
       << std::endl;
@@ -118,7 +115,7 @@ int main(int argc, char** argv) {
                                geometry_msgs::cov::q);
   EigenCovBlockToGeometryMsgs(cov, covpq.block<3, 3>(1, 1),
                                geometry_msgs::cov::p, geometry_msgs::cov::q);
-  std::cout << "result: \n" << covm << std::endl;
+  std::cout << "Result: \n" << covm << std::endl;
 
   return 0;
 }

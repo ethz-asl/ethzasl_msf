@@ -81,8 +81,7 @@ struct PositionMeasurement : public PositionMeasurementBase {
   typedef msf_updates::EKFState EKFState_T;
   typedef EKFState_T::StateSequence_T StateSequence_T;
   typedef EKFState_T::StateDefinition_T StateDefinition_T;
-  virtual ~PositionMeasurement() {
-  }
+  virtual ~PositionMeasurement() { }
   PositionMeasurement(double n_zp, bool fixed_covariance,
                       bool isabsoluteMeasurement, int sensorID, int fixedstates)
       : PositionMeasurementBase(isabsoluteMeasurement, sensorID),
@@ -184,9 +183,8 @@ struct PositionMeasurement : public PositionMeasurementBase {
       }
 
       // Call update step in base class.
-      this->CalculateAndApplyCorrection(state_nonconst_new, core, H_new, r_old,
-                                        R_);
-
+      this->CalculateAndApplyCorrection(
+          state_nonconst_new, core, H_new, r_old, R_);
     } else {
       MSF_ERROR_STREAM_THROTTLE(
           1, "You chose to apply the position measurement "
@@ -194,7 +192,6 @@ struct PositionMeasurement : public PositionMeasurementBase {
     }
   }
 };
-
 }
 }
 #endif /* POSITION_MEASUREMENT_HPP_ */

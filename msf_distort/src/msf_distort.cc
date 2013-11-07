@@ -37,17 +37,17 @@ struct CallbackHandler {
   ros::Publisher pubPoint_;
 
   CallbackHandler(ros::NodeHandle& nh) {
-    pubPoseWithCovarianceStamped_ = nh.advertise
-        < geometry_msgs::PoseWithCovarianceStamped
-        > ("pose_with_covariance_output", 100);
-    pubTransformStamped_ = nh.advertise < geometry_msgs::TransformStamped
-        > ("transform_output", 100);
-    pubPoseStamped_ = nh.advertise < geometry_msgs::PoseStamped
-        > ("pose_output", 100);
-    pubNavSatFix_ = nh.advertise < sensor_msgs::NavSatFix
-        > ("navsatfix_output", 100);
-    pubPoint_ = nh.advertise < geometry_msgs::PointStamped
-        > ("point_output", 100);
+    pubPoseWithCovarianceStamped_ =
+        nh.advertise<geometry_msgs::PoseWithCovarianceStamped>
+        ("pose_with_covariance_output", 100);
+    pubTransformStamped_ =
+        nh.advertise<geometry_msgs::TransformStamped>("transform_output", 100);
+    pubPoseStamped_ =
+        nh.advertise<geometry_msgs::PoseStamped>("pose_output", 100);
+    pubNavSatFix_ =
+        nh.advertise<sensor_msgs::NavSatFix>("navsatfix_output", 100);
+    pubPoint_ =
+        nh.advertise<geometry_msgs::PointStamped>("point_output", 100);
   }
 
   void config(Config_T &config, uint32_t level) {
@@ -87,7 +87,6 @@ struct CallbackHandler {
 };
 
 int main(int argc, char** argv) {
-
   ros::init(argc, argv, "msf_distort");
 
   typedef msf_distort::MSF_DistortConfig Config_T;

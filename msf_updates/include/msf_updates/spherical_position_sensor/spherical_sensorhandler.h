@@ -23,14 +23,13 @@
 namespace msf_spherical_position{
 
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
-class AngleSensorHandler : public msf_core::SensorHandler<typename msf_updates::EKFState>
-{
+class AngleSensorHandler :
+    public msf_core::SensorHandler<typename msf_updates::EKFState> {
 private:
-
   msf_core::Vector2 z_a_; ///< Angle measurement.
   double n_za_;   ///< Position measurement noise.
   double delay_;        ///< Delay to be subtracted from the ros-timestamp of the
-                        // measurement provided by this sensor
+                        // measurement provided by this sensor.
 
   ros::Subscriber subPointStamped_;
   bool use_fixed_covariance_;
@@ -51,10 +50,9 @@ public:
 
 
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
-class DistanceSensorHandler : public msf_core::SensorHandler<typename msf_updates::EKFState>
-{
+class DistanceSensorHandler :
+    public msf_core::SensorHandler<typename msf_updates::EKFState> {
 private:
-
   msf_core::Vector1 z_d_; ///< Angle measurement.
   double n_zd_; ///< Position measurement noise.
   double delay_;        ///< Delay to be subtracted from the ros-timestamp of

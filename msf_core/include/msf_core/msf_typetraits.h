@@ -18,7 +18,6 @@
 #define MSF_TYPETRAITS_H_
 
 namespace msf_tmp {
-
 // Two types of same type.
 template<typename T, typename U> struct SameType {
   enum {

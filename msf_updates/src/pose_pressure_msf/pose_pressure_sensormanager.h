@@ -66,8 +66,7 @@ class PosePressureSensorManager : public msf_core::MSF_SensorManagerROS<
     reconf_server_->setCallback(f);
   }
 
-  virtual ~PosePressureSensorManager() {
-  }
+  virtual ~PosePressureSensorManager() { }
 
   virtual const Config_T& Getcfg() {
     return config_;
@@ -110,11 +109,9 @@ class PosePressureSensorManager : public msf_core::MSF_SensorManagerROS<
     pose_handler_->SetNoises(config.pose_noise_meas_p,
                              config.pose_noise_meas_q);
     pressure_handler_->SetNoises(config.press_noise_meas_p);
-
   }
 
   void Init(double scale) const {
-
     Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ic, p_vc;
     Eigen::Quaternion<double> q, q_wv, q_ic, q_vc;
     Eigen::Matrix<double, 1, 1> b_p;
@@ -249,7 +246,6 @@ class PosePressureSensorManager : public msf_core::MSF_SensorManagerROS<
       EKFState_T& delaystate,
       const EKFState_T& buffstate,
       Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, 1>& correction) const {
-
     UNUSED(buffstate);
     UNUSED(correction);
 
@@ -265,4 +261,4 @@ class PosePressureSensorManager : public msf_core::MSF_SensorManagerROS<
   }
 };
 }
-#endif /* POSE_MEASUREMENTMANAGER_H */
+#endif  // POSE_PRESSURE_MEASUREMENTMANAGER_H

@@ -124,7 +124,6 @@ struct GenericState_T {
   Get();
 
  public:
-
   typedef Eigen::Matrix<double, nErrorStatesAtCompileTime,
       nErrorStatesAtCompileTime> P_type;  ///< Type of the error state
                                           // covariance matrix.
@@ -275,14 +274,13 @@ struct GenericState_T {
   template<int INDEX>
   inline void
   ClearCrossCov();
-
 };
 
 /**
  * \brief Comparator for the state objects. sorts by time asc.
  */
 template<typename stateSequence_T, typename stateDefinition_T>
-class sortStates {
+class SortStates {
  public:
   /**
    * \brief Implements the sorting by time.
@@ -293,7 +291,6 @@ class sortStates {
     return (lhs.time_ < rhs.time_);
   }
 };
-
 }
 
 #include <msf_core/implementation/msf_state_inl.h>

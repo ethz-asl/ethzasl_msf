@@ -77,7 +77,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
         &MSF_SensorManagerROS::Config, this, _1, _2);
     reconfServer_->setCallback(f);
 
-    pnh.param("GetDataPlaybackStatus", this->data_playback_, false);
+    pnh.param("data_playback", this->data_playback_, false);
 
     ros::NodeHandle nh("msf_core");
 
@@ -179,7 +179,6 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
 
     msgCorrect_.flag = sensor_fusion_comm::ExtEkf::initialization;
     pubCorrect_.publish(msgCorrect_);
-
   }
 
   virtual void PublishStateAfterPropagation(
@@ -205,7 +204,6 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
 
   virtual void PublishStateAfterUpdate(
       const shared_ptr<EKFState_T>& state) const {
-
     static int msg_seq = 0;
 
     sensor_fusion_comm::ExtEkf msgCorrect_;
@@ -231,8 +229,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
 
         MSF_ERROR_STREAM_THROTTLE(
             1, __FUNCTION__ << " You have connected the external propagation "
-            "topic but at the same time GetDataPlaybackStatus is on.");
-
+            "topic but at the same time data_playback is on.");
       } else {
         const EKFState_T& state_const = *state;
         msgCorrect_.state[0] =

@@ -23,18 +23,18 @@
 #include <iomanip>
 
 #define CHECK_IN_BOUNDS(iterator, container) \
-           do { \
-             decltype(iterator) __it = it; \
-             ++__it; \
-             if (__it == container.begin()) { \
-               MSF_ERROR_STREAM("Iterator out of bounds (begin) " << \
-                 __FILE__ << ":" << __LINE__); \
-             } \
-             if (iterator == container.end()) { \
-               MSF_ERROR_STREAM("Iterator out of bounds (end) " << \
-                 __FILE__ << ":" << __LINE__); \
-             } \
-           } while(0);
+  do { \
+    decltype(iterator) __it = it; \
+    ++__it; \
+    if (__it == container.begin()) { \
+      MSF_ERROR_STREAM("Iterator out of bounds (begin) " << \
+        __FILE__ << ":" << __LINE__); \
+    } \
+    if (iterator == container.end()) { \
+    MSF_ERROR_STREAM("Iterator out of bounds (end) " << \
+       __FILE__ << ":" << __LINE__); \
+    } \
+  } while(0);
 
 namespace msf_core {
 /**
@@ -348,7 +348,7 @@ class SortedContainer {
     if (it == stateList.end()) {
       std::stringstream ss;
       ss << "Wanted to update a states/measurements time, but could not find "
-              "the old state, for which the time was asked to be updated. time "
+            "the old state, for which the time was asked to be updated. time "
           << std::fixed << std::setprecision(9) << timeOld << std::endl;
 
       ss << "Map: " << std::endl;

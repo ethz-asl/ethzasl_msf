@@ -743,15 +743,14 @@ struct ResetState {
 template<typename stateVarT>
 struct CopyInitStates {
   CopyInitStates(const stateVarT& oldstate)
-      : oldstate_(oldstate) {
-  }
+      : oldstate_(oldstate) { }
   template<typename T, int NAME, int STATE_T, int OPTIONS>
   void operator()(msf_core::StateVar_T<T, NAME, STATE_T, OPTIONS>& t) const {
     if (oldstate_.template GetStateVariable<NAME>().hasResetValue) {
       // Copy value from old state to new state var.
         t = oldstate_.template GetStateVariable<NAME>();
       }
-    }
+  }
 
   private:
     const stateVarT& oldstate_;
@@ -804,8 +803,7 @@ struct CopyQBlocksFromAuxiliaryStatesToQ {
   typedef Eigen::Matrix<double, nErrorStatesAtCompileTime,
       nErrorStatesAtCompileTime> Q_T;
   CopyQBlocksFromAuxiliaryStatesToQ(Q_T& Q)
-      : Q_(Q) {
-  }
+      : Q_(Q) { }
   template<typename T, int NAME, int STATE_T, int OPTIONS>
   void operator()(msf_core::StateVar_T<T, NAME, STATE_T, OPTIONS>& t) const {
     typedef msf_core::StateVar_T<T, NAME, STATE_T, OPTIONS> var_T;

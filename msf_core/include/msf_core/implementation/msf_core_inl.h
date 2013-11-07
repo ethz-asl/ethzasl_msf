@@ -129,7 +129,8 @@ void MSF_Core<EKFState_T>::ProcessIMU(
     predictionMade_ = false;
     MSF_ERROR_STREAM(
         __FUNCTION__<<"latest IMU message was out of order by a too large amount, "
-        "resetting EKF: last-state-time: " << msf_core::timehuman(lastState->time) << " "<< "current-imu-time: "<< msf_core::timehuman(currentState->time));
+        "resetting EKF: last-state-time: " << msf_core::timehuman(lastState->time)
+        << " "<< "current-imu-time: "<< msf_core::timehuman(currentState->time));
     return;
   }
 
@@ -631,7 +632,8 @@ void MSF_Core<EKFState_T>::AddMeasurement(
     if (it_meas->second->time <= 0)  // Valid?
       continue;
     msf_timing::DebugTimer timer_meas_get_state("Get state for measurement");
-    shared_ptr<EKFState_T> state = GetClosestState(it_meas->second->time);  // Propagates covariance to state.
+    // Propagates covariance to state.
+    shared_ptr<EKFState_T> state = GetClosestState(it_meas->second->time);
     timer_meas_get_state.Stop();
     if (state->time <= 0) {
       MSF_ERROR_STREAM_THROTTLE(

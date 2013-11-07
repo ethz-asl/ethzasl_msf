@@ -37,7 +37,6 @@ struct PressureMeasurement : public PressureMeasurementBase {
   typedef Measurement_t::Measurement_ptr measptr_t;
 
   virtual void MakeFromSensorReadingImpl(measptr_t msg) {
-
     Eigen::Matrix<double, nMeasurements,
         msf_core::MSF_Core<msf_updates::EKFState>::nErrorStatesAtCompileTime> H_old;
     Eigen::Matrix<double, nMeasurements, 1> r_old;
@@ -59,12 +58,10 @@ struct PressureMeasurement : public PressureMeasurementBase {
 
   typedef msf_updates::EKFState EKFState_T;
   typedef EKFState_T::StateDefinition_T StateDefinition_T;
-  virtual ~PressureMeasurement() {
-  }
+  virtual ~PressureMeasurement() { }
   PressureMeasurement(double n_zp, bool isabsoluteMeasurement, int sensorID)
       : PressureMeasurementBase(isabsoluteMeasurement, sensorID),
-        n_zp_(n_zp) {
-  }
+        n_zp_(n_zp) { }
   virtual std::string Type() {
     return "pressure";
   }
@@ -114,7 +111,6 @@ struct PressureMeasurement : public PressureMeasurementBase {
 
     // Call update step in base class.
     this->CalculateAndApplyCorrection(non_const_state, core, H_old, r_old, R_);
-
   }
 };
 
