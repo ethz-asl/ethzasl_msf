@@ -3,3 +3,4 @@ doxygen msf_dox.dox
 cd html
 git add .
 git commit -m "Updated documentation."
+git push origin gh-pages
