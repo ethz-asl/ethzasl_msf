@@ -1,0 +1,40 @@
+\hypertarget{structmsf__tmp_1_1IndexOfBestNonTemporalDriftingState}{\section{msf\-\_\-tmp\-:\-:Index\-Of\-Best\-Non\-Temporal\-Drifting\-State$<$ Sequence $>$ Struct Template Reference}
+\label{structmsf__tmp_1_1IndexOfBestNonTemporalDriftingState}\index{msf\-\_\-tmp\-::\-Index\-Of\-Best\-Non\-Temporal\-Drifting\-State$<$ Sequence $>$@{msf\-\_\-tmp\-::\-Index\-Of\-Best\-Non\-Temporal\-Drifting\-State$<$ Sequence $>$}}
+}
+
+
+Find the best nontemporal drifting state in the full state vector at compile time.  
+
+
+
+
+{\ttfamily \#include $<$msf\-\_\-tmp.\-h$>$}
+
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ {\bfseries value}
+ \}
+\item 
+\hypertarget{structmsf__tmp_1_1IndexOfBestNonTemporalDriftingState_a9f25e8cd8a466ed4bc97cd51b6a953e0}{typedef \\*
+boost\-::fusion\-::result\-\_\-of\-::begin\\*
+$<$ Sequence const  $>$\-::type {\bfseries First}}\label{structmsf__tmp_1_1IndexOfBestNonTemporalDriftingState_a9f25e8cd8a466ed4bc97cd51b6a953e0}
+
+\item 
+\hypertarget{structmsf__tmp_1_1IndexOfBestNonTemporalDriftingState_a66dd8d7ca1fbe97b50c94896293c952f}{typedef \\*
+boost\-::fusion\-::result\-\_\-of\-::end\\*
+$<$ Sequence const  $>$\-::type {\bfseries Last}}\label{structmsf__tmp_1_1IndexOfBestNonTemporalDriftingState_a66dd8d7ca1fbe97b50c94896293c952f}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename Sequence$>$struct msf\-\_\-tmp\-::\-Index\-Of\-Best\-Non\-Temporal\-Drifting\-State$<$ Sequence $>$}
+
+Find the best nontemporal drifting state in the full state vector at compile time. 
+
+The goal of this tmp code is to find the best nontemporal drifting state in the full state vector at compile time. We therefore search the state variable list for states that the user has marked as non temporal drifting. If furthermore prefer quaternions over euclidean states. This function will return -\/1 if no suitable state has been found. 
+
+The documentation for this struct was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+msf\-\_\-core/include/msf\-\_\-core/msf\-\_\-tmp.\-h\end{DoxyCompactItemize}

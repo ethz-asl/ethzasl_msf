@@ -1,0 +1,126 @@
+\hypertarget{classmsf__core_1_1MSF__SensorManager}{\section{msf\-\_\-core\-:\-:M\-S\-F\-\_\-\-Sensor\-Manager$<$ E\-K\-F\-State\-\_\-\-T $>$ Class Template Reference}
+\label{classmsf__core_1_1MSF__SensorManager}\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager$<$ E\-K\-F\-State\-\_\-\-T $>$@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager$<$ E\-K\-F\-State\-\_\-\-T $>$}}
+}
+
+
+A manager for a given sensor set. Handlers for individual sensors (camera/vicon etc.) are registered with this class as handlers of particular sensors. This class also owns the E\-K\-F core instance and handles the initialization of the filter.  
+
+
+
+
+{\ttfamily \#include $<$msf\-\_\-sensormanager.\-h$>$}
+
+Inheritance diagram for msf\-\_\-core\-:\-:M\-S\-F\-\_\-\-Sensor\-Manager$<$ E\-K\-F\-State\-\_\-\-T $>$\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{classmsf__core_1_1MSF__SensorManager}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classmsf__core_1_1MSF__SensorManager_a50c42d9ed661147254d94c603b09691f}{bool {\bfseries data\-\_\-playback} ()}\label{classmsf__core_1_1MSF__SensorManager_a50c42d9ed661147254d94c603b09691f}
+
+\item 
+\hypertarget{classmsf__core_1_1MSF__SensorManager_a106ff842a5280f1799505a7203ad2c08}{void {\bfseries add\-Handler} (shared\-\_\-ptr$<$ \hyperlink{classmsf__core_1_1SensorHandler}{Sensor\-Handler}$<$ E\-K\-F\-State\-\_\-\-T $>$ $>$ handler)}\label{classmsf__core_1_1MSF__SensorManager_a106ff842a5280f1799505a7203ad2c08}
+
+\item 
+\hypertarget{classmsf__core_1_1MSF__SensorManager_a170802bb97dfc3afb931fd1d7779e3ac}{virtual void {\bfseries init} (double scale) const =0}\label{classmsf__core_1_1MSF__SensorManager_a170802bb97dfc3afb931fd1d7779e3ac}
+
+\item 
+\hypertarget{classmsf__core_1_1MSF__SensorManager_a326567c3181be5b0854b294431aa69ff}{virtual void {\bfseries init\-State} (E\-K\-F\-State\-\_\-\-T \&state) const =0}\label{classmsf__core_1_1MSF__SensorManager_a326567c3181be5b0854b294431aa69ff}
+
+\item 
+\hypertarget{classmsf__core_1_1MSF__SensorManager_afc9c8189b990db3c00df9bc239ff14e8}{virtual void {\bfseries calculate\-Q\-Auxiliary\-States} (E\-K\-F\-State\-\_\-\-T \&U\-N\-U\-S\-E\-D\-P\-A\-R\-A\-M(state), double U\-N\-U\-S\-E\-D\-P\-A\-R\-A\-M(dt)) const =0}\label{classmsf__core_1_1MSF__SensorManager_afc9c8189b990db3c00df9bc239ff14e8}
+
+\item 
+\hypertarget{classmsf__core_1_1MSF__SensorManager_a586c046dc1ffbe4f236c7c4413a8dc82}{virtual void {\bfseries set\-P} (Eigen\-::\-Matrix$<$ double, E\-K\-F\-State\-\_\-\-T\-::n\-Error\-States\-At\-Compile\-Time, E\-K\-F\-State\-\_\-\-T\-::n\-Error\-States\-At\-Compile\-Time $>$ \&P) const =0}\label{classmsf__core_1_1MSF__SensorManager_a586c046dc1ffbe4f236c7c4413a8dc82}
+
+\item 
+\hypertarget{classmsf__core_1_1MSF__SensorManager_a9f69dacac4e600a524691dd4c17f94a0}{virtual void {\bfseries augment\-Correction\-Vector} (Eigen\-::\-Matrix$<$ double, E\-K\-F\-State\-\_\-\-T\-::n\-Error\-States\-At\-Compile\-Time, 1 $>$ \&U\-N\-U\-S\-E\-D\-P\-A\-R\-A\-M(correction)) const =0}\label{classmsf__core_1_1MSF__SensorManager_a9f69dacac4e600a524691dd4c17f94a0}
+
+\item 
+\hypertarget{classmsf__core_1_1MSF__SensorManager_ae605f79877bbdd7ec297d5fe375f4c92}{virtual void {\bfseries sanity\-Check\-Correction} (E\-K\-F\-State\-\_\-\-T \&U\-N\-U\-S\-E\-D\-P\-A\-R\-A\-M(delaystate), const E\-K\-F\-State\-\_\-\-T \&U\-N\-U\-S\-E\-D\-P\-A\-R\-A\-M(buffstate), Eigen\-::\-Matrix$<$ double, E\-K\-F\-State\-\_\-\-T\-::n\-Error\-States\-At\-Compile\-Time, 1 $>$ \&U\-N\-U\-S\-E\-D\-P\-A\-R\-A\-M(correction)) const =0}\label{classmsf__core_1_1MSF__SensorManager_ae605f79877bbdd7ec297d5fe375f4c92}
+
+\item 
+\hypertarget{classmsf__core_1_1MSF__SensorManager_a5eb7188dea0d2aa231732199fd06b988}{virtual bool {\bfseries get\-Param\-\_\-fixed\-\_\-bias} () const =0}\label{classmsf__core_1_1MSF__SensorManager_a5eb7188dea0d2aa231732199fd06b988}
+
+\item 
+\hypertarget{classmsf__core_1_1MSF__SensorManager_a647bebf2feecd2929f58d6b4c8b3b319}{virtual double {\bfseries get\-Param\-\_\-noise\-\_\-acc} () const =0}\label{classmsf__core_1_1MSF__SensorManager_a647bebf2feecd2929f58d6b4c8b3b319}
+
+\item 
+\hypertarget{classmsf__core_1_1MSF__SensorManager_a7e7342acff24a4b5c5817903b2c8dfda}{virtual double {\bfseries get\-Param\-\_\-noise\-\_\-accbias} () const =0}\label{classmsf__core_1_1MSF__SensorManager_a7e7342acff24a4b5c5817903b2c8dfda}
+
+\item 
+\hypertarget{classmsf__core_1_1MSF__SensorManager_ae7b3b5a203fe118961ecdf28b49bfaa9}{virtual double {\bfseries get\-Param\-\_\-noise\-\_\-gyr} () const =0}\label{classmsf__core_1_1MSF__SensorManager_ae7b3b5a203fe118961ecdf28b49bfaa9}
+
+\item 
+\hypertarget{classmsf__core_1_1MSF__SensorManager_a8a5c694d3c6e5bd5bf4724269613bcb6}{virtual double {\bfseries get\-Param\-\_\-noise\-\_\-gyrbias} () const =0}\label{classmsf__core_1_1MSF__SensorManager_a8a5c694d3c6e5bd5bf4724269613bcb6}
+
+\item 
+\hypertarget{classmsf__core_1_1MSF__SensorManager_ab4498922d3d876ed9c4c5eeb7e090529}{virtual double {\bfseries get\-Param\-\_\-fuzzythres} () const =0}\label{classmsf__core_1_1MSF__SensorManager_ab4498922d3d876ed9c4c5eeb7e090529}
+
+\item 
+virtual void \hyperlink{classmsf__core_1_1MSF__SensorManager_ad851fff1bceaeb6696ef79a4792a317a}{publish\-State\-Initial} (const shared\-\_\-ptr$<$ E\-K\-F\-State\-\_\-\-T $>$ \&state) const =0
+\item 
+\hypertarget{classmsf__core_1_1MSF__SensorManager_a431f5b517c39fd9b2168857ae9513f8b}{virtual void {\bfseries publish\-State\-After\-Propagation} (const shared\-\_\-ptr$<$ E\-K\-F\-State\-\_\-\-T $>$ \&state) const =0}\label{classmsf__core_1_1MSF__SensorManager_a431f5b517c39fd9b2168857ae9513f8b}
+
+\item 
+\hypertarget{classmsf__core_1_1MSF__SensorManager_abbce1dfe246d7c58ec94529d70c862e5}{virtual void {\bfseries publish\-State\-After\-Update} (const shared\-\_\-ptr$<$ E\-K\-F\-State\-\_\-\-T $>$ \&state) const =0}\label{classmsf__core_1_1MSF__SensorManager_abbce1dfe246d7c58ec94529d70c862e5}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classmsf__core_1_1MSF__SensorManager_ad08942e66e76a572cd6425b79e653fd2}{E\-I\-G\-E\-N\-\_\-\-M\-A\-K\-E\-\_\-\-A\-L\-I\-G\-N\-E\-D\-\_\-\-O\-P\-E\-R\-A\-T\-O\-R\-\_\-\-N\-E\-W \\*
+shared\-\_\-ptr$<$ \hyperlink{classmsf__core_1_1MSF__Core}{M\-S\-F\-\_\-\-Core}\\*
+$<$ E\-K\-F\-State\-\_\-\-T $>$ $>$ \hyperlink{classmsf__core_1_1MSF__SensorManager_ad08942e66e76a572cd6425b79e653fd2}{msf\-\_\-core\-\_\-}}\label{classmsf__core_1_1MSF__SensorManager_ad08942e66e76a572cd6425b79e653fd2}
+
+\begin{DoxyCompactList}\small\item\em The ekf core instance. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Protected Types}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classmsf__core_1_1MSF__SensorManager_a4bcde5443748c5580b583f2056d4dc67}{typedef std\-::vector\\*
+$<$ shared\-\_\-ptr$<$ \hyperlink{classmsf__core_1_1SensorHandler}{Sensor\-Handler}\\*
+$<$ E\-K\-F\-State\-\_\-\-T $>$ $>$ $>$ {\bfseries Handlers}}\label{classmsf__core_1_1MSF__SensorManager_a4bcde5443748c5580b583f2056d4dc67}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classmsf__core_1_1MSF__SensorManager_a7c6fe8b491f541562cbf863c452891fd}{Handlers \hyperlink{classmsf__core_1_1MSF__SensorManager_a7c6fe8b491f541562cbf863c452891fd}{handlers}}\label{classmsf__core_1_1MSF__SensorManager_a7c6fe8b491f541562cbf863c452891fd}
+
+\begin{DoxyCompactList}\small\item\em A list of sensor handlers which provide measurements. \end{DoxyCompactList}\item 
+bool \hyperlink{classmsf__core_1_1MSF__SensorManager_a49ac85275688e5588b73ed98795abe1a}{data\-\_\-playback\-\_\-}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename E\-K\-F\-State\-\_\-\-T$>$class msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager$<$ E\-K\-F\-State\-\_\-\-T $>$}
+
+A manager for a given sensor set. Handlers for individual sensors (camera/vicon etc.) are registered with this class as handlers of particular sensors. This class also owns the E\-K\-F core instance and handles the initialization of the filter. 
+
+\subsection{Member Function Documentation}
+\hypertarget{classmsf__core_1_1MSF__SensorManager_ad851fff1bceaeb6696ef79a4792a317a}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager}!publish\-State\-Initial@{publish\-State\-Initial}}
+\index{publish\-State\-Initial@{publish\-State\-Initial}!msf_core::MSF_SensorManager@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager}}
+\subsubsection[{publish\-State\-Initial}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T$>$ virtual void {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::publish\-State\-Initial (
+\begin{DoxyParamCaption}
+\item[{const shared\-\_\-ptr$<$ E\-K\-F\-State\-\_\-\-T $>$ \&}]{state}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classmsf__core_1_1MSF__SensorManager_ad851fff1bceaeb6696ef79a4792a317a}
+This functions get called by the core to publish data to external middlewares like R\-O\-S. 
+
+Implemented in \hyperlink{structmsf__core_1_1MSF__SensorManagerROS_abde229602f1aeb393a2aad30ef413e12}{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S$<$ E\-K\-F\-State\-\_\-\-T $>$}.
+
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classmsf__core_1_1MSF__SensorManager_a49ac85275688e5588b73ed98795abe1a}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager}!data\-\_\-playback\-\_\-@{data\-\_\-playback\-\_\-}}
+\index{data\-\_\-playback\-\_\-@{data\-\_\-playback\-\_\-}!msf_core::MSF_SensorManager@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager}}
+\subsubsection[{data\-\_\-playback\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T$>$ bool {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::data\-\_\-playback\-\_\-\hspace{0.3cm}{\ttfamily [protected]}}}\label{classmsf__core_1_1MSF__SensorManager_a49ac85275688e5588b73ed98795abe1a}
+Used to determine if internal states get overwritten by the external state prediction (online) or internal state prediction is performed for log replay, when the external prediction is not available or should be done on the host. 
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+msf\-\_\-core/include/msf\-\_\-core/msf\-\_\-sensormanager.\-h\item 
+msf\-\_\-core/include/msf\-\_\-core/implementation/msf\-\_\-sensormanager.\-hpp\end{DoxyCompactItemize}

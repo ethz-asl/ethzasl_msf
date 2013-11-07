@@ -1,0 +1,64 @@
+\hypertarget{classmsf__core_1_1MSF__InitMeasurement}{\section{msf\-\_\-core\-:\-:M\-S\-F\-\_\-\-Init\-Measurement$<$ E\-K\-F\-State\-\_\-\-T $>$ Class Template Reference}
+\label{classmsf__core_1_1MSF__InitMeasurement}\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Init\-Measurement$<$ E\-K\-F\-State\-\_\-\-T $>$@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Init\-Measurement$<$ E\-K\-F\-State\-\_\-\-T $>$}}
+}
+
+
+A measurement to be send to initialize parts of or the full E\-K\-F state this can especially be used to split the initialization of the E\-K\-F between multiple sensors which init different parts of the state.  
+
+
+
+
+{\ttfamily \#include $<$msf\-\_\-measurement.\-h$>$}
+
+Inheritance diagram for msf\-\_\-core\-:\-:M\-S\-F\-\_\-\-Init\-Measurement$<$ E\-K\-F\-State\-\_\-\-T $>$\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classmsf__core_1_1MSF__InitMeasurement}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classmsf__core_1_1MSF__InitMeasurement_aaa7c4e7ea351aae40daa3ce32fb37e58}{E\-I\-G\-E\-N\-\_\-\-M\-A\-K\-E\-\_\-\-A\-L\-I\-G\-N\-E\-D\-\_\-\-O\-P\-E\-R\-A\-T\-O\-R\-\_\-\-N\-E\-W {\bfseries M\-S\-F\-\_\-\-Init\-Measurement} (bool Contains\-Initial\-Sensor\-Readings)}\label{classmsf__core_1_1MSF__InitMeasurement_aaa7c4e7ea351aae40daa3ce32fb37e58}
+
+\item 
+\hypertarget{classmsf__core_1_1MSF__InitMeasurement_a6ade2a1ba88e5f26de2125258e4c5238}{virtual std\-::string {\bfseries type} ()}\label{classmsf__core_1_1MSF__InitMeasurement_a6ade2a1ba88e5f26de2125258e4c5238}
+
+\item 
+\hypertarget{classmsf__core_1_1MSF__InitMeasurement_a19cc3b1efefda7694cca93d1bae441f5}{E\-K\-F\-State\-\_\-\-T\-::\-P\-\_\-type \& {\bfseries get\-\_\-\-P} ()}\label{classmsf__core_1_1MSF__InitMeasurement_a19cc3b1efefda7694cca93d1bae441f5}
+
+\item 
+\hypertarget{classmsf__core_1_1MSF__InitMeasurement_af0c9a4a740bc019d8a6a223d469bb42f}{Eigen\-::\-Matrix$<$ double, 3, 1 $>$ \& \hyperlink{classmsf__core_1_1MSF__InitMeasurement_af0c9a4a740bc019d8a6a223d469bb42f}{get\-\_\-w\-\_\-m} ()}\label{classmsf__core_1_1MSF__InitMeasurement_af0c9a4a740bc019d8a6a223d469bb42f}
+
+\begin{DoxyCompactList}\small\item\em Get the gyro measurement. \end{DoxyCompactList}\item 
+\hypertarget{classmsf__core_1_1MSF__InitMeasurement_a4c2c7250787e58868c9fc9596ed4c217}{Eigen\-::\-Matrix$<$ double, 3, 1 $>$ \& \hyperlink{classmsf__core_1_1MSF__InitMeasurement_a4c2c7250787e58868c9fc9596ed4c217}{get\-\_\-a\-\_\-m} ()}\label{classmsf__core_1_1MSF__InitMeasurement_a4c2c7250787e58868c9fc9596ed4c217}
+
+\begin{DoxyCompactList}\small\item\em Get the acceleration measurment. \end{DoxyCompactList}\item 
+\hypertarget{classmsf__core_1_1MSF__InitMeasurement_a972bcf6e09e13c96849b528c926b3a33}{{\footnotesize template$<$int I\-N\-D\-E\-X, typename T $>$ }\\void \hyperlink{classmsf__core_1_1MSF__InitMeasurement_a972bcf6e09e13c96849b528c926b3a33}{set\-State\-Init\-Value} (const T \&initvalue)}\label{classmsf__core_1_1MSF__InitMeasurement_a972bcf6e09e13c96849b528c926b3a33}
+
+\begin{DoxyCompactList}\small\item\em Set the flag that the state variable at index I\-N\-D\-E\-X has init values for the state. \end{DoxyCompactList}\item 
+\hypertarget{classmsf__core_1_1MSF__InitMeasurement_aa95a1f961bac237267d133035a113728}{{\footnotesize template$<$int I\-N\-D\-E\-X$>$ }\\void \hyperlink{classmsf__core_1_1MSF__InitMeasurement_aa95a1f961bac237267d133035a113728}{reset\-State\-Init\-Value} ()}\label{classmsf__core_1_1MSF__InitMeasurement_aa95a1f961bac237267d133035a113728}
+
+\begin{DoxyCompactList}\small\item\em Reset the flag that the state variable at index I\-N\-D\-E\-X has init values for the state. \end{DoxyCompactList}\item 
+\hypertarget{classmsf__core_1_1MSF__InitMeasurement_acd59df20e43b7151b1549b1a43a93511}{{\footnotesize template$<$int I\-N\-D\-E\-X$>$ }\\const \hyperlink{structmsf__tmp_1_1StripReference}{msf\-\_\-tmp\-::\-Strip\-Reference}\\*
+$<$ typename \\*
+boost\-::fusion\-::result\-\_\-of\-::at\-\_\-c\\*
+$<$ State\-Sequence\-\_\-\-T, I\-N\-D\-E\-X $>$\\*
+\-::type $>$\-::result\-\_\-t\-::value\-\_\-t \& \hyperlink{classmsf__core_1_1MSF__InitMeasurement_acd59df20e43b7151b1549b1a43a93511}{get\-State\-Init\-Value} () const }\label{classmsf__core_1_1MSF__InitMeasurement_acd59df20e43b7151b1549b1a43a93511}
+
+\begin{DoxyCompactList}\small\item\em Get the value stored in this object to initialize a state variable at index I\-N\-D\-E\-X. \end{DoxyCompactList}\item 
+\hypertarget{classmsf__core_1_1MSF__InitMeasurement_a7b92f1e55007491bec20273f6cc25ba6}{virtual void \hyperlink{classmsf__core_1_1MSF__InitMeasurement_a7b92f1e55007491bec20273f6cc25ba6}{apply} (shared\-\_\-ptr$<$ E\-K\-F\-State\-\_\-\-T $>$ state\-With\-Covariance, \hyperlink{classmsf__core_1_1MSF__Core}{M\-S\-F\-\_\-\-Core}$<$ E\-K\-F\-State\-\_\-\-T $>$ \&core)}\label{classmsf__core_1_1MSF__InitMeasurement_a7b92f1e55007491bec20273f6cc25ba6}
+
+\begin{DoxyCompactList}\small\item\em The method called by the msf\-\_\-core to apply the measurement represented by this object. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename E\-K\-F\-State\-\_\-\-T$>$class msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Init\-Measurement$<$ E\-K\-F\-State\-\_\-\-T $>$}
+
+A measurement to be send to initialize parts of or the full E\-K\-F state this can especially be used to split the initialization of the E\-K\-F between multiple sensors which init different parts of the state. 
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+msf\-\_\-core/include/msf\-\_\-core/msf\-\_\-measurement.\-h\item 
+msf\-\_\-core/include/msf\-\_\-core/implementation/msf\-\_\-measurement.\-hpp\end{DoxyCompactItemize}

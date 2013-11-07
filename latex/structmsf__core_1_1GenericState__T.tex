@@ -1,0 +1,276 @@
+\hypertarget{structmsf__core_1_1GenericState__T}{\section{msf\-\_\-core\-:\-:Generic\-State\-\_\-\-T$<$ State\-Seq\-\_\-\-T, State\-Def\-\_\-\-T $>$ Struct Template Reference}
+\label{structmsf__core_1_1GenericState__T}\index{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T$<$ State\-Seq\-\_\-\-T, State\-Def\-\_\-\-T $>$@{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T$<$ State\-Seq\-\_\-\-T, State\-Def\-\_\-\-T $>$}}
+}
+
+
+The state vector containing all the state variables for this E\-K\-F configuration.  
+
+
+
+
+{\ttfamily \#include $<$msf\-\_\-state.\-h$>$}
+
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ \\*
+\hyperlink{structmsf__core_1_1GenericState__T_a20545d9aacd8f84bc1a97a873310cd5fabae0f6113b2fd3bd1e55a7fd0a3e8534}{n\-State\-Vars\-At\-Compile\-Time}, 
+\hyperlink{structmsf__core_1_1GenericState__T_a20545d9aacd8f84bc1a97a873310cd5fab0136c5805e4e8d75677885fcaad5901}{n\-Error\-States\-At\-Compile\-Time}, 
+\hyperlink{structmsf__core_1_1GenericState__T_a20545d9aacd8f84bc1a97a873310cd5faf75f7ae9223cdbc573d043e82f5843bd}{n\-States\-At\-Compile\-Time}, 
+\hyperlink{structmsf__core_1_1GenericState__T_a20545d9aacd8f84bc1a97a873310cd5fabd9ce322dcc236ba424c7435e37a34f3}{n\-Core\-States\-At\-Compile\-Time}, 
+\\*
+\hyperlink{structmsf__core_1_1GenericState__T_a20545d9aacd8f84bc1a97a873310cd5fa20a7211e99e3848fc20fce6cd9834c91}{n\-Propagated\-Core\-States\-At\-Compile\-Time}, 
+\hyperlink{structmsf__core_1_1GenericState__T_a20545d9aacd8f84bc1a97a873310cd5faa076b31f0a4176856a0ddc0556801725}{n\-Propagated\-Core\-Error\-States\-At\-Compile\-Time}
+ \}
+\item 
+typedef State\-Seq\-\_\-\-T \hyperlink{structmsf__core_1_1GenericState__T_a75fe70f7c7517dbf7d4c91b75b08a1dd}{State\-Sequence\-\_\-\-T}
+\begin{DoxyCompactList}\small\item\em The state vector defining the state variables of this E\-K\-F. \end{DoxyCompactList}\item 
+\hypertarget{structmsf__core_1_1GenericState__T_a9a7d65b0325658ab07b81960a3ed4604}{typedef State\-Def\-\_\-\-T {\bfseries State\-Definition\-\_\-\-T}}\label{structmsf__core_1_1GenericState__T_a9a7d65b0325658ab07b81960a3ed4604}
+
+\item 
+\hypertarget{structmsf__core_1_1GenericState__T_ab6d971027f43219a480e910392b665c8}{typedef Eigen\-::\-Matrix$<$ double, \\*
+\hyperlink{structmsf__core_1_1GenericState__T_a20545d9aacd8f84bc1a97a873310cd5fab0136c5805e4e8d75677885fcaad5901}{n\-Error\-States\-At\-Compile\-Time}, \\*
+\hyperlink{structmsf__core_1_1GenericState__T_a20545d9aacd8f84bc1a97a873310cd5fab0136c5805e4e8d75677885fcaad5901}{n\-Error\-States\-At\-Compile\-Time} $>$ \hyperlink{structmsf__core_1_1GenericState__T_ab6d971027f43219a480e910392b665c8}{P\-\_\-type}}\label{structmsf__core_1_1GenericState__T_ab6d971027f43219a480e910392b665c8}
+
+\begin{DoxyCompactList}\small\item\em Type of the error state. \end{DoxyCompactList}\item 
+\hypertarget{structmsf__core_1_1GenericState__T_a9b665561d9157530cc72dab33ed0344f}{typedef \hyperlink{structmsf__core_1_1GenericState__T_ab6d971027f43219a480e910392b665c8}{P\-\_\-type} {\bfseries F\-\_\-type}}\label{structmsf__core_1_1GenericState__T_a9b665561d9157530cc72dab33ed0344f}
+
+\item 
+\hypertarget{structmsf__core_1_1GenericState__T_a2bd29a1ae1d6a6115a4dda70e285dc28}{typedef \hyperlink{structmsf__core_1_1GenericState__T_ab6d971027f43219a480e910392b665c8}{P\-\_\-type} {\bfseries Q\-\_\-type}}\label{structmsf__core_1_1GenericState__T_a2bd29a1ae1d6a6115a4dda70e285dc28}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{structmsf__core_1_1GenericState__T_acc97b8f5fe79d78dd1528b7c57100c5d}{void \hyperlink{structmsf__core_1_1GenericState__T_acc97b8f5fe79d78dd1528b7c57100c5d}{correct} (const Eigen\-::\-Matrix$<$ double, \hyperlink{structmsf__core_1_1GenericState__T_a20545d9aacd8f84bc1a97a873310cd5fab0136c5805e4e8d75677885fcaad5901}{n\-Error\-States\-At\-Compile\-Time}, 1 $>$ \&correction)}\label{structmsf__core_1_1GenericState__T_acc97b8f5fe79d78dd1528b7c57100c5d}
+
+\begin{DoxyCompactList}\small\item\em Apply the correction vector to all state vars. \end{DoxyCompactList}\item 
+\hypertarget{structmsf__core_1_1GenericState__T_a34e6c50f303098c763a02fbe8c3b673e}{{\footnotesize template$<$int I\-N\-D\-E\-X$>$ }\\\hyperlink{structmsf__tmp_1_1StripReference}{msf\-\_\-tmp\-::\-Strip\-Reference}\\*
+$<$ typename \\*
+boost\-::fusion\-::result\-\_\-of\-::at\-\_\-c\\*
+$<$ \hyperlink{structmsf__core_1_1GenericState__T_a75fe70f7c7517dbf7d4c91b75b08a1dd}{State\-Sequence\-\_\-\-T}, I\-N\-D\-E\-X $>$\\*
+\-::type $>$\-::result\-\_\-t\-::\-Q\-\_\-\-T \& \hyperlink{structmsf__core_1_1GenericState__T_a34e6c50f303098c763a02fbe8c3b673e}{get\-Q\-Block} ()}\label{structmsf__core_1_1GenericState__T_a34e6c50f303098c763a02fbe8c3b673e}
+
+\begin{DoxyCompactList}\small\item\em Returns the Q-\/block of the state at position I\-N\-D\-E\-X in the state list, not allowed for core states. \end{DoxyCompactList}\item 
+\hypertarget{structmsf__core_1_1GenericState__T_adde836b510073015d9ec54ed6b2bf971}{{\footnotesize template$<$int I\-N\-D\-E\-X$>$ }\\const \hyperlink{structmsf__tmp_1_1StripReference}{msf\-\_\-tmp\-::\-Strip\-Reference}\\*
+$<$ typename \\*
+boost\-::fusion\-::result\-\_\-of\-::at\-\_\-c\\*
+$<$ \hyperlink{structmsf__core_1_1GenericState__T_a75fe70f7c7517dbf7d4c91b75b08a1dd}{State\-Sequence\-\_\-\-T}, I\-N\-D\-E\-X $>$\\*
+\-::type $>$\-::result\-\_\-t\-::\-Q\-\_\-\-T \& \hyperlink{structmsf__core_1_1GenericState__T_adde836b510073015d9ec54ed6b2bf971}{get\-Q\-Block} () const }\label{structmsf__core_1_1GenericState__T_adde836b510073015d9ec54ed6b2bf971}
+
+\begin{DoxyCompactList}\small\item\em Returns the Q-\/block of the state at position I\-N\-D\-E\-X in the state list, also possible for core states, since const. \end{DoxyCompactList}\item 
+void \hyperlink{structmsf__core_1_1GenericState__T_aff789c110efbe85318a6455adeb46497}{reset} (\hyperlink{classmsf__core_1_1StateVisitor}{msf\-\_\-core\-::\-State\-Visitor}$<$ \hyperlink{structmsf__core_1_1GenericState__T}{Generic\-State\-\_\-\-T}$<$ \hyperlink{structmsf__core_1_1GenericState__T_a75fe70f7c7517dbf7d4c91b75b08a1dd}{State\-Sequence\-\_\-\-T}, State\-Definition\-\_\-\-T $>$ $>$ $\ast$usercalc=nullptr)
+\begin{DoxyCompactList}\small\item\em Reset the state 3\-D vectors\-: 0; quaternion\-: unit quaternion; scale\-: 1; time\-:0; Error covariance\-: zeros. \end{DoxyCompactList}\item 
+void \hyperlink{structmsf__core_1_1GenericState__T_ac83be2ba4d55a9099b067f7e462a9ec7}{get\-Pose\-Covariance} (geometry\-\_\-msgs\-::\-Pose\-With\-Covariance\-::\-\_\-covariance\-\_\-type \&cov)
+\begin{DoxyCompactList}\small\item\em Write the covariance corresponding to position and attitude to cov. \end{DoxyCompactList}\item 
+void \hyperlink{structmsf__core_1_1GenericState__T_ad30ecf639ff4c96fd689412c5be91d6a}{to\-Pose\-Msg} (geometry\-\_\-msgs\-::\-Pose\-With\-Covariance\-Stamped \&pose)
+\begin{DoxyCompactList}\small\item\em Assembles a Pose\-With\-Covariance\-Stamped message from the state. \end{DoxyCompactList}\item 
+void \hyperlink{structmsf__core_1_1GenericState__T_aa94d1ef9bf4f2d3aea2d1cc9c6c04f50}{to\-Ext\-State\-Msg} (sensor\-\_\-fusion\-\_\-comm\-::\-Ext\-State \&state)
+\begin{DoxyCompactList}\small\item\em Assemble an Ext\-State message from the state. \end{DoxyCompactList}\item 
+void \hyperlink{structmsf__core_1_1GenericState__T_ab987d5916f3b7ab394539b46a9d5fabb}{to\-Full\-State\-Msg} (sensor\-\_\-fusion\-\_\-comm\-::\-Double\-Array\-Stamped \&state)
+\begin{DoxyCompactList}\small\item\em Assembles a Double\-Array\-Stamped message from the state. \end{DoxyCompactList}\item 
+void \hyperlink{structmsf__core_1_1GenericState__T_a284c9a13e909d3a1d0d3d012e3445542}{to\-Core\-State\-Msg} (sensor\-\_\-fusion\-\_\-comm\-::\-Double\-Array\-Stamped \&state)
+\begin{DoxyCompactList}\small\item\em Assembles a Double\-Array\-Stamped message from the state. \end{DoxyCompactList}\item 
+\hypertarget{structmsf__core_1_1GenericState__T_a03efdc4aaadaf38d3beed4ed013c73a3}{Eigen\-::\-Matrix$<$ double, \\*
+\hyperlink{structmsf__core_1_1GenericState__T_a20545d9aacd8f84bc1a97a873310cd5fabd9ce322dcc236ba424c7435e37a34f3}{n\-Core\-States\-At\-Compile\-Time}, 1 $>$ \hyperlink{structmsf__core_1_1GenericState__T_a03efdc4aaadaf38d3beed4ed013c73a3}{to\-Eigen\-Vector} ()}\label{structmsf__core_1_1GenericState__T_a03efdc4aaadaf38d3beed4ed013c73a3}
+
+\begin{DoxyCompactList}\small\item\em Returns all values as an eigen vector. \end{DoxyCompactList}\item 
+void \hyperlink{structmsf__core_1_1GenericState__T_aa9b0416f9a69c5dc7a2be0f36a911e3b}{calculate\-Indices\-In\-Error\-State} (std\-::vector$<$ std\-::tuple$<$ int, int, int $>$ $>$ \&vec)
+\item 
+\hypertarget{structmsf__core_1_1GenericState__T_a1b9703f4f0c7e9fe930808893626e6ef}{std\-::string \hyperlink{structmsf__core_1_1GenericState__T_a1b9703f4f0c7e9fe930808893626e6ef}{print} ()}\label{structmsf__core_1_1GenericState__T_a1b9703f4f0c7e9fe930808893626e6ef}
+
+\begin{DoxyCompactList}\small\item\em Returns a string describing the state. \end{DoxyCompactList}\item 
+\hypertarget{structmsf__core_1_1GenericState__T_ac540479ddebda9d50e3329b1e652eefe}{bool \hyperlink{structmsf__core_1_1GenericState__T_ac540479ddebda9d50e3329b1e652eefe}{check\-State\-For\-Numeric} ()}\label{structmsf__core_1_1GenericState__T_ac540479ddebda9d50e3329b1e652eefe}
+
+\begin{DoxyCompactList}\small\item\em Returns whether the state is sane. No Na\-N no inf. \end{DoxyCompactList}\item 
+\hypertarget{structmsf__core_1_1GenericState__T_a7c634b0071239e42781a3603b00c9749}{{\footnotesize template$<$int I\-N\-D\-E\-X$>$ }\\const \hyperlink{structmsf__tmp_1_1StripReference}{msf\-\_\-tmp\-::\-Strip\-Reference}\\*
+$<$ typename \\*
+boost\-::fusion\-::result\-\_\-of\-::at\-\_\-c\\*
+$<$ \hyperlink{structmsf__core_1_1GenericState__T_a75fe70f7c7517dbf7d4c91b75b08a1dd}{State\-Sequence\-\_\-\-T}, I\-N\-D\-E\-X $>$\\*
+\-::type $>$\-::result\-\_\-t\-::value\-\_\-t \& \hyperlink{structmsf__core_1_1GenericState__T_a7c634b0071239e42781a3603b00c9749}{get} () const }\label{structmsf__core_1_1GenericState__T_a7c634b0071239e42781a3603b00c9749}
+
+\begin{DoxyCompactList}\small\item\em Returns the state at position I\-N\-D\-E\-X in the state list, const version. \end{DoxyCompactList}\item 
+\hypertarget{structmsf__core_1_1GenericState__T_a932947fcec47edfe556d37087cc74c5b}{{\footnotesize template$<$int I\-N\-D\-E\-X$>$ }\\\hyperlink{structmsf__tmp_1_1AddConstReference}{msf\-\_\-tmp\-::\-Add\-Const\-Reference}\\*
+$<$ typename \\*
+boost\-::fusion\-::result\-\_\-of\-::at\-\_\-c\\*
+$<$ \hyperlink{structmsf__core_1_1GenericState__T_a75fe70f7c7517dbf7d4c91b75b08a1dd}{State\-Sequence\-\_\-\-T}, I\-N\-D\-E\-X $>$\\*
+\-::type $>$\-::result\-\_\-t \hyperlink{structmsf__core_1_1GenericState__T_a932947fcec47edfe556d37087cc74c5b}{get\-State\-Var} () const }\label{structmsf__core_1_1GenericState__T_a932947fcec47edfe556d37087cc74c5b}
+
+\begin{DoxyCompactList}\small\item\em Returns the state\-Var at position I\-N\-D\-E\-X in the state list, const version. \end{DoxyCompactList}\item 
+\hypertarget{structmsf__core_1_1GenericState__T_ac5dc9e9190db9f0faf77e6bc373484ff}{{\footnotesize template$<$int I\-N\-D\-E\-X$>$ }\\void \hyperlink{structmsf__core_1_1GenericState__T_ac5dc9e9190db9f0faf77e6bc373484ff}{set} (const typename \hyperlink{structmsf__tmp_1_1StripConstReference}{msf\-\_\-tmp\-::\-Strip\-Const\-Reference}$<$ typename boost\-::fusion\-::result\-\_\-of\-::at\-\_\-c$<$ \hyperlink{structmsf__core_1_1GenericState__T_a75fe70f7c7517dbf7d4c91b75b08a1dd}{State\-Sequence\-\_\-\-T}, I\-N\-D\-E\-X $>$\-::type $>$\-::result\-\_\-t\-::value\-\_\-t \&newvalue)}\label{structmsf__core_1_1GenericState__T_ac5dc9e9190db9f0faf77e6bc373484ff}
+
+\begin{DoxyCompactList}\small\item\em Sets state at position I\-N\-D\-E\-X in the state list, fails for core states at compile time. \end{DoxyCompactList}\item 
+\hypertarget{structmsf__core_1_1GenericState__T_af549612e16331a261cec92ac5661a092}{{\footnotesize template$<$int I\-N\-D\-E\-X$>$ }\\void {\bfseries clear\-Cross\-Cov} ()}\label{structmsf__core_1_1GenericState__T_af549612e16331a261cec92ac5661a092}
+
+\item 
+\hypertarget{structmsf__core_1_1GenericState__T_a4d1ee0b277d6ef5c297b412d98f03efc}{{\footnotesize template$<$int I\-N\-D\-E\-X$>$ }\\void {\bfseries set} (const typename \hyperlink{structmsf__tmp_1_1StripConstReference}{msf\-\_\-tmp\-::\-Strip\-Const\-Reference}$<$ typename boost\-::fusion\-::result\-\_\-of\-::at\-\_\-c$<$ state\-Vector\-\_\-\-T, I\-N\-D\-E\-X $>$\-::type $>$\-::result\-\_\-t\-::value\-\_\-t \&newvalue)}\label{structmsf__core_1_1GenericState__T_a4d1ee0b277d6ef5c297b412d98f03efc}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{structmsf__core_1_1GenericState__T_acb07cfa8c01da7ea7527ebd78710f00a}{\hyperlink{structmsf__core_1_1GenericState__T_a75fe70f7c7517dbf7d4c91b75b08a1dd}{State\-Sequence\-\_\-\-T} \hyperlink{structmsf__core_1_1GenericState__T_acb07cfa8c01da7ea7527ebd78710f00a}{statevars}}\label{structmsf__core_1_1GenericState__T_acb07cfa8c01da7ea7527ebd78710f00a}
+
+\begin{DoxyCompactList}\small\item\em The actual state variables. \end{DoxyCompactList}\item 
+\hypertarget{structmsf__core_1_1GenericState__T_aa92f776680b8f2614d8069e0639e8864}{Eigen\-::\-Matrix$<$ double, 3, 1 $>$ \hyperlink{structmsf__core_1_1GenericState__T_aa92f776680b8f2614d8069e0639e8864}{w\-\_\-m}}\label{structmsf__core_1_1GenericState__T_aa92f776680b8f2614d8069e0639e8864}
+
+\begin{DoxyCompactList}\small\item\em Angular velocity from I\-M\-U. \end{DoxyCompactList}\item 
+\hypertarget{structmsf__core_1_1GenericState__T_af0fa8d13ba3aa3ff0253d85bb79d6a48}{Eigen\-::\-Matrix$<$ double, 3, 1 $>$ \hyperlink{structmsf__core_1_1GenericState__T_af0fa8d13ba3aa3ff0253d85bb79d6a48}{a\-\_\-m}}\label{structmsf__core_1_1GenericState__T_af0fa8d13ba3aa3ff0253d85bb79d6a48}
+
+\begin{DoxyCompactList}\small\item\em Linear acceleration from I\-M\-U. \end{DoxyCompactList}\item 
+\hypertarget{structmsf__core_1_1GenericState__T_aff998e4562be4645e60dfdb668870119}{double \hyperlink{structmsf__core_1_1GenericState__T_aff998e4562be4645e60dfdb668870119}{time}}\label{structmsf__core_1_1GenericState__T_aff998e4562be4645e60dfdb668870119}
+
+\begin{DoxyCompactList}\small\item\em Time of this state estimate. \end{DoxyCompactList}\item 
+\hypertarget{structmsf__core_1_1GenericState__T_adbfa25972a10054e2c310e5c74883427}{\hyperlink{structmsf__core_1_1GenericState__T_ab6d971027f43219a480e910392b665c8}{P\-\_\-type} \hyperlink{structmsf__core_1_1GenericState__T_adbfa25972a10054e2c310e5c74883427}{P}}\label{structmsf__core_1_1GenericState__T_adbfa25972a10054e2c310e5c74883427}
+
+\begin{DoxyCompactList}\small\item\em Error state covariance. \end{DoxyCompactList}\item 
+\hypertarget{structmsf__core_1_1GenericState__T_ad280aac57eb229c02d49172645159b60}{F\-\_\-type \hyperlink{structmsf__core_1_1GenericState__T_ad280aac57eb229c02d49172645159b60}{Fd}}\label{structmsf__core_1_1GenericState__T_ad280aac57eb229c02d49172645159b60}
+
+\begin{DoxyCompactList}\small\item\em Discrete state propagation matrix. \end{DoxyCompactList}\item 
+\hypertarget{structmsf__core_1_1GenericState__T_a68fa9e618784839b121ebbf2bbb42040}{Q\-\_\-type \hyperlink{structmsf__core_1_1GenericState__T_a68fa9e618784839b121ebbf2bbb42040}{Qd}}\label{structmsf__core_1_1GenericState__T_a68fa9e618784839b121ebbf2bbb42040}
+
+\begin{DoxyCompactList}\small\item\em Discrete propagation noise matrix. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{structmsf__core_1_1GenericState__T_af712399c37091d0c5b71a0dbe27cf4ae}{class {\bfseries msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Core$<$ Generic\-State\-\_\-\-T$<$ State\-Sequence\-\_\-\-T, State\-Definition\-\_\-\-T $>$ $>$}}\label{structmsf__core_1_1GenericState__T_af712399c37091d0c5b71a0dbe27cf4ae}
+
+\item 
+\hypertarget{structmsf__core_1_1GenericState__T_a8a2e95cafb3556e7b1e658353f6cd74e}{struct {\bfseries msf\-\_\-core\-::copy\-Non\-Propagation\-States$<$ Generic\-State\-\_\-\-T $>$}}\label{structmsf__core_1_1GenericState__T_a8a2e95cafb3556e7b1e658353f6cd74e}
+
+\item 
+\hypertarget{structmsf__core_1_1GenericState__T_aa5650f4d3b3f29f901872e699b9e6398}{class {\bfseries msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Init\-Measurement$<$ Generic\-State\-\_\-\-T$<$ State\-Sequence\-\_\-\-T, State\-Definition\-\_\-\-T $>$ $>$}}\label{structmsf__core_1_1GenericState__T_aa5650f4d3b3f29f901872e699b9e6398}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename State\-Seq\-\_\-\-T, typename State\-Def\-\_\-\-T$>$struct msf\-\_\-core\-::\-Generic\-State\-\_\-\-T$<$ State\-Seq\-\_\-\-T, State\-Def\-\_\-\-T $>$}
+
+The state vector containing all the state variables for this E\-K\-F configuration. 
+
+\subsection{Member Typedef Documentation}
+\hypertarget{structmsf__core_1_1GenericState__T_a75fe70f7c7517dbf7d4c91b75b08a1dd}{\index{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T@{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}!State\-Sequence\-\_\-\-T@{State\-Sequence\-\_\-\-T}}
+\index{State\-Sequence\-\_\-\-T@{State\-Sequence\-\_\-\-T}!msf_core::GenericState_T@{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}}
+\subsubsection[{State\-Sequence\-\_\-\-T}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename State\-Seq\-\_\-\-T, typename State\-Def\-\_\-\-T$>$ typedef State\-Seq\-\_\-\-T {\bf msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}$<$ State\-Seq\-\_\-\-T, State\-Def\-\_\-\-T $>$\-::{\bf State\-Sequence\-\_\-\-T}}}\label{structmsf__core_1_1GenericState__T_a75fe70f7c7517dbf7d4c91b75b08a1dd}
+
+
+The state vector defining the state variables of this E\-K\-F. 
+
+The enums of the state variables. 
+
+\subsection{Member Enumeration Documentation}
+\hypertarget{structmsf__core_1_1GenericState__T_a20545d9aacd8f84bc1a97a873310cd5f}{\subsubsection[{anonymous enum}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename State\-Seq\-\_\-\-T, typename State\-Def\-\_\-\-T$>$ anonymous enum}}\label{structmsf__core_1_1GenericState__T_a20545d9aacd8f84bc1a97a873310cd5f}
+\begin{Desc}
+\item[Enumerator\-: ]\par
+\begin{description}
+\index{n\-State\-Vars\-At\-Compile\-Time@{n\-State\-Vars\-At\-Compile\-Time}!msf\-\_\-core\-::\-Generic\-State\-\_\-\-T@{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}}\index{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T@{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}!n\-State\-Vars\-At\-Compile\-Time@{n\-State\-Vars\-At\-Compile\-Time}}\item[{\em 
+\hypertarget{structmsf__core_1_1GenericState__T_a20545d9aacd8f84bc1a97a873310cd5fabae0f6113b2fd3bd1e55a7fd0a3e8534}{n\-State\-Vars\-At\-Compile\-Time}\label{structmsf__core_1_1GenericState__T_a20545d9aacd8f84bc1a97a873310cd5fabae0f6113b2fd3bd1e55a7fd0a3e8534}
+}]N state vars. \index{n\-Error\-States\-At\-Compile\-Time@{n\-Error\-States\-At\-Compile\-Time}!msf\-\_\-core\-::\-Generic\-State\-\_\-\-T@{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}}\index{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T@{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}!n\-Error\-States\-At\-Compile\-Time@{n\-Error\-States\-At\-Compile\-Time}}\item[{\em 
+\hypertarget{structmsf__core_1_1GenericState__T_a20545d9aacd8f84bc1a97a873310cd5fab0136c5805e4e8d75677885fcaad5901}{n\-Error\-States\-At\-Compile\-Time}\label{structmsf__core_1_1GenericState__T_a20545d9aacd8f84bc1a97a873310cd5fab0136c5805e4e8d75677885fcaad5901}
+}]N error states. \index{n\-States\-At\-Compile\-Time@{n\-States\-At\-Compile\-Time}!msf\-\_\-core\-::\-Generic\-State\-\_\-\-T@{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}}\index{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T@{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}!n\-States\-At\-Compile\-Time@{n\-States\-At\-Compile\-Time}}\item[{\em 
+\hypertarget{structmsf__core_1_1GenericState__T_a20545d9aacd8f84bc1a97a873310cd5faf75f7ae9223cdbc573d043e82f5843bd}{n\-States\-At\-Compile\-Time}\label{structmsf__core_1_1GenericState__T_a20545d9aacd8f84bc1a97a873310cd5faf75f7ae9223cdbc573d043e82f5843bd}
+}]N total states. \index{n\-Core\-States\-At\-Compile\-Time@{n\-Core\-States\-At\-Compile\-Time}!msf\-\_\-core\-::\-Generic\-State\-\_\-\-T@{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}}\index{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T@{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}!n\-Core\-States\-At\-Compile\-Time@{n\-Core\-States\-At\-Compile\-Time}}\item[{\em 
+\hypertarget{structmsf__core_1_1GenericState__T_a20545d9aacd8f84bc1a97a873310cd5fabd9ce322dcc236ba424c7435e37a34f3}{n\-Core\-States\-At\-Compile\-Time}\label{structmsf__core_1_1GenericState__T_a20545d9aacd8f84bc1a97a873310cd5fabd9ce322dcc236ba424c7435e37a34f3}
+}]N total core states. \index{n\-Propagated\-Core\-States\-At\-Compile\-Time@{n\-Propagated\-Core\-States\-At\-Compile\-Time}!msf\-\_\-core\-::\-Generic\-State\-\_\-\-T@{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}}\index{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T@{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}!n\-Propagated\-Core\-States\-At\-Compile\-Time@{n\-Propagated\-Core\-States\-At\-Compile\-Time}}\item[{\em 
+\hypertarget{structmsf__core_1_1GenericState__T_a20545d9aacd8f84bc1a97a873310cd5fa20a7211e99e3848fc20fce6cd9834c91}{n\-Propagated\-Core\-States\-At\-Compile\-Time}\label{structmsf__core_1_1GenericState__T_a20545d9aacd8f84bc1a97a873310cd5fa20a7211e99e3848fc20fce6cd9834c91}
+}]N total core states with propagation. \index{n\-Propagated\-Core\-Error\-States\-At\-Compile\-Time@{n\-Propagated\-Core\-Error\-States\-At\-Compile\-Time}!msf\-\_\-core\-::\-Generic\-State\-\_\-\-T@{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}}\index{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T@{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}!n\-Propagated\-Core\-Error\-States\-At\-Compile\-Time@{n\-Propagated\-Core\-Error\-States\-At\-Compile\-Time}}\item[{\em 
+\hypertarget{structmsf__core_1_1GenericState__T_a20545d9aacd8f84bc1a97a873310cd5faa076b31f0a4176856a0ddc0556801725}{n\-Propagated\-Core\-Error\-States\-At\-Compile\-Time}\label{structmsf__core_1_1GenericState__T_a20545d9aacd8f84bc1a97a873310cd5faa076b31f0a4176856a0ddc0556801725}
+}]N total error states with propagation. \end{description}
+\end{Desc}
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{structmsf__core_1_1GenericState__T_aa9b0416f9a69c5dc7a2be0f36a911e3b}{\index{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T@{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}!calculate\-Indices\-In\-Error\-State@{calculate\-Indices\-In\-Error\-State}}
+\index{calculate\-Indices\-In\-Error\-State@{calculate\-Indices\-In\-Error\-State}!msf_core::GenericState_T@{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}}
+\subsubsection[{calculate\-Indices\-In\-Error\-State}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename state\-Vector\-\_\-\-T , typename State\-Definition\-\_\-\-T $>$ void {\bf msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}$<$ state\-Vector\-\_\-\-T, State\-Definition\-\_\-\-T $>$\-::calculate\-Indices\-In\-Error\-State (
+\begin{DoxyParamCaption}
+\item[{std\-::vector$<$ std\-::tuple$<$ int, int, int $>$ $>$ \&}]{vec}
+\end{DoxyParamCaption}
+)}}\label{structmsf__core_1_1GenericState__T_aa9b0416f9a69c5dc7a2be0f36a911e3b}
+Returns a vector of int pairs with enum index in errorstate and numblocks. \hypertarget{structmsf__core_1_1GenericState__T_ac83be2ba4d55a9099b067f7e462a9ec7}{\index{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T@{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}!get\-Pose\-Covariance@{get\-Pose\-Covariance}}
+\index{get\-Pose\-Covariance@{get\-Pose\-Covariance}!msf_core::GenericState_T@{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}}
+\subsubsection[{get\-Pose\-Covariance}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename state\-Vector\-\_\-\-T , typename State\-Definition\-\_\-\-T $>$ void {\bf msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}$<$ state\-Vector\-\_\-\-T, State\-Definition\-\_\-\-T $>$\-::get\-Pose\-Covariance (
+\begin{DoxyParamCaption}
+\item[{geometry\-\_\-msgs\-::\-Pose\-With\-Covariance\-::\-\_\-covariance\-\_\-type \&}]{cov}
+\end{DoxyParamCaption}
+)}}\label{structmsf__core_1_1GenericState__T_ac83be2ba4d55a9099b067f7e462a9ec7}
+
+
+Write the covariance corresponding to position and attitude to cov. 
+
+Writes the covariance corresponding to position and attitude to cov. \hypertarget{structmsf__core_1_1GenericState__T_aff789c110efbe85318a6455adeb46497}{\index{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T@{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}!reset@{reset}}
+\index{reset@{reset}!msf_core::GenericState_T@{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}}
+\subsubsection[{reset}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename State\-Seq\-\_\-\-T, typename State\-Def\-\_\-\-T$>$ void {\bf msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}$<$ state\-Vector\-\_\-\-T, State\-Definition\-\_\-\-T $>$\-::reset (
+\begin{DoxyParamCaption}
+\item[{{\bf msf\-\_\-core\-::\-State\-Visitor}$<$ {\bf Generic\-State\-\_\-\-T}$<$ {\bf State\-Sequence\-\_\-\-T}, State\-Definition\-\_\-\-T $>$ $>$ $\ast$}]{usercalc = {\ttfamily nullptr}}
+\end{DoxyParamCaption}
+)}}\label{structmsf__core_1_1GenericState__T_aff789c110efbe85318a6455adeb46497}
+
+
+Reset the state 3\-D vectors\-: 0; quaternion\-: unit quaternion; scale\-: 1; time\-:0; Error covariance\-: zeros. 
+
+Resets the state.
+
+3\-D vectors\-: 0; quaternion\-: unit quaternion; scale\-: 1; time\-:0; Error covariance\-: zeros \hypertarget{structmsf__core_1_1GenericState__T_a284c9a13e909d3a1d0d3d012e3445542}{\index{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T@{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}!to\-Core\-State\-Msg@{to\-Core\-State\-Msg}}
+\index{to\-Core\-State\-Msg@{to\-Core\-State\-Msg}!msf_core::GenericState_T@{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}}
+\subsubsection[{to\-Core\-State\-Msg}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename state\-Vector\-\_\-\-T , typename State\-Definition\-\_\-\-T $>$ void {\bf msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}$<$ state\-Vector\-\_\-\-T, State\-Definition\-\_\-\-T $>$\-::to\-Core\-State\-Msg (
+\begin{DoxyParamCaption}
+\item[{sensor\-\_\-fusion\-\_\-comm\-::\-Double\-Array\-Stamped \&}]{state}
+\end{DoxyParamCaption}
+)}}\label{structmsf__core_1_1GenericState__T_a284c9a13e909d3a1d0d3d012e3445542}
+
+
+Assembles a Double\-Array\-Stamped message from the state. 
+
+\begin{DoxyNote}{Note}
+It does not set the header
+\end{DoxyNote}
+it does not set the header \hypertarget{structmsf__core_1_1GenericState__T_aa94d1ef9bf4f2d3aea2d1cc9c6c04f50}{\index{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T@{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}!to\-Ext\-State\-Msg@{to\-Ext\-State\-Msg}}
+\index{to\-Ext\-State\-Msg@{to\-Ext\-State\-Msg}!msf_core::GenericState_T@{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}}
+\subsubsection[{to\-Ext\-State\-Msg}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename state\-Vector\-\_\-\-T , typename State\-Definition\-\_\-\-T $>$ void {\bf msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}$<$ state\-Vector\-\_\-\-T, State\-Definition\-\_\-\-T $>$\-::to\-Ext\-State\-Msg (
+\begin{DoxyParamCaption}
+\item[{sensor\-\_\-fusion\-\_\-comm\-::\-Ext\-State \&}]{state}
+\end{DoxyParamCaption}
+)}}\label{structmsf__core_1_1GenericState__T_aa94d1ef9bf4f2d3aea2d1cc9c6c04f50}
+
+
+Assemble an Ext\-State message from the state. 
+
+Assembles an Ext\-State message from the state.
+
+\begin{DoxyNote}{Note}
+It does not set the header.
+\end{DoxyNote}
+it does not set the header \hypertarget{structmsf__core_1_1GenericState__T_ab987d5916f3b7ab394539b46a9d5fabb}{\index{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T@{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}!to\-Full\-State\-Msg@{to\-Full\-State\-Msg}}
+\index{to\-Full\-State\-Msg@{to\-Full\-State\-Msg}!msf_core::GenericState_T@{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}}
+\subsubsection[{to\-Full\-State\-Msg}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename state\-Vector\-\_\-\-T , typename State\-Definition\-\_\-\-T $>$ void {\bf msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}$<$ state\-Vector\-\_\-\-T, State\-Definition\-\_\-\-T $>$\-::to\-Full\-State\-Msg (
+\begin{DoxyParamCaption}
+\item[{sensor\-\_\-fusion\-\_\-comm\-::\-Double\-Array\-Stamped \&}]{state}
+\end{DoxyParamCaption}
+)}}\label{structmsf__core_1_1GenericState__T_ab987d5916f3b7ab394539b46a9d5fabb}
+
+
+Assembles a Double\-Array\-Stamped message from the state. 
+
+it does not set the header \hypertarget{structmsf__core_1_1GenericState__T_ad30ecf639ff4c96fd689412c5be91d6a}{\index{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T@{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}!to\-Pose\-Msg@{to\-Pose\-Msg}}
+\index{to\-Pose\-Msg@{to\-Pose\-Msg}!msf_core::GenericState_T@{msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}}
+\subsubsection[{to\-Pose\-Msg}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename state\-Vector\-\_\-\-T , typename State\-Definition\-\_\-\-T $>$ void {\bf msf\-\_\-core\-::\-Generic\-State\-\_\-\-T}$<$ state\-Vector\-\_\-\-T, State\-Definition\-\_\-\-T $>$\-::to\-Pose\-Msg (
+\begin{DoxyParamCaption}
+\item[{geometry\-\_\-msgs\-::\-Pose\-With\-Covariance\-Stamped \&}]{pose}
+\end{DoxyParamCaption}
+)}}\label{structmsf__core_1_1GenericState__T_ad30ecf639ff4c96fd689412c5be91d6a}
+
+
+Assembles a Pose\-With\-Covariance\-Stamped message from the state. 
+
+\begin{DoxyNote}{Note}
+It does not set the header.
+\end{DoxyNote}
+it does not set the header 
+
+The documentation for this struct was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+msf\-\_\-core/include/msf\-\_\-core/msf\-\_\-state.\-h\item 
+msf\-\_\-core/include/msf\-\_\-core/implementation/msf\-\_\-state\-\_\-.\-hpp\end{DoxyCompactItemize}

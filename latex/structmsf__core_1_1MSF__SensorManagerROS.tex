@@ -1,0 +1,95 @@
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS}{\section{msf\-\_\-core\-:\-:M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S$<$ E\-K\-F\-State\-\_\-\-T $>$ Class Template Reference}
+\label{structmsf__core_1_1MSF__SensorManagerROS}\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S$<$ E\-K\-F\-State\-\_\-\-T $>$@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S$<$ E\-K\-F\-State\-\_\-\-T $>$}}
+}
+
+
+Abstract class defining user configurable calculations for the msf\-\_\-core with R\-O\-S interfaces.  
+
+
+
+
+{\ttfamily \#include $<$msf\-\_\-sensormanager\-R\-O\-S.\-h$>$}
+
+Inheritance diagram for msf\-\_\-core\-:\-:M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S$<$ E\-K\-F\-State\-\_\-\-T $>$\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{structmsf__core_1_1MSF__SensorManagerROS}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a1d665e46ae9945ab6a129575c4400bd3}{E\-I\-G\-E\-N\-\_\-\-M\-A\-K\-E\-\_\-\-A\-L\-I\-G\-N\-E\-D\-\_\-\-O\-P\-E\-R\-A\-T\-O\-R\-\_\-\-N\-E\-W {\bfseries M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S} (ros\-::\-Node\-Handle pnh=ros\-::\-Node\-Handle(\char`\"{}$\sim$core\char`\"{}))}\label{structmsf__core_1_1MSF__SensorManagerROS_a1d665e46ae9945ab6a129575c4400bd3}
+
+\item 
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a092e5cecd4d0586303c0412e55959603}{virtual void \hyperlink{structmsf__core_1_1MSF__SensorManagerROS_a092e5cecd4d0586303c0412e55959603}{core\-Config} (msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Core\-Config \&config, uint32\-\_\-t level)}\label{structmsf__core_1_1MSF__SensorManagerROS_a092e5cecd4d0586303c0412e55959603}
+
+\begin{DoxyCompactList}\small\item\em Gets called by the internal callback caller. \end{DoxyCompactList}\item 
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a05d1f96502e2733ac5d9810f4dd55706}{void \hyperlink{structmsf__core_1_1MSF__SensorManagerROS_a05d1f96502e2733ac5d9810f4dd55706}{Config} (msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Core\-Config \&config, uint32\-\_\-t level)}\label{structmsf__core_1_1MSF__SensorManagerROS_a05d1f96502e2733ac5d9810f4dd55706}
+
+\begin{DoxyCompactList}\small\item\em Gets called by dynamic reconfigure and calls all registered callbacks in callbacks\-\_\-. \end{DoxyCompactList}\item 
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a4b28905e8303ca5d74a2711c6483329c}{void {\bfseries set\-H\-L\-State\-Buffer} (const sensor\-\_\-fusion\-\_\-comm\-::\-Ext\-Ekf \&msg)}\label{structmsf__core_1_1MSF__SensorManagerROS_a4b28905e8303ca5d74a2711c6483329c}
+
+\item 
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a25e296341f9628b7e0c5616d09b1830b}{virtual bool {\bfseries get\-Param\-\_\-fixed\-\_\-bias} () const }\label{structmsf__core_1_1MSF__SensorManagerROS_a25e296341f9628b7e0c5616d09b1830b}
+
+\item 
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a8832a1f48d484a04120c32bf1ffa2b63}{virtual double {\bfseries get\-Param\-\_\-noise\-\_\-acc} () const }\label{structmsf__core_1_1MSF__SensorManagerROS_a8832a1f48d484a04120c32bf1ffa2b63}
+
+\item 
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a73d7709e65b947e02a8080b65c6d3e7a}{virtual double {\bfseries get\-Param\-\_\-noise\-\_\-accbias} () const }\label{structmsf__core_1_1MSF__SensorManagerROS_a73d7709e65b947e02a8080b65c6d3e7a}
+
+\item 
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_aedf81899b9210ba2d869f1b66f4e6ee0}{virtual double {\bfseries get\-Param\-\_\-noise\-\_\-gyr} () const }\label{structmsf__core_1_1MSF__SensorManagerROS_aedf81899b9210ba2d869f1b66f4e6ee0}
+
+\item 
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a5dad5d6ad078af02bf85ca5edd871a0b}{virtual double {\bfseries get\-Param\-\_\-noise\-\_\-gyrbias} () const }\label{structmsf__core_1_1MSF__SensorManagerROS_a5dad5d6ad078af02bf85ca5edd871a0b}
+
+\item 
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a40d9507b8a2a513b70078583c4851995}{virtual double {\bfseries get\-Param\-\_\-fuzzythres} () const }\label{structmsf__core_1_1MSF__SensorManagerROS_a40d9507b8a2a513b70078583c4851995}
+
+\item 
+virtual void \hyperlink{structmsf__core_1_1MSF__SensorManagerROS_abde229602f1aeb393a2aad30ef413e12}{publish\-State\-Initial} (const shared\-\_\-ptr$<$ E\-K\-F\-State\-\_\-\-T $>$ \&state) const 
+\item 
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_abcf566a97988f986deb36b5c7b2d8248}{virtual void {\bfseries publish\-State\-After\-Propagation} (const shared\-\_\-ptr$<$ E\-K\-F\-State\-\_\-\-T $>$ \&state) const }\label{structmsf__core_1_1MSF__SensorManagerROS_abcf566a97988f986deb36b5c7b2d8248}
+
+\item 
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_a612d69d5e10b3d6de0eed6e4c6720afa}{virtual void {\bfseries publish\-State\-After\-Update} (const shared\-\_\-ptr$<$ E\-K\-F\-State\-\_\-\-T $>$ \&state) const }\label{structmsf__core_1_1MSF__SensorManagerROS_a612d69d5e10b3d6de0eed6e4c6720afa}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_aa35b7b94cdf025302d7f980f2e68f413}{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Core\-Config \hyperlink{structmsf__core_1_1MSF__SensorManagerROS_aa35b7b94cdf025302d7f980f2e68f413}{config\-\_\-}}\label{structmsf__core_1_1MSF__SensorManagerROS_aa35b7b94cdf025302d7f980f2e68f413}
+
+\begin{DoxyCompactList}\small\item\em Dynamic reconfigure config. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename E\-K\-F\-State\-\_\-\-T$>$class msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S$<$ E\-K\-F\-State\-\_\-\-T $>$}
+
+Abstract class defining user configurable calculations for the msf\-\_\-core with R\-O\-S interfaces. 
+
+\subsection{Member Function Documentation}
+\hypertarget{structmsf__core_1_1MSF__SensorManagerROS_abde229602f1aeb393a2aad30ef413e12}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}!publish\-State\-Initial@{publish\-State\-Initial}}
+\index{publish\-State\-Initial@{publish\-State\-Initial}!msf_core::MSF_SensorManagerROS@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}}
+\subsubsection[{publish\-State\-Initial}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T $>$ virtual void {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager\-R\-O\-S}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::publish\-State\-Initial (
+\begin{DoxyParamCaption}
+\item[{const shared\-\_\-ptr$<$ E\-K\-F\-State\-\_\-\-T $>$ \&}]{state}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{structmsf__core_1_1MSF__SensorManagerROS_abde229602f1aeb393a2aad30ef413e12}
+This functions get called by the core to publish data to external middlewares like R\-O\-S. Initialize the H\-L\-P based propagation. 
+\begin{DoxyParams}{Parameters}
+{\em State} & the state to send to the H\-L\-P.\\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{classmsf__core_1_1MSF__SensorManager_ad851fff1bceaeb6696ef79a4792a317a}{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Sensor\-Manager$<$ E\-K\-F\-State\-\_\-\-T $>$}.
+
+
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+msf\-\_\-core/include/msf\-\_\-core/msf\-\_\-sensormanager\-R\-O\-S.\-h\end{DoxyCompactItemize}

@@ -1,0 +1,65 @@
+\hypertarget{classmsf__core_1_1MSF__Measurement}{\section{msf\-\_\-core\-:\-:M\-S\-F\-\_\-\-Measurement$<$ T, R\-M\-A\-T\-\_\-\-T, E\-K\-F\-State\-\_\-\-T $>$ Class Template Reference}
+\label{classmsf__core_1_1MSF__Measurement}\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement$<$ T, R\-M\-A\-T\-\_\-\-T, E\-K\-F\-State\-\_\-\-T $>$@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement$<$ T, R\-M\-A\-T\-\_\-\-T, E\-K\-F\-State\-\_\-\-T $>$}}
+}
+
+
+The class for sensor based measurements which we want to apply to a state in the update routine of the E\-K\-F. This calls the apply correction method of the E\-K\-F core.  
+
+
+
+
+{\ttfamily \#include $<$msf\-\_\-measurement.\-h$>$}
+
+Inheritance diagram for msf\-\_\-core\-:\-:M\-S\-F\-\_\-\-Measurement$<$ T, R\-M\-A\-T\-\_\-\-T, E\-K\-F\-State\-\_\-\-T $>$\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classmsf__core_1_1MSF__Measurement}
+\end{center}
+\end{figure}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classmsf__core_1_1MSF__Measurement_ab102d2c17bef09be28cb1403017992b6}{typedef T {\bfseries Measurement\-\_\-type}}\label{classmsf__core_1_1MSF__Measurement_ab102d2c17bef09be28cb1403017992b6}
+
+\item 
+\hypertarget{classmsf__core_1_1MSF__Measurement_afa4f826dadcfd129a50330f078a8dbf8}{typedef boost\-::shared\-\_\-ptr$<$ T \\*
+const  $>$ {\bfseries Measurement\-\_\-ptr}}\label{classmsf__core_1_1MSF__Measurement_afa4f826dadcfd129a50330f078a8dbf8}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classmsf__core_1_1MSF__Measurement_a33143412cbcabec0c16e1c6ad82641d0}{{\bfseries M\-S\-F\-\_\-\-Measurement} (bool is\-Absolute\-Measurement, int sensor\-I\-D)}\label{classmsf__core_1_1MSF__Measurement_a33143412cbcabec0c16e1c6ad82641d0}
+
+\item 
+\hypertarget{classmsf__core_1_1MSF__Measurement_a345b17105929ac6c70a0a5d21e281a5c}{void {\bfseries make\-From\-Sensor\-Reading} (const boost\-::shared\-\_\-ptr$<$ T const  $>$ reading, double timestamp)}\label{classmsf__core_1_1MSF__Measurement_a345b17105929ac6c70a0a5d21e281a5c}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classmsf__core_1_1MSF__Measurement_a481fa3230f73f28a8489223311c3033f}{{\bfseries E\-I\-G\-E\-N\-\_\-\-M\-A\-K\-E\-\_\-\-A\-L\-I\-G\-N\-E\-D\-\_\-\-O\-P\-E\-R\-A\-T\-O\-R\-\_\-\-N\-E\-W}}\label{classmsf__core_1_1MSF__Measurement_a481fa3230f73f28a8489223311c3033f}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classmsf__core_1_1MSF__Measurement_a20fcacb533df8a1e6ae4fad4a3eb06ec}{R\-M\-A\-T\-\_\-\-T {\bfseries R\-\_\-}}\label{classmsf__core_1_1MSF__Measurement_a20fcacb533df8a1e6ae4fad4a3eb06ec}
+
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename T, typename R\-M\-A\-T\-\_\-\-T, typename E\-K\-F\-State\-\_\-\-T$>$class msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement$<$ T, R\-M\-A\-T\-\_\-\-T, E\-K\-F\-State\-\_\-\-T $>$}
+
+The class for sensor based measurements which we want to apply to a state in the update routine of the E\-K\-F. This calls the apply correction method of the E\-K\-F core. 
+
+\begin{DoxyNote}{Note}
+Provides an abstract N\-V\-I to create measurements from sensor readings. 
+\end{DoxyNote}
+
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+msf\-\_\-core/include/msf\-\_\-core/msf\-\_\-measurement.\-h\end{DoxyCompactItemize}

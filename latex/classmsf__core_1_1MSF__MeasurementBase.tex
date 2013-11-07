@@ -1,0 +1,100 @@
+\hypertarget{classmsf__core_1_1MSF__MeasurementBase}{\section{msf\-\_\-core\-:\-:M\-S\-F\-\_\-\-Measurement\-Base$<$ E\-K\-F\-State\-\_\-\-T $>$ Class Template Reference}
+\label{classmsf__core_1_1MSF__MeasurementBase}\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base$<$ E\-K\-F\-State\-\_\-\-T $>$@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base$<$ E\-K\-F\-State\-\_\-\-T $>$}}
+}
+
+
+The base class for all measurement types. These are the objects provided to the E\-K\-F core to be applied in correct order to the states.  
+
+
+
+
+{\ttfamily \#include $<$msf\-\_\-measurement.\-h$>$}
+
+Inheritance diagram for msf\-\_\-core\-:\-:M\-S\-F\-\_\-\-Measurement\-Base$<$ E\-K\-F\-State\-\_\-\-T $>$\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=1.060606cm]{classmsf__core_1_1MSF__MeasurementBase}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classmsf__core_1_1MSF__MeasurementBase_a415d8c321cebf22510cce29f69a3b22f}{E\-I\-G\-E\-N\-\_\-\-M\-A\-K\-E\-\_\-\-A\-L\-I\-G\-N\-E\-D\-\_\-\-O\-P\-E\-R\-A\-T\-O\-R\-\_\-\-N\-E\-W {\bfseries M\-S\-F\-\_\-\-Measurement\-Base} (bool isabsolute\-Measurement, int sensor\-I\-D)}\label{classmsf__core_1_1MSF__MeasurementBase_a415d8c321cebf22510cce29f69a3b22f}
+
+\item 
+\hypertarget{classmsf__core_1_1MSF__MeasurementBase_ac1c4001e0c61b7cd2b551c0adeae7109}{virtual void \hyperlink{classmsf__core_1_1MSF__MeasurementBase_ac1c4001e0c61b7cd2b551c0adeae7109}{apply} (shared\-\_\-ptr$<$ E\-K\-F\-State\-\_\-\-T $>$ state\-With\-Covariance, \hyperlink{classmsf__core_1_1MSF__Core}{M\-S\-F\-\_\-\-Core}$<$ E\-K\-F\-State\-\_\-\-T $>$ \&core)=0}\label{classmsf__core_1_1MSF__MeasurementBase_ac1c4001e0c61b7cd2b551c0adeae7109}
+
+\begin{DoxyCompactList}\small\item\em The method called by the msf\-\_\-core to apply the measurement represented by this object. \end{DoxyCompactList}\item 
+\hypertarget{classmsf__core_1_1MSF__MeasurementBase_a6a711d7ed976c0aed497efc1b8fbe3e7}{virtual std\-::string {\bfseries type} ()=0}\label{classmsf__core_1_1MSF__MeasurementBase_a6a711d7ed976c0aed497efc1b8fbe3e7}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classmsf__core_1_1MSF__MeasurementBase_afad7c30029f47cea027415c04301dc48}{int {\bfseries sensor\-I\-D\-\_\-}}\label{classmsf__core_1_1MSF__MeasurementBase_afad7c30029f47cea027415c04301dc48}
+
+\item 
+\hypertarget{classmsf__core_1_1MSF__MeasurementBase_ad1ea7c4d392ecd3d894280283c04757a}{bool {\bfseries isabsolute\-\_\-}}\label{classmsf__core_1_1MSF__MeasurementBase_ad1ea7c4d392ecd3d894280283c04757a}
+
+\item 
+\hypertarget{classmsf__core_1_1MSF__MeasurementBase_a48b55b129f13afbed86db1b0543562db}{double \hyperlink{classmsf__core_1_1MSF__MeasurementBase_a48b55b129f13afbed86db1b0543562db}{time}}\label{classmsf__core_1_1MSF__MeasurementBase_a48b55b129f13afbed86db1b0543562db}
+
+\begin{DoxyCompactList}\small\item\em The time\-\_\- this measurement was taken. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$class H\-\_\-type , class Res\-\_\-type , class R\-\_\-type $>$ }\\void \hyperlink{classmsf__core_1_1MSF__MeasurementBase_a569c0772641a11d707349aab9dc0da7e}{calculate\-And\-Apply\-Correction} (shared\-\_\-ptr$<$ E\-K\-F\-State\-\_\-\-T $>$ state, \hyperlink{classmsf__core_1_1MSF__Core}{M\-S\-F\-\_\-\-Core}$<$ E\-K\-F\-State\-\_\-\-T $>$ \&core, const Eigen\-::\-Matrix\-Base$<$ H\-\_\-type $>$ \&H, const Eigen\-::\-Matrix\-Base$<$ Res\-\_\-type $>$ \&residual, const Eigen\-::\-Matrix\-Base$<$ R\-\_\-type $>$ \&R)
+\item 
+void \hyperlink{classmsf__core_1_1MSF__MeasurementBase_ade8ddcc9ef64571451560079381ecc64}{calculate\-And\-Apply\-Correction} (shared\-\_\-ptr$<$ E\-K\-F\-State\-\_\-\-T $>$ state, \hyperlink{classmsf__core_1_1MSF__Core}{M\-S\-F\-\_\-\-Core}$<$ E\-K\-F\-State\-\_\-\-T $>$ \&core, const Eigen\-::\-Matrix\-Xd \&H, const Eigen\-::\-Matrix\-Xd \&residual, const Eigen\-::\-Matrix\-Xd \&R)
+\item 
+{\footnotesize template$<$class H\-\_\-type , class Res\-\_\-type , class R\-\_\-type $>$ }\\void \hyperlink{classmsf__core_1_1MSF__MeasurementBase_a5b9db1020711ae6b5ba4e877dd03fa42}{calculate\-And\-Apply\-Correction\-Relative} (shared\-\_\-ptr$<$ E\-K\-F\-State\-\_\-\-T $>$ state\-\_\-old, shared\-\_\-ptr$<$ E\-K\-F\-State\-\_\-\-T $>$ state\-\_\-new, \hyperlink{classmsf__core_1_1MSF__Core}{M\-S\-F\-\_\-\-Core}$<$ E\-K\-F\-State\-\_\-\-T $>$ \&core, const Eigen\-::\-Matrix\-Base$<$ H\-\_\-type $>$ \&H\-\_\-old, const Eigen\-::\-Matrix\-Base$<$ H\-\_\-type $>$ \&H\-\_\-new, const Eigen\-::\-Matrix\-Base$<$ Res\-\_\-type $>$ \&residual, const Eigen\-::\-Matrix\-Base$<$ R\-\_\-type $>$ \&R)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename E\-K\-F\-State\-\_\-\-T$>$class msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base$<$ E\-K\-F\-State\-\_\-\-T $>$}
+
+The base class for all measurement types. These are the objects provided to the E\-K\-F core to be applied in correct order to the states. 
+
+\subsection{Member Function Documentation}
+\hypertarget{classmsf__core_1_1MSF__MeasurementBase_a569c0772641a11d707349aab9dc0da7e}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base}!calculate\-And\-Apply\-Correction@{calculate\-And\-Apply\-Correction}}
+\index{calculate\-And\-Apply\-Correction@{calculate\-And\-Apply\-Correction}!msf_core::MSF_MeasurementBase@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base}}
+\subsubsection[{calculate\-And\-Apply\-Correction}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T $>$ template$<$class H\-\_\-type , class Res\-\_\-type , class R\-\_\-type $>$ void {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::calculate\-And\-Apply\-Correction (
+\begin{DoxyParamCaption}
+\item[{shared\-\_\-ptr$<$ E\-K\-F\-State\-\_\-\-T $>$}]{state, }
+\item[{{\bf M\-S\-F\-\_\-\-Core}$<$ E\-K\-F\-State\-\_\-\-T $>$ \&}]{core, }
+\item[{const Eigen\-::\-Matrix\-Base$<$ H\-\_\-type $>$ \&}]{H, }
+\item[{const Eigen\-::\-Matrix\-Base$<$ Res\-\_\-type $>$ \&}]{residual, }
+\item[{const Eigen\-::\-Matrix\-Base$<$ R\-\_\-type $>$ \&}]{R}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}}\label{classmsf__core_1_1MSF__MeasurementBase_a569c0772641a11d707349aab9dc0da7e}
+Main update routine called by a given sensor, will apply the measurement to the state inside the core. Correction from E\-K\-F update. \hypertarget{classmsf__core_1_1MSF__MeasurementBase_ade8ddcc9ef64571451560079381ecc64}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base}!calculate\-And\-Apply\-Correction@{calculate\-And\-Apply\-Correction}}
+\index{calculate\-And\-Apply\-Correction@{calculate\-And\-Apply\-Correction}!msf_core::MSF_MeasurementBase@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base}}
+\subsubsection[{calculate\-And\-Apply\-Correction}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T $>$ void {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::calculate\-And\-Apply\-Correction (
+\begin{DoxyParamCaption}
+\item[{shared\-\_\-ptr$<$ E\-K\-F\-State\-\_\-\-T $>$}]{state, }
+\item[{{\bf M\-S\-F\-\_\-\-Core}$<$ E\-K\-F\-State\-\_\-\-T $>$ \&}]{core, }
+\item[{const Eigen\-::\-Matrix\-Xd \&}]{H, }
+\item[{const Eigen\-::\-Matrix\-Xd \&}]{residual, }
+\item[{const Eigen\-::\-Matrix\-Xd \&}]{R}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}}\label{classmsf__core_1_1MSF__MeasurementBase_ade8ddcc9ef64571451560079381ecc64}
+Correction from E\-K\-F update. \hypertarget{classmsf__core_1_1MSF__MeasurementBase_a5b9db1020711ae6b5ba4e877dd03fa42}{\index{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base}!calculate\-And\-Apply\-Correction\-Relative@{calculate\-And\-Apply\-Correction\-Relative}}
+\index{calculate\-And\-Apply\-Correction\-Relative@{calculate\-And\-Apply\-Correction\-Relative}!msf_core::MSF_MeasurementBase@{msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base}}
+\subsubsection[{calculate\-And\-Apply\-Correction\-Relative}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename E\-K\-F\-State\-\_\-\-T $>$ template$<$class H\-\_\-type , class Res\-\_\-type , class R\-\_\-type $>$ void {\bf msf\-\_\-core\-::\-M\-S\-F\-\_\-\-Measurement\-Base}$<$ E\-K\-F\-State\-\_\-\-T $>$\-::calculate\-And\-Apply\-Correction\-Relative (
+\begin{DoxyParamCaption}
+\item[{shared\-\_\-ptr$<$ E\-K\-F\-State\-\_\-\-T $>$}]{state\-\_\-old, }
+\item[{shared\-\_\-ptr$<$ E\-K\-F\-State\-\_\-\-T $>$}]{state\-\_\-new, }
+\item[{{\bf M\-S\-F\-\_\-\-Core}$<$ E\-K\-F\-State\-\_\-\-T $>$ \&}]{core, }
+\item[{const Eigen\-::\-Matrix\-Base$<$ H\-\_\-type $>$ \&}]{H\-\_\-old, }
+\item[{const Eigen\-::\-Matrix\-Base$<$ H\-\_\-type $>$ \&}]{H\-\_\-new, }
+\item[{const Eigen\-::\-Matrix\-Base$<$ Res\-\_\-type $>$ \&}]{residual, }
+\item[{const Eigen\-::\-Matrix\-Base$<$ R\-\_\-type $>$ \&}]{R}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}}\label{classmsf__core_1_1MSF__MeasurementBase_a5b9db1020711ae6b5ba4e877dd03fa42}
+Correction from E\-K\-F update. 
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+msf\-\_\-core/include/msf\-\_\-core/msf\-\_\-measurement.\-h\item 
+msf\-\_\-core/include/msf\-\_\-core/implementation/msf\-\_\-measurement.\-hpp\end{DoxyCompactItemize}
