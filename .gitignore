@@ -21,6 +21,7 @@ msf_core/cfg/cpp/
 .cproject
 .settings
 doc
+html
 *.cfgc
 *.dox
 *.wikidoc
