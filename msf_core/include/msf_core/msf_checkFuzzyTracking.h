@@ -66,7 +66,6 @@ class CheckFuzzyTracking {
         "which is not the case for the currently defined state vector. If you "
         "want to use an euclidean state, please first adapt qbuff and the error "
         "detection routines");
-    typedef typename EKFState_T::StateDefinition_T StateDefinition_T;
     typedef typename EKFState_T::StateSequence_T StateSequence_T;
 
     enum {

@@ -724,14 +724,11 @@ struct resetState {
   template<int NAME, int N, int STATE_T, int OPTIONS>
   void operator()(
       msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATE_T, OPTIONS>& t) const {
-    typedef msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATE_T,
-        OPTIONS> var_T;
     t.state_.setZero();
   }
   template<int NAME, int STATE_T, int OPTIONS>
   void operator()(
       msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATE_T, OPTIONS>& t) const {
-    typedef msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATE_T, OPTIONS> var_T;
     t.state_.setIdentity();
   }
 };

@@ -99,7 +99,6 @@ template<int INDEX>
 inline const typename msf_tmp::StripReference<
     typename boost::fusion::result_of::at_c<stateVector_T, INDEX>::type>::result_t::Q_T&
 GenericState_T<stateVector_T, StateDefinition_T>::getQBlock() const {
-  typedef typename boost::fusion::result_of::at_c<stateVector_T, INDEX>::type StateVar_T;
   return boost::fusion::at < boost::mpl::int_<INDEX> > (statevars).Q_;
 }
 
