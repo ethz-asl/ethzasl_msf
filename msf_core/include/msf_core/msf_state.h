@@ -219,19 +219,19 @@ struct GenericState_T {
   void toCoreStateMsg(sensor_fusion_comm::DoubleArrayStamped & state);
 
   /**
-   * \brief Assembles a DoubleArrayStamped message from the core error state covariance.
+   * \brief Assembles a DoubleMatrixStamped message from the core error state covariance.
    * \note It does not set the header
    */
   void getCoreCovariance(sensor_fusion_comm::DoubleMatrixStamped & cov);
 
   /**
-   * \brief Assembles a DoubleArrayStamped message from the aux error state covariance.
+   * \brief Assembles a DoubleMatrixStamped message from the aux error state covariance.
    * \note It does not set the header
    */
   void getAuxCovariance(sensor_fusion_comm::DoubleMatrixStamped & cov);
 
   /**
-   * \brief Assembles a DoubleArrayStamped message from the core-aux error state covariance.
+   * \brief Assembles a DoubleMatrixStamped message from the core-aux error state covariance.
    * \note It does not set the header
    */
   void getCoreAuxCovariance(sensor_fusion_comm::DoubleMatrixStamped & cov);
