@@ -27,6 +27,7 @@
 #include <msf_core/eigen_conversions.h>
 #include <sensor_fusion_comm/ExtState.h>
 #include <sensor_fusion_comm/DoubleArrayStamped.h>
+#include <sensor_fusion_comm/DoubleMatrixStamped.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 
 namespace msf_core {
@@ -95,6 +96,8 @@ struct GenericState_T {
         msf_tmp::StateLengthForType>::value,  ///<N total states.
     nCoreStatesAtCompileTime = msf_tmp::CountStates<StateSequence_T,
         msf_tmp::CoreStateLengthForType>::value,  ///<N total core states.
+    nCoreErrorStatesAtCompileTime = msf_tmp::CountStates<StateSequence_T,
+        msf_tmp::CoreErrorStateLengthForType>::value,  ///<N total core error states.
     nPropagatedCoreStatesAtCompileTime = msf_tmp::CountStates<StateSequence_T,
         msf_tmp::PropagatedCoreStateLengthForType>::value,  ///<N total core states with propagation.
     nPropagatedCoreErrorStatesAtCompileTime = msf_tmp::CountStates<
@@ -214,6 +217,24 @@ struct GenericState_T {
    * \note It does not set the header
    */
   void toCoreStateMsg(sensor_fusion_comm::DoubleArrayStamped & state);
+
+  /**
+   * \brief Assembles a DoubleArrayStamped message from the core error state covariance.
+   * \note It does not set the header
+   */
+  void getCoreCovariance(sensor_fusion_comm::DoubleMatrixStamped & cov);
+
+  /**
+   * \brief Assembles a DoubleArrayStamped message from the aux error state covariance.
+   * \note It does not set the header
+   */
+  void getAuxCovariance(sensor_fusion_comm::DoubleMatrixStamped & cov);
+
+  /**
+   * \brief Assembles a DoubleArrayStamped message from the core-aux error state covariance.
+   * \note It does not set the header
+   */
+  void getCoreAuxCovariance(sensor_fusion_comm::DoubleMatrixStamped & cov);
 
   /**
    * \brief Returns all values as an eigen vector.

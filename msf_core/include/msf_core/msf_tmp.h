@@ -237,6 +237,65 @@ struct CoreStateLengthForType<const mpl_::void_&> {
   };
 };
 
+// The number of entries in the error state for a given state var if it is core state.
+template<typename T>
+struct CoreErrorStateLengthForType;
+template<int NAME, int N, int STATE_T, int OPTIONS>
+struct CoreErrorStateLengthForType<
+    const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME, STATE_T,
+        OPTIONS>&> {
+  enum {
+    value = 0
+  };
+  // Not a core state, so length is zero.
+};
+template<int NAME, int STATE_T, int OPTIONS>
+struct CoreErrorStateLengthForType<
+    const msf_core::StateVar_T<Eigen::Quaterniond, NAME, STATE_T, OPTIONS>&> {
+  enum {
+    value = 0
+  };
+  // Not a core state, so length is zero.
+};
+template<int NAME, int OPTIONS, int N>
+struct CoreErrorStateLengthForType<
+    const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME,
+        msf_core::CoreStateWithoutPropagation, OPTIONS>&> {
+  enum {
+    value = N
+  };
+};
+template<int NAME, int OPTIONS>
+struct CoreErrorStateLengthForType<
+    const msf_core::StateVar_T<Eigen::Quaterniond, NAME,
+        msf_core::CoreStateWithoutPropagation, OPTIONS>&> {
+  enum {
+    value = 3
+  };
+};
+template<int NAME, int OPTIONS, int N>
+struct CoreErrorStateLengthForType<
+    const msf_core::StateVar_T<Eigen::Matrix<double, N, 1>, NAME,
+        msf_core::CoreStateWithPropagation, OPTIONS>&> {
+  enum {
+    value = N
+  };
+};
+template<int NAME, int OPTIONS>
+struct CoreErrorStateLengthForType<
+    const msf_core::StateVar_T<Eigen::Quaterniond, NAME,
+        msf_core::CoreStateWithPropagation, OPTIONS>&> {
+  enum {
+    value = 3
+  };
+};
+template<>
+struct CoreErrorStateLengthForType<const mpl_::void_&> {
+  enum {
+    value = 0
+  };
+};
+
 // The number of entries in the state for a given state var if it is core state
 // with propagation.
 template<typename T>
