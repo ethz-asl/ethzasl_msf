@@ -192,49 +192,49 @@ struct GenericState_T {
    * \brief Write the covariance corresponding to position and attitude to cov.
    */
   void getPoseCovariance(
-      geometry_msgs::PoseWithCovariance::_covariance_type & cov);
+      geometry_msgs::PoseWithCovariance::_covariance_type& cov);
 
   /**
    * \brief Assembles a PoseWithCovarianceStamped message from the state.
    * \note It does not set the header.
    */
-  void toPoseMsg(geometry_msgs::PoseWithCovarianceStamped & pose);
+  void toPoseMsg(geometry_msgs::PoseWithCovarianceStamped& pose);
 
   /**
    * \brief Assemble an ExtState message from the state.
    * \note It does not set the header.
    */
-  void toExtStateMsg(sensor_fusion_comm::ExtState & state);
+  void toExtStateMsg(sensor_fusion_comm::ExtState& state);
 
   /***
    * \brief Assemble a DoubleArrayStamped message from the state.
    * \note It does not set the header.
    */
-  void toFullStateMsg(sensor_fusion_comm::DoubleArrayStamped & state);
+  void toFullStateMsg(sensor_fusion_comm::DoubleArrayStamped& state);
 
   /**
    * \brief Assembles a DoubleArrayStamped message from the state.
-   * \note It does not set the header
+   * \note It does not set the header.
    */
-  void toCoreStateMsg(sensor_fusion_comm::DoubleArrayStamped & state);
+  void toCoreStateMsg(sensor_fusion_comm::DoubleArrayStamped& state);
 
   /**
    * \brief Assembles a DoubleMatrixStamped message from the core error state covariance.
-   * \note It does not set the header
+   * \note It does not set the header.
    */
-  void getCoreCovariance(sensor_fusion_comm::DoubleMatrixStamped & cov);
+  void getCoreCovariance(sensor_fusion_comm::DoubleMatrixStamped& cov);
 
   /**
    * \brief Assembles a DoubleMatrixStamped message from the aux error state covariance.
-   * \note It does not set the header
+   * \note It does not set the header.
    */
-  void getAuxCovariance(sensor_fusion_comm::DoubleMatrixStamped & cov);
+  void getAuxCovariance(sensor_fusion_comm::DoubleMatrixStamped& cov);
 
   /**
    * \brief Assembles a DoubleMatrixStamped message from the core-aux error state covariance.
-   * \note It does not set the header
+   * \note It does not set the header.
    */
-  void getCoreAuxCovariance(sensor_fusion_comm::DoubleMatrixStamped & cov);
+  void getCoreAuxCovariance(sensor_fusion_comm::DoubleMatrixStamped& cov);
 
   /**
    * \brief Returns all values as an eigen vector.

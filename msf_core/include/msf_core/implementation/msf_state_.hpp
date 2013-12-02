@@ -306,7 +306,7 @@ void GenericState_T<stateVector_T, StateDefinition_T>::reset(
 /// Writes the covariance corresponding to position and attitude to cov.
 template<typename stateVector_T, typename StateDefinition_T>
 void GenericState_T<stateVector_T, StateDefinition_T>::getPoseCovariance(
-    geometry_msgs::PoseWithCovariance::_covariance_type & cov) {
+    geometry_msgs::PoseWithCovariance::_covariance_type& cov) {
 
   typedef typename msf_tmp::getEnumStateType<stateVector_T, StateDefinition_T::p>::value p_type;
   typedef typename msf_tmp::getEnumStateType<stateVector_T, StateDefinition_T::q>::value q_type;
@@ -343,7 +343,7 @@ void GenericState_T<stateVector_T, StateDefinition_T>::getPoseCovariance(
 
 template<typename stateVector_T, typename StateDefinition_T>
 void GenericState_T<stateVector_T, StateDefinition_T>::getCoreCovariance(
-    sensor_fusion_comm::DoubleMatrixStamped & cov) {
+    sensor_fusion_comm::DoubleMatrixStamped& cov) {
 
   const int n_core = nCoreErrorStatesAtCompileTime;
   cov.data.resize(n_core * n_core);
@@ -359,27 +359,26 @@ void GenericState_T<stateVector_T, StateDefinition_T>::getCoreCovariance(
 
 template<typename stateVector_T, typename StateDefinition_T>
 void GenericState_T<stateVector_T, StateDefinition_T>::getAuxCovariance(
-    sensor_fusion_comm::DoubleMatrixStamped & cov) {
+    sensor_fusion_comm::DoubleMatrixStamped& cov) {
 
-  const int n_aux = nErrorStatesAtCompileTime-nCoreErrorStatesAtCompileTime;
+  const int n_core = nCoreErrorStatesAtCompileTime;
+  const int n_aux = nErrorStatesAtCompileTime-n_core;
   cov.data.resize(n_aux * n_aux);
   cov.rows = n_aux;
   cov.cols = n_aux;
 
-  const Eigen::Block<P_type, n_aux, n_aux> & P_aux = P
-      .template block<n_aux, n_aux>(nCoreErrorStatesAtCompileTime,
-                                          nCoreErrorStatesAtCompileTime);
-
-  for (int row = 0; row < n_aux; ++row) {
-    for (int col = 0; col < n_aux; ++col) {
-      cov.data[row * n_aux + col] = P_aux(row, col);
+  int idx = 0;
+  for (int row = n_core; row < nErrorStatesAtCompileTime; ++row) {
+    for (int col = n_core; col < nErrorStatesAtCompileTime; ++col) {
+      cov.data[idx] = P(row, col);
+      ++idx;
     }
   }
 }
 
 template<typename stateVector_T, typename StateDefinition_T>
 void GenericState_T<stateVector_T, StateDefinition_T>::getCoreAuxCovariance(
-    sensor_fusion_comm::DoubleMatrixStamped & cov) {
+    sensor_fusion_comm::DoubleMatrixStamped& cov) {
 
   const int n_core = nCoreErrorStatesAtCompileTime;
   const int n_aux = nErrorStatesAtCompileTime - n_core;
@@ -387,16 +386,14 @@ void GenericState_T<stateVector_T, StateDefinition_T>::getCoreAuxCovariance(
   cov.rows = n_core;
   cov.cols = n_aux;
 
-  // use upper right block --> n_core rows and n_aux cols.
-  const Eigen::Block<P_type, n_core, n_aux> & P_core_aux = P
-      .template block<n_core, n_aux>(0, n_core);
-
+  // Use upper right block --> n_core rows and n_aux cols.
+  int idx = 0;
   for (int row = 0; row < n_core; ++row) {
-    for (int col = 0; col < n_aux; ++col) {
-      cov.data[row * n_aux + col] = P_core_aux(row, col);
+    for (int col = n_core; col < nErrorStatesAtCompileTime; ++col) {
+      cov.data[idx] = P(row, col);
+      ++idx;
     }
   }
 }
 
 }
-;
