@@ -310,7 +310,6 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
     pubState_.publish(msgState);
 
     if (pubPoseAfterUpdate_.getNumSubscribers()) {
-
       // Publish pose after correction with covariance.
       geometry_msgs::PoseWithCovarianceStamped msgPose;
       msgPose.header.stamp = ros::Time(state->time);
@@ -337,7 +336,6 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
     }
 
     if (pubCovCore_.getNumSubscribers()) {
-
       sensor_fusion_comm::DoubleMatrixStampedPtr msg(
           new sensor_fusion_comm::DoubleMatrixStamped);
       msg->header = msgCorrect_.header;
@@ -346,7 +344,6 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
     }
 
     if (pubCovAux_.getNumSubscribers()) {
-
       sensor_fusion_comm::DoubleMatrixStampedPtr msg(
           new sensor_fusion_comm::DoubleMatrixStamped);
       msg->header = msgCorrect_.header;
@@ -355,7 +352,6 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
     }
 
     if (pubCovCoreAux_.getNumSubscribers()) {
-
       sensor_fusion_comm::DoubleMatrixStampedPtr msg(
           new sensor_fusion_comm::DoubleMatrixStamped);
       msg->header = msgCorrect_.header;
