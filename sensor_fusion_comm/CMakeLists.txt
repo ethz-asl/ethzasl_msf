@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS geometry_msgs message_generation)
 add_message_files(
   FILES
   DoubleArrayStamped.msg
+  DoubleMatrixStamped.msg
   ExtEkf.msg
   ExtState.msg
   PointWithCovarianceStamped.msg
