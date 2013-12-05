@@ -573,7 +573,7 @@ void MSF_Core<EKFState_T>::init(
 
   // Echo params.
   MSF_INFO_STREAM(
-      "Core parameters: "<<std::endl << "\tfixed_bias:\t" << usercalc_.getParam_fixed_bias() << std::endl << "\tfuzzythres:\t" << usercalc_.getParam_fuzzythres() << std::endl << "\tnoise_acc:\t" << usercalc_.getParam_noise_acc() << std::endl << "\tnoise_accbias:\t" << usercalc_.getParam_noise_accbias() << std::endl << "\tnoise_gyr:\t" << usercalc_.getParam_noise_gyr() << std::endl << "\tnoise_gyrbias:\t" << usercalc_.getParam_noise_gyrbias() << std::endl);
+      "Core parameters: "<<std::endl << "\tfixed_bias:\t" << usercalc_.getParam_fixed_bias() << std::endl << "\tfuzzythres:\t" << usercalc_.getParam_fuzzythres() << std::endl << "\tcore_noise_acc:\t" << usercalc_.getParam_noise_acc() << std::endl << "\tcore_noise_accbias:\t" << usercalc_.getParam_noise_accbias() << std::endl << "\tcore_noise_gyr:\t" << usercalc_.getParam_noise_gyr() << std::endl << "\tcore_noise_gyrbias:\t" << usercalc_.getParam_noise_gyrbias() << std::endl);
 
   MSF_INFO_STREAM("Core init with state: " << std::endl << state->print());
   initialized_ = true;
