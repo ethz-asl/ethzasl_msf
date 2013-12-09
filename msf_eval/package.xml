@@ -27,8 +27,8 @@
   <build_depend>roscpp</build_depend>
   <build_depend>opencv2</build_depend>
   <build_depend>sm_kinematics</build_depend>
-  <build_depend>pcl_ros</build_depend>
   <build_depend>rosbag</build_depend>
+  <build_depend>msf_core</build_depend>
 
   <!-- Dependencies needed after this package is compiled. -->
   <run_depend>std_msgs</run_depend>
@@ -40,6 +40,6 @@
   <run_depend>roscpp</run_depend>
   <run_depend>opencv2</run_depend>
   <run_depend>sm_kinematics</run_depend>
-  <run_depend>pcl_ros</run_depend>
   <run_depend>rosbag</run_depend>
+  <run_depend>msf_core</run_depend>
 </package>

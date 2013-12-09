@@ -27,6 +27,7 @@
 #include <sm/kinematics/Transformation.hpp>
 #include <sm/kinematics/quaternion_algebra.hpp>
 #include <ros/package.h>
+#include <msf_core/msf_macros.h>
 
 Eigen::Matrix<double, 3, 1> getPosition(geometry_msgs::TransformStampedConstPtr tf){
   Eigen::Matrix<double, 3, 1> pos;
@@ -81,14 +82,28 @@ int main(int argc, char **argv)
 
   //this is the Vicon one - SLAM sensor V0
   ///////////////////////////////////////////////////////////////////////////////////////////
-  T_BaBg_mat << 0.999706627053000, -0.022330158354000, 0.005123243528000, -0.060614697387000, 0.022650462142000, 0.997389634278000, -0.068267398302000, 0.035557942651000, -0.003589706237000, 0.068397960288000, 0.997617159323000, -0.042589657349000, 0, 0, 0, 1.000000000000000;
+//  T_BaBg_mat << 0.999706627053000, -0.022330158354000, 0.005123243528000, -0.060614697387000,
+  //              0.022650462142000, 0.997389634278000, -0.068267398302000, 0.035557942651000,
+  //             -0.003589706237000, 0.068397960288000, 0.997617159323000, -0.042589657349000,
+  //              0, 0, 0, 1.000000000000000;
   ////////////////////////////////////////////////////////////////////////////////////////////
 
-  ros::Duration dt(0.0039);
+  //this is the Vicon one - SLAM sensor V3 - large Rig for Leica eval
+  ///////////////////////////////////////////////////////////////////////////////////////////
+  T_BaBg_mat <<
+      0.167956  ,  0.95149842, -0.25776255,  0.17104256,
+      0.18648779,  0.22608787,  0.95608921,  0.10819705,
+      0.96799436, -0.20865049, -0.13947003,  0.09269324,
+      0.        ,  0.        ,  0.        ,  1.;
+  ////////////////////////////////////////////////////////////////////////////////////////////
+
+
+//  ros::Duration dt(0.0039);
+  ros::Duration dt(-0.010310717511189348);  // Joern Vicon to IMU
   const double timeSyncThreshold = 0.005;
   const double timeDiscretization = 10.0; //discretization step for different starting points into the dataset
   const double trajectoryTimeDiscretization = 0.049; //discretization of evaluation points (vision framerate for fair comparison)
-  const double startTimeOffset = 10.0;
+  const double startTimeOffset = 10;
 
   if (argc < 4)
   {
@@ -108,7 +123,7 @@ int main(int argc, char **argv)
   }
 
   typedef geometry_msgs::TransformStamped GT_TYPE;
-  typedef geometry_msgs::PoseWithCovarianceStamped EVAL_TYPE;
+  typedef geometry_msgs::TransformStamped EVAL_TYPE;
 
   // output file
   std::stringstream matlab_fname;
@@ -128,6 +143,8 @@ int main(int argc, char **argv)
   ros::Duration startOffset(startTimeOffset);
 
   sm::kinematics::Transformation T_BaBg(T_BaBg_mat); //body aslam to body Ground Truth
+
+  T_BaBg = T_BaBg.inverse();
 
   // open for reading
   rosbag::Bag bag(argv[bagfile], rosbag::bagmode::Read);
@@ -155,9 +172,18 @@ int main(int argc, char **argv)
 
   //get times of first messages
   GT_TYPE::ConstPtr GT_begin = view_GT.begin()->instantiate<GT_TYPE>();
-  assert(GT_begin);
+  if(!GT_begin) {
+    MSF_ERROR_STREAM("The bag you provided does not contain messages of the type "
+        " which was specified as groundtruth message type") ;
+    return -1;
+  }
+
   EVAL_TYPE::ConstPtr POSE_begin = view_EVAL.begin()->instantiate<EVAL_TYPE>();
-  assert(POSE_begin);
+  if(!POSE_begin) {
+     MSF_ERROR_STREAM("The bag you provided does not contain messages of the type "
+         " which was specified as estimator message type") ;
+     return -1;
+  }
 
   MSF_INFO_STREAM("First GT data at "<<GT_begin->header.stamp);
   MSF_INFO_STREAM("First EVAL data at "<<POSE_begin->header.stamp);
@@ -171,7 +197,7 @@ int main(int argc, char **argv)
     // read ground truth
     ros::Time start;
 
-    // Find start time alignment: set the GT iterater to point to a time larger than the aslam time
+    // Find start time alignment: set the GT iterator to point to a time larger than the aslam time
     while (true)
     {
       GT_TYPE::ConstPtr trafo = it_GT->instantiate<GT_TYPE>();
@@ -252,9 +278,11 @@ int main(int argc, char **argv)
       {
 
         T_WaBa = sm::kinematics::Transformation(
-            Eigen::Vector4d(-pose->pose.pose.orientation.x, -pose->pose.pose.orientation.y,
-                            -pose->pose.pose.orientation.z, pose->pose.pose.orientation.w),
-                            Eigen::Vector3d(pose->pose.pose.position.x, pose->pose.pose.position.y, pose->pose.pose.position.z));
+            Eigen::Vector4d(-pose->transform.rotation.x, -pose->transform.rotation.y,
+                            -pose->transform.rotation.z, pose->transform.rotation.w),
+                            Eigen::Vector3d(pose->transform.translation.x,
+                                            pose->transform.translation.y,
+                                            pose->transform.translation.z));
 
         T_WgBg = sm::kinematics::Transformation(
             Eigen::Vector4d(-trafo->transform.rotation.x, -trafo->transform.rotation.y, -trafo->transform.rotation.z,
@@ -315,7 +343,7 @@ int main(int argc, char **argv)
             poses_EVAL << T_WaBa.t().transpose() << ";" << std::endl;
             poses_GT << T_WgBg.t().transpose() << ";" << std::endl;
           }
-          Eigen::Matrix<double, 6, 6> cov = getCovariance(pose);
+          Eigen::Matrix<double, 6, 6> cov; cov.setIdentity();//= getCovariance(pose);
           outfile << (time_GT - start).toSec() << " "
               << ds << " " << (T_WaBa.t() - T_WaBa_gt.t()).norm() << " " //translation
               << 2 * acos(std::min(1.0, fabs(dT.q()[3]))) << " " << dalpha_e_z << " " //orientation
