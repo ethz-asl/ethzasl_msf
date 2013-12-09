@@ -23,30 +23,30 @@ binSize=10.0; % [m]
 
 % get the data
 
-SLAM_sensor_vicon_msf_abs_noscale;
+Data20131209LeicaEvalVicon1TF;
 data_EVAL{1} = data; %method A
 
-SLAM_sensor_vicon_msf_rel_noscale;
+Data20131209LeicaEvalVicon1TFInv;
 data_EVAL{2} = data; %method B
 
-SLAM_sensor_vicon_msf_rel_4KF; 
-data_EVAL{3} = data; %method C
+% SLAM_sensor_vicon_msf_rel_4KF; 
+% data_EVAL{3} = data; %method C
 
 nameMethodA = 'A';
 nameMethodB = 'B';
-nameMethodC = 'C';
+% nameMethodC = 'C';
 
 mk{1}='.';
 mk{2}='o';
-mk{3}='x';
+% mk{3}='x';
 
 clr{1}=[1,0,0];
 clr{2}=[0.0,0.75,0];
-clr{3}=[0,0,1];
+% clr{3}=[0,0,1];
 
 scales=[1.25,.4,.7];
 
-for k=1:3
+for k=1:2
 
 numBins = floor(max(data_EVAL{k}(:, 2)) / binSize);
 
@@ -94,8 +94,8 @@ errorbar(dsVector, translationMean * 100, translationLow * 100, translationHigh 
     12 * scales(k), 'LineWidth', 0.5,'Color',clr{k})
 ylabel('Translation error [%]')
 xlabel('Distance travelled [m]')
-axis([0 90 0 2.5])
-set(gca,'xTick', binSize / 2:binSize:160)
+axis([0 ds 0 1])
+set(gca,'xTick', binSize / 2:binSize*4:ds)
 set(gca,'YGrid', 'on');
 
 hold on;
@@ -106,8 +106,8 @@ errorbar(dsVector, rotationMean, rotationLow, rotationHigh, mk{k},'MarkerSize',1
 ylabel('Orient. err. [{}^\circ/m]')
 xlabel('Distance travelled [m]')
 hold on;
-axis([0 90 0 0.25])
-set(gca,'xTick',binSize/2:binSize:160)
+axis([0 ds 0 0.25])
+set(gca,'xTick',binSize/2:binSize*4:ds)
 set(gca,'YGrid','on');
 
 %Gravity align ERROR
@@ -116,14 +116,14 @@ errorbar(dsVector, rotationZMean, rotationZLow, rotationZHigh, mk{k},'MarkerSize
 ylabel('World z-dir. err. [{}^\circ/m]')
 xlabel('Distance travelled [m]')
 hold on;
-axis([0 90 0 0.25])
-set(gca,'xTick',binSize/2:binSize:160)
+axis([0 ds 0 0.05])
+set(gca,'xTick',binSize/2:binSize*4:ds)
 set(gca,'YGrid','on');
 
 end
 
 subplot(3,1,2)
-legend(nameMethodA, nameMethodB, nameMethodC,'Orientation','horizontal')
+legend(nameMethodA, nameMethodB, 'Orientation','horizontal')
 
 % save as pretty plot
 %set(gca,'FontSize',3)
