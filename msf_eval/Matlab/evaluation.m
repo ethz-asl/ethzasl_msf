@@ -19,34 +19,37 @@ close all
 %    system(['rosrun aslam_eval aslam_eval_run ' aslam_results ' ' gt]);
 %end
 
-binSize=10.0; % [m]
+binSize=20.0; % [m]
 
 % get the data
 
-Data20131209LeicaEvalVicon1TF;
+Vicon2_Range_once_svd_matlab;
 data_EVAL{1} = data; %method A
 
-Data20131209LeicaEvalVicon1TFInv;
-data_EVAL{2} = data; %method B
+% Data20131209LeicaEvalVicon1TFInv;
+% data_EVAL{2} = data; %method B
 
 % SLAM_sensor_vicon_msf_rel_4KF; 
 % data_EVAL{3} = data; %method C
 
-nameMethodA = 'A';
-nameMethodB = 'B';
+nameMethodA = 'Visual Inertial State Estimation';
+% nameMethodB = 'B';
 % nameMethodC = 'C';
+
+percentile_low = 0.15
+percentile_high = 0.85
 
 mk{1}='.';
 mk{2}='o';
 % mk{3}='x';
 
-clr{1}=[1,0,0];
-clr{2}=[0.0,0.75,0];
+clr{1}=[0.0,0.75,0];
+% clr{2}=[1.0,0.0,0];
 % clr{3}=[0,0,1];
 
 scales=[1.25,.4,.7];
 
-for k=1:2
+k = 1;
 
 numBins = floor(max(data_EVAL{k}(:, 2)) / binSize);
 
@@ -67,34 +70,38 @@ i=1;
 
 for ds = binSize / 2:binSize:max(data_EVAL{k}(:, 2) - binSize / 2)
     box=data_EVAL{k}(data_EVAL{k}(:, 2) > ds - binSize / 2 & data_EVAL{k}(:, 2) < ds + binSize / 2, :) / ds;
+    box_unnorm=data_EVAL{k}(data_EVAL{k}(:, 2) > ds - binSize / 2 & data_EVAL{k}(:, 2) < ds + binSize / 2, :);
     
     %translation
-    translationLow(i, 1) = prctile(box(:, 3), .05);
-    translationHigh(i, 1) = prctile(box(:, 3), .95);
+    translationLow(i, 1) = prctile(box(:, 3), percentile_low);
+    translationHigh(i, 1) = prctile(box(:, 3), percentile_high);
     translationMean(i, 1) = mean(box(:, 3));
     
-    rotationLow(i, 1) = prctile(box(:,4) / pi * 180, .05);
-    rotationHigh(i, 1) = prctile(box(:,4) / pi * 180, .95);
+    rotationLow(i, 1) = prctile(box(:,4) / pi * 180, percentile_low);
+    rotationHigh(i, 1) = prctile(box(:,4) / pi * 180, percentile_high);
     rotationMean(i, 1) = mean(box(:,4) / pi * 180);
     
     if size(box, 2) > 4
-        rotationZLow(i, 1) = prctile(box(:, 5) / pi * 180, .05);
-        rotationZHigh(i, 1) = prctile(box(:, 5) / pi * 180, .95);
-        rotationZMean(i, 1) = mean(box(:, 5) / pi * 180);
+        rotationZLow(i, 1) = prctile(box_unnorm(:, 5) / pi * 180, percentile_low);
+        rotationZHigh(i, 1) = prctile(box_unnorm(:, 5) / pi * 180, percentile_high);
+        rotationZMean(i, 1) = mean(box_unnorm(:, 5) / pi * 180);
     end
     
     dsVector(1, i) = ds + (k - 2) * 2;
     i = i + 1;
 end
+
 figure(1)
 
 %Translation ERROR
 subplot(3,1,1)
 errorbar(dsVector, translationMean * 100, translationLow * 100, translationHigh * 100, mk{k}, 'MarkerSize', ...
     12 * scales(k), 'LineWidth', 0.5,'Color',clr{k})
+
 ylabel('Translation error [%]')
 xlabel('Distance travelled [m]')
 axis([0 ds 0 1])
+grid minor;
 set(gca,'xTick', binSize / 2:binSize*4:ds)
 set(gca,'YGrid', 'on');
 
@@ -106,27 +113,62 @@ errorbar(dsVector, rotationMean, rotationLow, rotationHigh, mk{k},'MarkerSize',1
 ylabel('Orient. err. [{}^\circ/m]')
 xlabel('Distance travelled [m]')
 hold on;
-axis([0 ds 0 0.25])
+grid minor;
+axis([0 ds 0 0.15])
 set(gca,'xTick',binSize/2:binSize*4:ds)
 set(gca,'YGrid','on');
 
 %Gravity align ERROR
 subplot(3,1,3)
 errorbar(dsVector, rotationZMean, rotationZLow, rotationZHigh, mk{k},'MarkerSize',12*scales(k),'LineWidth',0.5,'Color',clr{k})
-ylabel('World z-dir. err. [{}^\circ/m]')
+ylabel('World z-dir. err. [{}^\circ]')
 xlabel('Distance travelled [m]')
 hold on;
-axis([0 ds 0 0.05])
+grid minor;
+axis([0 ds 0 5])
 set(gca,'xTick',binSize/2:binSize*4:ds)
 set(gca,'YGrid','on');
 
-end
 
 subplot(3,1,2)
-legend(nameMethodA, nameMethodB, 'Orientation','horizontal')
+legend(nameMethodA, 'Orientation','horizontal')
 
-% save as pretty plot
-%set(gca,'FontSize',3)
-%matfig2pgf('filename', 'ViconComp.pgf', 'fignr', 1,'converttexttolatex',true,'figwidth', 8,'texticklabelsize','scriptsize','textextlabelsize','scriptsize')
-%matlabfrag('ViconComp')
-%matlab2tikz('ViconComp.tikz', 'height', '\figureheight', 'width', '\figurewidth');
+wg = 15;
+exportfig(gcf, 'error_plots.pdf','height', wg * 1.5, 'width', wg, 'Color', 'cmyk', 'FontSize', 2);
+
+[total_distance, last_index_first_run] = max(data_EVAL{k}(:, 2));
+first_run_data = data_EVAL{k}(1:last_index_first_run, :);
+
+figure(); figure(gcf());
+%% Top down plots
+plot3(first_run_data(:, 6), first_run_data(:, 7), first_run_data(:, 8));
+hold on;
+grid on;
+plot3(first_run_data(:, 9), first_run_data(:, 10), first_run_data(:, 11), 'r');
+legend('Estimate', 'Groundtruth')
+axis equal;
+
+
+% figure(); figure(gcf());
+% %% Plots of drift over time.
+
+
+% subplot(3, 1, 1)
+% plot(first_run_data(:, 1), first_run_data(:, 3) / first_run_data(:, 2) * 100.);
+% ylabel('Translation error [%]')
+% xlabel('Time [s]')
+% grid minor;
+% 
+% subplot(3, 1, 2)
+% plot(first_run_data(:, 1), first_run_data(:, 4) / pi * 180);
+% ylabel('Orientation error [{}^\circ]')
+% xlabel('Time [s]')
+% grid minor;
+% 
+% 
+% subplot(3, 1, 3)
+% plot(first_run_data(:, 1), first_run_data(:, 5) / pi * 180);
+% ylabel('World z-dir. err. [{}^\circ]')
+% xlabel('Time [s]')
+% grid minor;
+
