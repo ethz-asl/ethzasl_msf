@@ -21,10 +21,11 @@ add_message_files(
 )
 
 #uncomment if you have defined services
-#add_service_files(
-#  FILES
-  # TODO: List your msg files here
-#)
+add_service_files(
+  FILES
+  InitScale.srv
+  InitHeight.srv
+)
 
 generate_messages(
   DEPENDENCIES geometry_msgs std_msgs
@@ -32,7 +33,7 @@ generate_messages(
 
 catkin_package(
     DEPENDS
-    CATKIN_DEPENDS  geometry_msgs
+    CATKIN_DEPENDS message_runtime geometry_msgs
     INCLUDE_DIRS # TODO include
     LIBRARIES # TODO
 )
