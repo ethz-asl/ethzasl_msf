@@ -84,6 +84,8 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
   ros::ServiceServer init_scale_srv_;
   ros::ServiceServer init_height_srv_;
 
+  const double MIN_INITIALIZATION_HEIGHT = 0.01; ///< Minimum initialization height. If a abs(height) is smaller than this value, no initialzation is performed.
+
   /**
    * \brief Dynamic reconfigure callback.
    */
@@ -131,9 +133,19 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
           "not allowed.");
       return false;
     }
-    double scale = p[2] / req.height;
-    init(scale);
-    res.result = "Initialized height";
+    std::stringstream ss;
+    if (std::abs(req.height) > MIN_INITIALIZATION_HEIGHT) {
+    	double scale = p[2] / req.height;
+    	init(scale);
+    	ss << scale;
+    	res.result = "Initialized by known height. Initial scale = " + ss.str();
+    }
+    else {
+    	ss << "Height to small for initialization, the minimum is " << MIN_INITIALIZATION_HEIGHT << "and " << req.height <<"was set.";
+    	MSF_WARN_STREAM(ss);
+    	res.result = ss.str();
+    	return false;
+    }
     return true;
   }
 
