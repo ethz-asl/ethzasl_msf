@@ -39,9 +39,9 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     msf_updates::EKFState> {
   typedef PositionPoseSensorManager this_T;
   typedef msf_pose_sensor::PoseSensorHandler<
-      msf_updates::pose_measurement::PoseMeasurement, this_T> PoseSensorHandler_T;
+      msf_updates::pose_measurement::PoseMeasurement<>, this_T> PoseSensorHandler_T;
   friend class msf_pose_sensor::PoseSensorHandler<
-      msf_updates::pose_measurement::PoseMeasurement, this_T>;
+      msf_updates::pose_measurement::PoseMeasurement<>, this_T>;
   typedef msf_position_sensor::PositionSensorHandler<
       msf_updates::position_measurement::PositionMeasurement, this_T> PositionSensorHandler_T;
   friend class msf_position_sensor::PositionSensorHandler<

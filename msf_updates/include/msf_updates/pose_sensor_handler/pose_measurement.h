@@ -34,6 +34,14 @@ enum {
  */
 typedef msf_core::MSF_Measurement<geometry_msgs::PoseWithCovarianceStamped,
     Eigen::Matrix<double, nMeasurements, nMeasurements>, msf_updates::EKFState> PoseMeasurementBase;
+
+template<
+    int StateL_ = EKFState::StateDefinition_T::L,
+    int StateQic_ = EKFState::StateDefinition_T::q_ic,
+    int StatePic_ = EKFState::StateDefinition_T::p_ic,
+    int StateQwv_ = EKFState::StateDefinition_T::q_wv,
+    int StatePwv_ = EKFState::StateDefinition_T::p_wv
+    >
 struct PoseMeasurement : public PoseMeasurementBase {
  private:
   typedef PoseMeasurementBase Measurement_t;
@@ -122,6 +130,15 @@ struct PoseMeasurement : public PoseMeasurementBase {
   typedef msf_updates::EKFState EKFState_T;
   typedef EKFState_T::StateSequence_T StateSequence_T;
   typedef EKFState_T::StateDefinition_T StateDefinition_T;
+
+  enum AuxState {
+    L = StateL_,
+    q_ic = StateQic_,
+    p_ic = StatePic_,
+    q_wv = StateQwv_,
+    p_wv = StatePwv_
+  };
+
   virtual ~PoseMeasurement() {
   }
   PoseMeasurement(double n_zp, double n_zq, bool measurement_world_sensor,
@@ -150,22 +167,22 @@ struct PoseMeasurement : public PoseMeasurementBase {
     H.setZero();
 
     // Get rotation matrices.
-    Eigen::Matrix<double, 3, 3> C_wv = state.get<StateDefinition_T::q_wv>()
+    Eigen::Matrix<double, 3, 3> C_wv = state.get<StateQwv_>()
         .toRotationMatrix();
     Eigen::Matrix<double, 3, 3> C_q = state.get<StateDefinition_T::q>()
         .toRotationMatrix();
-    Eigen::Matrix<double, 3, 3> C_ci = state.get<StateDefinition_T::q_ic>()
+    Eigen::Matrix<double, 3, 3> C_ci = state.get<StateQic_>()
         .conjugate().toRotationMatrix();
 
     // Preprocess for elements in H matrix.
     Eigen::Matrix<double, 3, 1> vecold;
     vecold = (state.get<StateDefinition_T::p>()
-        + C_q * state.get<StateDefinition_T::p_ic>())
-        * state.get<StateDefinition_T::L>();
+        + C_q * state.get<StatePic_>())
+        * state.get<StateL_>();
     Eigen::Matrix<double, 3, 3> skewold = skew(vecold);
 
     Eigen::Matrix<double, 3, 3> pci_sk = skew(
-        state.get<StateDefinition_T::p_ic>());
+        state.get<StatePic_>());
 
     // Get indices of states in error vector.
     enum {
@@ -176,50 +193,50 @@ struct PoseMeasurement : public PoseMeasurementBase {
       idxstartcorr_q_ = msf_tmp::getStartIndexInCorrection<StateSequence_T,
           StateDefinition_T::q>::value,
       idxstartcorr_L_ = msf_tmp::getStartIndexInCorrection<StateSequence_T,
-          StateDefinition_T::L>::value,
+          StateL_>::value,
       idxstartcorr_qwv_ = msf_tmp::getStartIndexInCorrection<StateSequence_T,
-          StateDefinition_T::q_wv>::value,
+          StateQwv_>::value,
       idxstartcorr_pwv_ = msf_tmp::getStartIndexInCorrection<StateSequence_T,
-          StateDefinition_T::p_wv>::value,
+          StatePwv_>::value,
       idxstartcorr_qic_ = msf_tmp::getStartIndexInCorrection<StateSequence_T,
-          StateDefinition_T::q_ic>::value,
+          StateQic_>::value,
       idxstartcorr_pic_ = msf_tmp::getStartIndexInCorrection<StateSequence_T,
-          StateDefinition_T::p_ic>::value,
+          StatePic_>::value,
     };
 
     // Read the fixed states flags.
-    bool scalefix = (fixedstates_ & 1 << StateDefinition_T::L);
-    bool calibposfix = (fixedstates_ & 1 << StateDefinition_T::p_ic);
-    bool calibattfix = (fixedstates_ & 1 << StateDefinition_T::q_ic);
-    bool driftwvattfix = (fixedstates_ & 1 << StateDefinition_T::q_wv);
-    bool driftwvposfix = (fixedstates_ & 1 << StateDefinition_T::p_wv);
+    bool scalefix = (fixedstates_ & 1 << StateL_);
+    bool calibposfix = (fixedstates_ & 1 << StatePic_);
+    bool calibattfix = (fixedstates_ & 1 << StateQic_);
+    bool driftwvattfix = (fixedstates_ & 1 << StateQwv_);
+    bool driftwvposfix = (fixedstates_ & 1 << StatePwv_);
 
     // Set crosscov to zero for fixed states.
     if (scalefix)
-      state_in->clearCrossCov<StateDefinition_T::L>();
+      state_in->clearCrossCov<StateL_>();
     if (calibposfix)
-      state_in->clearCrossCov<StateDefinition_T::p_ic>();
+      state_in->clearCrossCov<StatePic_>();
     if (calibattfix)
-      state_in->clearCrossCov<StateDefinition_T::q_ic>();
+      state_in->clearCrossCov<StateQic_>();
     if (driftwvattfix)
-      state_in->clearCrossCov<StateDefinition_T::q_wv>();
+      state_in->clearCrossCov<StateQwv_>();
     if (driftwvposfix)
-      state_in->clearCrossCov<StateDefinition_T::p_wv>();
+      state_in->clearCrossCov<StatePwv_>();
 
     // Construct H matrix.
     // Position:
     H.block<3, 3>(0, idxstartcorr_p_) = C_wv
-        * state.get<StateDefinition_T::L>()(0);  // p
+        * state.get<StateL_>()(0);  // p
 
     H.block<3, 3>(0, idxstartcorr_q_) = -C_wv * C_q * pci_sk
-        * state.get<StateDefinition_T::L>()(0);  // q
+        * state.get<StateL_>()(0);  // q
 
     H.block<3, 1>(0, idxstartcorr_L_) =
         scalefix ?
             Eigen::Matrix<double, 3, 1>::Zero() :
-            (C_wv * C_q * state.get<StateDefinition_T::p_ic>()
+            (C_wv * C_q * state.get<StatePic_>()
                 + C_wv
-                    * (-state.get<StateDefinition_T::p_wv>()
+                    * (-state.get<StatePwv_>()
                         + state.get<StateDefinition_T::p>())).eval();  // L
 
     H.block<3, 3>(0, idxstartcorr_qwv_) =
@@ -229,14 +246,14 @@ struct PoseMeasurement : public PoseMeasurementBase {
     H.block<3, 3>(0, idxstartcorr_pic_) =
         calibposfix ?
             Eigen::Matrix<double, 3, 3>::Zero() :
-            (C_wv * C_q * state.get<StateDefinition_T::L>()(0)).eval();  //p_ic
+            (C_wv * C_q * state.get<StateL_>()(0)).eval();  //p_ic
 
     // TODO (slynen): Check scale commenting
     H.block<3, 3>(0, idxstartcorr_pwv_) =
         driftwvposfix ?
             Eigen::Matrix<double, 3, 3>::Zero() :
             (-Eigen::Matrix<double, 3, 3>::Identity()
-            /* * state.get<StateDefinition_T::L>()(0)*/).eval();  //p_wv
+            /* * state.get<StateL_>()(0)*/).eval();  //p_wv
 
     // Attitude.
     H.block<3, 3>(3, idxstartcorr_q_) = C_ci;  // q
@@ -277,7 +294,7 @@ struct PoseMeasurement : public PoseMeasurementBase {
       calculateH(state_nonconst_new, H_new);
 
       // get rotation matrices
-      Eigen::Matrix<double, 3, 3> C_wv = state.get<StateDefinition_T::q_wv>()
+      Eigen::Matrix<double, 3, 3> C_wv = state.get<StateQwv_>()
           .conjugate().toRotationMatrix();
       Eigen::Matrix<double, 3, 3> C_q = state.get<StateDefinition_T::q>()
           .conjugate().toRotationMatrix();
@@ -286,19 +303,19 @@ struct PoseMeasurement : public PoseMeasurementBase {
       // Position
       r_old.block<3, 1>(0, 0) = z_p_
           - (C_wv.transpose()
-              * (-state.get<StateDefinition_T::p_wv>()
+              * (-state.get<StatePwv_>()
                   + state.get<StateDefinition_T::p>()
-                  + C_q.transpose() * state.get<StateDefinition_T::p_ic>()))
-              * state.get<StateDefinition_T::L>();
+                  + C_q.transpose() * state.get<StatePic_>()))
+              * state.get<StateL_>();
 
       // Attitude.
       Eigen::Quaternion<double> q_err;
-      q_err = (state.get<StateDefinition_T::q_wv>()
+      q_err = (state.get<StateQwv_>()
           * state.get<StateDefinition_T::q>()
-          * state.get<StateDefinition_T::q_ic>()).conjugate() * z_q_;
+          * state.get<StateQic_>()).conjugate() * z_q_;
       r_old.block<3, 1>(3, 0) = q_err.vec() / q_err.w() * 2;
       // Vision world yaw drift.
-      q_err = state.get<StateDefinition_T::q_wv>();
+      q_err = state.get<StateQwv_>();
       r_old(6, 0) = -2 * (q_err.w() * q_err.z() + q_err.x() * q_err.y())
           / (1 - 2 * (q_err.y() * q_err.y() + q_err.z() * q_err.z()));
 
@@ -375,11 +392,11 @@ struct PoseMeasurement : public PoseMeasurementBase {
       Eigen::Matrix<double, 3, 3> C_wv_old, C_wv_new;
       Eigen::Matrix<double, 3, 3> C_q_old, C_q_new;
 
-      C_wv_new = state_new.get<StateDefinition_T::q_wv>().conjugate()
+      C_wv_new = state_new.get<StateQwv_>().conjugate()
           .toRotationMatrix();
       C_q_new = state_new.get<StateDefinition_T::q>().conjugate()
           .toRotationMatrix();
-      C_wv_old = state_old.get<StateDefinition_T::q_wv>().conjugate()
+      C_wv_old = state_old.get<StateQwv_>().conjugate()
           .toRotationMatrix();
       C_q_old = state_old.get<StateDefinition_T::q>().conjugate()
           .toRotationMatrix();
@@ -387,16 +404,16 @@ struct PoseMeasurement : public PoseMeasurementBase {
       // Construct residuals.
       // Position:
       Eigen::Matrix<double, 3, 1> diffprobpos = (C_wv_new.transpose()
-          * (-state_new.get<StateDefinition_T::p_wv>()
+          * (-state_new.get<StatePwv_>()
               + state_new.get<StateDefinition_T::p>()
-              + C_q_new.transpose() * state_new.get<StateDefinition_T::p_ic>()))
-          * state_new.get<StateDefinition_T::L>()
+              + C_q_new.transpose() * state_new.get<StatePic_>()))
+          * state_new.get<StateL_>()
           - (C_wv_old.transpose()
-              * (-state_old.get<StateDefinition_T::p_wv>()
+              * (-state_old.get<StatePwv_>()
                   + state_old.get<StateDefinition_T::p>()
                   + C_q_old.transpose()
-                      * state_old.get<StateDefinition_T::p_ic>()))
-              * state_old.get<StateDefinition_T::L>();
+                      * state_old.get<StatePic_>()))
+              * state_old.get<StateL_>();
 
       Eigen::Matrix<double, 3, 1> diffmeaspos = z_p_ - prevmeas->z_p_;
 
@@ -404,12 +421,12 @@ struct PoseMeasurement : public PoseMeasurementBase {
 
       // Attitude:
       Eigen::Quaternion<double> diffprobatt = (state_new
-          .get<StateDefinition_T::q_wv>()
+          .get<StateQwv_>()
           * state_new.get<StateDefinition_T::q>()
-          * state_new.get<StateDefinition_T::q_ic>()).conjugate()
-          * (state_old.get<StateDefinition_T::q_wv>()
+          * state_new.get<StateQic_>()).conjugate()
+          * (state_old.get<StateQwv_>()
               * state_old.get<StateDefinition_T::q>()
-              * state_old.get<StateDefinition_T::q_ic>());
+              * state_old.get<StateQic_>());
       Eigen::Quaternion<double> diffmeasatt = z_q_.conjugate() * prevmeas->z_q_;
 
       Eigen::Quaternion<double> q_err;
@@ -417,7 +434,7 @@ struct PoseMeasurement : public PoseMeasurementBase {
 
       r_new.block<3, 1>(3, 0) = q_err.vec() / q_err.w() * 2;
       // Vision world yaw drift.
-      q_err = state_new.get<StateDefinition_T::q_wv>();
+      q_err = state_new.get<StateQwv_>();
       r_new(6, 0) = -2 * (q_err.w() * q_err.z() + q_err.x() * q_err.y())
           / (1 - 2 * (q_err.y() * q_err.y() + q_err.z() * q_err.z()));
 

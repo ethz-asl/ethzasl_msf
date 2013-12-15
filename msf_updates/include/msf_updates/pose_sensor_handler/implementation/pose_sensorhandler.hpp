@@ -129,21 +129,25 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
   // Get all the fixed states and set flag bits.
   MANAGER_TYPE* mngr = dynamic_cast<MANAGER_TYPE*>(&manager_);
 
+  // TODO: if we have multiple sensor handlers, they all share the same dynparams,
+  // which me maybe don't want. E.g. if we have this for multiple AR Markers, we
+  // may want to keep one fix --> move this to fixed parameters? Could be handled
+  // with parameter namespace then.
   if (mngr) {
     if (mngr->getcfg().pose_fixed_scale) {
-      fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::L;
+      fixedstates |= 1 << MEASUREMENT_TYPE::AuxState::L;
     }
     if (mngr->getcfg().pose_fixed_p_ic) {
-      fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::p_ic;
+      fixedstates |= 1 << MEASUREMENT_TYPE::AuxState::p_ic;
     }
     if (mngr->getcfg().pose_fixed_q_ic) {
-      fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::q_ic;
+      fixedstates |= 1 << MEASUREMENT_TYPE::AuxState::q_ic;
     }
     if (mngr->getcfg().pose_fixed_p_wv) {
-      fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::p_wv;
+      fixedstates |= 1 << MEASUREMENT_TYPE::AuxState::p_wv;
     }
     if (mngr->getcfg().pose_fixed_q_wv) {
-      fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::q_wv;
+      fixedstates |= 1 << MEASUREMENT_TYPE::AuxState::q_wv;
     }
   }
 
