@@ -84,7 +84,9 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
   ros::ServiceServer init_scale_srv_;
   ros::ServiceServer init_height_srv_;
 
-  const double MIN_INITIALIZATION_HEIGHT = 0.01; ///< Minimum initialization height. If a abs(height) is smaller than this value, no initialzation is performed.
+  /// Minimum initialization height. If a abs(height) is smaller than this value, 
+  /// no initialization is performed.
+  static constexpr double MIN_INITIALIZATION_HEIGHT = 0.01; 
 
   /**
    * \brief Dynamic reconfigure callback.
