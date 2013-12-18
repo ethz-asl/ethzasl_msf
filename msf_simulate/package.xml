@@ -1,7 +1,7 @@
 <package>
-  <name>sensor_fusion</name>
+  <name>msf_simulate</name>
   <version>0.0.1</version>
-  <description>msf</description>
+  <description>msf_simulate</description>
   <maintainer email="simon.lynen@mavt.ethz.ch">Simon Lynen</maintainer>
   <maintainer email="markus.achtelik_devel@mavt.ethz.ch">Markus Achtelik</maintainer>
 
@@ -13,21 +13,15 @@
   <author>Simon Lynen</author>
   <author>Markus Achtelik</author>
   <author>Stephan Weiss</author>
-  <author>Georg Wiedebach</author>
 
   <!-- Dependencies which this package needs to build itself. -->
   <buildtool_depend>catkin</buildtool_depend>
 
-  <!-- Dependencies needed after this package is compiled. -->
-  <run_depend>msf_eval</run_depend>
-  <run_depend>msf_simulate</run_depend>
-  <run_depend>msf_core</run_depend>
-  <run_depend>msf_distort</run_depend>
-  <run_depend>msf_updates</run_depend>
-  <run_depend>msf_timing</run_depend>  
-  <run_depend>sensor_fusion_comm</run_depend>
+  <!-- Dependencies needed to compile this package. -->
+  <build_depend>msf_core</build_depend>
+  <build_depend>msf_updates</build_depend>
 
-  <export>
-    <metapackage/>
-  </export>
+  <!-- Dependencies needed after this package is compiled. -->
+  <run_depend>msf_core</run_depend>
+  <run_depend>msf_updates</run_depend>
 </package>
