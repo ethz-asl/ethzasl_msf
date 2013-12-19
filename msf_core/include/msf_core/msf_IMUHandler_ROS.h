@@ -43,9 +43,7 @@ class IMUHandler_ROS : public IMUHandler<EKFState_T> {
                              &IMUHandler_ROS::stateCallback, this);
   }
 
-  virtual ~IMUHandler_ROS() {
-  }
-  ;
+  virtual ~IMUHandler_ROS() { };
 
   void stateCallback(const sensor_fusion_comm::ExtEkfConstPtr & msg) {
 

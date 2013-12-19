@@ -3,30 +3,29 @@
  *
  */
 
+#include <boost/assign/list_of.hpp>
 #include <boost/thread.hpp>
-#include <ros/ros.h>
-#include <image_transport/image_transport.h>
-#include "sensor_msgs/Imu.h"
+#include <boost/foreach.hpp>
+#include <geometry_msgs/TransformStamped.h>
 #include "geometry_msgs/PoseWithCovarianceStamped.h"
 #include "geometry_msgs/PoseStamped.h"
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
-#include "rosbag/bag.h"
-#include "rosbag/chunked_file.h"
-#include "rosbag/view.h"
+#include <image_transport/image_transport.h>
+#include "sensor_msgs/Imu.h"
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <set>
-#include <boost/assign/list_of.hpp>
-#include <boost/foreach.hpp>
-#include <nav_msgs/Odometry.h>
-#include <geometry_msgs/TransformStamped.h>
 #include <sm/kinematics/transformations.hpp>
 #include <sm/kinematics/Transformation.hpp>
 #include <sm/kinematics/quaternion_algebra.hpp>
+#include <ros/ros.h>
 #include <ros/package.h>
+#include "rosbag/bag.h"
+#include "rosbag/chunked_file.h"
+#include "rosbag/view.h"
 
 Eigen::Matrix<double, 3, 1> getPosition(geometry_msgs::TransformStampedConstPtr tf){
   Eigen::Matrix<double, 3, 1> pos;

@@ -26,8 +26,7 @@ catkin_package(
         image_geometry 
         rospy 
         roscpp 
-        sm_kinematics 
-        pcl_ros 
+        sm_kinematics  
         rosbag
     INCLUDE_DIRS include ${catkin_INCLUDE_DIRS}
     LIBRARIES 
