@@ -37,7 +37,7 @@ inline Eigen::Matrix<typename Derived::Scalar, 3, 3> skew(
 /// Returns a matrix with angular velocities used for quaternion derivatives/
 // integration with the JPL notation.
 /**
- The quaternion to be multiplied with this matrix has to be in the order x y z w !!!
+ The quaternion to be multiplied with this matrix has to be expressed in JPL notation.
  \param vec 3D vector with angular velocities.
  \return 4x4 matrix for multiplication with the quaternion.
  */
@@ -54,7 +54,7 @@ inline Eigen::Matrix<typename Derived::Scalar, 4, 4> omegaMatJPL(
 /// Returns a matrix with angular velocities used for quaternion derivatives/
 // integration with the Hamilton notation.
 /**
- The quaternion to be multiplied with this matrix has to be in the order x y z w !!!
+ The quaternion to be multiplied with this matrix has to be expressed in Hamilton notation.
  \param vec 3D vector with angular velocities
  \return 4x4 Matrix for multiplication with the quaternion
  */
@@ -99,34 +99,34 @@ Eigen::Quaternion<typename Derived::Scalar> quaternionFromSmallAngle(
   const Scalar q_squared = theta.squaredNorm() / 4.0;
 
   if (q_squared < 1) {
-    return Eigen::Quaternion < Scalar
-        > (sqrt(1 - q_squared), theta[0] * 0.5, theta[1] * 0.5, theta[2] * 0.5);
+    return Eigen::Quaternion<Scalar>(sqrt(1 - q_squared), theta[0] * 0.5,
+                                     theta[1] * 0.5, theta[2] * 0.5);
   } else {
     const Scalar w = 1.0 / sqrt(1 + q_squared);
     const Scalar f = w * 0.5;
-    return Eigen::Quaternion < Scalar
-        > (w, theta[0] * f, theta[1] * f, theta[2] * f);
+    return Eigen::Quaternion<Scalar>(w, theta[0] * f, theta[1] * f,
+                                     theta[2] * f);
   }
 }
 
-/// Debug output to check misbehavior of Eigen.
+/// Debug output to check Eigen matrices for NaN or Inf.
 template<class D>
 bool checkForNumeric(const Eigen::MatrixBase<D> & mat,
                      const std::string & info) {
   enum {
-    rows = Eigen::MatrixBase < D > ::RowsAtCompileTime,
-    cols = Eigen::MatrixBase < D > ::ColsAtCompileTime
+    rows = Eigen::MatrixBase<D>::RowsAtCompileTime,
+    cols = Eigen::MatrixBase<D>::ColsAtCompileTime
   };
 
   for (int i = 0; i < rows; ++i) {
     for (int j = 0; j < cols; ++j) {
       if (std::isnan(mat(i, j))) {
-        std::cerr << "=== ERROR ===  " << info << ": NAN at index [" << i << ","
+        std::cerr << "=== ERROR ===  " << info << ": NaN at index [" << i << ","
             << j << "]" << std::endl;
         return false;
       }
       if (std::isinf(mat(i, j))) {
-        std::cerr << "=== ERROR ===  " << info << ": INF at index [" << i << ","
+        std::cerr << "=== ERROR ===  " << info << ": Inf at index [" << i << ","
             << j << "]" << std::endl;
         return false;
       }
