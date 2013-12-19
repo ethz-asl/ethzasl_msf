@@ -22,6 +22,7 @@ catkin_package(
     CATKIN_DEPENDS # TODO
     INCLUDE_DIRS include
     LIBRARIES ${PROJECT_NAME}
+    CFG_EXTRAS export_flags.cmake
 )
 
 add_library(${PROJECT_NAME} src/Timer.cc)
