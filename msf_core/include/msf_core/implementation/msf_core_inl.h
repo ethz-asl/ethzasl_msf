@@ -99,7 +99,7 @@ template<typename EKFState_T>
 void MSF_Core<EKFState_T>::ProcessIMU(
     const msf_core::Vector3& linear_acceleration,
     const msf_core::Vector3& angular_velocity, const double& msg_stamp,
-    size_t msg_seq) {
+    size_t /*msg_seq*/) {
 
   if (!initialized_)
     return;
@@ -209,7 +209,7 @@ void MSF_Core<EKFState_T>::ProcessExternallyPropagatedState(
     const msf_core::Vector3& linear_acceleration,
     const msf_core::Vector3& angular_velocity, const msf_core::Vector3& p,
     const msf_core::Vector3& v, const msf_core::Quaternion& q,
-    bool is_already_propagated, const double& msg_stamp, size_t msg_seq) {
+    bool is_already_propagated, const double& msg_stamp, size_t /*msg_seq*/) {
 
   if (!initialized_)
     return;
