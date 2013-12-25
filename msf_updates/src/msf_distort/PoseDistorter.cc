@@ -45,7 +45,7 @@ PoseDistorter::~PoseDistorter() {
 
 }
 
-void PoseDistorter::distort(Eigen::Vector3d& pos, double dt) {
+void PoseDistorter::Distort(Eigen::Vector3d& pos, double dt) {
   //calculate distortions
   Eigen::Vector3d deltapos;
   deltapos << d_pos_[0](gen_) * dt, d_pos_[1](gen_) * dt, d_pos_[2](gen_) * dt;
@@ -69,11 +69,11 @@ void PoseDistorter::distort(Eigen::Vector3d& pos, double dt) {
 
 }
 
-void PoseDistorter::distort(Eigen::Quaterniond& att, double dt) {
+void PoseDistorter::Distort(Eigen::Quaterniond& att, double dt) {
   //calculate distortions
   Eigen::Vector3d rpydist;
   rpydist << d_att_[0](gen_) * dt, d_att_[1](gen_) * dt, d_att_[2](gen_) * dt;
-  Eigen::Quaterniond deltaquat = quaternionFromSmallAngle(rpydist);
+  Eigen::Quaterniond deltaquat = QuaternionFromSmallAngle(rpydist);
 
   deltaquat.normalize();
 
@@ -87,10 +87,10 @@ void PoseDistorter::distort(Eigen::Quaterniond& att, double dt) {
 
 }
 
-void PoseDistorter::distort(Eigen::Vector3d& pos, Eigen::Quaterniond& att,
+void PoseDistorter::Distort(Eigen::Vector3d& pos, Eigen::Quaterniond& att,
                             double dt) {
-  distort(pos, dt);
-  distort(att, dt);
+  Distort(pos, dt);
+  Distort(att, dt);
 }
 
 } /* namespace msf_updates */

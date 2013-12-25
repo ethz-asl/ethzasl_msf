@@ -31,14 +31,14 @@ class SensorHandler {
   int sensorID;
   std::string topic_namespace_;
   std::string parameternamespace_;
-  void setSensorID(int ID) {
+  void SetSensorID(int ID) {
     sensorID = ID;
   }
-  void sequenceWatchDog(size_t seq, const std::string& topic) {
-    if ((int) seq != lastseq_ + 1 && lastseq_ != 0) {
+  void SequenceWatchDog(size_t seq, const std::string& topic) {
+    if (static_cast<int>(seq) != lastseq_ + 1 && lastseq_ != 0) {
       MSF_WARN_STREAM(
           topic << ": message drop curr seq:" << seq << " expected: "
-              << lastseq_ + 1);
+                << lastseq_ + 1);
     }
     lastseq_ = seq;
   }

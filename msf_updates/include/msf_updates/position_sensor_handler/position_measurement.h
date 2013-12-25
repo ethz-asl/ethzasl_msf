@@ -33,14 +33,15 @@ enum {
 /**
  * \brief A measurement as provided by a position sensor, e.g. Total Station, GPS.
  */
-typedef msf_core::MSF_Measurement<sensor_fusion_comm::PointWithCovarianceStamped,
+typedef msf_core::MSF_Measurement<
+    sensor_fusion_comm::PointWithCovarianceStamped,
     Eigen::Matrix<double, nMeasurements, nMeasurements>, msf_updates::EKFState> PositionMeasurementBase;
 struct PositionMeasurement : public PositionMeasurementBase {
  private:
   typedef PositionMeasurementBase Measurement_t;
   typedef Measurement_t::Measurement_ptr measptr_t;
 
-  virtual void makeFromSensorReadingImpl(measptr_t msg) {
+  virtual void MakeFromSensorReadingImpl(measptr_t msg) {
 
     Eigen::Matrix<double, nMeasurements,
         msf_core::MSF_Core<msf_updates::EKFState>::nErrorStatesAtCompileTime> H_old;
@@ -65,8 +66,9 @@ struct PositionMeasurement : public PositionMeasurementBase {
 
       if (msg->header.seq % 100 == 0) {  // Only do this check from time to time.
         if (R_.block<3, 3>(0, 0).determinant() < -0.01)
-          MSF_WARN_STREAM_THROTTLE(60, "The covariance matrix you provided for "
-          "the position sensor is not positive definite");
+          MSF_WARN_STREAM_THROTTLE(
+              60, "The covariance matrix you provided for "
+              "the position sensor is not positive definite");
       }
     }
   }
@@ -90,11 +92,11 @@ struct PositionMeasurement : public PositionMeasurementBase {
         fixed_covariance_(fixed_covariance),
         fixedstates_(fixedstates) {
   }
-  virtual std::string type() {
+  virtual std::string Type() {
     return "position";
   }
 
-  virtual void calculateH(
+  virtual void CalculateH(
       shared_ptr<EKFState_T> state_in,
       Eigen::Matrix<double, nMeasurements,
           msf_core::MSF_Core<EKFState_T>::nErrorStatesAtCompileTime>& H) {
@@ -103,22 +105,22 @@ struct PositionMeasurement : public PositionMeasurementBase {
     H.setZero();
 
     // Get rotation matrices.
-    Eigen::Matrix<double, 3, 3> C_q = state.get<StateDefinition_T::q>()
+    Eigen::Matrix<double, 3, 3> C_q = state.Get<StateDefinition_T::q>()
         .conjugate().toRotationMatrix();
 
     // Preprocess for elements in H matrix.
-    Eigen::Matrix<double, 3, 3> p_prism_imu_sk = skew(
-        state.get<StateDefinition_T::p_ip>());
+    Eigen::Matrix<double, 3, 3> p_prism_imu_sk = Skew(
+        state.Get<StateDefinition_T::p_ip>());
 
     // Get indices of states in error vector.
     enum {
-      idxstartcorr_p_ = msf_tmp::getStartIndexInCorrection<StateSequence_T,
+      idxstartcorr_p_ = msf_tmp::GetStartIndexInCorrection<StateSequence_T,
           StateDefinition_T::p>::value,
-      idxstartcorr_v_ = msf_tmp::getStartIndexInCorrection<StateSequence_T,
+      idxstartcorr_v_ = msf_tmp::GetStartIndexInCorrection<StateSequence_T,
           StateDefinition_T::v>::value,
-      idxstartcorr_q_ = msf_tmp::getStartIndexInCorrection<StateSequence_T,
+      idxstartcorr_q_ = msf_tmp::GetStartIndexInCorrection<StateSequence_T,
           StateDefinition_T::q>::value,
-      idxstartcorr_p_pi_ = msf_tmp::getStartIndexInCorrection<StateSequence_T,
+      idxstartcorr_p_pi_ = msf_tmp::GetStartIndexInCorrection<StateSequence_T,
           StateDefinition_T::p_ip>::value,
     };
 
@@ -126,7 +128,7 @@ struct PositionMeasurement : public PositionMeasurementBase {
 
     // Clear crosscorrelations.
     if (fixed_p_pos_imu)
-      state_in->clearCrossCov<StateDefinition_T::p_ip>();
+      state_in->ClearCrossCov<StateDefinition_T::p_ip>();
 
     // Construct H matrix:
     // Position:
@@ -143,7 +145,7 @@ struct PositionMeasurement : public PositionMeasurementBase {
   /**
    * The method called by the msf_core to apply the measurement represented by this object.
    */
-  virtual void apply(shared_ptr<EKFState_T> state_nonconst_new,
+  virtual void Apply(shared_ptr<EKFState_T> state_nonconst_new,
                      msf_core::MSF_Core<EKFState_T>& core) {
 
     if (isabsolute_) {  // Does this measurement refer to an absolute measurement,
@@ -155,38 +157,37 @@ struct PositionMeasurement : public PositionMeasurementBase {
           msf_core::MSF_Core<EKFState_T>::nErrorStatesAtCompileTime> H_new;
       Eigen::Matrix<double, nMeasurements, 1> r_old;
 
-      calculateH(state_nonconst_new, H_new);
+      CalculateH(state_nonconst_new, H_new);
 
       // Get rotation matrices.
-      Eigen::Matrix<double, 3, 3> C_q = state.get<StateDefinition_T::q>()
+      Eigen::Matrix<double, 3, 3> C_q = state.Get<StateDefinition_T::q>()
           .conjugate().toRotationMatrix();
 
       // Construct residuals:
       // Position
       r_old.block<3, 1>(0, 0) = z_p_
-          - (state.get<StateDefinition_T::p>()
-              + C_q.transpose() * state.get<StateDefinition_T::p_ip>());
+          - (state.Get<StateDefinition_T::p>()
+              + C_q.transpose() * state.Get<StateDefinition_T::p_ip>());
 
-      if (!checkForNumeric(r_old, "r_old")) {
+      if (!CheckForNumeric(r_old, "r_old")) {
         MSF_ERROR_STREAM("r_old: "<<r_old);
         MSF_WARN_STREAM(
-            "state: "<<const_cast<EKFState_T&>(state). toEigenVector().transpose());
+            "state: "<<const_cast<EKFState_T&>(state). ToEigenVector().transpose());
       }
-      if (!checkForNumeric(H_new, "H_old")) {
+      if (!CheckForNumeric(H_new, "H_old")) {
         MSF_ERROR_STREAM("H_old: "<<H_new);
         MSF_WARN_STREAM(
-            "state: "<<const_cast<EKFState_T&>(state). toEigenVector().transpose());
+            "state: "<<const_cast<EKFState_T&>(state). ToEigenVector().transpose());
       }
-      if (!checkForNumeric(R_, "R_")) {
+      if (!CheckForNumeric(R_, "R_")) {
         MSF_ERROR_STREAM("R_: "<<R_);
         MSF_WARN_STREAM(
-            "state: "<<const_cast<EKFState_T&>(state). toEigenVector().transpose());
+            "state: "<<const_cast<EKFState_T&>(state). ToEigenVector().transpose());
       }
 
       // Call update step in base class.
-      this->calculateAndApplyCorrection(state_nonconst_new, core, H_new, r_old,
+      this->CalculateAndApplyCorrection(state_nonconst_new, core, H_new, r_old,
                                         R_);
-
     } else {
       MSF_ERROR_STREAM_THROTTLE(
           1, "You chose to apply the position measurement "
@@ -194,7 +195,7 @@ struct PositionMeasurement : public PositionMeasurementBase {
     }
   }
 };
+}  // namespace position_measurement
+}  // namespace msf_updates
 
-}
-}
-#endif /* POSITION_MEASUREMENT_HPP_ */
+#endif  // POSITION_MEASUREMENT_HPP_

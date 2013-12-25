@@ -64,7 +64,7 @@ typedef boost::fusion::vector<
     msf_core::StateVar_T<Eigen::Matrix<double, 1, 1>, L, msf_core::Auxiliary>,  ///< Visual scale.
     msf_core::StateVar_T<Eigen::Quaternion<double>, q_wv,
         msf_core::AuxiliaryNonTemporalDrifting>,  ///< Rotation from the world frame to the frame in which the pose is measured expressed in the world frame.
-    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_wv>,   ///< Translation from the world frame to the frame in which the pose is measured expressed in the world frame.
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_wv>,  ///< Translation from the world frame to the frame in which the pose is measured expressed in the world frame.
     msf_core::StateVar_T<Eigen::Quaternion<double>, q_ic>,  ///< Rotation from the IMU frame to the camera frame expressed in the IMU frame.
     msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_ic>  ///< Translation from the IMU frame to the camera frame expressed in the IMU frame.
 
@@ -78,4 +78,4 @@ typedef shared_ptr<const EKFState> EKFStateConstPtr;
 }
 
 #include <msf_updates/static_ordering_assertions.h> //DO NOT REMOVE THIS
-#endif /* MSF_STATEDEF_HPP_ */
+#endif  // MSF_STATEDEF_HPP_

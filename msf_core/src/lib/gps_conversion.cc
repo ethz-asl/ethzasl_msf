@@ -26,7 +26,7 @@ GPSConversion::GPSConversion() {
   ecef_ref_orientation_.setIdentity();
 }
 
-void GPSConversion::initReference(const double & latitude,
+void GPSConversion::InitReference(const double & latitude,
                                   const double & longitude,
                                   const double & altitude) {
   msf_core::Matrix3 R;
@@ -48,10 +48,10 @@ void GPSConversion::initReference(const double & latitude,
 
   ecef_ref_orientation_ = msf_core::Quaternion(R);
 
-  ecef_ref_point_ = wgs84ToEcef(latitude, longitude, altitude);
+  ecef_ref_point_ = WGS84ToECEF(latitude, longitude, altitude);
 }
 
-msf_core::Vector3 GPSConversion::wgs84ToEcef(const double & latitude,
+msf_core::Vector3 GPSConversion::WGS84ToECEF(const double & latitude,
                                              const double & longitude,
                                              const double & altitude) const {
   const double a = 6378137.0;  // semi-major axis
@@ -72,7 +72,7 @@ msf_core::Vector3 GPSConversion::wgs84ToEcef(const double & latitude,
   return ecef;
 }
 
-msf_core::Vector3 GPSConversion::ecefToEnu(
+msf_core::Vector3 GPSConversion::ECEFToENU(
     const msf_core::Vector3 & ecef) const {
   if (ecef_ref_point_.norm() == 0) {
     MSF_ERROR_STREAM_ONCE(
@@ -81,7 +81,7 @@ msf_core::Vector3 GPSConversion::ecefToEnu(
   return ecef_ref_orientation_ * (ecef - ecef_ref_point_);
 }
 
-void GPSConversion::adjustReference(double z_corr) {
+void GPSConversion::AdjustReference(double z_corr) {
   MSF_WARN_STREAM("z-ref old: "<<ecef_ref_point_(2));
   ecef_ref_point_(2) += z_corr;
   MSF_WARN_STREAM("z-ref new: "<<ecef_ref_point_(2));
