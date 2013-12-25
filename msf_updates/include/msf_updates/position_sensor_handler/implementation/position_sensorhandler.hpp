@@ -50,13 +50,13 @@ PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PositionSensorHandler(
 
   subPointStamped_ =
       nh.subscribe<geometry_msgs::PointStamped>
-      ("position_input", 20, &PositionSensorHandler::MeasurementCallback, this);
+  ("position_input", 20, &PositionSensorHandler::MeasurementCallback, this);
   subTransformStamped_ =
       nh.subscribe<geometry_msgs::TransformStamped>
-      ("transform_input", 20, &PositionSensorHandler::MeasurementCallback, this);
+  ("transform_input", 20, &PositionSensorHandler::MeasurementCallback, this);
   subNavSatFix_ =
       nh.subscribe<sensor_msgs::NavSatFix>
-      ("navsatfix_input", 20, &PositionSensorHandler::MeasurementCallback, this);
+  ("navsatfix_input", 20, &PositionSensorHandler::MeasurementCallback, this);
 
   z_p_.setZero();
 
@@ -107,10 +107,11 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPositionMeasu
     }
   }
 
-  shared_ptr<MEASUREMENT_TYPE> meas(
-      new MEASUREMENT_TYPE(n_zp_, use_fixed_covariance_,
-                           provides_absolute_measurements_, this->sensorID,
-                           fixedstates));
+  shared_ptr < MEASUREMENT_TYPE
+      > meas(
+          new MEASUREMENT_TYPE(n_zp_, use_fixed_covariance_,
+                               provides_absolute_measurements_, this->sensorID,
+                               fixedstates));
 
   meas->MakeFromSensorReading(msg, msg->header.stamp.toSec() - delay_);
 

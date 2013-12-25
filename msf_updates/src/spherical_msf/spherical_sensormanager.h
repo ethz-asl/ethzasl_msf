@@ -129,9 +129,10 @@ class SensorManager : public msf_core::MSF_SensorManagerROS<
         "initial measurement pos:[" << p_vc.transpose()<<"] orientation: "
         <<STREAMQUAT(q));
 
-        // Check if we have already input from the measurement sensor.
-if(    p_vc.norm() == 0)
-    ROS_WARN_STREAM("No measurements received yet to initialize position - using [0 0 0]");
+    // Check if we have already input from the measurement sensor.
+    if (p_vc.norm() == 0)
+      ROS_WARN_STREAM(
+          "No measurements received yet to initialize position - using [0 0 0]");
 
     ros::NodeHandle pnh("~");
     pnh.param("position_sensor/init/p_ip/x", p_ip[0], 0.0);
@@ -142,8 +143,8 @@ if(    p_vc.norm() == 0)
     p = p_vc - q.toRotationMatrix() * p_ip;
 
     // Prepare init "measurement".
-    shared_ptr<msf_core::MSF_InitMeasurement<EKFState_T> >
-        meas(new msf_core::MSF_InitMeasurement<EKFState_T>(true));
+    shared_ptr < msf_core::MSF_InitMeasurement<EKFState_T>
+        > meas(new msf_core::MSF_InitMeasurement<EKFState_T>(true));
 
     meas->SetStateInitValue < StateDefinition_T::p > (p);
     meas->SetStateInitValue < StateDefinition_T::v > (v);

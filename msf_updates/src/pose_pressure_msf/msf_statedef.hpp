@@ -60,10 +60,10 @@ typedef boost::fusion::vector<
         msf_core::CoreStateWithoutPropagation>,  ///< Acceleration biases.              
 
     // States not varying during propagation.
-    msf_core::StateVar_T<Eigen::Matrix<double, 1, 1>, L>,      ///< Visual scale.
+    msf_core::StateVar_T<Eigen::Matrix<double, 1, 1>, L>,     ///< Visual scale.
     msf_core::StateVar_T<Eigen::Quaternion<double>, q_wv,
         msf_core::AuxiliaryNonTemporalDrifting>,  ///< Rotation from the world frame to the frame in which the pose is measured expressed in the world frame.
-    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_wv>,   ///< Translation from the world frame to the frame in which the pose is measured expressed in the world frame.
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_wv>,  ///< Translation from the world frame to the frame in which the pose is measured expressed in the world frame.
     msf_core::StateVar_T<Eigen::Quaternion<double>, q_ic>,  ///< Rotation from the IMU frame to the camera frame expressed in the IMU frame.
     msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_ic>,  ///< Translation from the IMU frame to the camera frame expressed in the IMU frame.
     msf_core::StateVar_T<Eigen::Matrix<double, 1, 1>, b_p>  ///< Pressure sensor bias.

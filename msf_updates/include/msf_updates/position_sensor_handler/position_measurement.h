@@ -33,7 +33,8 @@ enum {
 /**
  * \brief A measurement as provided by a position sensor, e.g. Total Station, GPS.
  */
-typedef msf_core::MSF_Measurement<sensor_fusion_comm::PointWithCovarianceStamped,
+typedef msf_core::MSF_Measurement<
+    sensor_fusion_comm::PointWithCovarianceStamped,
     Eigen::Matrix<double, nMeasurements, nMeasurements>, msf_updates::EKFState> PositionMeasurementBase;
 struct PositionMeasurement : public PositionMeasurementBase {
  private:
@@ -65,8 +66,9 @@ struct PositionMeasurement : public PositionMeasurementBase {
 
       if (msg->header.seq % 100 == 0) {  // Only do this check from time to time.
         if (R_.block<3, 3>(0, 0).determinant() < -0.01)
-          MSF_WARN_STREAM_THROTTLE(60, "The covariance matrix you provided for "
-          "the position sensor is not positive definite");
+          MSF_WARN_STREAM_THROTTLE(
+              60, "The covariance matrix you provided for "
+              "the position sensor is not positive definite");
       }
     }
   }
@@ -81,7 +83,8 @@ struct PositionMeasurement : public PositionMeasurementBase {
   typedef msf_updates::EKFState EKFState_T;
   typedef EKFState_T::StateSequence_T StateSequence_T;
   typedef EKFState_T::StateDefinition_T StateDefinition_T;
-  virtual ~PositionMeasurement() { }
+  virtual ~PositionMeasurement() {
+  }
   PositionMeasurement(double n_zp, bool fixed_covariance,
                       bool isabsoluteMeasurement, int sensorID, int fixedstates)
       : PositionMeasurementBase(isabsoluteMeasurement, sensorID),
@@ -106,8 +109,8 @@ struct PositionMeasurement : public PositionMeasurementBase {
         .conjugate().toRotationMatrix();
 
     // Preprocess for elements in H matrix.
-    Eigen::Matrix<double, 3, 3> p_prism_imu_sk =
-        Skew(state.Get<StateDefinition_T::p_ip>());
+    Eigen::Matrix<double, 3, 3> p_prism_imu_sk = Skew(
+        state.Get<StateDefinition_T::p_ip>());
 
     // Get indices of states in error vector.
     enum {
@@ -157,8 +160,8 @@ struct PositionMeasurement : public PositionMeasurementBase {
       CalculateH(state_nonconst_new, H_new);
 
       // Get rotation matrices.
-      Eigen::Matrix<double, 3, 3> C_q =
-          state.Get<StateDefinition_T::q>().conjugate().toRotationMatrix();
+      Eigen::Matrix<double, 3, 3> C_q = state.Get<StateDefinition_T::q>()
+          .conjugate().toRotationMatrix();
 
       // Construct residuals:
       // Position
@@ -183,8 +186,8 @@ struct PositionMeasurement : public PositionMeasurementBase {
       }
 
       // Call update step in base class.
-      this->CalculateAndApplyCorrection(
-          state_nonconst_new, core, H_new, r_old, R_);
+      this->CalculateAndApplyCorrection(state_nonconst_new, core, H_new, r_old,
+                                        R_);
     } else {
       MSF_ERROR_STREAM_THROTTLE(
           1, "You chose to apply the position measurement "

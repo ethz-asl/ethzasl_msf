@@ -68,8 +68,8 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     AddHandler(position_handler_);
 
     reconf_server_.reset(new ReconfigureServer(pnh));
-    ReconfigureServer::CallbackType f =
-        boost::bind(&this_T::Config, this, _1, _2);
+    ReconfigureServer::CallbackType f = boost::bind(&this_T::Config, this, _1,
+                                                    _2);
     reconf_server_->setCallback(f);
   }
   virtual ~PositionPoseSensorManager() {
@@ -147,8 +147,7 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     q_vc = pose_handler_->GetAttitudeMeasurement();
 
     MSF_INFO_STREAM(
-        "initial measurement vision: pos:["<<p_vc.transpose()<<"] orientation: "
-        <<STREAMQUAT(q_vc));
+        "initial measurement vision: pos:["<<p_vc.transpose()<<"] orientation: " <<STREAMQUAT(q_vc));
     MSF_INFO_STREAM(
         "initial measurement position: pos:["<<p_pos.transpose()<<"]");
 
@@ -215,18 +214,18 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     shared_ptr < msf_core::MSF_InitMeasurement<EKFState_T>
         > meas(new msf_core::MSF_InitMeasurement<EKFState_T>(true));
 
-    meas->SetStateInitValue<StateDefinition_T::p> (p);
-    meas->SetStateInitValue<StateDefinition_T::v> (v);
-    meas->SetStateInitValue<StateDefinition_T::q> (q);
-    meas->SetStateInitValue<StateDefinition_T::b_w> (b_w);
-    meas->SetStateInitValue<StateDefinition_T::b_a> (b_a);
-    meas->SetStateInitValue<StateDefinition_T::L
+    meas->SetStateInitValue < StateDefinition_T::p > (p);
+    meas->SetStateInitValue < StateDefinition_T::v > (v);
+    meas->SetStateInitValue < StateDefinition_T::q > (q);
+    meas->SetStateInitValue < StateDefinition_T::b_w > (b_w);
+    meas->SetStateInitValue < StateDefinition_T::b_a > (b_a);
+    meas->SetStateInitValue < StateDefinition_T::L
         > (Eigen::Matrix<double, 1, 1>::Constant(scale));
-    meas->SetStateInitValue<StateDefinition_T::q_wv> (q_wv);
-    meas->SetStateInitValue<StateDefinition_T::p_wv> (p_wv);
-    meas->SetStateInitValue<StateDefinition_T::q_ic> (q_ic);
-    meas->SetStateInitValue<StateDefinition_T::p_ic> (p_ic);
-    meas->SetStateInitValue<StateDefinition_T::p_ip> (p_ip);
+    meas->SetStateInitValue < StateDefinition_T::q_wv > (q_wv);
+    meas->SetStateInitValue < StateDefinition_T::p_wv > (p_wv);
+    meas->SetStateInitValue < StateDefinition_T::q_ic > (q_ic);
+    meas->SetStateInitValue < StateDefinition_T::p_ic > (p_ic);
+    meas->SetStateInitValue < StateDefinition_T::p_ip > (p_ip);
 
     SetStateCovariance(meas->GetStateCovariance());  // Call my set P function.
     meas->Getw_m() = w_m;
@@ -242,7 +241,7 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     // Set scale to 1.
     Eigen::Matrix<double, 1, 1> scale;
     scale << 1.0;
-    state.Set<StateDefinition_T::L>(scale);
+    state.Set < StateDefinition_T::L > (scale);
   }
   virtual void InitState(EKFState_T& state) const {
     UNUSED(state);
@@ -298,11 +297,11 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     const EKFState_T& state = delaystate;
     if (state.Get<StateDefinition_T::L>()(0) < 0) {
       MSF_WARN_STREAM_THROTTLE(
-          1, "Negative scale detected: " << state.Get<StateDefinition_T::L>()(0)
-          << ". Correcting to 0.1");
+          1,
+          "Negative scale detected: " << state.Get<StateDefinition_T::L>()(0) << ". Correcting to 0.1");
       Eigen::Matrix<double, 1, 1> L_;
       L_ << 0.1;
-      delaystate.Set<StateDefinition_T::L>(L_);
+      delaystate.Set < StateDefinition_T::L > (L_);
     }
   }
 };

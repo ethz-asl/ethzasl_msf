@@ -79,13 +79,15 @@ struct AngleMeasurement : public AngleMeasurementBase {
   typedef msf_updates::EKFState EKFState_T;
   typedef EKFState_T::StateSequence_T StateSequence_T;
   typedef EKFState_T::StateDefinition_T StateDefinition_T;
-  virtual ~AngleMeasurement() { }
+  virtual ~AngleMeasurement() {
+  }
   AngleMeasurement(double n_za, bool fixed_covariance,
                    bool isabsoluteMeasurement, int sensorID, int fixedstates)
       : AngleMeasurementBase(isabsoluteMeasurement, sensorID),
         n_za_(n_za),
         fixed_covariance_(fixed_covariance),
-        fixedstates_(fixedstates) { }
+        fixedstates_(fixedstates) {
+  }
   virtual std::string Type() {
     return "angle";
   }
@@ -135,7 +137,9 @@ struct AngleMeasurement : public AngleMeasurementBase {
     dz_dp(1, 2) = 0;
     Eigen::Matrix<double, 2, 3> dz_dq;
     dz_dq(0, 0) = 1.0
-        / sqrt( 1.0 / (p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0)
+        / sqrt(
+            1.0
+                / (p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0)
                     + p_(2, 0) * p_(2, 0))) * 1.0
         / sqrt(p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0)) * 1.0
         / pow(p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0) + p_(2, 0) * p_(2, 0),
@@ -148,7 +152,9 @@ struct AngleMeasurement : public AngleMeasurementBase {
             + C_q(0, 2) * p_ip(1, 0) * p_(0, 0) * p_(2, 0)
             - C_q(1, 1) * p_ip(2, 0) * p_(1, 0) * p_(2, 0)
             + C_q(1, 2) * p_ip(1, 0) * p_(1, 0) * p_(2, 0));
-    dz_dq(0, 1) = -1.0 / sqrt(-(p_(2, 0) * p_(2, 0))
+    dz_dq(0, 1) = -1.0
+        / sqrt(
+            -(p_(2, 0) * p_(2, 0))
                 / (p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0)
                     + p_(2, 0) * p_(2, 0)) + 1.0) * 1.0
         / pow(p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0) + p_(2, 0) * p_(2, 0),
@@ -255,8 +261,8 @@ struct AngleMeasurement : public AngleMeasurementBase {
       CalculateH(state_nonconst_new, H_new);
 
       // Get rotation matrices.
-      Eigen::Matrix<double, 3, 3> C_q =
-          state.Get<StateDefinition_T::q>().conjugate().toRotationMatrix();
+      Eigen::Matrix<double, 3, 3> C_q = state.Get<StateDefinition_T::q>()
+          .conjugate().toRotationMatrix();
 
       // Construct residuals.
       Eigen::Matrix<double, 3, 1> z_carth = (state.Get<StateDefinition_T::p>()
@@ -304,8 +310,8 @@ struct AngleMeasurement : public AngleMeasurementBase {
       }
 
       // Call update step in base class.
-      this->CalculateAndApplyCorrection(
-          state_nonconst_new, core, H_new, r_old, R_);
+      this->CalculateAndApplyCorrection(state_nonconst_new, core, H_new, r_old,
+                                        R_);
 
     } else {
       ROS_ERROR_STREAM_THROTTLE(
@@ -358,13 +364,15 @@ struct DistanceMeasurement : public DistanceMeasurementBase {
   typedef msf_updates::EKFState EKFState_T;
   typedef EKFState_T::StateSequence_T StateSequence_T;
   typedef EKFState_T::StateDefinition_T StateDefinition_T;
-  virtual ~DistanceMeasurement() { }
+  virtual ~DistanceMeasurement() {
+  }
   DistanceMeasurement(double n_zd, bool fixed_covariance,
                       bool isabsoluteMeasurement, int sensorID, int fixedstates)
       : DistanceMeasurementBase(isabsoluteMeasurement, sensorID),
         n_zd_(n_zd),
         fixed_covariance_(fixed_covariance),
-        fixedstates_(fixedstates) { }
+        fixedstates_(fixedstates) {
+  }
   virtual std::string Type() {
     return "distance";
   }
@@ -378,8 +386,8 @@ struct DistanceMeasurement : public DistanceMeasurementBase {
     H.setZero();
 
     // Get rotation matrices.
-    Eigen::Matrix<double, 3, 3> C_q =
-        state.Get<StateDefinition_T::q>().conjugate().toRotationMatrix();
+    Eigen::Matrix<double, 3, 3> C_q = state.Get<StateDefinition_T::q>()
+        .conjugate().toRotationMatrix();
 
     // Preprocess for elements in H matrix.
     // Get indices of states in error vector.
@@ -469,8 +477,8 @@ struct DistanceMeasurement : public DistanceMeasurementBase {
       CalculateH(state_nonconst_new, H_new);
 
       // Get rotation matrices.
-      Eigen::Matrix<double, 3, 3> C_q =
-          state.Get<StateDefinition_T::q>().conjugate().toRotationMatrix();
+      Eigen::Matrix<double, 3, 3> C_q = state.Get<StateDefinition_T::q>()
+          .conjugate().toRotationMatrix();
 
       // Construct residuals
       Eigen::Matrix<double, 3, 1> z_carth = (state.Get<StateDefinition_T::p>()
@@ -503,8 +511,8 @@ struct DistanceMeasurement : public DistanceMeasurementBase {
       }
 
       // Call update step in base class.
-      this->CalculateAndApplyCorrection(
-          state_nonconst_new, core, H_new, r_old, R_);
+      this->CalculateAndApplyCorrection(state_nonconst_new, core, H_new, r_old,
+                                        R_);
     } else {
       ROS_ERROR_STREAM_THROTTLE(
           1,

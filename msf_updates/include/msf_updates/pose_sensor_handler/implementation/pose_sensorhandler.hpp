@@ -64,13 +64,12 @@ PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PoseSensorHandler(
 
   ros::NodeHandle nh("msf_updates/" + topic_namespace);
   subPoseWithCovarianceStamped_ =
-      nh.subscribe<geometry_msgs::PoseWithCovarianceStamped>
-      ("pose_with_covariance_input", 20,
-       &PoseSensorHandler::MeasurementCallback, this);
-  subTransformStamped_ = nh.subscribe<geometry_msgs::TransformStamped>
-      ("transform_input", 20, &PoseSensorHandler::MeasurementCallback, this);
-  subPoseStamped_ = nh.subscribe<geometry_msgs::PoseStamped>
-      ("pose_input", 20, &PoseSensorHandler::MeasurementCallback, this);
+      nh.subscribe < geometry_msgs::PoseWithCovarianceStamped
+          > ("pose_with_covariance_input", 20, &PoseSensorHandler::MeasurementCallback, this);
+  subTransformStamped_ = nh.subscribe < geometry_msgs::TransformStamped
+      > ("transform_input", 20, &PoseSensorHandler::MeasurementCallback, this);
+  subPoseStamped_ = nh.subscribe < geometry_msgs::PoseStamped
+      > ("pose_input", 20, &PoseSensorHandler::MeasurementCallback, this);
 
   z_p_.setZero();
   z_q_.setIdentity();
@@ -151,11 +150,12 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
     }
   }
 
-  shared_ptr<MEASUREMENT_TYPE> meas(
-      new MEASUREMENT_TYPE(n_zp_, n_zq_, measurement_world_sensor_,
-                           use_fixed_covariance_,
-                           provides_absolute_measurements_, this->sensorID,
-                           fixedstates, distorter_));
+  shared_ptr < MEASUREMENT_TYPE
+      > meas(
+          new MEASUREMENT_TYPE(n_zp_, n_zq_, measurement_world_sensor_,
+                               use_fixed_covariance_,
+                               provides_absolute_measurements_, this->sensorID,
+                               fixedstates, distorter_));
 
   meas->MakeFromSensorReading(msg, msg->header.stamp.toSec() - delay_);
 

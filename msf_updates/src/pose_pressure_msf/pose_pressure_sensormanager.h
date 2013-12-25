@@ -66,7 +66,8 @@ class PosePressureSensorManager : public msf_core::MSF_SensorManagerROS<
     reconf_server_->setCallback(f);
   }
 
-  virtual ~PosePressureSensorManager() { }
+  virtual ~PosePressureSensorManager() {
+  }
 
   virtual const Config_T& Getcfg() {
     return config_;
@@ -138,7 +139,7 @@ class PosePressureSensorManager : public msf_core::MSF_SensorManagerROS<
         << pose_handler_->GetPositionMeasurement()(2) / scale
             - pressure_handler_->GetPressureMeasurement()(0);  /// Pressure drift state
 
-    // Check if we have already input from the measurement sensor.
+            // Check if we have already input from the measurement sensor.
     if (p_vc.norm() == 0)
       MSF_WARN_STREAM(
           "No measurements received yet to initialize position - using [0 0 0]");
@@ -199,7 +200,7 @@ class PosePressureSensorManager : public msf_core::MSF_SensorManagerROS<
     // Set scale to 1.
     Eigen::Matrix<double, 1, 1> scale;
     scale << 1.0;
-    state.Set<StateDefinition_T::L>(scale);
+    state.Set < StateDefinition_T::L > (scale);
   }
   virtual void InitState(EKFState_T& state) const {
     UNUSED(state);
@@ -252,8 +253,8 @@ class PosePressureSensorManager : public msf_core::MSF_SensorManagerROS<
     const EKFState_T& state = delaystate;
     if (state.Get<StateDefinition_T::L>()(0) < 0) {
       MSF_WARN_STREAM_THROTTLE(
-          1, "Negative scale detected: " << state.Get<StateDefinition_T::L>()(0)
-          << ". Correcting to 0.1");
+          1,
+          "Negative scale detected: " << state.Get<StateDefinition_T::L>()(0) << ". Correcting to 0.1");
       Eigen::Matrix<double, 1, 1> L_;
       L_ << 0.1;
       delaystate.Set < StateDefinition_T::L > (L_);

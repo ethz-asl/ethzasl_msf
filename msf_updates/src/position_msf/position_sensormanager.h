@@ -123,8 +123,8 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
 
     p_vc = position_handler_->GetPositionMeasurement();
 
-    MSF_INFO_STREAM("initial measurement pos:[" << p_vc.transpose() <<
-                    "] orientation: " << STREAMQUAT(q));
+    MSF_INFO_STREAM(
+        "initial measurement pos:[" << p_vc.transpose() << "] orientation: " << STREAMQUAT(q));
 
     // check if we have already input from the measurement sensor
     if (p_vc.norm() == 0)
@@ -141,8 +141,8 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
 
     //prepare init "measurement"
     // True means that we will also set the initialsensor readings.
-    shared_ptr<msf_core::MSF_InitMeasurement<EKFState_T> >
-        meas(new msf_core::MSF_InitMeasurement<EKFState_T>(true));
+    shared_ptr < msf_core::MSF_InitMeasurement<EKFState_T>
+        > meas(new msf_core::MSF_InitMeasurement<EKFState_T>(true));
 
     meas->SetStateInitValue < StateDefinition_T::p > (p);
     meas->SetStateInitValue < StateDefinition_T::v > (v);

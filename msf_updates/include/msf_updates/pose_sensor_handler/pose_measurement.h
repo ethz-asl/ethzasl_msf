@@ -67,16 +67,18 @@ struct PoseMeasurement : public PoseMeasurementBase {
     if (fixed_covariance_) {  // Take fix covariance from reconfigure GUI.
       const double s_zp = n_zp_ * n_zp_;
       const double s_zq = n_zq_ * n_zq_;
-      R_ = (Eigen::Matrix<double, nMeasurements, 1>() <<
-          s_zp, s_zp, s_zp, s_zq, s_zq, s_zq, 1e-6).finished().asDiagonal();
+      R_ =
+          (Eigen::Matrix<double, nMeasurements, 1>() << s_zp, s_zp, s_zp, s_zq, s_zq, s_zq, 1e-6)
+              .finished().asDiagonal();
     } else {  // Take covariance from sensor.
       R_.block<6, 6>(0, 0) = Eigen::Matrix<double, 6, 6>(
           &msg->pose.covariance[0]);
 
       if (msg->header.seq % 100 == 0) {  // Only do this check from time to time.
         if (R_.block<6, 6>(0, 0).determinant() < -0.001)
-          MSF_WARN_STREAM_THROTTLE(60, "The covariance matrix you provided for "
-          "the pose sensor is not positive definite: "<<(R_.block<6, 6>(0, 0)));
+          MSF_WARN_STREAM_THROTTLE(
+              60,
+              "The covariance matrix you provided for " "the pose sensor is not positive definite: "<<(R_.block<6, 6>(0, 0)));
       }
 
       // Clear cross-correlations between q and p.
@@ -322,8 +324,7 @@ struct PoseMeasurement : public PoseMeasurementBase {
 
       if (prevmeas_base->time == -1) {
         MSF_WARN_STREAM(
-            "The previous measurement is invalid. Could not apply measurement! "
-            "time:"<<this->time<<" sensorID: "<<this->sensorID_);
+            "The previous measurement is invalid. Could not apply measurement! " "time:"<<this->time<<" sensorID: "<<this->sensorID_);
         return;
       }
 
@@ -367,14 +368,14 @@ struct PoseMeasurement : public PoseMeasurementBase {
       Eigen::Matrix<double, 3, 3> C_wv_old, C_wv_new;
       Eigen::Matrix<double, 3, 3> C_q_old, C_q_new;
 
-      C_wv_new =
-          state_new.Get<StateDefinition_T::q_wv>().conjugate().toRotationMatrix();
-      C_q_new =
-          state_new.Get<StateDefinition_T::q>().conjugate().toRotationMatrix();
-      C_wv_old =
-          state_old.Get<StateDefinition_T::q_wv>().conjugate().toRotationMatrix();
-      C_q_old =
-          state_old.Get<StateDefinition_T::q>().conjugate().toRotationMatrix();
+      C_wv_new = state_new.Get<StateDefinition_T::q_wv>().conjugate()
+          .toRotationMatrix();
+      C_q_new = state_new.Get<StateDefinition_T::q>().conjugate()
+          .toRotationMatrix();
+      C_wv_old = state_old.Get<StateDefinition_T::q_wv>().conjugate()
+          .toRotationMatrix();
+      C_q_old = state_old.Get<StateDefinition_T::q>().conjugate()
+          .toRotationMatrix();
 
       // Construct residuals.
       // Position:
@@ -395,8 +396,8 @@ struct PoseMeasurement : public PoseMeasurementBase {
       r_new.block<3, 1>(0, 0) = diffmeaspos - diffprobpos;
 
       // Attitude:
-      Eigen::Quaternion<double> diffprobatt =
-          (state_new.Get<StateDefinition_T::q_wv>()
+      Eigen::Quaternion<double> diffprobatt = (state_new
+          .Get<StateDefinition_T::q_wv>()
           * state_new.Get<StateDefinition_T::q>()
           * state_new.Get<StateDefinition_T::q_ic>()).conjugate()
           * (state_old.Get<StateDefinition_T::q_wv>()

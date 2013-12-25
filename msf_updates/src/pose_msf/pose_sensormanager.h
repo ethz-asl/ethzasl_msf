@@ -64,12 +64,12 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
     reconf_server_->setCallback(f);
 
     init_scale_srv_ = pnh.advertiseService("initialize_msf_scale",
-                                          &PoseSensorManager::InitScale, this);
+                                           &PoseSensorManager::InitScale, this);
     init_height_srv_ = pnh.advertiseService("initialize_msf_height",
-                                           &PoseSensorManager::InitHeight, this);
+                                            &PoseSensorManager::InitHeight,
+                                            this);
   }
-  virtual ~PoseSensorManager() {
-  }
+  virtual ~PoseSensorManager() { }
 
   virtual const Config_T& Getcfg() {
     return config_;
@@ -86,7 +86,7 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
 
   /// Minimum initialization height. If a abs(height) is smaller than this value, 
   /// no initialization is performed.
-  static constexpr double MIN_INITIALIZATION_HEIGHT = 0.01; 
+  static constexpr double MIN_INITIALIZATION_HEIGHT = 0.01;
 
   /**
    * \brief Dynamic reconfigure callback.
@@ -118,7 +118,7 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
   }
 
   bool InitScale(sensor_fusion_comm::InitScale::Request &req,
-                  sensor_fusion_comm::InitScale::Response &res) {
+                 sensor_fusion_comm::InitScale::Response &res) {
     ROS_INFO("Initialize filter with scale %f", req.scale);
     Init(req.scale);
     res.result = "Initialized scale";
@@ -126,7 +126,7 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
   }
 
   bool InitHeight(sensor_fusion_comm::InitHeight::Request &req,
-                   sensor_fusion_comm::InitHeight::Response &res) {
+                  sensor_fusion_comm::InitHeight::Response &res) {
     ROS_INFO("Initialize filter with height %f", req.height);
     Eigen::Matrix<double, 3, 1> p = pose_handler_->GetPositionMeasurement();
     if (p.norm() == 0) {
@@ -137,17 +137,16 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
     }
     std::stringstream ss;
     if (std::abs(req.height) > MIN_INITIALIZATION_HEIGHT) {
-    	double scale = p[2] / req.height;
-    	Init(scale);
-    	ss << scale;
-    	res.result = "Initialized by known height. Initial scale = " + ss.str();
-    }
-    else {
+      double scale = p[2] / req.height;
+      Init(scale);
+      ss << scale;
+      res.result = "Initialized by known height. Initial scale = " + ss.str();
+    } else {
       ss << "Height to small for initialization, the minimum is "
-         << MIN_INITIALIZATION_HEIGHT << "and " << req.height << "was set.";
-    	MSF_WARN_STREAM(ss);
-    	res.result = ss.str();
-    	return false;
+          << MIN_INITIALIZATION_HEIGHT << "and " << req.height << "was set.";
+      MSF_WARN_STREAM(ss);
+      res.result = ss.str();
+      return false;
     }
     return true;
   }
@@ -212,17 +211,17 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
     shared_ptr < msf_core::MSF_InitMeasurement<EKFState_T>
         > meas(new msf_core::MSF_InitMeasurement<EKFState_T>(true));
 
-    meas->SetStateInitValue<StateDefinition_T::p>(p);
-    meas->SetStateInitValue<StateDefinition_T::v>(v);
-    meas->SetStateInitValue<StateDefinition_T::q>(q);
-    meas->SetStateInitValue<StateDefinition_T::b_w>(b_w);
-    meas->SetStateInitValue<StateDefinition_T::b_a>(b_a);
-    meas->SetStateInitValue<StateDefinition_T::L>(
-        Eigen::Matrix<double, 1, 1>::Constant(scale));
-    meas->SetStateInitValue<StateDefinition_T::q_wv>(q_wv);
-    meas->SetStateInitValue<StateDefinition_T::p_wv>(p_wv);
-    meas->SetStateInitValue<StateDefinition_T::q_ic>(q_ic);
-    meas->SetStateInitValue<StateDefinition_T::p_ic>(p_ic);
+    meas->SetStateInitValue < StateDefinition_T::p > (p);
+    meas->SetStateInitValue < StateDefinition_T::v > (v);
+    meas->SetStateInitValue < StateDefinition_T::q > (q);
+    meas->SetStateInitValue < StateDefinition_T::b_w > (b_w);
+    meas->SetStateInitValue < StateDefinition_T::b_a > (b_a);
+    meas->SetStateInitValue < StateDefinition_T::L
+        > (Eigen::Matrix<double, 1, 1>::Constant(scale));
+    meas->SetStateInitValue < StateDefinition_T::q_wv > (q_wv);
+    meas->SetStateInitValue < StateDefinition_T::p_wv > (p_wv);
+    meas->SetStateInitValue < StateDefinition_T::q_ic > (q_ic);
+    meas->SetStateInitValue < StateDefinition_T::p_ic > (p_ic);
 
     SetStateCovariance(meas->GetStateCovariance());  // Call my set P function.
     meas->Getw_m() = w_m;
@@ -294,8 +293,8 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
     const EKFState_T& state = delaystate;
     if (state.Get<StateDefinition_T::L>()(0) < 0) {
       MSF_WARN_STREAM_THROTTLE(
-          1, "Negative scale detected: " << state.Get<StateDefinition_T::L>()(0)
-          << ". Correcting to 0.1");
+          1,
+          "Negative scale detected: " << state.Get<StateDefinition_T::L>()(0) << ". Correcting to 0.1");
       Eigen::Matrix<double, 1, 1> L_;
       L_ << 0.1;
       delaystate.Set < StateDefinition_T::L > (L_);
