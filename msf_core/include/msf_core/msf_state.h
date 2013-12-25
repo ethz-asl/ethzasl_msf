@@ -53,7 +53,8 @@ struct StateVar_T {
     sizeInCorrection_ = msf_tmp::CorrectionStateLengthForType<
         const StateVar_T<type_T, name_T>&>::value,
     ///The size of this state in the state vector
-    sizeInState_ = msf_tmp::StateLengthForType<const StateVar_T<type_T, name_T>&>::value
+    sizeInState_ = msf_tmp::StateLengthForType<const StateVar_T<type_T,
+        name_T>&>::value
   };
   typedef Eigen::Matrix<double, sizeInCorrection_, sizeInCorrection_> Q_T;
 
@@ -105,7 +106,6 @@ struct GenericState_T {
   };
 
  private:
-
   /**
    * \brief Returns the stateVar at position INDEX in the state list.
    * Non const version only for msf_core use. You must not make these functions
