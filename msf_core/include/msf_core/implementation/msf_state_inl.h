@@ -103,7 +103,6 @@ template<int INDEX>
 inline const typename msf_tmp::StripReference<
     typename boost::fusion::result_of::at_c<stateVector_T, INDEX>::type>::result_t::Q_T&
 GenericState_T<stateVector_T, StateDefinition_T>::GetQBlock() const {
-  typedef typename boost::fusion::result_of::at_c<stateVector_T, INDEX>::type StateVar_T;
   return boost::fusion::at < boost::mpl::int_<INDEX> > (statevars).Q_;
 }
 
@@ -310,7 +309,7 @@ void GenericState_T<stateVector_T, StateDefinition_T>::Reset(
 /// Writes the covariance corresponding to position and attitude to cov.
 template<typename stateVector_T, typename StateDefinition_T>
 void GenericState_T<stateVector_T, StateDefinition_T>::GetPoseCovariance(
-    geometry_msgs::PoseWithCovariance::_covariance_type & cov) {
+    geometry_msgs::PoseWithCovariance::_covariance_type& cov) {
 
   typedef typename msf_tmp::GetEnumStateType<stateVector_T, StateDefinition_T::p>::value p_type;
   typedef typename msf_tmp::GetEnumStateType<stateVector_T, StateDefinition_T::q>::value q_type;
@@ -344,5 +343,62 @@ void GenericState_T<stateVector_T, StateDefinition_T>::GetPoseCovariance(
     cov[(i / 3 + 3) * 6 + (i % 3 + 3)] = P(
         (i / 3 + idxstartcorr_q) * nErrorStatesAtCompileTime + (i % 3 + 6));
 }
+
+
+template<typename stateVector_T, typename StateDefinition_T>
+void GenericState_T<stateVector_T, StateDefinition_T>::GetCoreCovariance(
+    sensor_fusion_comm::DoubleMatrixStamped& cov) {
+
+  const int n_core = nCoreErrorStatesAtCompileTime;
+  cov.data.resize(n_core * n_core);
+  cov.rows = n_core;
+  cov.cols = n_core;
+
+  for (int row = 0; row < n_core; ++row) {
+    for (int col = 0; col < n_core; ++col) {
+      cov.data[row * n_core + col] = P(row, col);
+    }
+  }
+}
+
+template<typename stateVector_T, typename StateDefinition_T>
+void GenericState_T<stateVector_T, StateDefinition_T>::GetAuxCovariance(
+    sensor_fusion_comm::DoubleMatrixStamped& cov) {
+
+  const int n_core = nCoreErrorStatesAtCompileTime;
+  const int n_aux = nErrorStatesAtCompileTime-n_core;
+  cov.data.resize(n_aux * n_aux);
+  cov.rows = n_aux;
+  cov.cols = n_aux;
+
+  int idx = 0;
+  for (int row = n_core; row < nErrorStatesAtCompileTime; ++row) {
+    for (int col = n_core; col < nErrorStatesAtCompileTime; ++col) {
+      cov.data[idx] = P(row, col);
+      ++idx;
+    }
+  }
+}
+
+template<typename stateVector_T, typename StateDefinition_T>
+void GenericState_T<stateVector_T, StateDefinition_T>::GetCoreAuxCovariance(
+    sensor_fusion_comm::DoubleMatrixStamped& cov) {
+
+  const int n_core = nCoreErrorStatesAtCompileTime;
+  const int n_aux = nErrorStatesAtCompileTime - n_core;
+  cov.data.resize(n_core * n_aux);
+  cov.rows = n_core;
+  cov.cols = n_aux;
+
+  // Use upper right block --> n_core rows and n_aux cols.
+  int idx = 0;
+  for (int row = 0; row < n_core; ++row) {
+    for (int col = n_core; col < nErrorStatesAtCompileTime; ++col) {
+      cov.data[idx] = P(row, col);
+      ++idx;
+    }
+  }
+}
+
 }  // namespace msf_core
 #endif  // MSF_STATE_INL_H_

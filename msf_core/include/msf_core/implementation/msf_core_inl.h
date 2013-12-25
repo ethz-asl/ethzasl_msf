@@ -579,7 +579,14 @@ void MSF_Core<EKFState_T>::Init(
 
   // Echo params.
   MSF_INFO_STREAM(
-      "Core parameters: "<<std::endl << "\tfixed_bias:\t" << usercalc_.GetParamFixedBias() << std::endl << "\tfuzzythres:\t" << usercalc_.GetParamFuzzyTrackingThreshold() << std::endl << "\tnoise_acc:\t" << usercalc_.GetParamNoiseAcc() << std::endl << "\tnoise_accbias:\t" << usercalc_.GetParamNoiseAccbias() << std::endl << "\tnoise_gyr:\t" << usercalc_.GetParamNoiseGyr() << std::endl << "\tnoise_gyrbias:\t" << usercalc_.GetParamNoiseGyrbias() << std::endl);
+      "Core parameters: "<<std::endl << "\tfixed_bias:\t" <<
+      usercalc_.GetParamFixedBias() << std::endl << "\tfuzzythres:\t" <<
+      usercalc_.GetParamFuzzyTrackingThreshold() << std::endl <<
+      "\tnoise_acc:\t" << usercalc_.GetParamNoiseAcc() << std::endl <<
+      "\tnoise_accbias:\t" << usercalc_.GetParamNoiseAccbias() << std::endl <<
+      "\tnoise_gyr:\t" << usercalc_.GetParamNoiseGyr() << std::endl <<
+      "\tnoise_gyrbias:\t" << usercalc_.GetParamNoiseGyrbias() << std::endl);
+
 
   MSF_INFO_STREAM("Core init with state: " << std::endl << state->Print());
   initialized_ = true;

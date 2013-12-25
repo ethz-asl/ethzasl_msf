@@ -22,6 +22,7 @@
 
 // Message includes.
 #include <sensor_fusion_comm/DoubleArrayStamped.h>
+#include <sensor_fusion_comm/DoubleMatrixStamped.h>
 #include <sensor_fusion_comm/ExtState.h>
 #include <sensor_fusion_comm/ExtEkf.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
@@ -63,6 +64,9 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
   ros::Publisher pubPoseAfterUpdate_;  ///< Publishes 6DoF pose output after the update has been applied.
   ros::Publisher pubPoseCrtl_;  ///< Publishes 6DoF pose including velocity output.
   ros::Publisher pubCorrect_;  ///< Publishes corrections for external state propagation.
+  ros::Publisher pubCovCore_;  ///< Publishes the covariance matrix for the core states.
+  ros::Publisher pubCovAux_;  ///< Publishes the covariance matrix for the auxiliary states.
+  ros::Publisher pubCovCoreAux_; ///< Publishes the covariance matrix for the cross-correlations between core and auxiliary states.
 
   mutable tf::TransformBroadcaster tf_broadcaster_;
 
@@ -90,6 +94,12 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
         < geometry_msgs::PoseWithCovarianceStamped > ("pose_after_update", 100);
     pubPoseCrtl_ = nh.advertise < sensor_fusion_comm::ExtState
         > ("ext_state", 1);
+    pubCovCore_ = nh.advertise<sensor_fusion_comm::DoubleMatrixStamped>(
+        "cov_core", 10);
+    pubCovAux_ = nh.advertise<sensor_fusion_comm::DoubleMatrixStamped>(
+        "cov_aux", 10);
+    pubCovCoreAux_ = nh.advertise<sensor_fusion_comm::DoubleMatrixStamped>(
+        "cov_core_aux", 10);
 
     hl_state_buf_.state.resize(HLI_EKF_STATE_SIZE, 0);
 
@@ -297,7 +307,6 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
     pubState_.publish(msgState);
 
     if (pubPoseAfterUpdate_.getNumSubscribers()) {
-
       // Publish pose after correction with covariance.
       geometry_msgs::PoseWithCovarianceStamped msgPose;
       msgPose.header.stamp = ros::Time(state->time);
@@ -321,6 +330,30 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
           tf::StampedTransform(
               transform, ros::Time::now() /*ros::Time(latestState->time_)*/,
               "world", "state"));
+    }
+
+    if (pubCovCore_.getNumSubscribers()) {
+      sensor_fusion_comm::DoubleMatrixStampedPtr msg(
+          new sensor_fusion_comm::DoubleMatrixStamped);
+      msg->header = msgCorrect_.header;
+      state->GetCoreCovariance(*msg);
+      pubCovCore_.publish(msg);
+    }
+
+    if (pubCovAux_.getNumSubscribers()) {
+      sensor_fusion_comm::DoubleMatrixStampedPtr msg(
+          new sensor_fusion_comm::DoubleMatrixStamped);
+      msg->header = msgCorrect_.header;
+      state->GetAuxCovariance(*msg);
+      pubCovAux_.publish(msg);
+    }
+
+    if (pubCovCoreAux_.getNumSubscribers()) {
+      sensor_fusion_comm::DoubleMatrixStampedPtr msg(
+          new sensor_fusion_comm::DoubleMatrixStamped);
+      msg->header = msgCorrect_.header;
+      state->GetCoreAuxCovariance(*msg);
+      pubCovCoreAux_.publish(msg);
     }
     msg_seq++;
   }
