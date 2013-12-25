@@ -26,7 +26,7 @@ class GPSConversion {
   msf_core::Quaternion ecef_ref_orientation_;
   msf_core::Vector3 ecef_ref_point_;
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   GPSConversion();
   void InitReference(const double& latitude, const double& longitude,
                      const double& altitude);
