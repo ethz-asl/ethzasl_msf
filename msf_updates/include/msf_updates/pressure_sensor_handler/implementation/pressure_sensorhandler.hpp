@@ -17,6 +17,8 @@
  * limitations under the License.
  */
 #include <msf_core/eigen_utils.h>
+#ifndef PRESSURE_SENSORHANDLER_HPP_
+#define PRESSURE_SENSORHANDLER_HPP_
 
 namespace msf_pressure_sensor {
 PressureSensorHandler::PressureSensorHandler(
@@ -69,5 +71,5 @@ void PressureSensorHandler::MeasurementCallback(
 
   this->manager_.msf_core_->AddMeasurement(meas);
 }
-
-}
+}  // namespace msf_pressure_sensor
+#endif  // PRESSURE_SENSORHANDLER_HPP_

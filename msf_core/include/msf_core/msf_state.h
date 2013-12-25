@@ -97,11 +97,14 @@ struct GenericState_T {
         msf_tmp::StateLengthForType>::value,  ///<N total states.
     nCoreStatesAtCompileTime = msf_tmp::CountStates<StateSequence_T,
         msf_tmp::CoreStateLengthForType>::value,  ///<N total core states.
+    /// N total core error states.
     nCoreErrorStatesAtCompileTime = msf_tmp::CountStates<StateSequence_T,
-        msf_tmp::CoreErrorStateLengthForType>::value,  ///<N total core error states.
+        msf_tmp::CoreErrorStateLengthForType>::value,
+    /// N total core states with propagation.
     nPropagatedCoreStatesAtCompileTime = msf_tmp::CountStates<StateSequence_T,
-        msf_tmp::PropagatedCoreStateLengthForType>::value,  ///<N total core states with propagation.
-    nPropagatedCoreErrorStatesAtCompileTime = msf_tmp::CountStates< ///<N total error states with propagation.
+        msf_tmp::PropagatedCoreStateLengthForType>::value,
+    /// N total error states with propagation.
+    nPropagatedCoreErrorStatesAtCompileTime = msf_tmp::CountStates<
         StateSequence_T, msf_tmp::PropagatedCoreErrorStateLengthForType>::value
   };
 
@@ -223,19 +226,22 @@ struct GenericState_T {
   void ToCoreStateMsg(sensor_fusion_comm::DoubleArrayStamped& state);
 
   /**
-   * \brief Assembles a DoubleMatrixStamped message from the core error state covariance.
+   * \brief Assembles a DoubleMatrixStamped message from the core error state
+   * covariance.
    * \note It does not set the header.
    */
   void GetCoreCovariance(sensor_fusion_comm::DoubleMatrixStamped& cov);
 
   /**
-   * \brief Assembles a DoubleMatrixStamped message from the aux error state covariance.
+   * \brief Assembles a DoubleMatrixStamped message from the aux error state
+   * covariance.
    * \note It does not set the header.
    */
   void GetAuxCovariance(sensor_fusion_comm::DoubleMatrixStamped& cov);
 
   /**
-   * \brief Assembles a DoubleMatrixStamped message from the core-aux error state covariance.
+   * \brief Assembles a DoubleMatrixStamped message from the core-aux error
+   * state covariance.
    * \note It does not set the header.
    */
   void GetCoreAuxCovariance(sensor_fusion_comm::DoubleMatrixStamped& cov);
@@ -278,7 +284,8 @@ struct GenericState_T {
    */
   template<int INDEX>
   inline typename msf_tmp::AddConstReference<
-      typename boost::fusion::result_of::at_c<StateSequence_T, INDEX>::type>::result_t
+      typename boost::fusion::result_of::at_c<StateSequence_T, INDEX>::type>::
+      result_t
   GetStateVariable() const;
 
   /**
@@ -318,4 +325,4 @@ class SortStates {
 
 #include <msf_core/implementation/msf_state_inl.h>
 
-#endif /* MSF_STATE_H_ */
+#endif  // MSF_STATE_H_

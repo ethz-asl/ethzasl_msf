@@ -19,6 +19,9 @@
 #include <msf_core/eigen_utils.h>
 #include <msf_core/msf_types.h>
 
+#ifndef POSE_SENSORHANDLER_HPP_
+#define POSE_SENSORHANDLER_HPP_
+
 namespace msf_pose_sensor {
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PoseSensorHandler(
@@ -245,5 +248,5 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
 
   ProcessPoseMeasurement(pose);
 }
-
-}
+}  // namespace msf_pose_sensor
+#endif  // POSE_SENSORHANDLER_HPP_

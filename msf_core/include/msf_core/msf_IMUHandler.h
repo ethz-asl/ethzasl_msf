@@ -55,4 +55,4 @@ class IMUHandler : public SensorHandler<EKFState_T> {
 };
 }
 
-#endif /* MSF_IMU_HANDLER_H_ */
+#endif  // MSF_IMU_HANDLER_H_

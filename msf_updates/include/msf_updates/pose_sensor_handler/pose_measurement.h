@@ -438,6 +438,6 @@ struct PoseMeasurement : public PoseMeasurementBase {
   }
 };
 
-}
-}
-#endif /* POSE_MEASUREMENT_HPP_ */
+}  // namespace msf_pose_sensor
+}  // namespace msf_updates
+#endif  // POSE_MEASUREMENT_HPP_

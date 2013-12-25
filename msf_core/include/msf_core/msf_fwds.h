@@ -86,4 +86,4 @@ template<typename EKFState_T> class MSF_SensorHandler;
 template<typename EKFState_T> class MSF_SensorManager;
 
 }
-#endif /* MSF_FWD_HPP_ */
+#endif  // MSF_FWD_HPP_

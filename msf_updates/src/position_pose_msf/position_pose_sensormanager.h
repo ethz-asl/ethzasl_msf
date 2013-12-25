@@ -307,4 +307,4 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
   }
 };
 }
-#endif /* POSITION_POSE_SENSOR_MANAGER_H */
+#endif  // POSITION_POSE_SENSOR_MANAGER_H

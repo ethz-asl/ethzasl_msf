@@ -513,7 +513,5 @@ struct DistanceMeasurement : public DistanceMeasurementBase {
     }
   }
 };
-
-}
-
+}  // namespace msf_spherical_position
 #endif  // SPHERICAL_POSITION_MEASUREMENT_HPP_

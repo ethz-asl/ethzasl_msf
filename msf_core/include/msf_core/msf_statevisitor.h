@@ -34,4 +34,4 @@ class StateVisitor {
   ;
 };
 }
-#endif /* MSF_STATEVISITOR_H_ */
+#endif  // MSF_STATEVISITOR_H_

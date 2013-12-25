@@ -49,6 +49,6 @@ class PressureSensorHandler : public msf_core::SensorHandler<
   // Setters for configure values.
   void SetNoises(double n_zp);
 };
-}
+}  // namespace msf_pressure_sensor
 #include "implementation/pressure_sensorhandler.hpp"
-#endif /* POSE_SENSOR_H */
+#endif  // POSE_SENSOR_H

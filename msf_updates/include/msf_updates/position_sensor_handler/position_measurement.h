@@ -192,6 +192,7 @@ struct PositionMeasurement : public PositionMeasurementBase {
     }
   }
 };
-}
-}
-#endif /* POSITION_MEASUREMENT_HPP_ */
+}  // namespace position_measurement
+}  // namespace msf_updates
+
+#endif  // POSITION_MEASUREMENT_HPP_

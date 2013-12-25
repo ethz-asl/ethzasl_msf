@@ -304,4 +304,4 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
 };
 
 }
-#endif /* POSE_MEASUREMENTMANAGER_H */
+#endif // POSE_MEASUREMENTMANAGER_H

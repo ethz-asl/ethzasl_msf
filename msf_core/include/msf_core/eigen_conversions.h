@@ -43,7 +43,8 @@ inline geometry_msgs::Quaternion QuaternionToMsg(
   return q_out;
 }
 
-/// Copies an eigen 3d vector to a 3d Point struct. point has to have members x,y,z!
+/// Copies an eigen 3d vector to a 3d Point struct. point has to have members
+/// x,y,z!
 template<class Derived, class Point>
 inline void Vector3dToPoint(const Eigen::MatrixBase<Derived>& vec,
                             Point& point) {
@@ -53,7 +54,8 @@ inline void Vector3dToPoint(const Eigen::MatrixBase<Derived>& vec,
   point.z = vec[2];
 }
 
-/// Copies an eigen 3d vector to a 3d Point struct. point has to have members x,y,z!
+/// Copies an eigen 3d vector to a 3d Point struct. point has to have members
+/// x,y,z!
 template<class Derived, class Point>
 inline Point Vector3dToPoint(const Eigen::MatrixBase<Derived>& vec) {
   Point point;

@@ -130,4 +130,4 @@ class IMUHandler_ROS : public IMUHandler<EKFState_T> {
 };
 }
 
-#endif /* MSF_IMUHANDLER_ROS_H_ */
+#endif  // MSF_IMUHANDLER_ROS_H_

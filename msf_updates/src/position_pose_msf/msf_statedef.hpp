@@ -73,4 +73,4 @@ typedef shared_ptr<EKFState> EKFStatePtr;
 typedef shared_ptr<const EKFState> EKFStateConstPtr;
 }
 #include <msf_updates/static_ordering_assertions.h> //DO NOT REMOVE THIS
-#endif /* MSF_STATEDEF_HPP_ */
+#endif  // MSF_STATEDEF_HPP_

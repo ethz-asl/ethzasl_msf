@@ -113,7 +113,5 @@ struct PressureMeasurement : public PressureMeasurementBase {
     this->CalculateAndApplyCorrection(non_const_state, core, H_old, r_old, R_);
   }
 };
-
-}
-
-#endif /* POSE_MEASUREMENT_HPP_ */
+}  // namespace pressure_measurement
+#endif  // POSE_MEASUREMENT_HPP_

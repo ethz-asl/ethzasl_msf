@@ -20,6 +20,8 @@
  */
 #include <msf_core/eigen_utils.h>
 #include <msf_core/gps_conversion.h>
+#ifndef SPHERICAL_SENSORHANDLER_HPP_
+#define SPHERICAL_SENSORHANDLER_HPP_
 
 namespace msf_spherical_position {
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
@@ -203,3 +205,4 @@ void DistanceSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
   this->manager_.msf_core_->AddMeasurement(meas);
 }
 }  // namespace msf_spherical_position
+#endif  // SPHERICAL_SENSORHANDLER_HPP_

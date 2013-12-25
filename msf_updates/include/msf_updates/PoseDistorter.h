@@ -53,4 +53,4 @@ class PoseDistorter {
 };
 
 }  // namespace msf_updates
-#endif /* POSEDISTORTER_H_ */
+#endif  // POSEDISTORTER_H_

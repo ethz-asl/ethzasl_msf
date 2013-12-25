@@ -16,8 +16,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef POSE_SENSOR_H
-#define POSE_SENSOR_H
+#ifndef POSE_SENSOR_H_
+#define POSE_SENSOR_H_
 
 #include <msf_core/msf_sensormanagerROS.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
@@ -73,7 +73,7 @@ class PoseSensorHandler : public msf_core::SensorHandler<
   void SetNoises(double n_zp, double n_zq);
   void SetDelay(double delay);
 };
-}
+}  // namespace msf_pose_sensor
 #include "implementation/pose_sensorhandler.hpp"
 
-#endif /* POSE_SENSOR_H */
+#endif  // POSE_SENSOR_H_

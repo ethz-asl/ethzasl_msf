@@ -719,6 +719,4 @@ void CalcQCore(const double dt, const Eigen::Quaternion<double> & q,
   Qd(idxstartcorr_b_a + 2, idxstartcorr_b_a + 2) = dt * t400;
 
 }
-;
-
-#endif /* CALCQ_H_ */
+#endif  // CALCQ_H_

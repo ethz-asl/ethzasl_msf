@@ -260,4 +260,4 @@ class MSF_Core {
 
 #include <msf_core/implementation/msf_core_inl.h>
 
-#endif /* MSF_CORE_H_ */
+#endif  // MSF_CORE_H_

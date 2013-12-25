@@ -200,4 +200,4 @@ if(    p_vc.norm() == 0)
   }
 };
 }
-#endif /* SPHERICAL_POSITION_MEASUREMENTMANAGER_H */
+#endif  // SPHERICAL_POSITION_MEASUREMENTMANAGER_H

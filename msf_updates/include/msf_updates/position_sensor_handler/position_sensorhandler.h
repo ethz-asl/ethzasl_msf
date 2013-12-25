@@ -16,8 +16,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef POSITION_SENSOR_H
-#define POSITION_SENSOR_H
+#ifndef POSITION_SENSOR_H_
+#define POSITION_SENSOR_H_
 
 #include <msf_core/msf_sensormanagerROS.h>
 #include <geometry_msgs/PointStamped.h>
@@ -65,8 +65,8 @@ class PositionSensorHandler : public msf_core::SensorHandler<
   void SetDelay(double delay);
   void AdjustGPSZReference(double current_z);
 };
-}
+}  // namespace msf_position_sensor
 
 #include "implementation/position_sensorhandler.hpp"
 
-#endif /* POSITION_SENSOR_H */
+#endif  // POSITION_SENSOR_H_

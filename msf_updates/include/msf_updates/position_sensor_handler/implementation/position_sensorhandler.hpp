@@ -16,6 +16,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef POSITION_SENSORHANDLER_HPP_
+#define POSITION_SENSORHANDLER_HPP_
 #include <msf_core/msf_types.h>
 #include <msf_core/eigen_utils.h>
 #include <msf_core/gps_conversion.h>
@@ -212,5 +214,5 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
 
   ProcessPositionMeasurement(pointwCov);
 }
-
-}
+}  // namespace msf_position_sensor
+#endif  // POSITION_SENSORHANDLER_HPP_

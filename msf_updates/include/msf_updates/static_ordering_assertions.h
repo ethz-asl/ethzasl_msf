@@ -23,4 +23,4 @@ enum class CompileTimeChecker {
   value = StaticAssertCoreStateOrderingCorrect<msf_updates::EKFState>::value
 };
 }
-#endif /* STATIC_ORDERING_ASSERTIONS_HPP_ */
+#endif  // STATIC_ORDERING_ASSERTIONS_HPP_
