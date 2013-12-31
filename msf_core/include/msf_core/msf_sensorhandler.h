@@ -43,7 +43,7 @@ class SensorHandler {
     lastseq_ = seq;
   }
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
   SensorHandler(MSF_SensorManager<EKFState_T>& mng,
                 const std::string& topic_namespace,

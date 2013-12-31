@@ -81,7 +81,7 @@ class MSF_MeasurementBase {
 template<typename EKFState_T>
 class MSF_InvalidMeasurement : public MSF_MeasurementBase<EKFState_T> {
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   virtual void Apply(shared_ptr<EKFState_T> UNUSEDPARAM(stateWithCovariance),
                      MSF_Core<EKFState_T>& UNUSEDPARAM(core)) {
     MSF_ERROR_STREAM(
@@ -112,7 +112,7 @@ class MSF_Measurement : public MSF_MeasurementBase<EKFState_T> {
  protected:
   RMAT_T R_;
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   typedef T Measurement_type;
   typedef boost::shared_ptr<T const> Measurement_ptr;
 

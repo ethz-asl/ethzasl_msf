@@ -37,7 +37,7 @@ class CheckFuzzyTracking {
   Eigen::Matrix<double, nBuff_, qbuffRowsAtCompiletime> qbuff_;
 
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
   void Reset() {
     // Buffer for vision failure check.

@@ -50,7 +50,7 @@ struct CallbackHandler {
         nh.advertise<geometry_msgs::PointStamped>("point_output", 100);
   }
 
-  void config(Config_T &config, uint32_t level) {
+  void config(Config_T &config, uint32_t /*level*/) {
     config_ = config;
   }
 

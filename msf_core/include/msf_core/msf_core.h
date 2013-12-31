@@ -60,7 +60,7 @@ class MSF_Core {
   friend class MSF_MeasurementBase<EKFState_T>;
   friend class IMUHandler<EKFState_T>;
  public:
-  EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
   enum {
     /// Error state length.

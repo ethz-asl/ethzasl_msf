@@ -18,7 +18,7 @@
 
 using namespace msf_core;
 
-int main(int argc, char** argv) {
+int main(int /*argc*/, char** /*argv*/) {
 
   similarity_transform::From6DoF T;
   const int N = 100;
