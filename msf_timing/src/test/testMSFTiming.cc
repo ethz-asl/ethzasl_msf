@@ -16,13 +16,15 @@
  */
 
 #include <chrono>
+#include <gtest/gtest.h>
 #include <iostream>
 #include <thread>
 #include <unistd.h>
 
 #include <msf_timing/Timer.h>
 
-int main(int argc, char** argv) {
+namespace {
+TEST(timing, timing) {
   int elapsed_seconds = 0;
 
   for (int i = 0; i < 5; ++i) {
@@ -42,4 +44,10 @@ int main(int argc, char** argv) {
   msf_timing::Timing::Print(std::cout);
   msf_timing::Timing::Reset();
   msf_timing::Timing::Print(std::cout);
+}
+}  // namespace
+
+int main(int argc, char **argv) {
+  ::testing::InitGoogleTest(&argc, argv);
+  return RUN_ALL_TESTS();
 }
