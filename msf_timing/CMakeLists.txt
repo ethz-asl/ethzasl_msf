@@ -28,6 +28,6 @@ catkin_package(
 add_library(${PROJECT_NAME} src/Timer.cc)
 
 catkin_add_gtest(${PROJECT_NAME}_tests src/test/testMSFTiming.cc)
-target_link_libraries(${PROJECT_NAME}_tests ${PROJECT_NAME})
+target_link_libraries(${PROJECT_NAME}_tests ${PROJECT_NAME} pthread)
 
 
