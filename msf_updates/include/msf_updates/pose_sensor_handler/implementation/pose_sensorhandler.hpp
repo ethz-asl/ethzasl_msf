@@ -132,7 +132,7 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
   // Get all the fixed states and set flag bits.
   MANAGER_TYPE* mngr = dynamic_cast<MANAGER_TYPE*>(&manager_);
 
-  // TODO: if we have multiple sensor handlers, they all share the same dynparams,
+  // TODO(acmarkus): if we have multiple sensor handlers, they all share the same dynparams,
   // which me maybe don't want. E.g. if we have this for multiple AR Markers, we
   // may want to keep one fix --> move this to fixed parameters? Could be handled
   // with parameter namespace then.
