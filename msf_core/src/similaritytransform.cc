@@ -22,15 +22,15 @@ namespace msf_core {
 namespace similarity_transform {
 From6DoF::From6DoF() { }
 
-void From6DoF::addMeasurement(const PosePair & measurement) {
+void From6DoF::AddMeasurement(const PosePair & measurement) {
   measurements_.push_back(measurement);
 }
 
-void From6DoF::addMeasurement(const Pose & pose1, const Pose & pose2) {
-  addMeasurement(PosePair(pose1, pose2));
+void From6DoF::AddMeasurement(const Pose & pose1, const Pose & pose2) {
+  AddMeasurement(PosePair(pose1, pose2));
 }
 
-bool From6DoF::compute(Pose & pose, double *scale, double *cond, double eps) {
+bool From6DoF::Compute(Pose & pose, double *scale, double *cond, double eps) {
   const int n = 4;  // Number of parameters we need to optimize.
   const int m = measurements_.size();
 
@@ -48,16 +48,16 @@ bool From6DoF::compute(Pose & pose, double *scale, double *cond, double eps) {
   for (int i = 0; i < m; i++) {
     // Quaternion averaging.
     const PosePair & pp = measurements_[i];
-    const Eigen::Quaterniond q1 = geometry_msgsToEigen(
+    const Eigen::Quaterniond q1 = GeometryMsgsToEigen(
         pp.first.pose.orientation);
-    const Eigen::Quaterniond q2 = geometry_msgsToEigen(
+    const Eigen::Quaterniond q2 = GeometryMsgsToEigen(
         pp.second.pose.orientation);
     Eigen::Quaterniond q(q1.inverse() * q2);
     M += q.coeffs() * q.coeffs().transpose();  // Order is x y z w here !!!
 
         //
-    const Vector3 t1 = geometry_msgsToEigen(pp.first.pose.position);
-    const Vector3 t2 = geometry_msgsToEigen(pp.second.pose.position);
+    const Vector3 t1 = GeometryMsgsToEigen(pp.first.pose.position);
+    const Vector3 t2 = GeometryMsgsToEigen(pp.second.pose.position);
 
     A.block<3, 3>(i * 3, 0) = Eigen::Matrix<double, 3, 3>::Identity() * -1;
     A.block<3, 1>(i * 3, 3) = q1.inverse() * t2;
@@ -90,8 +90,8 @@ bool From6DoF::compute(Pose & pose, double *scale, double *cond, double eps) {
   if (scale)
     *scale = x[3];
 
-  pose.pose.position = eigenToGeometry_msgs(x.block<3, 1>(0, 0));
-  pose.pose.orientation = eigenToGeometry_msgs(q_mean);
+  pose.pose.position = EigenToGeometryMsgs(x.block<3, 1>(0, 0));
+  pose.pose.orientation = EigenToGeometryMsgs(q_mean);
 
   return true;
 }

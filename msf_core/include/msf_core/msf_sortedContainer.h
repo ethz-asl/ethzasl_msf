@@ -17,25 +17,24 @@
 #ifndef MSF_SORTEDCONTAINER_H_
 #define MSF_SORTEDCONTAINER_H_
 
-#include <msf_core/msf_types.hpp>
+#include <msf_core/msf_types.h>
 #include <msf_core/msf_tools.h>
 #include <msf_core/msf_macros.h>
 #include <iomanip>
 
 #define CHECK_IN_BOUNDS(iterator, container) \
-           do { \
-             decltype(iterator) __it = it; \
-             ++__it; \
-             if (__it == container.begin()) { \
-               MSF_ERROR_STREAM("Iterator out of bounds (begin) " << \
-                 __FILE__ << ":" << __LINE__); \
-             } \
-             if (iterator == container.end()) { \
-               MSF_ERROR_STREAM("Iterator out of bounds (end) " << \
-                 __FILE__ << ":" << __LINE__); \
-             } \
-           } while(0);
-
+  do { \
+    decltype(iterator) __it = it; \
+    ++__it; \
+    if (__it == container.begin()) { \
+      MSF_ERROR_STREAM("Iterator out of bounds (begin) " << \
+        __FILE__ << ":" << __LINE__); \
+    } \
+    if (iterator == container.end()) { \
+    MSF_ERROR_STREAM("Iterator out of bounds (end) " << \
+       __FILE__ << ":" << __LINE__); \
+    } \
+  } while(0);
 
 namespace msf_core {
 /**
@@ -45,7 +44,6 @@ namespace msf_core {
  */
 template<typename T, typename PrototypeInvalidT = T>
 class SortedContainer {
-
  public:
   typedef shared_ptr<T> Ptr_T;
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -65,14 +63,14 @@ class SortedContainer {
    * \brief To be called to signal that a request could not be satisfied
    * \returns an object of the "invalid" type
    */
-  inline shared_ptr<T>& getInvalid() {
+  inline shared_ptr<T>& GetInvalid() {
     return invalid;
   }
 
   /**
    * \brief Clears the internal container, dropping all the contents.
    */
-  inline void clear() {
+  inline void Clear() {
     stateList.clear();
   }
 
@@ -80,7 +78,7 @@ class SortedContainer {
    * \brief Returns the size of the internal container.
    * \returns Size of the container.
    */
-  inline typename ListT::size_type size() {
+  inline typename ListT::size_type Size() {
     return stateList.size();
   }
 
@@ -88,7 +86,7 @@ class SortedContainer {
    * \brief Insert an object to the internal container to the position not
    * violating the internal strict less than ordering by time.
    */
-  inline typename ListT::iterator insert(const shared_ptr<T>& value) {
+  inline typename ListT::iterator Insert(const shared_ptr<T>& value) {
     std::pair<typename ListT::iterator, bool> itpr = stateList.insert(
         std::pair<double, shared_ptr<T> >(value->time, value));
     if (!itpr.second) {
@@ -103,14 +101,14 @@ class SortedContainer {
   /**
    * \brief Returns the iterator at the beginning of the internal container.
    */
-  inline typename ListT::iterator getIteratorBegin() {
+  inline typename ListT::iterator GetIteratorBegin() {
     return stateList.begin();
   }
 
   /**
    * \brief Returns the iterator before the beginning of the internal container.
    */
-  inline typename ListT::iterator getIteratorBeforeBegin() {
+  inline typename ListT::iterator GetIteratorBeforeBegin() {
     typename ListT::iterator it = stateList.begin();
     return --it;
   }
@@ -118,7 +116,7 @@ class SortedContainer {
   /**
    * \brief Returns the iterator at the end of the internal container.
    */
-  inline typename ListT::iterator getIteratorEnd() {
+  inline typename ListT::iterator GetIteratorEnd() {
     return stateList.end();
   }
 
@@ -128,9 +126,8 @@ class SortedContainer {
    * \param value The value to get the iterator for.
    * \returns iterator.
    */
-  inline typename ListT::iterator getIteratorAtValue(const shared_ptr<T>& value,
-                                                     bool warnIfNotExistant =
-                                                         true) {
+  inline typename ListT::iterator GetIteratorAtValue(
+      const shared_ptr<T>& value, bool warnIfNotExistant = true) {
     typename ListT::iterator it = stateList.find(value->time);
     if (it == stateList.end()) {  // There is no value in the map with this time.
       if (warnIfNotExistant)
@@ -148,9 +145,8 @@ class SortedContainer {
    * \param time The time where we want to get an iterator at.
    * \returns iterator.
    */
-  inline typename ListT::iterator getIteratorAtValue(const double& time,
-                                                     bool warnIfNotExistant =
-                                                         true) {
+  inline typename ListT::iterator GetIteratorAtValue(
+      const double& time, bool warnIfNotExistant = true) {
     typename ListT::iterator it = stateList.find(time);
     if (it == stateList.end()) {  //there is no value in the map with this time
       if (warnIfNotExistant)
@@ -167,10 +163,10 @@ class SortedContainer {
    * \param time The time where we want to get an iterator at.
    * \returns iterator.
    */
-  inline typename ListT::iterator getIteratorClosestBefore(
+  inline typename ListT::iterator GetIteratorClosestBefore(
       const double& statetime) {
     typename ListT::iterator it = stateList.lower_bound(statetime);
-    it--;
+    --it;
     return it;
   }
 
@@ -179,7 +175,7 @@ class SortedContainer {
    * \param time The time where we want to get an iterator at.
    * \returns iterator.
    */
-  inline typename ListT::iterator getIteratorClosestAfter(
+  inline typename ListT::iterator GetIteratorClosestAfter(
       const double& statetime) {
     typename ListT::iterator it = stateList.upper_bound(statetime);
     return it;
@@ -190,7 +186,7 @@ class SortedContainer {
    * \param time The time where we want to get an iterator at.
    * \returns iterator.
    */
-  inline typename ListT::iterator getIteratorClosest(const double& statetime) {
+  inline typename ListT::iterator GetIteratorClosest(const double& statetime) {
 
     // First check if we have a value at this time in the buffer.
     typename ListT::iterator it_at = stateList.find(statetime);
@@ -199,10 +195,10 @@ class SortedContainer {
     }
 
     // If not, find the closest one.
-    typename ListT::iterator tauMinus = getIteratorClosestBefore(statetime);
-    typename ListT::iterator tauPlus = getIteratorClosestAfter(statetime);
+    typename ListT::iterator tauMinus = GetIteratorClosestBefore(statetime);
+    typename ListT::iterator tauPlus = GetIteratorClosestAfter(statetime);
 
-    typename ListT::iterator it_end = getIteratorEnd();
+    typename ListT::iterator it_end = GetIteratorEnd();
     if (tauMinus == it_end) {
       return tauPlus;
     }
@@ -222,20 +218,19 @@ class SortedContainer {
    * \param Time the time where we want to get the value at.
    * \returns shared pointer of the object.
    */
-  inline shared_ptr<T>& getClosestBefore(const double& statetime) {
+  inline shared_ptr<T>& GetClosestBefore(const double& statetime) {
     typename ListT::iterator it = stateList.lower_bound(statetime);
     if (stateList.empty()) {
       MSF_WARN_STREAM("Requested the first object before time " << statetime <<
         "but the container is empty");
-      return getInvalid();
+      return GetInvalid();
     }
     if (it == stateList.begin()) {
       return it->second;
     }
-    it--;
+    --it;
     return it->second;
   }
-  ;
 
   /**
    * \brief Returns a pointer to the closest after a specific time instant
@@ -243,14 +238,13 @@ class SortedContainer {
    * \param time The time where we want to get the value at
    * \returns shared pointer of the object.
    */
-  inline shared_ptr<T>& getClosestAfter(const double& statetime) {
+  inline shared_ptr<T>& GetClosestAfter(const double& statetime) {
     typename ListT::iterator it = stateList.upper_bound(statetime);
     if (it == stateList.end()) {
-      return getInvalid();
+      return GetInvalid();
     }
     return it->second;
   }
-  ;
 
   /**
    * \brief Returns a pointer to the object at a specific time instant
@@ -258,28 +252,27 @@ class SortedContainer {
    * \param time The time where we want to get the value at.
    * \returns shared pointer of the object.
    */
-  inline shared_ptr<T>& getValueAt(const double& statetime) {
+  inline shared_ptr<T>& GetValueAt(const double& statetime) {
     typename ListT::iterator it = stateList.find(statetime);
     if (it == stateList.end()) {
-      return getInvalid();
+      return GetInvalid();
     }
     return it->second;
   }
-  ;
 
   /**
    * \brief Returns a pointer to the closest to a specific time instant.
    * \param time The time where we want to get the value at.
    * \returns shared pointer of the object.
    */
-  inline shared_ptr<T>& getClosest(const double& statetime) {
-    shared_ptr<T>& at = getValueAt(statetime);  // Is there one exactly at this point?
-    if (at != getInvalid()) {
+  inline shared_ptr<T>& GetClosest(const double& statetime) {
+    shared_ptr<T>& at = GetValueAt(statetime);  // Is there one exactly at this point?
+    if (at != GetInvalid()) {
       return at;
     }
 
-    shared_ptr<T>& tauMinus = getClosestBefore(statetime);
-    shared_ptr<T>& tauPlus = getClosestAfter(statetime);
+    shared_ptr<T>& tauMinus = GetClosestBefore(statetime);
+    shared_ptr<T>& tauPlus = GetClosestAfter(statetime);
 
     if (tauMinus->time == -1) {
       return tauPlus;
@@ -300,9 +293,9 @@ class SortedContainer {
    * \param time The maximum age of states in the container.
    * \returns shared pointer of the object.
    */
-  inline void clearOlderThan(double age) {
-    double newest = getLast()->time;
-    iterator_T it = getIteratorClosest(newest - age);
+  inline void ClearOlderThan(double age) {
+    double newest = GetLast()->time;
+    iterator_T it = GetIteratorClosest(newest - age);
     if (newest - it->second->time < age)
       return;  //there is no state older than time
     if (it->second->time > stateList.begin()->second->time)
@@ -314,11 +307,11 @@ class SortedContainer {
    * or an invalid object if the container is empty.
    * \returns shared pointer of the object.
    */
-  inline shared_ptr<T>& getLast() {
+  inline shared_ptr<T>& GetLast() {
     if (stateList.empty()) {
       MSF_WARN_STREAM("Requested the last object in the sorted container, but "
       "the container is empty");
-      return getInvalid();
+      return GetInvalid();
     }
     typename ListT::iterator end = stateList.end();
     return (--end)->second;
@@ -329,11 +322,11 @@ class SortedContainer {
    * or an invalid object if the container is empty.
    * \returns shared pointer of the object.
    */
-  inline shared_ptr<T>& getFirst() {
+  inline shared_ptr<T>& GetFirst() {
     if (stateList.empty()) {
       MSF_WARN_STREAM("Requested the first object in the sorted container, "
       "but the container is empty");
-      return getInvalid();
+      return GetInvalid();
     }
     typename ListT::iterator start = stateList.begin();
     return start->second;
@@ -349,14 +342,13 @@ class SortedContainer {
    * \param timeNew The time to update to.
    * \returns shared pointer of the object.
    */
-  inline shared_ptr<T> updateTime(double timeOld, double timeNew)
+  inline shared_ptr<T> UpdateTime(double timeOld, double timeNew)
       __attribute__ ((warn_unused_result)) {
     typename ListT::iterator it = stateList.find(timeOld);
     if (it == stateList.end()) {
       std::stringstream ss;
-      ss
-          << "Wanted to update a states/measurements time, but could not find "
-              "the old state, for which the time was asked to be updated. time "
+      ss << "Wanted to update a states/measurements time, but could not find "
+            "the old state, for which the time was asked to be updated. time "
           << std::fixed << std::setprecision(9) << timeOld << std::endl;
 
       ss << "Map: " << std::endl;
@@ -365,14 +357,13 @@ class SortedContainer {
         ss << it2->first << std::endl;
       }
       MSF_WARN_STREAM(ss.str());
-
-      return getClosest(timeOld);
+      return GetClosest(timeOld);
     }
     // Get the data from the map, we need to update, then reinsert.
     shared_ptr<T> copy = it->second;
     stateList.erase(it->first);
     copy->time = timeNew;
-    typename ListT::iterator inserted = insert(copy);
+    typename ListT::iterator inserted = Insert(copy);
     return inserted->second;
   }
 
@@ -381,17 +372,14 @@ class SortedContainer {
    * format.
    * \returns String of the buffer contents with line breaks after every entry.
    */
-  std::string echoBufferContentTimes() {
+  std::string EchoBufferContentTimes() {
     std::stringstream ss;
-
-    for (typename ListT::iterator it = getIteratorBegin();
-        it != getIteratorEnd(); ++it) {
+    for (typename ListT::iterator it = GetIteratorBegin();
+        it != GetIteratorEnd(); ++it) {
       ss << std::fixed << std::setprecision(9) << it->second->time << std::endl;
     }
     return ss.str();
-
   }
-
 };
 }
 

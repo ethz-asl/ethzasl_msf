@@ -17,6 +17,8 @@
  * limitations under the License.
  */
 #include <msf_core/eigen_utils.h>
+#ifndef PRESSURE_SENSORHANDLER_HPP_
+#define PRESSURE_SENSORHANDLER_HPP_
 
 namespace msf_pressure_sensor {
 PressureSensorHandler::PressureSensorHandler(
@@ -28,20 +30,20 @@ PressureSensorHandler::PressureSensorHandler(
   ros::NodeHandle pnh("~/pressure_sensor");
   ros::NodeHandle nh("msf_updates");
   subPressure_ =
-      nh.subscribe < asctec_hl_comm::mav_imu
-          > ("pressure_input", 20, &PressureSensorHandler::measurementCallback, this);
+      nh.subscribe<asctec_hl_comm::mav_imu>
+      ("pressure_input", 20, &PressureSensorHandler::MeasurementCallback, this);
 
   memset(heightbuff, 0, sizeof(double) * heightbuffsize);
 
 }
 
-void PressureSensorHandler::setNoises(double n_zp) {
+void PressureSensorHandler::SetNoises(double n_zp) {
   n_zp_ = n_zp;
 }
 
-void PressureSensorHandler::measurementCallback(
+void PressureSensorHandler::MeasurementCallback(
     const asctec_hl_comm::mav_imuConstPtr & msg) {
-  this->sequenceWatchDog(msg->header.seq, subPressure_.getTopic());
+  this->SequenceWatchDog(msg->header.seq, subPressure_.getTopic());
   MSF_INFO_STREAM_ONCE(
       "*** pressure sensor got first measurement from topic "
           << this->topic_namespace_ << "/" << subPressure_.getTopic()
@@ -55,7 +57,7 @@ void PressureSensorHandler::measurementCallback(
   shared_ptr<pressure_measurement::PressureMeasurement> meas(
       new pressure_measurement::PressureMeasurement(n_zp_, true,
                                                     this->sensorID));
-  meas->makeFromSensorReading(msg, msg->header.stamp.toSec());
+  meas->MakeFromSensorReading(msg, msg->header.stamp.toSec());
 
   z_p_ = meas->z_p_;  // Store this for the init procedure.
 
@@ -67,7 +69,7 @@ void PressureSensorHandler::measurementCallback(
     sum += heightbuff[k];
   z_average_p(0) = sum / heightbuffsize;
 
-  this->manager_.msf_core_->addMeasurement(meas);
+  this->manager_.msf_core_->AddMeasurement(meas);
 }
-
-}
+}  // namespace msf_pressure_sensor
+#endif  // PRESSURE_SENSORHANDLER_HPP_

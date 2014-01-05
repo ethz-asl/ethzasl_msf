@@ -20,7 +20,6 @@
 
   <!-- Dependencies needed after this package is compiled. -->
   <run_depend>msf_eval</run_depend>
-  <run_depend>msf_simulate</run_depend>
   <run_depend>msf_core</run_depend>
   <run_depend>msf_distort</run_depend>
   <run_depend>msf_updates</run_depend>

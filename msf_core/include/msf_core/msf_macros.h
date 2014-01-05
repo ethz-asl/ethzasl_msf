@@ -86,48 +86,40 @@
 #endif
 
 #define MSF_INFO_STREAM_ONCE(x) \
-    do \
-    { \
+    do { \
       static bool __log_stream_once__hit__ = false; \
-      if (MSF_UNLIKELY(!__log_stream_once__hit__)) \
-      { \
+      if (MSF_UNLIKELY(!__log_stream_once__hit__)) { \
         __log_stream_once__hit__ = true; \
         MSF_INFO_STREAM(x); \
       } \
     } while(0)
 
 #define MSF_WARN_STREAM_ONCE(x) \
-    do \
-    { \
+    do { \
       static bool __log_stream_once__hit__ = false; \
-      if (MSF_UNLIKELY(!__log_stream_once__hit__)) \
-      { \
+      if (MSF_UNLIKELY(!__log_stream_once__hit__)) { \
         __log_stream_once__hit__ = true; \
         MSF_WARN_STREAM(x); \
       } \
     } while(0)
 
 #define MSF_ERROR_STREAM_ONCE(x) \
-    do \
-    { \
+    do { \
       static bool __log_stream_once__hit__ = false; \
-      if (MSF_UNLIKELY(!__log_stream_once__hit__)) \
-      { \
+      if (MSF_UNLIKELY(!__log_stream_once__hit__)) { \
         __log_stream_once__hit__ = true; \
         MSF_ERROR_STREAM(x); \
       } \
     } while(0)
 
 #define MSF_LOG_STREAM_THROTTLE(rate, x) \
-    do \
-    { \
+    do { \
       static double __log_stream_throttle__last_hit__ = 0.0; \
       std::chrono::time_point<std::chrono::system_clock> __log_stream_throttle__now__ = \
           std::chrono::system_clock::now(); \
       if (MSF_UNLIKELY(__log_stream_throttle__last_hit__ + rate <= \
          std::chrono::duration_cast<std::chrono::seconds>( \
-         __log_stream_throttle__now__.time_since_epoch()).count())) \
-      { \
+         __log_stream_throttle__now__.time_since_epoch()).count())) { \
         __log_stream_throttle__last_hit__ = std::chrono::duration_cast< \
         std::chrono::seconds>(__log_stream_throttle__now__.time_since_epoch()).count(); \
         MSF_INFO_STREAM(x); \
@@ -135,15 +127,13 @@
     } while(0)
 
 #define MSF_WARN_STREAM_THROTTLE(rate, x) \
-    do \
-    { \
+    do { \
       static double __log_stream_throttle__last_hit__ = 0.0; \
       std::chrono::time_point<std::chrono::system_clock> __log_stream_throttle__now__ = \
       std::chrono::system_clock::now(); \
       if (MSF_UNLIKELY(__log_stream_throttle__last_hit__ + rate <= \
         std::chrono::duration_cast<std::chrono::seconds>( \
-        __log_stream_throttle__now__.time_since_epoch()).count())) \
-      { \
+        __log_stream_throttle__now__.time_since_epoch()).count())) { \
         __log_stream_throttle__last_hit__ = \
         std::chrono::duration_cast<std::chrono::seconds>( \
         __log_stream_throttle__now__.time_since_epoch()).count(); \
@@ -152,15 +142,13 @@
     } while(0)
 
 #define MSF_ERROR_STREAM_THROTTLE(rate, x) \
-    do \
-    { \
+    do { \
       static double __log_stream_throttle__last_hit__ = 0.0; \
       std::chrono::time_point<std::chrono::system_clock> __log_stream_throttle__now__ = \
       std::chrono::system_clock::now(); \
       if (MSF_UNLIKELY(__log_stream_throttle__last_hit__ + rate <= \
         std::chrono::duration_cast<std::chrono::seconds>(\
-        __log_stream_throttle__now__.time_since_epoch()).count())) \
-      { \
+        __log_stream_throttle__now__.time_since_epoch()).count())) { \
         __log_stream_throttle__last_hit__ = \
         std::chrono::duration_cast<std::chrono::seconds>\
         (__log_stream_throttle__now__.time_since_epoch()).count(); \
@@ -169,28 +157,22 @@
     } while(0)
 
 #define MSF_INFO_STREAM_COND(cond, x) \
-    do \
-    {  \
-      if (MSF_UNLIKELY(cond)) \
-      { \
+    do {  \
+      if (MSF_UNLIKELY(cond)) { \
         MSF_INFO_STREAM(x); \
       } \
     } while(0)
 
 #define MSF_WARN_STREAM_COND(cond, x) \
-    do \
-    {  \
-      if (MSF_UNLIKELY(cond)) \
-      { \
+    do {  \
+      if (MSF_UNLIKELY(cond)) { \
         MSF_WARN_STREAM(x); \
       } \
     } while(0)
 
 #define MSF_ERROR_STREAM_COND(cond, x) \
-    do \
-    {  \
-      if (MSF_UNLIKELY(cond)) \
-      { \
+    do {  \
+      if (MSF_UNLIKELY(cond)) { \
         MSF_ERROR_STREAM(x); \
       } \
     } while(0)

@@ -36,25 +36,25 @@ struct StaticAssertCoreStateOrderingCorrect {
   // TODO: (slynen) This should be ok now, apart from the Cov init matrix.
   //{
   enum {
-    idxstartcorr_p_ = msf_tmp::getStartIndex<StateSequence_T,
-        typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::p>::value,
+    idxstartcorr_p_ = msf_tmp::GetStartIndex<StateSequence_T,
+        typename msf_tmp::GetEnumStateType<StateSequence_T, StateDefinition_T::p>::value,
         msf_tmp::CorrectionStateLengthForType>::value,
 
-    idxstartcorr_v_ = msf_tmp::getStartIndex<StateSequence_T,
-        typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::v>::value,
+    idxstartcorr_v_ = msf_tmp::GetStartIndex<StateSequence_T,
+        typename msf_tmp::GetEnumStateType<StateSequence_T, StateDefinition_T::v>::value,
         msf_tmp::CorrectionStateLengthForType>::value,
 
-    idxstartcorr_q_ = msf_tmp::getStartIndex<StateSequence_T,
-        typename msf_tmp::getEnumStateType<StateSequence_T, StateDefinition_T::q>::value,
+    idxstartcorr_q_ = msf_tmp::GetStartIndex<StateSequence_T,
+        typename msf_tmp::GetEnumStateType<StateSequence_T, StateDefinition_T::q>::value,
         msf_tmp::CorrectionStateLengthForType>::value,
 
-    idxstartcorr_b_w_ = msf_tmp::getStartIndex<StateSequence_T,
-        typename msf_tmp::getEnumStateType<StateSequence_T,
+    idxstartcorr_b_w_ = msf_tmp::GetStartIndex<StateSequence_T,
+        typename msf_tmp::GetEnumStateType<StateSequence_T,
             StateDefinition_T::b_w>::value,
         msf_tmp::CorrectionStateLengthForType>::value,
 
-    idxstartcorr_b_a_ = msf_tmp::getStartIndex<StateSequence_T,
-        typename msf_tmp::getEnumStateType<StateSequence_T,
+    idxstartcorr_b_a_ = msf_tmp::GetStartIndex<StateSequence_T,
+        typename msf_tmp::GetEnumStateType<StateSequence_T,
             StateDefinition_T::b_a>::value,
         msf_tmp::CorrectionStateLengthForType>::value
   };

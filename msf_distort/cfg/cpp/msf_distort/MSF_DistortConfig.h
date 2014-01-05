@@ -122,7 +122,7 @@ namespace msf_distort
 
       virtual void toServer(const ros::NodeHandle &nh, const MSF_DistortConfig &config) const
       {
-        nh.setParam(name, config.*field);
+        nh.SetStateCovariancearam(name, config.*field);
       }
 
       virtual bool fromMessage(const dynamic_reconfigure::Config &msg, MSF_DistortConfig &config) const
@@ -223,7 +223,7 @@ namespace msf_distort
         PT* config = boost::any_cast<PT*>(cfg);
 
         T* f = &((*config).*field);
-        f->setParams(top, abstract_parameters);
+        f->SetStateCovariancearams(top, abstract_parameters);
 
         for(std::vector<AbstractGroupDescriptionConstPtr>::const_iterator i = groups.begin(); i != groups.end(); i++) 
         {
@@ -256,7 +256,7 @@ class DEFAULT
       name = "Default";
     }
 
-    void setParams(MSF_DistortConfig &config, const std::vector<AbstractParamDescriptionConstPtr> params)
+    void SetStateCovariancearams(MSF_DistortConfig &config, const std::vector<AbstractParamDescriptionConstPtr> params)
     {
       for (std::vector<AbstractParamDescriptionConstPtr>::const_iterator i = params.begin(); i != params.end(); i++)
       {
