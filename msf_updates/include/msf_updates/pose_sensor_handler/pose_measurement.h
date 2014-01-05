@@ -163,8 +163,7 @@ struct PoseMeasurement : public PoseMeasurementBase {
     H.setZero();
 
     // Get rotation matrices.
-    Eigen::Matrix<double, 3, 3> C_wv = state.Get<StateQwv>()
-
+    Eigen::Matrix<double, 3, 3> C_wv = state.Get<StateQwvIdx>()
         .toRotationMatrix();
     Eigen::Matrix<double, 3, 3> C_q = state.Get<StateDefinition_T::q>()
         .toRotationMatrix();
@@ -177,9 +176,9 @@ struct PoseMeasurement : public PoseMeasurementBase {
 
     vecold = (state.Get<StateDefinition_T::p>()
         + C_q * state.Get<StatePicIdx>()) * state.Get<StateLIdx>();
-    Eigen::Matrix<double, 3, 3> skewold = skew(vecold);
+    Eigen::Matrix<double, 3, 3> skewold = Skew(vecold);
 
-    Eigen::Matrix<double, 3, 3> pci_sk = skew(state.Get<StatePicIdx>());
+    Eigen::Matrix<double, 3, 3> pci_sk = Skew(state.Get<StatePicIdx>());
 
 
     // Get indices of states in error vector.
@@ -240,7 +239,7 @@ struct PoseMeasurement : public PoseMeasurementBase {
 
     H.block<3, 3>(0, kIdxstartcorr_qwv) =
         driftwvattfix ?
-            Eigen::Matrix<double, 3, 3>::Zero() : (-C_wv * Skewold).eval();  // q_wv
+            Eigen::Matrix<double, 3, 3>::Zero() : (-C_wv * skewold).eval();  // q_wv
 
     H.block<3, 3>(0, kIdxstartcorr_pic) =
         calibposfix ?
