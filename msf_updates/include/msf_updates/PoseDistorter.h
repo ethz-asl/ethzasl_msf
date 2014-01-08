@@ -20,7 +20,7 @@
 #include <Eigen/Dense>
 #include <random>
 #include <cmath>
-#include <msf_core/msf_types.hpp>
+#include <msf_core/msf_types.h>
 #include <msf_core/msf_fwds.h>
 
 namespace msf_updates {
@@ -46,11 +46,11 @@ class PoseDistorter {
                 const Eigen::Vector3d& meanattdrift,
                 const Eigen::Vector3d& stddevattdrift,
                 const double meanscaledrift, const double stddevscaledrift);
-  void distort(Eigen::Vector3d& pos, Eigen::Quaterniond& att, double dt);
-  void distort(Eigen::Vector3d& pos, double dt);
-  void distort(Eigen::Quaterniond& att, double dt);
+  void Distort(Eigen::Vector3d& pos, Eigen::Quaterniond& att, double dt);
+  void Distort(Eigen::Vector3d& pos, double dt);
+  void Distort(Eigen::Quaterniond& att, double dt);
   virtual ~PoseDistorter();
 };
 
 }  // namespace msf_updates
-#endif /* POSEDISTORTER_H_ */
+#endif  // POSEDISTORTER_H_

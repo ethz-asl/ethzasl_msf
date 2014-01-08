@@ -35,11 +35,9 @@ Timing& Timing::Instance() {
 }
 
 Timing::Timing()
-    : maxTagLength_(0) {
-}
+    : maxTagLength_(0) { }
 
-Timing::~Timing() {
-}
+Timing::~Timing() { }
 
 // Static functions to query the timers:
 size_t Timing::GetHandle(std::string const& tag) {

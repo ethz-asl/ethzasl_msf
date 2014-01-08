@@ -16,8 +16,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef POSITION_SENSOR_H
-#define POSITION_SENSOR_H
+#ifndef POSITION_SENSOR_H_
+#define POSITION_SENSOR_H_
 
 #include <msf_core/msf_sensormanagerROS.h>
 #include <geometry_msgs/PointStamped.h>
@@ -46,27 +46,27 @@ class PositionSensorHandler : public msf_core::SensorHandler<
   bool use_fixed_covariance_;  ///< Use fixed covariance set by dynamic reconfigure.
   bool provides_absolute_measurements_;  ///< Does this sensor measure relative or absolute values.
 
-  void processPositionMeasurement(
+  void ProcessPositionMeasurement(
       const sensor_fusion_comm::PointWithCovarianceStampedConstPtr& msg);
-  void measurementCallback(const geometry_msgs::PointStampedConstPtr & msg);
-  void measurementCallback(const geometry_msgs::TransformStampedConstPtr & msg);
-  void measurementCallback(const sensor_msgs::NavSatFixConstPtr& msg);
+  void MeasurementCallback(const geometry_msgs::PointStampedConstPtr & msg);
+  void MeasurementCallback(const geometry_msgs::TransformStampedConstPtr & msg);
+  void MeasurementCallback(const sensor_msgs::NavSatFixConstPtr& msg);
 
  public:
   typedef MEASUREMENT_TYPE measurement_t;
   PositionSensorHandler(MANAGER_TYPE& meas, std::string topic_namespace,
                         std::string parameternamespace);
   // Used for the init.
-  Eigen::Matrix<double, 3, 1> getPositionMeasurement() {
+  Eigen::Matrix<double, 3, 1> GetPositionMeasurement() {
     return z_p_;
   }
   // Setters for configure values.
-  void setNoises(double n_zp);
-  void setDelay(double delay);
-  void adjustGPSZReference(double current_z);
-
+  void SetNoises(double n_zp);
+  void SetDelay(double delay);
+  void AdjustGPSZReference(double current_z);
 };
-}
+}  // namespace msf_position_sensor
+
 #include "implementation/position_sensorhandler.hpp"
 
-#endif /* POSITION_SENSOR_H */
+#endif  // POSITION_SENSOR_H_

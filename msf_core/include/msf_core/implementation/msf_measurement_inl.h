@@ -14,6 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef MEASUREMENT_INL_H_
+#define MEASUREMENT_INL_H_
 #include <msf_core/msf_core.h>
 
 namespace msf_core {
@@ -27,7 +29,7 @@ MSF_MeasurementBase<EKFState_T>::MSF_MeasurementBase(bool isabsoluteMeasurement,
 
 template<typename EKFState_T>
 template<class H_type, class Res_type, class R_type>
-void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrection(
+void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
     shared_ptr<EKFState_T> state, MSF_Core<EKFState_T>& core,
     const Eigen::MatrixBase<H_type>& H_delayed,
     const Eigen::MatrixBase<Res_type> & res_delayed,
@@ -56,11 +58,11 @@ void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrection(
   // Make sure P stays symmetric.
   P = 0.5 * (P + P.transpose());
 
-  core.applyCorrection(state, correction_);
+  core.ApplyCorrection(state, correction_);
 }
 
 template<typename EKFState_T>
-void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrection(
+void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
     shared_ptr<EKFState_T> state, MSF_Core<EKFState_T>& core,
     const Eigen::MatrixXd& H_delayed, const Eigen::MatrixXd & res_delayed,
     const Eigen::MatrixXd& R_delayed) {
@@ -86,12 +88,12 @@ void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrection(
   // Make sure P stays symmetric.
   P = 0.5 * (P + P.transpose());
 
-  core.applyCorrection(state, correction_);
+  core.ApplyCorrection(state, correction_);
 }
 
 template<typename EKFState_T>
 template<class H_type, class Res_type, class R_type>
-void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrectionRelative(
+void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrectionRelative(
     shared_ptr<EKFState_T> state_old, shared_ptr<EKFState_T> state_new,
     MSF_Core<EKFState_T>& core, const Eigen::MatrixBase<H_type>& H_old,
     const Eigen::MatrixBase<H_type>& H_new,
@@ -111,7 +113,7 @@ void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrectionRelative(
 
   // Get the accumulated system dynamics.
   Eigen::Matrix<double, Pdim, Pdim> F_accum;
-  core.getAccumF_SC(state_old, state_new, F_accum);
+  core.GetAccumulatedStateTransitionStochasticCloning(state_old, state_new, F_accum);
 
   /*[
    *        | P_kk       P_kk * F' |
@@ -160,18 +162,18 @@ void MSF_MeasurementBase<EKFState_T>::calculateAndApplyCorrectionRelative(
   // TODO (slynen): EV, set Evalues<eps to zero, then reconstruct.
   state_new->P = 0.5 * (state_new->P + state_new->P.transpose());
 
-  core.applyCorrection(state_new, correction_);
+  core.ApplyCorrection(state_new, correction_);
 }
 
 template<typename EKFState_T>
-void MSF_InitMeasurement<EKFState_T>::apply(
+void MSF_InitMeasurement<EKFState_T>::Apply(
     shared_ptr<EKFState_T> stateWithCovariance, MSF_Core<EKFState_T>& core) {
 
   // Makes this state a valid starting point.
   stateWithCovariance->time = this->time;
 
   boost::fusion::for_each(stateWithCovariance->statevars,
-                          msf_tmp::copyInitStates<EKFState_T>(InitState));
+                          msf_tmp::CopyInitStates<EKFState_T>(InitState));
 
   if (!(InitState.P.minCoeff() == 0 && InitState.P.maxCoeff() == 0)) {
     stateWithCovariance->P = InitState.P;
@@ -189,7 +191,8 @@ void MSF_InitMeasurement<EKFState_T>::apply(
     stateWithCovariance->w_m.setZero();
   }
 
-  core.usercalc().publishStateInitial(stateWithCovariance);
+  core.GetUserCalc().PublishStateInitial(stateWithCovariance);
 
 }
-}
+}  // namespace msf_core
+#endif  // MEASUREMENT_INL_H_

@@ -45,4 +45,4 @@ MSF_MAKE_EIGEN_TYPES(8)
 MSF_MAKE_EIGEN_TYPES(9)
 
 }
-#endif /* MSF_TYPES_HPP_ */
+#endif  // MSF_TYPES_HPP_

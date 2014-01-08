@@ -36,8 +36,7 @@ struct PressureMeasurement : public PressureMeasurementBase {
   typedef PressureMeasurementBase Measurement_t;
   typedef Measurement_t::Measurement_ptr measptr_t;
 
-  virtual void makeFromSensorReadingImpl(measptr_t msg) {
-
+  virtual void MakeFromSensorReadingImpl(measptr_t msg) {
     Eigen::Matrix<double, nMeasurements,
         msf_core::MSF_Core<msf_updates::EKFState>::nErrorStatesAtCompileTime> H_old;
     Eigen::Matrix<double, nMeasurements, 1> r_old;
@@ -59,20 +58,18 @@ struct PressureMeasurement : public PressureMeasurementBase {
 
   typedef msf_updates::EKFState EKFState_T;
   typedef EKFState_T::StateDefinition_T StateDefinition_T;
-  virtual ~PressureMeasurement() {
-  }
+  virtual ~PressureMeasurement() { }
   PressureMeasurement(double n_zp, bool isabsoluteMeasurement, int sensorID)
       : PressureMeasurementBase(isabsoluteMeasurement, sensorID),
-        n_zp_(n_zp) {
-  }
-  virtual std::string type() {
+        n_zp_(n_zp) { }
+  virtual std::string Type() {
     return "pressure";
   }
   /**
    * The method called by the msf_core to apply the measurement represented by
    * this object.
    */
-  virtual void apply(shared_ptr<EKFState_T> non_const_state,
+  virtual void Apply(shared_ptr<EKFState_T> non_const_state,
                      msf_core::MSF_Core<EKFState_T>& core) {
     // Init variables.
     Eigen::Matrix<double, nMeasurements,
@@ -90,13 +87,13 @@ struct PressureMeasurement : public PressureMeasurementBase {
     const EKFState_T& state = *non_const_state;
 
     enum {
-      idx_p = msf_tmp::getStartIndex<EKFState_T::StateSequence_T,
-          typename msf_tmp::getEnumStateType<EKFState_T::StateSequence_T,
+      idx_p = msf_tmp::GetStartIndex<EKFState_T::StateSequence_T,
+          typename msf_tmp::GetEnumStateType<EKFState_T::StateSequence_T,
               StateDefinition_T::p>::value,
           msf_tmp::CorrectionStateLengthForType>::value,
 
-      idx_b_p = msf_tmp::getStartIndex<EKFState_T::StateSequence_T,
-          typename msf_tmp::getEnumStateType<EKFState_T::StateSequence_T,
+      idx_b_p = msf_tmp::GetStartIndex<EKFState_T::StateSequence_T,
+          typename msf_tmp::GetEnumStateType<EKFState_T::StateSequence_T,
               StateDefinition_T::b_p>::value,
           msf_tmp::CorrectionStateLengthForType>::value
     };
@@ -109,15 +106,12 @@ struct PressureMeasurement : public PressureMeasurementBase {
 
     // Construct residuals.
     // Height.
-    r_old.block<1, 1>(0, 0) = (z_p_ + state.get<StateDefinition_T::b_p>())
-        - state.get<StateDefinition_T::p>().block<1, 1>(2, 0);
+    r_old.block<1, 1>(0, 0) = (z_p_ + state.Get<StateDefinition_T::b_p>())
+        - state.Get<StateDefinition_T::p>().block<1, 1>(2, 0);
 
     // Call update step in base class.
-    this->calculateAndApplyCorrection(non_const_state, core, H_old, r_old, R_);
-
+    this->CalculateAndApplyCorrection(non_const_state, core, H_old, r_old, R_);
   }
 };
-
-}
-
-#endif /* POSE_MEASUREMENT_HPP_ */
+}  // namespace pressure_measurement
+#endif  // POSE_MEASUREMENT_HPP_

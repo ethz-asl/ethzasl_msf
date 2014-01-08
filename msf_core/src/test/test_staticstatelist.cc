@@ -21,7 +21,7 @@
 #define WITHTESTS 1
 
 #if (WITHTESTS == 1)
-//test calculated sizes
+// Test calculated sizes.
 TEST(CompileTimeComputation, stateSizeCalculation) {
   using namespace msf_core;
   enum {
@@ -33,7 +33,7 @@ TEST(CompileTimeComputation, stateSizeCalculation) {
   const static int vectorlength1 = 4;
   const static int vectorlength2 = 10;
 
-  //setup some state type
+  // Setup some state type.
   typedef boost::fusion::vector<
   StateVar_T<Eigen::Matrix<double, vectorlength1, 1>, a >,
   StateVar_T<Eigen::Quaterniond, b >,
@@ -54,7 +54,7 @@ TEST(CompileTimeComputation, stateSizeCalculation) {
   ASSERT_EQ(somestate.get<3>().sizeInState_, vectorlength2);
 }
 
-//test indices of statevars in state vectors
+// Test indices of statevars in state vectors.
 TEST(CompileTimeComputation, stateIndexCalculation) {
   using namespace msf_core;
   enum {
@@ -66,7 +66,7 @@ TEST(CompileTimeComputation, stateIndexCalculation) {
   const static int vectorlength1 = 4;
   const static int vectorlength2 = 10;
 
-  //setup some state type
+  // Setup some state type.
   typedef boost::fusion::vector<
   StateVar_T<Eigen::Matrix<double, vectorlength1, 1>, a >,
   StateVar_T<Eigen::Quaterniond, b >,
@@ -76,29 +76,44 @@ TEST(CompileTimeComputation, stateIndexCalculation) {
   typedef GenericState_T<fullState_T> EKFState;
 
   EKFState somestate;
-  static const int idxstartcorr1 = msf_tmp::getStartIndex<fullState_T, StateVar_T<Eigen::Matrix<double, vectorlength1, 1>, a >, msf_tmp::CorrectionStateLengthForType>::value;
-  static const int idxstartstate1 = msf_tmp::getStartIndex<fullState_T, StateVar_T<Eigen::Matrix<double, vectorlength1, 1>, a >, msf_tmp::StateLengthForType>::value;
+  static const int idxstartcorr1 = msf_tmp::GetStartIndex<fullState_T,
+      StateVar_T<Eigen::Matrix<double, vectorlength1, 1>, a >,
+      msf_tmp::CorrectionStateLengthForType>::value;
+  static const int idxstartstate1 = msf_tmp::GetStartIndex<fullState_T,
+      StateVar_T<Eigen::Matrix<double, vectorlength1, 1>, a >,
+      msf_tmp::StateLengthForType>::value;
   ASSERT_EQ(idxstartcorr1, 0);
   ASSERT_EQ(idxstartstate1, 0);
 
-  static const int idxstartcorr2 = msf_tmp::getStartIndex<fullState_T, StateVar_T<Eigen::Quaterniond, b >, msf_tmp::CorrectionStateLengthForType>::value;
-  static const int idxstartstate2 = msf_tmp::getStartIndex<fullState_T, StateVar_T<Eigen::Quaterniond, b >, msf_tmp::StateLengthForType>::value;
+  static const int idxstartcorr2 = msf_tmp::GetStartIndex<fullState_T,
+      StateVar_T<Eigen::Quaterniond, b >,
+      msf_tmp::CorrectionStateLengthForType>::value;
+  static const int idxstartstate2 = msf_tmp::GetStartIndex<fullState_T,
+      StateVar_T<Eigen::Quaterniond, b >, msf_tmp::StateLengthForType>::value;
   ASSERT_EQ(idxstartcorr2, vectorlength1);
   ASSERT_EQ(idxstartstate2, vectorlength1);
 
-  static const int idxstartcorr3 = msf_tmp::getStartIndex<fullState_T, StateVar_T<Eigen::Matrix<double, 1, 1>, c >, msf_tmp::CorrectionStateLengthForType>::value;
-  static const int idxstartstate3 = msf_tmp::getStartIndex<fullState_T, StateVar_T<Eigen::Matrix<double, 1, 1>, c >, msf_tmp::StateLengthForType>::value;
+  static const int idxstartcorr3 = msf_tmp::GetStartIndex<fullState_T,
+      StateVar_T<Eigen::Matrix<double, 1, 1>, c >,
+      msf_tmp::CorrectionStateLengthForType>::value;
+  static const int idxstartstate3 = msf_tmp::GetStartIndex<fullState_T,
+      StateVar_T<Eigen::Matrix<double, 1, 1>, c >,
+      msf_tmp::StateLengthForType>::value;
   ASSERT_EQ(idxstartcorr3, vectorlength1 + 3);
   ASSERT_EQ(idxstartstate3, vectorlength1 + 4);
 
-  static const int idxstartcorr4 = msf_tmp::getStartIndex<fullState_T, StateVar_T<Eigen::Matrix<double, vectorlength2, 1>, d >, msf_tmp::CorrectionStateLengthForType>::value;
-  static const int idxstartstate4 = msf_tmp::getStartIndex<fullState_T, StateVar_T<Eigen::Matrix<double, vectorlength2, 1>, d >, msf_tmp::StateLengthForType>::value;
+  static const int idxstartcorr4 = msf_tmp::GetStartIndex<fullState_T,
+      StateVar_T<Eigen::Matrix<double, vectorlength2, 1>, d >,
+      msf_tmp::CorrectionStateLengthForType>::value;
+  static const int idxstartstate4 = msf_tmp::GetStartIndex<fullState_T,
+      StateVar_T<Eigen::Matrix<double, vectorlength2, 1>, d >,
+      msf_tmp::StateLengthForType>::value;
   ASSERT_EQ(idxstartcorr4, vectorlength1 + 3 + 1);
   ASSERT_EQ(idxstartstate4, vectorlength1 + 4 + 1);
 
 }
 
-// Tests compile time computed values for the state
+// Tests compile time computed values for the state.
 TEST(CompileTimeComputation, stateLengthCalculation) {
   using namespace msf_core;
   enum {
@@ -125,8 +140,7 @@ TEST(CompileTimeComputation, stateLengthCalculation) {
 }
 
 TEST(RuntimeTimeComputation, copyForNonPropagationStates) {
-
-  enum {  //must not manually set the enum values!
+  enum {
     p_,
     v_,
     q_,
@@ -138,20 +152,17 @@ TEST(RuntimeTimeComputation, copyForNonPropagationStates) {
     p_ci_
   };
 
-  //setup core state, then auxiliary state
   typedef boost::fusion::vector<
-  // states varying during propagation - must not change the ordering here for now, CalcQ has the ordering hardcoded
-  msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_, true>,///< position (IMU centered)          (0-2 / 0-2)
-  msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, v_, true>,///< velocity                         (3- 5 / 3- 5)
-  msf_core::StateVar_T<Eigen::Quaternion<double>, q_, true>,///< attitude                         (6- 9 / 6- 8)
-  msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, b_w_, true>,///< gyro biases                      
-  msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, b_a_, true>,///< acceleration biases              
+  msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_, true>,
+  msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, v_, true>,
+  msf_core::StateVar_T<Eigen::Quaternion<double>, q_, true>,
+  msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, b_w_, true>,
+  msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, b_a_, true>,
 
-  // states not varying during propagation
-  msf_core::StateVar_T<Eigen::Matrix<double, 1, 1>, L_>,///< visual scale                     (16 / 15)
-  msf_core::StateVar_T<Eigen::Quaternion<double>, q_wv_>,///< vision-world attitude drift      (17-20 / 16-18)
-  msf_core::StateVar_T<Eigen::Quaternion<double>, q_ci_>,///< camera-imu attitude calibration  (21-24 / 19-21)
-  msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_ci_>///< camera-imu position calibration  (25-27 / 22-24)
+  msf_core::StateVar_T<Eigen::Matrix<double, 1, 1>, L_>,
+  msf_core::StateVar_T<Eigen::Quaternion<double>, q_wv_>,
+  msf_core::StateVar_T<Eigen::Quaternion<double>, q_ci_>,
+  msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_ci_>
   > fullState_T;
 
   typedef msf_core::GenericState_T<fullState_T> EKFState;
@@ -172,24 +183,31 @@ TEST(RuntimeTimeComputation, copyForNonPropagationStates) {
 
   boost::fusion::for_each(
       first_state.statevars_,
-      msf_tmp::copyNonPropagationStates<EKFState>(second_state)
+      msf_tmp::CopyNonPropagationStates<EKFState>(second_state)
   );
 
-  ASSERT_DOUBLE_EQ(first_state.get<msf_core::p_>().state_(0), second_state.get<msf_core::p_>().state_(0));
-  ASSERT_DOUBLE_EQ(first_state.get<msf_core::p_>().state_(1), second_state.get<msf_core::p_>().state_(1));
-  ASSERT_DOUBLE_EQ(first_state.get<msf_core::p_>().state_(2), second_state.get<msf_core::p_>().state_(2));
+  ASSERT_DOUBLE_EQ(first_state.get<msf_core::p_>().state_(0),
+                   second_state.get<msf_core::p_>().state_(0));
+  ASSERT_DOUBLE_EQ(first_state.get<msf_core::p_>().state_(1),
+                   second_state.get<msf_core::p_>().state_(1));
+  ASSERT_DOUBLE_EQ(first_state.get<msf_core::p_>().state_(2),
+                   second_state.get<msf_core::p_>().state_(2));
 
-  ASSERT_DOUBLE_EQ(first_state.get<msf_core::q_>().state_.w(), second_state.get<msf_core::q_>().state_.w());
-  ASSERT_DOUBLE_EQ(first_state.get<msf_core::q_>().state_.x(), second_state.get<msf_core::q_>().state_.x());
-  ASSERT_DOUBLE_EQ(first_state.get<msf_core::q_>().state_.y(), second_state.get<msf_core::q_>().state_.y());
-  ASSERT_DOUBLE_EQ(first_state.get<msf_core::q_>().state_.z(), second_state.get<msf_core::q_>().state_.z());
+  ASSERT_DOUBLE_EQ(first_state.get<msf_core::q_>().state_.w(),
+                   second_state.get<msf_core::q_>().state_.w());
+  ASSERT_DOUBLE_EQ(first_state.get<msf_core::q_>().state_.x(),
+                   second_state.get<msf_core::q_>().state_.x());
+  ASSERT_DOUBLE_EQ(first_state.get<msf_core::q_>().state_.y(),
+                   second_state.get<msf_core::q_>().state_.y());
+  ASSERT_DOUBLE_EQ(first_state.get<msf_core::q_>().state_.z(),
+                   second_state.get<msf_core::q_>().state_.z());
 }
 
 #endif
 
 int main(int argc, char** argv) {
 
-  //an instantiation of a state
+  // An instantiation of a state.
   msf_core::EKFState somestate;
   msf_core::EKFState otherstate;
 
@@ -203,23 +221,23 @@ int main(int argc, char** argv) {
 
   std::cout << "name " << somestate.get<0>().name_ << std::endl;
 
-  //number of state variables
+  // Number of state variables.
   std::cout << "nstatevars: " << msf_core::EKFState::nStatesAtCompileTime
       << std::endl;
 
-  //number of states
+  // Number of states.
   std::cout << "nstates: " << msf_core::EKFState::nStatesAtCompileTime
       << std::endl;
 
-  //number of correction states
+  // Number of correction states.
   std::cout << "nerrortates: " << msf_core::EKFState::nErrorStatesAtCompileTime
       << std::endl;
 
-  //apply correction to all states
+  // Apply correction to all states.
   Eigen::Matrix<double, msf_core::EKFState::nErrorStatesAtCompileTime, 1> correction;
   std::cout << "passing random correction vector" << std::endl;
   correction.setRandom();
-  somestate.correct(correction);
+  somestate.Correct(correction);
 
 #if (WITHTESTS == 1)
   testing::InitGoogleTest(&argc, argv);
