@@ -23,7 +23,7 @@ binSize=20.0; % [m]
 
 % get the data
 
-Vicon2_Range_once_svd_matlab;
+Vicon2_Range_align20end;
 data_EVAL{1} = data; %method A
 
 % Data20131209LeicaEvalVicon1TFInv;
@@ -36,8 +36,8 @@ nameMethodA = 'Visual Inertial State Estimation';
 % nameMethodB = 'B';
 % nameMethodC = 'C';
 
-percentile_low = 0.15
-percentile_high = 0.85
+percentile_low = 0.05;
+percentile_high = 0.95;
 
 mk{1}='.';
 mk{2}='o';
@@ -82,9 +82,9 @@ for ds = binSize / 2:binSize:max(data_EVAL{k}(:, 2) - binSize / 2)
     rotationMean(i, 1) = mean(box(:,4) / pi * 180);
     
     if size(box, 2) > 4
-        rotationZLow(i, 1) = prctile(box_unnorm(:, 5) / pi * 180, percentile_low);
-        rotationZHigh(i, 1) = prctile(box_unnorm(:, 5) / pi * 180, percentile_high);
-        rotationZMean(i, 1) = mean(box_unnorm(:, 5) / pi * 180);
+        rotationZLow(i, 1) = prctile(box(:, 5) / pi * 180, percentile_low);
+        rotationZHigh(i, 1) = prctile(box(:, 5) / pi * 180, percentile_high);
+        rotationZMean(i, 1) = mean(box(:, 5) / pi * 180);
     end
     
     dsVector(1, i) = ds + (k - 2) * 2;
@@ -121,11 +121,11 @@ set(gca,'YGrid','on');
 %Gravity align ERROR
 subplot(3,1,3)
 errorbar(dsVector, rotationZMean, rotationZLow, rotationZHigh, mk{k},'MarkerSize',12*scales(k),'LineWidth',0.5,'Color',clr{k})
-ylabel('World z-dir. err. [{}^\circ]')
+ylabel('World z-dir. err. [{}^\circ/m]')
 xlabel('Distance travelled [m]')
 hold on;
 grid minor;
-axis([0 ds 0 5])
+axis([0 ds 0 0.05])
 set(gca,'xTick',binSize/2:binSize*4:ds)
 set(gca,'YGrid','on');
 
@@ -133,7 +133,7 @@ set(gca,'YGrid','on');
 subplot(3,1,2)
 legend(nameMethodA, 'Orientation','horizontal')
 
-wg = 15;
+wg = 10;
 exportfig(gcf, 'error_plots.pdf','height', wg * 1.5, 'width', wg, 'Color', 'cmyk', 'FontSize', 2);
 
 [total_distance, last_index_first_run] = max(data_EVAL{k}(:, 2));
@@ -147,6 +147,61 @@ grid on;
 plot3(first_run_data(:, 9), first_run_data(:, 10), first_run_data(:, 11), 'r');
 legend('Estimate', 'Groundtruth')
 axis equal;
+view([0 90])
+exportfig(gcf, 'topdown.pdf','height', wg * 1.5, 'width', wg, 'Color', 'cmyk', 'FontSize', 2);
+
+figure(); figure(gcf());
+subplot(3, 1, 1)
+plot(first_run_data(:, 2), first_run_data(:, 6), 'r');
+hold on;
+grid minor;
+plot(first_run_data(:, 2), first_run_data(:, 9), 'r--');
+ylabel('Estimated position x [m]')
+xlabel('Distance travelled [m]')
+legend('Estimation', 'Vicon')
+hold off;
+subplot(3, 1, 2)
+plot(first_run_data(:, 2), first_run_data(:, 7), 'g');
+hold on;
+grid minor;
+plot(first_run_data(:, 2), first_run_data(:, 10), 'g--');
+ylabel('Estimated position y [m]')
+xlabel('Distance travelled [m]')
+hold off;
+subplot(3, 1, 3)
+plot(first_run_data(:, 2), first_run_data(:, 8), 'b');
+hold on;
+grid minor;
+plot(first_run_data(:, 2), first_run_data(:, 11), 'b--');
+ylabel('Estimated position z [m]')
+xlabel('Distance travelled [m]')
+hold off;
+wg = 10;
+exportfig(gcf, 'estimation_plots_over_distance.pdf','height', wg * 1.5, 'width', wg, 'Color', 'cmyk', 'FontSize', 2);
+
+
+figure(); figure(gcf());
+subplot(3, 1, 1)
+plot(first_run_data(:, 2), first_run_data(:, 6) - first_run_data(:, 9), 'r');
+ylabel('Estimation error position x [m]')
+xlabel('Distance travelled [m]')
+grid minor;
+hold off;
+subplot(3, 1, 2)
+plot(first_run_data(:, 2), first_run_data(:, 7) - first_run_data(:, 10), 'g');
+ylabel('Estimation error position y [m]')
+xlabel('Distance travelled [m]')
+grid minor;
+hold off;
+subplot(3, 1, 3)
+plot(first_run_data(:, 2), first_run_data(:, 8) - first_run_data(:, 11), 'b');
+ylabel('Estimation error position z [m]')
+xlabel('Distance travelled [m]')
+grid minor;
+hold off;
+wg = 10;
+exportfig(gcf, 'error_plots_over_distance.pdf','height', wg * 1.5, 'width', wg, 'Color', 'cmyk', 'FontSize', 2);
+
 
 
 % figure(); figure(gcf());

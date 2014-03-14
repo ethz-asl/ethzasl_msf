@@ -23,6 +23,7 @@
 #include <boost/assign/list_of.hpp>
 #include <boost/foreach.hpp>
 #include <nav_msgs/Odometry.h>
+#include <geometry_msgs/PointStamped.h>
 #include <geometry_msgs/TransformStamped.h>
 #include <sm/kinematics/transformations.hpp>
 #include <sm/kinematics/Transformation.hpp>
@@ -130,6 +131,8 @@ void EstimateRigidTransform(
   *transformation = sm::kinematics::Transformation(rotation, translation);
 }
 
+#define VICON
+
 int main(int argc, char **argv) {
   ros::init(argc, argv, "msf_eval");
   ros::Time::init();
@@ -152,16 +155,37 @@ int main(int argc, char **argv) {
 
   //this is the Vicon one - SLAM sensor V3 - large Rig for Leica eval
   ///////////////////////////////////////////////////////////////////////////////////////////
+#ifdef VICON
   Eigen::Matrix4d T_BgBa_mat;
-  T_BgBa_mat << 0.167956, 0.95149842, -0.25776255, 0.17104256, 0.18648779, 0.22608787, 0.95608921, 0.10819705, 0.96799436, -0.20865049, -0.13947003, 0.09269324, 0., 0., 0., 1.;
+  T_BgBa_mat << 0.167956, 0.95149842, -0.25776255, 0.17104256,
+                0.18648779, 0.22608787, 0.95608921, 0.10819705,
+                0.96799436, -0.20865049, -0.13947003, 0.09269324,
+                0., 0., 0., 1.;
+#endif
   ////////////////////////////////////////////////////////////////////////////////////////////
+
+  //this is the Leica one - SLAM sensor V3 - large Rig for Leica eval
+    ///////////////////////////////////////////////////////////////////////////////////////////
+#ifdef LEICA
+//    Eigen::Matrix4d T_BgBa_mat;
+//    T_BgBa_mat <<  1, 0, 0, 0.05354061,
+//         0, 1, 0, -0.06776346,
+//         0, 0, 1, -0.05771415,
+//         0, 0, 0, 1;
+    ////////////////////////////////////////////////////////////////////////////////////////////
+#endif
 
   sm::kinematics::Transformation T_BgBa(T_BgBa_mat);  // Ground Truth to body
 
   sm::kinematics::Transformation T_BaBg = T_BgBa.inverse();
 
 //  ros::Duration dt(0.0039);
+#ifdef VICON
   ros::Duration dt(-0.010310717511189348);  // Joern Vicon to IMU
+#endif
+#ifdef LEICA
+//  ros::Duration dt( -0.193203053521053);  // Joern Leica to IMU
+#endif
   const double timeSyncThreshold = 0.005;
   const double timeDiscretization = 10.0;  //discretization step for different starting points into the dataset
   const double trajectoryTimeDiscretization = 0.049;  //discretization of evaluation points (vision framerate for fair comparison)
@@ -183,7 +207,12 @@ int main(int argc, char **argv) {
     MSF_WARN_STREAM("Will process the dataset from different starting points.");
   }
 
+#ifdef LEICA
+  typedef geometry_msgs::PointStamped GT_TYPE;
+#endif
+#ifdef VICON
   typedef geometry_msgs::TransformStamped GT_TYPE;
+#endif
   typedef geometry_msgs::TransformStamped EVAL_TYPE;
 
   // output file
@@ -295,13 +324,17 @@ int main(int argc, char **argv) {
     if (first) {
       Eigen::Matrix<double, 3, Eigen::Dynamic> points1;
       Eigen::Matrix<double, 3, Eigen::Dynamic> points2;
-      double alignment_range = 100;
+      double alignment_range = 20;
       double ds = 0.0;
 
       rosbag::View::const_iterator it_EVAL_align = it_EVAL;
       rosbag::View::const_iterator it_GT_align = it_GT;
-      for (; it_GT_align != view_GT.end() && ds < alignment_range;
-          ++it_GT_align) {
+
+      std::vector < Eigen::Matrix<double, 3, 1> > points1_list;
+      std::vector < Eigen::Matrix<double, 3, 1> > points2_list;
+      std::vector<double> ds_list;
+
+      for (; it_GT_align != view_GT.end(); ++it_GT_align) {
         GT_TYPE::ConstPtr trafo = it_GT_align->instantiate<GT_TYPE>();
         assert(trafo);
 
@@ -310,10 +343,20 @@ int main(int argc, char **argv) {
 
         EVAL_TYPE::ConstPtr pose = it_EVAL_align->instantiate<EVAL_TYPE>();
         ros::Time time_EKF = pose->header.stamp;
+
+        bool terminate = false;
         while (time_GT > time_EKF) {
           it_EVAL_align++;
+          if (it_EVAL_align == view_EVAL.end()) {
+            terminate = true;
+            break;
+          }
           pose = it_EVAL_align->instantiate<EVAL_TYPE>();
+          assert(pose);
           time_EKF = pose->header.stamp;
+        }
+        if (terminate) {
+          break;
         }
 
         if (time_GT - start >= startOffset) {
@@ -326,6 +369,7 @@ int main(int argc, char **argv) {
                               pose->transform.translation.y,
                               pose->transform.translation.z));
 
+#ifdef VICON
           T_WgBg = sm::kinematics::Transformation(
               Eigen::Vector4d(-trafo->transform.rotation.x,
                               -trafo->transform.rotation.y,
@@ -333,18 +377,49 @@ int main(int argc, char **argv) {
                               trafo->transform.rotation.w),
               Eigen::Vector3d(trafo->transform.translation.x,
                               trafo->transform.translation.y,
-                              trafo->transform.translation.z));
+                              trafo->transform.translation.z)
+          );
+#endif
+#ifdef LEICA
+              Eigen::Vector4d(-pose->transform.rotation.x,
+                              -pose->transform.rotation.y,
+                              -pose->transform.rotation.z,
+                              pose->transform.rotation.w),
+              Eigen::Vector3d(trafo->point.x,
+                              trafo->point.y,
+                              trafo->point.z)
+        );
+#endif
 
-          points1.conservativeResize(3, points1.cols() + 1);
-          points2.conservativeResize(3, points2.cols() + 1);
-          points1.block<3, 1>(0, points1.cols() - 1) = T_WgBg.t();
-          points2.block<3, 1>(0, points2.cols() - 1) = T_WaBa.t();
-          if (points2.cols() > 1) {
+          points1_list.push_back(T_WgBg.t());
+          points2_list.push_back(T_WaBa.t());
+          if (points1.cols() > 1) {
             ds += (points1.block<3, 1>(0, points1.cols() - 1)
                 - points1.block<3, 1>(0, points1.cols() - 2)).norm();
           }
+          ds_list.push_back(ds);
         }
       }
+      // Find the index to align from.
+      int idx_align_start = -1;
+      double max_ds = ds_list.at(ds_list.size() - 1);
+      for (size_t idx = 0; idx < ds_list.size(); ++idx) {
+        if (max_ds - alignment_range <= ds_list.at(idx)) {
+          idx_align_start = idx;
+          break;
+        }
+      }
+      assert(idx_align_start != -1);
+      size_t total_entries = ds_list.size() - idx_align_start;
+      points1.conservativeResize(3, total_entries);
+      points2.conservativeResize(3, total_entries);
+      size_t idx_pt = 0;
+      for (size_t idx = idx_align_start; idx < ds_list.size(); ++idx) {
+        points1.block<3, 1>(0, idx_pt) = points1_list.at(idx);
+        points2.block<3, 1>(0, idx_pt) = points2_list.at(idx);
+        ++idx_pt;
+      }
+
       std::cout << "Got " << points1.cols() << "points" << std::endl;
       EstimateRigidTransform(points1, points2, &T_WaWg_range);
       first = false;
@@ -399,6 +474,7 @@ int main(int argc, char **argv) {
                             pose->transform.translation.y,
                             pose->transform.translation.z));
 
+#ifdef VICON
         T_WgBg = sm::kinematics::Transformation(
             Eigen::Vector4d(-trafo->transform.rotation.x,
                             -trafo->transform.rotation.y,
@@ -407,6 +483,17 @@ int main(int argc, char **argv) {
             Eigen::Vector3d(trafo->transform.translation.x,
                             trafo->transform.translation.y,
                             trafo->transform.translation.z));
+#endif
+#ifdef LEICA
+        T_WgBg = sm::kinematics::Transformation(
+            Eigen::Vector4d(-pose->transform.rotation.x,
+                            -pose->transform.rotation.y,
+                            -pose->transform.rotation.z,
+                            pose->transform.rotation.w),
+                    Eigen::Vector3d(trafo->point.x,
+                                    trafo->point.y,
+                                    trafo->point.z));
+#endif
 
         // initial alignment
         if (ctr == 0) {
@@ -416,9 +503,6 @@ int main(int argc, char **argv) {
           T_WaWg = T_WaWg_range;
           std::cout << "Transformation range: " << std::endl <<
           T_WaWg.T() <<std::endl;
-
-          //TODO add range alignment
-
           T_WgBg_last = T_WgBg;
         }
 
@@ -470,7 +554,9 @@ int main(int argc, char **argv) {
           << 2 * acos(std::min(1.0, fabs(dT.q()[3]))) << " " << dalpha_e_z
           << " "//orientation
           << T_WaBa.t().transpose() << " "// position estimate
-          << (T_WaWg * T_WgBg * T_BgBa).t().transpose() << ";"// position ground truth
+          << T_WgBg.t().transpose() << " "// position ground truth
+          << T_WaBa.q().transpose() << " "// orientation estimate
+          << T_WgBg.q().transpose() << " "// orientation ground truth
           << std::endl;
 
           lastTime = time_EKF;  // remember
