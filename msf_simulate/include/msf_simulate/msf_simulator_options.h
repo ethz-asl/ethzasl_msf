@@ -1,6 +1,8 @@
 /*
- * Copyright (C) 2012-2013 Simon Lynen, ASL, ETH Zurich, Switzerland
+ * Copyright (C) 2014 Simon Lynen, ASL, ETH Zurich, Switzerland
  * You can contact the author at <slynen at ethz dot ch>
+ * Copyright (C) 2014 Markus Achtelik, ASL, ETH Zurich, Switzerland
+ * You can contact the author at <acmarkus at ethz dot ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

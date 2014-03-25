@@ -7,8 +7,8 @@
 
   <license>ASL 2.0</license>
 
-  <url type="website">http://ros.org/wiki/modular_sensor_fusion</url>
-  <url type="bugtracker">https://github.com/ethz-asl/sensor_fusion/issues</url>
+  <url type="website">https://github.com/ethz-asl/ethzasl_msf</url>
+  <url type="bugtracker">https://github.com/ethz-asl/ethzasl_msf/issues</url>
 
   <author>Simon Lynen</author>
   <author>Markus Achtelik</author>
