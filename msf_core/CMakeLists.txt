@@ -49,6 +49,5 @@ add_executable(test_similaritytransform src/test/test_similaritytransform.cc)
 target_link_libraries(test_similaritytransform similaritytransform)
 
 catkin_add_gtest(test_static_statelist src/test/test_staticstatelist.cc)
-target_link_libraries(test_static_statelist pthread ${PROJECT_NAME}
-                                            ${GLOG_LIBRARIES})
+target_link_libraries(test_static_statelist pthread ${PROJECT_NAME} ${GLOG_LIBRARY})
 
