@@ -45,8 +45,8 @@ add_dependencies(msf_core ${PROJECT_NAME}_gencfg)
 add_library(similaritytransform src/similaritytransform.cc)
 target_link_libraries(similaritytransform ${catkin_LIBRARIES})
 
-add_executable(test_similaritytransform src/test/test_similaritytransform.cc)
-target_link_libraries(test_similaritytransform similaritytransform)
+catkin_add_gtest(test_similaritytransform src/test/test_similaritytransform.cc)
+target_link_libraries(test_similaritytransform similaritytransform ${GLOG_LIBRARY})
 
 catkin_add_gtest(test_static_statelist src/test/test_staticstatelist.cc)
 target_link_libraries(test_static_statelist pthread ${PROJECT_NAME} ${GLOG_LIBRARY})
