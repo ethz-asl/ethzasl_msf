@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012-2013 Simon Lynen, ASL, ETH Zurich, Switzerland
+ * Copyright (C) 2014 Simon Lynen, ASL, ETH Zurich, Switzerland
  * You can contact the author at <slynen at ethz dot ch>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <ros/ros.h>
-#include <msf_core/msf_core.h>
-int main(int argc, char** argv) { }
 
+#ifndef TESTING_ENTRYPOINT_H_
+#define TESTING_ENTRYPOINT_H_
+
+#include <gtest/gtest.h>
+#include <glog/logging.h>
+
+// Let the Eclipse parser see the macro.
+#ifndef TEST
+#define TEST(a, b) int Test_##a##_##b()
+#endif
+
+#define MSF_UNITTEST_ENTRYPOINT\
+  int main(int argc, char** argv) {\
+ ::testing::InitGoogleTest(&argc, argv);\
+  google::InitGoogleLogging(argv[0]);\
+  return RUN_ALL_TESTS();\
+}
+
+#endif   // TESTING_ENTRYPOINT_H_

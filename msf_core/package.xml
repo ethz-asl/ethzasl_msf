@@ -19,11 +19,11 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <!-- Dependencies needed to compile this package. -->
-  <build_depend>roscpp</build_depend>
   <build_depend>sensor_msgs</build_depend>
   <build_depend>dynamic_reconfigure</build_depend>
   <build_depend>msf_timing</build_depend>
   <build_depend>tf</build_depend>
+  <build_depend>GLog</build_depend>
 
   <!-- Dependencies needed after this package is compiled. -->
   <run_depend>roscpp</run_depend>
@@ -31,4 +31,5 @@
   <run_depend>dynamic_reconfigure</run_depend>
   <run_depend>msf_timing</run_depend>
   <run_depend>tf</run_depend>
+  <run_depend>GLog</run_depend>
 </package>
