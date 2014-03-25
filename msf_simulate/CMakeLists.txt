@@ -20,13 +20,14 @@ catkin_package(
     DEPENDS 
     CATKIN_DEPENDS msf_core msf_updates
     INCLUDE_DIRS 
-    LIBRARIES 
+    LIBRARIES ${PROJECT_NAME}
 )
 
-add_library(${PROJECT_NAME} src/MSFSimulator.cc)
+add_library(${PROJECT_NAME} src/msf_simulator.cc)
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
 
-catkin_add_gtest(${PROJECT_NAME}_tests src/test/main.cc src/test/test_simulated_trajectory.cc)
-target_link_libraries(${PROJECT_NAME}_tests ${PROJECT_NAME})
+catkin_add_gtest(test_msf_simulator src/test/main.cc 
+                                    src/test/test_simulated_trajectory.cc)
+target_link_libraries(test_msf_simulator ${PROJECT_NAME})
 
 

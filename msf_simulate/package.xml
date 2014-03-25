@@ -12,16 +12,12 @@
 
   <author>Simon Lynen</author>
   <author>Markus Achtelik</author>
-  <author>Stephan Weiss</author>
 
-  <!-- Dependencies which this package needs to build itself. -->
   <buildtool_depend>catkin</buildtool_depend>
 
-  <!-- Dependencies needed to compile this package. -->
   <build_depend>msf_core</build_depend>
   <build_depend>msf_updates</build_depend>
 
-  <!-- Dependencies needed after this package is compiled. -->
   <run_depend>msf_core</run_depend>
   <run_depend>msf_updates</run_depend>
 </package>

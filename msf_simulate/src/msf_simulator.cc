@@ -7,28 +7,30 @@
 
 #include <stdexcept>
 #include <msf_simulate/msf_statedef.hpp>
-#include <msf_simulate/MSFSimulator.h>
+#include <msf_simulate/msf_simulator.h>
 
 namespace msf_simulate {
 
 MSFSimulator::MSFSimulator(const MSFSimulatorOptions& options)
-: options_(options) {
+    : options_(options) {
   generateRandomTrajectory();
   optimization_done_ = false;
 }
 
-MSFSimulator::MSFSimulator(const std::vector<Vertex4D>& sv, const MSFSimulatorOptions& options)
-: options_(options),
-  sv_(sv) {
+MSFSimulator::MSFSimulator(const std::vector<Vertex4D>& sv,
+                           const MSFSimulatorOptions& options)
+    : options_(options),
+      sv_(sv) {
   optimization_done_ = false;
 }
 
-MSFSimulator::~MSFSimulator() {
+MSFSimulator::~MSFSimulator() { }
 
-}
-
-void MSFSimulator::updatePathWithConstraint(int continuity, const Vertex1D & max_p, const Vertex1D & max_yaw,
-                                            double time_multiplier, double tol) {
+void MSFSimulator::updatePathWithConstraint(int continuity,
+                                            const Vertex1D & max_p,
+                                            const Vertex1D & max_yaw,
+                                            double time_multiplier,
+                                            double tol) {
   path_.optimizeWithTime(sv_, continuity, max_p, max_yaw, time_multiplier, tol);
   optimization_done_ = true;
 }
@@ -53,6 +55,4 @@ void MSFSimulator::generateRandomTrajectory() {
   sv_.back().addConstraint(0, (tmp << -5, 5, 2, 0).finished());
 }
 
-
-
-} /* namespace msf_simulate */
+}  // namespace msf_simulate
