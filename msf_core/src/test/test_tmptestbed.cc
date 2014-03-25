@@ -15,7 +15,8 @@
  * limitations under the License.
  */
 
-#include <msf_core/msf_state.hpp>
+#include <msf_core/msf_state.h>
+
 int main(int argc, char** argv) {
 
   msf_core::EKFState somestate;
