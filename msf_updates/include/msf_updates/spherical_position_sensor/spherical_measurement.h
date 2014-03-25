@@ -44,7 +44,7 @@ struct AngleMeasurement : public AngleMeasurementBase {
   typedef AngleMeasurementBase Measurement_t;
   typedef Measurement_t::Measurement_ptr measptr_t;
 
-  virtual void makeFromSensorReadingImpl(measptr_t msg) {
+  virtual void MakeFromSensorReadingImpl(measptr_t msg) {
 
     Eigen::Matrix<double, N_ANGLE_MEASUREMENTS,
         msf_core::MSF_Core<msf_updates::EKFState>::nErrorStatesAtCompileTime> H_old;
@@ -55,8 +55,7 @@ struct AngleMeasurement : public AngleMeasurementBase {
     // Get measurement.
     z_a_ << msg->point.x, msg->point.y;
 
-    if (fixed_covariance_)   //  Take fix covariance from reconfigure GUI.
-    {
+    if (fixed_covariance_) {   //  Take fix covariance from reconfigure GUI.
       const double s_zp = n_za_ * n_za_;
       R_ = (Eigen::Matrix<double, N_ANGLE_MEASUREMENTS, 1>() << s_zp, s_zp)
           .finished().asDiagonal();
@@ -89,11 +88,11 @@ struct AngleMeasurement : public AngleMeasurementBase {
         fixed_covariance_(fixed_covariance),
         fixedstates_(fixedstates) {
   }
-  virtual std::string type() {
+  virtual std::string Type() {
     return "angle";
   }
 
-  virtual void calculateH(
+  virtual void CalculateH(
       boost::shared_ptr<EKFState_T> state_in,
       Eigen::Matrix<double, N_ANGLE_MEASUREMENTS,
           msf_core::MSF_Core<EKFState_T>::nErrorStatesAtCompileTime>& H) {
@@ -104,13 +103,13 @@ struct AngleMeasurement : public AngleMeasurementBase {
     // Preprocess for elements in H matrix.
     // Get indices of states in error vector.
     enum {
-      idxstartcorr_p_ = msf_tmp::getStartIndexInCorrection<StateSequence_T,
+      idxstartcorr_p_ = msf_tmp::GetStartIndexInCorrection<StateSequence_T,
           StateDefinition_T::p>::value,
-      idxstartcorr_v_ = msf_tmp::getStartIndexInCorrection<StateSequence_T,
+      idxstartcorr_v_ = msf_tmp::GetStartIndexInCorrection<StateSequence_T,
           StateDefinition_T::v>::value,
-      idxstartcorr_q_ = msf_tmp::getStartIndexInCorrection<StateSequence_T,
+      idxstartcorr_q_ = msf_tmp::GetStartIndexInCorrection<StateSequence_T,
           StateDefinition_T::q>::value,
-      idxstartcorr_p_pi_ = msf_tmp::getStartIndexInCorrection<StateSequence_T,
+      idxstartcorr_p_pi_ = msf_tmp::GetStartIndexInCorrection<StateSequence_T,
           StateDefinition_T::p_ip>::value,
     };
 
@@ -118,12 +117,12 @@ struct AngleMeasurement : public AngleMeasurementBase {
 
     // Clear cross correlations.
     if (fixed_p_pos_imu)
-      state_in->clearCrossCov<StateDefinition_T::p_ip>();
+      state_in->ClearCrossCov<StateDefinition_T::p_ip>();
 
-    Eigen::Matrix<double, 3, 3> C_q = state.get<StateDefinition_T::q>()
+    Eigen::Matrix<double, 3, 3> C_q = state.Get<StateDefinition_T::q>()
         .conjugate().toRotationMatrix();
-    Eigen::Matrix<double, 3, 1> p_ = state.get<StateDefinition_T::p>();
-    Eigen::Matrix<double, 3, 1> p_ip = state.get<StateDefinition_T::p_ip>();
+    Eigen::Matrix<double, 3, 1> p_ = state.Get<StateDefinition_T::p>();
+    Eigen::Matrix<double, 3, 1> p_ip = state.Get<StateDefinition_T::p_ip>();
     Eigen::Matrix<double, 2, 3> dz_dp;
     dz_dp(0, 0) = (p_(0, 0) * p_(2, 0) * 1.0
         / sqrt(p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0)))
@@ -138,7 +137,9 @@ struct AngleMeasurement : public AngleMeasurementBase {
     dz_dp(1, 2) = 0;
     Eigen::Matrix<double, 2, 3> dz_dq;
     dz_dq(0, 0) = 1.0
-        / sqrt( 1.0 / (p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0)
+        / sqrt(
+            1.0
+                / (p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0)
                     + p_(2, 0) * p_(2, 0))) * 1.0
         / sqrt(p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0)) * 1.0
         / pow(p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0) + p_(2, 0) * p_(2, 0),
@@ -151,7 +152,9 @@ struct AngleMeasurement : public AngleMeasurementBase {
             + C_q(0, 2) * p_ip(1, 0) * p_(0, 0) * p_(2, 0)
             - C_q(1, 1) * p_ip(2, 0) * p_(1, 0) * p_(2, 0)
             + C_q(1, 2) * p_ip(1, 0) * p_(1, 0) * p_(2, 0));
-    dz_dq(0, 1) = -1.0 / sqrt(-(p_(2, 0) * p_(2, 0))
+    dz_dq(0, 1) = -1.0
+        / sqrt(
+            -(p_(2, 0) * p_(2, 0))
                 / (p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0)
                     + p_(2, 0) * p_(2, 0)) + 1.0) * 1.0
         / pow(p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0) + p_(2, 0) * p_(2, 0),
@@ -245,9 +248,8 @@ struct AngleMeasurement : public AngleMeasurementBase {
    * The method called by the msf_core to apply the measurement represented by
    * this object.
    */
-  virtual void apply(boost::shared_ptr<EKFState_T> state_nonconst_new,
+  virtual void Apply(boost::shared_ptr<EKFState_T> state_nonconst_new,
                      msf_core::MSF_Core<EKFState_T>& core) {
-
     if (isabsolute_) {  // Does this measurement refer to an absolute measurement,
       // or is is just relative to the last measurement.
       const EKFState_T& state = *state_nonconst_new;  // Get a const ref, so we can read core states.
@@ -256,15 +258,15 @@ struct AngleMeasurement : public AngleMeasurementBase {
           msf_core::MSF_Core<EKFState_T>::nErrorStatesAtCompileTime> H_new;
       Eigen::Matrix<double, N_ANGLE_MEASUREMENTS, 1> r_old;
 
-      calculateH(state_nonconst_new, H_new);
+      CalculateH(state_nonconst_new, H_new);
 
       // Get rotation matrices.
-      Eigen::Matrix<double, 3, 3> C_q = state.get<StateDefinition_T::q>()
+      Eigen::Matrix<double, 3, 3> C_q = state.Get<StateDefinition_T::q>()
           .conjugate().toRotationMatrix();
 
       // Construct residuals.
-      Eigen::Matrix<double, 3, 1> z_carth = (state.get<StateDefinition_T::p>()
-          + C_q.transpose() * state.get<StateDefinition_T::p_ip>());
+      Eigen::Matrix<double, 3, 1> z_carth = (state.Get<StateDefinition_T::p>()
+          + C_q.transpose() * state.Get<StateDefinition_T::p_ip>());
       double radius_old = sqrt(
           z_carth(0, 0) * z_carth(0, 0) + z_carth(1, 0) * z_carth(1, 0)
               + z_carth(2, 0) * z_carth(2, 0));
@@ -288,27 +290,27 @@ struct AngleMeasurement : public AngleMeasurementBase {
         r_old(1, 0) -= 2 * M_PI;
       }
 
-      if (!checkForNumeric(r_old, "r_old")) {
+      if (!CheckForNumeric(r_old, "r_old")) {
         ROS_ERROR_STREAM("r_old: " << r_old);
         ROS_WARN_STREAM(
             "state: "
-                << const_cast<EKFState_T&>(state).toEigenVector().transpose());
+                << const_cast<EKFState_T&>(state).ToEigenVector().transpose());
       }
-      if (!checkForNumeric(H_new, "H_old")) {
+      if (!CheckForNumeric(H_new, "H_old")) {
         ROS_ERROR_STREAM("H_old: " << H_new);
         ROS_WARN_STREAM(
             "state: "
-                << const_cast<EKFState_T&>(state).toEigenVector().transpose());
+                << const_cast<EKFState_T&>(state).ToEigenVector().transpose());
       }
-      if (!checkForNumeric(R_, "R_")) {
+      if (!CheckForNumeric(R_, "R_")) {
         ROS_ERROR_STREAM("R_: " << R_);
         ROS_WARN_STREAM(
             "state: "
-                << const_cast<EKFState_T&>(state).toEigenVector().transpose());
+                << const_cast<EKFState_T&>(state).ToEigenVector().transpose());
       }
 
       // Call update step in base class.
-      this->calculateAndApplyCorrection(state_nonconst_new, core, H_new, r_old,
+      this->CalculateAndApplyCorrection(state_nonconst_new, core, H_new, r_old,
                                         R_);
 
     } else {
@@ -331,8 +333,7 @@ struct DistanceMeasurement : public DistanceMeasurementBase {
   typedef DistanceMeasurementBase Measurement_t;
   typedef Measurement_t::Measurement_ptr measptr_t;
 
-  virtual void makeFromSensorReadingImpl(measptr_t msg) {
-
+  virtual void MakeFromSensorReadingImpl(measptr_t msg) {
     Eigen::Matrix<double, N_DISTANCE_MEASUREMENTS,
         msf_core::MSF_Core<msf_updates::EKFState>::nErrorStatesAtCompileTime> H_old;
     Eigen::Matrix<double, N_DISTANCE_MEASUREMENTS, 1> r_old;
@@ -372,11 +373,11 @@ struct DistanceMeasurement : public DistanceMeasurementBase {
         fixed_covariance_(fixed_covariance),
         fixedstates_(fixedstates) {
   }
-  virtual std::string type() {
+  virtual std::string Type() {
     return "distance";
   }
 
-  virtual void calculateH(
+  virtual void CalculateH(
       boost::shared_ptr<EKFState_T> state_in,
       Eigen::Matrix<double, N_DISTANCE_MEASUREMENTS,
           msf_core::MSF_Core<EKFState_T>::nErrorStatesAtCompileTime>& H) {
@@ -385,19 +386,19 @@ struct DistanceMeasurement : public DistanceMeasurementBase {
     H.setZero();
 
     // Get rotation matrices.
-    Eigen::Matrix<double, 3, 3> C_q = state.get<StateDefinition_T::q>()
+    Eigen::Matrix<double, 3, 3> C_q = state.Get<StateDefinition_T::q>()
         .conjugate().toRotationMatrix();
 
     // Preprocess for elements in H matrix.
     // Get indices of states in error vector.
     enum {
-      idxstartcorr_p_ = msf_tmp::getStartIndexInCorrection<StateSequence_T,
+      idxstartcorr_p_ = msf_tmp::GetStartIndexInCorrection<StateSequence_T,
           StateDefinition_T::p>::value,
-      idxstartcorr_v_ = msf_tmp::getStartIndexInCorrection<StateSequence_T,
+      idxstartcorr_v_ = msf_tmp::GetStartIndexInCorrection<StateSequence_T,
           StateDefinition_T::v>::value,
-      idxstartcorr_q_ = msf_tmp::getStartIndexInCorrection<StateSequence_T,
+      idxstartcorr_q_ = msf_tmp::GetStartIndexInCorrection<StateSequence_T,
           StateDefinition_T::q>::value,
-      idxstartcorr_p_pi_ = msf_tmp::getStartIndexInCorrection<StateSequence_T,
+      idxstartcorr_p_pi_ = msf_tmp::GetStartIndexInCorrection<StateSequence_T,
           StateDefinition_T::p_ip>::value,
     };
 
@@ -405,10 +406,10 @@ struct DistanceMeasurement : public DistanceMeasurementBase {
 
     // Clear cross correlations.
     if (fixed_p_pos_imu)
-      state_in->clearCrossCov<StateDefinition_T::p_ip>();
+      state_in->ClearCrossCov<StateDefinition_T::p_ip>();
 
-    Eigen::Matrix<double, 3, 1> p_ = state.get<StateDefinition_T::p>();
-    Eigen::Matrix<double, 3, 1> p_ip = state.get<StateDefinition_T::p_ip>();
+    Eigen::Matrix<double, 3, 1> p_ = state.Get<StateDefinition_T::p>();
+    Eigen::Matrix<double, 3, 1> p_ip = state.Get<StateDefinition_T::p_ip>();
     Eigen::Matrix<double, 1, 3> dz_dp;
     dz_dp(0, 0) = p_(0, 0) * 1.0
         / sqrt(p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0) + p_(2, 0) * p_(2, 0));
@@ -457,13 +458,12 @@ struct DistanceMeasurement : public DistanceMeasurementBase {
     H.block<1, 3>(0, idxstartcorr_p_) = dz_dp;
     H.block<1, 3>(0, idxstartcorr_q_) = dz_dq;
     H.block<1, 3>(0, idxstartcorr_p_pi_) = dz_dp_ip;
-
   }
 
   /**
    * The method called by the msf_core to apply the measurement represented by this object.
    */
-  virtual void apply(boost::shared_ptr<EKFState_T> state_nonconst_new,
+  virtual void Apply(boost::shared_ptr<EKFState_T> state_nonconst_new,
                      msf_core::MSF_Core<EKFState_T>& core) {
 
     if (isabsolute_) {  // Does this measurement refer to an absolute measurement,
@@ -474,15 +474,15 @@ struct DistanceMeasurement : public DistanceMeasurementBase {
           msf_core::MSF_Core<EKFState_T>::nErrorStatesAtCompileTime> H_new;
       Eigen::Matrix<double, N_DISTANCE_MEASUREMENTS, 1> r_old;
 
-      calculateH(state_nonconst_new, H_new);
+      CalculateH(state_nonconst_new, H_new);
 
       // Get rotation matrices.
-      Eigen::Matrix<double, 3, 3> C_q = state.get<StateDefinition_T::q>()
+      Eigen::Matrix<double, 3, 3> C_q = state.Get<StateDefinition_T::q>()
           .conjugate().toRotationMatrix();
 
       // Construct residuals
-      Eigen::Matrix<double, 3, 1> z_carth = (state.get<StateDefinition_T::p>()
-          + C_q.transpose() * state.get<StateDefinition_T::p_ip>());
+      Eigen::Matrix<double, 3, 1> z_carth = (state.Get<StateDefinition_T::p>()
+          + C_q.transpose() * state.Get<StateDefinition_T::p_ip>());
       double radius_old = sqrt(
           z_carth(0, 0) * z_carth(0, 0) + z_carth(1, 0) * z_carth(1, 0)
               + z_carth(2, 0) * z_carth(2, 0));
@@ -491,29 +491,28 @@ struct DistanceMeasurement : public DistanceMeasurementBase {
       z_spherical << radius_old;
       r_old = z_d_ - z_spherical;
 
-      if (!checkForNumeric(r_old, "r_old")) {
+      if (!CheckForNumeric(r_old, "r_old")) {
         ROS_ERROR_STREAM("r_old: " << r_old);
         ROS_WARN_STREAM(
             "state: "
-                << const_cast<EKFState_T&>(state).toEigenVector().transpose());
+                << const_cast<EKFState_T&>(state).ToEigenVector().transpose());
       }
-      if (!checkForNumeric(H_new, "H_old")) {
+      if (!CheckForNumeric(H_new, "H_old")) {
         ROS_ERROR_STREAM("H_old: " << H_new);
         ROS_WARN_STREAM(
             "state: "
-                << const_cast<EKFState_T&>(state).toEigenVector().transpose());
+                << const_cast<EKFState_T&>(state).ToEigenVector().transpose());
       }
-      if (!checkForNumeric(R_, "R_")) {
+      if (!CheckForNumeric(R_, "R_")) {
         ROS_ERROR_STREAM("R_: " << R_);
         ROS_WARN_STREAM(
             "state: "
-                << const_cast<EKFState_T&>(state).toEigenVector().transpose());
+                << const_cast<EKFState_T&>(state).ToEigenVector().transpose());
       }
 
       // Call update step in base class.
-      this->calculateAndApplyCorrection(state_nonconst_new, core, H_new, r_old,
+      this->CalculateAndApplyCorrection(state_nonconst_new, core, H_new, r_old,
                                         R_);
-
     } else {
       ROS_ERROR_STREAM_THROTTLE(
           1,
@@ -522,7 +521,5 @@ struct DistanceMeasurement : public DistanceMeasurementBase {
     }
   }
 };
-
-}
-
+}  // namespace msf_spherical_position
 #endif  // SPHERICAL_POSITION_MEASUREMENT_HPP_

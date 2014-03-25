@@ -15,16 +15,13 @@
  * limitations under the License.
  */
 
-#include <msf_core/msf_core.hpp>
-#include <gtest/gtest.h>
+#include <msf_core/msf_core.h>
+#include <msf_core/testing_entrypoint.h>
 
-#define WITHTESTS 1
-
-#if (WITHTESTS == 1)
-//test calculated sizes
-TEST(CompileTimeComputation, stateSizeCalculation) {
+// Test calculated sizes.
+TEST(MSF_Core, CompileTimeComputation_StateSizeCalculation) {
   using namespace msf_core;
-  enum {
+  enum StateDefinition {
     a,
     b,
     c,
@@ -33,31 +30,32 @@ TEST(CompileTimeComputation, stateSizeCalculation) {
   const static int vectorlength1 = 4;
   const static int vectorlength2 = 10;
 
-  //setup some state type
+  // Setup some state type.
   typedef boost::fusion::vector<
-  StateVar_T<Eigen::Matrix<double, vectorlength1, 1>, a >,
-  StateVar_T<Eigen::Quaterniond, b >,
-  StateVar_T<Eigen::Matrix<double, 1, 1>, c >,
-  StateVar_T<Eigen::Matrix<double, vectorlength2, 1>, d >
+      msf_core::StateVar_T<Eigen::Matrix<double, vectorlength1, 1>, a>,
+      msf_core::StateVar_T<Eigen::Quaterniond, b>,
+      msf_core::StateVar_T<Eigen::Matrix<double, 1, 1>, c>,
+      msf_core::StateVar_T<Eigen::Matrix<double, vectorlength2, 1>, d>
   > fullState_T;
-  typedef GenericState_T<fullState_T> EKFState;
+  typedef msf_core::GenericState_T<fullState_T, StateDefinition> EKFState;
 
-  EKFState somestate;
-  ASSERT_EQ(somestate.get<0>().sizeInCorrection_, vectorlength1);
-  ASSERT_EQ(somestate.get<1>().sizeInCorrection_, 3);
-  ASSERT_EQ(somestate.get<2>().sizeInCorrection_, 1);
-  ASSERT_EQ(somestate.get<3>().sizeInCorrection_, vectorlength2);
+  const EKFState somestate;
 
-  ASSERT_EQ(somestate.get<0>().sizeInState_, vectorlength1);
-  ASSERT_EQ(somestate.get<1>().sizeInState_, 4);
-  ASSERT_EQ(somestate.get<2>().sizeInState_, 1);
-  ASSERT_EQ(somestate.get<3>().sizeInState_, vectorlength2);
+  EXPECT_EQ(somestate.GetStateVariable<0>().sizeInCorrection_, vectorlength1);
+  EXPECT_EQ(somestate.GetStateVariable<1>().sizeInCorrection_, 3);
+  EXPECT_EQ(somestate.GetStateVariable<2>().sizeInCorrection_, 1);
+  EXPECT_EQ(somestate.GetStateVariable<3>().sizeInCorrection_, vectorlength2);
+
+  EXPECT_EQ(somestate.GetStateVariable<0>().sizeInState_, vectorlength1);
+  EXPECT_EQ(somestate.GetStateVariable<1>().sizeInState_, 4);
+  EXPECT_EQ(somestate.GetStateVariable<2>().sizeInState_, 1);
+  EXPECT_EQ(somestate.GetStateVariable<3>().sizeInState_, vectorlength2);
 }
 
-//test indices of statevars in state vectors
-TEST(CompileTimeComputation, stateIndexCalculation) {
+// Test indices of statevars in state vectors.
+TEST(MSF_Core, CompileTimeComputation_StateIndexCalculation) {
   using namespace msf_core;
-  enum {
+  enum StateDefinition {
     a,
     b,
     c,
@@ -66,42 +64,57 @@ TEST(CompileTimeComputation, stateIndexCalculation) {
   const static int vectorlength1 = 4;
   const static int vectorlength2 = 10;
 
-  //setup some state type
+  // Setup some state type.
   typedef boost::fusion::vector<
-  StateVar_T<Eigen::Matrix<double, vectorlength1, 1>, a >,
-  StateVar_T<Eigen::Quaterniond, b >,
-  StateVar_T<Eigen::Matrix<double, 1, 1>, c >,
-  StateVar_T<Eigen::Matrix<double, vectorlength2, 1>, d >
+      StateVar_T<Eigen::Matrix<double, vectorlength1, 1>, a>,
+      StateVar_T<Eigen::Quaterniond, b>,
+      StateVar_T<Eigen::Matrix<double, 1, 1>, c>,
+      StateVar_T<Eigen::Matrix<double, vectorlength2, 1>, d>
   > fullState_T;
-  typedef GenericState_T<fullState_T> EKFState;
+  typedef GenericState_T<fullState_T, StateDefinition> EKFState;
 
   EKFState somestate;
-  static const int idxstartcorr1 = msf_tmp::getStartIndex<fullState_T, StateVar_T<Eigen::Matrix<double, vectorlength1, 1>, a >, msf_tmp::CorrectionStateLengthForType>::value;
-  static const int idxstartstate1 = msf_tmp::getStartIndex<fullState_T, StateVar_T<Eigen::Matrix<double, vectorlength1, 1>, a >, msf_tmp::StateLengthForType>::value;
-  ASSERT_EQ(idxstartcorr1, 0);
-  ASSERT_EQ(idxstartstate1, 0);
+  static const int idxstartcorr1 = msf_tmp::GetStartIndex<fullState_T,
+      StateVar_T<Eigen::Matrix<double, vectorlength1, 1>, a>,
+      msf_tmp::CorrectionStateLengthForType>::value;
+  static const int idxstartstate1 = msf_tmp::GetStartIndex<fullState_T,
+      StateVar_T<Eigen::Matrix<double, vectorlength1, 1>, a>,
+      msf_tmp::StateLengthForType>::value;
+  EXPECT_EQ(idxstartcorr1, 0);
+  EXPECT_EQ(idxstartstate1, 0);
 
-  static const int idxstartcorr2 = msf_tmp::getStartIndex<fullState_T, StateVar_T<Eigen::Quaterniond, b >, msf_tmp::CorrectionStateLengthForType>::value;
-  static const int idxstartstate2 = msf_tmp::getStartIndex<fullState_T, StateVar_T<Eigen::Quaterniond, b >, msf_tmp::StateLengthForType>::value;
-  ASSERT_EQ(idxstartcorr2, vectorlength1);
-  ASSERT_EQ(idxstartstate2, vectorlength1);
+  static const int idxstartcorr2 = msf_tmp::GetStartIndex<fullState_T,
+      StateVar_T<Eigen::Quaterniond, b>,
+      msf_tmp::CorrectionStateLengthForType>::value;
+  static const int idxstartstate2 = msf_tmp::GetStartIndex<fullState_T,
+      StateVar_T<Eigen::Quaterniond, b>, msf_tmp::StateLengthForType>::value;
+  EXPECT_EQ(idxstartcorr2, vectorlength1);
+  EXPECT_EQ(idxstartstate2, vectorlength1);
 
-  static const int idxstartcorr3 = msf_tmp::getStartIndex<fullState_T, StateVar_T<Eigen::Matrix<double, 1, 1>, c >, msf_tmp::CorrectionStateLengthForType>::value;
-  static const int idxstartstate3 = msf_tmp::getStartIndex<fullState_T, StateVar_T<Eigen::Matrix<double, 1, 1>, c >, msf_tmp::StateLengthForType>::value;
-  ASSERT_EQ(idxstartcorr3, vectorlength1 + 3);
-  ASSERT_EQ(idxstartstate3, vectorlength1 + 4);
+  static const int idxstartcorr3 = msf_tmp::GetStartIndex<fullState_T,
+      StateVar_T<Eigen::Matrix<double, 1, 1>, c>,
+      msf_tmp::CorrectionStateLengthForType>::value;
+  static const int idxstartstate3 = msf_tmp::GetStartIndex<fullState_T,
+      StateVar_T<Eigen::Matrix<double, 1, 1>, c>,
+      msf_tmp::StateLengthForType>::value;
+  EXPECT_EQ(idxstartcorr3, vectorlength1 + 3);
+  EXPECT_EQ(idxstartstate3, vectorlength1 + 4);
 
-  static const int idxstartcorr4 = msf_tmp::getStartIndex<fullState_T, StateVar_T<Eigen::Matrix<double, vectorlength2, 1>, d >, msf_tmp::CorrectionStateLengthForType>::value;
-  static const int idxstartstate4 = msf_tmp::getStartIndex<fullState_T, StateVar_T<Eigen::Matrix<double, vectorlength2, 1>, d >, msf_tmp::StateLengthForType>::value;
-  ASSERT_EQ(idxstartcorr4, vectorlength1 + 3 + 1);
-  ASSERT_EQ(idxstartstate4, vectorlength1 + 4 + 1);
+  static const int idxstartcorr4 = msf_tmp::GetStartIndex<fullState_T,
+      StateVar_T<Eigen::Matrix<double, vectorlength2, 1>, d>,
+      msf_tmp::CorrectionStateLengthForType>::value;
+  static const int idxstartstate4 = msf_tmp::GetStartIndex<fullState_T,
+      StateVar_T<Eigen::Matrix<double, vectorlength2, 1>, d>,
+      msf_tmp::StateLengthForType>::value;
+  EXPECT_EQ(idxstartcorr4, vectorlength1 + 3 + 1);
+  EXPECT_EQ(idxstartstate4, vectorlength1 + 4 + 1);
 
 }
 
-// Tests compile time computed values for the state
-TEST(CompileTimeComputation, stateLengthCalculation) {
+// Tests compile time computed values for the state.
+TEST(MSF_Core, CompileTimeComputation_StateLengthCalculation) {
   using namespace msf_core;
-  enum {
+  enum StateDefinition {
     a,
     b,
     c,
@@ -112,21 +125,22 @@ TEST(CompileTimeComputation, stateLengthCalculation) {
 
   //setup some state type
   typedef boost::fusion::vector<
-  StateVar_T<Eigen::Matrix<double, vectorlength1, 1>, a >,
-  StateVar_T<Eigen::Quaterniond, b >,
-  StateVar_T<Eigen::Matrix<double, 1, 1>, c >,
-  StateVar_T<Eigen::Matrix<double, vectorlength2, 1>, d >
+      StateVar_T<Eigen::Matrix<double, vectorlength1, 1>, a>,
+      StateVar_T<Eigen::Quaterniond, b>,
+      StateVar_T<Eigen::Matrix<double, 1, 1>, c>,
+      StateVar_T<Eigen::Matrix<double, vectorlength2, 1>, d>
   > fullState_T;
-  typedef GenericState_T<fullState_T> EKFState;
+  typedef GenericState_T<fullState_T, StateDefinition> EKFState;
 
-  ASSERT_EQ(EKFState::nStateVarsAtCompileTime, 4);
-  ASSERT_EQ(EKFState::nStatesAtCompileTime, vectorlength1 + vectorlength2 + 4 + 1);
-  ASSERT_EQ(EKFState::nErrorStatesAtCompileTime, vectorlength1 + vectorlength2 + 3 +1);
+  EXPECT_EQ(EKFState::nStateVarsAtCompileTime, 4);
+  EXPECT_EQ(EKFState::nStatesAtCompileTime,
+            vectorlength1 + vectorlength2 + 4 + 1);
+  EXPECT_EQ(EKFState::nErrorStatesAtCompileTime,
+            vectorlength1 + vectorlength2 + 3 + 1);
 }
 
-TEST(RuntimeTimeComputation, copyForNonPropagationStates) {
-
-  enum {  //must not manually set the enum values!
+TEST(MSF_Core, RuntimeTimeComputation_CopyForNonPropagationStates) {
+  enum StateDefinition {
     p_,
     v_,
     q_,
@@ -138,91 +152,61 @@ TEST(RuntimeTimeComputation, copyForNonPropagationStates) {
     p_ci_
   };
 
-  //setup core state, then auxiliary state
   typedef boost::fusion::vector<
-  // states varying during propagation - must not change the ordering here for now, CalcQ has the ordering hardcoded
-  msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_, true>,///< position (IMU centered)          (0-2 / 0-2)
-  msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, v_, true>,///< velocity                         (3- 5 / 3- 5)
-  msf_core::StateVar_T<Eigen::Quaternion<double>, q_, true>,///< attitude                         (6- 9 / 6- 8)
-  msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, b_w_, true>,///< gyro biases                      
-  msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, b_a_, true>,///< acceleration biases              
+      msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_, true>,
+      msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, v_, true>,
+      msf_core::StateVar_T<Eigen::Quaternion<double>, q_, true>,
+      msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, b_w_, true>,
+      msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, b_a_, true>,
 
-  // states not varying during propagation
-  msf_core::StateVar_T<Eigen::Matrix<double, 1, 1>, L_>,///< visual scale                     (16 / 15)
-  msf_core::StateVar_T<Eigen::Quaternion<double>, q_wv_>,///< vision-world attitude drift      (17-20 / 16-18)
-  msf_core::StateVar_T<Eigen::Quaternion<double>, q_ci_>,///< camera-imu attitude calibration  (21-24 / 19-21)
-  msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_ci_>///< camera-imu position calibration  (25-27 / 22-24)
+      msf_core::StateVar_T<Eigen::Matrix<double, 1, 1>, L_>,
+      msf_core::StateVar_T<Eigen::Quaternion<double>, q_wv_>,
+      msf_core::StateVar_T<Eigen::Quaternion<double>, q_ci_>,
+      msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_ci_>
   > fullState_T;
 
-  typedef msf_core::GenericState_T<fullState_T> EKFState;
+  typedef msf_core::GenericState_T<fullState_T, StateDefinition> EKFState;
 
   EKFState first_state;
   EKFState second_state;
 
-  first_state.reset();
-  second_state.reset();
+  first_state.Reset();
+  second_state.Reset();
 
-  first_state.get<msf_core::p_>().state_.setRandom();
+  Eigen::Matrix<double, 3, 1> p;
+  p.setRandom();
+  first_state.Set<p_>(p);
 
-  first_state.get<msf_core::q_>().state_.w() = 0.4;
-  first_state.get<msf_core::q_>().state_.x() = 0.1;
-  first_state.get<msf_core::q_>().state_.y() = 0.2;
-  first_state.get<msf_core::q_>().state_.z() = 0.7;
-  first_state.get<msf_core::q_>().state_.normalize();
+  Eigen::Quaternion<double> q;
+  q.w() = 0.4;
+  q.x() = 0.1;
+  q.y() = 0.2;
+  q.z() = 0.7;
+  q.normalize();
+  first_state.Set<q_>(q);
 
   boost::fusion::for_each(
-      first_state.statevars_,
-      msf_tmp::copyNonPropagationStates<EKFState>(second_state)
-  );
+      first_state.statevars,
+      msf_tmp::CopyNonPropagationStates<EKFState>(second_state));
 
-  ASSERT_DOUBLE_EQ(first_state.get<msf_core::p_>().state_(0), second_state.get<msf_core::p_>().state_(0));
-  ASSERT_DOUBLE_EQ(first_state.get<msf_core::p_>().state_(1), second_state.get<msf_core::p_>().state_(1));
-  ASSERT_DOUBLE_EQ(first_state.get<msf_core::p_>().state_(2), second_state.get<msf_core::p_>().state_(2));
+  const EKFState& const_ref_first_state = first_state;
+  const EKFState& const_ref_second_state = second_state;
 
-  ASSERT_DOUBLE_EQ(first_state.get<msf_core::q_>().state_.w(), second_state.get<msf_core::q_>().state_.w());
-  ASSERT_DOUBLE_EQ(first_state.get<msf_core::q_>().state_.x(), second_state.get<msf_core::q_>().state_.x());
-  ASSERT_DOUBLE_EQ(first_state.get<msf_core::q_>().state_.y(), second_state.get<msf_core::q_>().state_.y());
-  ASSERT_DOUBLE_EQ(first_state.get<msf_core::q_>().state_.z(), second_state.get<msf_core::q_>().state_.z());
+  EXPECT_DOUBLE_EQ(const_ref_first_state.Get<p_>()(0),
+                   const_ref_second_state.Get<p_>()(0));
+  EXPECT_DOUBLE_EQ(const_ref_first_state.Get<p_>()(1),
+                   const_ref_second_state.Get<p_>()(1));
+  EXPECT_DOUBLE_EQ(const_ref_first_state.Get<p_>()(2),
+                   const_ref_second_state.Get<p_>()(2));
+
+  EXPECT_DOUBLE_EQ(const_ref_first_state.Get<q_>().w(),
+                   const_ref_second_state.Get<q_>().w());
+  EXPECT_DOUBLE_EQ(const_ref_first_state.Get<q_>().x(),
+                   const_ref_second_state.Get<q_>().x());
+  EXPECT_DOUBLE_EQ(const_ref_first_state.Get<q_>().y(),
+                   const_ref_second_state.Get<q_>().y());
+  EXPECT_DOUBLE_EQ(const_ref_first_state.Get<q_>().z(),
+                   const_ref_second_state.Get<q_>().z());
 }
 
-#endif
-
-int main(int argc, char** argv) {
-
-  //an instantiation of a state
-  msf_core::EKFState somestate;
-  msf_core::EKFState otherstate;
-
-  std::cout << "otherstate init: " << otherstate.get<0>().initialized
-      << std::endl;
-  somestate.get<0>().initialized = true;
-  std::cout << "somestate init: " << somestate.get<0>().initialized
-      << std::endl;
-  std::cout << "otherstate init: " << otherstate.get<0>().initialized
-      << std::endl;
-
-  std::cout << "name " << somestate.get<0>().name_ << std::endl;
-
-  //number of state variables
-  std::cout << "nstatevars: " << msf_core::EKFState::nStatesAtCompileTime
-      << std::endl;
-
-  //number of states
-  std::cout << "nstates: " << msf_core::EKFState::nStatesAtCompileTime
-      << std::endl;
-
-  //number of correction states
-  std::cout << "nerrortates: " << msf_core::EKFState::nErrorStatesAtCompileTime
-      << std::endl;
-
-  //apply correction to all states
-  Eigen::Matrix<double, msf_core::EKFState::nErrorStatesAtCompileTime, 1> correction;
-  std::cout << "passing random correction vector" << std::endl;
-  correction.setRandom();
-  somestate.correct(correction);
-
-#if (WITHTESTS == 1)
-  testing::InitGoogleTest(&argc, argv);
-  return RUN_ALL_TESTS();
-#endif
-}
+MSF_UNITTEST_ENTRYPOINT

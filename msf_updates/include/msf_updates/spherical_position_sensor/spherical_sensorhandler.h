@@ -20,64 +20,63 @@
 #include <msf_core/msf_sensormanagerROS.h>
 #include <geometry_msgs/PointStamped.h>
 
-namespace msf_spherical_position{
+namespace msf_spherical_position {
 
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
-class AngleSensorHandler : public msf_core::SensorHandler<typename msf_updates::EKFState>
-{
-private:
-
-  msf_core::Vector2 z_a_; ///< Angle measurement.
+class AngleSensorHandler : public msf_core::SensorHandler<
+    typename msf_updates::EKFState> {
+ private:
+  msf_core::Vector2 z_a_;  ///< Angle measurement.
   double n_za_;   ///< Position measurement noise.
-  double delay_;        ///< Delay to be subtracted from the ros-timestamp of the
-                        // measurement provided by this sensor
+  double delay_;       ///< Delay to be subtracted from the ros-timestamp of the
+                       // measurement provided by this sensor.
 
   ros::Subscriber subPointStamped_;
   bool use_fixed_covariance_;
-  bool provides_absolute_measurements_; ///< Does this sensor measure relative or absolute values.
+  bool provides_absolute_measurements_;  ///< Does this sensor measure relative or absolute values.
 
-  void measurementCallback(const geometry_msgs::PointStampedConstPtr & msg);
-public:
+  void MeasurementCallback(const geometry_msgs::PointStampedConstPtr & msg);
+ public:
   typedef MEASUREMENT_TYPE measurement_t;
-  AngleSensorHandler(MANAGER_TYPE& meas, std::string topic_namespace, std::string parameternamespace);
+  AngleSensorHandler(MANAGER_TYPE& meas, std::string topic_namespace,
+                     std::string parameternamespace);
   // Used for the init.
-  msf_core::Vector2 getAngleMeasurement(){
+  msf_core::Vector2 GetAngleMeasurement() {
     return z_a_;
   }
   // Setters for configure values.
-  void setNoises(double n_za);
-  void setDelay(double delay);
+  void SetNoises(double n_za);
+  void SetDelay(double delay);
 };
 
-
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
-class DistanceSensorHandler : public msf_core::SensorHandler<typename msf_updates::EKFState>
-{
-private:
-
-  msf_core::Vector1 z_d_; ///< Angle measurement.
-  double n_zd_; ///< Position measurement noise.
+class DistanceSensorHandler : public msf_core::SensorHandler<
+    typename msf_updates::EKFState> {
+ private:
+  msf_core::Vector1 z_d_;  ///< Angle measurement.
+  double n_zd_;  ///< Position measurement noise.
   double delay_;        ///< Delay to be subtracted from the ros-timestamp of
                         //the measurement provided by this sensor.
 
   ros::Subscriber subPointStamped_;
 
   bool use_fixed_covariance_;
-  bool provides_absolute_measurements_; ///< Does this sensor measure relative or absolute values.
+  bool provides_absolute_measurements_;  ///< Does this sensor measure relative or absolute values.
 
-  void measurementCallback(const geometry_msgs::PointStampedConstPtr & msg);
-public:
+  void MeasurementCallback(const geometry_msgs::PointStampedConstPtr & msg);
+ public:
   typedef MEASUREMENT_TYPE measurement_t;
-  DistanceSensorHandler(MANAGER_TYPE& meas, std::string topic_namespace, std::string parameternamespace);
+  DistanceSensorHandler(MANAGER_TYPE& meas, std::string topic_namespace,
+                        std::string parameternamespace);
   // Used for the init.
-  msf_core::Vector1 getDistanceMeasurement(){
+  msf_core::Vector1 GetDistanceMeasurement() {
     return z_d_;
   }
   // Setters for configure values.
-  void setNoises(double n_za);
-  void setDelay(double delay);
+  void SetNoises(double n_za);
+  void SetDelay(double delay);
 };
-}
+}  // namespace msf_spherical_position
 #include "./implementation/spherical_sensorhandler.hpp"
 
 #endif  // SPHERICAL_POSITION_SENSOR_H

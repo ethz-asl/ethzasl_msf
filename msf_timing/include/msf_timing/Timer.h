@@ -108,8 +108,7 @@ class Accumulator {
 };
 
 struct TimerMapValue {
-  TimerMapValue() {
-  }
+  TimerMapValue() { }
 
   //Create an accumulator with specified window size.
   Accumulator<double, double, 50> acc_;
@@ -120,17 +119,12 @@ struct TimerMapValue {
 // timing. Because all of the functions are inline, they should just disappear.
 class DummyTimer {
  public:
-  DummyTimer(size_t handle, bool constructStopped = false) {
-  }
-  DummyTimer(std::string const& tag, bool constructStopped = false) {
-  }
-  ~DummyTimer() {
-  }
+  DummyTimer(size_t /*handle*/, bool /*constructStopped*/ = false) { }
+  DummyTimer(std::string const& /*tag*/, bool /*constructStopped*/ = false) { }
+  ~DummyTimer() { }
 
-  void Start() {
-  }
-  void Stop() {
-  }
+  void Start() { }
+  void Stop() { }
   bool IsTiming() {
     return false;
   }

@@ -37,49 +37,49 @@ struct CallbackHandler {
   ros::Publisher pubPoint_;
 
   CallbackHandler(ros::NodeHandle& nh) {
-    pubPoseWithCovarianceStamped_ = nh.advertise
-        < geometry_msgs::PoseWithCovarianceStamped
-        > ("pose_with_covariance_output", 100);
-    pubTransformStamped_ = nh.advertise < geometry_msgs::TransformStamped
-        > ("transform_output", 100);
-    pubPoseStamped_ = nh.advertise < geometry_msgs::PoseStamped
-        > ("pose_output", 100);
-    pubNavSatFix_ = nh.advertise < sensor_msgs::NavSatFix
-        > ("navsatfix_output", 100);
-    pubPoint_ = nh.advertise < geometry_msgs::PointStamped
-        > ("point_output", 100);
+    pubPoseWithCovarianceStamped_ =
+        nh.advertise<geometry_msgs::PoseWithCovarianceStamped>
+        ("pose_with_covariance_output", 100);
+    pubTransformStamped_ =
+        nh.advertise<geometry_msgs::TransformStamped>("transform_output", 100);
+    pubPoseStamped_ =
+        nh.advertise<geometry_msgs::PoseStamped>("pose_output", 100);
+    pubNavSatFix_ =
+        nh.advertise<sensor_msgs::NavSatFix>("navsatfix_output", 100);
+    pubPoint_ =
+        nh.advertise<geometry_msgs::PointStamped>("point_output", 100);
   }
 
-  void config(Config_T &config, uint32_t level) {
+  void config(Config_T &config, uint32_t /*level*/) {
     config_ = config;
   }
 
-  void measurementCallback(
+  void MeasurementCallback(
       const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg) {
     if (config_.publish_pose) {
       pubPoseWithCovarianceStamped_.publish(msg);
     }
   }
 
-  void measurementCallback(
+  void MeasurementCallback(
       const geometry_msgs::TransformStampedConstPtr & msg) {
     if (config_.publish_pose) {
       pubTransformStamped_.publish(msg);
     }
   }
 
-  void measurementCallback(const geometry_msgs::PoseStampedConstPtr & msg) {
+  void MeasurementCallback(const geometry_msgs::PoseStampedConstPtr & msg) {
     if (config_.publish_pose) {
       pubPoseStamped_.publish(msg);
     }
   }
 
-  void measurementCallback(const sensor_msgs::NavSatFixConstPtr & msg) {
+  void MeasurementCallback(const sensor_msgs::NavSatFixConstPtr & msg) {
     if (config_.publish_position) {
       pubNavSatFix_.publish(msg);
     }
   }
-  void measurementCallback(const geometry_msgs::PointStampedConstPtr & msg) {
+  void MeasurementCallback(const geometry_msgs::PointStampedConstPtr & msg) {
     if (config_.publish_position) {
       pubPoint_.publish(msg);
     }
@@ -87,7 +87,6 @@ struct CallbackHandler {
 };
 
 int main(int argc, char** argv) {
-
   ros::init(argc, argv, "msf_distort");
 
   typedef msf_distort::MSF_DistortConfig Config_T;
@@ -106,17 +105,17 @@ int main(int argc, char** argv) {
 
   ros::Subscriber subPoseWithCovarianceStamped_ =
       nh.subscribe < geometry_msgs::PoseWithCovarianceStamped
-          > ("pose_with_covariance_input", 20, &CallbackHandler::measurementCallback, &handler);
+          > ("pose_with_covariance_input", 20, &CallbackHandler::MeasurementCallback, &handler);
   ros::Subscriber subTransformStamped_ =
       nh.subscribe < geometry_msgs::TransformStamped
-          > ("transform_input", 20, &CallbackHandler::measurementCallback, &handler);
+          > ("transform_input", 20, &CallbackHandler::MeasurementCallback, &handler);
   ros::Subscriber subPoseStamped_ = nh.subscribe < geometry_msgs::PoseStamped
-      > ("pose_input", 20, &CallbackHandler::measurementCallback, &handler);
+      > ("pose_input", 20, &CallbackHandler::MeasurementCallback, &handler);
   ros::Subscriber subNavSatFix_ =
       nh.subscribe < sensor_msgs::NavSatFix
-          > ("navsatfix_input", 20, &CallbackHandler::measurementCallback, &handler);
+          > ("navsatfix_input", 20, &CallbackHandler::MeasurementCallback, &handler);
   ros::Subscriber subPoint_ = nh.subscribe < geometry_msgs::PointStamped
-      > ("point_input", 20, &CallbackHandler::measurementCallback, &handler);
+      > ("point_input", 20, &CallbackHandler::MeasurementCallback, &handler);
 
   ros::V_string topics;
   ros::this_node::getSubscribedTopics(topics);

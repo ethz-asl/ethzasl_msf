@@ -14,15 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <ros/ros.h>
+#ifndef MSF_SENSORHANDLER_INL_H_
+#define MSF_SENSORHANDLER_INL_H_
+#include <msf_core/msf_sensorhandler.h>
+#include <msf_core/msf_types.h>
 #include <msf_core/msf_core.h>
-int main(int argc, char** argv) {
-//just to instantiate all templates, no production code
 
-//	ros::init(argc, argv, "msf_core");
-//	shared_ptr<msf_core::MSF_SensorManager> usercalcs(new msf_core::MSF_InitMeasurement(true));
-//	msf_core::MSF_Core core(usercalcs);
-
-//	ros::spin();
+namespace msf_core {
+template<typename EKFState_T>
+MSF_SensorManager<EKFState_T>::MSF_SensorManager() {
+  sensorID_ = 0;
+  data_playback_ = false;
+  //TODO (slynen): Make this a (better) design. This is so aweful.
+  msf_core_.reset(new msf_core::MSF_Core<EKFState_T>(*this));
 }
-
+}  // namespace msf_core
+#endif  // MSF_SENSORHANDLER_INL_H_

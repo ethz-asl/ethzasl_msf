@@ -44,8 +44,8 @@ int main(){
   std::cout<<"distortions"<<std::endl;
   double dt = 1.0 / 20;
   for(int i = 0;i<10;++i){
-    dist.distort(pos, dt);
-    dist.distort(att, dt);
+    dist.Distort(pos, dt);
+    dist.Distort(att, dt);
     std::cout<<"pos "<<i<<": ["<<pos.transpose()<<"]"<<std::endl;
     std::cout<<"att "<<i<<": ["<<att.w()<<", "<<att.x()<<", "<<att.y()<<", "<<att.z()<<"]"<<std::endl<<std::endl;
   }

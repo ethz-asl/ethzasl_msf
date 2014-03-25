@@ -19,7 +19,7 @@
 
 #include <Eigen/Dense>
 #include <string.h>
-#include <msf_core/msf_types.hpp>
+#include <msf_core/msf_types.h>
 #include <msf_core/msf_statevisitor.h>
 #include <msf_core/msf_macros.h>
 
@@ -60,7 +60,7 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
 
   MSF_SensorManager();
 
-  bool data_playback() {
+  bool GetDataPlaybackStatus() {
     return data_playback_;
   }
 
@@ -72,33 +72,33 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
    * Add a new sensor handler to the list of handlers owned by this manager
    * a sensor handler is in turn owning the sensor (camera/vicon etc.).
    */
-  void addHandler(shared_ptr<SensorHandler<EKFState_T> > handler) {
-    handler->setSensorID(sensorID_++);
+  void AddHandler(shared_ptr<SensorHandler<EKFState_T> > handler) {
+    handler->SetSensorID(sensorID_++);
     handlers.push_back(handler);
   }
 
   /***
    * Init function for the EKF.
    */
-  virtual void init(double scale) const = 0;
+  virtual void Init(double scale) const = 0;
 
   /***
    * This method will be called for the user to set the initial state.
    */
-  virtual void initState(EKFState_T& state) const = 0;
+  virtual void InitState(EKFState_T& state) const = 0;
 
   /***
    * This method will be called for the user to set the Q block entries for
    * Auxiliary states only changes to blocks in Q belonging to the auxiliary
    * states are allowed / evaluated.
    */
-  virtual void calculateQAuxiliaryStates(EKFState_T& UNUSEDPARAM(state),
+  virtual void CalculateQAuxiliaryStates(EKFState_T& UNUSEDPARAM(state),
                                          double UNUSEDPARAM(dt)) const = 0;
 
   /***
    * This method will be called for the user to set the initial P matrix.
    */
-  virtual void setP(
+  virtual void SetStateCovariance(
       Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,
           EKFState_T::nErrorStatesAtCompileTime>& P) const = 0;
 
@@ -106,7 +106,7 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
    * This method will be called for the user to have the possibility to augment
    * the correction vector.
    */
-  virtual void augmentCorrectionVector(
+  virtual void AugmentCorrectionVector(
       Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, 1>&
       UNUSEDPARAM(correction)) const = 0;
 
@@ -115,7 +115,7 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
    * has been applied to the state delaystate is the state on which the correction
    * has been applied buffstate is the state before the correction was applied.
    */
-  virtual void sanityCheckCorrection(
+  virtual void SanityCheckCorrection(
       EKFState_T& UNUSEDPARAM(delaystate),
       const EKFState_T& UNUSEDPARAM(buffstate),
       Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, 1>&
@@ -125,27 +125,27 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
    * Provide a getter for these parameters, this is implemented for a given
    * middleware or param file parser.
    */
-  virtual bool getParam_fixed_bias() const = 0;
-  virtual double getParam_noise_acc() const = 0;
-  virtual double getParam_noise_accbias() const = 0;
-  virtual double getParam_noise_gyr() const = 0;
-  virtual double getParam_noise_gyrbias() const = 0;
-  virtual double getParam_fuzzythres() const = 0;
+  virtual bool GetParamFixedBias() const = 0;
+  virtual double GetParamNoiseAcc() const = 0;
+  virtual double GetParamNoiseAccbias() const = 0;
+  virtual double GetParamNoiseGyr() const = 0;
+  virtual double GetParamNoiseGyrbias() const = 0;
+  virtual double GetParamFuzzyTrackingThreshold() const = 0;
 
   /**
    * This functions get called by the core to publish data to external
    * middlewares like ROS.
    */
-  virtual void publishStateInitial(
+  virtual void PublishStateInitial(
       const shared_ptr<EKFState_T>& state) const = 0;
-  virtual void publishStateAfterPropagation(
+  virtual void PublishStateAfterPropagation(
       const shared_ptr<EKFState_T>& state) const = 0;
-  virtual void publishStateAfterUpdate(
+  virtual void PublishStateAfterUpdate(
       const shared_ptr<EKFState_T>& state) const = 0;
 
 };
-}  // msf_core
+}  // namespace msf_core
 
-#include <msf_core/implementation/msf_sensormanager.hpp>
+#include <msf_core/implementation/msf_sensormanager_inl.h>
 
 #endif  // SENSORMANAGER_H
