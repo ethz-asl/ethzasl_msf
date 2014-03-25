@@ -34,7 +34,7 @@ catkin_package(
     CATKIN_DEPENDS roscpp sensor_msgs dynamic_reconfigure msf_timing tf
     INCLUDE_DIRS include ${Eigen_INCLUDE_DIRS}
     LIBRARIES msf_core similaritytransform
-    CFG_EXTRAS export_flags.cmake
+    CFG_EXTRAS export_flags.cmake FindGLog.cmake
 )
 
 add_library(${PROJECT_NAME} src/lib/msf_tools.cc src/lib/falsecolor.cc 
