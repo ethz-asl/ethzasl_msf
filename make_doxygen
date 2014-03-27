@@ -1,6 +1,6 @@
 #!/bin/bash
 doxygen msf_dox.dox
-cd html
+cd documentation
 git add .
 git commit -m "Updated documentation."
 git push origin gh-pages
