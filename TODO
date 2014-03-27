@@ -1,4 +1,3 @@
-
 Multiple fuzzy tracking states
 extern templates c++11
 Eigen::Map wrap Q-blocks (if possible)
