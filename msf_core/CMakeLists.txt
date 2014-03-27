@@ -16,11 +16,13 @@ find_package(Eigen REQUIRED)
 find_package(GLog REQUIRED)
 
 find_package(Doxygen)
+set(MSF_DOCUMENTATION msf_documentation)
 if(DOXYGEN_FOUND)
-  set(MSF_DOCUMENTATION msf_documentation)
   add_custom_target(${MSF_DOCUMENTATION}
                     COMMAND doxygen msf_dox.dox
                     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/../)
+else()
+  add_custom_target(${MSF_DOCUMENTATION})
 endif(DOXYGEN_FOUND)
 
 include_directories(include ${Eigen_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
@@ -48,7 +50,7 @@ catkin_package(
 add_library(${PROJECT_NAME} src/lib/msf_tools.cc src/lib/falsecolor.cc 
                      src/lib/gps_conversion.cc)
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${GLOG_LIBRARY})
-add_dependencies(msf_core ${PROJECT_NAME}_gencfg) 
+add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencfg ${MSF_DOCUMENTATION}) 
 
 add_library(similaritytransform src/similaritytransform.cc)
 target_link_libraries(similaritytransform ${catkin_LIBRARIES})
