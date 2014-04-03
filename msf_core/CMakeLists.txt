@@ -13,7 +13,24 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake/)
 
 find_package(catkin REQUIRED COMPONENTS sensor_msgs dynamic_reconfigure msf_timing tf)
 find_package(Eigen REQUIRED)
-find_package(GLog REQUIRED)
+find_package(GLog)
+
+if(GLOG_FOUND)
+ add_definitions(-DMSF_HAVE_GLOG)
+ set(MSF_GLOG_LIBRARY ${GLOG_LIBRARY})
+else()
+ set(MSF_GLOG_LIBRARY "")
+endif()
+
+find_package(Doxygen)
+set(MSF_DOCUMENTATION msf_documentation)
+if(DOXYGEN_FOUND)
+  add_custom_target(${MSF_DOCUMENTATION}
+                    COMMAND doxygen msf_dox.dox
+                    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/../)
+else()
+  add_custom_target(${MSF_DOCUMENTATION})
+endif(DOXYGEN_FOUND)
 
 include_directories(include ${Eigen_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
 
@@ -39,15 +56,15 @@ catkin_package(
 
 add_library(${PROJECT_NAME} src/lib/msf_tools.cc src/lib/falsecolor.cc 
                      src/lib/gps_conversion.cc)
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${GLOG_LIBRARY})
-add_dependencies(msf_core ${PROJECT_NAME}_gencfg) 
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} ${MSF_GLOG_LIBRARY})
+add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencfg ${MSF_DOCUMENTATION}) 
 
 add_library(similaritytransform src/similaritytransform.cc)
 target_link_libraries(similaritytransform ${catkin_LIBRARIES})
 
 catkin_add_gtest(test_similaritytransform src/test/test_similaritytransform.cc)
-target_link_libraries(test_similaritytransform similaritytransform ${GLOG_LIBRARY})
+target_link_libraries(test_similaritytransform similaritytransform ${MSF_GLOG_LIBRARY})
 
 catkin_add_gtest(test_static_statelist src/test/test_staticstatelist.cc)
-target_link_libraries(test_static_statelist pthread ${PROJECT_NAME} ${GLOG_LIBRARY})
+target_link_libraries(test_static_statelist pthread ${PROJECT_NAME} ${MSF_GLOG_LIBRARY})
 
