@@ -45,7 +45,7 @@
 #define LOG(WARNING) std ::cout << ""
 
 namespace google {
-void InitGoogleLogging(const std::string&) { };
+void InitGoogleLogging(const std::string&);
 }  // namespace google
 
 #endif  // MSF_HAVE_GLOG
