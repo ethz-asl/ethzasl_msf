@@ -17,9 +17,9 @@ find_package(GLog)
 
 if(GLOG_FOUND)
  add_definitions(-DMSF_HAVE_GLOG)
- set(MSF_GLOG_LIBRARY, ${GLOG_LIBRARY})
+ set(MSF_GLOG_LIBRARY ${GLOG_LIBRARY})
 else()
- set(MSF_GLOG_LIBRARY, "")
+ set(MSF_GLOG_LIBRARY "")
 endif()
 
 find_package(Doxygen)
