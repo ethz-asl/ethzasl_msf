@@ -13,7 +13,11 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake/)
 
 find_package(catkin REQUIRED COMPONENTS sensor_msgs dynamic_reconfigure msf_timing tf)
 find_package(Eigen REQUIRED)
-find_package(GLog REQUIRED)
+find_package(GLog)
+
+if(GLOG_FOUND)
+ add_definitions(-DMSF_HAVE_GLOG)
+endif()
 
 find_package(Doxygen)
 set(MSF_DOCUMENTATION msf_documentation)
