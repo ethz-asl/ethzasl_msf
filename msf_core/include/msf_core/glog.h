@@ -18,7 +18,7 @@
 #ifndef MSF_GLOG_H_
 #define MSF_GLOG_H_
 
-#ifndef MSF_HAVE_GLOG
+#ifdef MSF_HAVE_GLOG
 #include <glog/logging.h>
 #else
 #include <cassert>
@@ -46,7 +46,7 @@
 
 namespace google {
 void InitGoogleLogging(const std::string&) { };
-}
+}  // namespace google
 
 #endif  // MSF_HAVE_GLOG
 #endif  // MSF_GLOG_H_
