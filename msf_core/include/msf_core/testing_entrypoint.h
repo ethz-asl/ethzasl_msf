@@ -19,7 +19,7 @@
 #define TESTING_ENTRYPOINT_H_
 
 #include <gtest/gtest.h>
-#include <msf_core/glog.h>
+#include <glog/logging.h>
 
 // Let the Eclipse parser see the macro.
 #ifndef TEST
