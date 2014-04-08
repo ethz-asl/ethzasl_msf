@@ -75,7 +75,7 @@ endif(MSVC)
 if(MSVC)
     _FIND_GLOG_LIBRARY(GLOG_LIBRARY libglog.lib)
 else(MSVC)
-	# Linux
+    # Linux
     if(UNIX)
         _FIND_GLOG_LIBRARY(GLOG_LIBRARY libglog.so)
     endif(UNIX)
