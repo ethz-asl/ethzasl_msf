@@ -22,6 +22,7 @@
 #include <sstream>
 #include <stdio.h>
 #include <string>
+#include <math.h>
 
 #include <msf_timing/Timer.h>
 
