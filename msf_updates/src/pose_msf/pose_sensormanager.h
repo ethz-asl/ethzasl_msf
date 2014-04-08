@@ -144,7 +144,7 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
     } else {
       ss << "Height to small for initialization, the minimum is "
           << MIN_INITIALIZATION_HEIGHT << "and " << req.height << "was set.";
-      MSF_WARN_STREAM(ss);
+      MSF_WARN_STREAM(ss.str());
       res.result = ss.str();
       return false;
     }
