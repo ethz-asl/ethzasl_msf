@@ -1,0 +1,23 @@
+<package>
+  <name>msf_simulate</name>
+  <version>0.0.1</version>
+  <description>msf_simulate</description>
+  <maintainer email="simon.lynen@mavt.ethz.ch">Simon Lynen</maintainer>
+  <maintainer email="markus.achtelik_devel@mavt.ethz.ch">Markus Achtelik</maintainer>
+
+  <license>ASL 2.0</license>
+
+  <url type="website">https://github.com/ethz-asl/ethzasl_msf</url>
+  <url type="bugtracker">https://github.com/ethz-asl/ethzasl_msf/issues</url>
+
+  <author>Simon Lynen</author>
+  <author>Markus Achtelik</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>msf_core</build_depend>
+  <build_depend>msf_updates</build_depend>
+
+  <run_depend>msf_core</run_depend>
+  <run_depend>msf_updates</run_depend>
+</package>
