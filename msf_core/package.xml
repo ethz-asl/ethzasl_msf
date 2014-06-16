@@ -8,7 +8,7 @@
 
   <license>Apache 2.0</license>
 
-  <url type="website">http://ros.org/wiki/modular_sensor_fusion</url>
+  <url type="website">http://ros.org/wiki/ethzasl_msf</url>
   <url type="bugtracker">https://github.com/ethz-asl/sensor_fusion/issues</url>
 
   <author>Simon Lynen</author>

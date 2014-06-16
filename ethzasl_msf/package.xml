@@ -8,8 +8,8 @@
 
   <license>Apache 2.0</license>
 
-  <url type="website">http://ros.org/wiki/modular_sensor_fusion</url>
-  <url type="bugtracker">https://github.com/ethz-asl/sensor_fusion/issues</url>
+  <url type="website">http://ros.org/wiki/ethzasl_msf</url>
+  <url type="bugtracker">https://github.com/ethz-asl/ethzasl_msf/issues</url>
 
   <author>Simon Lynen</author>
   <author>Markus Achtelik</author>
@@ -17,16 +17,9 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <build_depend>sensor_msgs</build_depend>
-  <build_depend>dynamic_reconfigure</build_depend>
-  <build_depend>msf_timing</build_depend>
-  <build_depend>tf</build_depend>
-  <build_depend>GLog</build_depend>
-
-  <run_depend>roscpp</run_depend>
-  <run_depend>sensor_msgs</run_depend>
-  <run_depend>dynamic_reconfigure</run_depend>
+  <run_depend>msf_core</run_depend>
+  <run_depend>msf_distort</run_depend>
   <run_depend>msf_timing</run_depend>
-  <run_depend>tf</run_depend>
-  <run_depend>GLog</run_depend>
+  <run_depend>msf_updates</run_depend>
+  <run_depend>sensor_fusion_comm</run_depend>
 </package>
