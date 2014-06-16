@@ -1,11 +1,11 @@
 <package>
   <name>msf_updates</name>
-  <version>0.0.1</version>
+  <version>1.0.0</version>
   <description>Modular Sensor Fusion (MSF) framework containing the update sensor modules</description>
   <maintainer email="simon.lynen@mavt.ethz.ch">Simon Lynen</maintainer>
   <maintainer email="markus.achtelik_devel@mavt.ethz.ch">Markus Achtelik</maintainer>
 
-  <license>ASL 2.0</license>
+  <license>Apache 2.0</license>
 
   <url type="website">http://ros.org/wiki/modular_sensor_fusion</url>
   <url type="bugtracker">https://github.com/ethz-asl/sensor_fusion/issues</url>
@@ -15,17 +15,14 @@
   <author>Stephan Weiss</author>
   <author>Georg Wiedebach</author>
 
-  <!-- Dependencies which this package needs to build itself. -->
   <buildtool_depend>catkin</buildtool_depend>
 
-  <!-- Dependencies needed to compile this package. -->
   <build_depend>roscpp</build_depend>
   <build_depend>msf_core</build_depend>
   <build_depend>geometry_msgs</build_depend>
   <build_depend>asctec_hl_comm</build_depend>
   <build_depend>sensor_fusion_comm</build_depend>
 
-  <!-- Dependencies needed after this package is compiled. -->
   <run_depend>roscpp</run_depend>
   <run_depend>msf_core</run_depend>
   <run_depend>geometry_msgs</run_depend>
