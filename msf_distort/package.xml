@@ -1,6 +1,6 @@
 <package>
   <name>msf_distort</name>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <description>msf_distort</description>
   <maintainer email="simon.lynen@mavt.ethz.ch">Simon Lynen</maintainer>
   <maintainer email="markus.achtelik_devel@mavt.ethz.ch">Markus Achtelik</maintainer>

@@ -1,6 +1,6 @@
 <package>
   <name>msf_updates</name>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
   <description>Modular Sensor Fusion (MSF) framework containing the update sensor modules</description>
   <maintainer email="simon.lynen@mavt.ethz.ch">Simon Lynen</maintainer>
   <maintainer email="markus.achtelik_devel@mavt.ethz.ch">Markus Achtelik</maintainer>
