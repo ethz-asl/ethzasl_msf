@@ -199,6 +199,13 @@ class SortedContainer {
     typename ListT::iterator tauPlus = GetIteratorClosestAfter(statetime);
 
     typename ListT::iterator it_end = GetIteratorEnd();
+
+    // If we were asking for some iterator before or at the time at begin()
+    // tauMinus will be one element before begin(), so the best we can do is
+    // to return begin(), which would be closest in that case.
+    if (tauMinus == GetIteratorBeforeBegin()) {
+      return GetIteratorBegin();
+    }
     if (tauMinus == it_end) {
       return tauPlus;
     }
