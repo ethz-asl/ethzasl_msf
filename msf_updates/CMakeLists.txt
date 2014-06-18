@@ -25,7 +25,7 @@ catkin_package(
     DEPENDS 
     CATKIN_DEPENDS roscpp msf_core geometry_msgs asctec_hl_comm sensor_fusion_comm
     INCLUDE_DIRS include ${catkin_INCLUDE_DIRS}
-    LIBRARIES # TODO
+    LIBRARIES pose_distorter
 )
 
 add_library(pose_distorter src/msf_distort/PoseDistorter.cc)
