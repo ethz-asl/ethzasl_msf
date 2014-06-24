@@ -43,7 +43,7 @@ catkin_package(
     DEPENDS eigen GLog
     CATKIN_DEPENDS roscpp sensor_msgs dynamic_reconfigure msf_timing tf
     INCLUDE_DIRS include ${Eigen_INCLUDE_DIRS}
-    LIBRARIES msf_core similaritytransform ${GLOG_LIBRARY}
+    LIBRARIES msf_core similaritytransform ${glog_catkin_LIBRARIES}
     CFG_EXTRAS export_flags.cmake
 )
 
@@ -53,14 +53,14 @@ install(DIRECTORY cmake
 add_library(${PROJECT_NAME} src/lib/msf_tools.cc src/lib/falsecolor.cc 
                      src/lib/gps_conversion.cc)
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
-add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencfg ${MSF_DOCUMENTATION}) 
+add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencfg ${MSF_DOCUMENTATION} glog_catkin)
 
 add_library(similaritytransform src/similaritytransform.cc)
 target_link_libraries(similaritytransform ${catkin_LIBRARIES})
 
 catkin_add_gtest(test_similaritytransform src/test/test_similaritytransform.cc)
-target_link_libraries(test_similaritytransform similaritytransform ${GLOG_LIBRARY})
+target_link_libraries(test_similaritytransform similaritytransform ${glog_catkin_LIBRARIES})
 
 catkin_add_gtest(test_static_statelist src/test/test_staticstatelist.cc)
-target_link_libraries(test_static_statelist pthread ${PROJECT_NAME} ${GLOG_LIBRARY})
+target_link_libraries(test_static_statelist pthread ${PROJECT_NAME} ${glog_catkin_LIBRARIES})
 

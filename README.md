@@ -16,5 +16,8 @@ You are welcome contributing to the package by opening a pull-request:
 Please make yourself familiar with the Google c++ style guide: 
 http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml
 
+## Dependencies
+glog_catkin: https://github.com/ethz-asl/glog_catkin
+
 ##License
 The source code is released under the Apache 2.0 license
