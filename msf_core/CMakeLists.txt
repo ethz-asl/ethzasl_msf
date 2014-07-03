@@ -11,9 +11,8 @@ set(CMAKE_BUILD_TYPE Release)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake/)
 
-find_package(catkin REQUIRED COMPONENTS sensor_msgs dynamic_reconfigure msf_timing tf)
+find_package(catkin REQUIRED COMPONENTS sensor_msgs dynamic_reconfigure msf_timing tf glog_catkin)
 find_package(Eigen REQUIRED)
-find_package(GLog REQUIRED)
 
 find_package(Doxygen)
 set(MSF_DOCUMENTATION msf_documentation)
@@ -40,10 +39,10 @@ add_definitions (-DENABLE_MSF_TIMING)
 generate_dynamic_reconfigure_options(cfg/MSF_Core.cfg)
 
 catkin_package(
-    DEPENDS eigen GLog
-    CATKIN_DEPENDS roscpp sensor_msgs dynamic_reconfigure msf_timing tf
+    DEPENDS eigen glog_catkin
+    CATKIN_DEPENDS roscpp sensor_msgs dynamic_reconfigure msf_timing tf glog_catkin
     INCLUDE_DIRS include ${Eigen_INCLUDE_DIRS}
-    LIBRARIES msf_core similaritytransform ${GLOG_LIBRARY}
+    LIBRARIES msf_core similaritytransform
     CFG_EXTRAS export_flags.cmake
 )
 
@@ -59,8 +58,8 @@ add_library(similaritytransform src/similaritytransform.cc)
 target_link_libraries(similaritytransform ${catkin_LIBRARIES})
 
 catkin_add_gtest(test_similaritytransform src/test/test_similaritytransform.cc)
-target_link_libraries(test_similaritytransform similaritytransform ${GLOG_LIBRARY})
+target_link_libraries(test_similaritytransform similaritytransform)
 
 catkin_add_gtest(test_static_statelist src/test/test_staticstatelist.cc)
-target_link_libraries(test_static_statelist pthread ${PROJECT_NAME} ${GLOG_LIBRARY})
+target_link_libraries(test_static_statelist pthread ${PROJECT_NAME})
 
