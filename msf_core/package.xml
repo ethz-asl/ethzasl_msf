@@ -21,12 +21,12 @@
   <build_depend>dynamic_reconfigure</build_depend>
   <build_depend>msf_timing</build_depend>
   <build_depend>tf</build_depend>
-  <build_depend>GLog</build_depend>
+  <build_depend>glog_catkin</build_depend>
 
   <run_depend>roscpp</run_depend>
   <run_depend>sensor_msgs</run_depend>
   <run_depend>dynamic_reconfigure</run_depend>
   <run_depend>msf_timing</run_depend>
   <run_depend>tf</run_depend>
-  <run_depend>GLog</run_depend>
+  <run_depend>glog_catkin</run_depend>
 </package>
