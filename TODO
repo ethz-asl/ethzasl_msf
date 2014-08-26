@@ -15,4 +15,4 @@ plot_scripts autogen with correct indices from msf_core
 
 TRUE MODULARITY:
 a) template sensors to calibration states
-b) Every sensor has a set of states (calib bias etc) these get added to a large state vector automatically. 
+b) Every sensor has a set of states (calib bias etc) these get added to a large state vector automatically.
