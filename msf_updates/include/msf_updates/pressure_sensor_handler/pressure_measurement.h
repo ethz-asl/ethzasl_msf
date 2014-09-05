@@ -78,7 +78,7 @@ struct PressureMeasurement : public PressureMeasurementBase {
 
     H_old.setZero();
 
-    if (non_const_state->time == -1) {
+    if (non_const_state->time == msf_core::constants::INVALID_TIME) {
       MSF_WARN_STREAM(
           "Apply pressure update was called with an invalid state.");
       return;  // Early abort.

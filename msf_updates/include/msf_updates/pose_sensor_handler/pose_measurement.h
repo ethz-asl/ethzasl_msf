@@ -344,7 +344,7 @@ struct PoseMeasurement : public PoseMeasurementBase {
       shared_ptr < msf_core::MSF_MeasurementBase<EKFState_T> > prevmeas_base =
           core.GetPreviousMeasurement(this->time, this->sensorID_);
 
-      if (prevmeas_base->time == -1) {
+      if (prevmeas_base->time == msf_core::constants::INVALID_TIME) {
         MSF_WARN_STREAM(
             "The previous measurement is invalid. Could not apply measurement! " "time:"<<this->time<<" sensorID: "<<this->sensorID_);
         return;
@@ -364,7 +364,7 @@ struct PoseMeasurement : public PoseMeasurementBase {
       shared_ptr<EKFState_T> state_nonconst_old = core.GetClosestState(
           prevmeas->time);
 
-      if (state_nonconst_old->time == -1) {
+      if (state_nonconst_old->time == msf_core::constants::INVALID_TIME) {
         MSF_WARN_STREAM(
             "The state at the previous measurement is invalid. Could "
             "not apply measurement");

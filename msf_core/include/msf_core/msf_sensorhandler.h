@@ -50,7 +50,7 @@ class SensorHandler {
                 const std::string& parameternamespace)
       : lastseq_(0),
         manager_(mng),
-        sensorID(-1),
+        sensorID(constants::INVALID_ID),
         topic_namespace_(topic_namespace),
         parameternamespace_(parameternamespace) {
   }

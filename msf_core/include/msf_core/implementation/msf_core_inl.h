@@ -46,7 +46,6 @@ MSF_Core<EKFState_T>::MSF_Core(const MSF_SensorManager<EKFState_T>& GetUserCalc)
   initialized_ = false;
   predictionMade_ = false;
   isfuzzyState_ = false;
-  g_ << 0, 0, 9.80834;  // At 47.37 lat (Zurich).
   time_P_propagated = 0;
   it_last_IMU = stateBuffer_.GetIteratorEnd();
 }
@@ -113,7 +112,7 @@ void MSF_Core<EKFState_T>::ProcessIMU(
   timer_PropGetClosestState.Stop();
 
   msf_timing::DebugTimer timer_PropPrepare("PropPrepare");
-  if (lastState->time == -1) {
+  if (lastState->time == constants::INVALID_TIME) {
     MSF_WARN_STREAM_THROTTLE(
         2, __FUNCTION__<<"ImuCallback: closest state is invalid\n");
     return;  // Early abort.
@@ -146,7 +145,7 @@ void MSF_Core<EKFState_T>::ProcessIMU(
     currentState->a_m = last_am;
   else {
     // Try to get the state before the current time.
-    if (lastState->time == -1) {
+    if (lastState->time == constants::INVALID_TIME) {
       MSF_WARN_STREAM(
           "Accelerometer readings had a spike, but no prior state was in the "
           "buffer to take cleaner measurements from");
@@ -155,7 +154,7 @@ void MSF_Core<EKFState_T>::ProcessIMU(
     last_am = lastState->a_m;
   }
   if (!predictionMade_) {
-    if (lastState->time == -1) {
+    if (lastState->time == constants::INVALID_TIME) {
       MSF_WARN_STREAM("Wanted to compare prediction time offset to last state, "
       "but no prior state was in the buffer to take cleaner measurements from");
       return;
@@ -170,7 +169,7 @@ void MSF_Core<EKFState_T>::ProcessIMU(
     }
   }
 
-  if (lastState->time == -1) {
+  if (lastState->time == constants::INVALID_TIME) {
     MSF_WARN_STREAM(
         "Wanted to propagate state, but no valid prior state could be found in "
         "the buffer");
@@ -225,7 +224,7 @@ void MSF_Core<EKFState_T>::ProcessExternallyPropagatedState(
 
   // TODO(slynen): not broken, revert back when it_last_IMU->second from above is fixed
   shared_ptr<EKFState_T> lastState = stateBuffer_.GetLast();//it_last_IMU->second;
-  if (lastState->time == -1) {
+  if (lastState->time == constants::INVALID_TIME) {
     MSF_WARN_STREAM_THROTTLE(2, "StateCallback: closest state is invalid\n");
     return;  // Early abort.
   }
@@ -376,7 +375,8 @@ void MSF_Core<EKFState_T>::PropagateState(shared_ptr<EKFState_T>& state_old,
        ea + state_old->template Get<StateDefinition_T::q>().toRotationMatrix() *
        eaold) / 2;
   state_new->template Get<StateDefinition_T::v>() =
-      state_old->template Get<StateDefinition_T::v>() + (dv - g_) * dt;
+      state_old->template Get<StateDefinition_T::v>()
+      + (dv - constants::GRAVITY) * dt;
   state_new->template Get<StateDefinition_T::p>() =
       state_old->template Get<StateDefinition_T::p>()
       + ((state_new->template Get<StateDefinition_T::v>()
@@ -676,9 +676,12 @@ void MSF_Core<EKFState_T>::AddMeasurement(
 
     msf_timing::DebugTimer timer_prop_state_after_meas(
         "Repropagate state to now");
-    for (; it_curr != it_end && it_next != it_end && it_curr->second->time != -1
-    // Propagate to selected state.
-        && it_next->second->time != -1; ++it_curr, ++it_next) {
+    for (;
+        it_curr != it_end && it_next != it_end
+            && it_curr->second->time != constants::INVALID_TIME
+            // Propagate to selected state.
+            && it_next->second->time != constants::INVALID_TIME;
+        ++it_curr, ++it_next) {
       if (it_curr->second == it_next->second) {
         MSF_ERROR_STREAM(__FUNCTION__<< " propagation : it_curr points to same "
         "state as it_next. This must not happen.");
@@ -746,7 +749,8 @@ shared_ptr<EKFState_T> MSF_Core<EKFState_T>::GetClosestState(double tstamp) {
   shared_ptr<EKFState_T> closestState = it->second;
   // Check if the state really is close to the requested time.
   // With the new buffer this might not be given.
-  if (closestState->time == -1 || fabs(closestState->time - timenow) > 0.1) {
+  if (closestState->time == constants::INVALID_TIME
+      || fabs(closestState->time - timenow) > 0.1) {
     MSF_ERROR_STREAM(
         __FUNCTION__<< " Requested closest state to "<<timehuman(timenow)<<" but "
         "there was no suitable state in the map");
@@ -761,7 +765,8 @@ shared_ptr<EKFState_T> MSF_Core<EKFState_T>::GetClosestState(double tstamp) {
     shared_ptr<EKFState_T> lastState = stateBuffer_.GetClosestBefore(timenow);
     shared_ptr<EKFState_T> nextState = stateBuffer_.GetClosestAfter(timenow);
 
-    bool statevalid = lastState->time != -1 && nextState->time != -1;
+    bool statevalid = lastState->time != constants::INVALID_TIME
+        && nextState->time != -constants::INVALID_TIME;
     bool statenotnan = lastState->CheckStateForNumeric()
         && nextState->CheckStateForNumeric();
     bool statesnotsame = lastState->time != nextState->time;

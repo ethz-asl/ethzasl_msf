@@ -104,8 +104,9 @@ class IMUHandler_ROS : public IMUHandler<EKFState_T> {
   }
 
   void IMUCallback(const sensor_msgs::ImuConstPtr & msg) {
-    static int lastseq = -1;
-    if ((int) msg->header.seq != lastseq + 1 && lastseq != -1) {
+    static int lastseq = constants::INVALID_SEQUENCE;
+    if ((int) msg->header.seq != lastseq + 1
+        && lastseq != constants::INVALID_SEQUENCE) {
       MSF_WARN_STREAM(
           "msf_core: imu message drop curr seq:" << msg->header.seq
               << " expected: " << lastseq + 1);
