@@ -676,12 +676,11 @@ void MSF_Core<EKFState_T>::AddMeasurement(
 
     msf_timing::DebugTimer timer_prop_state_after_meas(
         "Repropagate state to now");
-    for (;
-        it_curr != it_end && it_next != it_end
-            && it_curr->second->time != constants::INVALID_TIME
-            // Propagate to selected state.
-            && it_next->second->time != constants::INVALID_TIME;
-        ++it_curr, ++it_next) {
+    // Propagate to selected state.
+    for (; it_curr != it_end && it_next != it_end &&
+           it_curr->second->time != constants::INVALID_TIME &&
+           it_next->second->time != constants::INVALID_TIME; ++it_curr,
+           ++it_next) {
       if (it_curr->second == it_next->second) {
         MSF_ERROR_STREAM(__FUNCTION__<< " propagation : it_curr points to same "
         "state as it_next. This must not happen.");
