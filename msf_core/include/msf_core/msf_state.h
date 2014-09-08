@@ -148,7 +148,7 @@ struct GenericState_T {
   Q_type Qd;   ///< Discrete propagation noise matrix.
 
   GenericState_T() {
-    time = -1;
+    time = constants::INVALID_TIME;
     P.setZero();
     Qd.setZero();
     Fd.setIdentity();

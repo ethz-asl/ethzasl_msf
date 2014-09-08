@@ -57,7 +57,7 @@ class SortedContainer {
 
   SortedContainer() {
     invalid.reset(new PrototypeInvalidT());
-    invalid->time = -1;
+    invalid->time = constants::INVALID_TIME;
   }
   /**
    * \brief To be called to signal that a request could not be satisfied
@@ -281,9 +281,9 @@ class SortedContainer {
     shared_ptr<T>& tauMinus = GetClosestBefore(statetime);
     shared_ptr<T>& tauPlus = GetClosestAfter(statetime);
 
-    if (tauMinus->time == -1) {
+    if (tauMinus->time == constants::INVALID_TIME) {
       return tauPlus;
-    } else if (tauPlus->time == -1) {
+    } else if (tauPlus->time == constants::INVALID_TIME) {
       return tauMinus;
     }
 

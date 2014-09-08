@@ -190,8 +190,6 @@ class MSF_Core {
   double time_P_propagated;
   /// Last time stamp where we have a valid state.
   typename StateBuffer_T::iterator_T it_last_IMU;
-  /// Gravity vector.
-  Eigen::Matrix<double, 3, 1> g_;
 
   /// Is the filter initialized, so that we can propagate the state?
   bool initialized_;

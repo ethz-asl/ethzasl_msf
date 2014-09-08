@@ -92,7 +92,7 @@ class MSF_InvalidMeasurement : public MSF_MeasurementBase<EKFState_T> {
     return "invalid";
   }
   MSF_InvalidMeasurement()
-      : MSF_MeasurementBase<EKFState_T>(true, -1) {
+      : MSF_MeasurementBase<EKFState_T>(true, constants::INVALID_ID) {
   }
   virtual ~MSF_InvalidMeasurement() {
   }
@@ -161,7 +161,7 @@ class MSF_InitMeasurement : public MSF_MeasurementBase<EKFState_T> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW MSF_InitMeasurement(
       bool ContainsInitialSensorReadings)
-      : MSF_MeasurementBase<EKFState_T>(true, -1) {
+      : MSF_MeasurementBase<EKFState_T>(true, constants::INVALID_ID) {
     ContainsInitialSensorReadings_ = ContainsInitialSensorReadings;
     this->time = ros::Time::now().toSec();
   }
