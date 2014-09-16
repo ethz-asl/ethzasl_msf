@@ -134,7 +134,7 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
 
     v << 0, 0, 0;			/// Robot velocity (IMU centered).
     w_m << 0, 0, 0;		/// Initial angular velocity.
-    a_m = g;			    /// Initial acceleration.
+    a_m = q.inverse() * g;			    /// Initial acceleration.
 
     q_wv.setIdentity();  // World-vision rotation drift.
     p_wv.setZero();      // World-vision position drift.

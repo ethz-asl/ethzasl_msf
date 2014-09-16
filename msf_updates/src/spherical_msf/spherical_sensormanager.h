@@ -105,7 +105,7 @@ class SensorManager : public msf_core::MSF_SensorManagerROS<
 
     v << 0, 0, 0;			/// Robot velocity (IMU centered).
     w_m << 0, 0, 0;		/// Initial angular velocity.
-    a_m = g;			/// Initial acceleration.
+    a_m = q.inverse() * g;			/// Initial acceleration.
 
     // Set the initial yaw alignment of body to world (the frame in which the
     // position sensor measures).
