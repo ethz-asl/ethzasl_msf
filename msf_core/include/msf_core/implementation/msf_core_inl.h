@@ -765,7 +765,7 @@ shared_ptr<EKFState_T> MSF_Core<EKFState_T>::GetClosestState(double tstamp) {
     shared_ptr<EKFState_T> nextState = stateBuffer_.GetClosestAfter(timenow);
 
     bool statevalid = lastState->time != constants::INVALID_TIME
-        && nextState->time != -constants::INVALID_TIME;
+        && nextState->time != constants::INVALID_TIME;
     bool statenotnan = lastState->CheckStateForNumeric()
         && nextState->CheckStateForNumeric();
     bool statesnotsame = lastState->time != nextState->time;
