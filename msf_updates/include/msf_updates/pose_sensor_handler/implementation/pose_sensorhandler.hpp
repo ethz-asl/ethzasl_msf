@@ -190,11 +190,13 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
           << this->topic_namespace_ << "/" << subTransformStamped_.getTopic()
           << " ***");
 
-  if (msg->header.seq % 5 != 0) {  // Slow down vicon.
-    MSF_WARN_STREAM_THROTTLE(30, "Measurement throttling is on, dropping every "
-                             "but the 5th message");
+  static double t_prev = msg->header.stamp.toSec();
+  if( msg->header.stamp.toSec() - t_prev < 0.025) {  // Slow down vicon.
+    MSF_WARN_STREAM_THROTTLE(30, "Measurement throttling is on, incorporating "
+                             "maximally 40 messages per second ");
     return;
   }
+  t_prev = msg->header.stamp.toSec();
 
   geometry_msgs::PoseWithCovarianceStampedPtr pose(
       new geometry_msgs::PoseWithCovarianceStamped());
