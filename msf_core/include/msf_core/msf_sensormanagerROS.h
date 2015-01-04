@@ -194,7 +194,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
   virtual void PublishStateAfterPropagation(
       const shared_ptr<EKFState_T>& state) const {
 
-    if (pubPoseCrtl_.getNumSubscribers()) {
+    if (pubPoseCrtl_.getNumSubscribers() || pubPose_.getNumSubscribers()) {
       static int msg_seq = 0;
 
       geometry_msgs::PoseWithCovarianceStamped msgPose;
