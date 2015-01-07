@@ -8,8 +8,8 @@ data_playback: true             # Set to true for playback, set to false on the 
 # See the following link for more information 
 # https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model-and-Intrinsics
 # 
-# The white noise is characterized with the continous time noise spectral density. 
-# The noise spectral density is sometime also refered to as noise density.
+# The white noise is characterized with the continuous time noise spectral density. 
+# The noise spectral density is sometime also referred to as noise density.
 # The units of the noise spectral density are:
 #  acc:  [m/s^2/sqrt(Hz)]
 #  gyro: [rad/s/sqrt(Hz)]
@@ -21,7 +21,7 @@ data_playback: true             # Set to true for playback, set to false on the 
 #  acc:  [m/s^3/sqrt(Hz)]
 #  gyro: [rad/s^2/sqrt(Hz)]
  
-####### ADIS
+####### ADIS 16448
 core/core_noise_acc: 0.0022563    # [m/s^2/sqrt(Hz)] 
 core/core_noise_gyr: 0.0004       # [rad/s/sqrt(Hz)] 
 
