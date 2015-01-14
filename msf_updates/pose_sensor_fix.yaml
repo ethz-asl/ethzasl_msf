@@ -3,7 +3,8 @@ data_playback: true             # Set to true for playback, set to false on the 
 ##############################
 #########IMU PARAMETERS#######
 ##############################
-# The IMU measurement model used in msf contains two types of sensor errors, a high frequency additive white noise and 
+# The IMU measurement model used in msf contains two types of sensor errors, 
+# a high frequency additive white noise and 
 # a slower varying sensor bias.  
 # See the following link for more information 
 # https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model-and-Intrinsics
@@ -16,7 +17,7 @@ data_playback: true             # Set to true for playback, set to false on the 
 # The noise spectral density can be found in the datasheet of the IMU.
 # 
 # The variation of the bias is characterized as a random walk. 
-# Again see https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model-and-Intrinsics for more information
+# See https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model-and-Intrinsics for more information
 # The units of the random walk are:
 #  acc:  [m/s^3/sqrt(Hz)]
 #  gyro: [rad/s^2/sqrt(Hz)]
@@ -41,7 +42,10 @@ core/core_noise_gyrbias: 3e-6     # [rad/s^2/sqrt(Hz)]
 #########Pose Sensor Parameters #######
 #######################################
 pose_sensor/pose_absolute_measurements: true
-pose_sensor/pose_measurement_world_sensor: false  # Selects if sensor measures its position w.r.t. world (true, e.g. Vicon) or the position of the world coordinate system w.r.t. the sensor (false, e.g. ethzasl_ptam).
+pose_sensor/pose_measurement_world_sensor: false  # Selects if sensor measures its position 
+                                                  # w.r.t. world (true, e.g. Vicon) or the position 
+                                                  # of the world coordinate system w.r.t. the 
+                                                  # sensor (false, e.g. ethzasl_ptam).
 pose_sensor/pose_delay: 0.02                      # [s] delay of pose sensor w.r.t. imu
 
 # For the pose sensor noise levels use the std deviation the units are
@@ -55,13 +59,15 @@ pose_sensor/pose_initial_scale: 1
 pose_sensor/pose_fixed_scale: false
 pose_sensor/pose_noise_scale: 0.0     
 
-# Transformation that expresses the position and orientation of the gravity aligned world frame w.r.t the vision/camera frame
+# Transformation that expresses the position and orientation of the gravity aligned world frame 
+# w.r.t the vision/camera frame
 pose_sensor/pose_fixed_p_wv: false              
 pose_sensor/pose_noise_p_wv: 0.0                  
 pose_sensor/pose_fixed_q_wv: false
 pose_sensor/pose_noise_q_wv: 0.0                  
 
-# Transformation that expresses the position and orientation of the pose-sensor w.r.t. the IMU frame of reference, expressed in the IMU frame of reference.
+# Transformation that expresses the position and orientation of the pose-sensor w.r.t. the IMU 
+# frame of reference, expressed in the IMU frame of reference.
 pose_sensor/pose_fixed_p_ic: false
 pose_sensor/pose_noise_p_ic: 0.0
 pose_sensor/pose_fixed_q_ic: false
