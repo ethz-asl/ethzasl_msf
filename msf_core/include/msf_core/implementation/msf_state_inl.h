@@ -24,6 +24,7 @@
 #include <Eigen/Geometry>
 #include <vector>
 #include <msf_core/eigen_conversions.h>
+#include <nav_msgs/Odometry.h>
 #include <sensor_fusion_comm/ExtState.h>
 #include <sensor_fusion_comm/DoubleArrayStamped.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
@@ -116,6 +117,23 @@ void GenericState_T<stateVector_T, StateDefinition_T>::ToPoseMsg(
   eigen_conversions::QuaternionToMsg(Get<StateDefinition_T::q>(),
                                      pose.pose.pose.orientation);
   GetPoseCovariance(pose.pose.covariance);
+}
+
+
+/// Assembles an Odometry message from the state.
+/** it does not set the header */
+template<typename stateVector_T, typename StateDefinition_T>
+void GenericState_T<stateVector_T, StateDefinition_T>::ToOdometryMsg(
+    nav_msgs::Odometry& odometry) {
+  eigen_conversions::Vector3dToPoint(Get<StateDefinition_T::p>(),
+                                     odometry.pose.pose.position);
+  eigen_conversions::QuaternionToMsg(Get<StateDefinition_T::q>(),
+                                     odometry.pose.pose.orientation);
+  GetPoseCovariance(odometry.pose.covariance);
+  eigen_conversions::Vector3dToPoint(Get<StateDefinition_T::v>(),
+                                     odometry.twist.twist.linear);
+  eigen_conversions::Vector3dToPoint(w_m,
+                                     odometry.twist.twist.angular);
 }
 
 /// Assembles an ExtState message from the state
