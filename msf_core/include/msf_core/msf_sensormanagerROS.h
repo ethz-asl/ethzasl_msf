@@ -26,6 +26,7 @@
 #include <sensor_fusion_comm/ExtState.h>
 #include <sensor_fusion_comm/ExtEkf.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <nav_msgs/Odometry.h>
 #include <sensor_msgs/Imu.h>
 #include <asctec_hl_comm/mav_imu.h>
 #include <tf/transform_broadcaster.h>
@@ -61,6 +62,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
 
   ros::Publisher pubState_;  ///< Publishes all states of the filter.
   ros::Publisher pubPose_;  ///< Publishes 6DoF pose output.
+  ros::Publisher pubOdometry_;  ///< Publishes odometry output.
   ros::Publisher pubPoseAfterUpdate_;  ///< Publishes 6DoF pose output after the update has been applied.
   ros::Publisher pubPoseCrtl_;  ///< Publishes 6DoF pose including velocity output.
   ros::Publisher pubCorrect_;  ///< Publishes corrections for external state propagation.
@@ -90,6 +92,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
     pubCorrect_ = nh.advertise < sensor_fusion_comm::ExtEkf > ("correction", 1);
     pubPose_ = nh.advertise < geometry_msgs::PoseWithCovarianceStamped
         > ("pose", 100);
+    pubOdometry_ = nh.advertise < nav_msgs::Odometry> ("odometry", 100);
     pubPoseAfterUpdate_ = nh.advertise
         < geometry_msgs::PoseWithCovarianceStamped > ("pose_after_update", 100);
     pubPoseCrtl_ = nh.advertise < sensor_fusion_comm::ExtState
@@ -203,6 +206,14 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
       msgPose.header.frame_id = "/world";
       state->ToPoseMsg(msgPose);
       pubPose_.publish(msgPose);
+
+
+      nav_msgs::Odometry msgOdometry;
+      msgOdometry.header.stamp = ros::Time(state->time);
+      msgOdometry.header.seq = msg_seq++;
+      msgOdometry.header.frame_id = "/world";
+      state->ToOdometryMsg(msgOdometry);
+      pubPose_.publish(msgOdometry);
 
       sensor_fusion_comm::ExtState msgPoseCtrl;
       msgPoseCtrl.header = msgPose.header;

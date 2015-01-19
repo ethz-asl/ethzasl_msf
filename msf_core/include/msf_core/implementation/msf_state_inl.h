@@ -393,19 +393,19 @@ void GenericState_T<stateVector_T, StateDefinition_T>::GetVelocityAttitudeCovari
    */
 
   for (int i = 0; i < 9; i++)
-    cov[i / 3 * 6 + i % 3] = P(
+    cov(i / 3 * 6 + i % 3) = P(
         (i / 3 + idxstartcorr_v) * nErrorStatesAtCompileTime + i % 3 + idxstartcorr_v);
 
   for (int i = 0; i < 9; i++)
-    cov[i / 3 * 6 + (i % 3 + 3)] = P(
+    cov(i / 3 * 6 + (i % 3 + 3)) = P(
         (i / 3 + idxstartcorr_v) * nErrorStatesAtCompileTime + (i % 3 + idxstartcorr_q));
 
   for (int i = 0; i < 9; i++)
-    cov[(i / 3 + 3) * 6 + i % 3] = P(
+    cov((i / 3 + 3) * 6 + i % 3) = P(
         (i / 3 + idxstartcorr_q) * nErrorStatesAtCompileTime + i % 3 + idxstartcorr_v);
 
   for (int i = 0; i < 9; i++)
-    cov[(i / 3 + 3) * 6 + (i % 3 + 3)] = P(
+    cov((i / 3 + 3) * 6 + (i % 3 + 3)) = P(
         (i / 3 + idxstartcorr_q) * nErrorStatesAtCompileTime + (i % 3 + idxstartcorr_q));
 }
 
@@ -434,7 +434,7 @@ void GenericState_T<stateVector_T, StateDefinition_T>::GetTwistCovarianceInImuFr
   J.block<3,3>(0,0) = R_W_I.transpose();
   J.block<3,3>(0,3) = Skew(v_I);
 
-  const msf_core::Matrix6 cov_velocity_I = J * cov_velocity_attitude_W * J.transpose();
+  const msf_core::Matrix3 cov_velocity_I = J * cov_velocity_attitude_W * J.transpose();
 
   for (int i = 0; i < 9; i++)
     cov[i / 3 * 6 + i % 3] = cov_velocity_I(i);
