@@ -130,10 +130,19 @@ void GenericState_T<stateVector_T, StateDefinition_T>::ToOdometryMsg(
   eigen_conversions::QuaternionToMsg(Get<StateDefinition_T::q>(),
                                      odometry.pose.pose.orientation);
   GetPoseCovariance(odometry.pose.covariance);
-  eigen_conversions::Vector3dToPoint(Get<StateDefinition_T::v>(),
+
+  const msf_core::Quaternion& q_W_I = Get<StateDefinition_T::q>();
+
+  // Express velocity in body frame as demanded by the ROS odometry message specification.
+  const msf_core::Vector3& v_W =  Get<StateDefinition_T::v>();
+  const msf_core::Vector3& v_I = q_W_I.inverse().toRotationMatrix() * v_W;
+  eigen_conversions::Vector3dToPoint(v_I,
                                      odometry.twist.twist.linear);
-  eigen_conversions::Vector3dToPoint(w_m,
+  // Subtract bias from gyro measurement.
+  eigen_conversions::Vector3dToPoint(w_m - Get<StateDefinition_T::b_w>(),
                                      odometry.twist.twist.angular);
+
+  GetTwistCovarianceInImuFrame(odometry.twist.covariance);
 }
 
 /// Assembles an ExtState message from the state
@@ -400,6 +409,43 @@ void GenericState_T<stateVector_T, StateDefinition_T>::GetVelocityAttitudeCovari
         (i / 3 + idxstartcorr_q) * nErrorStatesAtCompileTime + (i % 3 + idxstartcorr_q));
 }
 
+/// Writes the covariance corresponding to velocity and angular velocity expressed in the imu frame
+// to cov.
+template<typename stateVector_T, typename StateDefinition_T>
+void GenericState_T<stateVector_T, StateDefinition_T>::GetTwistCovarianceInImuFrame(
+    geometry_msgs::TwistWithCovariance::_covariance_type& cov) {
+
+
+  typedef typename msf_tmp::GetEnumStateType<stateVector_T, StateDefinition_T::b_w>::value b_w_type;
+
+  // Get index of gyro bias in the covariance matrix.
+  static const int idxstartcorr_b_w = msf_tmp::GetStartIndex<stateVector_T,
+      b_w_type, msf_tmp::CorrectionStateLengthForType>::value;
+
+  const msf_core::Quaternion& q_W_I = Get<StateDefinition_T::q>();
+  const msf_core::Matrix3 R_W_I = q_W_I.toRotationMatrix();
+  const msf_core::Vector3& v_W =  Get<StateDefinition_T::v>();
+  const msf_core::Vector3& v_I =  R_W_I.transpose() * v_W;
+
+  msf_core::Matrix6 cov_velocity_attitude_W;
+  GetVelocityAttitudeCovariance(cov_velocity_attitude_W);
+
+  Eigen::Matrix<double_t, 3, 6> J;
+  J.block<3,3>(0,0) = R_W_I.transpose();
+  J.block<3,3>(0,3) = Skew(v_I);
+
+  const msf_core::Matrix6 cov_velocity_I = J * cov_velocity_attitude_W * J.transpose();
+
+  for (int i = 0; i < 9; i++)
+    cov[i / 3 * 6 + i % 3] = cov_velocity_I(i);
+
+
+// TODO(burrimi): Handle covariance of gyro measurements correctly.
+  for (int i = 0; i < 9; i++)
+    cov[(i / 3 + 3) * 6 + (i % 3 + 3)] = P(
+        (i / 3 + idxstartcorr_b_w) * nErrorStatesAtCompileTime + i % 3 + idxstartcorr_b_w);
+
+}
 
 template<typename stateVector_T, typename StateDefinition_T>
 void GenericState_T<stateVector_T, StateDefinition_T>::GetCoreCovariance(
