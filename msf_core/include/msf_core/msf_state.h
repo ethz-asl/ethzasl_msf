@@ -143,6 +143,10 @@ struct GenericState_T {
   Eigen::Matrix<double, 3, 1> w_m;         ///< Angular velocity from IMU.
   Eigen::Matrix<double, 3, 1> a_m;         ///< Linear acceleration from IMU.
 
+  // imu uncertainty
+
+  msf_core::Vector3 noise_gyr;
+
   double time; 	///< Time of this state estimate.
   P_type P;  ///< Error state covariance.
   F_type Fd;   ///< Discrete state propagation matrix.

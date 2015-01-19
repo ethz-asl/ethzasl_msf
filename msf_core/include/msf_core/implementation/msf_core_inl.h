@@ -137,6 +137,8 @@ void MSF_Core<EKFState_T>::ProcessIMU(
   // Get inputs.
   currentState->a_m = linear_acceleration;
   currentState->w_m = angular_velocity;
+  currentState->noise_gyr = Vector3::Constant(usercalc_.GetParamNoiseGyr());
+
 
   // Remove acc spikes (TODO (slynen): find a cleaner way to do this).
   static Eigen::Matrix<double, 3, 1> last_am =
@@ -236,6 +238,7 @@ void MSF_Core<EKFState_T>::ProcessExternallyPropagatedState(
   // Get inputs.
   currentState->a_m = linear_acceleration;
   currentState->w_m = angular_velocity;
+  currentState->noise_gyr = Vector3::Constant(usercalc_.GetParamNoiseGyr());
 
   // Remove acc spikes (TODO (slynen): Find a cleaner way to do this).
   static Eigen::Matrix<double, 3, 1> last_am =
@@ -786,6 +789,8 @@ shared_ptr<EKFState_T> MSF_Core<EKFState_T>::GetClosestState(double tstamp) {
           + (nextState->w_m - lastState->w_m)
               / (nextState->time - lastState->time)
               * (timenow - lastState->time);
+
+      currentState->noise_gyr = Vector3::Constant(usercalc_.GetParamNoiseGyr());
 
       // Propagate with respective dt.
       PropagateState(lastState, currentState);

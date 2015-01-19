@@ -440,10 +440,16 @@ void GenericState_T<stateVector_T, StateDefinition_T>::GetTwistCovarianceInImuFr
     cov[i / 3 * 6 + i % 3] = cov_velocity_I(i);
 
 
-// TODO(burrimi): Handle covariance of gyro measurements correctly.
+  msf_core::Matrix3 cov_noise_gyr;
+  cov_noise_gyr <<  noise_gyr[0] * noise_gyr[0], 0, 0,
+                    0, noise_gyr[1] * noise_gyr[1], 0,
+                    0, 0, noise_gyr[2] * noise_gyr[2];
+
+  // Add noise of gyro measurement and gyro bias to get covariance of corrected angular velocity.
   for (int i = 0; i < 9; i++)
     cov[(i / 3 + 3) * 6 + (i % 3 + 3)] = P(
-        (i / 3 + idxstartcorr_b_w) * nErrorStatesAtCompileTime + i % 3 + idxstartcorr_b_w);
+        (i / 3 + idxstartcorr_b_w) * nErrorStatesAtCompileTime + i % 3 + idxstartcorr_b_w) +
+        cov_noise_gyr(i);
 
 }
 
