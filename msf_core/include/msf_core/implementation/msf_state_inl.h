@@ -362,6 +362,44 @@ void GenericState_T<stateVector_T, StateDefinition_T>::GetPoseCovariance(
         (i / 3 + idxstartcorr_q) * nErrorStatesAtCompileTime + (i % 3 + 6));
 }
 
+/// Writes the covariance corresponding to velocity and attitude to cov.
+template<typename stateVector_T, typename StateDefinition_T>
+void GenericState_T<stateVector_T, StateDefinition_T>::GetVelocityAttitudeCovariance(
+    Eigen::Matrix<double_t, 6, 6>& cov) {
+
+  typedef typename msf_tmp::GetEnumStateType<stateVector_T, StateDefinition_T::v>::value v_type;
+  typedef typename msf_tmp::GetEnumStateType<stateVector_T, StateDefinition_T::q>::value q_type;
+
+  // Get indices of position and attitude in the covariance matrix.
+  static const int idxstartcorr_v = msf_tmp::GetStartIndex<stateVector_T,
+      v_type, msf_tmp::CorrectionStateLengthForType>::value;
+  static const int idxstartcorr_q = msf_tmp::GetStartIndex<stateVector_T,
+      q_type, msf_tmp::CorrectionStateLengthForType>::value;
+
+  /*        |  cov_v_v  |  cov_v_q  |
+   *        |           |           |
+   * cov =  |-----------|-----------|
+   *        |           |           |
+   *        |  cov_q_v  |  cov_q_q  |
+   */
+
+  for (int i = 0; i < 9; i++)
+    cov[i / 3 * 6 + i % 3] = P(
+        (i / 3 + idxstartcorr_v) * nErrorStatesAtCompileTime + i % 3 + idxstartcorr_v);
+
+  for (int i = 0; i < 9; i++)
+    cov[i / 3 * 6 + (i % 3 + 3)] = P(
+        (i / 3 + idxstartcorr_v) * nErrorStatesAtCompileTime + (i % 3 + idxstartcorr_q));
+
+  for (int i = 0; i < 9; i++)
+    cov[(i / 3 + 3) * 6 + i % 3] = P(
+        (i / 3 + idxstartcorr_q) * nErrorStatesAtCompileTime + i % 3 + idxstartcorr_v);
+
+  for (int i = 0; i < 9; i++)
+    cov[(i / 3 + 3) * 6 + (i % 3 + 3)] = P(
+        (i / 3 + idxstartcorr_q) * nErrorStatesAtCompileTime + (i % 3 + idxstartcorr_q));
+}
+
 
 template<typename stateVector_T, typename StateDefinition_T>
 void GenericState_T<stateVector_T, StateDefinition_T>::GetCoreCovariance(

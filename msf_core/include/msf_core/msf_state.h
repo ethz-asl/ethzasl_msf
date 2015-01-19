@@ -202,6 +202,12 @@ struct GenericState_T {
       geometry_msgs::PoseWithCovariance::_covariance_type& cov);
 
   /**
+   * \brief Write the covariance corresponding to velocity and attitude to cov.
+   */
+  void GetVelocityAttitudeCovariance(
+      Eigen::Matrix<double_t, 6, 6>& cov);
+
+  /**
    * \brief Assembles a PoseWithCovarianceStamped message from the state.
    * \note It does not set the header.
    */
