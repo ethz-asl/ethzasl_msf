@@ -197,7 +197,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
   virtual void PublishStateAfterPropagation(
       const shared_ptr<EKFState_T>& state) const {
 
-    if (pubPoseCrtl_.getNumSubscribers() || pubPose_.getNumSubscribers()) {
+    if (pubPoseCrtl_.getNumSubscribers() || pubPose_.getNumSubscribers() || pubOdometry_.getNumSubscribers()) {
       static int msg_seq = 0;
 
       geometry_msgs::PoseWithCovarianceStamped msgPose;
@@ -213,7 +213,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
       msgOdometry.header.seq = msg_seq++;
       msgOdometry.header.frame_id = "/world";
       state->ToOdometryMsg(msgOdometry);
-      pubPose_.publish(msgOdometry);
+      pubOdometry_.publish(msgOdometry);
 
       sensor_fusion_comm::ExtState msgPoseCtrl;
       msgPoseCtrl.header = msgPose.header;

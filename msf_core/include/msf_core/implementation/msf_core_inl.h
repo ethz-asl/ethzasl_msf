@@ -183,19 +183,19 @@ void MSF_Core<EKFState_T>::ProcessIMU(
   //propagate state and covariance
   PropagateState(lastState, currentState);
   timer_PropState.Stop();
+
+  msf_timing::DebugTimer timer_PropInsertState("PropInsertState");
+  it_last_IMU = stateBuffer_.Insert(currentState);
+  timer_PropInsertState.Stop();
+
   msf_timing::DebugTimer timer_PropCov("PropCov");
   PropagatePOneStep();
   timer_PropCov.Stop();
-
   usercalc_.PublishStateAfterPropagation(currentState);
 
   // Making sure we have sufficient states to apply measurements to.
   if (stateBuffer_.Size() > 3)
     predictionMade_ = true;
-
-  msf_timing::DebugTimer timer_PropInsertState("PropInsertState");
-  it_last_IMU = stateBuffer_.Insert(currentState);
-  timer_PropInsertState.Stop();
 
   if (predictionMade_) {
     // Check if we can apply some pending measurement.
@@ -279,12 +279,6 @@ void MSF_Core<EKFState_T>::ProcessExternallyPropagatedState(
     PropagateState(lastState, currentState);
   }
 
-  PropagatePOneStep();
-
-  isnumeric = CheckForNumeric(
-      currentState->template Get<StateDefinition_T::p>(), "prediction p");
-  isnumeric = CheckForNumeric(currentState->P, "prediction done P");
-
   // Clean reset of state and measurement buffer, before we start propagation.
   if (!predictionMade_) {
 
@@ -297,10 +291,16 @@ void MSF_Core<EKFState_T>::ProcessExternallyPropagatedState(
     while (!queueFutureMeasurements_.empty()) {
       queueFutureMeasurements_.pop();
     }
+  } else {
+    stateBuffer_.Insert(currentState);
+    PropagatePOneStep();
   }
   predictionMade_ = true;
 
-  stateBuffer_.Insert(currentState);
+  isnumeric = CheckForNumeric(
+      currentState->template Get<StateDefinition_T::p>(), "prediction p");
+  isnumeric = CheckForNumeric(currentState->P, "prediction done P");
+
   // Check if we can apply some pending measurement.
   HandlePendingMeasurements();
 }
