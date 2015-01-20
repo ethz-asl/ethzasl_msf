@@ -22,6 +22,7 @@
 #include <msf_core/msf_tmp.h>
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
+#include <glog/logging.h>
 #include <vector>
 #include <msf_core/eigen_conversions.h>
 #include <nav_msgs/Odometry.h>
@@ -354,21 +355,13 @@ void GenericState_T<stateVector_T, StateDefinition_T>::GetPoseCovariance(
    *        |  cov_q_p  |  cov_q_q  |
    */
 
-  for (int i = 0; i < 9; i++)
-    cov[i / 3 * 6 + i % 3] = P(
-        (i / 3 + idxstartcorr_p) * nErrorStatesAtCompileTime + i % 3);
+  CHECK_EQ(cov.size(), 6 * 6);
+  Eigen::Map<Eigen::Matrix<double,6,6> > covariance_map(cov.data());
 
-  for (int i = 0; i < 9; i++)
-    cov[i / 3 * 6 + (i % 3 + 3)] = P(
-        (i / 3 + idxstartcorr_p) * nErrorStatesAtCompileTime + (i % 3 + 6));
-
-  for (int i = 0; i < 9; i++)
-    cov[(i / 3 + 3) * 6 + i % 3] = P(
-        (i / 3 + idxstartcorr_q) * nErrorStatesAtCompileTime + i % 3);
-
-  for (int i = 0; i < 9; i++)
-    cov[(i / 3 + 3) * 6 + (i % 3 + 3)] = P(
-        (i / 3 + idxstartcorr_q) * nErrorStatesAtCompileTime + (i % 3 + 6));
+  covariance_map.block<3,3>(0,0) = P.template block<3,3>(idxstartcorr_p, idxstartcorr_p);
+  covariance_map.block<3,3>(3,0) = P.template block<3,3>(idxstartcorr_q, idxstartcorr_p);
+  covariance_map.block<3,3>(0,3) = P.template block<3,3>(idxstartcorr_p, idxstartcorr_q);
+  covariance_map.block<3,3>(3,3) = P.template block<3,3>(idxstartcorr_q, idxstartcorr_q);
 }
 
 /// Writes the covariance corresponding to velocity and attitude to cov.
@@ -392,21 +385,10 @@ void GenericState_T<stateVector_T, StateDefinition_T>::GetVelocityAttitudeCovari
    *        |  cov_q_v  |  cov_q_q  |
    */
 
-  for (int i = 0; i < 9; i++)
-    cov(i / 3 * 6 + i % 3) = P(
-        (i / 3 + idxstartcorr_v) * nErrorStatesAtCompileTime + i % 3 + idxstartcorr_v);
-
-  for (int i = 0; i < 9; i++)
-    cov(i / 3 * 6 + (i % 3 + 3)) = P(
-        (i / 3 + idxstartcorr_v) * nErrorStatesAtCompileTime + (i % 3 + idxstartcorr_q));
-
-  for (int i = 0; i < 9; i++)
-    cov((i / 3 + 3) * 6 + i % 3) = P(
-        (i / 3 + idxstartcorr_q) * nErrorStatesAtCompileTime + i % 3 + idxstartcorr_v);
-
-  for (int i = 0; i < 9; i++)
-    cov((i / 3 + 3) * 6 + (i % 3 + 3)) = P(
-        (i / 3 + idxstartcorr_q) * nErrorStatesAtCompileTime + (i % 3 + idxstartcorr_q));
+  cov.block<3,3>(0,0) = P.template block<3,3>(idxstartcorr_v, idxstartcorr_v);
+  cov.block<3,3>(3,0) = P.template block<3,3>(idxstartcorr_q, idxstartcorr_v);
+  cov.block<3,3>(0,3) = P.template block<3,3>(idxstartcorr_v, idxstartcorr_q);
+  cov.block<3,3>(3,3) = P.template block<3,3>(idxstartcorr_q, idxstartcorr_q);
 }
 
 /// Writes the covariance corresponding to velocity and angular velocity expressed in the imu frame
@@ -436,21 +418,19 @@ void GenericState_T<stateVector_T, StateDefinition_T>::GetTwistCovarianceInImuFr
 
   const msf_core::Matrix3 cov_velocity_I = J * cov_velocity_attitude_W * J.transpose();
 
-  for (int i = 0; i < 9; i++)
-    cov[i / 3 * 6 + i % 3] = cov_velocity_I(i);
-
-
   msf_core::Matrix3 cov_noise_gyr;
   cov_noise_gyr <<  noise_gyr[0] * noise_gyr[0], 0, 0,
                     0, noise_gyr[1] * noise_gyr[1], 0,
                     0, 0, noise_gyr[2] * noise_gyr[2];
 
-  // Add noise of gyro measurement and gyro bias to get covariance of corrected angular velocity.
-  for (int i = 0; i < 9; i++)
-    cov[(i / 3 + 3) * 6 + (i % 3 + 3)] = P(
-        (i / 3 + idxstartcorr_b_w) * nErrorStatesAtCompileTime + i % 3 + idxstartcorr_b_w) +
-        cov_noise_gyr(i);
+  CHECK_EQ(cov.size(), 6 * 6);
+  Eigen::Map<Eigen::Matrix<double,6,6> > covariance_map(cov.data());
 
+  covariance_map.block<3,3>(0,0) = cov_velocity_I;
+
+  // Add noise of gyro measurement and gyro bias to get covariance of corrected angular velocity.
+  covariance_map.block<3,3>(3,3) = P.template block<3,3>(idxstartcorr_b_w, idxstartcorr_b_w) +
+                                   cov_noise_gyr;
 }
 
 template<typename stateVector_T, typename StateDefinition_T>
