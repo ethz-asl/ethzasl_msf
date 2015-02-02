@@ -391,12 +391,11 @@ void GenericState_T<stateVector_T, StateDefinition_T>::GetVelocityAttitudeCovari
   cov.block<3,3>(3,3) = P.template block<3,3>(idxstartcorr_q, idxstartcorr_q);
 }
 
-/// Writes the covariance corresponding to velocity and angular velocity expressed in the imu frame
+/// Writes the covariance corresponding to velocity and angular velocity expressed in the IMU frame
 // to cov.
 template<typename stateVector_T, typename StateDefinition_T>
 void GenericState_T<stateVector_T, StateDefinition_T>::GetTwistCovarianceInImuFrame(
     geometry_msgs::TwistWithCovariance::_covariance_type& cov) {
-
 
   typedef typename msf_tmp::GetEnumStateType<stateVector_T, StateDefinition_T::b_w>::value b_w_type;
 
@@ -416,6 +415,7 @@ void GenericState_T<stateVector_T, StateDefinition_T>::GetTwistCovarianceInImuFr
   J.block<3,3>(0,0) = R_W_I.transpose();
   J.block<3,3>(0,3) = Skew(v_I);
 
+  // Transform noise covariance of velocity into the IMU frame.
   const msf_core::Matrix3 cov_velocity_I = J * cov_velocity_attitude_W * J.transpose();
 
   msf_core::Matrix3 cov_noise_gyr;
