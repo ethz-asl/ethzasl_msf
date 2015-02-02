@@ -25,6 +25,7 @@
 #include <vector>
 #include <utility>
 #include <msf_core/eigen_conversions.h>
+#include <nav_msgs/Odometry.h>
 #include <sensor_fusion_comm/ExtState.h>
 #include <sensor_fusion_comm/DoubleArrayStamped.h>
 #include <sensor_fusion_comm/DoubleMatrixStamped.h>
@@ -142,6 +143,10 @@ struct GenericState_T {
   Eigen::Matrix<double, 3, 1> w_m;         ///< Angular velocity from IMU.
   Eigen::Matrix<double, 3, 1> a_m;         ///< Linear acceleration from IMU.
 
+  // Uncertainty of the IMU.
+  msf_core::Vector3 noise_gyr;
+  msf_core::Vector3 noise_acc;
+
   double time; 	///< Time of this state estimate.
   P_type P;  ///< Error state covariance.
   F_type Fd;   ///< Discrete state propagation matrix.
@@ -201,10 +206,26 @@ struct GenericState_T {
       geometry_msgs::PoseWithCovariance::_covariance_type& cov);
 
   /**
+   * \brief Write the covariance corresponding to velocity and attitude to cov.
+   */
+  void GetVelocityAttitudeCovariance(
+      Eigen::Matrix<double_t, 6, 6>& cov);
+
+
+  void GetTwistCovarianceInImuFrame(
+      geometry_msgs::TwistWithCovariance::_covariance_type& cov);
+
+  /**
    * \brief Assembles a PoseWithCovarianceStamped message from the state.
    * \note It does not set the header.
    */
   void ToPoseMsg(geometry_msgs::PoseWithCovarianceStamped& pose);
+
+  /**
+   * \brief Assembles a Odometry message from the state.
+   * \note It does not set the header.
+   */
+  void ToOdometryMsg(nav_msgs::Odometry& odometry);
 
   /**
    * \brief Assemble an ExtState message from the state.

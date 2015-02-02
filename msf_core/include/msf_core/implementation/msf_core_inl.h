@@ -137,6 +137,9 @@ void MSF_Core<EKFState_T>::ProcessIMU(
   // Get inputs.
   currentState->a_m = linear_acceleration;
   currentState->w_m = angular_velocity;
+  currentState->noise_gyr = Vector3::Constant(usercalc_.GetParamNoiseGyr());
+  currentState->noise_acc = Vector3::Constant(usercalc_.GetParamNoiseAcc());
+
 
   // Remove acc spikes (TODO (slynen): find a cleaner way to do this).
   static Eigen::Matrix<double, 3, 1> last_am =
@@ -181,19 +184,19 @@ void MSF_Core<EKFState_T>::ProcessIMU(
   //propagate state and covariance
   PropagateState(lastState, currentState);
   timer_PropState.Stop();
+
+  msf_timing::DebugTimer timer_PropInsertState("PropInsertState");
+  it_last_IMU = stateBuffer_.Insert(currentState);
+  timer_PropInsertState.Stop();
+
   msf_timing::DebugTimer timer_PropCov("PropCov");
   PropagatePOneStep();
   timer_PropCov.Stop();
-
   usercalc_.PublishStateAfterPropagation(currentState);
 
   // Making sure we have sufficient states to apply measurements to.
   if (stateBuffer_.Size() > 3)
     predictionMade_ = true;
-
-  msf_timing::DebugTimer timer_PropInsertState("PropInsertState");
-  it_last_IMU = stateBuffer_.Insert(currentState);
-  timer_PropInsertState.Stop();
 
   if (predictionMade_) {
     // Check if we can apply some pending measurement.
@@ -236,6 +239,8 @@ void MSF_Core<EKFState_T>::ProcessExternallyPropagatedState(
   // Get inputs.
   currentState->a_m = linear_acceleration;
   currentState->w_m = angular_velocity;
+  currentState->noise_gyr = Vector3::Constant(usercalc_.GetParamNoiseGyr());
+  currentState->noise_acc = Vector3::Constant(usercalc_.GetParamNoiseAcc());
 
   // Remove acc spikes (TODO (slynen): Find a cleaner way to do this).
   static Eigen::Matrix<double, 3, 1> last_am =
@@ -276,12 +281,6 @@ void MSF_Core<EKFState_T>::ProcessExternallyPropagatedState(
     PropagateState(lastState, currentState);
   }
 
-  PropagatePOneStep();
-
-  isnumeric = CheckForNumeric(
-      currentState->template Get<StateDefinition_T::p>(), "prediction p");
-  isnumeric = CheckForNumeric(currentState->P, "prediction done P");
-
   // Clean reset of state and measurement buffer, before we start propagation.
   if (!predictionMade_) {
 
@@ -294,10 +293,16 @@ void MSF_Core<EKFState_T>::ProcessExternallyPropagatedState(
     while (!queueFutureMeasurements_.empty()) {
       queueFutureMeasurements_.pop();
     }
+  } else {
+    stateBuffer_.Insert(currentState);
+    PropagatePOneStep();
   }
   predictionMade_ = true;
 
-  stateBuffer_.Insert(currentState);
+  isnumeric = CheckForNumeric(
+      currentState->template Get<StateDefinition_T::p>(), "prediction p");
+  isnumeric = CheckForNumeric(currentState->P, "prediction done P");
+
   // Check if we can apply some pending measurement.
   HandlePendingMeasurements();
 }
@@ -786,6 +791,9 @@ shared_ptr<EKFState_T> MSF_Core<EKFState_T>::GetClosestState(double tstamp) {
           + (nextState->w_m - lastState->w_m)
               / (nextState->time - lastState->time)
               * (timenow - lastState->time);
+
+      currentState->noise_gyr = Vector3::Constant(usercalc_.GetParamNoiseGyr());
+      currentState->noise_acc = Vector3::Constant(usercalc_.GetParamNoiseAcc());
 
       // Propagate with respective dt.
       PropagateState(lastState, currentState);
