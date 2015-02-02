@@ -396,7 +396,6 @@ void GenericState_T<stateVector_T, StateDefinition_T>::GetVelocityAttitudeCovari
 template<typename stateVector_T, typename StateDefinition_T>
 void GenericState_T<stateVector_T, StateDefinition_T>::GetTwistCovarianceInImuFrame(
     geometry_msgs::TwistWithCovariance::_covariance_type& cov) {
-
   typedef typename msf_tmp::GetEnumStateType<stateVector_T, StateDefinition_T::b_w>::value b_w_type;
 
   // Get index of gyro bias in the covariance matrix.
@@ -428,7 +427,8 @@ void GenericState_T<stateVector_T, StateDefinition_T>::GetTwistCovarianceInImuFr
 
   covariance_map.block<3,3>(0,0) = cov_velocity_I;
 
-  // Add noise of gyro measurement and gyro bias to get covariance of corrected angular velocity.
+  // Add covariance of gyro measurement and gyro bias to get the covariance of the corrected
+  // angular velocity.
   covariance_map.block<3,3>(3,3) = P.template block<3,3>(idxstartcorr_b_w, idxstartcorr_b_w) +
                                    cov_noise_gyr;
 }
