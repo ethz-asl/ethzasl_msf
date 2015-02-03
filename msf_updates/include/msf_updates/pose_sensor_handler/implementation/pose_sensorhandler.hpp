@@ -193,7 +193,7 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
           << this->topic_namespace_ << "/" << subTransformStamped_.getTopic()
           << " ***");
 
-  double time_now = msg->header.stamp.toSec();
+  double time_now = msg->header.stamp.sec + msg->header.stamp.nsec/1000000000;
   if (time_now - timestamp_previous_pose_ <= pose_measurement_minimum_dt_) {  // Slow down vicon.
     MSF_WARN_STREAM_THROTTLE(30, "Measurement throttling is on, dropping messages to be below " +
                              std::to_string(1/pose_measurement_minimum_dt_) + " Hz");
