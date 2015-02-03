@@ -49,6 +49,11 @@ class PoseSensorHandler : public msf_core::SensorHandler<
   bool provides_absolute_measurements_;  ///<Does this sensor measure relative or
                                          // absolute values
 
+  double pose_measurement_minimum_dt_; ///< Minimum time between two pose measurements in seconds.
+                                       // If more pose measurements are received they are dropped.
+
+  double timestamp_previous_pose_;  ///< Timestamp of previous pose message to subsample messages.
+
   msf_updates::PoseDistorter::Ptr distorter_;
 
   void ProcessPoseMeasurement(
