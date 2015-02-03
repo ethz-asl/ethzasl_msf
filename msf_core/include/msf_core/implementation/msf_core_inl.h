@@ -293,11 +293,12 @@ void MSF_Core<EKFState_T>::ProcessExternallyPropagatedState(
     while (!queueFutureMeasurements_.empty()) {
       queueFutureMeasurements_.pop();
     }
-  } else {
-    stateBuffer_.Insert(currentState);
-    PropagatePOneStep();
   }
+
+  stateBuffer_.Insert(currentState);
+  PropagatePOneStep();
   predictionMade_ = true;
+  usercalc_.PublishStateAfterPropagation(currentState);
 
   isnumeric = CheckForNumeric(
       currentState->template Get<StateDefinition_T::p>(), "prediction p");
