@@ -75,7 +75,7 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     reconf_server_->setCallback(f);
 
     init_filter_srv_ = pnh.advertiseService("initialize_msf_scale",
-                                            &this_T::InitFilter, this);
+                                            &this_T::InitScale, this);
   }
   virtual ~PositionPoseSensorManager() {
   }
@@ -128,7 +128,7 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     }
   }
 
-  bool InitFilter(sensor_fusion_comm::InitScale::Request &req,
+  bool InitScale(sensor_fusion_comm::InitScale::Request &req,
                  sensor_fusion_comm::InitScale::Response &res) {
     ROS_INFO("Initialize filter with scale %f", req.scale);
     Init(req.scale);

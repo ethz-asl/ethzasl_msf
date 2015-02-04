@@ -29,6 +29,8 @@
 #include <msf_updates/position_sensor_handler/position_measurement.h>
 #include <msf_updates/SinglePositionSensorConfig.h>
 
+#include "sensor_fusion_comm/InitScale.h"
+
 namespace msf_position_sensor {
 
 typedef msf_updates::SinglePositionSensorConfig Config_T;
@@ -62,6 +64,9 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
     ReconfigureServer::CallbackType f = boost::bind(
         &PositionSensorManager::Config, this, _1, _2);
     reconf_server_->setCallback(f);
+
+    init_filter_srv_ = pnh.advertiseService("initialize_msf_scale",
+                                            &PositionSensorManager::InitScale, this);
   }
   virtual ~PositionSensorManager() {
   }
@@ -77,6 +82,8 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
   Config_T config_;
   ReconfigureServerPtr reconf_server_;
 
+  ros::ServiceServer init_filter_srv_;
+
   /**
    * \brief Dynamic reconfigure callback.
    */
@@ -89,6 +96,14 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
       Init(1.0);
       config.core_init_filter = false;
     }
+  }
+
+  bool InitScale(sensor_fusion_comm::InitScale::Request &req,
+                 sensor_fusion_comm::InitScale::Response &res) {
+    ROS_INFO("Initialize filter with scale %f", req.scale);
+    Init(req.scale);
+    res.result = "Initialized scale";
+    return true;
   }
 
   void Init(double scale) const {
