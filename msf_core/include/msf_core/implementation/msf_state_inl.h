@@ -22,8 +22,10 @@
 #include <msf_core/msf_tmp.h>
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
+#include <glog/logging.h>
 #include <vector>
 #include <msf_core/eigen_conversions.h>
+#include <nav_msgs/Odometry.h>
 #include <sensor_fusion_comm/ExtState.h>
 #include <sensor_fusion_comm/DoubleArrayStamped.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
@@ -116,6 +118,32 @@ void GenericState_T<stateVector_T, StateDefinition_T>::ToPoseMsg(
   eigen_conversions::QuaternionToMsg(Get<StateDefinition_T::q>(),
                                      pose.pose.pose.orientation);
   GetPoseCovariance(pose.pose.covariance);
+}
+
+
+/// Assembles an Odometry message from the state.
+/** it does not set the header */
+template<typename stateVector_T, typename StateDefinition_T>
+void GenericState_T<stateVector_T, StateDefinition_T>::ToOdometryMsg(
+    nav_msgs::Odometry& odometry) {
+  eigen_conversions::Vector3dToPoint(Get<StateDefinition_T::p>(),
+                                     odometry.pose.pose.position);
+  eigen_conversions::QuaternionToMsg(Get<StateDefinition_T::q>(),
+                                     odometry.pose.pose.orientation);
+  GetPoseCovariance(odometry.pose.covariance);
+
+  const msf_core::Quaternion& q_W_I = Get<StateDefinition_T::q>();
+
+  // Express velocity in body frame as demanded by the ROS odometry message specification.
+  const msf_core::Vector3& v_W =  Get<StateDefinition_T::v>();
+  const msf_core::Vector3& v_I = q_W_I.inverse().toRotationMatrix() * v_W;
+  eigen_conversions::Vector3dToPoint(v_I,
+                                     odometry.twist.twist.linear);
+  // Subtract bias from gyro measurement.
+  eigen_conversions::Vector3dToPoint(w_m - Get<StateDefinition_T::b_w>(),
+                                     odometry.twist.twist.angular);
+
+  GetTwistCovarianceInImuFrame(odometry.twist.covariance);
 }
 
 /// Assembles an ExtState message from the state
@@ -327,23 +355,83 @@ void GenericState_T<stateVector_T, StateDefinition_T>::GetPoseCovariance(
    *        |  cov_q_p  |  cov_q_q  |
    */
 
-  for (int i = 0; i < 9; i++)
-    cov[i / 3 * 6 + i % 3] = P(
-        (i / 3 + idxstartcorr_p) * nErrorStatesAtCompileTime + i % 3);
+  CHECK_EQ(cov.size(), 6 * 6);
+  Eigen::Map<Eigen::Matrix<double,6,6> > covariance_map(cov.data());
 
-  for (int i = 0; i < 9; i++)
-    cov[i / 3 * 6 + (i % 3 + 3)] = P(
-        (i / 3 + idxstartcorr_p) * nErrorStatesAtCompileTime + (i % 3 + 6));
-
-  for (int i = 0; i < 9; i++)
-    cov[(i / 3 + 3) * 6 + i % 3] = P(
-        (i / 3 + idxstartcorr_q) * nErrorStatesAtCompileTime + i % 3);
-
-  for (int i = 0; i < 9; i++)
-    cov[(i / 3 + 3) * 6 + (i % 3 + 3)] = P(
-        (i / 3 + idxstartcorr_q) * nErrorStatesAtCompileTime + (i % 3 + 6));
+  covariance_map.block<3,3>(0,0) = P.template block<3,3>(idxstartcorr_p, idxstartcorr_p);
+  covariance_map.block<3,3>(3,0) = P.template block<3,3>(idxstartcorr_q, idxstartcorr_p);
+  covariance_map.block<3,3>(0,3) = P.template block<3,3>(idxstartcorr_p, idxstartcorr_q);
+  covariance_map.block<3,3>(3,3) = P.template block<3,3>(idxstartcorr_q, idxstartcorr_q);
 }
 
+/// Writes the covariance corresponding to velocity and attitude to cov.
+template<typename stateVector_T, typename StateDefinition_T>
+void GenericState_T<stateVector_T, StateDefinition_T>::GetVelocityAttitudeCovariance(
+    Eigen::Matrix<double_t, 6, 6>& cov) {
+
+  typedef typename msf_tmp::GetEnumStateType<stateVector_T, StateDefinition_T::v>::value v_type;
+  typedef typename msf_tmp::GetEnumStateType<stateVector_T, StateDefinition_T::q>::value q_type;
+
+  // Get indices of position and attitude in the covariance matrix.
+  static const int idxstartcorr_v = msf_tmp::GetStartIndex<stateVector_T,
+      v_type, msf_tmp::CorrectionStateLengthForType>::value;
+  static const int idxstartcorr_q = msf_tmp::GetStartIndex<stateVector_T,
+      q_type, msf_tmp::CorrectionStateLengthForType>::value;
+
+  /*        |  cov_v_v  |  cov_v_q  |
+   *        |           |           |
+   * cov =  |-----------|-----------|
+   *        |           |           |
+   *        |  cov_q_v  |  cov_q_q  |
+   */
+
+  cov.block<3,3>(0,0) = P.template block<3,3>(idxstartcorr_v, idxstartcorr_v);
+  cov.block<3,3>(3,0) = P.template block<3,3>(idxstartcorr_q, idxstartcorr_v);
+  cov.block<3,3>(0,3) = P.template block<3,3>(idxstartcorr_v, idxstartcorr_q);
+  cov.block<3,3>(3,3) = P.template block<3,3>(idxstartcorr_q, idxstartcorr_q);
+}
+
+/// Writes the covariance corresponding to velocity and angular velocity expressed in the IMU frame
+// to cov.
+template<typename stateVector_T, typename StateDefinition_T>
+void GenericState_T<stateVector_T, StateDefinition_T>::GetTwistCovarianceInImuFrame(
+    geometry_msgs::TwistWithCovariance::_covariance_type& cov) {
+  typedef typename msf_tmp::GetEnumStateType<stateVector_T, StateDefinition_T::b_w>::value b_w_type;
+
+  // Get index of gyro bias in the covariance matrix.
+  static const int idxstartcorr_b_w = msf_tmp::GetStartIndex<stateVector_T,
+      b_w_type, msf_tmp::CorrectionStateLengthForType>::value;
+
+  const msf_core::Quaternion& q_W_I = Get<StateDefinition_T::q>();
+  const msf_core::Matrix3 R_W_I = q_W_I.toRotationMatrix();
+  const msf_core::Vector3& v_W =  Get<StateDefinition_T::v>();
+  const msf_core::Vector3& v_I =  R_W_I.transpose() * v_W;
+
+  msf_core::Matrix6 cov_velocity_attitude_W;
+  GetVelocityAttitudeCovariance(cov_velocity_attitude_W);
+
+  Eigen::Matrix<double_t, 3, 6> J;
+  J.block<3,3>(0,0) = R_W_I.transpose();
+  J.block<3,3>(0,3) = Skew(v_I);
+
+  // Transform noise covariance of velocity into the IMU frame.
+  const msf_core::Matrix3 cov_velocity_I = J * cov_velocity_attitude_W * J.transpose();
+
+  msf_core::Matrix3 cov_noise_gyr;
+  cov_noise_gyr <<  noise_gyr[0] * noise_gyr[0], 0, 0,
+                    0, noise_gyr[1] * noise_gyr[1], 0,
+                    0, 0, noise_gyr[2] * noise_gyr[2];
+
+  CHECK_EQ(cov.size(), 6 * 6);
+  Eigen::Map<Eigen::Matrix<double,6,6> > covariance_map(cov.data());
+
+  covariance_map.block<3,3>(0,0) = cov_velocity_I;
+
+  // Add covariance of gyro measurement and gyro bias to get the covariance of the corrected
+  // angular velocity.
+  covariance_map.block<3,3>(3,3) = P.template block<3,3>(idxstartcorr_b_w, idxstartcorr_b_w) +
+                                   cov_noise_gyr;
+}
 
 template<typename stateVector_T, typename StateDefinition_T>
 void GenericState_T<stateVector_T, StateDefinition_T>::GetCoreCovariance(

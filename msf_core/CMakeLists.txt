@@ -40,7 +40,7 @@ generate_dynamic_reconfigure_options(cfg/MSF_Core.cfg)
 
 catkin_package(
     DEPENDS eigen glog_catkin
-    CATKIN_DEPENDS roscpp sensor_msgs dynamic_reconfigure msf_timing tf glog_catkin
+    CATKIN_DEPENDS roscpp sensor_msgs nav_msgs dynamic_reconfigure msf_timing tf glog_catkin
     INCLUDE_DIRS include ${Eigen_INCLUDE_DIRS}
     LIBRARIES msf_core similaritytransform
     CFG_EXTRAS export_flags.cmake
