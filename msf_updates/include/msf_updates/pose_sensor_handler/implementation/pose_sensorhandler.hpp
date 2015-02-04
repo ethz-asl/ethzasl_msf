@@ -31,7 +31,8 @@ PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PoseSensorHandler(
                                            parameternamespace),
       n_zp_(1e-6),
       n_zq_(1e-6),
-      delay_(0) {
+      delay_(0),
+      timestamp_previous_pose_(0) {
   ros::NodeHandle pnh("~/" + parameternamespace);
 
   MSF_INFO_STREAM(
@@ -42,6 +43,8 @@ PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PoseSensorHandler(
             true);
   pnh.param("pose_measurement_world_sensor", measurement_world_sensor_, true);
   pnh.param("pose_use_fixed_covariance", use_fixed_covariance_, false);
+  pnh.param("pose_measurement_minimum_dt", pose_measurement_minimum_dt_, 0.05);
+
 
   MSF_INFO_STREAM_COND(measurement_world_sensor_, "Pose sensor is interpreting "
                        "measurement as sensor w.r.t. world");
@@ -190,11 +193,16 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
           << this->topic_namespace_ << "/" << subTransformStamped_.getTopic()
           << " ***");
 
-  if (msg->header.seq % 5 != 0) {  // Slow down vicon.
-    MSF_WARN_STREAM_THROTTLE(30, "Measurement throttling is on, dropping every "
-                             "but the 5th message");
+  double time_now = msg->header.stamp.toSec();
+  const double epsilon = 0.001; // Small time correction to avoid rounding errors in the timestamps.
+  if (time_now - timestamp_previous_pose_ <= pose_measurement_minimum_dt_ - epsilon) {
+    MSF_WARN_STREAM_THROTTLE(30, "Pose measurement throttling is on, dropping messages"
+                             "to be below " +
+                             std::to_string(1/pose_measurement_minimum_dt_) + " Hz");
     return;
   }
+
+  timestamp_previous_pose_ = time_now;
 
   geometry_msgs::PoseWithCovarianceStampedPtr pose(
       new geometry_msgs::PoseWithCovarianceStamped());
