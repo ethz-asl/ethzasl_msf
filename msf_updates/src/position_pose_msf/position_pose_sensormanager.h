@@ -30,6 +30,7 @@
 #include <msf_updates/PositionPoseSensorConfig.h>
 
 #include "sensor_fusion_comm/InitScale.h"
+#include "sensor_fusion_comm/InitYaw.h"
 
 namespace msf_updates {
 
@@ -74,8 +75,11 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
                                                     _2);
     reconf_server_->setCallback(f);
 
-    init_filter_srv_ = pnh.advertiseService("initialize_msf_scale",
+    init_scale_srv_ = pnh.advertiseService("initialize_msf_scale",
                                             &this_T::InitScale, this);
+    init_yaw_srv_   = pnh.advertiseService("initialize_msf_yaw",
+                                            &this_T::InitYaw, this);
+
   }
   virtual ~PositionPoseSensorManager() {
   }
@@ -92,7 +96,8 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
   Config_T config_;
   ReconfigureServerPtr reconf_server_;  ///< Dynamic reconfigure server.
 
-  ros::ServiceServer init_filter_srv_;
+  ros::ServiceServer init_scale_srv_;
+  ros::ServiceServer init_yaw_srv_;
 
   /**
    * \brief Dynamic reconfigure callback.
@@ -137,6 +142,18 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
   }
 
   void Init(double scale) const {
+    InitYaw( -90.0 / 180.0 * M_PI, scale );//config_.position_yaw_init / 180 * M_PI, scale);
+  }
+
+  bool InitYaw(sensor_fusion_comm::InitYaw::Request &req,
+               sensor_fusion_comm::InitYaw::Response &res) {
+    ROS_INFO("Initialize filter with yaw %f, scale %f", req.yaw, req.scale);
+    InitYaw(req.yaw, req.scale);
+    res.result = "Initialized yaw";
+    return true;
+  }
+
+  void InitYaw(double yawinit, double scale) const {
     Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ic, p_vc, p_wv,
         p_ip, p_pos;
     Eigen::Quaternion<double> q, q_wv, q_ic, q_vc;
@@ -198,12 +215,19 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     // Calculate initial attitude and position based on sensor measurements
     // here we take the attitude from the pose sensor and augment it with
     // global yaw init.
-    double yawinit = config_.position_yaw_init / 180 * M_PI;
     Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
     yawq.normalize();
 
-    q = yawq;
-    q_wv = (q * q_ic * q_vc.conjugate()).conjugate();
+    q_wv = yawq.conjugate();
+
+    // taken from pose_sensoranager
+    if (q_vc.w() == 1) {  // If there is no pose measurement, only apply q_wv.
+      q = q_wv;
+    } else {  // If there is a pose measurement, apply q_ic and q_wv to get initial attitud
+      q = (q_ic * q_vc.conjugate() * q_wv).conjugate();
+    }
+
+    q.normalize();
 
     MSF_WARN_STREAM("q " << STREAMQUAT(q));
     MSF_WARN_STREAM("q_wv " << STREAMQUAT(q_wv));

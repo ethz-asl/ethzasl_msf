@@ -1,0 +1,4 @@
+float64 yaw
+float32 scale
+---
+string result

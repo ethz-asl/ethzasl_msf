@@ -30,6 +30,7 @@
 #include <msf_updates/SinglePositionSensorConfig.h>
 
 #include "sensor_fusion_comm/InitScale.h"
+#include "sensor_fusion_comm/InitYaw.h"
 
 namespace msf_position_sensor {
 
@@ -65,8 +66,10 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
         &PositionSensorManager::Config, this, _1, _2);
     reconf_server_->setCallback(f);
 
-    init_filter_srv_ = pnh.advertiseService("initialize_msf_scale",
+    init_scale_srv_ = pnh.advertiseService("initialize_msf_scale",
                                             &PositionSensorManager::InitScale, this);
+    init_yaw_srv_   = pnh.advertiseService("initialize_msf_yaw",
+                                            &PositionSensorManager::InitYaw, this);
   }
   virtual ~PositionSensorManager() {
   }
@@ -82,7 +85,8 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
   Config_T config_;
   ReconfigureServerPtr reconf_server_;
 
-  ros::ServiceServer init_filter_srv_;
+  ros::ServiceServer init_scale_srv_;
+  ros::ServiceServer init_yaw_srv_;
 
   /**
    * \brief Dynamic reconfigure callback.
@@ -107,6 +111,18 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
   }
 
   void Init(double scale) const {
+    InitYaw( -90.0 / 180.0 * M_PI, scale );//config_.position_yaw_init / 180 * M_PI, scale);
+  }
+
+  bool InitYaw(sensor_fusion_comm::InitYaw::Request &req,
+               sensor_fusion_comm::InitYaw::Response &res) {
+    ROS_INFO("Initialize filter with yaw %f, scale %f", req.yaw, req.scale);
+    InitYaw(req.yaw, req.scale);
+    res.result = "Initialized yaw";
+    return true;
+  }
+
+  void InitYaw(double yawinit, double scale) const {
     if (scale < 0.001) {
       MSF_WARN_STREAM("init scale is "<<scale<<" correcting to 1");
       scale = 1;
@@ -127,7 +143,6 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
 
     // Set the initial yaw alignment of body to world (the frame in which the
     // position sensor measures).
-    double yawinit = config_.position_yaw_init / 180 * M_PI;
     Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
     yawq.normalize();
 
