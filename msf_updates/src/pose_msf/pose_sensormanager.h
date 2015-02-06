@@ -29,6 +29,7 @@
 
 #include "sensor_fusion_comm/InitScale.h"
 #include "sensor_fusion_comm/InitHeight.h"
+#include "sensor_fusion_comm/InitTransform.h"
 
 namespace msf_pose_sensor {
 
@@ -66,8 +67,9 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
     init_scale_srv_ = pnh.advertiseService("initialize_msf_scale",
                                            &PoseSensorManager::InitScale, this);
     init_height_srv_ = pnh.advertiseService("initialize_msf_height",
-                                            &PoseSensorManager::InitHeight,
-                                            this);
+                                            &PoseSensorManager::InitHeight, this);
+    init_transform_srv_ = pnh.advertiseService("initialize_msf_transform",
+                                               &PoseSensorManager::InitTransform, this);
   }
   virtual ~PoseSensorManager() { }
 
@@ -83,6 +85,7 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
   ReconfigureServerPtr reconf_server_;
   ros::ServiceServer init_scale_srv_;
   ros::ServiceServer init_height_srv_;
+  ros::ServiceServer init_transform_srv_;
 
   /// Minimum initialization height. If a abs(height) is smaller than this value, 
   /// no initialization is performed.
@@ -151,9 +154,33 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
     return true;
   }
 
+  bool InitTransform(sensor_fusion_comm::InitTransform::Request &req,
+                     sensor_fusion_comm::InitTransform::Response &res) {
+    /*ROS_INFO("Initialize filter with transform p_wv = [%f, %f, %f], q_wv = [%f, %f, %f, %f], scale %f",
+             req.transform_wv.translation.x, req.transform_wv.translation.y, req.transform_wv.translation.z,
+             req.transform_wv.rotation.w, req.transform_wv.rotation.x, req.transform_wv.rotation.y, req.transform_wv.rotation.z,
+             req.scale);*/
+    Eigen::Matrix<double, 3, 1> p_wv(req.transform_wv.translation.x, req.transform_wv.translation.y, req.transform_wv.translation.z);
+    Eigen::Quaternion<double> q_wv(req.transform_wv.rotation.w, req.transform_wv.rotation.x, req.transform_wv.rotation.y, req.transform_wv.rotation.z);
+    ROS_INFO_STREAM("Initialize filter with transform p_wv = ["<<p_wv.transpose()<<"], q_wv = ["<<STREAMQUAT(q_wv)<<"], scale "<<req.scale);
+    InitTransform(p_wv, q_wv, req.scale);
+    res.result = "Initialized scale";
+    return true;
+  }
+
   void Init(double scale) const {
-    Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ic, p_vc, p_wv;
-    Eigen::Quaternion<double> q, q_wv, q_ic, q_cv;
+    Eigen::Matrix<double, 3, 1> p_wv;
+    p_wv.setZero();
+    Eigen::Quaternion<double> q_wv;
+    q_wv.setIdentity();
+    InitTransform(p_wv, q_wv, scale);
+  }
+
+  void InitTransform(const Eigen::Matrix<double, 3, 1> &p_wv,
+                     const Eigen::Quaternion<double> &q_wv,
+                     double scale) const {
+    Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ic, p_vc;
+    Eigen::Quaternion<double> q, q_ic, q_cv;
     msf_core::MSF_Core<EKFState_T>::ErrorStateCov P;
 
     // init values
@@ -164,9 +191,6 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
     v << 0, 0, 0;			/// Robot velocity (IMU centered).
     w_m << 0, 0, 0;		/// Initial angular velocity.
     a_m = g;			/// Initial acceleration.
-
-    q_wv.setIdentity();  // Vision-world rotation drift.
-    p_wv.setZero();  // Vision-world position drift.
 
     P.setZero();  // Error state covariance; if zero, a default initialization in msf_core is used
 
