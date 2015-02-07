@@ -134,7 +134,6 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
 
     v << 0, 0, 0;			/// Robot velocity (IMU centered).
     w_m << 0, 0, 0;		/// Initial angular velocity.
-    a_m = g;			    /// Initial acceleration.
 
     q_wv.setIdentity();  // World-vision rotation drift.
     p_wv.setZero();      // World-vision position drift.
@@ -202,6 +201,8 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     p = p_pos - q.toRotationMatrix() * p_ip;
     p_wv = p - p_vision;  // Shift the vision frame so that it fits the position
     // measurement
+
+    a_m = q.inverse() * g;			    /// Initial acceleration.
 
     //TODO (slynen) Fix this.
     //we want z from vision (we did scale init), so:

@@ -163,7 +163,6 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
 
     v << 0, 0, 0;			/// Robot velocity (IMU centered).
     w_m << 0, 0, 0;		/// Initial angular velocity.
-    a_m = g;			/// Initial acceleration.
 
     q_wv.setIdentity();  // Vision-world rotation drift.
     p_wv.setZero();  // Vision-world position drift.
@@ -205,6 +204,8 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
     q.normalize();
     p = p_wv + q_wv.conjugate().toRotationMatrix() * p_vc / scale
         - q.toRotationMatrix() * p_ic;
+
+    a_m = q.inverse() * g;			/// Initial acceleration.
 
     // Prepare init "measurement"
     // True means that this message contains initial sensor readings.
