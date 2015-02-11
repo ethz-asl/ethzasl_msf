@@ -164,7 +164,7 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
     Eigen::Quaternion<double> q_wv(req.transform_wv.rotation.w, req.transform_wv.rotation.x, req.transform_wv.rotation.y, req.transform_wv.rotation.z);
     ROS_INFO_STREAM("Initialize filter with transform p_wv = ["<<p_wv.transpose()<<"], q_wv = ["<<STREAMQUAT(q_wv)<<"], scale "<<req.scale);
     InitTransform(p_wv, q_wv, req.scale);
-    res.result = "Initialized scale";
+    res.result = "Initialized with transform";
     return true;
   }
 
