@@ -220,6 +220,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
       state->ToExtStateMsg(msgPoseCtrl);
       pubPoseCrtl_.publish(msgPoseCtrl);
 
+      PublishStateAfterUpdate(state);
     }
   }
 
@@ -340,7 +341,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
       tf_broadcaster_.sendTransform(
           tf::StampedTransform(
               transform, ros::Time::now() /*ros::Time(latestState->time_)*/,
-              "world", "state"));
+              "world", ros::names::clean(ros::this_node::getNamespace() + "/state")));
     }
 
     if (pubCovCore_.getNumSubscribers()) {

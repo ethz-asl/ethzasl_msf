@@ -128,7 +128,7 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
       scale = 1;
     }
 
-    Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ip, p_vc;
+    Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ip, p_wp;
     Eigen::Quaternion<double> q;
     msf_core::MSF_Core<EKFState_T>::ErrorStateCov P;
 
@@ -141,23 +141,27 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
     w_m << 0, 0, 0;		/// Initial angular velocity.
     a_m = g;			    /// Initial acceleration.
 
-    // Set the initial yaw alignment of body to world (the frame in which the
-    // position sensor measures).
-    Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
-    yawq.normalize();
-
-    q = yawq;
-
     P.setZero();  // Error state covariance; if zero, a default initialization
                   // in msf_core is used
 
-    p_vc = position_handler_->GetPositionMeasurement();
+    p_wp = position_handler_->GetPositionMeasurement();
+
+    // Set the initial yaw alignment of body to world (the frame in which the
+    // position sensor measures).
+    ROS_INFO("yaw found = %f", yawinit);
+    double yawtrue = yawinit;//std::atan2(p_wp[1], p_wp[0]);
+    ROS_INFO("yaw true  = %f = %f degrees", yawtrue, yawtrue/M_PI*180.);
+    ROS_WARN("using yaw true!!!");
+    Eigen::Quaterniond yawq(cos(yawtrue / 2), 0, 0, sin(yawtrue / 2));
+    yawq.normalize();
+
+    q = yawq;//.conjugate();
 
     MSF_INFO_STREAM(
-        "initial measurement pos:[" << p_vc.transpose() << "] orientation: " << STREAMQUAT(q));
+        "initial measurement pos:[" << p_wp.transpose() << "] orientation: " << STREAMQUAT(q));
 
     // check if we have already input from the measurement sensor
-    if (p_vc.norm() == 0)
+    if (p_wp.norm() == 0)
       MSF_WARN_STREAM(
           "No measurements received yet to initialize position - using [0 0 0]");
 
@@ -167,7 +171,7 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
     pnh.param("position_sensor/init/p_ip/z", p_ip[2], 0.0);
 
     // Calculate initial attitude and position based on sensor measurements.
-    p = p_vc - q.toRotationMatrix() * p_ip;
+    p = p_wp - q.toRotationMatrix() * p_ip;
 
     //prepare init "measurement"
     // True means that we will also set the initialsensor readings.
