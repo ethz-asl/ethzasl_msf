@@ -139,7 +139,6 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
 
     v << 0, 0, 0;			/// Robot velocity (IMU centered).
     w_m << 0, 0, 0;		/// Initial angular velocity.
-    a_m = g;			    /// Initial acceleration.
 
     P.setZero();  // Error state covariance; if zero, a default initialization
                   // in msf_core is used
@@ -172,6 +171,8 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
 
     // Calculate initial attitude and position based on sensor measurements.
     p = p_wp - q.toRotationMatrix() * p_ip;
+
+    a_m = q.inverse() * g;			    /// Initial acceleration.
 
     //prepare init "measurement"
     // True means that we will also set the initialsensor readings.
