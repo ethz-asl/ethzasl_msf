@@ -136,9 +136,10 @@ void GenericState_T<stateVector_T, StateDefinition_T>::ToOdometryMsg(
 
   // Express velocity in body frame as demanded by the ROS odometry message specification.
   const msf_core::Vector3& v_W =  Get<StateDefinition_T::v>();
-  const msf_core::Vector3& v_I = q_W_I.inverse().toRotationMatrix() * v_W;
+  const msf_core::Vector3 v_I = q_W_I.inverse().toRotationMatrix() * v_W;
   eigen_conversions::Vector3dToPoint(v_I,
                                      odometry.twist.twist.linear);
+
   // Subtract bias from gyro measurement.
   eigen_conversions::Vector3dToPoint(w_m - Get<StateDefinition_T::b_w>(),
                                      odometry.twist.twist.angular);
