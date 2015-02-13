@@ -406,7 +406,7 @@ void GenericState_T<stateVector_T, StateDefinition_T>::GetTwistCovarianceInImuFr
   const msf_core::Quaternion& q_W_I = Get<StateDefinition_T::q>();
   const msf_core::Matrix3 R_W_I = q_W_I.toRotationMatrix();
   const msf_core::Vector3& v_W =  Get<StateDefinition_T::v>();
-  const msf_core::Vector3& v_I =  R_W_I.transpose() * v_W;
+  const msf_core::Vector3 v_I =  R_W_I.transpose() * v_W;
 
   msf_core::Matrix6 cov_velocity_attitude_W;
   GetVelocityAttitudeCovariance(cov_velocity_attitude_W);
