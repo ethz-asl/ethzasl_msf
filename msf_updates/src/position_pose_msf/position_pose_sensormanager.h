@@ -214,6 +214,10 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     // Calculate initial attitude and position based on sensor measurements
     // here we take the attitude from the pose sensor and augment it with
     // global yaw init.
+    ROS_INFO("yaw found = %f = %f degrees", yawinit, yawinit/M_PI*180.);
+    double yawtrue = atan2(p_pos[1], p_pos[0]) + M_PI;//yawinit;//
+    ROS_INFO("yaw true  = %f = %f degrees", yawtrue, yawtrue/M_PI*180.);
+    ROS_WARN("using yaw found!!!");
     Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
     yawq.normalize();
 

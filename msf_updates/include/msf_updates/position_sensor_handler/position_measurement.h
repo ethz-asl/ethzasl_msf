@@ -168,11 +168,6 @@ struct PositionMeasurement : public PositionMeasurementBase {
       r_old.block<3, 1>(0, 0) = z_p_
           - (state.Get<StateDefinition_T::p>()
               + C_q.transpose() * state.Get<StateDefinition_T::p_ip>());
-      std::cout << "measurement               = " << z_p_.transpose() << std::endl;
-      std::cout << "prediction                = " << (state.Get<StateDefinition_T::p>()
-          + C_q.transpose() * state.Get<StateDefinition_T::p_ip>()).transpose() << std::endl;
-      std::cout << "position error of pos msf = " << r_old.block<3, 1>(0, 0).transpose() << std::endl;
-      std::cout << "p                         = " << state.Get<StateDefinition_T::p>().transpose() << std::endl;
 
       if (!CheckForNumeric(r_old, "r_old")) {
         MSF_ERROR_STREAM("r_old: "<<r_old);

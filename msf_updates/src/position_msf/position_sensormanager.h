@@ -147,11 +147,11 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
 
     // Set the initial yaw alignment of body to world (the frame in which the
     // position sensor measures).
-    ROS_INFO("yaw found = %f", yawinit);
-    double yawtrue = atan2(p_wp[1], p_wp[0]);
+    ROS_INFO("yaw found = %f = %f degrees", yawinit, yawinit/M_PI*180.);
+    double yawtrue = atan2(p_wp[1], p_wp[0]);//yawinit;//
     ROS_INFO("yaw true  = %f = %f degrees", yawtrue, yawtrue/M_PI*180.);
-    ROS_WARN("using yaw true!!!");
-    Eigen::Quaterniond yawq(cos(yawtrue / 2), 0, 0, sin(yawtrue / 2));
+    ROS_WARN("using yaw found!!!");
+    Eigen::Quaterniond yawq(cos((yawinit+M_PI) / 2), 0, 0, sin((yawinit+M_PI) / 2));
     yawq.normalize();
 
     q = yawq;//.conjugate();

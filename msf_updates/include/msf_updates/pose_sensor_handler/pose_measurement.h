@@ -307,7 +307,6 @@ struct PoseMeasurement : public PoseMeasurementBase {
                   + state.Get<StateDefinition_T::p>()
                   + C_q.transpose() * state.Get<StatePicIdx>()))
               * state.Get<StateLIdx>();
-      std::cout << "position error of pose msf = " << r_old.block<3, 1>(0, 0) << std::endl;
 
       // Attitude.
       Eigen::Quaternion<double> q_err;
