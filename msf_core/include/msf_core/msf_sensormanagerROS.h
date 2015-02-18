@@ -242,17 +242,6 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
     // Prevent junk being sent to the external state propagation when data
     // playback is (accidentally) on.
     if (pubCorrect_.getNumSubscribers() > 0) {
-      if (this->data_playback_) {
-        for (int i = 0; i < HLI_EKF_STATE_SIZE; ++i) {
-          msgCorrect_.state[i] = 0;
-        }
-        msgCorrect_.state[6] = 1;  //w
-        msgCorrect_.flag = sensor_fusion_comm::ExtEkf::initialization;
-
-        MSF_ERROR_STREAM_THROTTLE(
-            1, __FUNCTION__ << " You have connected the external propagation "
-            "topic but at the same time data_playback is on.");
-      } else {
         const EKFState_T& state_const = *state;
         msgCorrect_.state[0] =
             state_const.template Get<StateDefinition_T::p>()[0]
@@ -301,7 +290,14 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
             state_const.template Get<StateDefinition_T::b_a>()[2]
                 - hl_state_buf_.state[15];
 
-        msgCorrect_.flag = sensor_fusion_comm::ExtEkf::state_correction;
+        if (this->data_playback_) {
+          msgCorrect_.flag = sensor_fusion_comm::ExtEkf::ignore_state;
+
+          MSF_ERROR_STREAM_THROTTLE(
+              1, __FUNCTION__ << " You have connected the external propagation "
+              "topic but at the same time data_playback is on.");
+        } else {
+          msgCorrect_.flag = sensor_fusion_comm::ExtEkf::state_correction;
       }
 
       if (state->CheckStateForNumeric()) {  // If not NaN.
@@ -368,6 +364,12 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
       pubCovCoreAux_.publish(msg);
     }
     msg_seq++;
+  }
+
+  virtual void PublishCorrectionAfterUpdate(
+      Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, 1>&
+            correction) const {
+
   }
 };
 
