@@ -905,6 +905,8 @@ bool MSF_Core<EKFState_T>::ApplyCorrection(shared_ptr<EKFState_T>& delaystate,
   // update we have to apply.
   CheckForNumeric(correction, "update");
 
+  usercalc_.PublishCorrectionAfterUpdate(correction);
+
   // Set time latest propagated, we need to repropagate at least from here.
   time_P_propagated = delaystate->time;
 

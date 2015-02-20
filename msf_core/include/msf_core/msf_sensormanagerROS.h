@@ -61,6 +61,8 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
   ReconfigureServer *reconfServer_;  ///< Dynamic reconfigure server.
 
   ros::Publisher pubState_;  ///< Publishes all states of the filter.
+  ros::Publisher pubUpdate_;  ///< Publishes the correction after the update.
+  ros::Publisher pubResidual_;  ///< Publishes the residual after the update.
   ros::Publisher pubPose_;  ///< Publishes 6DoF pose output.
   ros::Publisher pubOdometry_;  ///< Publishes odometry output.
   ros::Publisher pubPoseAfterUpdate_;  ///< Publishes 6DoF pose output after the update has been applied.
@@ -90,6 +92,10 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
     pubState_ = nh.advertise < sensor_fusion_comm::DoubleArrayStamped
         > ("state_out", 100);
     pubCorrect_ = nh.advertise < sensor_fusion_comm::ExtEkf > ("correction", 1);
+    pubUpdate_ = nh.advertise < sensor_fusion_comm::DoubleArrayStamped
+        > ("update", 100);
+    pubResidual_ = nh.advertise < sensor_fusion_comm::DoubleArrayStamped
+        > ("residual", 100);
     pubPose_ = nh.advertise < geometry_msgs::PoseWithCovarianceStamped
         > ("pose", 100);
     pubOdometry_ = nh.advertise < nav_msgs::Odometry> ("odometry", 100);
@@ -337,7 +343,8 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
       tf_broadcaster_.sendTransform(
           tf::StampedTransform(
               transform, ros::Time::now() /*ros::Time(latestState->time_)*/,
-              "world", ros::names::clean(ros::this_node::getNamespace() + "/state")));
+              "world",
+              ros::names::clean(ros::this_node::getNamespace() + "/state")));
     }
 
     if (pubCovCore_.getNumSubscribers()) {
@@ -369,7 +376,30 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
   virtual void PublishCorrectionAfterUpdate(
       Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, 1>&
             correction) const {
+    static int msg_seq = 0;
+    if (pubUpdate_.getNumSubscribers()) {
+      sensor_fusion_comm::DoubleArrayStamped msg;
+      msg.data.resize(EKFState_T::nErrorStatesAtCompileTime); // Make sure this is correctly sized.
+      for (unsigned int i = 0; i < EKFState_T::nErrorStatesAtCompileTime; i++)
+        msg.data[i] = correction(i,0);
+      pubUpdate_.publish(msg);
+    }
+    msg_seq++;
+  }
 
+//  template<class Res_type>
+  virtual void PublishResidualAfterUpdate(
+//      const Eigen::MatrixBase<Res_type>& residual) const {
+      const Eigen::MatrixXd& residual) const {
+    static int msg_seq = 0;
+    if (pubResidual_.getNumSubscribers()) {
+      sensor_fusion_comm::DoubleArrayStamped msg;
+      msg.data.resize(residual.rows()); // Make sure this is correctly sized.
+      for (unsigned int i = 0; i < msg.data.size(); i++)
+        msg.data[i] = residual(i,0);
+      pubResidual_.publish(msg);
+    }
+    msg_seq++;
   }
 };
 

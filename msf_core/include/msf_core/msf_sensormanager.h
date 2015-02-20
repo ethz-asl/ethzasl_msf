@@ -142,6 +142,14 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
       const shared_ptr<EKFState_T>& state) const = 0;
   virtual void PublishStateAfterUpdate(
       const shared_ptr<EKFState_T>& state) const = 0;
+  virtual void PublishCorrectionAfterUpdate(
+      Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, 1>&
+      correction) const = 0;
+//  template<class Res_type>
+  virtual void PublishResidualAfterUpdate(
+//      const Eigen::MatrixBase<Res_type>& residual) const;
+      const Eigen::MatrixXd& residual) const = 0;
+
 
 };
 }  // namespace msf_core
