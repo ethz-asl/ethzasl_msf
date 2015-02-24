@@ -299,9 +299,9 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
         if (this->data_playback_) {
           msgCorrect_.flag = sensor_fusion_comm::ExtEkf::ignore_state;
 
-          MSF_ERROR_STREAM_THROTTLE(
-              1, __FUNCTION__ << " You have connected the external propagation "
-              "topic but at the same time data_playback is on.");
+//          MSF_ERROR_STREAM_THROTTLE(
+//              1, __FUNCTION__ << " You have connected the external propagation "
+//              "topic but at the same time data_playback is on.");
         } else {
           msgCorrect_.flag = sensor_fusion_comm::ExtEkf::state_correction;
       }
