@@ -30,7 +30,7 @@
 #include <msf_updates/SinglePositionSensorConfig.h>
 
 #include "sensor_fusion_comm/InitScale.h"
-#include "sensor_fusion_comm/InitYaw.h"
+#include "sensor_fusion_comm/InitTransform.h"
 
 namespace msf_position_sensor {
 
@@ -67,9 +67,11 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
     reconf_server_->setCallback(f);
 
     init_scale_srv_ = pnh.advertiseService("initialize_msf_scale",
-                                            &PositionSensorManager::InitScale, this);
-    init_yaw_srv_   = pnh.advertiseService("initialize_msf_yaw",
-                                            &PositionSensorManager::InitYaw, this);
+                                            &PositionSensorManager::InitScale,
+                                            this);
+    init_transform_srv_ = pnh.advertiseService("initialize_msf_transform",
+                                               &PositionSensorManager::InitTransform,
+                                               this);
   }
   virtual ~PositionSensorManager() {
   }
@@ -86,7 +88,7 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
   ReconfigureServerPtr reconf_server_;
 
   ros::ServiceServer init_scale_srv_;
-  ros::ServiceServer init_yaw_srv_;
+  ros::ServiceServer init_transform_srv_;
 
   /**
    * \brief Dynamic reconfigure callback.
@@ -110,26 +112,37 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
     return true;
   }
 
-  void Init(double scale) const {
-    InitYaw( -90.0 / 180.0 * M_PI, scale );//config_.position_yaw_init / 180 * M_PI, scale);
-  }
-
-  bool InitYaw(sensor_fusion_comm::InitYaw::Request &req,
-               sensor_fusion_comm::InitYaw::Response &res) {
-    ROS_INFO("Initialize filter with yaw %f, scale %f", req.yaw, req.scale);
-    InitYaw(req.yaw, req.scale);
-    res.result = "Initialized yaw";
+  bool InitTransform(sensor_fusion_comm::InitTransform::Request &req,
+                     sensor_fusion_comm::InitTransform::Response &res) {
+    /*ROS_INFO("Initialize filter with quaternion q_wv = [%f, %f, %f, %f], scale %f",
+             req.transform_wv.rotation.w, req.transform_wv.rotation.x, req.transform_wv.rotation.y, req.transform_wv.rotation.z,
+             req.scale);*/
+    Eigen::Quaternion<double> q(req.transform_wv.rotation.w,
+                                req.transform_wv.rotation.x,
+                                req.transform_wv.rotation.y,
+                                req.transform_wv.rotation.z);
+    q.normalize();
+    ROS_INFO_STREAM("Initialize filter with transform q = ["<<
+                    STREAMQUAT(q)<<"], scale "<<req.scale);
+    InitTransform(q, req.scale);
     return true;
   }
 
-  void InitYaw(double yawinit, double scale) const {
+  void Init(double scale) const {
+    double yawinit = config_.position_yaw_init / 180 * M_PI;
+    Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
+    yawq.normalize();
+    InitTransform(yawq, scale);
+  }
+
+  void InitTransform(const Eigen::Quaternion<double> &q,
+                     double scale) const {
     if (scale < 0.001) {
       MSF_WARN_STREAM("init scale is "<<scale<<" correcting to 1");
       scale = 1;
     }
 
     Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ip, p_wp;
-    Eigen::Quaternion<double> q;
     msf_core::MSF_Core<EKFState_T>::ErrorStateCov P;
 
     // Init values.
@@ -145,19 +158,9 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
 
     p_wp = position_handler_->GetPositionMeasurement();
 
-    // Set the initial yaw alignment of body to world (the frame in which the
-    // position sensor measures).
-    ROS_INFO("yaw found = %f = %f degrees", yawinit, yawinit/M_PI*180.);
-    double yawtrue = atan2(p_wp[1], p_wp[0]);//yawinit;//
-    ROS_INFO("yaw true  = %f = %f degrees", yawtrue, yawtrue/M_PI*180.);
-    ROS_WARN("using yaw found!!!");
-    Eigen::Quaterniond yawq(cos((yawinit+M_PI) / 2), 0, 0, sin((yawinit+M_PI) / 2));
-    yawq.normalize();
-
-    q = yawq;//.conjugate();
-
     MSF_INFO_STREAM(
-        "initial measurement pos:[" << p_wp.transpose() << "] orientation: " << STREAMQUAT(q));
+        "initial measurement pos:[" << p_wp.transpose() <<
+        "] orientation: " << STREAMQUAT(q));
 
     // check if we have already input from the measurement sensor
     if (p_wp.norm() == 0)
