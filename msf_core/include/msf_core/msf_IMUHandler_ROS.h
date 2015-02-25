@@ -63,6 +63,9 @@ class IMUHandler_ROS : public IMUHandler<EKFState_T> {
     if (this->manager_.GetDataPlaybackStatus())
       flag = sensor_fusion_comm::ExtEkf::ignore_state;
 
+    if (msg->header.stamp.toSec() - this->GetTimeLastInit() < 0.15)
+      flag = sensor_fusion_comm::ExtEkf::ignore_state;
+
     bool isnumeric = true;
     if (flag == sensor_fusion_comm::ExtEkf::current_state) {
       isnumeric = CheckForNumeric(
@@ -81,6 +84,9 @@ class IMUHandler_ROS : public IMUHandler<EKFState_T> {
     q = Eigen::Quaternion<double>(msg->state[6], msg->state[7], msg->state[8],
                                   msg->state[9]);
     q.normalize();
+
+    std::cout << "p in fcu state out cb = " << p.transpose() << std::endl;
+    std::cout << "time diff in cb = " << msg->header.stamp.toSec() - this->GetTimeLastInit() << std::endl;
 
     bool is_already_propagated = false;
     if (flag == sensor_fusion_comm::ExtEkf::current_state && isnumeric) {

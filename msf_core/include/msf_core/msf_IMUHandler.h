@@ -52,6 +52,7 @@ class IMUHandler : public SensorHandler<EKFState_T> {
                                             is_already_propagated,
                                             msg_stamp, msg_seq);
   }
+  double GetTimeLastInit() {return core_->time_last_init_;}
 };
 }
 
