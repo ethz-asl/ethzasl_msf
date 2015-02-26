@@ -47,6 +47,7 @@ MSF_Core<EKFState_T>::MSF_Core(const MSF_SensorManager<EKFState_T>& GetUserCalc)
   predictionMade_ = false;
   isfuzzyState_ = false;
   time_P_propagated = 0;
+  time_last_init_ = 0;
   it_last_IMU = stateBuffer_.GetIteratorEnd();
 }
 
@@ -575,6 +576,8 @@ void MSF_Core<EKFState_T>::Init(
   usleep(10000);
 
   assert(state->time != 0);
+
+  time_last_init_ = state->time;
 
   it_last_IMU = stateBuffer_.Insert(state);
 

@@ -188,6 +188,8 @@ class MSF_Core {
   std::queue<shared_ptr<MSF_MeasurementBase<EKFState_T> > > queueFutureMeasurements_;
   /// Last time stamp where we have a valid propagation.
   double time_P_propagated;
+  /// Time when the filter was last initialized
+  double time_last_init_;
   /// Last time stamp where we have a valid state.
   typename StateBuffer_T::iterator_T it_last_IMU;
 
