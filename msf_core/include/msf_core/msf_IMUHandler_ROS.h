@@ -85,9 +85,6 @@ class IMUHandler_ROS : public IMUHandler<EKFState_T> {
                                   msg->state[9]);
     q.normalize();
 
-    std::cout << "p in fcu state out cb = " << p.transpose() << std::endl;
-    std::cout << "time diff in cb = " << msg->header.stamp.toSec() - this->GetTimeLastInit() << std::endl;
-
     bool is_already_propagated = false;
     if (flag == sensor_fusion_comm::ExtEkf::current_state && isnumeric) {
       is_already_propagated = true;
