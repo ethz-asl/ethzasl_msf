@@ -20,6 +20,7 @@
 #define POSITION_MEASUREMENTMANAGER_H
 
 #include <ros/ros.h>
+#include <ros/callback_queue.h>
 
 #include <msf_core/msf_core.h>
 #include <msf_core/msf_sensormanagerROS.h>
@@ -32,7 +33,11 @@
 #include "sensor_fusion_comm/InitScale.h"
 #include "sensor_fusion_comm/InitTransform.h"
 
+#include "sensor_msgs/Imu.h"
+
 namespace msf_position_sensor {
+
+bool isIMUDataReceived_ = 1;
 
 typedef msf_updates::SinglePositionSensorConfig Config_T;
 typedef dynamic_reconfigure::Server<Config_T> ReconfigureServer;
@@ -72,6 +77,8 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
     init_transform_srv_ = pnh.advertiseService("initialize_msf_transform",
                                                &PositionSensorManager::InitTransform,
                                                this);
+    sub_imu_state_input_ = pnh.subscribe("/imu0", 1,
+        &PositionSensorManager::IMUCallback, this);
   }
   virtual ~PositionSensorManager() {
   }
@@ -89,6 +96,19 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
 
   ros::ServiceServer init_scale_srv_;
   ros::ServiceServer init_transform_srv_;
+  ros::Subscriber sub_imu_state_input_;
+
+  msf_core::Vector3 linacc;
+
+  void IMUCallback(const sensor_msgs::ImuConstPtr &msg)
+  {
+	  if(!isIMUDataReceived_)
+	  {
+		  linacc << msg->linear_acceleration.x, msg->linear_acceleration.y, msg
+			  ->linear_acceleration.z;
+		  isIMUDataReceived_ = 1;
+	  }
+  }
 
   /**
    * \brief Dynamic reconfigure callback.
@@ -143,6 +163,7 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
     }
 
     Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ip, p_wp;
+    Eigen::Quaterniond q_acc, q_res;
     msf_core::MSF_Core<EKFState_T>::ErrorStateCov P;
 
     // Init values.
@@ -158,33 +179,59 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
 
     p_wp = position_handler_->GetPositionMeasurement();
 
-    MSF_INFO_STREAM(
-        "initial measurement pos:[" << p_wp.transpose() <<
-        "] orientation: " << STREAMQUAT(q));
+    // Calculate the orientation from the accelerometer of topic /imu0
+	MSF_INFO_STREAM("Waiting for IMU data ....!");
+	isIMUDataReceived_ = 0;
+	while(!isIMUDataReceived_ && ros::ok())
+	{
+		ros::getGlobalCallbackQueue()->callAvailable(
+			ros::WallDuration(0.03));
+	}
+	if(!isIMUDataReceived_) {
+		MSF_WARN_STREAM("No IMU measurements received yet to initialize attitude - using [1 0 0 0]");
+	}
+	else {
+		MSF_WARN_STREAM("Received IMU measurements [" << linacc << "]");
+		// Normalize acc vector
+		Eigen::Vector3d e_acc = linacc.normalized();
+
+		// Align with ez_world
+		// Gravity unity vector in world frame
+		Eigen::Vector3d ez_world(0.0, 0.0, 1.0);
+		// Axis angle from world frame to IMU frame
+		Eigen::Vector3d axis = ez_world.cross(e_acc).normalized();
+		// Quaternion representation
+		Eigen::Quaternion<double> q_acc_temp(Eigen::AngleAxis<double>(-std::acos(ez_world.transpose() * e_acc), axis));
+		q_acc = q_acc_temp.normalized();
+    }
+
+	q_res = (q*q_acc).normalized();		// Keep yawinit
+
+    MSF_INFO_STREAM("initial measurement pos:[" << p_wp.transpose() << "] orientation: " << STREAMQUAT(q_res));
 
     // check if we have already input from the measurement sensor
     if (p_wp.norm() == 0)
-      MSF_WARN_STREAM(
-          "No measurements received yet to initialize position - using [0 0 0]");
+      MSF_WARN_STREAM("No measurements received yet to initialize position - using [0 0 0]");
 
+    // Fetch some parameters
     ros::NodeHandle pnh("~");
-    pnh.param("position_sensor/init/p_ip/x", p_ip[0], 0.0);
-    pnh.param("position_sensor/init/p_ip/y", p_ip[1], 0.0);
-    pnh.param("position_sensor/init/p_ip/z", p_ip[2], 0.0);
+    pnh.param("position_sensor/init/p_ip/x", p_ip.x(), 0.0);
+    pnh.param("position_sensor/init/p_ip/y", p_ip.y(), 0.0);
+    pnh.param("position_sensor/init/p_ip/z", p_ip.z(), 0.0);
 
     // Calculate initial attitude and position based on sensor measurements.
-    p = p_wp - q.toRotationMatrix() * p_ip;
+    p = p_wp - q_res.toRotationMatrix() * p_ip;
 
-    a_m = q.inverse() * g;			    /// Initial acceleration.
+    a_m = q_res.inverse() * g;		// Initial acceleration.
 
-    //prepare init "measurement"
+    // Prepare init "measurement"
     // True means that we will also set the initialsensor readings.
     shared_ptr < msf_core::MSF_InitMeasurement<EKFState_T>
         > meas(new msf_core::MSF_InitMeasurement<EKFState_T>(true));
 
     meas->SetStateInitValue < StateDefinition_T::p > (p);
     meas->SetStateInitValue < StateDefinition_T::v > (v);
-    meas->SetStateInitValue < StateDefinition_T::q > (q);
+    meas->SetStateInitValue < StateDefinition_T::q > (q_res);
     meas->SetStateInitValue < StateDefinition_T::b_w > (b_w);
     meas->SetStateInitValue < StateDefinition_T::b_a > (b_a);
     meas->SetStateInitValue < StateDefinition_T::p_ip > (p_ip);

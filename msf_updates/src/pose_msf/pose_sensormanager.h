@@ -18,6 +18,7 @@
 #define POSE_MEASUREMENTMANAGER_H
 
 #include <ros/ros.h>
+#include <ros/callback_queue.h>
 
 #include <msf_core/msf_core.h>
 #include <msf_core/msf_sensormanagerROS.h>
@@ -31,7 +32,11 @@
 #include "sensor_fusion_comm/InitHeight.h"
 #include "sensor_fusion_comm/InitTransform.h"
 
+#include "sensor_msgs/Imu.h"
+
 namespace msf_pose_sensor {
+
+bool isIMUDataReceived_ = 1;
 
 typedef msf_updates::SinglePoseSensorConfig Config_T;
 typedef dynamic_reconfigure::Server<Config_T> ReconfigureServer;
@@ -58,18 +63,19 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
         new PoseSensorHandler_T(*this, "", "pose_sensor", distortmeas));
 
     AddHandler(pose_handler_);
-
     reconf_server_.reset(new ReconfigureServer(pnh));
     ReconfigureServer::CallbackType f = boost::bind(&PoseSensorManager::Config,
                                                     this, _1, _2);
     reconf_server_->setCallback(f);
 
     init_scale_srv_ = pnh.advertiseService("initialize_msf_scale",
+
                                            &PoseSensorManager::InitScale, this);
     init_height_srv_ = pnh.advertiseService("initialize_msf_height",
                                             &PoseSensorManager::InitHeight, this);
     init_transform_srv_ = pnh.advertiseService("initialize_msf_transform",
                                                &PoseSensorManager::InitTransform, this);
+    sub_imu_state_input_ = pnh.subscribe("/imu0", 1, &PoseSensorManager::IMUCallback, this);
   }
   virtual ~PoseSensorManager() { }
 
@@ -86,10 +92,23 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
   ros::ServiceServer init_scale_srv_;
   ros::ServiceServer init_height_srv_;
   ros::ServiceServer init_transform_srv_;
+  ros::Subscriber sub_imu_state_input_;
+
+  msf_core::Vector3 linacc;
 
   /// Minimum initialization height. If a abs(height) is smaller than this value, 
   /// no initialization is performed.
   static constexpr double MIN_INITIALIZATION_HEIGHT = 0.01;
+
+  void IMUCallback(const sensor_msgs::ImuConstPtr &msg)
+  {
+      if(!isIMUDataReceived_)
+      {
+          linacc << msg->linear_acceleration.x, msg->linear_acceleration.y, msg
+              ->linear_acceleration.z;
+          isIMUDataReceived_ = 1;
+      }
+  }
 
   /**
    * \brief Dynamic reconfigure callback.
@@ -180,24 +199,21 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
                      const Eigen::Quaternion<double> &q_wv,
                      double scale) const {
     Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ic, p_vc;
-    Eigen::Quaternion<double> q, q_ic, q_cv;
+    Eigen::Quaternion<double> q, q_ic, q_cv, q_acc;
     msf_core::MSF_Core<EKFState_T>::ErrorStateCov P;
 
-    // init values
-    g << 0, 0, 9.81;	        /// Gravity.
-    b_w << 0, 0, 0;		/// Bias gyroscopes.
-    b_a << 0, 0, 0;		/// Bias accelerometer.
+    // Init values
+    g << 0, 0, 9.81;	        // Gravity.
+    b_w << 0, 0, 0;				// Bias gyroscopes.
+    b_a << 0, 0, 0;				// Bias accelerometer.
 
-    v << 0, 0, 0;			/// Robot velocity (IMU centered).
-    w_m << 0, 0, 0;		/// Initial angular velocity.
+    v << 0, 0, 0;				// Robot velocity (IMU centered).
+    w_m << 0, 0, 0;				// Initial angular velocity.
 
     P.setZero();  // Error state covariance; if zero, a default initialization in msf_core is used
 
     p_vc = pose_handler_->GetPositionMeasurement();
     q_cv = pose_handler_->GetAttitudeMeasurement();
-
-    MSF_INFO_STREAM(
-        "initial measurement pos:["<<p_vc.transpose()<<"] orientation: "<<STREAMQUAT(q_cv));
 
     // Check if we have already input from the measurement sensor.
     if (p_vc.norm() == 0)
@@ -207,10 +223,11 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
       MSF_WARN_STREAM(
           "No measurements received yet to initialize attitude - using [1 0 0 0]");
 
+    // Fetch some parameters
     ros::NodeHandle pnh("~");
-    pnh.param("pose_sensor/init/p_ic/x", p_ic[0], 0.0);
-    pnh.param("pose_sensor/init/p_ic/y", p_ic[1], 0.0);
-    pnh.param("pose_sensor/init/p_ic/z", p_ic[2], 0.0);
+    pnh.param("pose_sensor/init/p_ic/x", p_ic.x(), 0.0);
+    pnh.param("pose_sensor/init/p_ic/y", p_ic.y(), 0.0);
+    pnh.param("pose_sensor/init/p_ic/z", p_ic.z(), 0.0);
 
     pnh.param("pose_sensor/init/q_ic/w", q_ic.w(), 1.0);
     pnh.param("pose_sensor/init/q_ic/x", q_ic.x(), 0.0);
@@ -218,18 +235,50 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
     pnh.param("pose_sensor/init/q_ic/z", q_ic.z(), 0.0);
     q_ic.normalize();
 
-    // Calculate initial attitude and position based on sensor measurements.
-    if (q_cv.w() == 1) {  // If there is no pose measurement, only apply q_wv.
-      q = q_wv;
-    } else {  // If there is a pose measurement, apply q_ic and q_wv to get initial attitude.
-      q = (q_ic * q_cv.conjugate() * q_wv).conjugate();
+    // Calculate the orientation from the accelerometer of topic /imu0
+    MSF_INFO_STREAM("Waiting for IMU data ....!");
+    isIMUDataReceived_ = 0;
+    while(!isIMUDataReceived_ && ros::ok())
+    {
+        ros::getGlobalCallbackQueue()->callAvailable(
+            ros::WallDuration(0.03));
+    }
+    if(!isIMUDataReceived_) {
+        MSF_WARN_STREAM("No IMU measurements received yet to initialize attitude - using [1 0 0 0]");
+    }
+    else {
+		MSF_WARN_STREAM("Received IMU measurements [" << linacc << "]");
+		// Normalize acc vector
+		Eigen::Vector3d e_acc = linacc.normalized();
+
+		// Align with ez_world
+		// Gravity unity vector in world frame
+		Eigen::Vector3d ez_world(0.0, 0.0, 1.0);
+		// Axis angle from world frame to IMU frame
+		Eigen::Vector3d axis = ez_world.cross(e_acc).normalized();
+		// Quaternion representation
+		Eigen::Quaternion<double> q_acc_temp(Eigen::AngleAxis<double>(-std::acos(ez_world.transpose() * e_acc), axis));
+		q_acc = q_acc_temp.normalized();
     }
 
+    // Display some info on position and attitude
+    MSF_INFO_STREAM("initial measurement pos:[" << p_vc.transpose() << "] orientation: [" << STREAMQUAT(q_cv)
+    		<< "] orientation (accelerometer): [" << STREAMQUAT(q_acc));
+
+    // Calculate initial attitude and position based on sensor measurements.
+    if (q_acc.w() == 1) {  // If there is no pose measurement, only apply q_wv.
+      q = q_wv;
+    } else {  // If there is a pose measurement, apply q_ic and q_wv to get initial attitude.
+      q = (q_ic * q_acc.conjugate() * q_wv).conjugate();
+    }
     q.normalize();
+
+    // Initial position
     p = p_wv + q_wv.conjugate().toRotationMatrix() * p_vc / scale
         - q.toRotationMatrix() * p_ic;
 
-    a_m = q.inverse() * g;			/// Initial acceleration.
+    // Initial acceleration
+    a_m = q.inverse() * g;
 
     // Prepare init "measurement"
     // True means that this message contains initial sensor readings.
