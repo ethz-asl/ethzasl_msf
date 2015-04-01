@@ -1,33 +1,78 @@
+data_playback: true             # Set to true for playback, set to false on the real system.
 
-data_playback: true
+##############################
+#########IMU PARAMETERS#######
+##############################
+# The IMU measurement model used in msf contains two types of sensor errors, 
+# a high frequency additive white noise and 
+# a slower varying sensor bias.  
+# See the following link for more information 
+# https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model-and-Intrinsics
+# 
+# The white noise is characterized with the continuous time noise spectral density. 
+# The noise spectral density is sometime also referred to as noise density.
+# The units of the noise spectral density are:
+#  acc:  [m/s^2/sqrt(Hz)]
+#  gyro: [rad/s/sqrt(Hz)]
+# The noise spectral density can be found in the datasheet of the IMU.
+# 
+# The variation of the bias is characterized as a random walk. 
+# See https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model-and-Intrinsics for more information
+# The units of the random walk are:
+#  acc:  [m/s^3/sqrt(Hz)]
+#  gyro: [rad/s^2/sqrt(Hz)]
+ 
+####### ADIS 16448
+core/core_noise_acc: 0.0022563    # [m/s^2/sqrt(Hz)] 
+core/core_noise_gyr: 0.0004       # [rad/s/sqrt(Hz)] 
 
 core/core_fixed_bias: false
+core/core_noise_accbias: 8e-5     # [m/s^3/sqrt(Hz)]
+core/core_noise_gyrbias: 3e-6     # [rad/s^2/sqrt(Hz)]
 
-#########IMU PARAMETERS#######
-####### bluebird
-core/core_noise_acc: 0.083
-core/core_noise_accbias: 0.0083
-core/core_noise_gyr: 0.0013
-core/core_noise_gyrbias: 0.00013
-####### ADIS
-#core/core_noise_acc: 0.002
-#core/core_noise_accbias: 8e-5
-#core/core_noise_gyr: 0.0004
-#core/core_noise_gyrbias: 3e-6
+####### mpu6000
+#core/core_noise_acc: 0.003924    # [m/s^2/sqrt(Hz)] mpu6000 datasheet
+#core/core_noise_gyr: 0.00008726  # [rad/s/sqrt(Hz)] mpu6000 datasheet
 
-pose_sensor/pose_fixed_scale: false
-pose_sensor/pose_noise_scale: 0.0
-pose_sensor/pose_noise_p_wv: 0.0
-pose_sensor/pose_noise_q_wv: 0.0
-pose_sensor/pose_noise_q_ic: 0.0
-pose_sensor/pose_noise_p_ic: 0.0
-pose_sensor/pose_delay: 0.02
-pose_sensor/pose_noise_meas_p: 0.01
-pose_sensor/pose_noise_meas_q: 0.02
+#core/core_fixed_bias: true
+#core/core_noise_gyrbias: 0.0     # For fixed bias we do not need process noise.
+#core/core_noise_accbias: 0.0     # For fixed bias we do not need process noise.
+
+#######################################
+#########Pose Sensor Parameters #######
+#######################################
+pose_sensor/pose_absolute_measurements: true
+pose_sensor/pose_measurement_world_sensor: false  # Selects if sensor measures its position 
+                                                  # w.r.t. world (true, e.g. Vicon) or the position 
+                                                  # of the world coordinate system w.r.t. the 
+                                                  # sensor (false, e.g. ethzasl_ptam).
+pose_sensor/pose_delay: 0.02                      # [s] delay of pose sensor w.r.t. imu
+
+# For the pose sensor noise levels use the std deviation the units are
+#  position: [m]
+#  orientation: [rad]
+pose_sensor/pose_use_fixed_covariance: false
+pose_sensor/pose_noise_meas_p: 0.01              # [m]
+pose_sensor/pose_noise_meas_q: 0.02              # [rad]
+
 pose_sensor/pose_initial_scale: 1
+pose_sensor/pose_fixed_scale: false
+pose_sensor/pose_noise_scale: 0.0     
 
-# initialization of camera w.r.t. IMU
-#bluebird
+# Transformation that expresses the position and orientation of the gravity aligned world frame 
+# w.r.t the vision/camera frame
+pose_sensor/pose_fixed_p_wv: false              
+pose_sensor/pose_noise_p_wv: 0.0                  
+pose_sensor/pose_fixed_q_wv: false
+pose_sensor/pose_noise_q_wv: 0.0                  
+
+# Transformation that expresses the position and orientation of the pose-sensor w.r.t. the IMU 
+# frame of reference, expressed in the IMU frame of reference.
+pose_sensor/pose_fixed_p_ic: false
+pose_sensor/pose_noise_p_ic: 0.0
+pose_sensor/pose_fixed_q_ic: false
+pose_sensor/pose_noise_q_ic: 0.0
+
 pose_sensor/init/q_ic/w: 0.0
 pose_sensor/init/q_ic/x: 1
 pose_sensor/init/q_ic/y: -1
@@ -35,22 +80,7 @@ pose_sensor/init/q_ic/z: 0
 pose_sensor/init/p_ic/x: 0.0   
 pose_sensor/init/p_ic/y: 0.0
 pose_sensor/init/p_ic/z: -0.08
- 
-###SLAM sensor 
-#pose_sensor/init/q_ic/w: 0
-#pose_sensor/init/q_ic/x: 0
-#pose_sensor/init/q_ic/y: 0
-#pose_sensor/init/q_ic/z: 1
-#pose_sensor/init/p_ic/x: 0.0745374   
-#pose_sensor/init/p_ic/y: -0.086751
-#pose_sensor/init/p_ic/z: 0.0123919
 
-pose_sensor/pose_fixed_scale: false
-pose_sensor/pose_fixed_p_ic: false
-pose_sensor/pose_fixed_q_ic: false
-pose_sensor/pose_fixed_p_wv: false
-pose_sensor/pose_fixed_q_wv: false
 
-pose_sensor/pose_absolute_measurements: true
-pose_sensor/pose_use_fixed_covariance: false
-pose_sensor/pose_measurement_world_sensor: false  # selects if sensor measures its position w.r.t. world (true, e.g. Vicon) or the position of the world coordinate system w.r.t. the sensor (false, e.g. ethzasl_ptam
+
+

@@ -174,7 +174,7 @@ struct PoseMeasurement : public PoseMeasurementBase {
     // Preprocess for elements in H matrix.
     Eigen::Matrix<double, 3, 1> vecold;
 
-    vecold = (state.Get<StateDefinition_T::p>()
+    vecold = (-state.Get<StatePwvIdx>() + state.Get<StateDefinition_T::p>()
         + C_q * state.Get<StatePicIdx>()) * state.Get<StateLIdx>();
     Eigen::Matrix<double, 3, 3> skewold = Skew(vecold);
 
