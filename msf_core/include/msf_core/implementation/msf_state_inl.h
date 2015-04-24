@@ -368,7 +368,7 @@ void GenericState_T<stateVector_T, StateDefinition_T>::GetPoseCovariance(
 /// Writes the covariance corresponding to velocity and attitude to cov.
 template<typename stateVector_T, typename StateDefinition_T>
 void GenericState_T<stateVector_T, StateDefinition_T>::GetVelocityAttitudeCovariance(
-    Eigen::Matrix<double_t, 6, 6>& cov) {
+    Eigen::Matrix<double, 6, 6>& cov) {
 
   typedef typename msf_tmp::GetEnumStateType<stateVector_T, StateDefinition_T::v>::value v_type;
   typedef typename msf_tmp::GetEnumStateType<stateVector_T, StateDefinition_T::q>::value q_type;
@@ -411,7 +411,7 @@ void GenericState_T<stateVector_T, StateDefinition_T>::GetTwistCovarianceInImuFr
   msf_core::Matrix6 cov_velocity_attitude_W;
   GetVelocityAttitudeCovariance(cov_velocity_attitude_W);
 
-  Eigen::Matrix<double_t, 3, 6> J;
+  Eigen::Matrix<double, 3, 6> J;
   J.block<3,3>(0,0) = R_W_I.transpose();
   J.block<3,3>(0,3) = Skew(v_I);
 
