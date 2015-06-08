@@ -172,10 +172,9 @@ struct PoseMeasurement : public PoseMeasurementBase {
         .conjugate().toRotationMatrix();
 
     // Preprocess for elements in H matrix.
-    Eigen::Matrix<double, 3, 1> vecold;
-
-    vecold = (-state.Get<StatePwvIdx>() + state.Get<StateDefinition_T::p>()
-        + C_wi * state.Get<StatePicIdx>()) * state.Get<StateLIdx>();
+    Eigen::Matrix<double, 3, 1> vecold =
+        (-state.Get<StatePwvIdx>() + state.Get<StateDefinition_T::p>()
+            + C_wi * state.Get<StatePicIdx>()) * state.Get<StateLIdx>();
     Eigen::Matrix<double, 3, 3> skewold = Skew(vecold);
 
     Eigen::Matrix<double, 3, 3> pci_sk = Skew(state.Get<StatePicIdx>());
@@ -318,7 +317,7 @@ struct PoseMeasurement : public PoseMeasurementBase {
               * state.Get<StateLIdx>();
 
       // Attitude.
-      Eigen::Quaternion<double> q_err;
+      Eigen::Quaternion<double> q_err;  // q_err = \hat{q}_vc * q_cv
       q_err = (state.Get<StateQwvIdx>().conjugate()
           * state.Get<StateDefinition_T::q>()
           * state.Get<StateQicIdx>()).conjugate() * z_q_;
