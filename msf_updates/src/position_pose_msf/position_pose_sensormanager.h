@@ -183,10 +183,10 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     // here we take the attitude from the pose sensor and augment it with
     // global yaw init.
     double yawinit = config_.position_yaw_init / 180 * M_PI;
-    Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
-    yawq.normalize();
+    Eigen::Quaterniond q_wv_yaw(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
+    q_wv_yaw.normalize();
 
-    q_wv = yawq.conjugate();
+    q_wv = q_wv_yaw.conjugate();
 
     if (q_vc.w() == 1) {  // If there is no pose measurement, only apply q_wv.
       q = q_wv;
