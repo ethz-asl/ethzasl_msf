@@ -186,8 +186,15 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
     yawq.normalize();
 
-    q = yawq;
-    q_wv = (q * q_ic * q_vc.conjugate()).conjugate();
+    q_wv = yawq.conjugate();
+
+    if (q_vc.w() == 1) {  // If there is no pose measurement, only apply q_wv.
+      q = q_wv;
+    } else {  // If there is a pose measurement, apply q_ic and q_wv to get initial attitud
+      q = (q_ic * q_vc.conjugate() * q_wv).conjugate();
+    }
+
+    q.normalize();
 
     MSF_WARN_STREAM("q " << STREAMQUAT(q));
     MSF_WARN_STREAM("q_wv " << STREAMQUAT(q_wv));
