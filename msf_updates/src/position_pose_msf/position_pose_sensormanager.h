@@ -190,7 +190,7 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
 
     if (q_vc.w() == 1) {  // If there is no pose measurement, only apply q_wv.
       q = q_wv;
-    } else {  // If there is a pose measurement, apply q_ic and q_wv to get initial attitud
+    } else {  // If there is a pose measurement, apply q_ic and q_wv to get initial attitude.
       q = (q_ic * q_vc.conjugate() * q_wv).conjugate();
     }
 
