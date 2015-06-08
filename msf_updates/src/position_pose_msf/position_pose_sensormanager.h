@@ -151,15 +151,13 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
         "initial measurement position: pos:["<<p_pos.transpose()<<"]");
 
     // Check if we have already input from the measurement sensor.
-    if (p_vc.norm() == 0)
+    if (!pose_handler_->receivedFirstMeasurement())
       MSF_WARN_STREAM(
-          "No measurements received yet to initialize vision position - using [0 0 0]");
-    if (p_pos.norm() == 0)
+          "No measurements received yet to initialize vision position and attitude - "
+          "using [0 0 0] and [1 0 0 0] respectively");
+    if (!position_handler_->receivedFirstMeasurement())
       MSF_WARN_STREAM(
           "No measurements received yet to initialize absolute position - using [0 0 0]");
-    if (q_vc.w() == 1)
-      MSF_WARN_STREAM(
-          "No measurements received yet to initialize attitude - using [1 0 0 0]");
 
     ros::NodeHandle pnh("~");
     pnh.param("pose_sensor/init/p_ic/x", p_ic[0], 0.0);

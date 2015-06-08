@@ -83,6 +83,10 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::AdjustGPSZReference(
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPositionMeasurement(
     const sensor_fusion_comm::PointWithCovarianceStampedConstPtr& msg) {
+  if (!received_first_measurement_) {
+    received_first_measurement_ = true;
+  }
+
   // Get the fixed states.
   int fixedstates = 0;
   static_assert(msf_updates::EKFState::nStateVarsAtCompileTime < 32, "Your state "

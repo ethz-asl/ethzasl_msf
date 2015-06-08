@@ -124,6 +124,9 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::SetDelay(double delay) {
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
     const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg) {
+  if (!received_first_measurement_) {
+    received_first_measurement_ = true;
+  }
 
   // Get the fixed states.
   int fixedstates = 0;

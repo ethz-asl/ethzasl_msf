@@ -31,6 +31,7 @@ class SensorHandler {
   int sensorID;
   std::string topic_namespace_;
   std::string parameternamespace_;
+  bool received_first_measurement_;
   void SetSensorID(int ID) {
     sensorID = ID;
   }
@@ -52,10 +53,12 @@ class SensorHandler {
         manager_(mng),
         sensorID(constants::INVALID_ID),
         topic_namespace_(topic_namespace),
-        parameternamespace_(parameternamespace) {
+        parameternamespace_(parameternamespace),
+        received_first_measurement_(false) {
   }
   virtual ~SensorHandler() {
   }
+  bool receivedFirstMeasurement() {return received_first_measurement_;}
 };
 }
 #endif  // MSF_SENSORHANDLER_H_
