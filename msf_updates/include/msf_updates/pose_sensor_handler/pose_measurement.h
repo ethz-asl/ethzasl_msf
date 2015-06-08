@@ -230,42 +230,51 @@ struct PoseMeasurement : public PoseMeasurementBase {
     H.block<3, 3>(0, kIdxstartcorr_q) = -C_wv.transpose() * C_wi * pci_sk
         * state.Get<StateLIdx>()(0);  // q
 
-    H.block<3, 1>(0, kIdxstartcorr_L) =
-        scalefix ?
-            Eigen::Matrix<double, 3, 1>::Zero() :
-            (C_wv.transpose() * C_wi * state.Get<StatePicIdx>() + C_wv.transpose()
-                    * (-state.Get<StatePwvIdx>()
-                        + state.Get<StateDefinition_T::p>())).eval();  // L
+    if (scalefix) {
+      H.block<3, 1>(0, kIdxstartcorr_L).setZero();
+    } else {
+      H.block<3, 1>(0, kIdxstartcorr_L) =
+          (C_wv.transpose() * C_wi * state.Get<StatePicIdx>() +
+              C_wv.transpose() *
+              (-state.Get<StatePwvIdx>() + state.Get<StateDefinition_T::p>())).eval();  // L
+    }
 
-    H.block<3, 3>(0, kIdxstartcorr_qwv) =
-        driftwvattfix ?
-            Eigen::Matrix<double, 3, 3>::Zero() : (-C_wv.transpose() * skewold).eval();  // q_wv
+    if (driftwvattfix) {
+      H.block<3, 3>(0, kIdxstartcorr_qwv).setZero();
+    } else {
+      H.block<3, 3>(0, kIdxstartcorr_qwv) = (-C_wv.transpose() * skewold).eval();  // q_wv
+    }
 
-    H.block<3, 3>(0, kIdxstartcorr_pic) =
-        calibposfix ?
-            Eigen::Matrix<double, 3, 3>::Zero() :
-            (C_wv.transpose() * C_wi * state.Get<StateLIdx>()(0)).eval();  //p_ic
-
+    if (calibposfix) {
+      H.block<3, 3>(0, kIdxstartcorr_pic).setZero();
+    } else {
+      H.block<3, 3>(0, kIdxstartcorr_pic) =
+          (C_wv.transpose() * C_wi * state.Get<StateLIdx>()(0)).eval();  //p_ic
+    }
 
     // TODO (slynen): Check scale commenting
-    H.block<3, 3>(0, kIdxstartcorr_pwv) =
-        driftwvposfix ?
-            Eigen::Matrix<double, 3, 3>::Zero() :
-            (-Eigen::Matrix<double, 3, 3>::Identity()
-            /* * state.Get<StateLIdx>()(0)*/).eval();  //p_wv
+    if (driftwvposfix) {
+      H.block<3, 3>(0, kIdxstartcorr_pwv).setZero();
+    } else {
+      H.block<3, 3>(0, kIdxstartcorr_pwv) = (-Eigen::Matrix<double, 3, 3>::Identity()
+          /* * state.Get<StateLIdx>()(0)*/).eval();  //p_wv
+    }
 
     // Attitude.
     H.block<3, 3>(3, kIdxstartcorr_q) = C_ci;  // q
 
-    H.block<3, 3>(3, kIdxstartcorr_qwv) =
-        driftwvattfix ?
-            Eigen::Matrix<double, 3, 3>::Zero() :
-            (C_ci * C_wi.transpose()).eval();  // q_wv
+    if (driftwvattfix) {
+      H.block<3, 3>(3, kIdxstartcorr_qwv).setZero();
+    } else {
+      H.block<3, 3>(3, kIdxstartcorr_qwv) = (C_ci * C_wi.transpose()).eval();  // q_wv
+    }
 
-    H.block<3, 3>(3, kIdxstartcorr_qic) =
-        calibattfix ?
-            Eigen::Matrix<double, 3, 3>::Zero() :
-            Eigen::Matrix<double, 3, 3>::Identity().eval();  //q_ic
+    if (calibattfix) {
+      H.block<3, 3>(3, kIdxstartcorr_qic).setZero();
+    } else {
+      H.block<3, 3>(3, kIdxstartcorr_qic) =
+          Eigen::Matrix<double, 3, 3>::Identity().eval();  //q_ic
+    }
 
     // This line breaks the filter if a position sensor in the global frame is
     // available or if we want to set a global yaw rotation.
