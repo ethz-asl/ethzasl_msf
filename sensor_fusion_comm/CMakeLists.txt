@@ -25,6 +25,8 @@ add_service_files(
   FILES
   InitScale.srv
   InitHeight.srv
+  InitTransform.srv
+  InitYaw.srv
 )
 
 generate_messages(
