@@ -97,7 +97,7 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
       scale = 1;
     }
 
-    Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ip, p_vc;
+    Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ip, p_wp;
     Eigen::Quaternion<double> q;
     msf_core::MSF_Core<EKFState_T>::ErrorStateCov P;
 
@@ -120,13 +120,13 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
     P.setZero();  // Error state covariance; if zero, a default initialization
                   // in msf_core is used
 
-    p_vc = position_handler_->GetPositionMeasurement();
+    p_wp = position_handler_->GetPositionMeasurement();
 
     MSF_INFO_STREAM(
-        "initial measurement pos:[" << p_vc.transpose() << "] orientation: " << STREAMQUAT(q));
+        "initial measurement pos:[" << p_wp.transpose() << "] orientation: " << STREAMQUAT(q));
 
     // check if we have already input from the measurement sensor
-    if (p_vc.norm() == 0)
+    if (p_wp.norm() == 0)
       MSF_WARN_STREAM(
           "No measurements received yet to initialize position - using [0 0 0]");
 
@@ -136,7 +136,7 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
     pnh.param("position_sensor/init/p_ip/z", p_ip[2], 0.0);
 
     // Calculate initial attitude and position based on sensor measurements.
-    p = p_vc - q.toRotationMatrix() * p_ip;
+    p = p_wp - q.toRotationMatrix() * p_ip;
 
     a_m = q.inverse() * g;			    /// Initial acceleration.
 
