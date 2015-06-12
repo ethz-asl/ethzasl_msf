@@ -29,6 +29,9 @@
 #include <msf_updates/position_sensor_handler/position_measurement.h>
 #include <msf_updates/SinglePositionSensorConfig.h>
 
+#include "sensor_fusion_comm/InitScale.h"
+#include "sensor_fusion_comm/InitTransform.h"
+
 namespace msf_position_sensor {
 
 typedef msf_updates::SinglePositionSensorConfig Config_T;
@@ -62,6 +65,13 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
     ReconfigureServer::CallbackType f = boost::bind(
         &PositionSensorManager::Config, this, _1, _2);
     reconf_server_->setCallback(f);
+
+    init_scale_srv_ = pnh.advertiseService("initialize_msf_scale",
+                                            &PositionSensorManager::InitScale,
+                                            this);
+    init_transform_srv_ = pnh.advertiseService("initialize_msf_transform",
+                                               &PositionSensorManager::InitTransform,
+                                               this);
   }
   virtual ~PositionSensorManager() {
   }
@@ -77,6 +87,9 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
   Config_T config_;
   ReconfigureServerPtr reconf_server_;
 
+  ros::ServiceServer init_scale_srv_;
+  ros::ServiceServer init_transform_srv_;
+
   /**
    * \brief Dynamic reconfigure callback.
    */
@@ -91,14 +104,42 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
     }
   }
 
+  bool InitScale(sensor_fusion_comm::InitScale::Request &req,
+                 sensor_fusion_comm::InitScale::Response &res) {
+    ROS_INFO("Initialize filter with scale %f", req.scale);
+    Init(req.scale);
+    res.result = "Initialized scale";
+    return true;
+  }
+
+  bool InitTransform(sensor_fusion_comm::InitTransform::Request &req,
+                     sensor_fusion_comm::InitTransform::Response &res) {
+    Eigen::Quaternion<double> q(req.transform_wv.rotation.w,
+                                req.transform_wv.rotation.x,
+                                req.transform_wv.rotation.y,
+                                req.transform_wv.rotation.z);
+    q.normalize();
+    ROS_INFO_STREAM("Initialize filter with transform q = ["<<
+                    STREAMQUAT(q)<<"], scale "<<req.scale);
+    InitTransform(q, req.scale);
+    return true;
+  }
+
   void Init(double scale) const {
+    double yawinit = config_.position_yaw_init / 180 * M_PI;
+    Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
+    yawq.normalize();
+    InitTransform(yawq, scale);
+  }
+
+  void InitTransform(const Eigen::Quaternion<double> &q,
+                     double scale) const {
     if (scale < 0.001) {
       MSF_WARN_STREAM("init scale is "<<scale<<" correcting to 1");
       scale = 1;
     }
 
     Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ip, p_vc;
-    Eigen::Quaternion<double> q;
     msf_core::MSF_Core<EKFState_T>::ErrorStateCov P;
 
     // Init values.
@@ -108,14 +149,6 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
 
     v << 0, 0, 0;			/// Robot velocity (IMU centered).
     w_m << 0, 0, 0;		/// Initial angular velocity.
-
-    // Set the initial yaw alignment of body to world (the frame in which the
-    // position sensor measures).
-    double yawinit = config_.position_yaw_init / 180 * M_PI;
-    Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
-    yawq.normalize();
-
-    q = yawq;
 
     P.setZero();  // Error state covariance; if zero, a default initialization
                   // in msf_core is used
