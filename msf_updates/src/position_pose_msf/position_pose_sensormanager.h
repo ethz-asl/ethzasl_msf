@@ -222,7 +222,7 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     MSF_WARN_STREAM("q " << STREAMQUAT(q));
     MSF_WARN_STREAM("q_wv " << STREAMQUAT(q_wv));
 
-    Eigen::Matrix<double, 3, 1> p_vision = q_wv.conjugate().toRotationMatrix()
+    Eigen::Matrix<double, 3, 1> p_vision = q_wv.toRotationMatrix()
         * p_vc / scale - q.toRotationMatrix() * p_ic;
 
     //TODO (slynen): what if there is no initial position measurement? Then we

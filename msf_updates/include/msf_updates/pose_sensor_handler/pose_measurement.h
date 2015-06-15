@@ -165,17 +165,16 @@ struct PoseMeasurement : public PoseMeasurementBase {
     // Get rotation matrices.
     Eigen::Matrix<double, 3, 3> C_wv = state.Get<StateQwvIdx>()
         .toRotationMatrix();
-    Eigen::Matrix<double, 3, 3> C_q = state.Get<StateDefinition_T::q>()
+    Eigen::Matrix<double, 3, 3> C_wi = state.Get<StateDefinition_T::q>()
         .toRotationMatrix();
 
     Eigen::Matrix<double, 3, 3> C_ci = state.Get<StateQicIdx>()
         .conjugate().toRotationMatrix();
 
     // Preprocess for elements in H matrix.
-    Eigen::Matrix<double, 3, 1> vecold;
-
-    vecold = (-state.Get<StatePwvIdx>() + state.Get<StateDefinition_T::p>()
-        + C_q * state.Get<StatePicIdx>()) * state.Get<StateLIdx>();
+    Eigen::Matrix<double, 3, 1> vecold =
+        (-state.Get<StatePwvIdx>() + state.Get<StateDefinition_T::p>()
+            + C_wi * state.Get<StatePicIdx>()) * state.Get<StateLIdx>();
     Eigen::Matrix<double, 3, 3> skewold = Skew(vecold);
 
     Eigen::Matrix<double, 3, 3> pci_sk = Skew(state.Get<StatePicIdx>());
@@ -224,48 +223,57 @@ struct PoseMeasurement : public PoseMeasurementBase {
 
     // Construct H matrix.
     // Position:
-    H.block<3, 3>(0, kIdxstartcorr_p) = C_wv
+    H.block<3, 3>(0, kIdxstartcorr_p) = C_wv.transpose()
         * state.Get<StateLIdx>()(0);  // p
 
-    H.block<3, 3>(0, kIdxstartcorr_q) = -C_wv * C_q * pci_sk
+    H.block<3, 3>(0, kIdxstartcorr_q) = -C_wv.transpose() * C_wi * pci_sk
         * state.Get<StateLIdx>()(0);  // q
 
-    H.block<3, 1>(0, kIdxstartcorr_L) =
-        scalefix ?
-            Eigen::Matrix<double, 3, 1>::Zero() :
-            (C_wv * C_q * state.Get<StatePicIdx>() + C_wv
-                    * (-state.Get<StatePwvIdx>()
-                        + state.Get<StateDefinition_T::p>())).eval();  // L
+    if (scalefix) {
+      H.block<3, 1>(0, kIdxstartcorr_L).setZero();
+    } else {
+      H.block<3, 1>(0, kIdxstartcorr_L) =
+          (C_wv.transpose() * C_wi * state.Get<StatePicIdx>() +
+              C_wv.transpose() *
+              (-state.Get<StatePwvIdx>() + state.Get<StateDefinition_T::p>())).eval();  // L
+    }
 
-    H.block<3, 3>(0, kIdxstartcorr_qwv) =
-        driftwvattfix ?
-            Eigen::Matrix<double, 3, 3>::Zero() : (-C_wv * skewold).eval();  // q_wv
+    if (driftwvattfix) {
+      H.block<3, 3>(0, kIdxstartcorr_qwv).setZero();
+    } else {
+      H.block<3, 3>(0, kIdxstartcorr_qwv) = (-C_wv.transpose() * skewold).eval();  // q_wv
+    }
 
-    H.block<3, 3>(0, kIdxstartcorr_pic) =
-        calibposfix ?
-            Eigen::Matrix<double, 3, 3>::Zero() :
-            (C_wv * C_q * state.Get<StateLIdx>()(0)).eval();  //p_ic
-
+    if (calibposfix) {
+      H.block<3, 3>(0, kIdxstartcorr_pic).setZero();
+    } else {
+      H.block<3, 3>(0, kIdxstartcorr_pic) =
+          (C_wv.transpose() * C_wi * state.Get<StateLIdx>()(0)).eval();  //p_ic
+    }
 
     // TODO (slynen): Check scale commenting
-    H.block<3, 3>(0, kIdxstartcorr_pwv) =
-        driftwvposfix ?
-            Eigen::Matrix<double, 3, 3>::Zero() :
-            (-Eigen::Matrix<double, 3, 3>::Identity()
-            /* * state.Get<StateLIdx>()(0)*/).eval();  //p_wv
+    if (driftwvposfix) {
+      H.block<3, 3>(0, kIdxstartcorr_pwv).setZero();
+    } else {
+      H.block<3, 3>(0, kIdxstartcorr_pwv) = (-Eigen::Matrix<double, 3, 3>::Identity()
+          /* * state.Get<StateLIdx>()(0)*/).eval();  //p_wv
+    }
 
     // Attitude.
     H.block<3, 3>(3, kIdxstartcorr_q) = C_ci;  // q
 
-    H.block<3, 3>(3, kIdxstartcorr_qwv) =
-        driftwvattfix ?
-            Eigen::Matrix<double, 3, 3>::Zero() :
-            (C_ci * C_q.transpose()).eval();  // q_wv
+    if (driftwvattfix) {
+      H.block<3, 3>(3, kIdxstartcorr_qwv).setZero();
+    } else {
+      H.block<3, 3>(3, kIdxstartcorr_qwv) = (C_ci * C_wi.transpose()).eval();  // q_wv
+    }
 
-    H.block<3, 3>(3, kIdxstartcorr_qic) =
-        calibattfix ?
-            Eigen::Matrix<double, 3, 3>::Zero() :
-            Eigen::Matrix<double, 3, 3>::Identity().eval();  //q_ic
+    if (calibattfix) {
+      H.block<3, 3>(3, kIdxstartcorr_qic).setZero();
+    } else {
+      H.block<3, 3>(3, kIdxstartcorr_qic) =
+          Eigen::Matrix<double, 3, 3>::Identity().eval();  //q_ic
+    }
 
     // This line breaks the filter if a position sensor in the global frame is
     // available or if we want to set a global yaw rotation.
@@ -295,22 +303,22 @@ struct PoseMeasurement : public PoseMeasurementBase {
       // Get rotation matrices.
       Eigen::Matrix<double, 3, 3> C_wv = state.Get<StateQwvIdx>()
 
-          .conjugate().toRotationMatrix();
-      Eigen::Matrix<double, 3, 3> C_q = state.Get<StateDefinition_T::q>()
-          .conjugate().toRotationMatrix();
+          .toRotationMatrix();
+      Eigen::Matrix<double, 3, 3> C_wi = state.Get<StateDefinition_T::q>()
+          .toRotationMatrix();
 
       // Construct residuals.
       // Position.
       r_old.block<3, 1>(0, 0) = z_p_
-          - (C_wv.transpose()
+          - (C_wv
               * (-state.Get<StatePwvIdx>()
                   + state.Get<StateDefinition_T::p>()
-                  + C_q.transpose() * state.Get<StatePicIdx>()))
+                  + C_wi * state.Get<StatePicIdx>()))
               * state.Get<StateLIdx>();
 
       // Attitude.
-      Eigen::Quaternion<double> q_err;
-      q_err = (state.Get<StateQwvIdx>()
+      Eigen::Quaternion<double> q_err;  // q_err = \hat{q}_vc * q_cv
+      q_err = (state.Get<StateQwvIdx>().conjugate()
           * state.Get<StateDefinition_T::q>()
           * state.Get<StateQicIdx>()).conjugate() * z_q_;
       r_old.block<3, 1>(3, 0) = q_err.vec() / q_err.w() * 2;
@@ -388,24 +396,24 @@ struct PoseMeasurement : public PoseMeasurementBase {
 
       //TODO (slynen): check that both measurements have the same states fixed!
       Eigen::Matrix<double, 3, 3> C_wv_old, C_wv_new;
-      Eigen::Matrix<double, 3, 3> C_q_old, C_q_new;
+      Eigen::Matrix<double, 3, 3> C_wi_old, C_wi_new;
 
-      C_wv_new = state_new.Get<StateQwvIdx>().conjugate().toRotationMatrix();
-      C_q_new = state_new.Get<StateDefinition_T::q>().conjugate()
+      C_wv_new = state_new.Get<StateQwvIdx>().toRotationMatrix();
+      C_wi_new = state_new.Get<StateDefinition_T::q>()
           .toRotationMatrix();
 
-      C_wv_old = state_old.Get<StateQwvIdx>().conjugate().toRotationMatrix();
-      C_q_old = state_old.Get<StateDefinition_T::q>().conjugate()
+      C_wv_old = state_old.Get<StateQwvIdx>().toRotationMatrix();
+      C_wi_old = state_old.Get<StateDefinition_T::q>()
           .toRotationMatrix();
 
       // Construct residuals.
       // Position:
       Eigen::Matrix<double, 3, 1> diffprobpos = (C_wv_new.transpose()
           * (-state_new.Get<StatePwvIdx>() + state_new.Get<StateDefinition_T::p>()
-              + C_q_new.transpose() * state_new.Get<StatePicIdx>()))
+              + C_wi_new * state_new.Get<StatePicIdx>()))
           * state_new.Get<StateLIdx>() - (C_wv_old.transpose()
           * (-state_old.Get<StatePwvIdx>() + state_old.Get<StateDefinition_T::p>()
-              + C_q_old.transpose() * state_old.Get<StatePicIdx>()))
+              + C_wi_old * state_old.Get<StatePicIdx>()))
               * state_old.Get<StateLIdx>();
 
 

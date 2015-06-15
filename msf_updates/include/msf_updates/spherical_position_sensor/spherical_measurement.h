@@ -120,7 +120,7 @@ struct AngleMeasurement : public AngleMeasurementBase {
       state_in->ClearCrossCov<StateDefinition_T::p_ip>();
 
     Eigen::Matrix<double, 3, 3> C_q = state.Get<StateDefinition_T::q>()
-        .conjugate().toRotationMatrix();
+        .toRotationMatrix();
     Eigen::Matrix<double, 3, 1> p_ = state.Get<StateDefinition_T::p>();
     Eigen::Matrix<double, 3, 1> p_ip = state.Get<StateDefinition_T::p_ip>();
     Eigen::Matrix<double, 2, 3> dz_dp;
@@ -144,14 +144,14 @@ struct AngleMeasurement : public AngleMeasurementBase {
         / sqrt(p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0)) * 1.0
         / pow(p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0) + p_(2, 0) * p_(2, 0),
               3.0 / 2.0)
-        * (C_q(2, 1) * p_ip(2, 0) * (p_(0, 0) * p_(0, 0))
+        * (C_q(1, 2) * p_ip(2, 0) * (p_(0, 0) * p_(0, 0))
             - C_q(2, 2) * p_ip(1, 0) * (p_(0, 0) * p_(0, 0))
-            + C_q(2, 1) * p_ip(2, 0) * (p_(1, 0) * p_(1, 0))
+            + C_q(1, 2) * p_ip(2, 0) * (p_(1, 0) * p_(1, 0))
             - C_q(2, 2) * p_ip(1, 0) * (p_(1, 0) * p_(1, 0))
-            - C_q(0, 1) * p_ip(2, 0) * p_(0, 0) * p_(2, 0)
-            + C_q(0, 2) * p_ip(1, 0) * p_(0, 0) * p_(2, 0)
+            - C_q(1, 0) * p_ip(2, 0) * p_(0, 0) * p_(2, 0)
+            + C_q(2, 0) * p_ip(1, 0) * p_(0, 0) * p_(2, 0)
             - C_q(1, 1) * p_ip(2, 0) * p_(1, 0) * p_(2, 0)
-            + C_q(1, 2) * p_ip(1, 0) * p_(1, 0) * p_(2, 0));
+            + C_q(2, 1) * p_ip(1, 0) * p_(1, 0) * p_(2, 0));
     dz_dq(0, 1) = -1.0
         / sqrt(
             -(p_(2, 0) * p_(2, 0))
@@ -159,14 +159,14 @@ struct AngleMeasurement : public AngleMeasurementBase {
                     + p_(2, 0) * p_(2, 0)) + 1.0) * 1.0
         / pow(p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0) + p_(2, 0) * p_(2, 0),
               3.0 / 2.0)
-        * (C_q(2, 0) * p_ip(2, 0) * (p_(0, 0) * p_(0, 0))
+        * (C_q(0, 2) * p_ip(2, 0) * (p_(0, 0) * p_(0, 0))
             - C_q(2, 2) * p_ip(0, 0) * (p_(0, 0) * p_(0, 0))
-            + C_q(2, 0) * p_ip(2, 0) * (p_(1, 0) * p_(1, 0))
+            + C_q(0, 2) * p_ip(2, 0) * (p_(1, 0) * p_(1, 0))
             - C_q(2, 2) * p_ip(0, 0) * (p_(1, 0) * p_(1, 0))
             - C_q(0, 0) * p_ip(2, 0) * p_(0, 0) * p_(2, 0)
-            + C_q(0, 2) * p_ip(0, 0) * p_(0, 0) * p_(2, 0)
-            - C_q(1, 0) * p_ip(2, 0) * p_(1, 0) * p_(2, 0)
-            + C_q(1, 2) * p_ip(0, 0) * p_(1, 0) * p_(2, 0));
+            + C_q(2, 0) * p_ip(0, 0) * p_(0, 0) * p_(2, 0)
+            - C_q(0, 1) * p_ip(2, 0) * p_(1, 0) * p_(2, 0)
+            + C_q(2, 1) * p_ip(0, 0) * p_(1, 0) * p_(2, 0));
     dz_dq(0, 2) = 1.0
         / sqrt(
             1.0
@@ -175,22 +175,22 @@ struct AngleMeasurement : public AngleMeasurementBase {
         / sqrt(p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0)) * 1.0
         / pow(p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0) + p_(2, 0) * p_(2, 0),
               3.0 / 2.0)
-        * (C_q(2, 0) * p_ip(1, 0) * (p_(0, 0) * p_(0, 0))
-            - C_q(2, 1) * p_ip(0, 0) * (p_(0, 0) * p_(0, 0))
-            + C_q(2, 0) * p_ip(1, 0) * (p_(1, 0) * p_(1, 0))
-            - C_q(2, 1) * p_ip(0, 0) * (p_(1, 0) * p_(1, 0))
+        * (C_q(0, 2) * p_ip(1, 0) * (p_(0, 0) * p_(0, 0))
+            - C_q(1, 2) * p_ip(0, 0) * (p_(0, 0) * p_(0, 0))
+            + C_q(0, 2) * p_ip(1, 0) * (p_(1, 0) * p_(1, 0))
+            - C_q(1, 2) * p_ip(0, 0) * (p_(1, 0) * p_(1, 0))
             - C_q(0, 0) * p_ip(1, 0) * p_(0, 0) * p_(2, 0)
-            + C_q(0, 1) * p_ip(0, 0) * p_(0, 0) * p_(2, 0)
-            - C_q(1, 0) * p_ip(1, 0) * p_(1, 0) * p_(2, 0)
+            + C_q(1, 0) * p_ip(0, 0) * p_(0, 0) * p_(2, 0)
+            - C_q(0, 1) * p_ip(1, 0) * p_(1, 0) * p_(2, 0)
             + C_q(1, 1) * p_ip(0, 0) * p_(1, 0) * p_(2, 0));
-    dz_dq(1, 0) = (p_(1, 0) * (C_q(0, 1) * p_ip(2, 0) - C_q(0, 2) * p_ip(1, 0))
-        - p_(0, 0) * (C_q(1, 1) * p_ip(2, 0) - C_q(1, 2) * p_ip(1, 0)))
+    dz_dq(1, 0) = (p_(1, 0) * (C_q(1, 0) * p_ip(2, 0) - C_q(2, 0) * p_ip(1, 0))
+        - p_(0, 0) * (C_q(1, 1) * p_ip(2, 0) - C_q(2, 1) * p_ip(1, 0)))
         / (p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0));
-    dz_dq(1, 1) = -(p_(1, 0) * (C_q(0, 0) * p_ip(2, 0) - C_q(0, 2) * p_ip(0, 0))
-        - p_(0, 0) * (C_q(1, 0) * p_ip(2, 0) - C_q(1, 2) * p_ip(0, 0)))
+    dz_dq(1, 1) = -(p_(1, 0) * (C_q(0, 0) * p_ip(2, 0) - C_q(2, 0) * p_ip(0, 0))
+        - p_(0, 0) * (C_q(0, 1) * p_ip(2, 0) - C_q(2, 1) * p_ip(0, 0)))
         / (p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0));
-    dz_dq(1, 2) = (p_(1, 0) * (C_q(0, 0) * p_ip(1, 0) - C_q(0, 1) * p_ip(0, 0))
-        - p_(0, 0) * (C_q(1, 0) * p_ip(1, 0) - C_q(1, 1) * p_ip(0, 0)))
+    dz_dq(1, 2) = (p_(1, 0) * (C_q(0, 0) * p_ip(1, 0) - C_q(1, 0) * p_ip(0, 0))
+        - p_(0, 0) * (C_q(0, 1) * p_ip(1, 0) - C_q(1, 1) * p_ip(0, 0)))
         / (p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0));
     Eigen::Matrix<double, 2, 3> dz_dp_ip;
     dz_dp_ip(0, 0) =
@@ -202,10 +202,10 @@ struct AngleMeasurement : public AngleMeasurementBase {
             / pow(
                 p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0) + p_(2, 0) * p_(2, 0),
                 3.0 / 2.0)
-            * (C_q(2, 0) * (p_(0, 0) * p_(0, 0))
-                + C_q(2, 0) * (p_(1, 0) * p_(1, 0))
+            * (C_q(0, 2) * (p_(0, 0) * p_(0, 0))
+                + C_q(0, 2) * (p_(1, 0) * p_(1, 0))
                 - C_q(0, 0) * p_(0, 0) * p_(2, 0)
-                - C_q(1, 0) * p_(1, 0) * p_(2, 0));
+                - C_q(0, 1) * p_(1, 0) * p_(2, 0));
     dz_dp_ip(0, 1) =
         -1.0
             / sqrt(
@@ -215,9 +215,9 @@ struct AngleMeasurement : public AngleMeasurementBase {
             / pow(
                 p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0) + p_(2, 0) * p_(2, 0),
                 3.0 / 2.0)
-            * (C_q(2, 1) * (p_(0, 0) * p_(0, 0))
-                + C_q(2, 1) * (p_(1, 0) * p_(1, 0))
-                - C_q(0, 1) * p_(0, 0) * p_(2, 0)
+            * (C_q(1, 2) * (p_(0, 0) * p_(0, 0))
+                + C_q(1, 2) * (p_(1, 0) * p_(1, 0))
+                - C_q(1, 0) * p_(0, 0) * p_(2, 0)
                 - C_q(1, 1) * p_(1, 0) * p_(2, 0));
     dz_dp_ip(0, 2) =
         -1.0
@@ -230,13 +230,13 @@ struct AngleMeasurement : public AngleMeasurementBase {
                 3.0 / 2.0)
             * (C_q(2, 2) * (p_(0, 0) * p_(0, 0))
                 + C_q(2, 2) * (p_(1, 0) * p_(1, 0))
-                - C_q(0, 2) * p_(0, 0) * p_(2, 0)
-                - C_q(1, 2) * p_(1, 0) * p_(2, 0));
-    dz_dp_ip(1, 0) = -(C_q(0, 0) * p_(1, 0) - C_q(1, 0) * p_(0, 0))
+                - C_q(2, 0) * p_(0, 0) * p_(2, 0)
+                - C_q(2, 1) * p_(1, 0) * p_(2, 0));
+    dz_dp_ip(1, 0) = -(C_q(0, 0) * p_(1, 0) - C_q(0, 1) * p_(0, 0))
         / (p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0));
-    dz_dp_ip(1, 1) = -(C_q(0, 1) * p_(1, 0) - C_q(1, 1) * p_(0, 0))
+    dz_dp_ip(1, 1) = -(C_q(1, 0) * p_(1, 0) - C_q(1, 1) * p_(0, 0))
         / (p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0));
-    dz_dp_ip(1, 2) = -(C_q(0, 2) * p_(1, 0) - C_q(1, 2) * p_(0, 0))
+    dz_dp_ip(1, 2) = -(C_q(2, 0) * p_(1, 0) - C_q(2, 1) * p_(0, 0))
         / (p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0));
     H.block<2, 3>(0, idxstartcorr_p_) = dz_dp;
     H.block<2, 3>(0, idxstartcorr_q_) = dz_dq;
@@ -262,11 +262,11 @@ struct AngleMeasurement : public AngleMeasurementBase {
 
       // Get rotation matrices.
       Eigen::Matrix<double, 3, 3> C_q = state.Get<StateDefinition_T::q>()
-          .conjugate().toRotationMatrix();
+          .toRotationMatrix();
 
       // Construct residuals.
       Eigen::Matrix<double, 3, 1> z_carth = (state.Get<StateDefinition_T::p>()
-          + C_q.transpose() * state.Get<StateDefinition_T::p_ip>());
+          + C_q * state.Get<StateDefinition_T::p_ip>());
       double radius_old = sqrt(
           z_carth(0, 0) * z_carth(0, 0) + z_carth(1, 0) * z_carth(1, 0)
               + z_carth(2, 0) * z_carth(2, 0));
@@ -387,7 +387,7 @@ struct DistanceMeasurement : public DistanceMeasurementBase {
 
     // Get rotation matrices.
     Eigen::Matrix<double, 3, 3> C_q = state.Get<StateDefinition_T::q>()
-        .conjugate().toRotationMatrix();
+        .toRotationMatrix();
 
     // Preprocess for elements in H matrix.
     // Get indices of states in error vector.
@@ -419,40 +419,40 @@ struct DistanceMeasurement : public DistanceMeasurementBase {
         / sqrt(p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0) + p_(2, 0) * p_(2, 0));
     Eigen::Matrix<double, 1, 3> dz_dq;
     dz_dq(0, 0) = (p_(0, 0)
-        * (C_q(0, 1) * p_ip(2, 0) * 2.0 - C_q(0, 2) * p_ip(1, 0) * 2.0)
+        * (C_q(1, 0) * p_ip(2, 0) * 2.0 - C_q(2, 0) * p_ip(1, 0) * 2.0)
         + p_(1, 0)
-            * (C_q(1, 1) * p_ip(2, 0) * 2.0 - C_q(1, 2) * p_ip(1, 0) * 2.0)
+            * (C_q(1, 1) * p_ip(2, 0) * 2.0 - C_q(2, 1) * p_ip(1, 0) * 2.0)
         + p_(2, 0)
-            * (C_q(2, 1) * p_ip(2, 0) * 2.0 - C_q(2, 2) * p_ip(1, 0) * 2.0))
+            * (C_q(1, 2) * p_ip(2, 0) * 2.0 - C_q(2, 2) * p_ip(1, 0) * 2.0))
         * 1.0
         / sqrt(p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0) + p_(2, 0) * p_(2, 0))
         * (-1.0 / 2.0);
     dz_dq(0, 1) = (p_(0, 0)
-        * (C_q(0, 0) * p_ip(2, 0) * 2.0 - C_q(0, 2) * p_ip(0, 0) * 2.0)
+        * (C_q(0, 0) * p_ip(2, 0) * 2.0 - C_q(2, 0) * p_ip(0, 0) * 2.0)
         + p_(1, 0)
-            * (C_q(1, 0) * p_ip(2, 0) * 2.0 - C_q(1, 2) * p_ip(0, 0) * 2.0)
+            * (C_q(0, 1) * p_ip(2, 0) * 2.0 - C_q(2, 1) * p_ip(0, 0) * 2.0)
         + p_(2, 0)
-            * (C_q(2, 0) * p_ip(2, 0) * 2.0 - C_q(2, 2) * p_ip(0, 0) * 2.0))
+            * (C_q(0, 2) * p_ip(2, 0) * 2.0 - C_q(2, 2) * p_ip(0, 0) * 2.0))
         * 1.0
         / sqrt(p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0) + p_(2, 0) * p_(2, 0))
         * (1.0 / 2.0);
     dz_dq(0, 2) = (p_(0, 0)
-        * (C_q(0, 0) * p_ip(1, 0) * 2.0 - C_q(0, 1) * p_ip(0, 0) * 2.0)
+        * (C_q(0, 0) * p_ip(1, 0) * 2.0 - C_q(1, 0) * p_ip(0, 0) * 2.0)
         + p_(1, 0)
-            * (C_q(1, 0) * p_ip(1, 0) * 2.0 - C_q(1, 1) * p_ip(0, 0) * 2.0)
+            * (C_q(0, 1) * p_ip(1, 0) * 2.0 - C_q(1, 1) * p_ip(0, 0) * 2.0)
         + p_(2, 0)
-            * (C_q(2, 0) * p_ip(1, 0) * 2.0 - C_q(2, 1) * p_ip(0, 0) * 2.0))
+            * (C_q(0, 2) * p_ip(1, 0) * 2.0 - C_q(1, 2) * p_ip(0, 0) * 2.0))
         * 1.0
         / sqrt(p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0) + p_(2, 0) * p_(2, 0))
         * (-1.0 / 2.0);
     Eigen::Matrix<double, 1, 3> dz_dp_ip;
-    dz_dp_ip(0, 0) = (C_q(0, 0) * p_(0, 0) + C_q(1, 0) * p_(1, 0)
-        + C_q(2, 0) * p_(2, 0)) * 1.0
+    dz_dp_ip(0, 0) = (C_q(0, 0) * p_(0, 0) + C_q(0, 1) * p_(1, 0)
+        + C_q(0, 2) * p_(2, 0)) * 1.0
         / sqrt(p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0) + p_(2, 0) * p_(2, 0));
-    dz_dp_ip(0, 1) = (C_q(0, 1) * p_(0, 0) + C_q(1, 1) * p_(1, 0)
-        + C_q(2, 1) * p_(2, 0)) * 1.0
+    dz_dp_ip(0, 1) = (C_q(1, 0) * p_(0, 0) + C_q(1, 1) * p_(1, 0)
+        + C_q(1, 2) * p_(2, 0)) * 1.0
         / sqrt(p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0) + p_(2, 0) * p_(2, 0));
-    dz_dp_ip(0, 2) = (C_q(0, 2) * p_(0, 0) + C_q(1, 2) * p_(1, 0)
+    dz_dp_ip(0, 2) = (C_q(2, 0) * p_(0, 0) + C_q(2, 1) * p_(1, 0)
         + C_q(2, 2) * p_(2, 0)) * 1.0
         / sqrt(p_(0, 0) * p_(0, 0) + p_(1, 0) * p_(1, 0) + p_(2, 0) * p_(2, 0));
     H.block<1, 3>(0, idxstartcorr_p_) = dz_dp;
@@ -478,11 +478,11 @@ struct DistanceMeasurement : public DistanceMeasurementBase {
 
       // Get rotation matrices.
       Eigen::Matrix<double, 3, 3> C_q = state.Get<StateDefinition_T::q>()
-          .conjugate().toRotationMatrix();
+          .toRotationMatrix();
 
       // Construct residuals
       Eigen::Matrix<double, 3, 1> z_carth = (state.Get<StateDefinition_T::p>()
-          + C_q.transpose() * state.Get<StateDefinition_T::p_ip>());
+          + C_q * state.Get<StateDefinition_T::p_ip>());
       double radius_old = sqrt(
           z_carth(0, 0) * z_carth(0, 0) + z_carth(1, 0) * z_carth(1, 0)
               + z_carth(2, 0) * z_carth(2, 0));
