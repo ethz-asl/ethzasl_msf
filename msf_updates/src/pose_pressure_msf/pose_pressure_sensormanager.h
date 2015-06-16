@@ -139,7 +139,7 @@ class PosePressureSensorManager : public msf_core::MSF_SensorManagerROS<
             - pressure_handler_->GetPressureMeasurement()(0);  /// Pressure drift state
 
             // Check if we have already input from the measurement sensor.
-    if (!pose_handler_->receivedFirstMeasurement())
+    if (!pose_handler_->ReceivedFirstMeasurement())
       MSF_WARN_STREAM(
           "No measurements received yet to initialize position and attitude - "
           "using [0 0 0] and [1 0 0 0] respectively");
@@ -156,7 +156,7 @@ class PosePressureSensorManager : public msf_core::MSF_SensorManagerROS<
     q_ic.normalize();
 
     // Calculate initial attitude and position based on sensor measurements.
-    if (!pose_handler_->receivedFirstMeasurement()) {  // If there is no pose measurement, only apply q_wv.
+    if (!pose_handler_->ReceivedFirstMeasurement()) {  // If there is no pose measurement, only apply q_wv.
       q = q_wv;
     } else {  // If there is a pose measurement, apply q_ic and q_wv to get initial attitude.
       q = (q_ic * q_vc.conjugate() * q_wv).conjugate();
