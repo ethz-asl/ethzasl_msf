@@ -58,7 +58,7 @@ class SensorHandler {
   }
   virtual ~SensorHandler() {
   }
-  bool receivedFirstMeasurement() {return received_first_measurement_;}
+  bool receivedFirstMeasurement() const {return received_first_measurement_;}
 };
 }
 #endif  // MSF_SENSORHANDLER_H_
