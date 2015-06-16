@@ -43,9 +43,7 @@ void PressureSensorHandler::SetNoises(double n_zp) {
 
 void PressureSensorHandler::MeasurementCallback(
     const asctec_hl_comm::mav_imuConstPtr & msg) {
-  if (!received_first_measurement_) {
-    received_first_measurement_ = true;
-  }
+  received_first_measurement_ = true;
 
   this->SequenceWatchDog(msg->header.seq, subPressure_.getTopic());
   MSF_INFO_STREAM_ONCE(
