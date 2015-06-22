@@ -126,7 +126,7 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
         "initial measurement pos:[" << p_wp.transpose() << "] orientation: " << STREAMQUAT(q));
 
     // check if we have already input from the measurement sensor
-    if (p_wp.norm() == 0)
+    if (!position_handler_->ReceivedFirstMeasurement())
       MSF_WARN_STREAM(
           "No measurements received yet to initialize position - using [0 0 0]");
 
