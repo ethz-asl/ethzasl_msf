@@ -114,7 +114,7 @@ class PosePressureSensorManager : public msf_core::MSF_SensorManagerROS<
 
   void Init(double scale) const {
     Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ic, p_vc;
-    Eigen::Quaternion<double> q, q_wv, q_ic, q_vc;
+    Eigen::Quaternion<double> q, q_wv, q_ic, q_pose;
     Eigen::Matrix<double, 1, 1> b_p;
     msf_core::MSF_Core<EKFState_T>::ErrorStateCov P;
 
@@ -132,7 +132,7 @@ class PosePressureSensorManager : public msf_core::MSF_SensorManagerROS<
                   // in msf_core is used.
 
     p_vc = pose_handler_->GetPositionMeasurement();
-    q_vc = pose_handler_->GetAttitudeMeasurement();
+    q_pose = pose_handler_->GetAttitudeMeasurement();  // Can be q_cv (vicon) or q_vc (ptam).
 
     b_p
         << pose_handler_->GetPositionMeasurement()(2) / scale
@@ -142,7 +142,7 @@ class PosePressureSensorManager : public msf_core::MSF_SensorManagerROS<
     if (p_vc.norm() == 0)
       MSF_WARN_STREAM(
           "No measurements received yet to initialize position - using [0 0 0]");
-    if (q_vc.w() == 1)
+    if (q_pose.w() == 1)
       MSF_WARN_STREAM(
           "No measurements received yet to initialize attitude - using [1 0 0 0]");
 
@@ -158,10 +158,15 @@ class PosePressureSensorManager : public msf_core::MSF_SensorManagerROS<
     q_ic.normalize();
 
     // Calculate initial attitude and position based on sensor measurements.
-    if (q_vc.w() == 1) {  // If there is no pose measurement, only apply q_wv.
+    if (q_pose.w() == 1) {  // If there is no pose measurement, only apply q_wv.
       q = q_wv;
     } else {  // If there is a pose measurement, apply q_ic and q_wv to get initial attitude.
-      q = (q_ic * q_vc.conjugate() * q_wv.conjugate()).conjugate();
+      if (pose_handler_->IsMeasurementWorldToSensor()) {  // q_pose = q_vc
+        q = (q_ic * q_pose.conjugate() * q_wv.conjugate()).conjugate();
+      }
+      else {  // q_pose = q_cv
+        q = (q_ic * q_pose * q_wv.conjugate()).conjugate();
+      }
     }
     q.normalize();
     p = q_wv.toRotationMatrix() * p_vc / scale
