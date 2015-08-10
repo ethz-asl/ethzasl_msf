@@ -30,8 +30,8 @@ PressureSensorHandler::PressureSensorHandler(
   ros::NodeHandle pnh("~/pressure_sensor");
   ros::NodeHandle nh("msf_updates");
   subPressure_ =
-      nh.subscribe<asctec_hl_comm::mav_imu>
-      ("pressure_input", 20, &PressureSensorHandler::MeasurementCallback, this);
+      nh.subscribe<geometry_msgs::PointStamped>
+      ("pressure_height", 20, &PressureSensorHandler::MeasurementCallback, this);
 
   memset(heightbuff, 0, sizeof(double) * heightbuffsize);
 
@@ -42,7 +42,7 @@ void PressureSensorHandler::SetNoises(double n_zp) {
 }
 
 void PressureSensorHandler::MeasurementCallback(
-    const asctec_hl_comm::mav_imuConstPtr & msg) {
+    const geometry_msgs::PointStampedConstPtr & msg) {
   this->SequenceWatchDog(msg->header.seq, subPressure_.getTopic());
   MSF_INFO_STREAM_ONCE(
       "*** pressure sensor got first measurement from topic "

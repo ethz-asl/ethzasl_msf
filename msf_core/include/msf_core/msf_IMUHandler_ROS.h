@@ -37,8 +37,6 @@ class IMUHandler_ROS : public IMUHandler<EKFState_T> {
 
     subImu_ = nh.subscribe("imu_state_input", 100, &IMUHandler_ROS::IMUCallback,
                            this);
-    subImuCustom_ = nh.subscribe("imu_state_input_asctec", 10,
-                                 &IMUHandler_ROS::IMUCallbackAsctec, this);
     subState_ = nh.subscribe("hl_state_input", 10,
                              &IMUHandler_ROS::StateCallback, this);
   }
@@ -89,18 +87,6 @@ class IMUHandler_ROS : public IMUHandler<EKFState_T> {
 
     this->ProcessState(linacc, angvel, p, v, q, is_already_propagated,
                         msg->header.stamp.toSec(), msg->header.seq);
-  }
-
-  void IMUCallbackAsctec(const asctec_hl_comm::mav_imuConstPtr & msg) {
-    msf_core::Vector3 linacc;
-    linacc << msg->acceleration.x, msg->acceleration.y, msg->acceleration.z;
-
-    msf_core::Vector3 angvel;
-    angvel << msg->angular_velocity.x, msg->angular_velocity.y, msg
-        ->angular_velocity.z;
-
-    this->ProcessIMU(linacc, angvel, msg->header.stamp.toSec(),
-                      msg->header.seq);
   }
 
   void IMUCallback(const sensor_msgs::ImuConstPtr & msg) {

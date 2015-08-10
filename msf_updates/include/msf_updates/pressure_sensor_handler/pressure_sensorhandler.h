@@ -17,10 +17,12 @@
 #ifndef PRESSURE_SENSOR_H
 #define PRESSURE_SENSOR_H
 
-#include <msf_core/msf_sensormanagerROS.h>
-#include <asctec_hl_comm/mav_imu.h>
-#include <msf_updates/pressure_sensor_handler/pressure_measurement.h>
 #include <queue>
+
+#include <geometry_msgs/PointStamped.h>
+#include <msf_core/msf_sensormanagerROS.h>
+
+#include <msf_updates/pressure_sensor_handler/pressure_measurement.h>
 
 namespace msf_pressure_sensor {
 class PressureSensorHandler : public msf_core::SensorHandler<
@@ -34,7 +36,7 @@ class PressureSensorHandler : public msf_core::SensorHandler<
   Eigen::Matrix<double, 1, 1> z_average_p;  ///<Averaged pressure measurement.
   double heightbuff[heightbuffsize];
   ros::Subscriber subPressure_;
-  void MeasurementCallback(const asctec_hl_comm::mav_imuConstPtr & msg);
+  void MeasurementCallback(const geometry_msgs::PointStampedConstPtr & msg);
  public:
   PressureSensorHandler(
       msf_core::MSF_SensorManager<msf_updates::EKFState>& meas,
