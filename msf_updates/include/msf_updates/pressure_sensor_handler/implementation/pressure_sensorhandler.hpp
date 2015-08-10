@@ -43,6 +43,9 @@ void PressureSensorHandler::SetNoises(double n_zp) {
 
 void PressureSensorHandler::MeasurementCallback(
     const geometry_msgs::PointStampedConstPtr & msg) {
+
+  received_first_measurement_ = true;
+
   this->SequenceWatchDog(msg->header.seq, subPressure_.getTopic());
   MSF_INFO_STREAM_ONCE(
       "*** pressure sensor got first measurement from topic "
