@@ -3,7 +3,7 @@
             <!--remap from="msf_core/imu_state_input" to="/bluebird/fcu/imu" /-->
             <remap from="msf_core/hl_state_input" to="/bluebird/fcu/ekf_state_out" />
             <remap from="msf_updates/pose_with_covariance_input" to="/bluebird/down/vslam/pose" />
-            <remap from="msf_updates/pressure_input" to="/bluebird/fcu/imu_custom" />
+            <remap from="msf_updates/pressure_height" to="/bluebird/fcu/pressure_height" />
             <remap from="msf_core/correction" to="/bluebird/fcu/ekf_state_in"/>
 
             <rosparam file="$(find msf_updates)/pose_pressure_sensor_fix.yaml"/>

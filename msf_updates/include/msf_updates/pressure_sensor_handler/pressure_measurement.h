@@ -29,7 +29,7 @@ enum {
 /**
  * \brief A measurement as provided by a pressure sensor.
  */
-typedef msf_core::MSF_Measurement<asctec_hl_comm::mav_imu,
+typedef msf_core::MSF_Measurement<geometry_msgs::PointStamped,
     Eigen::Matrix<double, nMeasurements, nMeasurements>, msf_updates::EKFState> PressureMeasurementBase;
 struct PressureMeasurement : public PressureMeasurementBase {
  private:
@@ -44,7 +44,7 @@ struct PressureMeasurement : public PressureMeasurementBase {
     H_old.setZero();
 
     // Get measurements.
-    z_p_ = Eigen::Matrix<double, 1, 1>::Constant(msg->height);
+    z_p_ = Eigen::Matrix<double, 1, 1>::Constant(msg->point.z);
 
     const double s_zp = n_zp_ * n_zp_;
     R_ = (Eigen::Matrix<double, nMeasurements, 1>() << s_zp).finished()
