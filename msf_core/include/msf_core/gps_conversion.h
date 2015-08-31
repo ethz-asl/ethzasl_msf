@@ -22,19 +22,32 @@
 
 namespace msf_core {
 class GPSConversion {
- private:
-  msf_core::Quaternion ecef_ref_orientation_;
-  msf_core::Vector3 ecef_ref_point_;
- public:
+public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
   GPSConversion();
-  void InitReference(const double& latitude, const double& longitude,
+  // default copy constructor and assignment operator are OK
+  ~GPSConversion();
+
+  void InitReference(const double& latitude,
+                     const double& longitude,
                      const double& altitude);
+
   msf_core::Vector3 WGS84ToECEF(const double& latitude,
                                 const double& longitude,
                                 const double& altitude) const;
+
   msf_core::Vector3 ECEFToENU(const msf_core::Vector3& ecef) const;
-  void AdjustReference(double z_corr);
+
+  msf_core::Vector3 WGS84ToENU(const double& latitude,
+                               const double& longitude,
+                               const double& altitude) const; // convenience
+
+  void AdjustReference(const double& z_correction);
+
+private:
+  msf_core::Quaternion ecef_ref_orientation_;
+  msf_core::Vector3 ecef_ref_point_;
 };
 }  // namespace msf_core
 #endif  // GPS_CONVERSION_H_
