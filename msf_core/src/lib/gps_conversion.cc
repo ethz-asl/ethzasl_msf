@@ -88,7 +88,7 @@ msf_core::Vector3 GPSConversion::ECEFToENU(const msf_core::Vector3& ecef) const 
 msf_core::Vector3 GPSConversion::WGS84ToENU(const double latitude,
                                             const double longitude,
                                             const double altitude) const {
-    msf_core::Vector3 ecef = this->WGS84ToECEF(latitude, longitude, altitude);
+    const msf_core::Vector3 ecef = this->WGS84ToECEF(latitude, longitude, altitude);
     return this->ECEFToENU(ecef);
 }
 
