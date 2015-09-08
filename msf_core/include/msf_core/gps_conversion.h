@@ -26,24 +26,26 @@ public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
   GPSConversion();
-  // default copy constructor and assignment operator are OK
+  // Default copy constructor and assignment operator are OK.
+
   ~GPSConversion();
 
-  void InitReference(const double& latitude,
-                     const double& longitude,
-                     const double& altitude);
+  void InitReference(const double latitude,
+                     const double longitude,
+                     const double altitude);
 
-  msf_core::Vector3 WGS84ToECEF(const double& latitude,
-                                const double& longitude,
-                                const double& altitude) const;
+  msf_core::Vector3 WGS84ToECEF(const double latitude,
+                                const double longitude,
+                                const double altitude) const;
 
   msf_core::Vector3 ECEFToENU(const msf_core::Vector3& ecef) const;
 
-  msf_core::Vector3 WGS84ToENU(const double& latitude,
-                               const double& longitude,
-                               const double& altitude) const; // convenience
+  // Simply calls WGS84ToECEF(...) followed by ECEFToENU(...)
+  msf_core::Vector3 WGS84ToENU(const double latitude,
+                               const double longitude,
+                               const double altitude) const;
 
-  void AdjustReference(const double& z_correction);
+  void AdjustReference(const double z_correction);
 
 private:
   msf_core::Quaternion ecef_ref_orientation_;
