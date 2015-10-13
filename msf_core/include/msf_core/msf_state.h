@@ -209,7 +209,7 @@ struct GenericState_T {
    * \brief Write the covariance corresponding to velocity and attitude to cov.
    */
   void GetVelocityAttitudeCovariance(
-      Eigen::Matrix<double_t, 6, 6>& cov);
+      Eigen::Matrix<double, 6, 6>& cov);
 
 
   void GetTwistCovarianceInImuFrame(

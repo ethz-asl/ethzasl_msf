@@ -70,6 +70,8 @@ void AngleSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::SetDelay(
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 void AngleSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
     const geometry_msgs::PointStampedConstPtr & msg) {
+  received_first_measurement_ = true;
+
   this->SequenceWatchDog(msg->header.seq, subPointStamped_.getTopic());
 
   ROS_INFO_STREAM_ONCE(
@@ -163,6 +165,8 @@ void DistanceSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::SetDelay(
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 void DistanceSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
     const geometry_msgs::PointStampedConstPtr & msg) {
+  received_first_measurement_ = true;
+
   this->SequenceWatchDog(msg->header.seq, subPointStamped_.getTopic());
 
   ROS_INFO_STREAM_ONCE(
