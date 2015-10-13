@@ -25,10 +25,10 @@
 #include <sensor_fusion_comm/DoubleMatrixStamped.h>
 #include <sensor_fusion_comm/ExtState.h>
 #include <sensor_fusion_comm/ExtEkf.h>
+#include <geometry_msgs/PointStamped.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <nav_msgs/Odometry.h>
 #include <sensor_msgs/Imu.h>
-#include <asctec_hl_comm/mav_imu.h>
 #include <tf/transform_broadcaster.h>
 
 #include <msf_core/MSF_CoreConfig.h>

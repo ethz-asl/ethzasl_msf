@@ -1,7 +1,11 @@
 Multiple fuzzy tracking states
+
 extern templates c++11
+
 Eigen::Map wrap Q-blocks (if possible)
+
 Multiplication of F blockwise
+
 Obs-constrainted EKF prediction
 
 symm P: EV decompose P, set EVs<eps to zero and rebuild (profile this to know the cost!)

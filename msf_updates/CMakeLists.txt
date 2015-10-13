@@ -9,21 +9,21 @@ project(msf_updates)
 #  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
 set(CMAKE_BUILD_TYPE Release)
 
-find_package(catkin REQUIRED COMPONENTS roscpp msf_core geometry_msgs asctec_hl_comm sensor_fusion_comm)
+find_package(catkin REQUIRED COMPONENTS roscpp msf_core geometry_msgs sensor_fusion_comm)
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 
 generate_dynamic_reconfigure_options(
-    cfg/PosePressureSensor.cfg  
-    cfg/PositionPoseSensor.cfg  
-    cfg/SinglePoseSensor.cfg  
-    cfg/SinglePositionSensor.cfg  
+    cfg/PosePressureSensor.cfg
+    cfg/PositionPoseSensor.cfg
+    cfg/SinglePoseSensor.cfg
+    cfg/SinglePositionSensor.cfg
     cfg/SphericalPositionSensor.cfg
 )
 
 catkin_package(
-    DEPENDS 
-    CATKIN_DEPENDS roscpp msf_core geometry_msgs asctec_hl_comm sensor_fusion_comm
+    DEPENDS
+    CATKIN_DEPENDS roscpp msf_core geometry_msgs sensor_fusion_comm
     INCLUDE_DIRS include ${catkin_INCLUDE_DIRS}
     LIBRARIES pose_distorter
 )
@@ -44,5 +44,3 @@ endif()
 
 add_executable(test_distort src/test/test_distort.cc)
 target_link_libraries(test_distort pose_distorter)
-
-
