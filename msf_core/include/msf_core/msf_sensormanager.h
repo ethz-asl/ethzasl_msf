@@ -52,6 +52,7 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
    * done on the host.
    */
   bool data_playback_;
+  std::string world_frame_;
 
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW

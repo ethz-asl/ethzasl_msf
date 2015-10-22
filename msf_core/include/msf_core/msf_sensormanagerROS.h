@@ -86,6 +86,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
     reconfServer_->setCallback(f);
 
     pnh.param("data_playback", this->data_playback_, false);
+    pnh.param<std::string>("world_frame", this->world_frame_, "world");
 
     ros::NodeHandle nh("msf_core");
 
@@ -343,7 +344,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
       tf_broadcaster_.sendTransform(
           tf::StampedTransform(
               transform, ros::Time::now() /*ros::Time(latestState->time_)*/,
-              "world",
+              this->world_frame_,
               ros::names::clean(ros::this_node::getNamespace() + "/state")));
     }
 
