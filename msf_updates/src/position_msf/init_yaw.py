@@ -16,9 +16,9 @@ def callback_orientation(data):
 if __name__ == "__main__":
     rospy.init_node("dynamic_client")
 
-    sub_orientation = rospy.Subscriber('orientation_degrees', Vector3, callback_orientation, queue_size=1, tcp_nodelay=True)
 
     r = rospy.Rate(0.5)
 
     while not rospy.is_shutdown():
+	sub_orientation = rospy.Subscriber('orientation_degrees', Vector3, callback_orientation, queue_size=1, tcp_nodelay=True)
         r.sleep()
