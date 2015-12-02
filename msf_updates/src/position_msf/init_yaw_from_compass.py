@@ -10,20 +10,32 @@ from math import *
 
 import dynamic_reconfigure.client
 
+heading = 0.0
+is_init_heading = False
+
 # Spacify MSF node name parameter from launch file
 client = dynamic_reconfigure.client.Client(rospy.get_param("msf_sensor_node",
-    "msf_gps_pose_estimator/position_sensor"), timeout=30)
+    "msf_gps_pose_estimator/position_sensor"), timeout=30.0)
 
 # Write init_yaw MSF parameter from orientation message
 def callback_orientation_degrees(data):
-    client.update_configuration({"position_yaw_init":data.z})
+    global is_init_heading
+    global heading
+    heading = data.z
+    is_init_heading = True
 
 def callback_orientation_quaternion(data):
-    degrees = tf.transformations.euler_from_quaternion(data)
-    client.update_configuration({"position_yaw_init":degrees[2]})
+    global is_init_heading
+    global heading
+    radians = tf.transformations.euler_from_quaternion(data)
+    heading = degrees(radians[2])
+    is_init_heading = True
 
 def callback_heading_radians(data):
-    client.update_configuration({"position_yaw_init":degrees(data.data)})
+    global is_init_heading
+    global heading
+    heading = degrees(data.data)
+    is_init_heading = True
 
 if __name__ == "__main__":
     rospy.init_node("yaw_init_dyn_reconfigure_client")
@@ -36,5 +48,11 @@ if __name__ == "__main__":
         callback_heading_radians, queue_size=1, tcp_nodelay=True)
 
     r = rospy.Rate(0.5)
+    while not rospy.is_shutdown() and not is_init_heading:
+        r.sleep()
+
     while not rospy.is_shutdown():
+        print rospy.get_param("msf_sensor_node",
+            "msf_gps_pose_estimator/position_sensor")
+        client.update_configuration({"position_yaw_init":heading})
         r.sleep()
