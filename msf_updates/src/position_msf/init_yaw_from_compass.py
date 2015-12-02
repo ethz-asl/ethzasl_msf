@@ -10,6 +10,7 @@ from math import *
 
 import dynamic_reconfigure.client
 
+# Spacify MSF node name parameter from launch file
 client = dynamic_reconfigure.client.Client(rospy.get_param("msf_sensor_node",
     "msf_gps_pose_estimator/position_sensor"), timeout=30)
 
