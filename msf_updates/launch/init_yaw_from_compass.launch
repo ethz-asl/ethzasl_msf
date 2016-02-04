@@ -8,8 +8,9 @@
     <!-- Specify topic to obtain heading from (use one) -->
     <remap from="imu" to="imu" />
     <!-- remap from="heading_radians" to="heading" / -->
-    <!-- remap from="orientation_degrees" to="/orientation_euler_estimated_odometry_degrees" / -->
-    <!-- remap from="orientation_degrees" to="/orientation_euler_fcu_degrees" / -->
+    <!-- remap from="orientation_quaternion" to="fcu/imu/orientation" / -->
+    <!-- remap from="orientation_degrees" to="orientation_euler_estimated_odometry_degrees" / -->
+
   </node>
 
 </launch>
