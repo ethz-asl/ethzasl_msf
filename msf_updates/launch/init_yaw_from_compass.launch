@@ -1,13 +1,15 @@
 <launch>
 
   <node pkg="msf_updates" type="init_yaw_from_compass.py" name="init_yaw" clear_params="true" output="screen">
+
     <!-- Specify name of node running MSF -->
     <param name="msf_sensor_node" type="string" value="msf_gps_pose_estimator/position_sensor" />
 
     <!-- Specify topic to obtain heading from (use one) -->
-    <!-- remap from="orientation_quaternion" to="/fcu/imu/orientation" / -->
+    <remap from="imu" to="imu" />
+    <!-- remap from="heading_radians" to="heading" / -->
     <!-- remap from="orientation_degrees" to="/orientation_euler_estimated_odometry_degrees" / -->
-    <remap from="heading_radians" to="heading" />
+    <!-- remap from="orientation_degrees" to="/orientation_euler_fcu_degrees" / -->
   </node>
 
 </launch>
