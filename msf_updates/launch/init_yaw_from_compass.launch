@@ -2,7 +2,7 @@
 
   <!-- This node updates the 'position_yaw_init' parameter of a target MSF sensor node using yaw information received from an external topic. Various forms of yaw topic inputs are available (see below).
 
-  To check if the node is working correctly, open the target MSF node parameters in a Dynamic Reconfigure client (using rqt). You should see the 'position_yaw_init' parameter changing to correspond to the input heading topic. The update frequency is 0.5Hz by default; this can be changed by controlling the rate at which this node is running -->
+  To check if the node is working correctly, open the target MSF node parameters in a Dynamic Reconfigure client (using rqt). You should see the 'position_yaw_init' parameter changing to correspond to the input heading topic. The update frequency is 0.5Hz by default; this can be changed by controlling the rate at which this node is running. -->
   <node pkg="msf_updates" type="init_yaw_from_compass.py" name="init_yaw" clear_params="true" output="screen">
 
     <!-- Inputs -->
