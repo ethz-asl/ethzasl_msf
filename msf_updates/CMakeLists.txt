@@ -30,6 +30,11 @@ catkin_package(
 
 add_library(pose_distorter src/msf_distort/PoseDistorter.cc)
 target_link_libraries(pose_distorter ${catkin_LIBRARIES})
+install(TARGETS
+    pose_distorter
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+)
 
 #just build the pose filter on the helicopters
 if(EXISTS "${PROJECT_SOURCE_DIR}/COMPILE_ONLY_POSEFILTER")
