@@ -57,9 +57,22 @@ add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencfg) # ${MSF_DOCUMENTATION})
 add_library(similaritytransform src/similaritytransform.cc)
 target_link_libraries(similaritytransform ${catkin_LIBRARIES})
 
-catkin_add_gtest(test_similaritytransform src/test/test_similaritytransform.cc)
-target_link_libraries(test_similaritytransform similaritytransform)
+install(TARGETS
+    ${PROJECT_NAME}
+    similaritytransform
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+)
 
-catkin_add_gtest(test_static_statelist src/test/test_staticstatelist.cc)
-target_link_libraries(test_static_statelist pthread ${PROJECT_NAME})
+install(DIRECTORY include/
+    DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}
+    FILES_MATCHING PATTERN "*.h"
+)
 
+if (CATKIN_ENABLE_TESTING)
+    catkin_add_gtest(test_similaritytransform src/test/test_similaritytransform.cc)
+    target_link_libraries(test_similaritytransform similaritytransform)
+
+    catkin_add_gtest(test_static_statelist src/test/test_staticstatelist.cc)
+    target_link_libraries(test_static_statelist pthread ${PROJECT_NAME})
+endif()
