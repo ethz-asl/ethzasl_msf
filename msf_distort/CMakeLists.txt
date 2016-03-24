@@ -26,3 +26,8 @@ add_executable(msf_distort src/msf_distort.cc)
 target_link_libraries(msf_distort ${catkin_LIBRARIES} ${boost_LIBRARIES})
 add_dependencies(msf_distort ${${PROJECT_NAME}_EXPORTED_TARGETS})
 
+install(TARGETS
+    msf_distort
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+)
