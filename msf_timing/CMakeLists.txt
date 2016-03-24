@@ -29,7 +29,20 @@ catkin_package(
 
 add_library(${PROJECT_NAME} src/Timer.cc)
 
-catkin_add_gtest(${PROJECT_NAME}_tests src/test/testMSFTiming.cc)
-target_link_libraries(${PROJECT_NAME}_tests ${PROJECT_NAME} pthread)
+install(TARGETS
+    ${PROJECT_NAME}
+    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+    LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+)
+
+install(DIRECTORY include/
+   DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}
+   FILES_MATCHING PATTERN "*.h"
+)
+
+if (CATKIN_ENABLE_TESTING)
+    catkin_add_gtest(${PROJECT_NAME}_tests src/test/testMSFTiming.cc)
+    target_link_libraries(${PROJECT_NAME}_tests ${PROJECT_NAME} pthread)
+endif()
 
 
