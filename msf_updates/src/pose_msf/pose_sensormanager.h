@@ -68,6 +68,13 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
     init_height_srv_ = pnh.advertiseService("initialize_msf_height",
                                             &PoseSensorManager::InitHeight,
                                             this);
+    bool init_on_startup = false;
+    constexpr double kInitialScale = 1.0;
+    pnh.param("init_on_startup", init_on_startup, init_on_startup);
+
+    if (init_on_startup) {
+      Init(kInitialScale);
+    }
   }
   virtual ~PoseSensorManager() { }
 
