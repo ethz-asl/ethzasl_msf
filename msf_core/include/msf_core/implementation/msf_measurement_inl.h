@@ -52,8 +52,11 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
 
   double mah_dist = res_delayed.transpose() * S.inverse() * res_delayed;
   mah_dist = sqrt(mah_dist);
-  MSF_INFO_STREAM("RUN 1");
   MSF_INFO_STREAM(mah_dist);
+
+  if (mah_dist > 10){
+    return;
+  }
 
   correction_ = K * res_delayed;
   const typename MSF_Core<EKFState_T>::ErrorStateCov KH =
