@@ -17,6 +17,7 @@
 #ifndef MEASUREMENT_INL_H_
 #define MEASUREMENT_INL_H_
 #include <msf_core/msf_core.h>
+ #include <ros/console.h>
 
 namespace msf_core {
 template<typename EKFState_T>
@@ -50,8 +51,9 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
   S = H_delayed * P * H_delayed.transpose() + R_delayed;
   K = P * H_delayed.transpose() * S.inverse();
 
-  std::cerr << res_delayed << std::endl;
-  std::cerr << S << std::endl;
+  ROS_ERROR_STREAM("RUN 1");
+  ROS_ERROR_STREAM(res_delayed);
+  ROS_ERROR_STREAM(S);
 
   correction_ = K * res_delayed;
   const typename MSF_Core<EKFState_T>::ErrorStateCov KH =
@@ -83,8 +85,9 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
   S = H_delayed * P * H_delayed.transpose() + R_delayed;
   K = P * H_delayed.transpose() * S.inverse();
 
-  std::cerr << res_delayed << std::endl;
-  std::cerr << S << std::endl;
+  ROS_ERROR_STREAM("RUN 2");
+  ROS_ERROR_STREAM(res_delayed);
+  ROS_ERROR_STREAM(S);
 
   correction_ = K * res_delayed;
   const typename MSF_Core<EKFState_T>::ErrorStateCov KH =
