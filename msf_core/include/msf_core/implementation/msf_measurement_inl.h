@@ -50,6 +50,9 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
   S = H_delayed * P * H_delayed.transpose() + R_delayed;
   K = P * H_delayed.transpose() * S.inverse();
 
+  std::cerr << res_delayed << std::endl;
+  std::cerr << S << std::endl;
+
   correction_ = K * res_delayed;
   const typename MSF_Core<EKFState_T>::ErrorStateCov KH =
       (MSF_Core<EKFState_T>::ErrorStateCov::Identity() - K * H_delayed);
@@ -79,6 +82,9 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
 
   S = H_delayed * P * H_delayed.transpose() + R_delayed;
   K = P * H_delayed.transpose() * S.inverse();
+
+  std::cerr << res_delayed << std::endl;
+  std::cerr << S << std::endl;
 
   correction_ = K * res_delayed;
   const typename MSF_Core<EKFState_T>::ErrorStateCov KH =
