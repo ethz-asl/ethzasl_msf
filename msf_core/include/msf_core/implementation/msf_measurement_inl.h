@@ -186,6 +186,7 @@ void MSF_InitMeasurement<EKFState_T>::Apply(
   boost::fusion::for_each(stateWithCovariance->statevars,
                           msf_tmp::CopyInitStates<EKFState_T>(InitState));
 
+  MSF_INFO_STREAM("TESTING");
   if (!(InitState.P.minCoeff() == 0 && InitState.P.maxCoeff() == 0)) {
     stateWithCovariance->P = InitState.P;
     MSF_WARN_STREAM("Using user defined initial error state covariance.");
