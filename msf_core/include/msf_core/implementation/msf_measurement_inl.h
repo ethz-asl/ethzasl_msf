@@ -51,9 +51,9 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
   S = H_delayed * P * H_delayed.transpose() + R_delayed;
   K = P * H_delayed.transpose() * S.inverse();
 
-  ROS_ERROR_STREAM("RUN 1");
-  ROS_ERROR_STREAM(res_delayed);
-  ROS_ERROR_STREAM(S);
+  MSF_INFO_STREAM("RUN 1");
+  MSF_INFO_STREAM(res_delayed);
+  MSF_INFO_STREAM(S);
 
   correction_ = K * res_delayed;
   const typename MSF_Core<EKFState_T>::ErrorStateCov KH =
@@ -85,9 +85,9 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
   S = H_delayed * P * H_delayed.transpose() + R_delayed;
   K = P * H_delayed.transpose() * S.inverse();
 
-  ROS_ERROR_STREAM("RUN 2");
-  ROS_ERROR_STREAM(res_delayed);
-  ROS_ERROR_STREAM(S);
+  MSF_INFO_STREAM("RUN 2");
+  MSF_INFO_STREAM(res_delayed);
+  MSF_INFO_STREAM(S);
 
   correction_ = K * res_delayed;
   const typename MSF_Core<EKFState_T>::ErrorStateCov KH =
