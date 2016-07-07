@@ -112,6 +112,7 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrectionRelative(
   EIGEN_STATIC_ASSERT_FIXED_SIZE (R_type);
 
   MSF_INFO_STREAM("RUN 3");
+  int a = 1;
 
   // Get measurements.
   /// Correction from EKF update.
