@@ -17,7 +17,6 @@
 #ifndef MEASUREMENT_INL_H_
 #define MEASUREMENT_INL_H_
 #include <msf_core/msf_core.h>
- #include <ros/console.h>
 
 namespace msf_core {
 template<typename EKFState_T>
@@ -111,6 +110,8 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrectionRelative(
 
   EIGEN_STATIC_ASSERT_FIXED_SIZE (H_type);
   EIGEN_STATIC_ASSERT_FIXED_SIZE (R_type);
+
+  MSF_INFO_STREAM("RUN 3");
 
   // Get measurements.
   /// Correction from EKF update.
