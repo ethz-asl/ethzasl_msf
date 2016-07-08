@@ -163,7 +163,7 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
   shared_ptr<MEASUREMENT_TYPE> meas(new MEASUREMENT_TYPE(
       n_zp_, n_zq_, measurement_world_sensor_, use_fixed_covariance_,
       provides_absolute_measurements_, this->sensorID,
-      enable_mah_outlier_rejection_, 7, fixedstates, distorter_));
+      enable_mah_outlier_rejection_, mah_threshold_, fixedstates, distorter_));
 
   meas->MakeFromSensorReading(msg, msg->header.stamp.toSec() - delay_);
 

@@ -127,7 +127,7 @@ class MSF_Measurement : public MSF_MeasurementBase<EKFState_T> {
                   bool enable_mah_outlier_rejection, double mah_threshold)
       : MSF_MeasurementBase<EKFState_T>(isAbsoluteMeasurement, sensorID,
                                         enable_mah_outlier_rejection,
-                                        mah_threshold) {
+                                        7) {
     R_.setZero();
   }
   virtual ~MSF_Measurement() { }
