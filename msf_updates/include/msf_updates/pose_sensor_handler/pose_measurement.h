@@ -144,7 +144,7 @@ struct PoseMeasurement : public PoseMeasurementBase {
                   msf_updates::PoseDistorter::Ptr distorter =
                       msf_updates::PoseDistorter::Ptr())
       : PoseMeasurementBase(isabsoluteMeasurement, sensorID,
-                            enable_mah_outlier_rejection, mah_threshold),
+                            enable_mah_outlier_rejection, 7),
         n_zp_(n_zp),
         n_zq_(n_zq),
         measurement_world_sensor_(measurement_world_sensor),
