@@ -62,6 +62,7 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
 
     //reject point as outlier if distance above threshold
     if (mah_dist > mah_threshold_){
+      MSF_WARN_STREAM_THROTTLE(1,"rejecting reading as outlier");
       return;
     }
   }
@@ -104,6 +105,7 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
 
     //reject point as outlier if distance above threshold
     if (mah_dist > mah_threshold_){
+      MSF_WARN_STREAM_THROTTLE(1,"rejecting reading as outlier");
       return;
     }
   }
