@@ -21,9 +21,13 @@
 namespace msf_core {
 template<typename EKFState_T>
 MSF_MeasurementBase<EKFState_T>::MSF_MeasurementBase(bool isabsoluteMeasurement,
-                                                     int sensorID)
+                                                     int sensorID, 
+                                                     bool enable_mah_outlier_rejection,
+                                                     double mah_threshold)
     : sensorID_(sensorID),
       isabsolute_(isabsoluteMeasurement),
+      enable_mah_outlier_rejection_(enable_mah_outlier_rejection),
+      mah_threshold_(mah_threshold),
       time(0) {
 }
 
@@ -50,12 +54,16 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
   S = H_delayed * P * H_delayed.transpose() + R_delayed;
   K = P * H_delayed.transpose() * S.inverse();
 
-  double mah_dist = res_delayed.transpose() * S.inverse() * res_delayed;
-  mah_dist = sqrt(mah_dist);
-  MSF_INFO_STREAM(mah_dist);
+  if(enable_mah_outlier_rejection_){
+    //calculate mahalanobis distance
+    double mah_dist = res_delayed.transpose() * S.inverse() * res_delayed;
+    mah_dist = sqrt(mah_dist);
+    MSF_INFO_STREAM(mah_dist);
 
-  if (mah_dist > 10){
-    return;
+    //reject point as outlier if distance above threshold
+    if (mah_dist > mah_threshold_){
+      return;
+    }
   }
 
   correction_ = K * res_delayed;
@@ -88,9 +96,17 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
   S = H_delayed * P * H_delayed.transpose() + R_delayed;
   K = P * H_delayed.transpose() * S.inverse();
 
-  MSF_INFO_STREAM("RUN 2");
-  MSF_INFO_STREAM(res_delayed);
-  MSF_INFO_STREAM(S);
+  if(enable_mah_outlier_rejection_){
+    //calculate mahalanobis distance
+    double mah_dist = res_delayed.transpose() * S.inverse() * res_delayed;
+    mah_dist = sqrt(mah_dist);
+    MSF_INFO_STREAM(mah_dist);
+
+    //reject point as outlier if distance above threshold
+    if (mah_dist > mah_threshold_){
+      return;
+    }
+  }
 
   correction_ = K * res_delayed;
   const typename MSF_Core<EKFState_T>::ErrorStateCov KH =
@@ -114,9 +130,6 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrectionRelative(
 
   EIGEN_STATIC_ASSERT_FIXED_SIZE (H_type);
   EIGEN_STATIC_ASSERT_FIXED_SIZE (R_type);
-
-  MSF_INFO_STREAM("RUN 3");
-  int a = 1;
 
   // Get measurements.
   /// Correction from EKF update.

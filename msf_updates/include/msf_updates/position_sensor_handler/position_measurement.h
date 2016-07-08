@@ -86,8 +86,10 @@ struct PositionMeasurement : public PositionMeasurementBase {
   virtual ~PositionMeasurement() {
   }
   PositionMeasurement(double n_zp, bool fixed_covariance,
-                      bool isabsoluteMeasurement, int sensorID, int fixedstates)
-      : PositionMeasurementBase(isabsoluteMeasurement, sensorID),
+                      bool isabsoluteMeasurement, int sensorID, int fixedstates,
+                      bool enable_mah_outlier_rejection, double mah_threshold)
+      : PositionMeasurementBase(isabsoluteMeasurement, sensorID,
+                                enable_mah_outlier_rejection, mah_threshold),
         n_zp_(n_zp),
         fixed_covariance_(fixed_covariance),
         fixedstates_(fixedstates) {

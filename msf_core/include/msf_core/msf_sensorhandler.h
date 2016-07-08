@@ -32,6 +32,10 @@ class SensorHandler {
   std::string topic_namespace_;
   std::string parameternamespace_;
   bool received_first_measurement_;
+  bool enable_mah_outlier_rejection_;
+  double mah_threshold_;
+  const double default_mah_threshold_ = 100.0;
+
   void SetSensorID(int ID) {
     sensorID = ID;
   }
