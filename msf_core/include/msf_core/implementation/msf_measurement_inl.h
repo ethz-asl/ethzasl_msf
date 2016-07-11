@@ -58,7 +58,6 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
     //calculate mahalanobis distance
     double mah_dist = res_delayed.transpose() * S.inverse() * res_delayed;
     mah_dist = sqrt(mah_dist);
-    MSF_INFO_STREAM(mah_dist << " " << mah_threshold_);
 
     //reject point as outlier if distance above threshold
     if (mah_dist > mah_threshold_){
