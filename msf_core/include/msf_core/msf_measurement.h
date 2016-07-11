@@ -73,7 +73,7 @@ class MSF_MeasurementBase {
       const Eigen::MatrixBase<Res_type>& residual,
       const Eigen::MatrixBase<R_type>& R);
 
-  /// Enabels mahalanobis distance outlier rejection
+  /// Enables mahalanobis distance outlier rejection
   bool enable_mah_outlier_rejection_;
 
   /// Mahalanobis distance outlier rejection threshold
