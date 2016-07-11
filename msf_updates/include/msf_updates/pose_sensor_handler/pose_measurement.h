@@ -150,7 +150,10 @@ struct PoseMeasurement : public PoseMeasurementBase {
         measurement_world_sensor_(measurement_world_sensor),
         fixed_covariance_(fixed_covariance),
         distorter_(distorter),
-        fixedstates_(fixedstates) {}
+        fixedstates_(fixedstates) {
+            MSF_INFO_STREAM(mah_threshold << " output value !!!!!!!!!!!!!!!!!!!!!");
+            MSF_INFO_STREAM(mah_threshold_ << " output real value !!!!!!!!!!!!!!!!!!!!!");
+        }
   virtual std::string Type() {
     return "pose";
   }
