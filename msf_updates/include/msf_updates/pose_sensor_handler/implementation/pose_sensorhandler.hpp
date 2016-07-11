@@ -162,8 +162,6 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
     }
   }
 
-  MSF_INFO_STREAM(mah_threshold_ << " input value !!!!!!!!!!!!!!!!!!!!!");
-
   shared_ptr<MEASUREMENT_TYPE> meas(new MEASUREMENT_TYPE(
       n_zp_, n_zq_, measurement_world_sensor_, use_fixed_covariance_,
       provides_absolute_measurements_, this->sensorID,
