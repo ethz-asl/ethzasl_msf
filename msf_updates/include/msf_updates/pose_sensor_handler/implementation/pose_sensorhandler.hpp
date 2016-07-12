@@ -45,7 +45,7 @@ PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PoseSensorHandler(
   pnh.param("pose_use_fixed_covariance", use_fixed_covariance_, false);
   pnh.param("pose_measurement_minimum_dt", pose_measurement_minimum_dt_, 0.05);
   pnh.param("enable_mah_outlier_rejection", enable_mah_outlier_rejection_, false);
-  pnh.param("mah_threshold", mah_threshold_, default_mah_threshold_);
+  pnh.param("mah_threshold", mah_threshold_, msf_core::kDefaultMahThreshold_);
 
   MSF_INFO_STREAM_COND(measurement_world_sensor_, "Pose sensor is interpreting "
                        "measurement as sensor w.r.t. world");

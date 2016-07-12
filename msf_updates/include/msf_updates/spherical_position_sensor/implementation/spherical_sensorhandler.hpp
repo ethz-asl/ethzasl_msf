@@ -36,7 +36,7 @@ AngleSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::AngleSensorHandler(
   pnh.param("use_fixed_covariance", use_fixed_covariance_, true);
   pnh.param("absolute_measurements", provides_absolute_measurements_, false);
   pnh.param("enable_mah_outlier_rejection", enable_mah_outlier_rejection_, false);
-  pnh.param("mah_threshold", mah_threshold_, default_mah_threshold_);
+  pnh.param("mah_threshold", mah_threshold_, msf_core::kDefaultMahThreshold_);
 
   ROS_INFO_COND(use_fixed_covariance_,
                 "Angle sensor is using fixed covariance");
@@ -132,7 +132,7 @@ DistanceSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::DistanceSensorHandler(
   pnh.param("use_fixed_covariance", use_fixed_covariance_, true);
   pnh.param("absolute_measurements", provides_absolute_measurements_, false);
   pnh.param("enable_mah_outlier_rejection", enable_mah_outlier_rejection_, false);
-  pnh.param("mah_threshold", mah_threshold_, default_mah_threshold_);
+  pnh.param("mah_threshold", mah_threshold_, msf_core::kDefaultMahThreshold_);
 
   ROS_INFO_COND(use_fixed_covariance_,
                 "Distance sensor is using fixed covariance");

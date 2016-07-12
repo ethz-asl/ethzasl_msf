@@ -31,7 +31,7 @@ PressureSensorHandler::PressureSensorHandler(
   ros::NodeHandle nh("msf_updates");
 
   pnh.param("enable_mah_outlier_rejection", enable_mah_outlier_rejection_, false);
-  pnh.param("mah_threshold", mah_threshold_, default_mah_threshold_);
+  pnh.param("mah_threshold", mah_threshold_, msf_core::kDefaultMahThreshold_);
 
   subPressure_ =
       nh.subscribe<geometry_msgs::PointStamped>

@@ -36,7 +36,7 @@ PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PositionSensorHandler(
   pnh.param("position_absolute_measurements", provides_absolute_measurements_,
             false);
   pnh.param("enable_mah_outlier_rejection", enable_mah_outlier_rejection_, false);
-  pnh.param("mah_threshold", mah_threshold_, default_mah_threshold_);
+  pnh.param("mah_threshold", mah_threshold_, msf_core::kDefaultMahThreshold_);
 
   MSF_INFO_STREAM_COND(use_fixed_covariance_, "Position sensor is using fixed "
                        "covariance");
