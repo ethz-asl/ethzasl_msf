@@ -96,6 +96,7 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
   typename MSF_Core<EKFState_T>::ErrorStateCov & P = state->P;
 
   S = H_delayed * P * H_delayed.transpose() + R_delayed;
+  S_inverse = S.inverse();
   K = P * H_delayed.transpose() * S_inverse;
 
   if(enable_mah_outlier_rejection_){
