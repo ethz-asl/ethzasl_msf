@@ -82,12 +82,13 @@ struct AngleMeasurement : public AngleMeasurementBase {
   virtual ~AngleMeasurement() {
   }
   AngleMeasurement(double n_za, bool fixed_covariance,
-                   bool isabsoluteMeasurement, int sensorID, int fixedstates)
-      : AngleMeasurementBase(isabsoluteMeasurement, sensorID),
+                   bool isabsoluteMeasurement, int sensorID, int fixedstates,
+                   bool enable_mah_outlier_rejection, double mah_threshold)
+      : AngleMeasurementBase(isabsoluteMeasurement, sensorID,
+                             enable_mah_outlier_rejection, mah_threshold),
         n_za_(n_za),
         fixed_covariance_(fixed_covariance),
-        fixedstates_(fixedstates) {
-  }
+        fixedstates_(fixedstates) {}
   virtual std::string Type() {
     return "angle";
   }
@@ -367,12 +368,13 @@ struct DistanceMeasurement : public DistanceMeasurementBase {
   virtual ~DistanceMeasurement() {
   }
   DistanceMeasurement(double n_zd, bool fixed_covariance,
-                      bool isabsoluteMeasurement, int sensorID, int fixedstates)
-      : DistanceMeasurementBase(isabsoluteMeasurement, sensorID),
+                      bool isabsoluteMeasurement, int sensorID, int fixedstates,
+                      bool enable_mah_outlier_rejection, double mah_threshold)
+      : DistanceMeasurementBase(isabsoluteMeasurement, sensorID,
+                                enable_mah_outlier_rejection, mah_threshold),
         n_zd_(n_zd),
         fixed_covariance_(fixed_covariance),
-        fixedstates_(fixedstates) {
-  }
+        fixedstates_(fixedstates) {}
   virtual std::string Type() {
     return "distance";
   }

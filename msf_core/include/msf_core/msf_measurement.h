@@ -33,9 +33,10 @@ template<typename EKFState_T>
 class MSF_MeasurementBase {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  MSF_MeasurementBase(bool isabsoluteMeasurement, int sensorID);
-  virtual ~MSF_MeasurementBase() {
-  }
+  MSF_MeasurementBase(bool isabsoluteMeasurement, int sensorID,
+                      bool enable_mah_outlier_rejection,
+                      double mah_threshold);
+  virtual ~MSF_MeasurementBase() {}
   /**
    * \brief The method called by the msf_core to apply the measurement
    * represented by this object.
@@ -72,6 +73,12 @@ class MSF_MeasurementBase {
       const Eigen::MatrixBase<Res_type>& residual,
       const Eigen::MatrixBase<R_type>& R);
 
+  /// Enables mahalanobis distance outlier rejection
+  bool enable_mah_outlier_rejection_;
+
+  /// Mahalanobis distance outlier rejection threshold
+  double mah_threshold_;
+
 };
 
 /**
@@ -92,7 +99,7 @@ class MSF_InvalidMeasurement : public MSF_MeasurementBase<EKFState_T> {
     return "invalid";
   }
   MSF_InvalidMeasurement()
-      : MSF_MeasurementBase<EKFState_T>(true, constants::INVALID_ID) {
+      : MSF_MeasurementBase<EKFState_T>(true, constants::INVALID_ID, false, 0.0) {
   }
   virtual ~MSF_InvalidMeasurement() {
   }
@@ -116,8 +123,11 @@ class MSF_Measurement : public MSF_MeasurementBase<EKFState_T> {
   typedef T Measurement_type;
   typedef boost::shared_ptr<T const> Measurement_ptr;
 
-  MSF_Measurement(bool isAbsoluteMeasurement, int sensorID)
-      : MSF_MeasurementBase<EKFState_T>(isAbsoluteMeasurement, sensorID) {
+  MSF_Measurement(bool isAbsoluteMeasurement, int sensorID,
+                  bool enable_mah_outlier_rejection, double mah_threshold)
+      : MSF_MeasurementBase<EKFState_T>(isAbsoluteMeasurement, sensorID,
+                                        enable_mah_outlier_rejection,
+                                        mah_threshold) {
     R_.setZero();
   }
   virtual ~MSF_Measurement() { }
@@ -161,7 +171,7 @@ class MSF_InitMeasurement : public MSF_MeasurementBase<EKFState_T> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW MSF_InitMeasurement(
       bool ContainsInitialSensorReadings)
-      : MSF_MeasurementBase<EKFState_T>(true, constants::INVALID_ID) {
+      : MSF_MeasurementBase<EKFState_T>(true, constants::INVALID_ID, false, 0.0) {
     ContainsInitialSensorReadings_ = ContainsInitialSensorReadings;
     this->time = ros::Time::now().toSec();
   }

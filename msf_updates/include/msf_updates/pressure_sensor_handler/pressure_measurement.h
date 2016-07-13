@@ -58,13 +58,13 @@ struct PressureMeasurement : public PressureMeasurementBase {
 
   typedef msf_updates::EKFState EKFState_T;
   typedef EKFState_T::StateDefinition_T StateDefinition_T;
-  virtual ~PressureMeasurement() { }
-  PressureMeasurement(double n_zp, bool isabsoluteMeasurement, int sensorID)
-      : PressureMeasurementBase(isabsoluteMeasurement, sensorID),
-        n_zp_(n_zp) { }
-  virtual std::string Type() {
-    return "pressure";
-  }
+  virtual ~PressureMeasurement() {}
+  PressureMeasurement(double n_zp, bool isabsoluteMeasurement, int sensorID,
+                      bool enable_mah_outlier_rejection, double mah_threshold)
+      : PressureMeasurementBase(isabsoluteMeasurement, sensorID,
+                                enable_mah_outlier_rejection, mah_threshold),
+        n_zp_(n_zp) {}
+  virtual std::string Type() { return "pressure"; }
   /**
    * The method called by the msf_core to apply the measurement represented by
    * this object.
