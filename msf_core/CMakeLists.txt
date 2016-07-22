@@ -9,6 +9,9 @@ project(msf_core)
 #  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
 set(CMAKE_BUILD_TYPE Release)
 
+#build with boost 1.6x
+add_definitions(-DBOOST_NO_CXX11_VARIADIC_TEMPLATES)
+
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake/)
 
 find_package(catkin REQUIRED COMPONENTS sensor_msgs dynamic_reconfigure msf_timing tf glog_catkin cmake_modules)
