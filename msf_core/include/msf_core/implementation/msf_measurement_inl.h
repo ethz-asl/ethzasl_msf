@@ -101,7 +101,8 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
 
   if(enable_mah_outlier_rejection_){
     //calculate mahalanobis distance
-    double mah_dist_squared = res_delayed.transpose() * S_inverse * res_delayed;
+    Eigen::MatrixXd mah_dist_squared_temp = res_delayed.transpose() * S_inverse * res_delayed;
+    double mah_dist_squared = mah_dist_squared_temp(0,0);
 
     //reject point as outlier if distance above threshold
     if (sqrt(mah_dist_squared) > mah_threshold_){
