@@ -35,6 +35,8 @@ PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PositionSensorHandler(
   pnh.param("position_use_fixed_covariance", use_fixed_covariance_, false);
   pnh.param("position_absolute_measurements", provides_absolute_measurements_,
             false);
+  pnh.param("enable_mah_outlier_rejection", enable_mah_outlier_rejection_, false);
+  pnh.param("mah_threshold", mah_threshold_, msf_core::kDefaultMahThreshold_);
 
   MSF_INFO_STREAM_COND(use_fixed_covariance_, "Position sensor is using fixed "
                        "covariance");
@@ -109,11 +111,10 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPositionMeasu
     }
   }
 
-  shared_ptr < MEASUREMENT_TYPE
-      > meas(
-          new MEASUREMENT_TYPE(n_zp_, use_fixed_covariance_,
-                               provides_absolute_measurements_, this->sensorID,
-                               fixedstates));
+  shared_ptr<MEASUREMENT_TYPE> meas(new MEASUREMENT_TYPE(
+      n_zp_, use_fixed_covariance_, provides_absolute_measurements_,
+      this->sensorID, fixedstates, enable_mah_outlier_rejection_,
+      mah_threshold_));
 
   meas->MakeFromSensorReading(msg, msg->header.stamp.toSec() - delay_);
 

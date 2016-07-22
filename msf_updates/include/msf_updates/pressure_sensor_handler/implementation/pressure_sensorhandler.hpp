@@ -29,6 +29,10 @@ PressureSensorHandler::PressureSensorHandler(
       n_zp_(1e-6) {
   ros::NodeHandle pnh("~/pressure_sensor");
   ros::NodeHandle nh("msf_updates");
+
+  pnh.param("enable_mah_outlier_rejection", enable_mah_outlier_rejection_, false);
+  pnh.param("mah_threshold", mah_threshold_, msf_core::kDefaultMahThreshold_);
+
   subPressure_ =
       nh.subscribe<geometry_msgs::PointStamped>
       ("pressure_height", 20, &PressureSensorHandler::MeasurementCallback, this);
@@ -58,8 +62,9 @@ void PressureSensorHandler::MeasurementCallback(
   }
 
   shared_ptr<pressure_measurement::PressureMeasurement> meas(
-      new pressure_measurement::PressureMeasurement(n_zp_, true,
-                                                    this->sensorID));
+      new pressure_measurement::PressureMeasurement(
+          n_zp_, true, this->sensorID, enable_mah_outlier_rejection_,
+          mah_threshold_));
   meas->MakeFromSensorReading(msg, msg->header.stamp.toSec());
 
   z_p_ = meas->z_p_;  // Store this for the init procedure.

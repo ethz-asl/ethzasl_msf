@@ -44,7 +44,8 @@ PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PoseSensorHandler(
   pnh.param("pose_measurement_world_sensor", measurement_world_sensor_, true);
   pnh.param("pose_use_fixed_covariance", use_fixed_covariance_, false);
   pnh.param("pose_measurement_minimum_dt", pose_measurement_minimum_dt_, 0.05);
-
+  pnh.param("enable_mah_outlier_rejection", enable_mah_outlier_rejection_, false);
+  pnh.param("mah_threshold", mah_threshold_, msf_core::kDefaultMahThreshold_);
 
   MSF_INFO_STREAM_COND(measurement_world_sensor_, "Pose sensor is interpreting "
                        "measurement as sensor w.r.t. world");
@@ -158,12 +159,10 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
     }
   }
 
-  shared_ptr < MEASUREMENT_TYPE
-      > meas(
-          new MEASUREMENT_TYPE(n_zp_, n_zq_, measurement_world_sensor_,
-                               use_fixed_covariance_,
-                               provides_absolute_measurements_, this->sensorID,
-                               fixedstates, distorter_));
+  shared_ptr<MEASUREMENT_TYPE> meas(new MEASUREMENT_TYPE(
+      n_zp_, n_zq_, measurement_world_sensor_, use_fixed_covariance_,
+      provides_absolute_measurements_, this->sensorID,
+      enable_mah_outlier_rejection_, mah_threshold_, fixedstates, distorter_));
 
   meas->MakeFromSensorReading(msg, msg->header.stamp.toSec() - delay_);
 

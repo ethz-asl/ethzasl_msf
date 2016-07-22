@@ -35,6 +35,8 @@ AngleSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::AngleSensorHandler(
   ros::NodeHandle pnh("~/spherical_position_sensor");
   pnh.param("use_fixed_covariance", use_fixed_covariance_, true);
   pnh.param("absolute_measurements", provides_absolute_measurements_, false);
+  pnh.param("enable_mah_outlier_rejection", enable_mah_outlier_rejection_, false);
+  pnh.param("mah_threshold", mah_threshold_, msf_core::kDefaultMahThreshold_);
 
   ROS_INFO_COND(use_fixed_covariance_,
                 "Angle sensor is using fixed covariance");
@@ -105,10 +107,10 @@ void AngleSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
     }
   }
 
-  typename boost::shared_ptr<MEASUREMENT_TYPE> meas(
-      new MEASUREMENT_TYPE(n_za_, use_fixed_covariance_,
-                           provides_absolute_measurements_, this->sensorID,
-                           fixedstates));
+  typename boost::shared_ptr<MEASUREMENT_TYPE> meas(new MEASUREMENT_TYPE(
+      n_za_, use_fixed_covariance_, provides_absolute_measurements_,
+      this->sensorID, fixedstates, enable_mah_outlier_rejection_,
+      mah_threshold_));
 
   meas->MakeFromSensorReading(msg, msg->header.stamp.toSec() - delay_);
 
@@ -129,6 +131,8 @@ DistanceSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::DistanceSensorHandler(
   ros::NodeHandle pnh("~/spherical_position_sensor");
   pnh.param("use_fixed_covariance", use_fixed_covariance_, true);
   pnh.param("absolute_measurements", provides_absolute_measurements_, false);
+  pnh.param("enable_mah_outlier_rejection", enable_mah_outlier_rejection_, false);
+  pnh.param("mah_threshold", mah_threshold_, msf_core::kDefaultMahThreshold_);
 
   ROS_INFO_COND(use_fixed_covariance_,
                 "Distance sensor is using fixed covariance");
@@ -197,10 +201,10 @@ void DistanceSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
     }
   }
 
-  typename boost::shared_ptr<MEASUREMENT_TYPE> meas(
-      new MEASUREMENT_TYPE(n_zd_, use_fixed_covariance_,
-                           provides_absolute_measurements_, this->sensorID,
-                           fixedstates));
+  typename boost::shared_ptr<MEASUREMENT_TYPE> meas(new MEASUREMENT_TYPE(
+      n_zd_, use_fixed_covariance_, provides_absolute_measurements_,
+      this->sensorID, fixedstates, enable_mah_outlier_rejection_,
+      mah_threshold_));
 
   meas->MakeFromSensorReading(msg, msg->header.stamp.toSec() - delay_);
 

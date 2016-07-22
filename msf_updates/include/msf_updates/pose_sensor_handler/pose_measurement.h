@@ -135,21 +135,21 @@ struct PoseMeasurement : public PoseMeasurementBase {
     p_wv = StatePwvIdx
   };
 
-  virtual ~PoseMeasurement() {
-  }
+  virtual ~PoseMeasurement() {}
   PoseMeasurement(double n_zp, double n_zq, bool measurement_world_sensor,
                   bool fixed_covariance, bool isabsoluteMeasurement,
-                  int sensorID, int fixedstates,
+                  int sensorID, bool enable_mah_outlier_rejection,
+                  double mah_threshold, int fixedstates,
                   msf_updates::PoseDistorter::Ptr distorter =
                       msf_updates::PoseDistorter::Ptr())
-      : PoseMeasurementBase(isabsoluteMeasurement, sensorID),
+      : PoseMeasurementBase(isabsoluteMeasurement, sensorID,
+                            enable_mah_outlier_rejection, mah_threshold),
         n_zp_(n_zp),
         n_zq_(n_zq),
         measurement_world_sensor_(measurement_world_sensor),
         fixed_covariance_(fixed_covariance),
         distorter_(distorter),
-        fixedstates_(fixedstates) {
-  }
+        fixedstates_(fixedstates) {}
   virtual std::string Type() {
     return "pose";
   }

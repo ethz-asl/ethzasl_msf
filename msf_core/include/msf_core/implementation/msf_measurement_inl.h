@@ -21,9 +21,13 @@
 namespace msf_core {
 template<typename EKFState_T>
 MSF_MeasurementBase<EKFState_T>::MSF_MeasurementBase(bool isabsoluteMeasurement,
-                                                     int sensorID)
+                                                     int sensorID, 
+                                                     bool enable_mah_outlier_rejection,
+                                                     double mah_threshold)
     : sensorID_(sensorID),
       isabsolute_(isabsoluteMeasurement),
+      enable_mah_outlier_rejection_(enable_mah_outlier_rejection),
+      mah_threshold_(mah_threshold),
       time(0) {
 }
 
@@ -43,12 +47,25 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
   Eigen::Matrix<double, MSF_Core<EKFState_T>::nErrorStatesAtCompileTime, 1> correction_;
 
   R_type S;
+  R_type S_inverse;
   Eigen::Matrix<double, MSF_Core<EKFState_T>::nErrorStatesAtCompileTime,
       R_type::RowsAtCompileTime> K;
   typename MSF_Core<EKFState_T>::ErrorStateCov & P = state->P;
 
   S = H_delayed * P * H_delayed.transpose() + R_delayed;
-  K = P * H_delayed.transpose() * S.inverse();
+  S_inverse = S.inverse();
+  K = P * H_delayed.transpose() * S_inverse;
+
+  if(enable_mah_outlier_rejection_){
+    //calculate mahalanobis distance
+    double mah_dist_squared = res_delayed.transpose() * S_inverse * res_delayed;
+
+    //reject point as outlier if distance above threshold
+    if (sqrt(mah_dist_squared) > mah_threshold_){
+      MSF_WARN_STREAM_THROTTLE(1,"rejecting reading as outlier");
+      return;
+    }
+  }
 
   correction_ = K * res_delayed;
   const typename MSF_Core<EKFState_T>::ErrorStateCov KH =
@@ -72,13 +89,26 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
   Eigen::Matrix<double, MSF_Core<EKFState_T>::nErrorStatesAtCompileTime, 1> correction_;
 
   Eigen::MatrixXd S;
+  Eigen::MatrixXd S_inverse;
   Eigen::MatrixXd K(
       static_cast<int>(MSF_Core<EKFState_T>::nErrorStatesAtCompileTime),
       R_delayed.rows());
   typename MSF_Core<EKFState_T>::ErrorStateCov & P = state->P;
 
   S = H_delayed * P * H_delayed.transpose() + R_delayed;
-  K = P * H_delayed.transpose() * S.inverse();
+  S_inverse = S.inverse();
+  K = P * H_delayed.transpose() * S_inverse;
+
+  if(enable_mah_outlier_rejection_){
+    //calculate mahalanobis distance
+    double mah_dist_squared = res_delayed.transpose() * S_inverse * res_delayed;
+
+    //reject point as outlier if distance above threshold
+    if (sqrt(mah_dist_squared) > mah_threshold_){
+      MSF_WARN_STREAM_THROTTLE(1,"rejecting reading as outlier");
+      return;
+    }
+  }
 
   correction_ = K * res_delayed;
   const typename MSF_Core<EKFState_T>::ErrorStateCov KH =
