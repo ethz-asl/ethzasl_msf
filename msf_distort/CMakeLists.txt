@@ -8,6 +8,8 @@ project(msf_distort)
 #  RelWithDebInfo : w/ debug symbols, w/ optimization
 #  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
+#build with boost 1.6x
+add_definitions(-DBOOST_NO_CXX11_VARIADIC_TEMPLATES)
 
 find_package(catkin REQUIRED COMPONENTS msf_core std_msgs visualization_msgs sensor_msgs image_transport image_geometry geometry_msgs dynamic_reconfigure)
 

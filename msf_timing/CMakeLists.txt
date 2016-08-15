@@ -8,6 +8,8 @@ project(msf_timing)
 #  RelWithDebInfo : w/ debug symbols, w/ optimization
 #  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
+#build with boost 1.6x
+add_definitions(-DBOOST_NO_CXX11_VARIADIC_TEMPLATES)
 
 include_directories(include)
 
