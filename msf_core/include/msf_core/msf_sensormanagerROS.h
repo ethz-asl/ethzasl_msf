@@ -70,8 +70,6 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
   ros::Publisher pubCovAux_;  ///< Publishes the covariance matrix for the auxiliary states.
   ros::Publisher pubCovCoreAux_; ///< Publishes the covariance matrix for the cross-correlations between core and auxiliary states.
 
-  std::string msf_output_frame_;
-
   mutable tf::TransformBroadcaster tf_broadcaster_;
 
   sensor_fusion_comm::ExtEkf hl_state_buf_;  ///< Buffer to store external propagation data.
@@ -86,7 +84,6 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
     reconfServer_->setCallback(f);
 
     pnh.param("data_playback", this->data_playback_, false);
-    pnh.param("msf_output_frame", msf_output_frame_, std::string("world"));
 
     ros::NodeHandle nh("msf_core");
 
@@ -206,7 +203,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
       geometry_msgs::PoseWithCovarianceStamped msgPose;
       msgPose.header.stamp = ros::Time(state->time);
       msgPose.header.seq = msg_seq++;
-      msgPose.header.frame_id = msf_output_frame_;
+      msgPose.header.frame_id = "/world";
       state->ToPoseMsg(msgPose);
       pubPose_.publish(msgPose);
 
@@ -214,7 +211,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
       nav_msgs::Odometry msgOdometry;
       msgOdometry.header.stamp = ros::Time(state->time);
       msgOdometry.header.seq = msg_seq++;
-      msgOdometry.header.frame_id = msf_output_frame_;
+      msgOdometry.header.frame_id = "/world";
       msgOdometry.child_frame_id = "imu";
       state->ToOdometryMsg(msgOdometry);
       pubOdometry_.publish(msgOdometry);
@@ -326,7 +323,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
       geometry_msgs::PoseWithCovarianceStamped msgPose;
       msgPose.header.stamp = ros::Time(state->time);
       msgPose.header.seq = msg_seq;
-      msgPose.header.frame_id = msf_output_frame_;
+      msgPose.header.frame_id = "/world";
 
       state->ToPoseMsg(msgPose);
       pubPoseAfterUpdate_.publish(msgPose);
@@ -344,7 +341,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
       tf_broadcaster_.sendTransform(
           tf::StampedTransform(
               transform, ros::Time::now() /*ros::Time(latestState->time_)*/,
-              msf_output_frame_, "state"));
+              "world", "state"));
     }
 
     if (pubCovCore_.getNumSubscribers()) {
