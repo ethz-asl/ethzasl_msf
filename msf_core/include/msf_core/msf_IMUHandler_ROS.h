@@ -35,10 +35,11 @@ class IMUHandler_ROS : public IMUHandler<EKFState_T> {
 
     ros::NodeHandle nh(topic_namespace);
 
-    subImu_ = nh.subscribe("imu_state_input", 100, &IMUHandler_ROS::IMUCallback,
-                           this);
-    subState_ = nh.subscribe("hl_state_input", 10,
-                             &IMUHandler_ROS::StateCallback, this);
+    subImu_ = nh.subscribe("imu_state_input", 1, &IMUHandler_ROS::IMUCallback,
+                           this, ros::TransportHints().tcpNoDelay());
+    subState_ =
+        nh.subscribe("hl_state_input", 1, &IMUHandler_ROS::StateCallback, this,
+                     ros::TransportHints().tcpNoDelay());
   }
 
   virtual ~IMUHandler_ROS() { }
