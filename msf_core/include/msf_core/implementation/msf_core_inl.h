@@ -44,6 +44,7 @@ MSF_Core<EKFState_T>::MSF_Core(const MSF_SensorManager<EKFState_T>& GetUserCalc)
   // Set the output precision for numeric values.
   std::setprecision(NUMERIC_PREC);
   initialized_ = false;
+  initTime_ = 0;
   predictionMade_ = false;
   isfuzzyState_ = false;
   time_P_propagated = 0;
@@ -102,6 +103,11 @@ void MSF_Core<EKFState_T>::ProcessIMU(
 
   if (!initialized_)
     return;
+
+  if (msg_stamp < initTime_) {
+    MSF_WARN_STREAM("IMU time before filter init time: Discarding");
+    return;
+  }
 
   msf_timing::DebugTimer timer_PropGetClosestState("PropGetClosestState");
   if (it_last_IMU == stateBuffer_.GetIteratorEnd()) {
@@ -595,6 +601,7 @@ void MSF_Core<EKFState_T>::Init(
 
 
   MSF_INFO_STREAM("Core init with state: " << std::endl << state->Print());
+  initTime_ = state->time;
   initialized_ = true;
 
   msf_timing::Timing::Print(std::cout);
