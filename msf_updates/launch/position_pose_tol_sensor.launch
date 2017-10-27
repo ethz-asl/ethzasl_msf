@@ -1,0 +1,24 @@
+<launch>
+    <node launch-prefix="gdb -ex run --args" name="msf_position_pose_sensor" pkg="msf_updates" type="position_pose_sensor" clear_params="true" output="screen">
+        <!--remap from="msf_core/hl_state_input" to="/auk/fcu/ekf_state_out" /--> <!--HL STATE-->
+        <!--remap from="msf_core/correction" to="/auk/fcu/ekf_state_in"/-->
+  			
+        <!--remap from="msf_core/imu_state_input" to="/imu0" /--> <!--SLAM SENSOR IMU-->
+        <remap from="msf_core/imu_state_input" to="/auk/fcu/imu" /> <!--IMU-->
+
+        <!--remap from="msf_updates/position_input" to="/leica/position" /--> <!--LEICA-->
+        <!--remap from="msf_updates/navsatfix_input" to="/auk/fcu/gps" /-->  <!--GPS-->
+	    	
+        <!--remap from="msf_updates/transform_input" to="vicon/auk/auk" /--> <!--VICON-->
+                    
+        <!--remap from="msf_updates/pose_with_covariance_input" to="/bluebird/down/vslam/pose" /-->  <!--BLUEBIRD-->
+        <!--remap from="msf_updates/pose_with_covariance_input" to="/auk/down/vslam/pose" /--> <!--AUK-->
+        <!--remap from="msf_updates/pose_with_covariance_input" to="vslam/pose" /-->
+
+        <!--DISTORTED-->
+        <remap from="msf_updates/navsatfix_input" to="/msf_distort/navsatfix_output" /> 
+        <remap from="msf_updates/pose_with_covariance_input" to="/msf_distort/pose_with_covariance_output" />
+
+        <rosparam file="$(find msf_updates)/position_pose_sensor_fix.yaml"/>
+    </node>
+</launch>
