@@ -282,14 +282,16 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
 
   virtual void AugmentCorrectionVector(
       Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, 1>& correction) const {
+		  //MSF_WARN_STREAM("AugmentCorrectionVector called");
     UNUSED(correction);
+    
   }
 
   virtual void SanityCheckCorrection(
       EKFState_T& delaystate,
       const EKFState_T& buffstate,
       Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, 1>& correction) const {
-
+	//MSF_WARN_STREAM("SanityCheckCorrection called");
     UNUSED(buffstate);
     UNUSED(correction);
 

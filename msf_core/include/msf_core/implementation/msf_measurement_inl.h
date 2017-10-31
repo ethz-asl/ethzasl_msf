@@ -54,20 +54,24 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
 
   S = H_delayed * P * H_delayed.transpose() + R_delayed;
   S_inverse = S.inverse();
-  K = P * H_delayed.transpose() * S_inverse;
 
-  if(enable_mah_outlier_rejection_){
+  //MSF_WARN_STREAM("getting close");
+  if(enable_mah_outlier_rejection_){ //could do this earlier to save computation time
+	  //MSF_WARN_STREAM("outlier rejection active");
     //calculate mahalanobis distance
-    Eigen::MatrixXd mah_dist_squared_temp = res_delayed.transpose() * S_inverse * res_delayed;
-    double mah_dist_squared = mah_dist_squared_temp(0,0);
+    //Eigen::MatrixXd mah_dist_squared_temp = res_delayed.transpose() * S_inverse * res_delayed;//is this correct (this should output a scalar right?)
+    double mah_dist_squared=res_delayed.transpose() * S_inverse * res_delayed;
+    //double mah_dist_squared = mah_dist_squared_temp(0,0);
 
     //reject point as outlier if distance above threshold
-    if (sqrt(mah_dist_squared) > mah_threshold_){
-      MSF_WARN_STREAM_THROTTLE(1,"rejecting reading as outlier");
+    //if (sqrt(mah_dist_squared) > mah_threshold_){ //should not compute sqrt for efficiency
+    if(mah_dist_squared>mah_threshold_*mah_threshold_){
+      MSF_WARN_STREAM("rejecting reading as outlier");
       return;
     }
   }
-
+  
+  K = P * H_delayed.transpose() * S_inverse;
   correction_ = K * res_delayed;
   const typename MSF_Core<EKFState_T>::ErrorStateCov KH =
       (MSF_Core<EKFState_T>::ErrorStateCov::Identity() - K * H_delayed);
@@ -98,16 +102,17 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
 
   S = H_delayed * P * H_delayed.transpose() + R_delayed;
   S_inverse = S.inverse();
-  K = P * H_delayed.transpose() * S_inverse;
-
+  K = P * H_delayed.transpose() * S_inverse; //do same here as on the previous
+  //MSF_WARN_STREAM("getting close2");
   if(enable_mah_outlier_rejection_){
+	//MSF_WARN_STREAM("outlier rejection active2");
     //calculate mahalanobis distance
     Eigen::MatrixXd mah_dist_squared_temp = res_delayed.transpose() * S_inverse * res_delayed;
     double mah_dist_squared = mah_dist_squared_temp(0,0);
 
     //reject point as outlier if distance above threshold
     if (sqrt(mah_dist_squared) > mah_threshold_){
-      MSF_WARN_STREAM_THROTTLE(1,"rejecting reading as outlier");
+      MSF_WARN_STREAM("rejecting reading as outlier");
       return;
     }
   }
@@ -131,7 +136,7 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrectionRelative(
     const Eigen::MatrixBase<H_type>& H_new,
     const Eigen::MatrixBase<Res_type> & res,
     const Eigen::MatrixBase<R_type>& R) {
-
+  //MSF_WARN_STREAM("using relative correction");
   EIGEN_STATIC_ASSERT_FIXED_SIZE (H_type);
   EIGEN_STATIC_ASSERT_FIXED_SIZE (R_type);
 

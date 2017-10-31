@@ -1,4 +1,4 @@
-/pose_sensor/core/data_playback: false
+/pose_sensor/core/data_playback: true
 /pose_sensor/core/fixed_bias: 0
 
 #########IMU PARAMETERS#######
@@ -8,32 +8,32 @@
 /pose_sensor/core/core_noise_gyr: 0.0013
 /pose_sensor/core/core_noise_gyrbias: 0.00013
 
-/pose_sensor/pose_sensor/fixed_scale: 1
-/pose_sensor/pose_sensor/pose_noise_scale: 0.0
-/pose_sensor/pose_sensor/pose_noise_p_wv: 0.0
-/pose_sensor/pose_sensor/pose_noise_q_wv: 0.0
-/pose_sensor/pose_sensor/pose_noise_q_ic: 0.0
-/pose_sensor/pose_sensor/pose_noise_p_ic: 0.0
-/pose_sensor/pose_sensor/pose_delay: 0.002
-/pose_sensor/pose_sensor/pose_noise_meas_p: 0.005
-/pose_sensor/pose_sensor/pose_noise_meas_q: 0.005
+/msf_viconpos_sensor/pose_sensor/fixed_scale: 1
+/msf_viconpos_sensor/pose_sensor/pose_noise_scale: 0.0
+/msf_viconpos_sensor/pose_sensor/pose_noise_p_wv: 0.0
+/msf_viconpos_sensor/pose_sensor/pose_noise_q_wv: 0.0
+/msf_viconpos_sensor/pose_sensor/pose_noise_q_ic: 0.0
+/msf_viconpos_sensor/pose_sensor/pose_noise_p_ic: 0.0
+/msf_viconpos_sensor/pose_sensor/pose_delay: 0.002
+/msf_viconpos_sensor/pose_sensor/pose_noise_meas_p: 0.005
+/msf_viconpos_sensor/pose_sensor/pose_noise_meas_q: 0.005
 
-/pose_sensor/pose_sensor/init/q_ic/w: 1.0
-/pose_sensor/pose_sensor/init/q_ic/x: 0.0
-/pose_sensor/pose_sensor/init/q_ic/y: 0.0
-/pose_sensor/pose_sensor/init/q_ic/z: 0.0
-/pose_sensor/pose_sensor/init/p_ic/x: 0.0   
-/pose_sensor/pose_sensor/init/p_ic/y: 0.0
-/pose_sensor/pose_sensor/init/p_ic/z: 0.0
+/msf_viconpos_sensor/pose_sensor/init/q_ic/w: 1.0
+/msf_viconpos_sensor/pose_sensor/init/q_ic/x: 0.0
+/msf_viconpos_sensor/pose_sensor/init/q_ic/y: 0.0
+/msf_viconpos_sensor/pose_sensor/init/q_ic/z: 0.0
+/msf_viconpos_sensor/pose_sensor/init/p_ic/x: 0.0   
+/msf_viconpos_sensor/pose_sensor/init/p_ic/y: 0.0
+/msf_viconpos_sensor/pose_sensor/init/p_ic/z: 0.0
 
-/pose_sensor/pose_sensor/pose_fixed_scale: true
-/pose_sensor/pose_sensor/pose_fixed_p_ic: true
-/pose_sensor/pose_sensor/pose_fixed_q_ic: true
-/pose_sensor/pose_sensor/pose_fixed_p_wv: true
-/pose_sensor/pose_sensor/pose_fixed_q_wv: true
+/msf_viconpos_sensor/pose_sensor/pose_fixed_scale: true
+/msf_viconpos_sensor/pose_sensor/pose_fixed_p_ic: true
+/msf_viconpos_sensor/pose_sensor/pose_fixed_q_ic: true
+/msf_viconpos_sensor/pose_sensor/pose_fixed_p_wv: true
+/msf_viconpos_sensor/pose_sensor/pose_fixed_q_wv: true
  
-/pose_sensor/pose_sensor/pose_absolute_measurements: true
-/pose_sensor/pose_sensor/pose_use_fixed_covariance: true
-/pose_sensor/pose_sensor/pose_measurement_world_sensor: true  # selects if sensor measures its position w.r.t. world (true, e.g. Vicon) or the position of the world coordinate system w.r.t. the sensor (false, e.g. ethzasl_ptam
+/msf_viconpos_sensor/pose_sensor/pose_absolute_measurements: true
+/msf_viconpos_sensor/pose_sensor/pose_use_fixed_covariance: true
+/msf_viconpos_sensor/pose_sensor/pose_measurement_world_sensor: true  # selects if sensor measures its position w.r.t. world (true, e.g. Vicon) or the position of the world coordinate system w.r.t. the sensor (false, e.g. ethzasl_ptam
 
-/pose_sensor/pose_sensor/pose_measurement_minimum_dt: 0.05  # Sets the minimum time in seconds between two pose measurements.
+/msf_viconpos_sensor/pose_sensor/pose_measurement_minimum_dt: 0.05  # Sets the minimum time in seconds between two pose measurements.

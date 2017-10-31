@@ -1,0 +1,57 @@
+scale_init: 1
+/position_sensor/coredata_playback: true
+
+/position_sensor/core/core_fixed_bias: 0
+
+#########IMU PARAMETERS#######
+######## Asctec Firefly IMU
+/core/core_noise_acc: 0.083
+/core/core_noise_accbias: 0.0083
+/core/core_noise_gyr: 0.0013
+/core/core_noise_gyrbias: 0.00013
+
+
+#######Parameters for Pose######
+/msf_position_pose_sensor/pose_sensor/pose_use_fixed_covariance: true
+/msf_position_pose_sensor/pose_sensor/pose_fixed_scale: false
+/msf_position_pose_sensor/pose_sensor/pose_noise_scale: 0.0
+/msf_position_pose_sensor/pose_sensor/pose_noise_p_wv: 0.0
+/msf_position_pose_sensor/pose_sensor/pose_noise_q_wv: 0.0
+/msf_position_pose_sensor/pose_sensor/pose_noise_q_ic: 0.0
+/msf_position_pose_sensor/pose_sensor/pose_noise_p_ic: 0.0
+/msf_position_pose_sensor/pose_sensor/pose_delay: 0.02
+/msf_position_pose_sensor/pose_sensor/pose_noise_meas_p: 0.01
+/msf_position_pose_sensor/pose_sensor/pose_noise_meas_q: 0.02
+/msf_position_pose_sensor/pose_sensor/pose_initial_scale: 1
+
+/msf_position_pose_sensor/pose_sensor/init/q_ic/w: 0
+/msf_position_pose_sensor/pose_sensor/init/q_ic/x: 0
+/msf_position_pose_sensor/pose_sensor/init/q_ic/y: 0
+/msf_position_pose_sensor/pose_sensor/init/q_ic/z: 1
+/msf_position_pose_sensor/pose_sensor/init/p_ic/x: 0.0745374   
+/msf_position_pose_sensor/pose_sensor/init/p_ic/y: -0.086751
+/msf_position_pose_sensor/pose_sensor/init/p_ic/z: 0.0123919
+
+/msf_position_pose_sensor/position_pose_sensor/pose_fixed_scale: false
+/msf_position_pose_sensor/position_pose_sensor/pose_fixed_p_ic: false
+/msf_position_pose_sensor/position_pose_sensor/pose_fixed_q_ic: false
+/msf_position_pose_sensor/position_pose_sensor/pose_fixed_p_wv: false
+/msf_position_pose_sensor/position_pose_sensor/pose_fixed_q_wv: false
+
+#######Parameters for Position#########
+/msf_position_pose_sensor/position_sensor/position_noise_meas: 0.01
+/msf_position_pose_sensor/position_sensor/position_fixed_ppi: true
+/msf_position_pose_sensor/position_sensor/position_delay: 0.2
+
+#settings for outlier detection
+/msf_position_pose_sensor/position_sensor/enable_mah_outlier_rejection: false
+/msf_position_pose_sensor/position_sensor/mah_threshold: 100.0
+
+#init position offset prism imu
+/msf_position_pose_sensor/position_sensor/init/p_ip/x: 0.02    
+/msf_position_pose_sensor/position_sensor/init/p_ip/y: -0.05
+/msf_position_pose_sensor/position_sensor/init/p_ip/z: 0.05
+
+/msf_position_pose_sensor/position_sensor/position_absolute_measurements: true
+/msf_position_pose_sensor/position_sensor/position_use_fixed_covariance: true
+/msf_position_pose_sensor/position_sensor/position_measurement_world_sensor: true  # selects if sensor measures its position w.r.t. world (true, e.g. Vicon) or the position of the world coordinate system w.r.t. the sensor (false, e.g. ethzasl_ptam)
