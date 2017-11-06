@@ -31,6 +31,7 @@ PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PositionSensorHandler(
                                            parameternamespace),
       n_zp_(1e-6),
       delay_(0) {
+  MSF_WARN_STREAM("initialized position sensor handler");
   ros::NodeHandle pnh("~/position_sensor");
   pnh.param("position_use_fixed_covariance", use_fixed_covariance_, false);
   pnh.param("position_absolute_measurements", provides_absolute_measurements_,
@@ -110,17 +111,37 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPositionMeasu
       fixedstates |= 1 << msf_updates::EKFState::StateDefinition_T::p_ip;
     }
   }
-
+  
+  //get (potentially) changed threshold
+  //chagned by position measurement
+  ros::NodeHandle pnh("~/position_sensor");
+  pnh.param("mah_threshold", mah_threshold_, msf_core::kDefaultMahThreshold_);
   shared_ptr<MEASUREMENT_TYPE> meas(new MEASUREMENT_TYPE(
       n_zp_, use_fixed_covariance_, provides_absolute_measurements_,
       this->sensorID, fixedstates, enable_mah_outlier_rejection_,
       mah_threshold_));
 
   meas->MakeFromSensorReading(msg, msg->header.stamp.toSec() - delay_);
+  
 
   z_p_ = meas->z_p_;  // Store this for the init procedure.
-
+  
   this->manager_.msf_core_->AddMeasurement(meas);
+
+  /*bool rejected_as_outlier=this->manager_.msf_core_->AddMeasurement(meas);
+  if(rejected_as_outlier)
+  {
+	  mah_threshold_factor_*=msf_core::MahTRejectionPunishement_;
+  }
+  else
+  {
+	  mah_threshold_factor_*=msf_core::MahOutlierRejectionReliefe_;
+  }
+  if(mah_threshold_factor_>=msf_core::MahThresholdLimit_)
+  {
+	  mah_threshold_factor_=1;
+	  //REINIT THIS SENSOR
+  }*/
 }
 
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>

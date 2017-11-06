@@ -117,6 +117,21 @@ void AngleSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
   z_a_ = meas->z_a_;  //store this for the init procedure
 
   this->manager_.msf_core_->AddMeasurement(meas);
+
+  /*bool rejected_as_outlier=this->manager_.msf_core_->AddMeasurement(meas);
+  if(rejected_as_outlier)
+  {
+	  mah_threshold_factor_*=msf_core::MahThresholdRejectionPunishement_;
+  }
+  else
+  {
+	  mah_threshold_factor_*=msf_core::MahThresholdRejectionReliefe_;
+  }
+  if(mah_threshold_factor_>=msf_core::MahThresholdLimit_)
+  {
+	  mah_threshold_factor_=1;
+	  //REINIT THIS SENSOR
+  }*/
 }
 
 // Distance sensor implementation:

@@ -1,0 +1,14 @@
+<launch>
+    
+
+    <node  launch-prefix="gdb -ex run --args" name="msf_position_pose_sensor" pkg="msf_updates" type="position_pose_sensor" clear_params="true" output="screen">
+        <remap from="msf_core/hl_state_input" to="/fcu/ekf_state_out" />
+        <remap from="msf_core/correction" to="/fcu/ekf_state_in"/>
+  			
+        <remap from="msf_core/imu_state_input" to="/imu0" />
+
+        <remap from="msf_updates/position_input" to="/leica/position" /> 
+        <rosparam file="$(find msf_updates)/position_pose_tol_sensor_fix.yaml"/>
+    </node>
+    <node pkg="rosservice" type="rosservice" name="initialize" args="call --wait /msf_position_pose_sensor/position_sensor/initialize_msf_scale 1"/>
+</launch>

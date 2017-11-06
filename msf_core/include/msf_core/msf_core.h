@@ -155,6 +155,17 @@ class MSF_Core {
           EKFState_T::nErrorStatesAtCompileTime>& P);
 
   /**
+   * \brief Applies the correction.
+   * \param delaystate The state to apply the correction on.
+   * \param correction The correction vector.
+   * \param fuzzythres The error of the non temporal drifting state allowed
+   *  before fuzzy tracking will be triggered.
+   */
+  bool ApplyCorrection(shared_ptr<EKFState_T>& delaystate,
+                       ErrorState & correction, double fuzzythres = 0.1);
+
+
+  /**
    * \brief Ctor takes a pointer to an object which does the user defined
    * calculations and provides interfaces for initialization etc.
    * \param GetUserCalc The class providing the user defined calculations
@@ -203,15 +214,6 @@ class MSF_Core {
   /// A class which provides methods for customization of several calculations.
   const MSF_SensorManager<EKFState_T>& usercalc_;
 
-  /**
-   * \brief Applies the correction.
-   * \param delaystate The state to apply the correction on.
-   * \param correction The correction vector.
-   * \param fuzzythres The error of the non temporal drifting state allowed
-   *  before fuzzy tracking will be triggered.
-   */
-  bool ApplyCorrection(shared_ptr<EKFState_T>& delaystate,
-                       ErrorState & correction, double fuzzythres = 0.1);
 
   /**
    * \brief Propagate covariance to a given state in time.

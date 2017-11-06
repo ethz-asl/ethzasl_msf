@@ -78,6 +78,21 @@ void PressureSensorHandler::MeasurementCallback(
   z_average_p(0) = sum / heightbuffsize;
 
   this->manager_.msf_core_->AddMeasurement(meas);
+
+  /*bool rejected_as_outlier=this->manager_.msf_core_->AddMeasurement(meas);
+  if(rejected_as_outlier)
+  {
+	  mah_threshold_factor_*=msf_core::MahThresholdRejectionPunishement_;
+  }
+  else
+  {
+	  mah_threshold_factor_*=msf_core::MahThresholdRejectionReliefe_;
+  }
+  if(mah_threshold_factor_>=msf_core::MahThresholdLimit_)
+  {
+	  mah_threshold_factor_=1;
+	  //REINIT THIS SENSOR
+  }*/
 }
 }  // namespace msf_pressure_sensor
 #endif  // PRESSURE_SENSORHANDLER_HPP_

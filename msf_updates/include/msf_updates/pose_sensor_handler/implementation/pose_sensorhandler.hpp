@@ -33,7 +33,7 @@ PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PoseSensorHandler(
       n_zq_(1e-6),
       delay_(0),
       timestamp_previous_pose_(0) {
-  ros::NodeHandle pnh("~/" + parameternamespace);
+  ros::NodeHandle pnh("~/pose_sensor");
 
   MSF_INFO_STREAM(
       "Loading parameters for pose sensor from namespace: "
@@ -158,7 +158,8 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
       fixedstates |= 1 << MEASUREMENT_TYPE::AuxState::q_wv;
     }
   }
-
+  ros::NodeHandle pnh("~/pose_sensor");
+  pnh.param("mah_threshold", mah_threshold_, msf_core::kDefaultMahThreshold_);
   shared_ptr<MEASUREMENT_TYPE> meas(new MEASUREMENT_TYPE(
       n_zp_, n_zq_, measurement_world_sensor_, use_fixed_covariance_,
       provides_absolute_measurements_, this->sensorID,
@@ -170,6 +171,21 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
   z_q_ = meas->z_q_;
 
   this->manager_.msf_core_->AddMeasurement(meas);
+
+  /*bool rejected_as_outlier=this->manager_.msf_core_->AddMeasurement(meas);
+  if(rejected_as_outlier)
+  {
+	  mah_threshold_factor_*=msf_core::MahThresholdRejectionPunishement_;
+  }
+  else
+  {
+	  mah_threshold_factor_*=msf_core::MahThresholdRejectionReliefe_;
+  }
+  if(mah_threshold_factor_>=msf_core::MahThresholdLimit_)
+  {
+	  mah_threshold_factor_=1;
+	  //REINIT THIS SENSOR
+  }*/
 }
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
