@@ -32,7 +32,21 @@ PressureSensorHandler::PressureSensorHandler(
 
   pnh.param("enable_mah_outlier_rejection", enable_mah_outlier_rejection_, false);
   pnh.param("mah_threshold", mah_threshold_, msf_core::kDefaultMahThreshold_);
-
+  mah_threshold_base_=mah_threshold_;
+  pnh.param("mah_threshold_limit", mah_threshold_limit_, msf_core::kDefaultMahThresholdLimit_);
+  pnh.param("mah_rejection_modification", mah_rejection_modification_, msf_core::kDefaultMahRejectionModification_);
+  pnh.param("mah_acceptance_modification", mah_acceptance_modification_, msf_core::kDefaultMahAcceptanceModification_);
+  
+  
+    if(enable_mah_outlier_rejection_)
+  {
+	  MSF_INFO_STREAM("Pressure sensor is using outlier rejection with initial threshold: " <<
+	  mah_threshold_ << ", rejection modificator: " << mah_rejection_modification_ <<
+	  ", acceptance modificator: " << mah_acceptance_modification_ <<
+	  " and reset limit: "<< mah_threshold_limit_);
+  }
+  
+  
   subPressure_ =
       nh.subscribe<geometry_msgs::PointStamped>
       ("pressure_height", 20, &PressureSensorHandler::MeasurementCallback, this);
@@ -64,7 +78,7 @@ void PressureSensorHandler::MeasurementCallback(
   shared_ptr<pressure_measurement::PressureMeasurement> meas(
       new pressure_measurement::PressureMeasurement(
           n_zp_, true, this->sensorID, enable_mah_outlier_rejection_,
-          mah_threshold_));
+          &mah_threshold_, mah_rejection_modification_, mah_acceptance_modification_));
   meas->MakeFromSensorReading(msg, msg->header.stamp.toSec());
 
   z_p_ = meas->z_p_;  // Store this for the init procedure.

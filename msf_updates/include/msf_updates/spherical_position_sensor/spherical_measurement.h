@@ -83,9 +83,11 @@ struct AngleMeasurement : public AngleMeasurementBase {
   }
   AngleMeasurement(double n_za, bool fixed_covariance,
                    bool isabsoluteMeasurement, int sensorID, int fixedstates,
-                   bool enable_mah_outlier_rejection, double mah_threshold)
+                   bool enable_mah_outlier_rejection, double* mah_threshold,
+                   double mah_rejection_modification, double mah_acceptance_modification)
       : AngleMeasurementBase(isabsoluteMeasurement, sensorID,
-                             enable_mah_outlier_rejection, mah_threshold),
+                             enable_mah_outlier_rejection, mah_threshold,
+                             mah_rejection_modification, mah_acceptance_modification),
         n_za_(n_za),
         fixed_covariance_(fixed_covariance),
         fixedstates_(fixedstates) {}
@@ -369,9 +371,11 @@ struct DistanceMeasurement : public DistanceMeasurementBase {
   }
   DistanceMeasurement(double n_zd, bool fixed_covariance,
                       bool isabsoluteMeasurement, int sensorID, int fixedstates,
-                      bool enable_mah_outlier_rejection, double mah_threshold)
+                      bool enable_mah_outlier_rejection, double* mah_threshold,
+                      double mah_rejection_modification, double mah_acceptance_modification)
       : DistanceMeasurementBase(isabsoluteMeasurement, sensorID,
-                                enable_mah_outlier_rejection, mah_threshold),
+                                enable_mah_outlier_rejection, mah_threshold,
+                                mah_rejection_modification, mah_acceptance_modification),
         n_zd_(n_zd),
         fixed_covariance_(fixed_covariance),
         fixedstates_(fixedstates) {}

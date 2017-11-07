@@ -23,11 +23,15 @@ template<typename EKFState_T>
 MSF_MeasurementBase<EKFState_T>::MSF_MeasurementBase(bool isabsoluteMeasurement,
                                                      int sensorID, 
                                                      bool enable_mah_outlier_rejection,
-                                                     double mah_threshold)
+                                                     double* mah_threshold,
+                                                     double mah_rejection_modification,
+                                                     double mah_acceptance_modification)
     : sensorID_(sensorID),
       isabsolute_(isabsoluteMeasurement),
       enable_mah_outlier_rejection_(enable_mah_outlier_rejection),
       mah_threshold_(mah_threshold),
+      mah_rejection_modification_(mah_rejection_modification),
+      mah_acceptance_modification_(mah_acceptance_modification),
       time(0) {
 		  //MSF_WARN_STREAM("init ne MeasurementBase class");
 }
@@ -79,7 +83,7 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
   pnh.getParam("mah_threshold",paramvalue);
   MSF_WARN_STREAM("threshold on params server is:"<<paramvalue);*/
   //MSF_WARN_STREAM("mah distance squared is"<<mah_dist_squaredtest);
-  //MSF_WARN_STREAM("new step");
+  MSF_WARN_STREAM("new step with mah treshhold"<<(*mah_threshold_));
   if(enable_mah_outlier_rejection_){ //could do this earlier to save computation time
 	  //MSF_WARN_STREAM("outlier rejection active");
     //calculate mahalanobis distance
@@ -89,14 +93,15 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
 
     //reject point as outlier if distance above threshold
     //if (sqrt(mah_dist_squared) > mah_threshold_){ //should not compute sqrt for efficiency
-    if(mah_dist_squared>mah_threshold_*mah_threshold_){
-	  //mah_threshold_*=2;
+    if(mah_dist_squared>(*mah_threshold_)*(*mah_threshold_)){
+	  (*mah_threshold_)*=2;
 	  //MSF_WARN_STREAM("new mah_threshold"<<mah_threshold_);
       MSF_WARN_STREAM("rejecting reading as outlier with distance squared"<<mah_dist_squared);
       return;
     }
+    (*mah_threshold_)*=0.9;
   }
-  //mah_threshold_*=1.2;
+
   K = P * H_delayed.transpose() * S_inverse;
   correction_ = K * res_delayed;
   const typename MSF_Core<EKFState_T>::ErrorStateCov KH =
@@ -128,21 +133,23 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
 
   S = H_delayed * P * H_delayed.transpose() + R_delayed;
   S_inverse = S.inverse();
-  K = P * H_delayed.transpose() * S_inverse; //do same here as on the previous
+
   //MSF_WARN_STREAM("getting close2");
   if(enable_mah_outlier_rejection_){
 	//MSF_WARN_STREAM("outlier rejection active2");
     //calculate mahalanobis distance
-    Eigen::MatrixXd mah_dist_squared_temp = res_delayed.transpose() * S_inverse * res_delayed;
-    double mah_dist_squared = mah_dist_squared_temp(0,0);
+    double mah_dist_squared = res_delayed.transpose() * S_inverse * res_delayed;
 
     //reject point as outlier if distance above threshold
-    if (sqrt(mah_dist_squared) > mah_threshold_){
+    if (mah_dist_squared > (*mah_threshold_)*(*mah_threshold_)){
       MSF_WARN_STREAM("rejecting reading as outlier");
+      (*mah_threshold_)*=2;
       return;
     }
+    (*mah_threshold_)*=0.9;
   }
 
+  K = P * H_delayed.transpose() * S_inverse; 
   correction_ = K * res_delayed;
   const typename MSF_Core<EKFState_T>::ErrorStateCov KH =
       (MSF_Core<EKFState_T>::ErrorStateCov::Identity() - K * H_delayed);

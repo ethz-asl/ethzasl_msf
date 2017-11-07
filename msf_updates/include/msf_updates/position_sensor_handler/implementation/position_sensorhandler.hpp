@@ -38,6 +38,10 @@ PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PositionSensorHandler(
             false);
   pnh.param("enable_mah_outlier_rejection", enable_mah_outlier_rejection_, false);
   pnh.param("mah_threshold", mah_threshold_, msf_core::kDefaultMahThreshold_);
+  mah_threshold_base_=mah_threshold_;
+  pnh.param("mah_threshold_limit", mah_threshold_limit_, msf_core::kDefaultMahThresholdLimit_);
+  pnh.param("mah_rejection_modification", mah_rejection_modification_, msf_core::kDefaultMahRejectionModification_);
+  pnh.param("mah_acceptance_modification", mah_acceptance_modification_, msf_core::kDefaultMahAcceptanceModification_);
 
   MSF_INFO_STREAM_COND(use_fixed_covariance_, "Position sensor is using fixed "
                        "covariance");
@@ -49,6 +53,13 @@ PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PositionSensorHandler(
   MSF_INFO_STREAM_COND(!provides_absolute_measurements_, "Position sensor is "
                        "handling measurements as relative values");
 
+  if(enable_mah_outlier_rejection_)
+  {
+	  MSF_INFO_STREAM("Position sensor is using outlier rejection with initial threshold: " <<
+	  mah_threshold_ << ", rejection modificator: " << mah_rejection_modification_ <<
+	  ", acceptance modificator: " << mah_acceptance_modification_ <<
+	  " and reset limit: "<< mah_threshold_limit_);
+  }
   ros::NodeHandle nh("msf_updates");
 
   subPointStamped_ =
@@ -114,12 +125,12 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPositionMeasu
   
   //get (potentially) changed threshold
   //chagned by position measurement
-  ros::NodeHandle pnh("~/position_sensor");
-  pnh.param("mah_threshold", mah_threshold_, msf_core::kDefaultMahThreshold_);
+  //ros::NodeHandle pnh("~/position_sensor");
+  //pnh.param("mah_threshold", mah_threshold_, msf_core::kDefaultMahThreshold_);
   shared_ptr<MEASUREMENT_TYPE> meas(new MEASUREMENT_TYPE(
       n_zp_, use_fixed_covariance_, provides_absolute_measurements_,
       this->sensorID, fixedstates, enable_mah_outlier_rejection_,
-      mah_threshold_));
+      &mah_threshold_, mah_rejection_modification_, mah_acceptance_modification_));
 
   meas->MakeFromSensorReading(msg, msg->header.stamp.toSec() - delay_);
   

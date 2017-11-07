@@ -43,18 +43,25 @@ scale_init: 1
 /msf_position_pose_sensor/position_sensor/position_fixed_ppi: true
 /msf_position_pose_sensor/position_sensor/position_delay: 0.2
 
-#settings for outlier detection
-/msf_position_pose_sensor/position_sensor/enable_mah_outlier_rejection: true
-/msf_position_pose_sensor/position_sensor/mah_threshold: 100.0
-
-/msf_position_pose_sensor/pose_sensor/enable_mah_outlier_rejection: true
-/msf_position_pose_sensor/position_sensor/mah_threshold: 100.0
-
 #init position offset prism imu
-/msf_position_pose_sensor/position_sensor/init/p_ip/x: 0.02    
-/msf_position_pose_sensor/position_sensor/init/p_ip/y: -0.05
-/msf_position_pose_sensor/position_sensor/init/p_ip/z: 0.05
+/msf_position_pose_sensor/position_sensor/init/p_ip/x: 7.48903e-02    
+/msf_position_pose_sensor/position_sensor/init/p_ip/y: -1.84772e-02
+/msf_position_pose_sensor/position_sensor/init/p_ip/z: -1.20209e-01
 
 /msf_position_pose_sensor/position_sensor/position_absolute_measurements: true
 /msf_position_pose_sensor/position_sensor/position_use_fixed_covariance: true
 /msf_position_pose_sensor/position_sensor/position_measurement_world_sensor: true  # selects if sensor measures its position w.r.t. world (true, e.g. Vicon) or the position of the world coordinate system w.r.t. the sensor (false, e.g. ethzasl_ptam)
+
+#settings for outlier detection
+/msf_position_pose_sensor/position_sensor/enable_mah_outlier_rejection: true
+/msf_position_pose_sensor/position_sensor/mah_threshold: 100.0
+/msf_position_pose_sensor/position_sensor/mah_rejection_modification: 3.0
+/msf_position_pose_sensor/position_sensor/mah_acceptance_modification: 0.9
+/msf_position_pose_sensor/position_sensor/mah_threshold_limit: 500.0
+
+/msf_position_pose_sensor/pose_sensor/enable_mah_outlier_rejection: true
+/msf_position_pose_sensor/pose_sensor/mah_threshold: 100.0
+/msf_position_pose_sensor/pose_sensor/mah_rejection_modification: 2.0
+/msf_position_pose_sensor/pose_sensor/mah_acceptance_modification: 0.9
+/msf_position_pose_sensor/pose_sensor/mah_threshold_limit: 1000.0
+

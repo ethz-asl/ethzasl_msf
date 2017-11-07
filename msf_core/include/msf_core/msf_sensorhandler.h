@@ -20,9 +20,9 @@
 namespace msf_core {
 
   static constexpr double kDefaultMahThreshold_ = 100.0;
-  static constexpr double MahThresholdRejectionPunishement_ = 2.0;
-  static constexpr double MahThresholdRejectionReliefe_ = 0.8;
-  static constexpr double MahThresholdLimit_ = 1000.0;
+  static constexpr double kDefaultMahRejectionModification_ = 2.0;
+  static constexpr double kDefaultMahAcceptanceModification_ = 0.9;
+  static constexpr double kDefaultMahThresholdLimit_ = 1000.0;
 /**
  * \class SensorHandler
  * \brief Handles a sensor driver which provides the sensor readings.
@@ -39,7 +39,10 @@ class SensorHandler {
   bool received_first_measurement_;
   bool enable_mah_outlier_rejection_;
   double mah_threshold_;
-  double mah_threshold_factor_=1.0;
+  double mah_threshold_base_;
+  double mah_rejection_modification_;
+  double mah_acceptance_modification_;
+  double mah_threshold_limit_;
 
   void SetSensorID(int ID) {
     sensorID = ID;

@@ -139,11 +139,13 @@ struct PoseMeasurement : public PoseMeasurementBase {
   PoseMeasurement(double n_zp, double n_zq, bool measurement_world_sensor,
                   bool fixed_covariance, bool isabsoluteMeasurement,
                   int sensorID, bool enable_mah_outlier_rejection,
-                  double mah_threshold, int fixedstates,
+                  double* mah_threshold, double mah_rejection_modification,
+                  double mah_acceptance_modification, int fixedstates,
                   msf_updates::PoseDistorter::Ptr distorter =
                       msf_updates::PoseDistorter::Ptr())
       : PoseMeasurementBase(isabsoluteMeasurement, sensorID,
-                            enable_mah_outlier_rejection, mah_threshold),
+                            enable_mah_outlier_rejection, mah_threshold,
+                            mah_rejection_modification, mah_acceptance_modification),
         n_zp_(n_zp),
         n_zq_(n_zq),
         measurement_world_sensor_(measurement_world_sensor),
@@ -276,7 +278,7 @@ struct PoseMeasurement : public PoseMeasurementBase {
   /**
    * this method add description (overriding base)
    */
-  template<class H_type, class Res_type, class R_type>
+  /*template<class H_type, class Res_type, class R_type>
   void CalculateAndApplyCorrection(
     shared_ptr<EKFState_T> state, msf_core::MSF_Core<EKFState_T>& core,
     const Eigen::MatrixBase<H_type>& H_delayed,
@@ -332,7 +334,7 @@ struct PoseMeasurement : public PoseMeasurementBase {
   P = 0.5 * (P + P.transpose());
 
   core.ApplyCorrection(state, correction_);
-} 
+} */
   
   
   
