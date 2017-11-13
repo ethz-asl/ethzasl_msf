@@ -30,7 +30,8 @@ PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PositionSensorHandler(
     : SensorHandler<msf_updates::EKFState>(meas, topic_namespace,
                                            parameternamespace),
       n_zp_(1e-6),
-      delay_(0) {
+      delay_(0),
+      received_first_magnetic_field_measurement_(false) {
   ros::NodeHandle pnh("~/position_sensor");
   pnh.param("position_use_fixed_covariance", use_fixed_covariance_, false);
   pnh.param("position_absolute_measurements", provides_absolute_measurements_,
@@ -53,14 +54,20 @@ PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PositionSensorHandler(
   subPointStamped_ =
       nh.subscribe<geometry_msgs::PointStamped>
   ("position_input", 20, &PositionSensorHandler::MeasurementCallback, this);
+
   subTransformStamped_ =
       nh.subscribe<geometry_msgs::TransformStamped>
-  ("transform_input", 20, &PositionSensorHandler::MeasurementCallback, this);
+  ("transform_position_input", 20, &PositionSensorHandler::MeasurementCallback, this);
   subNavSatFix_ =
       nh.subscribe<sensor_msgs::NavSatFix>
   ("navsatfix_input", 20, &PositionSensorHandler::MeasurementCallback, this);
 
+  subMagneticField_ =
+      nh.subscribe<sensor_msgs::MagneticField>
+  ("magnetic_field_input", 20, &PositionSensorHandler::MeasurementCallback, this);
+
   z_p_.setZero();
+  z_m_.setZero();
 
 }
 
@@ -217,6 +224,22 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
   }
 
   ProcessPositionMeasurement(pointwCov);
+}
+
+template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
+void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
+    const sensor_msgs::MagneticFieldConstPtr & msg) {
+
+  MSF_INFO_STREAM_ONCE(
+      "*** position sensor got first measurement from topic "
+          << this->topic_namespace_ << "/" << subMagneticField_.getTopic()
+          << " ***");
+
+  // Saving the field. Only used for initialization
+  z_m_.x() = msg->magnetic_field.x;
+  z_m_.y() = msg->magnetic_field.y;
+  z_m_.z() = msg->magnetic_field.z;
+  received_first_magnetic_field_measurement_ = true;
 }
 }  // namespace msf_position_sensor
 #endif  // POSITION_SENSORHANDLER_HPP_

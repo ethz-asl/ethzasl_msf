@@ -22,6 +22,7 @@
 #include <msf_core/msf_sensormanagerROS.h>
 #include <geometry_msgs/PointStamped.h>
 #include <geometry_msgs/TransformStamped.h>
+#include <sensor_msgs/MagneticField.h>
 #include <sensor_msgs/NavSatFix.h>
 #include <msf_core/gps_conversion.h>
 #include <sensor_fusion_comm/PointWithCovarianceStamped.h>
@@ -34,6 +35,7 @@ class PositionSensorHandler : public msf_core::SensorHandler<
  private:
 
   Eigen::Matrix<double, 3, 1> z_p_;  ///< Position measurement.
+  Eigen::Matrix<double, 3, 1> z_m_;  ///< Magnetic measurement.
   double n_zp_;  ///< Position measurement noise.
   double delay_;       ///< Delay to be subtracted from the ros-timestamp of
                        //the measurement provided by this sensor.
@@ -41,16 +43,20 @@ class PositionSensorHandler : public msf_core::SensorHandler<
   ros::Subscriber subPointStamped_;
   ros::Subscriber subTransformStamped_;
   ros::Subscriber subNavSatFix_;
+  ros::Subscriber subMagneticField_;
   msf_core::GPSConversion gpsConversion_;
 
   bool use_fixed_covariance_;  ///< Use fixed covariance set by dynamic reconfigure.
   bool provides_absolute_measurements_;  ///< Does this sensor measure relative or absolute values.
+
+  bool received_first_magnetic_field_measurement_; // Indicates if the first magnetic field has been received
 
   void ProcessPositionMeasurement(
       const sensor_fusion_comm::PointWithCovarianceStampedConstPtr& msg);
   void MeasurementCallback(const geometry_msgs::PointStampedConstPtr & msg);
   void MeasurementCallback(const geometry_msgs::TransformStampedConstPtr & msg);
   void MeasurementCallback(const sensor_msgs::NavSatFixConstPtr& msg);
+  void MeasurementCallback(const sensor_msgs::MagneticFieldConstPtr& msg);
 
  public:
   typedef MEASUREMENT_TYPE measurement_t;
@@ -60,6 +66,13 @@ class PositionSensorHandler : public msf_core::SensorHandler<
   Eigen::Matrix<double, 3, 1> GetPositionMeasurement() {
     return z_p_;
   }
+  Eigen::Matrix<double, 3, 1> GetMagneticFieldMeasurement() {
+    return z_m_;
+  }
+  bool ReceivedFirstMagneticFieldMeasurement() {
+    return received_first_magnetic_field_measurement_;
+  }
+
   // Setters for configure values.
   void SetNoises(double n_zp);
   void SetDelay(double delay);

@@ -128,12 +128,12 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     msf_core::MSF_Core<EKFState_T>::ErrorStateCov P;
 
     // init values
-    g << 0, 0, 9.81;	/// Gravity.
-    b_w << 0, 0, 0;		/// Bias gyroscopes.
-    b_a << 0, 0, 0;		/// Bias accelerometer.
+    g << 0, 0, 9.81;  /// Gravity.
+    b_w << 0, 0, 0;   /// Bias gyroscopes.
+    b_a << 0, 0, 0;   /// Bias accelerometer.
 
-    v << 0, 0, 0;			/// Robot velocity (IMU centered).
-    w_m << 0, 0, 0;		/// Initial angular velocity.
+    v << 0, 0, 0;     /// Robot velocity (IMU centered).
+    w_m << 0, 0, 0;   /// Initial angular velocity.
 
     q_wv.setIdentity();  // World-vision rotation drift.
     p_wv.setZero();      // World-vision position drift.
@@ -180,7 +180,21 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     // Calculate initial attitude and position based on sensor measurements
     // here we take the attitude from the pose sensor and augment it with
     // global yaw init.
-    double yawinit = config_.position_yaw_init / 180 * M_PI;
+    double yawinit;
+    if (!config_.position_init_yaw_from_compass) {
+      yawinit = config_.position_yaw_init / 180 * M_PI;
+    } else {
+      if (!position_handler_->ReceivedFirstMagneticFieldMeasurement()) {
+        MSF_WARN_STREAM(
+            "No compass measurements received yet. Initializing with 0 yaw.");
+        yawinit = 0;
+      } else {
+        Eigen::Matrix<double, 3, 1> magnetic_field =
+            position_handler_->GetMagneticFieldMeasurement();
+        yawinit = std::atan2(magnetic_field.x(), magnetic_field.y());
+        MSF_WARN_STREAM("Initializing from compass as yaw: " << yawinit * 180 / M_PI);
+      }
+    }
     Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
     yawq.normalize();
 
@@ -200,7 +214,7 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     p_wv = p - p_vision;  // Shift the vision frame so that it fits the position
     // measurement
 
-    a_m = q.inverse() * g;			    /// Initial acceleration.
+    a_m = q.inverse() * g;          /// Initial acceleration.
 
     //TODO (slynen) Fix this.
     //we want z from vision (we did scale init), so:
