@@ -29,7 +29,7 @@ class PosToErrHandler:
     self.init_meas_=False
     
     #init publisher
-    self.pub_=rospy.Publisher("position_to_error_handler/output", messagetype)
+    self.pub_=rospy.Publisher("position_to_error_handler/output", messagetype, queue_size=20)
     
   def l2_norm(self, arrin, truth):
     return np.linalg.norm(arrin-truth, None)

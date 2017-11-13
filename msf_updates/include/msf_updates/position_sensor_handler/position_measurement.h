@@ -88,10 +88,10 @@ struct PositionMeasurement : public PositionMeasurementBase {
   PositionMeasurement(double n_zp, bool fixed_covariance,
                       bool isabsoluteMeasurement, int sensorID, int fixedstates,
                       bool enable_mah_outlier_rejection, double* mah_threshold,
-                      double mah_rejection_modification, double mah_acceptance_modification)
+                      double mah_rejection_modification, double mah_acceptance_modification, double mah_threshold_limit)
       : PositionMeasurementBase(isabsoluteMeasurement, sensorID,
                                 enable_mah_outlier_rejection, mah_threshold,
-                                mah_rejection_modification, mah_acceptance_modification),
+                                mah_rejection_modification, mah_acceptance_modification, mah_threshold_limit),
         n_zp_(n_zp),
         fixed_covariance_(fixed_covariance),
         fixedstates_(fixedstates) {

@@ -110,7 +110,8 @@ void AngleSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
   typename boost::shared_ptr<MEASUREMENT_TYPE> meas(new MEASUREMENT_TYPE(
       n_za_, use_fixed_covariance_, provides_absolute_measurements_,
       this->sensorID, fixedstates, enable_mah_outlier_rejection_,
-      &mah_threshold_, mah_rejection_modification_, mah_acceptance_modification_));
+      &mah_threshold_, mah_rejection_modification_, mah_acceptance_modification_,
+      mah_threshold_limit_));
 
   meas->MakeFromSensorReading(msg, msg->header.stamp.toSec() - delay_);
 
@@ -232,7 +233,7 @@ void DistanceSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
   typename boost::shared_ptr<MEASUREMENT_TYPE> meas(new MEASUREMENT_TYPE(
       n_zd_, use_fixed_covariance_, provides_absolute_measurements_,
       this->sensorID, fixedstates, enable_mah_outlier_rejection_,
-      &mah_threshold_, mah_rejection_modification_, mah_acceptance_modification_));
+      &mah_threshold_, mah_rejection_modification_, mah_acceptance_modification_, mah_threshold_limit_));
 
   meas->MakeFromSensorReading(msg, msg->header.stamp.toSec() - delay_);
 

@@ -78,7 +78,7 @@ void PressureSensorHandler::MeasurementCallback(
   shared_ptr<pressure_measurement::PressureMeasurement> meas(
       new pressure_measurement::PressureMeasurement(
           n_zp_, true, this->sensorID, enable_mah_outlier_rejection_,
-          &mah_threshold_, mah_rejection_modification_, mah_acceptance_modification_));
+          &mah_threshold_, mah_rejection_modification_, mah_acceptance_modification_, mah_threshold_limit_));
   meas->MakeFromSensorReading(msg, msg->header.stamp.toSec());
 
   z_p_ = meas->z_p_;  // Store this for the init procedure.

@@ -1,5 +1,5 @@
 /noise_drift_handler/noise_mean: 0.0
 /noise_drift_handler/noise_number_stddeviations: 0.0
 /noise_drift_handler/use_noise: false
-/noise_drift_handler/probability_outlier: 0.0
-/noise_drift_handler/create_outlier: false
+/noise_drift_handler/probability_outlier: 0.5
+/noise_drift_handler/create_outlier: true

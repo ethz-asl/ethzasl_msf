@@ -25,13 +25,15 @@ MSF_MeasurementBase<EKFState_T>::MSF_MeasurementBase(bool isabsoluteMeasurement,
                                                      bool enable_mah_outlier_rejection,
                                                      double* mah_threshold,
                                                      double mah_rejection_modification,
-                                                     double mah_acceptance_modification)
+                                                     double mah_acceptance_modification,
+                                                     double mah_threshold_limit)
     : sensorID_(sensorID),
       isabsolute_(isabsoluteMeasurement),
       enable_mah_outlier_rejection_(enable_mah_outlier_rejection),
       mah_threshold_(mah_threshold),
       mah_rejection_modification_(mah_rejection_modification),
       mah_acceptance_modification_(mah_acceptance_modification),
+      mah_threshold_limit_(mah_threshold_limit),
       time(0) {
 		  //MSF_WARN_STREAM("init ne MeasurementBase class");
 }
@@ -65,24 +67,7 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
   
   //MSF_WARN_STREAM(EKFState_T::w_m);
   
-  //double mah_dist_squaredtest=res_delayed.transpose() * S_inverse * res_delayed;
-  //ros::NodeHandle pnh("~/position_sensor");
-  /*std::vector<std::string> keys=std::vector<std::string>();
-  pnh.getParamNames(keys);
-  for(auto k:keys)
-  {
-	  MSF_WARN_STREAM("paramnames"<<k);
-  }
-  if(pnh.hasParam("mah_threshold"))
-  {
-	  MSF_INFO_STREAM("param found");
-  }
-  pnh.setParam("mah_threshold", mah_threshold_*2);
-  MSF_WARN_STREAM("current threshold is:"<<mah_threshold_);
-  double paramvalue;
-  pnh.getParam("mah_threshold",paramvalue);
-  MSF_WARN_STREAM("threshold on params server is:"<<paramvalue);*/
-  //MSF_WARN_STREAM("mah distance squared is"<<mah_dist_squaredtest);
+
   MSF_WARN_STREAM("new step with mah treshhold"<<(*mah_threshold_));
   if(enable_mah_outlier_rejection_){ //could do this earlier to save computation time
 	  //MSF_WARN_STREAM("outlier rejection active");
@@ -94,7 +79,7 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
     //reject point as outlier if distance above threshold
     //if (sqrt(mah_dist_squared) > mah_threshold_){ //should not compute sqrt for efficiency
     if(mah_dist_squared>(*mah_threshold_)*(*mah_threshold_)){
-	  (*mah_threshold_)*=mah_rejection_modification_;
+	  (*mah_threshold_)=(*mah_threshold_)*(1.0-mah_rejection_modification_)+mah_rejection_modification_*mah_threshold_limit_;
 	  //MSF_WARN_STREAM("new mah_threshold"<<mah_threshold_);
       MSF_WARN_STREAM("rejecting reading as outlier with distance squared"<<mah_dist_squared);
       return;

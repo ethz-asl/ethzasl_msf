@@ -33,13 +33,13 @@ class MsfNoiseHandler:
     self.create_outlier_=rospy.get_param("~create_outlier", False)
     
     #params to estimate stddeviation of data
-    self.ninit_=100
+    self.ninit_=20
     self.nrecv_=0
     self.stddeviation_=0
     self.datamean_=0
     
     #init publisher
-    self.pub_=rospy.Publisher("noise_drift_handler/output", messagetype)
+    self.pub_=rospy.Publisher("noise_drift_handler/output", messagetype, queue_size=20)
     
   def add_noise(self, arrin):
     noise=np.random.normal(self.mu_, self.nstddeviations_*self.stddeviation_ , len(arrin))
@@ -49,8 +49,8 @@ class MsfNoiseHandler:
 
   def create_outlier(self, arrin):
     #add some big disturbance to arrin (for now 100 times stddeviation)
-    sign=np.random.bool #need 0/1 random
-    noise=np.array([100*self.stddeviation for i in range(len(arrin))])
+    sign=np.random.randint(0,2) #need 0/1 random
+    noise=np.array([10000*self.stddeviation_ for i in range(len(arrin))])
     if sign:
       arrout=arrin+noise
     else:
@@ -59,6 +59,7 @@ class MsfNoiseHandler:
 
   def callback(self, data):
     #handle data here and add noise if necessary
+    #print("first "+str(data.pose.pose.position.x))
     dataarr=np.array([data.pose.pose.position.x, data.pose.pose.position.y, data.pose.pose.position.z,
     data.pose.pose.orientation.x, data.pose.pose.orientation.y, data.pose.pose.orientation.z,
     data.pose.pose.orientation.w]) # (something like this) may need to convert to array
@@ -69,16 +70,19 @@ class MsfNoiseHandler:
       self.datamean_+=delta/self.nrecv_
       delta2=dataarr[0]-self.datamean_
       self.stddeviation_+=delta*delta2
-    if self.nrecv_==self.ninit_:
+    elif self.nrecv_==self.ninit_:
       self.stddeviation_=sqrt(self.stddeviation_/(self.nrecv_-1))
+      self.nrecv_+=1
     
     else:
       if self.use_noise_:
-        dataarr=add_noise(self, dataarr)
+        dataarr=add_noise(dataarr)
       if self.create_outlier_:
         t=np.random.uniform()
         if t<self.p_outlier_:
-          dataarr=create_outlier(self, dataarr)
+          #print("creating outlier")
+          #print(self.stddeviation_)
+          dataarr=self.create_outlier(dataarr)
       data.pose.pose.position.x = dataarr[0]
       data.pose.pose.position.y = dataarr[1]
       data.pose.pose.position.z = dataarr[2]
@@ -86,6 +90,7 @@ class MsfNoiseHandler:
       data.pose.pose.orientation.y = dataarr[4]
       data.pose.pose.orientation.z = dataarr[5]
       data.pose.pose.orientation.w = dataarr[6]
+      #print("second "+str(data.pose.pose.position.x))
       self.pub_.publish(data)
     
   def listener(self):

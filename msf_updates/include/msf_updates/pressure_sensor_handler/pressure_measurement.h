@@ -61,10 +61,10 @@ struct PressureMeasurement : public PressureMeasurementBase {
   virtual ~PressureMeasurement() {}
   PressureMeasurement(double n_zp, bool isabsoluteMeasurement, int sensorID,
                       bool enable_mah_outlier_rejection, double* mah_threshold,
-                      double mah_rejection_modification, double mah_acceptance_modification)
+                      double mah_rejection_modification, double mah_acceptance_modification, double mah_threshold_limit)
       : PressureMeasurementBase(isabsoluteMeasurement, sensorID,
                                 enable_mah_outlier_rejection, mah_threshold,
-                                mah_rejection_modification, mah_acceptance_modification),
+                                mah_rejection_modification, mah_acceptance_modification, mah_threshold_limit),
         n_zp_(n_zp) {}
   virtual std::string Type() { return "pressure"; }
   /**
