@@ -187,9 +187,9 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
   //}
   //else
   //{
-    MSF_WARN_STREAM("too large drift detected, reseting pose sensor");
-    this->manager_.msf_core_->Init(meas);
-    mah_threshold_=mah_threshold_base_;
+  //  MSF_WARN_STREAM("too large drift detected, reseting pose sensor");
+  //  this->manager_.msf_core_->Init(meas);
+  //  mah_threshold_=mah_threshold_base_;
   //}
 
   /*bool rejected_as_outlier=this->manager_.msf_core_->AddMeasurement(meas);

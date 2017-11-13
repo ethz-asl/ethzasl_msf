@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [ -n "$1" ]
+then
+T=$1
+else
+T=5
+fi
+
+echo " ### plotting error(l2 norm, position) as data[0] error(l2 norm, velocity) as data[2]###"
+echo " ### buffer = " $T "sec"
+
+
+rqt_plot /position_to_error_handler/output/data[0] /position_to_error_handler/output/data[2] #-t "position & velocity"

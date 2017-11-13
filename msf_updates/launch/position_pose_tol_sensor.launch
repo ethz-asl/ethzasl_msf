@@ -8,7 +8,7 @@
         <remap from="msf_core/imu_state_input" to="/imu0" />
 
         <remap from="msf_updates/position_input" to="/leica/position" /> 
-        <remap from="msf_updates/pose_with_covariance_input" to="rovio/pose_with_covariance_stamped" />
+        <remap from="msf_updates/pose_with_covariance_input" to="noise_drift_handler/output" />
         <rosparam file="$(find msf_updates)/position_pose_tol_sensor_fix.yaml"/>
     
     </node>
@@ -22,6 +22,16 @@
     	<remap from="imu0" to="imu0"/>
     	<param name="world_frame" value="odom"/>
     	<param name="capability_group" value="Rovio" />
+    </node>
+
+    <node name="position_to_error_handler" pkg="msf_updates" type="position_to_error_handler.py" output="screen">
+        <remap from="position_to_error_handler/input" to="msf_core/state_out"/>
+        <rosparam file="$(find msf_updates)/position_to_error_handler_fix.yaml"/>
+    </node>
+    
+    <node name="noise_drift_handler" pkg="msf_updates" type="noise_drift_handler.py" output="screen">
+        <remap from="noise_drift_handler/input" to="rovio/pose_with_covariance_stamped"/>
+        <rosparam file="$(find msf_updates)/noise_drift_handler_fix.yaml"/>
     </node>
 
 </launch>

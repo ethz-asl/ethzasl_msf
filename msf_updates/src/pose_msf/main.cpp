@@ -21,6 +21,7 @@
 int main(int argc, char** argv) {
   ros::init(argc, argv, "msf_pose_sensor");
 
+
   msf_pose_sensor::PoseSensorManager manager;
 
   ros::spin();

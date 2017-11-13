@@ -21,6 +21,7 @@ int main(int argc, char** argv) {
 
   msf_pose_pressure_sensor::PosePressureSensorManager manager;
 
+
   ros::spin();
 
   return 0;

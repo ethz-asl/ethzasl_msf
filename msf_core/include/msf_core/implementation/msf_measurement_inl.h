@@ -94,12 +94,14 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
     //reject point as outlier if distance above threshold
     //if (sqrt(mah_dist_squared) > mah_threshold_){ //should not compute sqrt for efficiency
     if(mah_dist_squared>(*mah_threshold_)*(*mah_threshold_)){
-	  (*mah_threshold_)*=2;
+	  (*mah_threshold_)*=mah_rejection_modification_;
 	  //MSF_WARN_STREAM("new mah_threshold"<<mah_threshold_);
       MSF_WARN_STREAM("rejecting reading as outlier with distance squared"<<mah_dist_squared);
       return;
     }
-    (*mah_threshold_)*=0.9;
+    (*mah_threshold_)=(*mah_threshold_)*(1.0-mah_acceptance_modification_)+mah_acceptance_modification_*sqrt(mah_dist_squared);
+    //(*mah_threshold_)*=mah_acceptance_modification_;
+    //(*mah_threshold_)+=mah_acceptance_modification_;
   }
 
   K = P * H_delayed.transpose() * S_inverse;

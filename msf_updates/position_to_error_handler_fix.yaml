@@ -1,0 +1,1 @@
+/position_to_error_handler/ground_truth: /home/yannick/Downloads/mav0/state_groundtruth_estimate0 #insert path to groundtruth csv file. File then should be called data.csv
