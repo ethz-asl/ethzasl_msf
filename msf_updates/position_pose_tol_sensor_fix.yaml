@@ -55,13 +55,13 @@ scale_init: 1
 /msf_position_pose_sensor/position_sensor/position_measurement_world_sensor: true  # selects if sensor measures its position w.r.t. world (true, e.g. Vicon) or the position of the world coordinate system w.r.t. the sensor (false, e.g. ethzasl_ptam)
 
 #settings for outlier detection
-/msf_position_pose_sensor/position_sensor/enable_mah_outlier_rejection: false
+/msf_position_pose_sensor/position_sensor/enable_mah_outlier_rejection: true
 /msf_position_pose_sensor/position_sensor/mah_threshold: 100.0
 /msf_position_pose_sensor/position_sensor/mah_rejection_modification: 0.2
 /msf_position_pose_sensor/position_sensor/mah_acceptance_modification: 0.5
 /msf_position_pose_sensor/position_sensor/mah_threshold_limit: 2000.0
 
-/msf_position_pose_sensor/pose_sensor/enable_mah_outlier_rejection: false
+/msf_position_pose_sensor/pose_sensor/enable_mah_outlier_rejection: true
 /msf_position_pose_sensor/pose_sensor/mah_threshold: 100.0
 /msf_position_pose_sensor/pose_sensor/mah_rejection_modification: 0.4
 /msf_position_pose_sensor/pose_sensor/mah_acceptance_modification: 0.5

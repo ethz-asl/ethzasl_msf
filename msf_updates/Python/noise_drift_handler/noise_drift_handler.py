@@ -76,7 +76,7 @@ class MsfNoiseHandler:
     
     else:
       if self.use_noise_:
-        dataarr=add_noise(dataarr)
+        dataarr=self.add_noise(dataarr)
       if self.create_outlier_:
         t=np.random.uniform()
         if t<self.p_outlier_:
