@@ -79,12 +79,16 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
     //reject point as outlier if distance above threshold
     //if (sqrt(mah_dist_squared) > mah_threshold_){ //should not compute sqrt for efficiency
     if(mah_dist_squared>(*mah_threshold_)*(*mah_threshold_)){
+      //in case of rejection computes the new threshold in case of rejection as a weighted sum of the current threshold and a
+      //maximal threshold to be defined
 	  (*mah_threshold_)=(*mah_threshold_)*(1.0-mah_rejection_modification_)+mah_rejection_modification_*mah_threshold_limit_;
 	  //MSF_WARN_STREAM("new mah_threshold"<<mah_threshold_);
       MSF_WARN_STREAM("rejecting reading as outlier with distance squared"<<mah_dist_squared);
       return;
     }
-    (*mah_threshold_)=(*mah_threshold_)*(1.0-mah_acceptance_modification_)+mah_acceptance_modification_*sqrt(mah_dist_squared);
+    //in case of a measurement being accepted computes a weighted average between the current threshold and the distance of the current 
+    //measurement. Adds 0.1 times measurement to account for noise in it to not everfitt.
+    (*mah_threshold_)=(*mah_threshold_)*(1.0-mah_acceptance_modification_)+(mah_acceptance_modification_+0.1)*sqrt(mah_dist_squared);
     //(*mah_threshold_)*=mah_acceptance_modification_;
     //(*mah_threshold_)+=mah_acceptance_modification_;
   }

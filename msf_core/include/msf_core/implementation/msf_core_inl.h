@@ -899,8 +899,10 @@ bool MSF_Core<EKFState_T>::ApplyCorrection(shared_ptr<EKFState_T>& delaystate,
   usercalc_.SanityCheckCorrection(*delaystate, buffstate, correction);
 
   // TODO(slynen): Allow multiple fuzzy tracking states at the same time.
-  isfuzzyState_ |= fuzzyTracker_.Check(delaystate, buffstate, fuzzythres);
-
+  //if(use_fuzzy_tracking_)
+  //{
+    isfuzzyState_ |= fuzzyTracker_.Check(delaystate, buffstate, fuzzythres);
+  //}
   // No publishing and propagation here, because this might not be the last
   // update we have to apply.
   CheckForNumeric(correction, "update");

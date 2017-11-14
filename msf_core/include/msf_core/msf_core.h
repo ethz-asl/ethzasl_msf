@@ -162,7 +162,7 @@ class MSF_Core {
    *  before fuzzy tracking will be triggered.
    */
   bool ApplyCorrection(shared_ptr<EKFState_T>& delaystate,
-                       ErrorState & correction, double fuzzythres = 0.1);
+                       ErrorState & correction, double fuzzythres = 100.1);
 
 
   /**

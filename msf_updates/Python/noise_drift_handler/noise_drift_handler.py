@@ -31,6 +31,8 @@ class MsfNoiseHandler:
     #params for outlier creation. To be set in yaml file
     self.p_outlier_=rospy.get_param("~probability_outlier", 0.0)
     self.create_outlier_=rospy.get_param("~create_outlier", False)
+    self.group_size_=rospy.get_param("~group_size", 1)
+    self.curr_group_=0
     
     #params to estimate stddeviation of data
     self.ninit_=20
@@ -79,10 +81,17 @@ class MsfNoiseHandler:
         dataarr=self.add_noise(dataarr)
       if self.create_outlier_:
         t=np.random.uniform()
-        if t<self.p_outlier_:
+        if self.curr_group_>0:
+          #print("creating grouped outlier")
+          dataarr=self.create_outlier(dataarr)
+          self.curr_group_-=1
+        elif t<self.p_outlier_:
           #print("creating outlier")
           #print(self.stddeviation_)
           dataarr=self.create_outlier(dataarr)
+          self.curr_group_=self.group_size_-1
+          #print(self.curr_group_)
+      #print(dataarr[0])
       data.pose.pose.position.x = dataarr[0]
       data.pose.pose.position.y = dataarr[1]
       data.pose.pose.position.z = dataarr[2]

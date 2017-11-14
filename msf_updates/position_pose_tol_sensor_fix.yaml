@@ -58,12 +58,12 @@ scale_init: 1
 /msf_position_pose_sensor/position_sensor/enable_mah_outlier_rejection: true
 /msf_position_pose_sensor/position_sensor/mah_threshold: 100.0
 /msf_position_pose_sensor/position_sensor/mah_rejection_modification: 0.2
-/msf_position_pose_sensor/position_sensor/mah_acceptance_modification: 0.5
+/msf_position_pose_sensor/position_sensor/mah_acceptance_modification: 0.1
 /msf_position_pose_sensor/position_sensor/mah_threshold_limit: 2000.0
 
 /msf_position_pose_sensor/pose_sensor/enable_mah_outlier_rejection: true
 /msf_position_pose_sensor/pose_sensor/mah_threshold: 100.0
-/msf_position_pose_sensor/pose_sensor/mah_rejection_modification: 0.4
-/msf_position_pose_sensor/pose_sensor/mah_acceptance_modification: 0.5
+/msf_position_pose_sensor/pose_sensor/mah_rejection_modification: 0.5
+/msf_position_pose_sensor/pose_sensor/mah_acceptance_modification: 0.2
 /msf_position_pose_sensor/pose_sensor/mah_threshold_limit: 2000.0
 
