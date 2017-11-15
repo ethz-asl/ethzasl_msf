@@ -604,7 +604,7 @@ template<typename EKFState_T>
 void MSF_Core<EKFState_T>::AddMeasurement(
     shared_ptr<MSF_MeasurementBase<EKFState_T> > measurement) {
 
-  // Return if not initialized of no imu data available.
+  // Return if not initialized or no imu data available.
   if (!initialized_ || !predictionMade_)
     return;
 

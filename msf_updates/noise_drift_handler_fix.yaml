@@ -3,4 +3,4 @@
 /noise_drift_handler/use_noise: false
 /noise_drift_handler/probability_outlier: 0.2
 /noise_drift_handler/group_size: 1
-/noise_drift_handler/create_outlier: false
+/noise_drift_handler/create_outlier: true
