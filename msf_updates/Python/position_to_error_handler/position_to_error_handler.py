@@ -104,6 +104,17 @@ class PosToErrHandler:
           self.init_meas_=True
           print("initializing")
           self.transform_=truth-arrin
+          
+          #error for position
+          outputp1=self.l2_norm(arrin[0:3], truth[0:3])
+          outputp2=self.linf_norm(arrin[0:3], truth[0:3])
+          outputp3=self.difference(arrin[0:3],truth[0:3])
+          
+          datanew=(outputp1, outputp2, outputp3[0], outputp3[1], outputp3[2])
+      
+          #keep timestamp from previous data and just replace actual data
+          data.data=datanew
+          self.pub_.publish(data)
           break
         else:
           print("no measurement to initialize found")
