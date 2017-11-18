@@ -1,0 +1,32 @@
+<launch>
+    
+
+    <node  launch-prefix="gdb -ex run --args" name="msf_position_pose_sensor" pkg="msf_updates" type="position_pose_sensor" clear_params="true" output="screen">
+        <remap from="msf_core/hl_state_input" to="/fcu/ekf_state_out" />
+        <remap from="msf_core/correction" to="/fcu/ekf_state_in"/>
+  			
+        <remap from="msf_core/imu_state_input" to="/imu0" />
+
+        <remap from="msf_updates/pose_with_covariance_input" to="rovio/pose_with_covariance_stamped" />
+        <rosparam file="$(find msf_updates)/position_pose_tol_sensor_fix.yaml"/>
+    
+    </node>
+    
+    <node name="rovio" pkg="rovio" type="rovio_node" output="screen">
+        <param name="filter_config" value="$(find rovio)/cfg/rovio.info"/>
+        <param name="camera0_config" value="$(find rovio)/cfg/euroc_cam0.yaml"/>
+        <param name="camera1_config" value="$(find rovio)/cfg/euroc_cam1.yaml"/>
+    	<remap from="cam0/image_raw" to="cam0/image_raw"/>
+		<remap from="cam1/image_raw" to="cam1/image_raw"/>
+    	<remap from="imu0" to="imu0"/>
+    	<param name="world_frame" value="odom"/>
+    	<param name="capability_group" value="Rovio" />
+
+    </node>
+
+    <node name="position_to_error_handler" pkg="msf_updates" type="position_to_error_handler.py" output="screen">
+        <remap from="position_to_error_handler/input" to="msf_core/state_out"/>
+        <rosparam file="$(find msf_updates)/position_to_error_handler_fix.yaml"/>
+    </node>
+
+</launch>
