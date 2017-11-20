@@ -14,7 +14,7 @@ scale_init: 1
 #######Parameters for Pose######
 /msf_position_pose_sensor/pose_sensor/pose_absolute_measurements: true
 /msf_position_pose_sensor/pose_sensor/pose_use_fixed_covariance: false
-
+/msf_position_pose_sensor/pose_sensor/pose_measurement_world_sensor: false
 /msf_position_pose_sensor/pose_sensor/pose_fixed_scale: false
 /msf_position_pose_sensor/pose_sensor/pose_noise_scale: 0.0
 /msf_position_pose_sensor/pose_sensor/pose_noise_p_wv: 0.0
