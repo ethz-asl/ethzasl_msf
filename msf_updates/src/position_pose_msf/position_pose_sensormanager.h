@@ -143,7 +143,83 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     }
   }
 
-  //this part looks super messed up
+  //to make it "cleaner" couldnt this call the functions of sensor memebers :thinking:
+  void Init(double scale) const {
+    //variables from pose
+    Eigen::Matrix<double, 3, 1> p, a_m, p_ic, p_vc, p_wv;
+    Eigen::Quaternion<double> q, q_wv, q_ic, q_cv;
+
+    //variables from position
+    Eigen::Matrix<double, 3, 1> p, a_m, p_ip, p_vc;
+    Eigen::Quaternion<double> q;
+
+    //variables that have same meaning+value in both
+    Eigen::Matrix<double, 3, 1> v, b_w, b_a, g, w_m;
+    Eigen::Quaternion<double>
+    msf_Core::MSF_Core<EKFState_T>::ErrorStateCov P;
+
+    // init values (why are they not taken from some settings file)
+    //this means code needs to be recompiled (and wont speedup either since
+    //not const)
+    //these values are shared for both position and pose
+    g << 0, 0, 9.81;	        /// Gravity.
+    b_w << 0, 0, 0;		/// Bias gyroscopes.
+    b_a << 0, 0, 0;		/// Bias accelerometer.
+
+    v << 0, 0, 0;			/// Robot velocity (IMU centered).
+    w_m << 0, 0, 0;		/// Initial angular velocity.
+
+    P.setZero();  // Error state covariance; if zero, a default initialization in msf_core is used
+
+    //variables only from pose
+    q_wv.setIdentity();  // Vision-world rotation drift.
+    p_wv.setZero();  // Vision-world position drift.
+
+    p_vc = pose_handler_->GetPositionMeasurement(); //This is potentially different for both sensors but has same name
+    q_cv = pose_handler_->GetAttitudeMeasurement();
+
+    //variables only from position
+    double yawinit = config_.position_yaw_init / 180 * M_PI;
+    Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
+    yawq.normalize();
+    q = yawq; //This is potentially different for both sensors but has same name
+    p_vc = position_handler_->GetPositionMeasurement(); //This is potentially different for both sensors but has same name
+    
+
+    // Check if we have already input from the measurement sensor.
+    if (!pose_handler_->ReceivedFirstMeasurement())
+    MSF_WARN_STREAM(
+        "No measurements received yet to initialize position - using [0 0 0]");
+    if (!pose_handler_->ReceivedFirstMeasurement())
+    MSF_WARN_STREAM(
+        "No measurements received yet to initialize attitude - using [1 0 0 0]");
+
+    if (!position_handler_->ReceivedFirstMeasurement())
+      MSF_WARN_STREAM(
+          "No measurements received yet to initialize position - using [0 0 0]");
+    ros::NodeHandle pnh("~");
+    //from pose
+    pnh.param("pose_sensor/init/p_ic/x", p_ic[0], 0.0);
+    pnh.param("pose_sensor/init/p_ic/y", p_ic[1], 0.0);
+    pnh.param("pose_sensor/init/p_ic/z", p_ic[2], 0.0);
+
+    pnh.param("pose_sensor/init/q_ic/w", q_ic.w(), 1.0);
+    pnh.param("pose_sensor/init/q_ic/x", q_ic.x(), 0.0);
+    pnh.param("pose_sensor/init/q_ic/y", q_ic.y(), 0.0);
+    pnh.param("pose_sensor/init/q_ic/z", q_ic.z(), 0.0);
+    q_ic.normalize();
+    //from position
+    pnh.param("position_sensor/init/p_ip/x", p_ip[0], 0.0);
+    pnh.param("position_sensor/init/p_ip/y", p_ip[1], 0.0);
+    pnh.param("position_sensor/init/p_ip/z", p_ip[2], 0.0);
+
+    //need to think carefully about next part: want to have one "6Dof pose" for both sensors togethe
+    //but might potentially be different:
+    //easy case: only one recieved measurement->need to ignore second
+    //otherwise may somehow "average"
+    //also should probably compute transform between the 2 somehow based on that
+  }
+  //this part looks super messed up writing whole function new so i can keep old as ref (comment)
   //need to really understand whats happening here
   //and then fix this
   void Init(double scale) const {
