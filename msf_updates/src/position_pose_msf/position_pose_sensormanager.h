@@ -27,8 +27,14 @@
 #include <msf_updates/pose_sensor_handler/pose_measurement.h>
 #include <msf_updates/position_sensor_handler/position_sensorhandler.h>
 #include <msf_updates/position_sensor_handler/position_measurement.h>
-#include <msf_updates/PositionPoseSensorConfig.h>
+#include <msf_updates/PositionPoseSensorConfig.h> //look at differences in these config files
+//look very much the same
 
+
+//dont I need these includes (as in pose sensor handler)
+#include "sensor_fusion_comm/InitScale.h"
+#include "sensor_fusion_comm/InitHeight.h"
+//why is this namespace msf_updates when all other sensormanagers are in their respective msf_sensortype_sensor nampespace
 namespace msf_updates {
 
 typedef msf_updates::PositionPoseSensorConfig Config_T;
@@ -37,6 +43,7 @@ typedef shared_ptr<ReconfigureServer> ReconfigureServerPtr;
 
 class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     msf_updates::EKFState> {
+  //this_T doesnt exits for pose handler but it simply refers to the class name
   typedef PositionPoseSensorManager this_T;
   typedef msf_pose_sensor::PoseSensorHandler<
       msf_updates::pose_measurement::PoseMeasurement<>, this_T> PoseSensorHandler_T;
@@ -46,6 +53,8 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
       msf_updates::position_measurement::PositionMeasurement, this_T> PositionSensorHandler_T;
   friend class msf_position_sensor::PositionSensorHandler<
       msf_updates::position_measurement::PositionMeasurement, this_T>;
+ //untit here seems to agree with pose_sensormanager and position sensor manager (may want to look at second 
+//template argument of PoseMeasurement)
  public:
   typedef msf_updates::EKFState EKFState_T;
   typedef EKFState_T::StateSequence_T StateSequence_T;
@@ -53,11 +62,11 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
 
   PositionPoseSensorManager(
       ros::NodeHandle pnh = ros::NodeHandle("~/position_pose_sensor")) {
+
+    bool distortmeas = false;  ///< Distort the pose measurements
     imu_handler_.reset(
         new msf_core::IMUHandler_ROS<msf_updates::EKFState>(*this, "msf_core",
                                                             "imu_handler"));
-
-    bool distortmeas = false;  ///< Distort the pose measurements
 
     pose_handler_.reset(
         new PoseSensorHandler_T(*this, "", "pose_sensor", distortmeas));
@@ -71,8 +80,19 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     ReconfigureServer::CallbackType f = boost::bind(&this_T::Config, this, _1,
                                                     _2);
     reconf_server_->setCallback(f);
+
+    //dont we need this since we are using a pose sensor? (may not work exactly like this since different
+    //class but could help)
+    //no should be done somewhere else (where?)
+    init_scale_srv_ = pnh.advertiseService("initialize_msf_scale",
+                                           &PoseSensorManager::InitScale, this);
+    init_height_srv_ = pnh.advertiseService("initialize_msf_height",
+                                            &PoseSensorManager::InitHeight,
+                                            this);
   }
   virtual ~PositionPoseSensorManager() {
+      //shouldnt destructor actually do something since we are allocating other classes
+      //like call their destructors (not necessary in other sensormanagers)
   }
 
   virtual const Config_T& Getcfg() {
@@ -86,6 +106,7 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
 
   Config_T config_;
   ReconfigureServerPtr reconf_server_;  ///< Dynamic reconfigure server.
+  //something with this init stuff that is in pose sensormanager seems to be missing here?
 
   /**
    * \brief Dynamic reconfigure callback.
@@ -101,7 +122,8 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
 
     if ((level & msf_updates::PositionPoseSensor_INIT_FILTER)
         && config.core_init_filter == true) {
-      Init(config.pose_initial_scale);
+      Init(config.pose_initial_scale); //initializes pose (how is this for position-> has always scale 1
+    //and therefore need not be passed as argumen. still has to be initialized in Init)
       config.core_init_filter = false;
     }
 
@@ -121,9 +143,18 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     }
   }
 
+  //this part looks super messed up
+  //need to really understand whats happening here
+  //and then fix this
   void Init(double scale) const {
+      //may want to add this here aswell:
+      /*
+      if (scale < 0.001) {
+      MSF_WARN_STREAM("init scale is "<<scale<<" correcting to 1");
+      scale = 1;
+    }*/
     Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ic, p_vc, p_wv,
-        p_ip, p_pos;
+        p_ip, p_pos; //what is p_pos and what is done with duplicates
     Eigen::Quaternion<double> q, q_wv, q_ic, q_vc;
     msf_core::MSF_Core<EKFState_T>::ErrorStateCov P;
 
@@ -140,7 +171,7 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
 
     P.setZero();  // Error state covariance; if zero, a default initialization in msf_core is used.
 
-    p_pos = position_handler_->GetPositionMeasurement();
+    p_pos = position_handler_->GetPositionMeasurement(); //is this correct (see position sensormanager)
 
     p_vc = pose_handler_->GetPositionMeasurement();
     q_vc = pose_handler_->GetAttitudeMeasurement();
@@ -151,11 +182,21 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
         "initial measurement position: pos:["<<p_pos.transpose()<<"]");
 
     // Check if we have already input from the measurement sensor.
+    //maybe change this to work as in sensormanager (does not look like a problem though)
+    /*
+        // Check if we have already input from the measurement sensor.
+    if (p_vc.norm() == 0)
+      MSF_WARN_STREAM(
+          "No measurements received yet to initialize position - using [0 0 0]");
+    if (q_cv.w() == 1)
+      MSF_WARN_STREAM(
+          "No measurements received yet to initialize attitude - using [1 0 0 0]");
+*/
     if (!pose_handler_->ReceivedFirstMeasurement())
       MSF_WARN_STREAM(
           "No measurements received yet to initialize vision position and attitude - "
           "using [0 0 0] and [1 0 0 0] respectively");
-    if (!position_handler_->ReceivedFirstMeasurement())
+    if (!position_handler_->ReceivedFirstMeasurement()) //how is this for position_sensormanager
       MSF_WARN_STREAM(
           "No measurements received yet to initialize absolute position - using [0 0 0]");
 
@@ -180,6 +221,10 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     // Calculate initial attitude and position based on sensor measurements
     // here we take the attitude from the pose sensor and augment it with
     // global yaw init.
+    //this looks rather strange could actually be the problem
+    //note this should do the exact same thing as pose_sensormanager in case of no position
+    //measurement (but will need to init it later)
+    //and the other way round
     double yawinit = config_.position_yaw_init / 180 * M_PI;
     Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
     yawq.normalize();
@@ -224,7 +269,7 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     meas->SetStateInitValue < StateDefinition_T::p_wv > (p_wv);
     meas->SetStateInitValue < StateDefinition_T::q_ic > (q_ic);
     meas->SetStateInitValue < StateDefinition_T::p_ic > (p_ic);
-    meas->SetStateInitValue < StateDefinition_T::p_ip > (p_ip);
+    meas->SetStateInitValue < StateDefinition_T::p_ip > (p_ip); //is this only addition needed for position
 
     SetStateCovariance(meas->GetStateCovariance());  // Call my set P function.
     meas->Getw_m() = w_m;
@@ -232,7 +277,7 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     meas->time = ros::Time::now().toSec();
 
     // Call initialization in core.
-    msf_core_->Init(meas);
+    msf_core_->Init(meas); //also figure out what exactly this is
   }
 
   // Prior to this call, all states are initialized to zero/identity.
@@ -246,6 +291,7 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     UNUSED(state);
   }
 
+  //only necessary for pose?
   virtual void CalculateQAuxiliaryStates(EKFState_T& state, double dt) const {
     const msf_core::Vector3 nqwvv = msf_core::Vector3::Constant(
         config_.pose_noise_q_wv);
@@ -258,6 +304,16 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     const msf_core::Vector1 n_L = msf_core::Vector1::Constant(
         config_.pose_noise_scale);
 
+    //why isnt p_ip block set: add this
+    const msf_core::Vector3 npipv = msf_core::Vector3::Constant(
+        config_.position_noise_p_ip);
+
+    // Compute the blockwise Q values and store them with the states,
+    //these then get copied by the core to the correct places in Qd.
+    state.GetQBlock<StateDefinition_T::p_ip>() =
+        (dt * npipv.cwiseProduct(npipv)).asDiagonal();
+
+    //end add
     // Compute the blockwise Q values and store them with the states,
     // these then get copied by the core to the correct places in Qd.
     state.GetQBlock<StateDefinition_T::L>() = (dt * n_L.cwiseProduct(n_L))
@@ -271,7 +327,8 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     state.GetQBlock<StateDefinition_T::p_ic>() =
         (dt * npicv.cwiseProduct(npicv)).asDiagonal();
   }
-
+  
+  //this might become important for outlier rejection and stuff
   virtual void SetStateCovariance(
       Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,
           EKFState_T::nErrorStatesAtCompileTime>& P) const {

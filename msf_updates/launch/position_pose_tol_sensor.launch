@@ -1,14 +1,11 @@
 <launch>
-    
 
-    <node  launch-prefix="gdb -ex run --args" name="msf_position_pose_sensor" pkg="msf_updates" type="position_pose_sensor" clear_params="true" output="screen">
-        <remap from="msf_core/hl_state_input" to="/fcu/ekf_state_out" />
-        <remap from="msf_core/correction" to="/fcu/ekf_state_in"/>
-  			
+    <node name="msf_position_pose_sensor" pkg="msf_updates" type="position_pose_sensor" clear_params="true" output="screen">
+
         <remap from="msf_core/imu_state_input" to="/imu0" />
 
-        <remap from="msf_updates/position_input" to="/leica/position" /> 
-        <remap from="msf_updates/pose_with_covariance_input" to="noise_drift_handler/output" />
+        <remap from="msf_updates/position_input" to="leica/position" /> 
+        <remap from="msf_updates/pose_with_covariance_input" to="rovio/pose_with_covariance_stamped" />
         <rosparam file="$(find msf_updates)/position_pose_tol_sensor_fix.yaml"/>
     
     </node>
@@ -24,14 +21,16 @@
     	<param name="capability_group" value="Rovio" />
     </node>
 
-    <node name="position_to_error_handler" pkg="msf_updates" type="position_to_error_handler.py" output="screen">
-        <remap from="position_to_error_handler/input" to="msf_core/state_out"/>
-        <rosparam file="$(find msf_updates)/position_to_error_handler_fix.yaml"/>
+    <node name="pos_error_leica" pkg="msf_updates" type="pos_error_leica.py" output="screen">
+        <remap from="pos_error_leica/datainput" to="msf_core/state_out"/>
+        <remap from="pos_error_leica/truthinput" to="/leica/position"/>
+        <rosparam file="$(find msf_updates)/pos_error_leica_fix.yaml"/>
     </node>
-    
+<?ignore
     <node name="noise_drift_handler" pkg="msf_updates" type="noise_drift_handler.py" output="screen">
-        <remap from="noise_drift_handler/input" to="rovio/pose_with_covariance_stamped"/>
+        <remap from="noise_drift_handler/pose_input" to="rovio/pose_with_covariance_stamped"/>
+        <remap from="noise_drift_handler/position_input" to="/leica/position"/>
         <rosparam file="$(find msf_updates)/noise_drift_handler_fix.yaml"/>
     </node>
-
+?>
 </launch>

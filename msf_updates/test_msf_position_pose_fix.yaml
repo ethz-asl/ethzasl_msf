@@ -1,0 +1,49 @@
+#params taken from https://github.com/ethz-asl/mav_tools/blob/17a65124ce76fc667f7032c321d18373554fd150/mav_startup/parameters/mavs/auk/msf_parameters_leica.yaml
+#launch file (test_msf_position_pose) taken from: https://github.com/ethz-asl/mav_tools/blob/master/mav_startup/launch/old/auk.launch
+core/data_playback: true
+core/fixed_bias: 0
+
+#########IMU PARAMETERS#######
+core/core_noise_acc: 0.083
+core/core_noise_accbias: 0.00005
+core/core_noise_gyr: 0.0013
+core/core_noise_gyrbias: 0.0000013
+
+position_pose_sensor/fixed_scale: 1.0
+position_pose_sensor/pose_noise_scale: 0.0
+position_pose_sensor/pose_noise_p_wv: 0.10
+position_pose_sensor/pose_noise_q_wv: 0.0
+position_pose_sensor/pose_noise_q_ic: 0.0
+position_pose_sensor/pose_noise_p_ic: 0.0
+position_pose_sensor/pose_delay: 0.000
+position_pose_sensor/pose_noise_meas_p: 0.02
+position_pose_sensor/pose_noise_meas_q: 0.005
+position_pose_sensor/position_noise_meas: 0.02
+
+pose_sensor/init/q_ic/x: 0
+pose_sensor/init/q_ic/y: 0
+pose_sensor/init/q_ic/z: 0
+pose_sensor/init/q_ic/w: 1
+
+pose_sensor/init/p_ic/x: 0
+pose_sensor/init/p_ic/y: 0
+pose_sensor/init/p_ic/z: 0
+
+
+position_sensor/init/p_ip/x: 0.0
+position_sensor/init/p_ip/y: 0.0
+position_sensor/init/p_ip/z: 0.05
+
+position_pose_sensor/pose_fixed_scale: true
+position_pose_sensor/pose_fixed_p_ic: true
+position_pose_sensor/pose_fixed_q_ic: true
+position_pose_sensor/pose_fixed_p_wv: true
+position_pose_sensor/pose_fixed_q_wv: true
+position_pose_sensor/position_fixed_p_ip: true
+ 
+pose_sensor/pose_absolute_measurements: true
+pose_sensor/pose_use_fixed_covariance: true
+pose_sensor/pose_measurement_world_sensor: true  
+
+position_sensor/position_use_fixed_covariance: true
+position_sensor/position_absolute_measurements: true
