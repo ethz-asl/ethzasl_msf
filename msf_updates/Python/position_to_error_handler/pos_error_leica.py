@@ -15,8 +15,11 @@ import csv
 import os
 #import sys
 #sys.path.insert(0, '~/catkin_ws/src/ethzasl_msf/msf_core')
-from transformation_functions import estimate_transformation, transform_point
-from geometry_msgs.msg import PointStamped as leicatype
+from transformation_functions import estimate_transformation, transform_point, quaternion_to_matrix
+#this is for leica
+#from geometry_msgs.msg import PointStamped as leicatype
+#this is for vicon
+from geometry_msgs.msg import TransformStamped as leicatype
 from sensor_fusion_comm.msg import DoubleArrayStamped as msftype
 """
 $ rosmsg show geometry_msgs/PointStamped 
@@ -54,13 +57,20 @@ class PosErrLeica:
     #init publisher
     self.pub_=rospy.Publisher("pos_error_leica/output", msftype, queue_size=20)
     
+    estimate_tf=True
     #transformation stuff
-    self.translation_=np.array([0,0,0]) #translation x, y, z
-    self.rotation_=np.zeros((3,3)) #3x3 rotation matrix
-    self.ninit_points_=rospy.get_param("~ninit_points", 100)
-    self.npoints_=0
-    self.points_=np.zeros((3,self.ninit_points_)) #matrix to store all init points (each point has 3 coordinates)
-    self.truth_points_=np.zeros((3,self.ninit_points_)) #matrix to store all truth points (each point has 3 coordinates)
+    if estimate_tf:
+      self.translation_=np.array([0,0,0]) #translation x, y, z
+      self.rotation_=np.zeros((3,3)) #3x3 rotation matrix
+      self.ninit_points_=rospy.get_param("~ninit_points", 100)
+      self.npoints_=0
+      self.points_=np.zeros((3,self.ninit_points_)) #matrix to store all init points (each point has 3 coordinates)
+      self.truth_points_=np.zeros((3,self.ninit_points_)) #matrix to store all truth points (each point has 3 coordinates)
+    else:
+	  self.translation_=rospy.get_param("~translation", [0,0,0])
+	  #quaternion is w, x, y, z
+	  self.rotation_=quaternion_to_matrix(rospy.get_param("~quaternion", [1,0,0,0]))
+	  self.init_meas_=True
 
     
   def l2_norm(self, arrin, truth):
@@ -159,7 +169,10 @@ class PosErrLeica:
           return
       """
   def callbackleica(self, data):
-    self.curr_leica_truth_=np.array([data.point.x, data.point.y, data.point.z])
+    #this is for leica
+    #self.curr_leica_truth_=np.array([data.point.x, data.point.y, data.point.z])
+    #this is for vicon
+    self.curr_leica_truth_=np.array([data.transform.translation.x, data.transform.translation.y, data.transform.translation.z])
     return
     
   def listener(self):

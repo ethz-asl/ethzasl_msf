@@ -16,7 +16,10 @@ import os
 #import sys
 #sys.path.insert(0, '~/catkin_ws/src/ethzasl_msf/msf_core')
 from transformation_functions import estimate_transformation, transform_point, quaternion_to_matrix
-from geometry_msgs.msg import PointStamped as leicatype
+#this is for leica
+#from geometry_msgs.msg import PointStamped as leicatype
+#this is for vicon
+from geometry_msgs.msg import TransformStamped as leicatype
 from sensor_fusion_comm.msg import DoubleArrayStamped as msftype
 from geometry_msgs.msg import PoseWithCovarianceStamped as roviotype
 """
@@ -64,7 +67,7 @@ class PosErrLeica:
     #init publisher
     self.pub_=rospy.Publisher("pos_error_leica/output", msftype, queue_size=20)
     
-    setimate_tf=False
+    estimate_tf=True
     #transformation stuff
     if estimate_tf:
       self.translation_=np.array([0,0,0]) #translation x, y, z
@@ -76,8 +79,8 @@ class PosErrLeica:
     else:
 	  self.translation_=rospy.get_param("~translation", [0,0,0])
 	  #quaternion is w, x, y, z
-	  self.rotation_=quaternion_to_matrix(rospy.get_param("~quaternion", [1,0,0,0])
-	  self.init_meas=True
+	  self.rotation_=quaternion_to_matrix(rospy.get_param("~quaternion", [1,0,0,0]))
+	  self.init_meas_=True
 
   def l2_norm(self, arrin, truth):
     return np.linalg.norm(arrin-truth, None)
@@ -131,7 +134,10 @@ class PosErrLeica:
         return
 
   def callbackleica(self, data):
-    self.curr_leica_truth_=np.array([data.point.x, data.point.y, data.point.z])
+    #this is for leica
+    #self.curr_leica_truth_=np.array([data.point.x, data.point.y, data.point.z])
+    #this is for vicon
+    self.curr_leica_truth_=np.array([data.transform.translation.x, data.transform.translation.y, data.transform.translation.z])
     return
     
   def listener(self):

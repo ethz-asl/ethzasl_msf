@@ -10,9 +10,9 @@ import numpy as np
 
 def quaternion_to_matrix(quaternion):
   assert len(quaternion)==4
-  q=quaternion/np.norm(quaternion)
+  q=np.reshape(quaternion/np.linalg.norm(quaternion), (4,1))
   qquad=np.matmul(q,np.transpose(q))
-  return numpy.array([
+  return np.array([
     [1.0-qquad[2,2]-qquad[3, 3],     qquad[1, 2]-qquad[3, 0],     qquad[1, 3]+qquad[2, 0]],
     [    qquad[1, 2]+qquad[3, 0], 1.0-qquad[1, 1]-qquad[3, 3],     qquad[2, 3]-qquad[1, 0]],
     [    qquad[1, 3]-qquad[2, 0],     qquad[2, 3]+qquad[1, 0], 1.0-qquad[1, 1]-qquad[2, 2]]])

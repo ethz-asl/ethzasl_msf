@@ -84,11 +84,11 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     //dont we need this since we are using a pose sensor? (may not work exactly like this since different
     //class but could help)
     //no should be done somewhere else (where?)
-    init_scale_srv_ = pnh.advertiseService("initialize_msf_scale",
-                                           &PoseSensorManager::InitScale, this);
-    init_height_srv_ = pnh.advertiseService("initialize_msf_height",
-                                            &PoseSensorManager::InitHeight,
-                                            this);
+    //init_scale_srv_ = pnh.advertiseService("initialize_msf_scale",
+    //                                       &PoseSensorManager::InitScale, this);
+    //init_height_srv_ = pnh.advertiseService("initialize_msf_height",
+    //                                        &PoseSensorManager::InitHeight,
+    //                                        this);
   }
   virtual ~PositionPoseSensorManager() {
       //shouldnt destructor actually do something since we are allocating other classes
@@ -143,7 +143,7 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     }
   }
 
-  //to make it "cleaner" couldnt this call the functions of sensor memebers :thinking:
+  /*//to make it "cleaner" couldnt this call the functions of sensor memebers :thinking:
   void Init(double scale) const {
     //variables from pose
     Eigen::Matrix<double, 3, 1> p, a_m, p_ic, p_vc, p_wv;
@@ -218,7 +218,9 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     //easy case: only one recieved measurement->need to ignore second
     //otherwise may somehow "average"
     //also should probably compute transform between the 2 somehow based on that
-  }
+}
+*/
+/*
   //this part looks super messed up writing whole function new so i can keep old as ref (comment)
   //need to really understand whats happening here
   //and then fix this
@@ -228,7 +230,7 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
       if (scale < 0.001) {
       MSF_WARN_STREAM("init scale is "<<scale<<" correcting to 1");
       scale = 1;
-    }*/
+    }//
     Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ic, p_vc, p_wv,
         p_ip, p_pos; //what is p_pos and what is done with duplicates
     Eigen::Quaternion<double> q, q_wv, q_ic, q_vc;
@@ -267,7 +269,7 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     if (q_cv.w() == 1)
       MSF_WARN_STREAM(
           "No measurements received yet to initialize attitude - using [1 0 0 0]");
-*/
+//
     if (!pose_handler_->ReceivedFirstMeasurement())
       MSF_WARN_STREAM(
           "No measurements received yet to initialize vision position and attitude - "
@@ -354,7 +356,93 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
 
     // Call initialization in core.
     msf_core_->Init(meas); //also figure out what exactly this is
-  }
+}*/
+
+//this is an exact copy from pose sensor
+/*
+void Init(double scale) const {
+    Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ic, p_vc, p_wv;
+    Eigen::Quaternion<double> q, q_wv, q_ic, q_cv;
+    msf_core::MSF_Core<EKFState_T>::ErrorStateCov P;
+
+    // init values
+    g << 0, 0, 9.81;	        /// Gravity.
+    b_w << 0, 0, 0;		/// Bias gyroscopes.
+    b_a << 0, 0, 0;		/// Bias accelerometer.
+
+    v << 0, 0, 0;			/// Robot velocity (IMU centered).
+    w_m << 0, 0, 0;		/// Initial angular velocity.
+
+    q_wv.setIdentity();  // Vision-world rotation drift.
+    p_wv.setZero();  // Vision-world position drift.
+
+    P.setZero();  // Error state covariance; if zero, a default initialization in msf_core is used
+
+    p_vc = pose_handler_->GetPositionMeasurement();
+    q_cv = pose_handler_->GetAttitudeMeasurement();
+
+    MSF_INFO_STREAM(
+        "initial measurement pos:["<<p_vc.transpose()<<"] orientation: "<<STREAMQUAT(q_cv));
+
+    // Check if we have already input from the measurement sensor.
+    if (p_vc.norm() == 0)
+      MSF_WARN_STREAM(
+          "No measurements received yet to initialize position - using [0 0 0]");
+    if (q_cv.w() == 1)
+      MSF_WARN_STREAM(
+          "No measurements received yet to initialize attitude - using [1 0 0 0]");
+
+    ros::NodeHandle pnh("~");
+    pnh.param("pose_sensor/init/p_ic/x", p_ic[0], 0.0);
+    pnh.param("pose_sensor/init/p_ic/y", p_ic[1], 0.0);
+    pnh.param("pose_sensor/init/p_ic/z", p_ic[2], 0.0);
+
+    pnh.param("pose_sensor/init/q_ic/w", q_ic.w(), 1.0);
+    pnh.param("pose_sensor/init/q_ic/x", q_ic.x(), 0.0);
+    pnh.param("pose_sensor/init/q_ic/y", q_ic.y(), 0.0);
+    pnh.param("pose_sensor/init/q_ic/z", q_ic.z(), 0.0);
+    q_ic.normalize();
+
+    // Calculate initial attitude and position based on sensor measurements.
+    if (!pose_handler_->ReceivedFirstMeasurement()) {  // If there is no pose measurement, only apply q_wv.
+      q = q_wv;
+    } else {  // If there is a pose measurement, apply q_ic and q_wv to get initial attitude.
+      q = (q_ic * q_cv.conjugate() * q_wv).conjugate();
+    }
+
+    q.normalize();
+    p = p_wv + q_wv.conjugate().toRotationMatrix() * p_vc / scale
+        - q.toRotationMatrix() * p_ic;
+
+    a_m = q.inverse() * g;			/// Initial acceleration.
+
+    // Prepare init "measurement"
+    // True means that this message contains initial sensor readings.
+    shared_ptr < msf_core::MSF_InitMeasurement<EKFState_T>
+        > meas(new msf_core::MSF_InitMeasurement<EKFState_T>(true));
+
+    meas->SetStateInitValue < StateDefinition_T::p > (p);
+    meas->SetStateInitValue < StateDefinition_T::v > (v);
+    meas->SetStateInitValue < StateDefinition_T::q > (q);
+    meas->SetStateInitValue < StateDefinition_T::b_w > (b_w);
+    meas->SetStateInitValue < StateDefinition_T::b_a > (b_a);
+    meas->SetStateInitValue < StateDefinition_T::L
+        > (Eigen::Matrix<double, 1, 1>::Constant(scale));
+    meas->SetStateInitValue < StateDefinition_T::q_wv > (q_wv);
+    meas->SetStateInitValue < StateDefinition_T::p_wv > (p_wv);
+    meas->SetStateInitValue < StateDefinition_T::q_ic > (q_ic);
+    meas->SetStateInitValue < StateDefinition_T::p_ic > (p_ic);
+
+    SetStateCovariance(meas->GetStateCovariance());  // Call my set P function.
+    meas->Getw_m() = w_m;
+    meas->Geta_m() = a_m;
+    meas->time = ros::Time::now().toSec();
+
+    // Call initialization in core.
+    msf_core_->Init(meas);
+
+  }*/
+
 
   // Prior to this call, all states are initialized to zero/identity.
   virtual void ResetState(EKFState_T& state) const {
