@@ -6,7 +6,7 @@
         <rosparam file="$(find msf_updates)/pose_sensor_test_fix.yaml"/>
         <remap from="msf_updates/pose_with_covariance_input" to="rovio/pose_with_covariance_stamped" />
 
-        <param name="capability_group" value="Rovio" />
+        <param name="capability_group" value="MSF" />
     
     </node>    
 

@@ -19,7 +19,7 @@ from transformation_functions import estimate_transformation, transform_point, q
 #this is for leica
 from geometry_msgs.msg import PointStamped as leicatype
 #this is for vicon
-#from geometry_msgs.msg import TransformStamped as leicatype
+from geometry_msgs.msg import TransformStamped as vicontype
 from sensor_fusion_comm.msg import DoubleArrayStamped as msftype
 """
 $ rosmsg show geometry_msgs/PointStamped 
@@ -56,8 +56,9 @@ class PosErrLeica:
     self.curr_leica_truth_=np.array([0,0,0])
     #init publisher
     self.pub_=rospy.Publisher("pos_error_leica/output", msftype, queue_size=20)
+    self.truth_type_=rospy.get_param("~truth_type", "leica")
     
-    estimate_tf=False
+    estimate_tf=rospy.get_param("~estimate_tf", True)
     #transformation stuff
     if estimate_tf:
       self.translation_=np.array([0,0,0]) #translation x, y, z
@@ -68,6 +69,7 @@ class PosErrLeica:
       self.truth_points_=np.zeros((3,self.ninit_points_)) #matrix to store all truth points (each point has 3 coordinates)
     else:
 	  self.translation_=rospy.get_param("~translation", [0,0,0])
+	  print(self.translation_)
 	  #quaternion is w, x, y, z
 	  self.rotation_=quaternion_to_matrix(rospy.get_param("~quaternion", [1,0,0,0]))
 	  self.init_meas_=True
@@ -171,15 +173,21 @@ class PosErrLeica:
   def callbackleica(self, data):
     #this is for leica
     self.curr_leica_truth_=np.array([data.point.x, data.point.y, data.point.z])
-    #this is for vicon
-    #self.curr_leica_truth_=np.array([data.transform.translation.x, data.transform.translation.y, data.transform.translation.z])
     return
-    
+  def callbackvicon(self, data):
+	#this is for vicon
+    self.curr_leica_truth_=np.array([data.transform.translation.x, data.transform.translation.y, data.transform.translation.z])
+    return
   def listener(self):
     topicdata="pos_error_leica/datainput"
     rospy.Subscriber(topicdata, msftype, self.callbackmsf)
     topictruth="pos_error_leica/truthinput"
-    rospy.Subscriber(topictruth, leicatype, self.callbackleica)
+    if self.truth_type_=="leica":
+        rospy.Subscriber(topictruth, leicatype, self.callbackleica)
+    elif self.truth_type_=="vicon":
+	    rospy.Subscriber(topictruth, vicontype, self.callbackvicon)
+    else:
+	    print("Not supported groundtruth type: "+str(self.truth_type))
     rospy.spin()
       
   def reconfigure(self, config, level):

@@ -8,7 +8,7 @@
 
 #params for position
 /noise_drift_handler/position_noise_mean: 0.0
-/noise_drift_handler/position_noise_number_stddeviations: 0.5
+/noise_drift_handler/position_noise_number_stddeviations: 0.2
 /noise_drift_handler/position_use_noise: true
 /noise_drift_handler/position_probability_outlier: 0.2
 /noise_drift_handler/position_group_size: 1
