@@ -11,9 +11,9 @@ core/core_noise_gyrbias: 0.0000013
 
 #########GPS PARAMETERS#######
 
-position_sensor/init/p_ip/x: 0.0748903
-position_sensor/init/p_ip/y: -0.01847772
-position_sensor/init/p_ip/z: -0.120209
+position_sensor/init/p_ip/x: 0.0
+position_sensor/init/p_ip/y: 0.0
+position_sensor/init/p_ip/z: 0.0
 
 position_sensor/position_absolute_measurements: true
 position_sensor/position_use_fixed_covariance: true
