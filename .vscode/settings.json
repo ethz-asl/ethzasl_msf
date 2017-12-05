@@ -1,2 +1,5 @@
 {
+    "files.associations": {
+        "core": "cpp"
+    }
 }
