@@ -107,10 +107,12 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
   Config_T config_;
   ReconfigureServerPtr reconf_server_;  ///< Dynamic reconfigure server.
   //something with this init stuff that is in pose sensormanager seems to be missing here?
-
+  ros::ServiceServer init_scale_srv_;
+  ros::ServiceServer init_height_srv_;
   /**
    * \brief Dynamic reconfigure callback.
    */
+  static constexpr double MIN_INITIALIZATION_HEIGHT = 0.01;
   virtual void Config(Config_T &config, uint32_t level) {
     config_ = config;
     pose_handler_->SetNoises(config.pose_noise_meas_p,
@@ -141,6 +143,41 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
       Init(scale);
       config.core_set_height = false;
     }
+}
+
+//stuff from pose_sensormanager
+bool InitScale(sensor_fusion_comm::InitScale::Request &req,
+                 sensor_fusion_comm::InitScale::Response &res) {
+    ROS_INFO("Initialize filter with scale %f", req.scale);
+    Init(req.scale);
+    res.result = "Initialized scale";
+    return true;
+  }
+
+  bool InitHeight(sensor_fusion_comm::InitHeight::Request &req,
+                  sensor_fusion_comm::InitHeight::Response &res) {
+    ROS_INFO("Initialize filter with height %f", req.height);
+    Eigen::Matrix<double, 3, 1> p = pose_handler_->GetPositionMeasurement();
+    if (p.norm() == 0) {
+      MSF_WARN_STREAM(
+          "No measurements received yet to initialize position. Height init "
+          "not allowed.");
+      return false;
+    }
+    std::stringstream ss;
+    if (std::abs(req.height) > MIN_INITIALIZATION_HEIGHT) {
+      double scale = p[2] / req.height;
+      Init(scale);
+      ss << scale;
+      res.result = "Initialized by known height. Initial scale = " + ss.str();
+    } else {
+      ss << "Height to small for initialization, the minimum is "
+          << MIN_INITIALIZATION_HEIGHT << "and " << req.height << "was set.";
+      MSF_WARN_STREAM(ss.str());
+      res.result = ss.str();
+      return false;
+    }
+    return true;
   }
 
   /*//to make it "cleaner" couldnt this call the functions of sensor memebers :thinking:
@@ -220,147 +257,8 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     //also should probably compute transform between the 2 somehow based on that
 }
 */
-/*
-  //this part looks super messed up writing whole function new so i can keep old as ref (comment)
-  //need to really understand whats happening here
-  //and then fix this
+
   void Init(double scale) const {
-      //may want to add this here aswell:
-      /*
-      if (scale < 0.001) {
-      MSF_WARN_STREAM("init scale is "<<scale<<" correcting to 1");
-      scale = 1;
-    }//
-    Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ic, p_vc, p_wv,
-        p_ip, p_pos; //what is p_pos and what is done with duplicates
-    Eigen::Quaternion<double> q, q_wv, q_ic, q_vc;
-    msf_core::MSF_Core<EKFState_T>::ErrorStateCov P;
-
-    // init values
-    g << 0, 0, 9.81;	/// Gravity.
-    b_w << 0, 0, 0;		/// Bias gyroscopes.
-    b_a << 0, 0, 0;		/// Bias accelerometer.
-
-    v << 0, 0, 0;			/// Robot velocity (IMU centered).
-    w_m << 0, 0, 0;		/// Initial angular velocity.
-
-    q_wv.setIdentity();  // World-vision rotation drift.
-    p_wv.setZero();      // World-vision position drift.
-
-    P.setZero();  // Error state covariance; if zero, a default initialization in msf_core is used.
-
-    p_pos = position_handler_->GetPositionMeasurement(); //is this correct (see position sensormanager)
-
-    p_vc = pose_handler_->GetPositionMeasurement();
-    q_vc = pose_handler_->GetAttitudeMeasurement();
-
-    MSF_INFO_STREAM(
-        "initial measurement vision: pos:["<<p_vc.transpose()<<"] orientation: " <<STREAMQUAT(q_vc));
-    MSF_INFO_STREAM(
-        "initial measurement position: pos:["<<p_pos.transpose()<<"]");
-
-    // Check if we have already input from the measurement sensor.
-    //maybe change this to work as in sensormanager (does not look like a problem though)
-    /*
-        // Check if we have already input from the measurement sensor.
-    if (p_vc.norm() == 0)
-      MSF_WARN_STREAM(
-          "No measurements received yet to initialize position - using [0 0 0]");
-    if (q_cv.w() == 1)
-      MSF_WARN_STREAM(
-          "No measurements received yet to initialize attitude - using [1 0 0 0]");
-//
-    if (!pose_handler_->ReceivedFirstMeasurement())
-      MSF_WARN_STREAM(
-          "No measurements received yet to initialize vision position and attitude - "
-          "using [0 0 0] and [1 0 0 0] respectively");
-    if (!position_handler_->ReceivedFirstMeasurement()) //how is this for position_sensormanager
-      MSF_WARN_STREAM(
-          "No measurements received yet to initialize absolute position - using [0 0 0]");
-
-    ros::NodeHandle pnh("~");
-    pnh.param("pose_sensor/init/p_ic/x", p_ic[0], 0.0);
-    pnh.param("pose_sensor/init/p_ic/y", p_ic[1], 0.0);
-    pnh.param("pose_sensor/init/p_ic/z", p_ic[2], 0.0);
-
-    pnh.param("pose_sensor/init/q_ic/w", q_ic.w(), 1.0);
-    pnh.param("pose_sensor/init/q_ic/x", q_ic.x(), 0.0);
-    pnh.param("pose_sensor/init/q_ic/y", q_ic.y(), 0.0);
-    pnh.param("pose_sensor/init/q_ic/z", q_ic.z(), 0.0);
-    q_ic.normalize();
-
-    MSF_INFO_STREAM("p_ic: " << p_ic.transpose());
-    MSF_INFO_STREAM("q_ic: " << STREAMQUAT(q_ic));
-
-    pnh.param("position_sensor/init/p_ip/x", p_ip[0], 0.0);
-    pnh.param("position_sensor/init/p_ip/y", p_ip[1], 0.0);
-    pnh.param("position_sensor/init/p_ip/z", p_ip[2], 0.0);
-
-    // Calculate initial attitude and position based on sensor measurements
-    // here we take the attitude from the pose sensor and augment it with
-    // global yaw init.
-    //this looks rather strange could actually be the problem
-    //note this should do the exact same thing as pose_sensormanager in case of no position
-    //measurement (but will need to init it later)
-    //and the other way round
-    double yawinit = config_.position_yaw_init / 180 * M_PI;
-    Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
-    yawq.normalize();
-
-    q = yawq;
-    q_wv = (q * q_ic * q_vc.conjugate()).conjugate();
-
-    MSF_WARN_STREAM("q " << STREAMQUAT(q));
-    MSF_WARN_STREAM("q_wv " << STREAMQUAT(q_wv));
-
-    Eigen::Matrix<double, 3, 1> p_vision = q_wv.conjugate().toRotationMatrix()
-        * p_vc / scale - q.toRotationMatrix() * p_ic;
-
-    //TODO (slynen): what if there is no initial position measurement? Then we
-    // have to shift vision-world later on, before applying the first position
-    // measurement.
-    p = p_pos - q.toRotationMatrix() * p_ip;
-    p_wv = p - p_vision;  // Shift the vision frame so that it fits the position
-    // measurement
-
-    a_m = q.inverse() * g;			    /// Initial acceleration.
-
-    //TODO (slynen) Fix this.
-    //we want z from vision (we did scale init), so:
-//    p(2) = p_vision(2);
-//    p_wv(2) = 0;
-//    position_handler_->adjustGPSZReference(p(2));
-
-    // Prepare init "measurement"
-    // True means that we will also set the initial sensor readings.
-    shared_ptr < msf_core::MSF_InitMeasurement<EKFState_T>
-        > meas(new msf_core::MSF_InitMeasurement<EKFState_T>(true));
-
-    meas->SetStateInitValue < StateDefinition_T::p > (p);
-    meas->SetStateInitValue < StateDefinition_T::v > (v);
-    meas->SetStateInitValue < StateDefinition_T::q > (q);
-    meas->SetStateInitValue < StateDefinition_T::b_w > (b_w);
-    meas->SetStateInitValue < StateDefinition_T::b_a > (b_a);
-    meas->SetStateInitValue < StateDefinition_T::L
-        > (Eigen::Matrix<double, 1, 1>::Constant(scale));
-    meas->SetStateInitValue < StateDefinition_T::q_wv > (q_wv);
-    meas->SetStateInitValue < StateDefinition_T::p_wv > (p_wv);
-    meas->SetStateInitValue < StateDefinition_T::q_ic > (q_ic);
-    meas->SetStateInitValue < StateDefinition_T::p_ic > (p_ic);
-    meas->SetStateInitValue < StateDefinition_T::p_ip > (p_ip); //is this only addition needed for position
-
-    SetStateCovariance(meas->GetStateCovariance());  // Call my set P function.
-    meas->Getw_m() = w_m;
-    meas->Geta_m() = a_m;
-    meas->time = ros::Time::now().toSec();
-
-    // Call initialization in core.
-    msf_core_->Init(meas); //also figure out what exactly this is
-}*/
-
-//this is an exact copy from pose sensor
-/*
-void Init(double scale) const {
     Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ic, p_vc, p_wv;
     Eigen::Quaternion<double> q, q_wv, q_ic, q_cv;
     msf_core::MSF_Core<EKFState_T>::ErrorStateCov P;
@@ -441,12 +339,11 @@ void Init(double scale) const {
     // Call initialization in core.
     msf_core_->Init(meas);
 
-  }*/
-
+  }
 
   // Prior to this call, all states are initialized to zero/identity.
   virtual void ResetState(EKFState_T& state) const {
-    // Set scale to 1.
+    //set scale to 1
     Eigen::Matrix<double, 1, 1> scale;
     scale << 1.0;
     state.Set < StateDefinition_T::L > (scale);
@@ -455,7 +352,6 @@ void Init(double scale) const {
     UNUSED(state);
   }
 
-  //only necessary for pose?
   virtual void CalculateQAuxiliaryStates(EKFState_T& state, double dt) const {
     const msf_core::Vector3 nqwvv = msf_core::Vector3::Constant(
         config_.pose_noise_q_wv);
@@ -468,16 +364,6 @@ void Init(double scale) const {
     const msf_core::Vector1 n_L = msf_core::Vector1::Constant(
         config_.pose_noise_scale);
 
-    //why isnt p_ip block set: add this
-    const msf_core::Vector3 npipv = msf_core::Vector3::Constant(
-        config_.position_noise_p_ip);
-
-    // Compute the blockwise Q values and store them with the states,
-    //these then get copied by the core to the correct places in Qd.
-    state.GetQBlock<StateDefinition_T::p_ip>() =
-        (dt * npipv.cwiseProduct(npipv)).asDiagonal();
-
-    //end add
     // Compute the blockwise Q values and store them with the states,
     // these then get copied by the core to the correct places in Qd.
     state.GetQBlock<StateDefinition_T::L>() = (dt * n_L.cwiseProduct(n_L))
@@ -491,8 +377,7 @@ void Init(double scale) const {
     state.GetQBlock<StateDefinition_T::p_ic>() =
         (dt * npicv.cwiseProduct(npicv)).asDiagonal();
   }
-  
-  //this might become important for outlier rejection and stuff
+
   virtual void SetStateCovariance(
       Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime,
           EKFState_T::nErrorStatesAtCompileTime>& P) const {
@@ -503,16 +388,13 @@ void Init(double scale) const {
 
   virtual void AugmentCorrectionVector(
       Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, 1>& correction) const {
-		  //MSF_WARN_STREAM("AugmentCorrectionVector called");
     UNUSED(correction);
-    
   }
 
   virtual void SanityCheckCorrection(
       EKFState_T& delaystate,
       const EKFState_T& buffstate,
       Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, 1>& correction) const {
-	//MSF_WARN_STREAM("SanityCheckCorrection called");
     UNUSED(buffstate);
     UNUSED(correction);
 

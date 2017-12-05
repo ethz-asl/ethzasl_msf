@@ -1,0 +1,11 @@
+<launch>
+    <node name="pos_error_leica" pkg="msf_updates" type="leica_error_check.py" output="screen">
+        <remap from="pos_error_leica/datainput" to="noise_drift_handler/position_output"/>
+        <remap from="pos_error_leica/truthinput" to="/leica/position"/>
+        <rosparam file="$(find msf_updates)/pos_error_leica_fix.yaml"/>
+    </node>
+    <node name="noise_drift_handler" pkg="msf_updates" type="noise_drift_handler.py" output="screen">
+        <remap from="noise_drift_handler/position_input" to="/leica/position"/>
+        <rosparam file="$(find msf_updates)/noise_drift_handler_fix.yaml"/>
+    </node>
+</launch>

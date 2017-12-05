@@ -1,0 +1,38 @@
+core/data_playback: true
+core/fixed_bias: 0
+
+#########IMU PARAMETERS#######
+core/core_noise_acc: 0.083
+core/core_noise_accbias: 0.00005
+core/core_noise_gyr: 0.0013
+core/core_noise_gyrbias: 0.0000013
+
+pose_sensor/fixed_scale: 1.0
+pose_sensor/pose_noise_scale: 0.0
+pose_sensor/pose_noise_p_wv: 0.0
+pose_sensor/pose_noise_q_wv: 0.0
+pose_sensor/pose_noise_q_ic: 0.0
+pose_sensor/pose_noise_p_ic: 0.0
+pose_sensor/pose_delay: -0.0191162212711
+pose_sensor/pose_noise_meas_p: 0.002
+pose_sensor/pose_noise_meas_q: 0.005
+
+pose_sensor/init/q_ic/x: 0.807264573826
+pose_sensor/init/q_ic/y: -0.000354456866938
+pose_sensor/init/q_ic/z: 0.590149775732
+pose_sensor/init/q_ic/w: 0.00685743456288
+
+pose_sensor/init/p_ic/x: 0.118867928682
+pose_sensor/init/p_ic/y: -0.0292211469162
+pose_sensor/init/p_ic/z: -0.062828441889
+
+pose_sensor/pose_fixed_scale: true
+pose_sensor/pose_fixed_p_ic: true
+pose_sensor/pose_fixed_q_ic: true
+pose_sensor/pose_fixed_p_wv: true
+pose_sensor/pose_fixed_q_wv: true
+
+pose_sensor/pose_absolute_measurements: true
+pose_sensor/pose_use_fixed_covariance: true
+pose_sensor/pose_measurement_world_sensor: true  # selects if sensor measures its position w.r.t. world (true, e.g. Vicon) or the position of the world coordinate system w.r.t. the sensor (false, e.g. ethzasl_ptam
+

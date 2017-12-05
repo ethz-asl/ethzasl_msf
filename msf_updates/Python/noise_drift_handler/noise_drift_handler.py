@@ -67,7 +67,7 @@ class MsfNoiseHandler:
     #params for position
     self.position_mu_=rospy.get_param("~position_noise_mean",0.0)
     self.position_stddeviation_=rospy.get_param("~position_noise_number_stddeviations", 0.0)
-    self.position_use_noise_=rospy.get_param("~position_ use_noise", False)
+    self.position_use_noise_=rospy.get_param("~position_use_noise", False)
         
     self.position_p_outlier_=rospy.get_param("~probability_outlier", 0.0)
     self.position_create_outlier_=rospy.get_param("~create_outlier", False)
@@ -87,7 +87,7 @@ class MsfNoiseHandler:
   
   #adds gaussian distributed noise with mu and stddeviation   
   def add_noise(self, arrin, mu, stddeviation):
-    noise=np.random.normal(self.mu_, self.nstddeviations_*self.stddeviation_ , len(arrin))
+    noise=np.random.normal(mu, stddeviation, len(arrin))
     arrout=arrin+noise
     return arrout
 

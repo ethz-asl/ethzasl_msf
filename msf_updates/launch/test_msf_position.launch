@@ -1,0 +1,15 @@
+<launch>
+
+ <node name="msf_position_sensor" pkg="msf_updates" type="position_sensor" clear_params="true" output="screen">
+       <remap from="msf_core/imu_state_input" to="/imu0" />
+       <remap from="msf_updates/position_input" to="/leica/position" />
+       <rosparam file="$(find msf_updates)/test_msf_position_fix.yaml"/>
+       <param name="capability_group" value="MSF"></param>
+ </node>
+    <node name="pos_error_leica" pkg="msf_updates" type="pos_error_leica.py" output="screen">
+        <remap from="pos_error_leica/datainput" to="msf_core/state_out"/>
+        <remap from="pos_error_leica/truthinput" to="/leica/position"/>
+        <rosparam file="$(find msf_updates)/pos_error_leica_fix.yaml"/>
+    </node>
+
+</launch>

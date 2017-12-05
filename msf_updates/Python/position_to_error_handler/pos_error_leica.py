@@ -17,9 +17,9 @@ import os
 #sys.path.insert(0, '~/catkin_ws/src/ethzasl_msf/msf_core')
 from transformation_functions import estimate_transformation, transform_point, quaternion_to_matrix
 #this is for leica
-#from geometry_msgs.msg import PointStamped as leicatype
+from geometry_msgs.msg import PointStamped as leicatype
 #this is for vicon
-from geometry_msgs.msg import TransformStamped as leicatype
+#from geometry_msgs.msg import TransformStamped as leicatype
 from sensor_fusion_comm.msg import DoubleArrayStamped as msftype
 """
 $ rosmsg show geometry_msgs/PointStamped 
@@ -170,9 +170,9 @@ class PosErrLeica:
       """
   def callbackleica(self, data):
     #this is for leica
-    #self.curr_leica_truth_=np.array([data.point.x, data.point.y, data.point.z])
+    self.curr_leica_truth_=np.array([data.point.x, data.point.y, data.point.z])
     #this is for vicon
-    self.curr_leica_truth_=np.array([data.transform.translation.x, data.transform.translation.y, data.transform.translation.z])
+    #self.curr_leica_truth_=np.array([data.transform.translation.x, data.transform.translation.y, data.transform.translation.z])
     return
     
   def listener(self):
