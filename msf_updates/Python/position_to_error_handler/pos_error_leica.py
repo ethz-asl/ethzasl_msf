@@ -57,7 +57,6 @@ class PosErrLeica:
     #init publisher
     self.pub_=rospy.Publisher("pos_error_leica/output", msftype, queue_size=20)
     self.truth_type_=rospy.get_param("~truth_type", "leica")
-    
     estimate_tf=rospy.get_param("~estimate_tf", True)
     #transformation stuff
     if estimate_tf:

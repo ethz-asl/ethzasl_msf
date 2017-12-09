@@ -7,10 +7,11 @@ else
 T=5
 fi
 
-echo " ### plotting error(l2 norm, position) as data[0] error(l2 norm, velocity) as data[1]###"
+echo " ### plotting error(l2 norm, position) as data[0] error(max norm, position) as data[1]###"
 echo " ### buffer = " $T "sec"
 
 
 #rqt_plot /position_to_error_handler/output/data[0] /position_to_error_handler/output/data[2] #-t "position & velocity"
 #rqt_plot /position_to_error_handler/output/data[2]:data[3]:data[4]
-rqt_plot /pos_error_leica/output/data[0] #data[2]:data[3]:data[4] #-t "position"
+#rqt_plot /pos_error_leica/output/data[0] #data[2]:data[3]:data[4] #-t "position"
+rqt_plot /pos_to_error/output/data[0]:data[1] #data[2]:data[3]:data[4] #-t "position"

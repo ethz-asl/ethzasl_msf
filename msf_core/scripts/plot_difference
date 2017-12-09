@@ -1,0 +1,15 @@
+#!/bin/bash
+
+if [ -n "$1" ]
+then
+T=$1
+else
+T=5
+fi
+
+echo " ### plotting error(differences, position) as data[2]-data[4]###"
+echo " ### buffer = " $T "sec"
+
+
+
+rqt_plot /pos_to_error/output/data[2]:data[3]:data[4] #-t "position"
