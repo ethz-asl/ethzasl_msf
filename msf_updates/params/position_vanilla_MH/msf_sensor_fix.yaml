@@ -1,0 +1,25 @@
+scale_init: 1
+core/data_playback: true
+core/fixed_bias: false
+
+######## Asctec Firefly IMU
+core/core_noise_acc: 0.083
+core/core_noise_accbias: 0.00005
+core/core_noise_gyr: 0.0013
+core/core_noise_gyrbias: 0.0000013
+
+
+#########GPS PARAMETERS#######
+
+position_sensor/init/p_ip/x: 7.48903e-02
+position_sensor/init/p_ip/y: -1.84772e-02
+position_sensor/init/p_ip/z: -1.20209e-01
+
+position_sensor/position_absolute_measurements: true
+position_sensor/position_use_fixed_covariance: true
+position_sensor/position_delay: 0.0
+
+position_sensor/position_noise_p_ip: 0.0
+position_sensor/position_noise_meas: 0.0
+position_sensor/position_fixed_p_ip: true
+position_sensor/position_measurement_world_sensor: true 

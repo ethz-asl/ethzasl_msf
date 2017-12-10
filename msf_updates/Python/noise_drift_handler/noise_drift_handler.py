@@ -18,6 +18,7 @@ from math import sqrt
 #need pose_with_covariance (as input for msf) and position if want to apply noise there as well
 from geometry_msgs.msg import PoseWithCovarianceStamped as posetype
 from geometry_msgs.msg import PointStamped as positiontype
+from geometry_msgs.msg import TransformStamped as transformtype
 """
 $ rosmsg show geometry_msgs/PoseWithCovarianceStamped 
 std_msgs/Header header
@@ -46,6 +47,24 @@ geometry_msgs/Point point
   float64 x
   float64 y
   float64 z
+  
+$ rosmsg show geometry_msgs/TransformStamped 
+std_msgs/Header header
+  uint32 seq
+  time stamp
+  string frame_id
+string child_frame_id
+geometry_msgs/Transform transform
+  geometry_msgs/Vector3 translation
+    float64 x
+    float64 y
+    float64 z
+  geometry_msgs/Quaternion rotation
+    float64 x
+    float64 y
+    float64 z
+    float64 w
+
 """
 
 class MsfNoiseHandler:
@@ -59,9 +78,9 @@ class MsfNoiseHandler:
     self.pose_stddeviation_=rospy.get_param("~pose_noise_number_stddeviations", 0.0)
     self.pose_use_noise_=rospy.get_param("~pose_ use_noise", False)
         
-    self.pose_p_outlier_=rospy.get_param("~probability_outlier", 0.0)
-    self.pose_create_outlier_=rospy.get_param("~create_outlier", False)
-    self.pose_group_size_=rospy.get_param("~group_size", 1) #not working rn
+    self.pose_p_outlier_=rospy.get_param("~pose_probability_outlier", 0.0)
+    self.pose_create_outlier_=rospy.get_param("~pose_create_outlier", False)
+    self.pose_group_size_=rospy.get_param("~pose_group_size", 1) #not working rn
     self.pose_curr_group_=0
     
     #params for position
@@ -69,10 +88,20 @@ class MsfNoiseHandler:
     self.position_stddeviation_=rospy.get_param("~position_noise_number_stddeviations", 0.0)
     self.position_use_noise_=rospy.get_param("~position_use_noise", False)
         
-    self.position_p_outlier_=rospy.get_param("~probability_outlier", 0.0)
-    self.position_create_outlier_=rospy.get_param("~create_outlier", False)
-    self.position_group_size_=rospy.get_param("~group_size", 1) #not working rn
+    self.position_p_outlier_=rospy.get_param("~position_probability_outlier", 0.0)
+    self.position_create_outlier_=rospy.get_param("~position_create_outlier", False)
+    self.position_group_size_=rospy.get_param("~position_group_size", 1) #not working rn
     self.position_curr_group_=0
+    
+    #params for transform
+    self.transform_mu_=rospy.get_param("~transform_noise_mean",0.0)
+    self.transform_stddeviation_=rospy.get_param("~transform_noise_number_stddeviations", 0.0)
+    self.transform_use_noise_=rospy.get_param("~transform_use_noise", False)
+        
+    self.transform_p_outlier_=rospy.get_param("~transform_probability_outlier", 0.0)
+    self.transform_create_outlier_=rospy.get_param("~transform_create_outlier", False)
+    self.transform_group_size_=rospy.get_param("~transform_group_size", 1) #not working rn
+    self.transform_curr_group_=0
     
     #params to estimate stddeviation of data 
     #to be set manually
@@ -132,22 +161,21 @@ class MsfNoiseHandler:
       create_outlier=self.position_create_outlier_
       group_size=self.position_group_size_
       curr_group=self.position_curr_group_
+    elif dtype=="geometry_msgs/TransformStamped":
+      dataarr=np.array([data.transform.translation.x, data.transform.translation.y, data.transform.translation.z])
+
+      stddeviation=self.transform_stddeviation_
+      use_noise=self.transform_use_noise_
+      mu=self.transform_mu_
+      
+      p_outlier=self.transform_p_outlier_
+      create_outlier=self.transform_create_outlier_
+      group_size=self.transform_group_size_
+      curr_group=self.transform_curr_group_
     else:
       print("not supported datatype:")
       print(dtype)
-    #no init needed since its design parameter now
-    #if self.nrecv_<self.ninit_:
-    #use data to estimate stddeviation (maybe need to do multidim) right now computes 1d stddeviation
-    #  self.nrecv_+=1
-    #  delta=dataarr[0]-self.datamean_
-    #  self.datamean_+=delta/self.nrecv_
-    #  delta2=dataarr[0]-self.datamean_
-    #  self.stddeviation_+=delta*delta2
-    #elif self.nrecv_==self.ninit_:
-    #  self.stddeviation_=sqrt(self.stddeviation_/(self.nrecv_-1))
-    #  self.nrecv_+=1
-    
-    #else:
+
     #change data according to params choosen above
     if use_noise:
       dataarr=self.add_noise(dataarr, mu, stddeviation)
@@ -160,12 +188,16 @@ class MsfNoiseHandler:
           self.pose_curr_group_-=1
         elif dtype=="geometry_msgs/PointStamped":
           self.position_curr_group-=1
+        elif dtype=="geometry_msgs/TransformStamped":
+          self.transform_curr_group-=1
       elif t<p_outlier:
         dataarr=self.create_outlier(dataarr, stddeviation)
         if dtype=="geometry_msgs/PoseWithCovarianceStamped":
           self.pose_curr_group_=self.pose_group_size_-1
         elif dtype=="geometry_msgs/PointStamped":
           self.position_curr_group=self.position_group_size_-1
+        elif dtype=="geometry_msgs/TransformStamped":
+          self.transform_curr_group=self.transform_group_size_-1
         
         
     #print(dataarr[0])
@@ -184,12 +216,24 @@ class MsfNoiseHandler:
       data.point.y = dataarr[1]
       data.point.z = dataarr[2]
       self.position_pub_.publish(data)
+    elif dtype=="geometry_msgs/TransformStamped":
+      datan=positiontype()
+      datan.header = data.header
+      datan.point.x = dataarr[0]
+      datan.point.y = dataarr[1]
+      datan.point.z = dataarr[2]
+      self.position_pub_.publish(datan)
+    else:
+      print("not supported datatype (output):")
+      print(dtype)
     
   def listener(self):
     topic_pose="noise_drift_handler/pose_input"
     rospy.Subscriber(topic_pose, posetype, self.callback)
     topic_position="noise_drift_handler/position_input"
     rospy.Subscriber(topic_position, positiontype, self.callback)
+    topic_transform="noise_drift_handler/transform_input"
+    rospy.Subscriber(topic_transform, transformtype, self.callback)
     rospy.spin()
       
   def reconfigure(self, config, level):
