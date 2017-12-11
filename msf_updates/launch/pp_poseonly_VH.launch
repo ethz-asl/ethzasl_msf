@@ -1,0 +1,30 @@
+<launch>
+    
+    <node  name="msf_position_pose_sensor" pkg="msf_updates" type="position_pose_sensor" clear_params="true" output="screen">			
+        <remap from="msf_core/imu_state_input" to="/fcu/imu" />
+        <rosparam file="$(find msf_updates)/params/pp_poseonly_VH/msf_sensor_fix.yaml"/>
+        <remap from="msf_updates/pose_with_covariance_input" to="noise_drift_handler/pose_output" />
+        <param name="capability_group" value="MSF" />
+    </node>    
+
+    <node name="rovio" pkg="rovio" type="rovio_node" output="screen">
+        <param name="filter_config" value="$(find rovio)/cfg/rovio.info"/>
+        <param name="camera0_config" value="$(find rovio)/cfg/euroc_cam0_equidist.yaml"/>
+        <param name="camera1_config" value="$(find rovio)/cfg/euroc_cam1_equidist.yaml"/>
+    	<remap from="cam0/image_raw" to="cam0/image_raw"/>
+		<remap from="cam1/image_raw" to="cam1/image_raw"/>
+    	<remap from="imu0" to="imu0"/>
+    </node>
+    
+    <node name="pos_to_error" pkg="msf_updates" type="pos_to_error.py" output="screen">
+        <remap from="pos_to_error/datainput" to="msf_core/state_out"/>
+        <remap from="pos_to_error/truthinput" to="/vicon/firefly_sbx/firefly_sbx"/>
+        <rosparam file="$(find msf_updates)/params/pp_poseonly_VH/pos_to_error_fix.yaml"/>
+    </node>
+
+    <node name="noise_drift_handler" pkg="msf_updates" type="noise_drift_handler.py" output="screen">
+        <remap from="noise_drift_handler/pose_input" to="/rovio/pose_with_covariance_stamped"/>
+        <rosparam file="$(find msf_updates)/params/pp_poseonly_VH/noise_drift_handler_fix.yaml"/>
+    </node>
+    
+</launch>

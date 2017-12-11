@@ -172,6 +172,8 @@ class PosToError:
         [self.translation_, self.rotation_]=estimate_transformation(self.points_, self.truth_points_)
         self.npoints_+=1
         self.init_meas_=True
+        print(self.translation_)
+        print(self.rotation_)
         return   
       else:
         print("something strange happened!!")
@@ -219,8 +221,8 @@ class PosToError:
         [self.translation_, self.rotation_]=estimate_transformation(self.points_, self.truth_points_)
         self.npoints_+=1
         self.init_meas_=True
-        #print(self.translation_)
-        #print(self.rotation_)
+        print(self.translation_)
+        print(self.rotation_)
         return   
       else:
         print("something strange happened!!")

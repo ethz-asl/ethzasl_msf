@@ -1,0 +1,6 @@
+/pos_to_error/translation: [7.48903e-02, -1.84772e-02, -1.20209e-01]
+/pos_to_error/quaternion: [1, 0, 0, 0]
+/pos_to_error/truth_type: "vicon"
+/pos_to_error/estimate_tf: True
+/pos_to_error/ninit_points: 200
+/pos_to_error/data_type: "msf"
