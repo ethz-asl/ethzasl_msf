@@ -13,11 +13,3 @@
 /noise_drift_handler/position_probability_outlier: 0.2
 /noise_drift_handler/position_group_size: 1
 /noise_drift_handler/position_create_outlier: false
-
-#params for transform
-/noise_drift_handler/transform_noise_mean: 0.0
-/noise_drift_handler/transform_noise_number_stddeviations: 0.2
-/noise_drift_handler/transform_use_noise: false
-/noise_drift_handler/transform_probability_outlier: 0.2
-/noise_drift_handler/transform_group_size: 1
-/noise_drift_handler/transform_create_outlier: false

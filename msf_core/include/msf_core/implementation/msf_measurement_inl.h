@@ -88,7 +88,10 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
     }
     //in case of a measurement being accepted computes a weighted average between the current threshold and the distance of the current 
     //measurement. Adds 0.1 times measurement to account for noise in it to not everfitt.
-    (*mah_threshold_)=(*mah_threshold_)*(1.0-mah_acceptance_modification_)+(mah_acceptance_modification_+0.1)*sqrt(mah_dist_squared);
+    if(mah_acceptance_modification_!=0.0)
+    {
+      (*mah_threshold_)=(*mah_threshold_)*(1.0-mah_acceptance_modification_)+(mah_acceptance_modification_+0.1)*sqrt(mah_dist_squared);
+    }
     //(*mah_threshold_)*=mah_acceptance_modification_;
     //(*mah_threshold_)+=mah_acceptance_modification_;
   }

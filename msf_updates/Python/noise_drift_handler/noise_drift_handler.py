@@ -124,7 +124,7 @@ class MsfNoiseHandler:
   def create_outlier(self, arrin, stddeviation):
     #add some big disturbance to arrin (for now 100 times stddeviation)
     sign=np.random.randint(0,2) #need 0/1 random
-    noise=np.array([100*self.stddeviation_ for i in range(len(arrin))])
+    noise=np.array([100*stddeviation for i in range(len(arrin))])
     if sign:
       arrout=arrin+noise
     else:

@@ -1,0 +1,6 @@
+/pos_to_error/translation: [0.0, 0.0, 0.0]
+/pos_to_error/quaternion: [1, 0, 0, 0]
+/pos_to_error/truth_type: "leica"
+/pos_to_error/estimate_tf: False
+/pos_to_error/ninit_points: 200
+/pos_to_error/data_type: "msf"
