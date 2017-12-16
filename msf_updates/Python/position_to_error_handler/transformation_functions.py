@@ -11,13 +11,41 @@ from math import sqrt
 
 def quaternion_to_matrix(quaternion):
   assert len(quaternion)==4
+  """
   q=np.reshape(quaternion/np.linalg.norm(quaternion), (4,1))
   qquad=np.matmul(q,np.transpose(q))
   return np.array([
     [1.0-qquad[2,2]-qquad[3, 3],     qquad[1, 2]-qquad[3, 0],     qquad[1, 3]+qquad[2, 0]],
     [    qquad[1, 2]+qquad[3, 0], 1.0-qquad[1, 1]-qquad[3, 3],     qquad[2, 3]-qquad[1, 0]],
     [    qquad[1, 3]-qquad[2, 0],     qquad[2, 3]+qquad[1, 0], 1.0-qquad[1, 1]-qquad[2, 2]]])
-    
+  """
+  rotation=np.zeros((3,3))
+  sqw=quaternion[0]*quaternion[0]
+  sqx=quaternion[1]*quaternion[1]
+  sqy=quaternion[2]*quaternion[2]
+  sqz=quaternion[3]*quaternion[3]
+  invs=1/(sqw+sqx+sqy+sqz)
+  rotation[0,0]=(sqx-sqy-sqz+sqw)*invs
+  rotation[1,1]=(-sqx+sqy-sqz+sqw)*invs
+  rotation[2,2]=(-sqx-sqy+sqz+sqw)*invs
+   
+  tmp1=quaternion[1]*quaternion[2]
+  tmp2=quaternion[3]*quaternion[0]
+  rotation[1,0]=2*(tmp1+tmp2)*invs
+  rotation[0,1]=2*(tmp1-tmp2)*invs
+  
+  tmp1=quaternion[1]*quaternion[3]
+  tmp2=quaternion[2]*quaternion[0]
+  rotation[2,0]=2*(tmp1-tmp2)*invs
+  rotation[0,2]=2*(tmp1+tmp2)*invs
+  
+  tmp1=quaternion[2]*quaternion[3]
+  tmp2=quaternion[1]*quaternion[0]
+  rotation[2,1]=2*(tmp1+tmp2)*invs
+  rotation[1,2]=2*(tmp1-tmp2)*invs
+   
+  return rotation
+   
 #estimates the best transformation based on 2 point clouds represented by (3,n) matrices
 def estimate_transformation(pointsfrom, pointsto):
   #make sure matrices have same dimensions
@@ -28,22 +56,11 @@ def estimate_transformation(pointsfrom, pointsto):
 
   npoints=pointsfrom.shape[1]
   #print(npoints)
-  comfrom=np.sum(pointsfrom, axis=1)/npoints
-  #print(comfrom)
-  comto=np.sum(pointsto, axis=1)/npoints
-  #print(comto)
-  #print(pointsfrom[:,0])
-  #print(comfrom)
-  #print(pointsto[:,0])
-  #print(comto)
-  #print(np.matmul(np.reshape(pointsfrom[:,0]-comfrom,(3,1)), np.reshape(pointsto[:,0]-comto,(1,3))))
-  #H_test=np.zeros((3,3))
-  #for i in range(npoints):
-  #  H_test+=np.matmul(np.reshape(pointsfrom[:,i]-comfrom,(3,1)), np.reshape(pointsto[:,i]-comto,(1,3)))
-  #print(H_test)
-  #comfrommat=np.matmul(np.reshape(comfrom, (1,3)),np.ones((3,npoints)))
-  #comtomat=np.matmul(np.reshape(comto,(1,3)),np.ones((3,npoints)))
-  #H=np.matmul((pointsfrom-comfrommat), np.transpose(pointsto-comtomat))
+  comfrom=np.mean(pointsfrom, axis=1)
+  print(comfrom)
+  comto=np.mean(pointsto, axis=1)
+  print(comto)
+
   H=sum(np.matmul(np.reshape(pointsfrom[:,i]-comfrom,(3,1)), np.reshape(pointsto[:,i]-comto,(1,3))) for i in range(npoints))
   #print(H)
   U,s,V=np.linalg.svd(H)
@@ -74,20 +91,17 @@ def rot_to_quat(rotation):
   m21=rotation[2,1]
   m22=rotation[2,2]
   tr = m00 + m11 + m22
-  tol=0.001
-  if tr > 0+tol:
-    S = sqrt(tr+1.0) * 2; # S=4*qw 
-    qw = 0.25 * S;
-    qx = (m21 - m12) / S;
-    qy = (m02 - m20) / S; 
-    qz = (m10 - m01) / S; 
-  elif m00 > m11+tol and m00 > m22+tol: 
+  tr1=1+m00-m11-m22
+  tr2=1-m00+m11-m22
+  tr3=1-m00-m11+m22
+  tol=0.00001
+  if tr1>tr2 and tr2>tr3: 
     S = sqrt(1.0 + m00 - m11 - m22) * 2; # S=4*qx 
     qw = (m21 - m12) / S;
     qx = 0.25 * S;
     qy = (m01 + m10) / S; 
     qz = (m02 + m20) / S; 
-  elif m11+tol > m22+tol: 
+  elif tr2>tr1 and tr2>tr3: 
     S = sqrt(1.0 + m11 - m00 - m22) * 2; # S=4*qy
     qw = (m02 - m20) / S;
     qx = (m01 + m10) / S; 

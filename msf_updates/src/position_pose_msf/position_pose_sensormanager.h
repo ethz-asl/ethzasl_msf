@@ -281,7 +281,17 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
 
     MSF_INFO_STREAM(
         "initial measurement pos:["<<p_vc.transpose()<<"] orientation: "<<STREAMQUAT(q_cv));
-
+    MSF_WARN_STREAM("We are in Init function");
+    if (!pose_handler_->ReceivedFirstMeasurement())
+    {
+        MSF_WARN_STREAM(
+          "Pose sensor did not recieve any measurement yet");
+        }
+    if (!position_handler_->ReceivedFirstMeasurement())
+    {
+        MSF_WARN_STREAM(
+          "Position sensor did not recieve any measurement yet");
+    }
     // Check if we have already input from the measurement sensor.
     if (p_vc.norm() == 0)
       MSF_WARN_STREAM(

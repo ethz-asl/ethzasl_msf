@@ -1,6 +1,7 @@
-/pos_to_error/translation: [0.06901, -0.02781, -0.12395]
-/pos_to_error/quaternion: [-0.00143132, 0.81742737, -0.0117044, 0.5759105 ]
+#this is best transformation estimate for VH1
+/pos_to_error/translation: [0.82340916, 2.22741483, 0.97403493]
+/pos_to_error/quaternion: [-0.1338321, -0.00132899, 0.0028016, 0.99099917]
 /pos_to_error/truth_type: "vicon"
-/pos_to_error/estimate_tf: True
-/pos_to_error/ninit_points: 200
+/pos_to_error/estimate_tf: False
+/pos_to_error/ninit_points: 2000
 /pos_to_error/data_type: "msf"
