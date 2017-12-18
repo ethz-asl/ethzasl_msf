@@ -23,6 +23,7 @@ namespace msf_core {
   static constexpr double kDefaultMahRejectionModification_ = 2.0;
   static constexpr double kDefaultMahAcceptanceModification_ = 0.9;
   static constexpr double kDefaultMahThresholdLimit_ = 1000.0;
+  static constexpr double minRequestedSamplesForRejection_ = 50.0;
 /**
  * \class SensorHandler
  * \brief Handles a sensor driver which provides the sensor readings.
@@ -43,6 +44,11 @@ class SensorHandler {
   double mah_rejection_modification_;
   double mah_acceptance_modification_;
   double mah_threshold_limit_;
+  double n_rejected_;
+  double n_curr_rejected_;
+  double n_accepted_;
+  double max_outlier_relative_;
+  double rejection_divergence_threshold_;
 
   void SetSensorID(int ID) {
     sensorID = ID;
@@ -66,7 +72,9 @@ class SensorHandler {
         sensorID(constants::INVALID_ID),
         topic_namespace_(topic_namespace),
         parameternamespace_(parameternamespace),
-        received_first_measurement_(false) {
+        received_first_measurement_(false),
+        n_rejected_(0), n_curr_rejected_(0),
+        n_accepted_(0) {
   }
   virtual ~SensorHandler() {
   }

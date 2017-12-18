@@ -68,6 +68,14 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
 
   }
   ;
+
+  /***
+   * This function resets sensorID_ to 0 for new numbering
+   */
+  void ResetSensorID()
+  {
+      sensorID_ = 0;
+  }
   /***
    * Add a new sensor handler to the list of handlers owned by this manager
    * a sensor handler is in turn owning the sensor (camera/vicon etc.).
@@ -131,6 +139,11 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
   virtual double GetParamNoiseGyr() const = 0;
   virtual double GetParamNoiseGyrbias() const = 0;
   virtual double GetParamFuzzyTrackingThreshold() const = 0;
+
+  /***
+   * This function is used to increase noise from within handler
+   */
+  virtual void IncreaseNoise(int sensorID) = 0;
 
   /**
    * This functions get called by the core to publish data to external

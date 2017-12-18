@@ -50,6 +50,9 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
 
   PositionSensorManager(
       ros::NodeHandle pnh = ros::NodeHandle("~/position_sensor")) {
+    //initializing sensorID with 0
+    ResetSensorID();
+    //now each sensor will have a ID according to its position in vector (which can be used to access)
     imu_handler_.reset(
         new msf_core::IMUHandler_ROS<msf_updates::EKFState>(*this, "msf_core",
                                                             "imu_handler"));
@@ -70,6 +73,20 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
     return config_;
   }
 
+  virtual void IncreaseNoise(int sensorID)
+  {
+    //how to get correct config in case of multiple sensors
+    MSF_INFO_STREAM("polymorphd called");
+    if(sensorID==0)
+    {
+      config_.position_noise_meas+=0.05;
+      position_handler_->SetNoises(config_.position_noise_meas);
+    }
+    else{
+      MSF_WARN_STREAM("Unknown sensorID: "<< sensorID);
+    }
+    return;
+  }
  private:
   shared_ptr<msf_core::IMUHandler_ROS<msf_updates::EKFState> > imu_handler_;
   shared_ptr<PositionSensorHandler_T> position_handler_;

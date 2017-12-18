@@ -75,6 +75,9 @@ def estimate_transformation(pointsfrom, pointsto):
 #computes the transformed point
 #translation is a 3 vector and rotation is 3x3 rotation matrix
 def transform_point(point, translation, rotation):
+  #print("n")
+  #print(point)
+  #print(np.matmul(rotation, point)+translation)
   return np.matmul(rotation, point)+translation
   
 

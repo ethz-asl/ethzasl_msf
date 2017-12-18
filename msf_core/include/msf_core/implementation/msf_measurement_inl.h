@@ -26,7 +26,9 @@ MSF_MeasurementBase<EKFState_T>::MSF_MeasurementBase(bool isabsoluteMeasurement,
                                                      double* mah_threshold,
                                                      double mah_rejection_modification,
                                                      double mah_acceptance_modification,
-                                                     double mah_threshold_limit)
+                                                     double mah_threshold_limit,
+                                                     double* n_rejected, double* n_curr_rejected,
+                                                     double* n_accepted)
     : sensorID_(sensorID),
       isabsolute_(isabsoluteMeasurement),
       enable_mah_outlier_rejection_(enable_mah_outlier_rejection),
@@ -34,6 +36,8 @@ MSF_MeasurementBase<EKFState_T>::MSF_MeasurementBase(bool isabsoluteMeasurement,
       mah_rejection_modification_(mah_rejection_modification),
       mah_acceptance_modification_(mah_acceptance_modification),
       mah_threshold_limit_(mah_threshold_limit),
+      n_rejected_(n_rejected), n_curr_rejected_(n_curr_rejected),
+      n_accepted_(n_accepted),
       time(0) {
 		  //MSF_WARN_STREAM("init ne MeasurementBase class");
 }
@@ -68,7 +72,7 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
   //MSF_WARN_STREAM(EKFState_T::w_m);
   
 
-  MSF_WARN_STREAM("new step with mah treshhold"<<(*mah_threshold_));
+  //MSF_WARN_STREAM("new step with mah treshhold"<<(*mah_threshold_));
   if(enable_mah_outlier_rejection_){ //could do this earlier to save computation time
 	  //MSF_WARN_STREAM("outlier rejection active");
     //calculate mahalanobis distance
@@ -81,9 +85,11 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
     if(mah_dist_squared>(*mah_threshold_)*(*mah_threshold_)){
       //in case of rejection computes the new threshold in case of rejection as a weighted sum of the current threshold and a
       //maximal threshold to be defined
-	  (*mah_threshold_)=(*mah_threshold_)*(1.0-mah_rejection_modification_)+mah_rejection_modification_*mah_threshold_limit_;
-	  //MSF_WARN_STREAM("new mah_threshold"<<mah_threshold_);
-      MSF_WARN_STREAM("rejecting reading as outlier with distance squared"<<mah_dist_squared);
+      (*mah_threshold_)=(*mah_threshold_)*(1.0-mah_rejection_modification_)+mah_rejection_modification_*mah_threshold_limit_;
+      (*n_rejected_)++;
+      (*n_curr_rejected_)++;
+	    //MSF_WARN_STREAM("new mah_threshold"<<mah_threshold_);
+      //MSF_WARN_STREAM("rejecting reading as outlier with distance squared"<<mah_dist_squared);
       return;
     }
     //in case of a measurement being accepted computes a weighted average between the current threshold and the distance of the current 
@@ -92,8 +98,8 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
     {
       (*mah_threshold_)=(*mah_threshold_)*(1.0-mah_acceptance_modification_)+(mah_acceptance_modification_+0.1)*sqrt(mah_dist_squared);
     }
-    //(*mah_threshold_)*=mah_acceptance_modification_;
-    //(*mah_threshold_)+=mah_acceptance_modification_;
+    (*n_accepted_)++;
+    (*n_curr_rejected_)=0;
   }
 
   K = P * H_delayed.transpose() * S_inverse;
@@ -108,6 +114,8 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
   core.ApplyCorrection(state, correction_);
 }
 
+//this function should be updated according to the one above
+//however its currently unused
 template<typename EKFState_T>
 void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
     shared_ptr<EKFState_T> state, MSF_Core<EKFState_T>& core,

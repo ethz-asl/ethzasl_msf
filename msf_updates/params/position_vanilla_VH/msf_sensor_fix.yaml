@@ -15,6 +15,10 @@ position_sensor/init/p_ip/x: 0.06901
 position_sensor/init/p_ip/y: -0.02781
 position_sensor/init/p_ip/z: -0.12395
 
+#position_sensor/init/p_ip/x: 0.0
+#position_sensor/init/p_ip/y: 0.0
+#position_sensor/init/p_ip/z: 0.0
+
 position_sensor/position_absolute_measurements: true
 position_sensor/position_use_fixed_covariance: true
 position_sensor/position_delay: 0.0

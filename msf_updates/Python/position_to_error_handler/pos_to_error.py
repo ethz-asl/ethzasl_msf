@@ -112,6 +112,8 @@ class PosToError:
 	  self.translation_=rospy.get_param("~translation", [0,0,0])#translation x, y, z
       #rotation is given as a quaternion. quaternion is w, x, y, z
 	  self.rotation_=quaternion_to_matrix(rospy.get_param("~quaternion", [1,0,0,0]))#3x3 rotation matrix.
+	  print(self.translation_)
+	  print(self.rotation_)
 	  self.init_meas_=True
 
   #computes the l2 norm of the difference between arrin and truth.
@@ -138,8 +140,10 @@ class PosToError:
     #if transformation is available
     if(self.init_meas_):
       #transforms the input to truth frame with given transformation
+      #print("n")
+      #print(np.array([data.data[0], data.data[1], data.data[2]]))
       arrin=transform_point(np.array([data.data[0], data.data[1], data.data[2]]), self.translation_, self.rotation_)
-      
+      #print(arrin)
       #compute error for input
       outputp1=self.l2_norm(arrin[0:3], self.curr_truth_[0:3])
       outputp2=self.linf_norm(arrin[0:3], self.curr_truth_[0:3])
