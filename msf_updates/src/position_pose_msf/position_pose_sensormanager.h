@@ -286,8 +286,10 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
       //Eigen::Quaternion<double> temp = (q_ic * q_cv.conjugate() * q_wv).conjugate();
       //q_ic = (q.toRotationMatrix().inverse()*temp.toRotationMatrix());
       q_ic = q.conjugate()*q_wv.inverse()*q_cv.conjugate().inverse(); //better but still not correct
+      q_ic.normalize();
     }
 
+    MSF_WARN_STREAM("position q:" << STREAMQUAT(q)<<"pose q_cv:"<<STREAMQUAT(q_cv));
     
     //need to think carefully about next part: want to have one "6Dof pose" for both sensors togethe
     //but might potentially be different:
@@ -321,9 +323,9 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
         //take position world frame
         p = p_vc_p - q.toRotationMatrix() * p_ip;
         //adjust pose transformation
-        p_ic=q_ic.toRotationMatrix().inverse()*(q_wv.conjugate().toRotationMatrix() * p_vc_c / scale - p);
+        p_ic=q_ic.toRotationMatrix().inverse()*(p_wv + q_wv.conjugate().toRotationMatrix() * p_vc_c / scale - p);
     }
-
+    MSF_WARN_STREAM("position p_vc_p:"<<p_vc_p.transpose()<<" pose p_vc_c:"<<p_vc_c.transpose());
 
     a_m = q.inverse() * g;			/// Initial acceleration.
     // Prepare init "measurement"
