@@ -60,7 +60,7 @@ class SensorManager : public msf_core::MSF_SensorManagerROS<
   virtual ~SensorManager() {
   }
 
-  virtual void IncreaseNoise(int sensorID)
+  virtual void IncreaseNoise(int sensorID, double val)
   {
     MSF_WARN_STREAM("NOT IMPLEMENTED FUNCTION");
     return;
@@ -169,6 +169,13 @@ class SensorManager : public msf_core::MSF_SensorManagerROS<
     msf_core_->Init(meas);
   }
 
+  //since this has only 1 sensor simply call normal Init
+  void Init(double scale, int sensorID) const
+  {
+      Init(scale);
+      return;
+  }
+    
   // Prior to this call, all states are initialized to zero/identity.
   virtual void ResetState(EKFState_T& state) const {
     UNUSED(state);

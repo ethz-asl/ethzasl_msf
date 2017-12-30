@@ -91,6 +91,11 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
   virtual void Init(double scale) const = 0;
 
   /***
+   * Init function in case only one (of multiple sensors should be reinitialized)
+   */
+  virtual void Init(double scale, int sensorID) const = 0;
+
+  /***
    * This method will be called for the user to set the initial state.
    */
   virtual void InitState(EKFState_T& state) const = 0;
@@ -143,7 +148,7 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
   /***
    * This function is used to increase noise from within handler
    */
-  virtual void IncreaseNoise(int sensorID) = 0;
+  virtual void IncreaseNoise(int sensorID, double val) = 0;
 
   /**
    * This functions get called by the core to publish data to external

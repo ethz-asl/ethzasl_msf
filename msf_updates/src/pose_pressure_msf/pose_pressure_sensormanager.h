@@ -69,7 +69,7 @@ class PosePressureSensorManager : public msf_core::MSF_SensorManagerROS<
   virtual ~PosePressureSensorManager() {
   }
 
-  virtual void IncreaseNoise(int sensorID)
+  virtual void IncreaseNoise(int sensorID, double val)
   {
     MSF_WARN_STREAM("NOT IMPLEMENTED FUNCTION");
     return;
@@ -198,6 +198,13 @@ class PosePressureSensorManager : public msf_core::MSF_SensorManagerROS<
     // Call initialization in core.
     this->msf_core_->Init(meas);
 
+}
+
+  //not implemented for this
+  void Init(double scale, int sensorID) const
+  {
+      Init(scale);
+      return;
   }
 
   // Prior to this call, all states are initialized to zero/identity.

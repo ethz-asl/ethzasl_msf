@@ -73,13 +73,13 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
     return config_;
   }
 
-  virtual void IncreaseNoise(int sensorID)
+  virtual void IncreaseNoise(int sensorID, double val)
   {
     //how to get correct config in case of multiple sensors
     MSF_INFO_STREAM("polymorphd called");
     if(sensorID==0)
     {
-      config_.position_noise_meas+=0.05;
+      config_.position_noise_meas+=val;
       position_handler_->SetNoises(config_.position_noise_meas);
     }
     else{
@@ -178,6 +178,13 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
     msf_core_->Init(meas);
   }
 
+  //since this has only 1 sensor simply call normal Init
+  void Init(double scale, int sensorID) const
+  {
+      Init(scale);
+      return;
+  }
+    
   // Prior to this call, all states are initialized to zero/identity.
   virtual void ResetState(EKFState_T& state) const {
     UNUSED(state);

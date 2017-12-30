@@ -739,6 +739,12 @@ MSF_Core<EKFState_T>::GetPreviousMeasurement(
 }
 
 template<typename EKFState_T>
+shared_ptr<EKFState_T> MSF_Core<EKFState_T>::GetLastState()
+{
+  return stateBuffer_.GetLast();
+}
+
+template<typename EKFState_T>
 shared_ptr<EKFState_T> MSF_Core<EKFState_T>::GetStateAtTime(double tstamp) {
   return stateBuffer_.GetValueAt(tstamp);
 }

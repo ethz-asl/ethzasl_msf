@@ -119,6 +119,11 @@ class MSF_Core {
       double time, int sensorID);
 
   /**
+   * returns latest state in buffer
+   */
+  shared_ptr<EKFState_T> GetLastState();
+  
+  /**
    * \brief Finds the state at the requested time in the internal state.
    * \param tstamp The time stamp to find the state to.
    */

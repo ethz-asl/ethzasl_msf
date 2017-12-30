@@ -158,8 +158,9 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPositionMeasu
           //auto config=manager_.Getcfg(); //this is some config type
           //want to do this differently, i.e. adjust the value in config (may need function in manager)
           //this->SetNoises(config.position_noise_meas+0.1);
-          manager_.IncreaseNoise(this->sensorID);
-          manager_.Init(1.0);
+          //might want to make val depedent on how bad it is (later)
+          manager_.IncreaseNoise(this->sensorID, 0.05);
+          manager_.Init(1.0, this->sensorID);
       }
       else if(n_curr_rejected_>rejection_divergence_threshold_)
       {
@@ -170,7 +171,7 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPositionMeasu
           mah_threshold_limit_*=1.1;
           mah_rejection_modification_+=0.1;
           mah_acceptance_modification_+=0.1;
-          manager_.Init(1.0);
+          manager_.Init(1.0, this->sensorID);
       }  
   }
 

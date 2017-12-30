@@ -53,6 +53,10 @@ class SensorHandler {
   void SetSensorID(int ID) {
     sensorID = ID;
   }
+
+  int GetSensorID(){
+    return sensorID;
+  }
   void SequenceWatchDog(size_t seq, const std::string& topic) {
     if (static_cast<int>(seq) != lastseq_ + 1 && lastseq_ != 0) {
       MSF_WARN_STREAM(

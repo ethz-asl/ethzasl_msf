@@ -64,17 +64,20 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
       ros::NodeHandle pnh = ros::NodeHandle("~/position_pose_sensor")) {
 
     bool distortmeas = false;  ///< Distort the pose measurements
+    //initializing sensorID with 0
+    ResetSensorID();
+    //now each sensor will have a ID according to its position in vector (which can be used to access)
     imu_handler_.reset(
         new msf_core::IMUHandler_ROS<msf_updates::EKFState>(*this, "msf_core",
                                                             "imu_handler"));
 
     pose_handler_.reset(
         new PoseSensorHandler_T(*this, "", "pose_sensor", distortmeas));
-    AddHandler(pose_handler_);
+    AddHandler(pose_handler_); //this will be ID=0
 
     position_handler_.reset(
         new PositionSensorHandler_T(*this, "", "position_sensor"));
-    AddHandler(position_handler_);
+    AddHandler(position_handler_); //this will be ID=1
 
     reconf_server_.reset(new ReconfigureServer(pnh));
     ReconfigureServer::CallbackType f = boost::bind(&this_T::Config, this, _1,
@@ -95,9 +98,27 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
       //like call their destructors (not necessary in other sensormanagers)
   }
 
-  virtual void IncreaseNoise(int sensorID)
+  virtual void IncreaseNoise(int sensorID, double val)
   {
-    MSF_WARN_STREAM("NOT IMPLEMENTED FUNCTION");
+    //how to get correct config in case of multiple sensors
+    MSF_INFO_STREAM("polymorphd called");
+    if(sensorID==0)
+    {
+        MSF_INFO_STREAM("increasing pose noise");
+        config_.pose_noise_meas_p+=val;
+        config_.pose_noise_meas_q+=val;
+        MSF_INFO_STREAM("New noise meas"<<config_.pose_noise_meas_p);
+        pose_handler_->SetNoises(config_.pose_noise_meas_p, config_.pose_noise_meas_q);
+    }
+    else if(sensorID==1)
+    {
+      MSF_INFO_STREAM("increasing position noise");
+      config_.position_noise_meas+=val;
+      position_handler_->SetNoises(config_.position_noise_meas);
+    }
+    else{
+      MSF_WARN_STREAM("Unknown sensorID: "<< sensorID);
+    }
     return;
 }
 
@@ -355,6 +376,165 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
     msf_core_->Init(meas);
     
 }
+
+  //distinguish between sensors and reinit this sensor only
+  //be careful about transformations
+  void Init(double scale, int sensorID) const
+  {
+    Init(scale);
+    //this is not working yet-> how to get state look at line 421 and GetStateVariable
+    /*//ID==0 is pose sensor
+    if(sensorID==0)
+    {
+        const shared_ptr<EKFState_T>& latestState = msf_core_->GetLastState();
+        //init pose sensor
+        if(!position_handler_->ReceivedFirstMeasurement() && !pose_handler_->ReceivedFirstMeasurement())
+        {
+            MSF_WARN_STREAM("No Measurements recieved at all. This hardly ever makes sense. Aborting Init");
+            return;
+        }
+        //variables from pose
+        Eigen::Matrix<double, 3, 1> p_ic, p_vc_c, p_wv;
+        Eigen::Quaternion<double> q_wv, q_ic, q_cv;
+
+        //variables from position
+        Eigen::Matrix<double, 3, 1> p_ip, p_vc_p;
+
+        //this SHOULD be the same for both since its orientation
+        //if available get it from pose (since position has no orientation per se)
+        //otherwise get it from yawinit (as in position sensor)
+        //for position need to be somewhat smart. probably makes sense to use position sensor since its more "absolute"
+        //than pose sensor (if available)
+        Eigen::Quaternion<double> q;
+        Eigen::Matrix<double, 3, 1> p;
+
+        //variables that have same meaning+value in both
+        Eigen::Matrix<double, 3, 1> b_w, b_a, g, w_m, a_m;
+        msf_core::MSF_Core<EKFState_T>::ErrorStateCov P;
+
+        //here the values have to be the same as in latest state
+        //these values are shared for both position and pose
+        g << 0, 0, 9.81;	        /// Gravity.
+        b_w << 0, 0, 0;		/// Bias gyroscopes.
+        b_a << 0, 0, 0;		/// Bias accelerometer.
+        //latestState->statevars //this accesses underlying statevars which are of type msf::generic_state_T
+        const Eigen::Matrix<double, 3, 1> v = latestState->statevars.template GetStateVariable<StateDefinition_T::v>();		/// Robot velocity (IMU centered).
+        w_m << 0, 0, 0;		/// Initial angular velocity.
+
+        P.setZero();  // Error state covariance; if zero, a default initialization in msf_core is used
+
+        //variables only from pose
+        q_wv.setIdentity();  // Vision-world rotation drift.
+        p_wv.setZero();  // Vision-world position drift.
+
+        p_vc_c = pose_handler_->GetPositionMeasurement(); //This is potentially different for both sensors but has same name
+        q_cv = pose_handler_->GetAttitudeMeasurement();
+
+        //variables only from position
+        //probably only need yawinit if we cannot estimate it from pose->will see
+        
+        p_vc_p = position_handler_->GetPositionMeasurement(); //This is potentially different for both sensors but has same name
+        
+
+        // Check if we have already input from the measurement sensor.
+        if (!pose_handler_->ReceivedFirstMeasurement())
+        {
+        MSF_WARN_STREAM(
+            "No measurements received yet to initialize position - using [0 0 0]");
+        MSF_WARN_STREAM(
+            "No measurements received yet to initialize attitude - using [1 0 0 0]");
+        }
+        if (!position_handler_->ReceivedFirstMeasurement())
+        MSF_WARN_STREAM(
+            "No measurements received yet to initialize position - using [0 0 0]");
+
+        // Calculate initial attitude and position based on sensor measurements.
+        if (!pose_handler_->ReceivedFirstMeasurement()) {  // If there is no pose measurement, compute q as in position sensormanager
+        double yawinit = config_.position_yaw_init / 180 * M_PI;
+        Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
+        yawq.normalize();
+        q = yawq; 
+        }
+        else if(!position_handler_->ReceivedFirstMeasurement())//if there is no position measurement compute q as in pose sensormanager
+        {
+            q = (q_ic * q_cv.conjugate() * q_wv).conjugate(); //i believe quaternions here are handled as matrices
+            q.normalize();
+        }
+        else {  // If there are both take orientation from position handler (since we want to live in position frame)
+        double yawinit = config_.position_yaw_init / 180 * M_PI;
+        Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
+        yawq.normalize();
+        q = yawq; 
+        //compute new transform for pose (rotational part)
+        //Eigen::Quaternion<double> temp = (q_ic * q_cv.conjugate() * q_wv).conjugate();
+        //q_ic = (q.toRotationMatrix().inverse()*temp.toRotationMatrix());
+        q_ic = q.conjugate()*q_wv.inverse()*q_cv.conjugate().inverse(); //better but still not correct
+        q_ic.normalize();
+        }
+
+        MSF_WARN_STREAM("position q:" << STREAMQUAT(q)<<"pose q_cv:"<<STREAMQUAT(q_cv));
+
+        //only position measurement recieved. position as in position sensormanager
+        if(!pose_handler_->ReceivedFirstMeasurement())
+        {
+            p = p_vc_p - q.toRotationMatrix() * p_ip;
+        }
+        //only pose measurement recieved. position as in pose sensormanager
+        else if(!position_handler_->ReceivedFirstMeasurement())
+        {
+            p = p_wv + q_wv.conjugate().toRotationMatrix() * p_vc_c / scale
+            - q.toRotationMatrix() * p_ic;
+        }
+        
+        //both measurements recieved...need to do something smart 
+        else
+        {
+            //take position world frame
+            p = p_vc_p - q.toRotationMatrix() * p_ip;
+            //adjust pose transformation
+            p_ic=q_ic.toRotationMatrix().inverse()*(p_wv + q_wv.conjugate().toRotationMatrix() * p_vc_c / scale - p);
+        }
+        MSF_WARN_STREAM("position p_vc_p:"<<p_vc_p.transpose()<<" pose p_vc_c:"<<p_vc_c.transpose());
+
+        a_m = q.inverse() * g;			/// Initial acceleration.
+        // Prepare init "measurement"
+        // True means that this message contains initial sensor readings.
+        shared_ptr < msf_core::MSF_InitMeasurement<EKFState_T>
+            > meas(new msf_core::MSF_InitMeasurement<EKFState_T>(true));
+
+        meas->SetStateInitValue < StateDefinition_T::p > (p);
+        meas->SetStateInitValue < StateDefinition_T::v > (v);
+        meas->SetStateInitValue < StateDefinition_T::q > (q);
+        meas->SetStateInitValue < StateDefinition_T::b_w > (b_w);
+        meas->SetStateInitValue < StateDefinition_T::b_a > (b_a);
+        meas->SetStateInitValue < StateDefinition_T::L
+            > (Eigen::Matrix<double, 1, 1>::Constant(scale));
+        meas->SetStateInitValue < StateDefinition_T::q_wv > (q_wv);
+        meas->SetStateInitValue < StateDefinition_T::p_wv > (p_wv);
+        meas->SetStateInitValue < StateDefinition_T::q_ic > (q_ic);
+        meas->SetStateInitValue < StateDefinition_T::p_ic > (p_ic);
+        meas->SetStateInitValue < StateDefinition_T::p_ip > (p_ip);
+
+        SetStateCovariance(meas->GetStateCovariance());  // Call my set P function.
+        meas->Getw_m() = w_m;
+        meas->Geta_m() = a_m;
+        meas->time = ros::Time::now().toSec();
+
+        // Call initialization in core.
+        msf_core_->Init(meas);
+    }
+    //ID==1 is position sensor
+    else if(sensorID==1)
+    {
+        //init position sensor
+        Init(scale);
+    }
+    else
+    {
+        MSF_WARN_STREAM("Unknown sensor ID:"<<sensorID);
+    }     */
+    return;
+  }
 
 
   /*void Init(double scale) const {
