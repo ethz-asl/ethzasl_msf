@@ -112,7 +112,7 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     }
     else if(sensorID==1)
     {
-      MSF_INFO_STREAM("increasing position noise");
+      MSF_INFO_STREAM("increasing position noise"<<config_.position_noise_meas);
       config_.position_noise_meas+=val;
       position_handler_->SetNoises(config_.position_noise_meas);
     }
@@ -439,6 +439,7 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
 
         //compute new tranfor for pose (translational part)
         p_ic=q_ic.toRotationMatrix().inverse()*(p_wv + q_wv.conjugate().toRotationMatrix() * p_vc_c / scale - p);
+        MSF_WARN_STREAM("new p_ic"<<p_ic<<"p_wv:"<<p_wv<<"p_vc_c:"<<p_vc_c<<"scale"<<scale<<"p"<<p);
 
         a_m = q.inverse() * g;			/// Initial acceleration.
         // Prepare init "measurement"

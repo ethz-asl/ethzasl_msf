@@ -52,6 +52,7 @@ PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PoseSensorHandler(
   pnh.param("mah_acceptance_modification", mah_acceptance_modification_, msf_core::kDefaultMahAcceptanceModification_);
   pnh.param("max_outlier_relative", max_outlier_relative_, 1.0);
   pnh.param("divergence_rejection_limit", rejection_divergence_threshold_, 999999999.0);
+  pnh.param("bad_initialization_limit", bad_initialization_threshold_, 999999999.0);
   
   MSF_INFO_STREAM_COND(measurement_world_sensor_, "Pose sensor is interpreting "
                        "measurement as sensor w.r.t. world");
@@ -78,7 +79,8 @@ PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PoseSensorHandler(
 	  mah_threshold_ << ", rejection modificator: " << mah_rejection_modification_ <<
 	  ", acceptance modificator: " << mah_acceptance_modification_ <<
 	  " and reset limit: "<< mah_threshold_limit_<<"relative maximal outliers: "<<
-      max_outlier_relative_<< " and divergence limit: "<<rejection_divergence_threshold_);
+      max_outlier_relative_<< " and divergence limit: "<<rejection_divergence_threshold_
+      <<"bad initialization limit:"<<bad_initialization_threshold_);
   }
   
   ros::NodeHandle nh("msf_updates/" + topic_namespace);
@@ -190,12 +192,14 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
   this->manager_.msf_core_->AddMeasurement(meas);
 
   //this part checks if something went wrong on initialization
-  if (n_accepted_==0&&n_curr_rejected_>msf_core::badInitializationThreshold_)
+  if (n_accepted_==0&&n_curr_rejected_>bad_initialization_threshold_)
   {
       MSF_WARN_STREAM("First Measurements have all been rejected. Probably initialized on an outlier. Reinitializing");
       n_accepted_=0.0;
       n_rejected_=0.0;
       n_curr_rejected_=0.0;
+      //just to be safe (should devcrease once implemented)
+      manager_.IncreaseNoise(this->sensorID, 0.01);
       manager_.Initsingle(this->sensorID);
     }
     
