@@ -24,6 +24,7 @@ namespace msf_core {
   static constexpr double kDefaultMahAcceptanceModification_ = 0.9;
   static constexpr double kDefaultMahThresholdLimit_ = 1000.0;
   static constexpr double minRequestedSamplesForRejection_ = 50.0;
+  static constexpr double badInitializationThreshold_ = 20.0;
 /**
  * \class SensorHandler
  * \brief Handles a sensor driver which provides the sensor readings.

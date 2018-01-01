@@ -93,7 +93,7 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
   /***
    * Init function in case only one (of multiple sensors should be reinitialized)
    */
-  virtual void Init(double scale, int sensorID) const = 0;
+  virtual void Initsingle(int sensorID) const = 0;
 
   /***
    * This method will be called for the user to set the initial state.

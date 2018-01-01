@@ -200,10 +200,10 @@ class PosePressureSensorManager : public msf_core::MSF_SensorManagerROS<
 
 }
 
-  //not implemented for this
-  void Init(double scale, int sensorID) const
+  //look at position pose sensormanager
+  void Initsingle(int sensorID) const
   {
-      Init(scale);
+      MSF_WARN_STREAM("Function not implemented yet");
       return;
   }
 

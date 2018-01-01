@@ -179,9 +179,9 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
   }
 
   //since this has only 1 sensor simply call normal Init
-  void Init(double scale, int sensorID) const
+  void Initsingle(int sensorID) const
   {
-      Init(scale);
+      MSF_WARN_STREAM("Function not implemented yet");
       return;
   }
     

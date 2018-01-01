@@ -379,122 +379,66 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
 
   //distinguish between sensors and reinit this sensor only
   //be careful about transformations
-  void Init(double scale, int sensorID) const
+  void Initsingle(int sensorID) const
   {
-    Init(scale);
     //this is not working yet-> how to get state look at line 421 and GetStateVariable
-    /*//ID==0 is pose sensor
+    //ID==0 is pose sensor
     if(sensorID==0)
     {
         const shared_ptr<EKFState_T>& latestState = msf_core_->GetLastState();
+        //this is how to do this
+        //const Eigen::Matrix<double,3,1> temp=const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::v>();
         //init pose sensor
-        if(!position_handler_->ReceivedFirstMeasurement() && !pose_handler_->ReceivedFirstMeasurement())
+        if(!pose_handler_->ReceivedFirstMeasurement())
         {
-            MSF_WARN_STREAM("No Measurements recieved at all. This hardly ever makes sense. Aborting Init");
+            MSF_WARN_STREAM("Cannot Reinitialize pose sensor without measurements. Aborting");
             return;
         }
+        //we do not change scale when reinitializing one sensor->get scale from last state
+        const double scale = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::L>()(0,0); //for some reasone scale is saved as a 1 by 1 matrix... (might want to change this eventually)
         //variables from pose
-        Eigen::Matrix<double, 3, 1> p_ic, p_vc_c, p_wv;
-        Eigen::Quaternion<double> q_wv, q_ic, q_cv;
+        Eigen::Matrix<double, 3, 1> p_ic, p_vc_c;
+        Eigen::Quaternion<double> q_ic, q_cv;
 
-        //variables from position
-        Eigen::Matrix<double, 3, 1> p_ip, p_vc_p;
+        const Eigen::Matrix<double, 3, 1> p_ip = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::p_ip>();
 
-        //this SHOULD be the same for both since its orientation
-        //if available get it from pose (since position has no orientation per se)
-        //otherwise get it from yawinit (as in position sensor)
-        //for position need to be somewhat smart. probably makes sense to use position sensor since its more "absolute"
-        //than pose sensor (if available)
-        Eigen::Quaternion<double> q;
-        Eigen::Matrix<double, 3, 1> p;
+        //since we are only reinitializing one sensor take last state as "truth" and recompute this transform
+        const Eigen::Quaternion<double> q = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::q>();;
+        const Eigen::Matrix<double, 3, 1> p = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::p>();;
 
         //variables that have same meaning+value in both
-        Eigen::Matrix<double, 3, 1> b_w, b_a, g, w_m, a_m;
+        Eigen::Matrix<double, 3, 1> g, w_m, a_m;
         msf_core::MSF_Core<EKFState_T>::ErrorStateCov P;
 
         //here the values have to be the same as in latest state
         //these values are shared for both position and pose
         g << 0, 0, 9.81;	        /// Gravity.
-        b_w << 0, 0, 0;		/// Bias gyroscopes.
-        b_a << 0, 0, 0;		/// Bias accelerometer.
-        //latestState->statevars //this accesses underlying statevars which are of type msf::generic_state_T
-        const Eigen::Matrix<double, 3, 1> v = latestState->statevars.template GetStateVariable<StateDefinition_T::v>();		/// Robot velocity (IMU centered).
-        w_m << 0, 0, 0;		/// Initial angular velocity.
+        w_m << 0, 0, 0;             //angular velocity (how to access this from state)
 
+        const Eigen::Matrix<double, 3, 1> b_w = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::b_w>();
+        const Eigen::Matrix<double, 3, 1> b_a = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::b_a>();
+        const Eigen::Matrix<double, 3, 1> v = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::v>();		/// Robot velocity (IMU centered).
+        
+        //const Eigen::Matrix<double, 3, 1> w_m = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::w_m>();		/// to access this is different (how/why?)
+
+        //idk about that one yet
         P.setZero();  // Error state covariance; if zero, a default initialization in msf_core is used
 
         //variables only from pose
-        q_wv.setIdentity();  // Vision-world rotation drift.
-        p_wv.setZero();  // Vision-world position drift.
+        const Eigen::Quaternion<double> q_wv = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::q_wv>();
+        const Eigen::Matrix<double, 3, 1> p_wv = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::p_wv>();
 
         p_vc_c = pose_handler_->GetPositionMeasurement(); //This is potentially different for both sensors but has same name
         q_cv = pose_handler_->GetAttitudeMeasurement();
 
-        //variables only from position
-        //probably only need yawinit if we cannot estimate it from pose->will see
-        
-        p_vc_p = position_handler_->GetPositionMeasurement(); //This is potentially different for both sensors but has same name
-        
-
-        // Check if we have already input from the measurement sensor.
-        if (!pose_handler_->ReceivedFirstMeasurement())
-        {
-        MSF_WARN_STREAM(
-            "No measurements received yet to initialize position - using [0 0 0]");
-        MSF_WARN_STREAM(
-            "No measurements received yet to initialize attitude - using [1 0 0 0]");
-        }
-        if (!position_handler_->ReceivedFirstMeasurement())
-        MSF_WARN_STREAM(
-            "No measurements received yet to initialize position - using [0 0 0]");
-
-        // Calculate initial attitude and position based on sensor measurements.
-        if (!pose_handler_->ReceivedFirstMeasurement()) {  // If there is no pose measurement, compute q as in position sensormanager
-        double yawinit = config_.position_yaw_init / 180 * M_PI;
-        Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
-        yawq.normalize();
-        q = yawq; 
-        }
-        else if(!position_handler_->ReceivedFirstMeasurement())//if there is no position measurement compute q as in pose sensormanager
-        {
-            q = (q_ic * q_cv.conjugate() * q_wv).conjugate(); //i believe quaternions here are handled as matrices
-            q.normalize();
-        }
-        else {  // If there are both take orientation from position handler (since we want to live in position frame)
-        double yawinit = config_.position_yaw_init / 180 * M_PI;
-        Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
-        yawq.normalize();
-        q = yawq; 
+        //position is given by last state
+        //we do not touch position sensor so we need to recompute transformation of pose sensor
         //compute new transform for pose (rotational part)
-        //Eigen::Quaternion<double> temp = (q_ic * q_cv.conjugate() * q_wv).conjugate();
-        //q_ic = (q.toRotationMatrix().inverse()*temp.toRotationMatrix());
-        q_ic = q.conjugate()*q_wv.inverse()*q_cv.conjugate().inverse(); //better but still not correct
+        q_ic = q.conjugate()*q_wv.inverse()*q_cv.conjugate().inverse(); //looks good now
         q_ic.normalize();
-        }
 
-        MSF_WARN_STREAM("position q:" << STREAMQUAT(q)<<"pose q_cv:"<<STREAMQUAT(q_cv));
-
-        //only position measurement recieved. position as in position sensormanager
-        if(!pose_handler_->ReceivedFirstMeasurement())
-        {
-            p = p_vc_p - q.toRotationMatrix() * p_ip;
-        }
-        //only pose measurement recieved. position as in pose sensormanager
-        else if(!position_handler_->ReceivedFirstMeasurement())
-        {
-            p = p_wv + q_wv.conjugate().toRotationMatrix() * p_vc_c / scale
-            - q.toRotationMatrix() * p_ic;
-        }
-        
-        //both measurements recieved...need to do something smart 
-        else
-        {
-            //take position world frame
-            p = p_vc_p - q.toRotationMatrix() * p_ip;
-            //adjust pose transformation
-            p_ic=q_ic.toRotationMatrix().inverse()*(p_wv + q_wv.conjugate().toRotationMatrix() * p_vc_c / scale - p);
-        }
-        MSF_WARN_STREAM("position p_vc_p:"<<p_vc_p.transpose()<<" pose p_vc_c:"<<p_vc_c.transpose());
+        //compute new tranfor for pose (translational part)
+        p_ic=q_ic.toRotationMatrix().inverse()*(p_wv + q_wv.conjugate().toRotationMatrix() * p_vc_c / scale - p);
 
         a_m = q.inverse() * g;			/// Initial acceleration.
         // Prepare init "measurement"
@@ -526,13 +470,89 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
     //ID==1 is position sensor
     else if(sensorID==1)
     {
+         const shared_ptr<EKFState_T>& latestState = msf_core_->GetLastState();
+        //this is how to do this
+        //const Eigen::Matrix<double,3,1> temp=const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::v>();
         //init position sensor
-        Init(scale);
+        if(!position_handler_->ReceivedFirstMeasurement())
+        {
+            MSF_WARN_STREAM("Cannot Reinitialize position sensor without measurements. Aborting");
+            return;
+        }
+        //we do not change scale when reinitializing one sensor->get scale from last state
+        const double scale = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::L>()(0,0); //for some reasone scale is saved as a 1 by 1 matrix... (might want to change this eventually)
+        //variables from position
+        Eigen::Matrix<double, 3, 1> p_ip, p_vc_p;
+
+        const Eigen::Matrix<double, 3, 1> p_ic = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::p_ic>();
+        const Eigen::Quaternion<double> q_ic = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::q_ic>();
+
+        //since we are only reinitializing one sensor take last state as "truth" and recompute this transform
+        const Eigen::Quaternion<double> q = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::q>();;
+        const Eigen::Matrix<double, 3, 1> p = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::p>();;
+
+        //variables that have same meaning+value in both
+        Eigen::Matrix<double, 3, 1> g, w_m, a_m;
+        msf_core::MSF_Core<EKFState_T>::ErrorStateCov P;
+
+        //here the values have to be the same as in latest state
+        //these values are shared for both position and pose
+        g << 0, 0, 9.81;	        /// Gravity.
+        w_m << 0, 0, 0;             //angular velocity (how to access this from state)
+        
+        const Eigen::Matrix<double, 3, 1> b_w = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::b_w>();
+        const Eigen::Matrix<double, 3, 1> b_a = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::b_a>();
+        const Eigen::Matrix<double, 3, 1> v = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::v>();		/// Robot velocity (IMU centered).
+        
+        //const Eigen::Matrix<double, 3, 1> w_m = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::w_m>();		/// to access this is different (how/why?)
+
+        //idk about that one yet
+        P.setZero();  // Error state covariance; if zero, a default initialization in msf_core is used
+
+        //variables only from pose
+        const Eigen::Quaternion<double> q_wv = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::q_wv>();
+        const Eigen::Matrix<double, 3, 1> p_wv = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::p_wv>();
+
+        p_vc_p = position_handler_->GetPositionMeasurement(); //This is potentially different for both sensors but has same name
+
+        //position is given by last state
+        //we do not touch pose sensor so we need to recompute transformation of position sensor
+
+        //rotational part doesnt really exist since gps has no orientation
+        //compute new tranform for position (translational part)
+        p_ip = q.toRotationMatrix().inverse()*(p_vc_p-p);
+
+        a_m = q.inverse() * g;			/// Initial acceleration.
+        // Prepare init "measurement"
+        // True means that this message contains initial sensor readings.
+        shared_ptr < msf_core::MSF_InitMeasurement<EKFState_T>
+            > meas(new msf_core::MSF_InitMeasurement<EKFState_T>(true));
+
+        meas->SetStateInitValue < StateDefinition_T::p > (p);
+        meas->SetStateInitValue < StateDefinition_T::v > (v);
+        meas->SetStateInitValue < StateDefinition_T::q > (q);
+        meas->SetStateInitValue < StateDefinition_T::b_w > (b_w);
+        meas->SetStateInitValue < StateDefinition_T::b_a > (b_a);
+        meas->SetStateInitValue < StateDefinition_T::L
+            > (Eigen::Matrix<double, 1, 1>::Constant(scale));
+        meas->SetStateInitValue < StateDefinition_T::q_wv > (q_wv);
+        meas->SetStateInitValue < StateDefinition_T::p_wv > (p_wv);
+        meas->SetStateInitValue < StateDefinition_T::q_ic > (q_ic);
+        meas->SetStateInitValue < StateDefinition_T::p_ic > (p_ic);
+        meas->SetStateInitValue < StateDefinition_T::p_ip > (p_ip);
+
+        SetStateCovariance(meas->GetStateCovariance());  // Call my set P function.
+        meas->Getw_m() = w_m;
+        meas->Geta_m() = a_m;
+        meas->time = ros::Time::now().toSec();
+
+        // Call initialization in core.
+        msf_core_->Init(meas);
     }
     else
     {
         MSF_WARN_STREAM("Unknown sensor ID:"<<sensorID);
-    }     */
+    }     
     return;
   }
 

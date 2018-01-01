@@ -143,6 +143,15 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPositionMeasu
   
   this->manager_.msf_core_->AddMeasurement(meas);
 
+  //this part checks wether something went wrong on initialization
+  if (n_accepted_==0&&n_curr_rejected_>msf_core::badInitializationThreshold_)
+  {
+      MSF_WARN_STREAM("First Measurements have all been rejected. Probably initialized on an outlier. Reinitializing");
+      n_accepted_=0.0;
+      n_rejected_=0.0;
+      n_curr_rejected_=0.0;
+      manager_.Initsingle(this->sensorID);
+  }
   //this function should check wether too many measurements have been rejected -> increase noise meas
   //or wether this sensor is currently diverging -> reset and adjust threshold
   //CheckNoiseDivergence();
@@ -160,20 +169,21 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPositionMeasu
           //this->SetNoises(config.position_noise_meas+0.1);
           //might want to make val depedent on how bad it is (later)
           manager_.IncreaseNoise(this->sensorID, 0.05);
-          manager_.Init(1.0, this->sensorID);
-      }
-      else if(n_curr_rejected_>rejection_divergence_threshold_)
-      {
-          MSF_WARN_STREAM("too many measurements have been rejected back to back -> increasing stability parameters and reseting");
-          n_accepted_ = 0.0;
-          n_rejected_ = 0.0;
-          n_curr_rejected_ = 0.0;
-          mah_threshold_limit_*=1.1;
-          mah_rejection_modification_+=0.1;
-          mah_acceptance_modification_+=0.1;
-          manager_.Init(1.0, this->sensorID);
-      }  
+          manager_.Initsingle(this->sensorID);
+        }
   }
+  if(n_curr_rejected_>rejection_divergence_threshold_)
+  {
+      MSF_WARN_STREAM("too many measurements have been rejected back to back -> increasing stability parameters and reseting");
+      n_accepted_ = 0.0;
+      n_rejected_ = 0.0;
+      n_curr_rejected_ = 0.0;
+      mah_threshold_limit_*=1.1;
+      mah_rejection_modification_+=0.1;
+      mah_acceptance_modification_+=0.1;
+      manager_.Initsingle(this->sensorID);
+  }  
+  
 
 
 }
