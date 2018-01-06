@@ -29,21 +29,40 @@ PressureSensorHandler::PressureSensorHandler(
       n_zp_(1e-6) {
   ros::NodeHandle pnh("~/pressure_sensor");
   ros::NodeHandle nh("msf_updates");
-
+  //params for outlierrejection
   pnh.param("enable_mah_outlier_rejection", enable_mah_outlier_rejection_, false);
   pnh.param("mah_threshold", mah_threshold_, msf_core::kDefaultMahThreshold_);
-  mah_threshold_base_=mah_threshold_;
-  pnh.param("mah_threshold_limit", mah_threshold_limit_, msf_core::kDefaultMahThresholdLimit_);
-  pnh.param("mah_rejection_modification", mah_rejection_modification_, msf_core::kDefaultMahRejectionModification_);
-  pnh.param("mah_acceptance_modification", mah_acceptance_modification_, msf_core::kDefaultMahAcceptanceModification_);
-  
-  
-    if(enable_mah_outlier_rejection_)
+  //mah_threshold must not be <1 for two reasons:
+  //numerical stability
+  //makes no sense to expecte most measurement to have mahalanobis distance < 1
+  if(mah_threshold_<1.0)
   {
-	  MSF_INFO_STREAM("Pressure sensor is using outlier rejection with initial threshold: " <<
-	  mah_threshold_ << ", rejection modificator: " << mah_rejection_modification_ <<
-	  ", acceptance modificator: " << mah_acceptance_modification_ <<
-	  " and reset limit: "<< mah_threshold_limit_);
+      MSF_WARN_STREAM("mah_threshold set to be < 1. Correcting to 1");
+      mah_threshold_=1.0;
+  }
+  //params for noise estimation
+  pnh.param("enable_noise_estimation", enable_noise_estimation_, false);
+  pnh.param("noise_estimation_discount_factor", average_discount_factor_, 1.0);
+    running_maha_dist_average_=msf_core::desiredNoiseLevel_*mah_threshold_;
+  //params for divergence recovery
+  pnh.param("enable_divergence_recovery", enable_divergence_recovery_, false);
+  pnh.param("divergence_rejection_limit", rejection_divergence_threshold_, msf_core::defaultRejectionDivergenceThreshold_);
+  
+  
+  if(enable_mah_outlier_rejection_)
+  {
+	  MSF_INFO_STREAM("Pressure sensor is using outlier rejection with threshold: " <<
+	  mah_threshold_);
+  }
+  if(enable_noise_estimation_)
+  {
+      MSF_INFO_STREAM("Pressure sensor is using noise estimation with discout factor:"<<
+      average_discount_factor_);
+  }
+  if(enable_divergence_recovery_)
+  {
+      MSF_INFO_STREAM("Pressure sensor is using divergence recovery with rejection limit:"<<
+      rejection_divergence_threshold_);
   }
   
   
@@ -77,7 +96,7 @@ void PressureSensorHandler::MeasurementCallback(
   shared_ptr<pressure_measurement::PressureMeasurement> meas(
       new pressure_measurement::PressureMeasurement(
           n_zp_, true, this->sensorID, enable_mah_outlier_rejection_,
-          &mah_threshold_, mah_rejection_modification_, mah_acceptance_modification_, mah_threshold_limit_,
+          mah_threshold_, &running_maha_dist_average_, average_discount_factor_,
           &n_rejected_, &n_curr_rejected_, &n_accepted_));
   meas->MakeFromSensorReading(msg, msg->header.stamp.toSec());
 

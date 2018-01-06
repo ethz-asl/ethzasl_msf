@@ -60,12 +60,12 @@ struct PressureMeasurement : public PressureMeasurementBase {
   typedef EKFState_T::StateDefinition_T StateDefinition_T;
   virtual ~PressureMeasurement() {}
   PressureMeasurement(double n_zp, bool isabsoluteMeasurement, int sensorID,
-                      bool enable_mah_outlier_rejection, double* mah_threshold,
-                      double mah_rejection_modification, double mah_acceptance_modification, double mah_threshold_limit,
+                      bool enable_mah_outlier_rejection, double mah_threshold,
+                      double* running_maha_dist_average, double average_discount_factor,
                       double* n_rejected, double* n_curr_rejected, double* n_accepted)
       : PressureMeasurementBase(isabsoluteMeasurement, sensorID,
                                 enable_mah_outlier_rejection, mah_threshold,
-                                mah_rejection_modification, mah_acceptance_modification, mah_threshold_limit,
+                                running_maha_dist_average, average_discount_factor,
                                n_rejected, n_curr_rejected, n_accepted),
         n_zp_(n_zp) {}
   virtual std::string Type() { return "pressure"; }

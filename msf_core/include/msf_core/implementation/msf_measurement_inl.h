@@ -20,26 +20,20 @@
 
 namespace msf_core {
 template<typename EKFState_T>
-MSF_MeasurementBase<EKFState_T>::MSF_MeasurementBase(bool isabsoluteMeasurement,
-                                                     int sensorID, 
-                                                     bool enable_mah_outlier_rejection,
-                                                     double* mah_threshold,
-                                                     double mah_rejection_modification,
-                                                     double mah_acceptance_modification,
-                                                     double mah_threshold_limit,
-                                                     double* n_rejected, double* n_curr_rejected,
-                                                     double* n_accepted)
+MSF_MeasurementBase<EKFState_T>::MSF_MeasurementBase(bool isabsoluteMeasurement, int sensorID,
+                      bool enable_mah_outlier_rejection, double mah_threshold,
+                      double* running_maha_dist_average, double average_discount_factor,
+                      double* n_rejected, double* n_curr_rejected,
+                      double* n_accepted)
     : sensorID_(sensorID),
       isabsolute_(isabsoluteMeasurement),
       enable_mah_outlier_rejection_(enable_mah_outlier_rejection),
       mah_threshold_(mah_threshold),
-      mah_rejection_modification_(mah_rejection_modification),
-      mah_acceptance_modification_(mah_acceptance_modification),
-      mah_threshold_limit_(mah_threshold_limit),
+      running_maha_dist_average_(running_maha_dist_average),
+      average_discount_factor_(average_discount_factor),
       n_rejected_(n_rejected), n_curr_rejected_(n_curr_rejected),
       n_accepted_(n_accepted),
       time(0) {
-		  //MSF_WARN_STREAM("init ne MeasurementBase class");
 }
 
 template<typename EKFState_T>
@@ -62,44 +56,36 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
   Eigen::Matrix<double, MSF_Core<EKFState_T>::nErrorStatesAtCompileTime,
       R_type::RowsAtCompileTime> K;
   typename MSF_Core<EKFState_T>::ErrorStateCov & P = state->P;
-  //MSF_WARN_STREAM(state->P);
-  
-  //state->P*=2;
 
   S = H_delayed * P * H_delayed.transpose() + R_delayed;
   S_inverse = S.inverse();
-  
-  //MSF_WARN_STREAM(EKFState_T::w_m);
-  
+  //we need this anyways
+  double mah_dist_squared=res_delayed.transpose() * S_inverse * res_delayed;
+  if(enable_mah_outlier_rejection_){ //could do this earlier to save computation time (maybe?)
 
-  //MSF_WARN_STREAM("new step with mah treshhold"<<(*mah_threshold_));
-  if(enable_mah_outlier_rejection_){ //could do this earlier to save computation time
-	  //MSF_WARN_STREAM("outlier rejection active");
-    //calculate mahalanobis distance
-    //Eigen::MatrixXd mah_dist_squared_temp = res_delayed.transpose() * S_inverse * res_delayed;//is this correct (this should output a scalar right?)
-    double mah_dist_squared=res_delayed.transpose() * S_inverse * res_delayed;
-    //double mah_dist_squared = mah_dist_squared_temp(0,0);
-
-    //reject point as outlier if distance above threshold
-    //if (sqrt(mah_dist_squared) > mah_threshold_){ //should not compute sqrt for efficiency
-    if(mah_dist_squared>(*mah_threshold_)*(*mah_threshold_)){
-      //in case of rejection computes the new threshold in case of rejection as a weighted sum of the current threshold and a
-      //maximal threshold to be defined
-      (*mah_threshold_)=(*mah_threshold_)*(1.0-mah_rejection_modification_)+mah_rejection_modification_*mah_threshold_limit_;
+    if(mah_dist_squared>mah_threshold_*mah_threshold_){
+      //in case a measurement is rejected we dont apply it
+      //count the rejected measurement
       (*n_rejected_)++;
       (*n_curr_rejected_)++;
-	    //MSF_WARN_STREAM("new mah_threshold"<<mah_threshold_);
-      //MSF_WARN_STREAM("rejecting reading as outlier with distance squared"<<mah_dist_squared);
+      //update discounted sum
+      (*running_maha_dist_average_)=(1.0-average_discount_factor_)*mah_threshold_+average_discount_factor_*(*running_maha_dist_average_);
       return;
     }
-    //in case of a measurement being accepted computes a weighted average between the current threshold and the distance of the current 
-    //measurement. Adds 0.1 times measurement to account for noise in it to not everfitt.
-    if(mah_acceptance_modification_!=0.0)
-    {
-      (*mah_threshold_)=(*mah_threshold_)*(1.0-mah_acceptance_modification_)+(mah_acceptance_modification_+0.1)*sqrt(mah_dist_squared);
-    }
+    //if accepted update counters as well and then apply measurement
+    //count the accepted measurement and set curr rejected to 0
     (*n_accepted_)++;
     (*n_curr_rejected_)=0;
+    //update discounted sum (cant get around computing sqrt here I think)
+    (*running_maha_dist_average_)=(1.0-average_discount_factor_)*std::sqrt(mah_dist_squared)+average_discount_factor_*(*running_maha_dist_average_);
+  }
+  //no outlierrejection
+  else
+  {
+    //we count every measurement as accepted (noise estimation might still be enabled)
+    (*n_accepted_)++;
+    //update discounted sum
+    (*running_maha_dist_average_)=(1.0-average_discount_factor_)*std::sqrt(mah_dist_squared)+average_discount_factor_*(*running_maha_dist_average_);
   }
 
   K = P * H_delayed.transpose() * S_inverse;
@@ -136,21 +122,36 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
   S = H_delayed * P * H_delayed.transpose() + R_delayed;
   S_inverse = S.inverse();
 
-  //MSF_WARN_STREAM("getting close2");
-  if(enable_mah_outlier_rejection_){
-	//MSF_WARN_STREAM("outlier rejection active2");
-    //calculate mahalanobis distance
-    double mah_dist_squared = res_delayed.transpose() * S_inverse * res_delayed;
+  //we need this anyways
+  double mah_dist_squared=res_delayed.transpose() * S_inverse * res_delayed;
+  if(enable_mah_outlier_rejection_){ //could do this earlier to save computation time (maybe?)
 
-    //reject point as outlier if distance above threshold
-    if (mah_dist_squared > (*mah_threshold_)*(*mah_threshold_)){
-      MSF_WARN_STREAM("rejecting reading as outlier");
-      (*mah_threshold_)*=2;
+    if(mah_dist_squared>mah_threshold_*mah_threshold_){
+      //in case a measurement is rejected we dont apply it
+      //count the rejected measurement
+      (*n_rejected_)++;
+      (*n_curr_rejected_)++;
+      //update discounted sum
+      (*running_maha_dist_average_)=(1.0-average_discount_factor_)*mah_threshold_+average_discount_factor_*(*running_maha_dist_average_);
       return;
     }
-    (*mah_threshold_)*=0.9;
+    //if accepted update counters as well and then apply measurement
+    //count the accepted measurement and set curr rejected to 0
+    (*n_accepted_)++;
+    (*n_curr_rejected_)=0;
+    //update discounted sum (cant get around computing sqrt here I think)
+    MSF_WARN_STREAM("old val"<<(*running_maha_dist_average_));
+    (*running_maha_dist_average_)=(1.0-average_discount_factor_)*std::sqrt(mah_dist_squared)+average_discount_factor_*(*running_maha_dist_average_);
+    MSF_WARN_STREAM("new val"<<(*running_maha_dist_average_));
   }
-
+  //no outlierrejection
+  else
+  {
+    //we count every measurement as accepted (noise estimation might still be enabled)
+    (*n_accepted_)++;
+    //update discounted sum
+    (*running_maha_dist_average_)=(1.0-average_discount_factor_)*std::sqrt(mah_dist_squared)+average_discount_factor_*(*running_maha_dist_average_);
+  }
   K = P * H_delayed.transpose() * S_inverse; 
   correction_ = K * res_delayed;
   const typename MSF_Core<EKFState_T>::ErrorStateCov KH =

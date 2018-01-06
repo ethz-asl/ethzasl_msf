@@ -24,6 +24,7 @@
 #include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <msf_updates/PoseDistorter.h>
+#include <rovio/SrvResetToPose.h>
 
 namespace msf_pose_sensor {
 

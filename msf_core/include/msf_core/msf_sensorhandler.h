@@ -20,10 +20,10 @@
 namespace msf_core {
 
   static constexpr double kDefaultMahThreshold_ = 100.0;
-  static constexpr double kDefaultMahRejectionModification_ = 2.0;
-  static constexpr double kDefaultMahAcceptanceModification_ = 0.9;
-  static constexpr double kDefaultMahThresholdLimit_ = 1000.0;
-  static constexpr double minRequestedSamplesForRejection_ = 50.0;
+  static constexpr double defaultRejectionDivergenceThreshold_ = 100.0;
+  static constexpr double upperNoiseLimit_ = 0.7;
+  static constexpr double lowerNoiseLimit_ = 0.3;
+  static constexpr double desiredNoiseLevel_ = 0.5;
 /**
  * \class SensorHandler
  * \brief Handles a sensor driver which provides the sensor readings.
@@ -38,18 +38,19 @@ class SensorHandler {
   std::string topic_namespace_;
   std::string parameternamespace_;
   bool received_first_measurement_;
+  //params for outlierrejection
   bool enable_mah_outlier_rejection_;
   double mah_threshold_;
-  double mah_threshold_base_;
-  double mah_rejection_modification_;
-  double mah_acceptance_modification_;
-  double mah_threshold_limit_;
+  //params for noise estimation
+  bool enable_noise_estimation_;
+  double running_maha_dist_average_;
+  double average_discount_factor_;
+  //params for divergence recovery
+  bool enable_divergence_recovery_;
   double n_rejected_;
   double n_curr_rejected_;
   double n_accepted_;
-  double max_outlier_relative_;
   double rejection_divergence_threshold_;
-  double bad_initialization_threshold_;
 
   void SetSensorID(int ID) {
     sensorID = ID;
@@ -79,7 +80,7 @@ class SensorHandler {
         parameternamespace_(parameternamespace),
         received_first_measurement_(false),
         n_rejected_(0), n_curr_rejected_(0),
-        n_accepted_(0) {
+        n_accepted_(0){
   }
   virtual ~SensorHandler() {
   }

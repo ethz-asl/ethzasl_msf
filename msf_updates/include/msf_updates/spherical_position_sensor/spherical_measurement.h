@@ -83,12 +83,12 @@ struct AngleMeasurement : public AngleMeasurementBase {
   }
   AngleMeasurement(double n_za, bool fixed_covariance,
                    bool isabsoluteMeasurement, int sensorID, int fixedstates,
-                   bool enable_mah_outlier_rejection, double* mah_threshold,
-                   double mah_rejection_modification, double mah_acceptance_modification,
-                   double mah_threshold_limit, double* n_rejected, double* n_curr_rejected, double* n_accepted)
+                   bool enable_mah_outlier_rejection, double mah_threshold,
+                   double* running_maha_dist_average, double average_discount_factor,
+                   double* n_rejected, double* n_curr_rejected, double* n_accepted)
       : AngleMeasurementBase(isabsoluteMeasurement, sensorID,
                              enable_mah_outlier_rejection, mah_threshold,
-                             mah_rejection_modification, mah_acceptance_modification, mah_threshold_limit,
+                             running_maha_dist_average, average_discount_factor,
                              n_rejected, n_curr_rejected, n_accepted),
         n_za_(n_za),
         fixed_covariance_(fixed_covariance),
@@ -373,14 +373,14 @@ struct DistanceMeasurement : public DistanceMeasurementBase {
   }
   DistanceMeasurement(double n_zd, bool fixed_covariance,
                       bool isabsoluteMeasurement, int sensorID, int fixedstates,
-                      bool enable_mah_outlier_rejection, double* mah_threshold,
-                      double mah_rejection_modification, double mah_acceptance_modification,
-                      double mah_threshold_limit, double* n_rejected, double* n_curr_rejected,
+                      bool enable_mah_outlier_rejection, double mah_threshold,
+                      double* running_maha_dist_average, double average_discount_factor,
+                      double* n_rejected, double* n_curr_rejected,
                       double* n_accepted)
       : DistanceMeasurementBase(isabsoluteMeasurement, sensorID,
                                 enable_mah_outlier_rejection, mah_threshold,
-                                mah_rejection_modification, mah_acceptance_modification,
-                                mah_threshold_limit, n_rejected, n_curr_rejected, n_accepted),
+                                running_maha_dist_average, average_discount_factor,
+                                n_rejected, n_curr_rejected, n_accepted),
         n_zd_(n_zd),
         fixed_covariance_(fixed_covariance),
         fixedstates_(fixedstates) {}

@@ -33,11 +33,11 @@ template<typename EKFState_T>
 class MSF_MeasurementBase {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  MSF_MeasurementBase(bool isabsoluteMeasurement, int sensorID,
-                      bool enable_mah_outlier_rejection, double * mah_threshold,
-                      double mah_rejection_modification, double mah_acceptance_modification,
-                      double mah_threshold_limit, double* n_rejected, double* n_curr_rejected,
-                      double* n_accepted_);
+  MSF_MeasurementBase(bool isAbsoluteMeasurement, int sensorID,
+                      bool enable_mah_outlier_rejection, double mah_threshold,
+                      double* running_maha_dist_average, double average_discount_factor,
+                      double* n_rejected, double* n_curr_rejected,
+                      double* n_accepted);
   virtual ~MSF_MeasurementBase() {}
   /**
    * \brief The method called by the msf_core to apply the measurement
@@ -79,14 +79,13 @@ class MSF_MeasurementBase {
   bool enable_mah_outlier_rejection_;
 
   /// Mahalanobis distance outlier rejection threshold
-  double* mah_threshold_;
+  double mah_threshold_;
   
-  ///Modificators for Mahalanobis distance based on rejection/acception
-  ///This accounts for the additional uncertainty caused by rejecting a 
-  ///measurement
-  double mah_rejection_modification_;
-  double mah_acceptance_modification_;
-  double mah_threshold_limit_;
+  ///discounted sum of maha distance. Outliers distance will be=rejection threshold
+  ///if outlier rejection is enabled
+  double* running_maha_dist_average_;
+  ///discount factor for above sum
+  double average_discount_factor_;
 
   //variables to keep track of how many measurements have been rejected
   double* n_rejected_;
@@ -113,7 +112,7 @@ class MSF_InvalidMeasurement : public MSF_MeasurementBase<EKFState_T> {
     return "invalid";
   }
   MSF_InvalidMeasurement()
-      : MSF_MeasurementBase<EKFState_T>(true, constants::INVALID_ID, false, NULL, 0.0, 0.0, 0.0, NULL, NULL, NULL) {
+      : MSF_MeasurementBase<EKFState_T>(true, constants::INVALID_ID, false, 0.0, NULL, 0.0, NULL, NULL, NULL) {
   }
   virtual ~MSF_InvalidMeasurement() {
   }
@@ -138,15 +137,15 @@ class MSF_Measurement : public MSF_MeasurementBase<EKFState_T> {
   typedef boost::shared_ptr<T const> Measurement_ptr;
 
   MSF_Measurement(bool isAbsoluteMeasurement, int sensorID,
-                  bool enable_mah_outlier_rejection, double* mah_threshold,
-                  double mah_rejection_modification, double mah_acceptance_modification,
-                  double mah_threshold_limit, double* n_rejected, double* n_curr_rejected,
+                  bool enable_mah_outlier_rejection, double mah_threshold,
+                  double* running_maha_dist_average, double average_discount_factor,
+                  double* n_rejected, double* n_curr_rejected,
                   double* n_accepted)
       : MSF_MeasurementBase<EKFState_T>(isAbsoluteMeasurement, sensorID,
                                         enable_mah_outlier_rejection,
-                                        mah_threshold, mah_rejection_modification,
-                                        mah_acceptance_modification, mah_threshold_limit,
-                                        n_rejected, n_curr_rejected, n_accepted) {
+                                        mah_threshold, running_maha_dist_average,
+                                        average_discount_factor, n_rejected,
+                                        n_curr_rejected, n_accepted) {
     R_.setZero();
   }
   virtual ~MSF_Measurement() { }
@@ -190,7 +189,7 @@ class MSF_InitMeasurement : public MSF_MeasurementBase<EKFState_T> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW MSF_InitMeasurement(
       bool ContainsInitialSensorReadings)
-      : MSF_MeasurementBase<EKFState_T>(true, constants::INVALID_ID, false, NULL, 0.0, 0.0, 0.0, NULL, NULL, NULL) {
+      : MSF_MeasurementBase<EKFState_T>(true, constants::INVALID_ID, false, 0.0, NULL, 0.0, NULL, NULL, NULL) {
     ContainsInitialSensorReadings_ = ContainsInitialSensorReadings;
     this->time = ros::Time::now().toSec();
   }

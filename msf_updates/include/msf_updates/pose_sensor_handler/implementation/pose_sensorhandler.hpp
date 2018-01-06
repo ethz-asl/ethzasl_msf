@@ -23,6 +23,9 @@
 #define POSE_SENSORHANDLER_HPP_
 
 namespace msf_pose_sensor {
+typedef msf_updates::EKFState EKFState_T;
+typedef EKFState_T::StateSequence_T StateSequence_T;
+typedef EKFState_T::StateDefinition_T StateDefinition_T;
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PoseSensorHandler(
     MANAGER_TYPE& mng, std::string topic_namespace,
@@ -44,15 +47,24 @@ PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PoseSensorHandler(
   pnh.param("pose_measurement_world_sensor", measurement_world_sensor_, true);
   pnh.param("pose_use_fixed_covariance", use_fixed_covariance_, false);
   pnh.param("pose_measurement_minimum_dt", pose_measurement_minimum_dt_, 0.05);
+  //params for outlierrejection
   pnh.param("enable_mah_outlier_rejection", enable_mah_outlier_rejection_, false);
   pnh.param("mah_threshold", mah_threshold_, msf_core::kDefaultMahThreshold_);
-  mah_threshold_base_=mah_threshold_;
-  pnh.param("mah_threshold_limit", mah_threshold_limit_, msf_core::kDefaultMahThresholdLimit_);
-  pnh.param("mah_rejection_modification", mah_rejection_modification_, msf_core::kDefaultMahRejectionModification_);
-  pnh.param("mah_acceptance_modification", mah_acceptance_modification_, msf_core::kDefaultMahAcceptanceModification_);
-  pnh.param("max_outlier_relative", max_outlier_relative_, 1.0);
-  pnh.param("divergence_rejection_limit", rejection_divergence_threshold_, 999999999.0);
-  pnh.param("bad_initialization_limit", bad_initialization_threshold_, 999999999.0);
+  //mah_threshold must not be <1 for two reasons:
+  //numerical stability
+  //makes no sense to expecte most measurement to have mahalanobis distance < 1
+  if(mah_threshold_<1.0)
+  {
+      MSF_WARN_STREAM("mah_threshold set to be < 1. Correcting to 1");
+      mah_threshold_=1.0;
+  }
+  //params for noise estimation
+  pnh.param("enable_noise_estimation", enable_noise_estimation_, false);
+  pnh.param("noise_estimation_discount_factor", average_discount_factor_, 1.0);
+  running_maha_dist_average_=msf_core::desiredNoiseLevel_*mah_threshold_;
+  //params for divergence recovery
+  pnh.param("enable_divergence_recovery", enable_divergence_recovery_, false);
+  pnh.param("divergence_rejection_limit", rejection_divergence_threshold_, msf_core::defaultRejectionDivergenceThreshold_);
   
   MSF_INFO_STREAM_COND(measurement_world_sensor_, "Pose sensor is interpreting "
                        "measurement as sensor w.r.t. world");
@@ -75,12 +87,18 @@ PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PoseSensorHandler(
 
   if(enable_mah_outlier_rejection_)
   {
-	  MSF_INFO_STREAM("Pose sensor is using outlier rejection with initial threshold: " <<
-	  mah_threshold_ << ", rejection modificator: " << mah_rejection_modification_ <<
-	  ", acceptance modificator: " << mah_acceptance_modification_ <<
-	  " and reset limit: "<< mah_threshold_limit_<<"relative maximal outliers: "<<
-      max_outlier_relative_<< " and divergence limit: "<<rejection_divergence_threshold_
-      <<"bad initialization limit:"<<bad_initialization_threshold_);
+	  MSF_INFO_STREAM("Pose sensor is using outlier rejection with threshold: " <<
+	  mah_threshold_);
+  }
+  if(enable_noise_estimation_)
+  {
+      MSF_INFO_STREAM("Pose sensor is using noise estimation with discout factor:"<<
+      average_discount_factor_);
+  }
+  if(enable_divergence_recovery_)
+  {
+      MSF_INFO_STREAM("Pose sensor is using divergence recovery with rejection limit:"<<
+      rejection_divergence_threshold_);
   }
   
   ros::NodeHandle nh("msf_updates/" + topic_namespace);
@@ -180,8 +198,8 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
   shared_ptr<MEASUREMENT_TYPE> meas(new MEASUREMENT_TYPE(
       n_zp_, n_zq_, measurement_world_sensor_, use_fixed_covariance_,
       provides_absolute_measurements_, this->sensorID,
-      enable_mah_outlier_rejection_, &mah_threshold_, mah_rejection_modification_,
-      mah_acceptance_modification_, mah_threshold_limit_, &n_rejected_, &n_curr_rejected_,
+      enable_mah_outlier_rejection_, mah_threshold_, &running_maha_dist_average_,
+      average_discount_factor_, &n_rejected_, &n_curr_rejected_,
       &n_accepted_, fixedstates, distorter_));
 
   meas->MakeFromSensorReading(msg, msg->header.stamp.toSec() - delay_);
@@ -192,7 +210,8 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
   this->manager_.msf_core_->AddMeasurement(meas);
 
   //this part checks if something went wrong on initialization
-  if (n_accepted_==0&&n_curr_rejected_>bad_initialization_threshold_)
+  //we dont need this anymore since we dont completly reinitialize
+  /*if (n_accepted_==0&&n_curr_rejected_>bad_initialization_threshold_)
   {
       MSF_WARN_STREAM("First Measurements have all been rejected. Probably initialized on an outlier. Reinitializing");
       n_accepted_=0.0;
@@ -201,13 +220,42 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
       //just to be safe (should devcrease once implemented)
       manager_.IncreaseNoise(this->sensorID, 0.01);
       manager_.Initsingle(this->sensorID);
-    }
+    }*/
     
   //this function should check wether too many measurements have been rejected -> increase noise meas
   //or wether this sensor is currently diverging -> reset and adjust threshold
   //CheckNoiseDivergence();
   //MSF_INFO_STREAM("accepted"<<n_accepted_<<" rejected"<<n_rejected_<<" curr rejected"<<n_curr_rejected_);
-  if(n_rejected_+n_accepted_>msf_core::minRequestedSamplesForRejection_)
+  if(enable_noise_estimation_)
+  {
+      //if running average is larger than upperNoiseLimit of threshold recompute noise based on this
+      if(running_maha_dist_average_>=msf_core::upperNoiseLimit_*mah_threshold_)
+      {
+          //MSF_WARN_STREAM("too big:"<<running_maha_dist_average_<<"..."<<msf_core::upperNoiseLimit_*mah_threshold_);
+          manager_.IncreaseNoise(this->sensorID, running_maha_dist_average_/mah_threshold_);
+          //probably reset makes sense here since we basically start again
+          n_accepted_=0.0;
+          n_rejected_=0.0;
+          n_curr_rejected_=0.0;
+          running_maha_dist_average_=msf_core::desiredNoiseLevel_*mah_threshold_;
+          //manager_.Initsingle(this->sensorID);
+          return;
+      }
+      //if running average is lower thatn lowerNoiseLimit of threshold recompute noise based on this
+      else if(running_maha_dist_average_<=msf_core::lowerNoiseLimit_*mah_threshold_)
+      {
+          //MSF_WARN_STREAM("too small:"<<running_maha_dist_average_<<"..."<<msf_core::upperNoiseLimit_*mah_threshold_);
+          manager_.IncreaseNoise(this->sensorID, running_maha_dist_average_/mah_threshold_);
+          //probably reset makes sense here since we basically start again
+          n_accepted_=0.0;
+          n_rejected_=0.0;
+          n_curr_rejected_=0.0;
+          running_maha_dist_average_=msf_core::desiredNoiseLevel_*mah_threshold_;
+          //manager_.Initsingle(this->sensorID);
+          return;
+      }
+  }
+  /*if(n_rejected_+n_accepted_>msf_core::minRequestedSamplesForRejection_)
   {
       if(n_rejected_/(n_rejected_+n_accepted_)>max_outlier_relative_)
       {
@@ -217,21 +265,46 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
           n_curr_rejected_=0.0;
           //auto config=manager_.Getcfg(); //this is some config type
           //want to do this differently, i.e. adjust the value in config (may need function in manager)
-          //this->SetNoises(config.position_noise_meas+0.1);
+          //might want to make val depedent on how bad it is (later)
+          //compute this depending on current average of maha distance (set rejection threshold for rejected samples)
           manager_.IncreaseNoise(this->sensorID, 0.05);
           manager_.Initsingle(this->sensorID);
         }
-  }
+  }*/
+  //here either msf or rovio diverged. since we cant now just reinit both  
   else if(n_curr_rejected_>rejection_divergence_threshold_)
   {
       MSF_WARN_STREAM("too many measurements have been rejected back to back -> increasing stability parameters and reseting");
+      
       n_accepted_ = 0.0;
       n_rejected_ = 0.0;
       n_curr_rejected_ = 0.0;
-      mah_threshold_limit_*=1.1;
-      mah_rejection_modification_+=0.1;
-      mah_acceptance_modification_+=0.1;
+
+      //probably adaptive threshold is bad instead increase noise (if it is actually sensor diverging its not too bad either, will decrease later)
+      //think about what to do with this number
+      manager_.IncreaseNoise(this->sensorID, running_maha_dist_average_/mah_threshold_);
+      running_maha_dist_average_=msf_core::desiredNoiseLevel_*mah_threshold_;
+      //access state via manager to get pose for rovio init
+      ros::NodeHandle ntemp;
+      ros::ServiceClient clienttemp = ntemp.serviceClient<rovio::SrvResetToPose>("rovio/reset_to_pose");
+      rovio::SrvResetToPose srvtemp;
+      //this should be: shared_ptr<EKFState_T>&
+      //but no access to EKFState_T
+      const shared_ptr<EKFState_T>& latestState = this->manager_.msf_core_->GetLastState();
+      //this is the last state
+      const Eigen::Quaternion<double> q = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::q>();
+      const Eigen::Matrix<double, 3, 1> p = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::p>();
+      srvtemp.request.T_WM.position.x = p(0,0);
+      srvtemp.request.T_WM.position.y = p(1,0);
+      srvtemp.request.T_WM.position.z = p(2,0);
+      srvtemp.request.T_WM.orientation.w = q.w();
+      srvtemp.request.T_WM.orientation.x = q.x();
+      srvtemp.request.T_WM.orientation.y = q.y();
+      srvtemp.request.T_WM.orientation.z = q.z();
+      clienttemp.call(srvtemp);
+      //we somehow need to wait for rovio to reinitialize->this wont work
       manager_.Initsingle(this->sensorID);
+      return;
   }  
 }
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>

@@ -36,15 +36,25 @@ PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PositionSensorHandler(
   pnh.param("position_use_fixed_covariance", use_fixed_covariance_, false);
   pnh.param("position_absolute_measurements", provides_absolute_measurements_,
             false);
+  //params for outlierrejection
   pnh.param("enable_mah_outlier_rejection", enable_mah_outlier_rejection_, false);
   pnh.param("mah_threshold", mah_threshold_, msf_core::kDefaultMahThreshold_);
-  mah_threshold_base_=mah_threshold_;
-  pnh.param("mah_threshold_limit", mah_threshold_limit_, msf_core::kDefaultMahThresholdLimit_);
-  pnh.param("mah_rejection_modification", mah_rejection_modification_, msf_core::kDefaultMahRejectionModification_);
-  pnh.param("mah_acceptance_modification", mah_acceptance_modification_, msf_core::kDefaultMahAcceptanceModification_);
-  pnh.param("max_outlier_relative", max_outlier_relative_, 1.0);
-  pnh.param("divergence_rejection_limit", rejection_divergence_threshold_, 999999999.0);
-  pnh.param("bad_initialization_limit", bad_initialization_threshold_, 999999999.0);
+  //mah_threshold must not be <1 for two reasons:
+  //numerical stability
+  //makes no sense to expecte most measurement to have mahalanobis distance < 1
+  if(mah_threshold_<1.0)
+  {
+      MSF_WARN_STREAM("mah_threshold set to be < 1. Correcting to 1");
+      mah_threshold_=1.0;
+  }
+  //params for noise estimation
+  pnh.param("enable_noise_estimation", enable_noise_estimation_, false);
+  pnh.param("noise_estimation_discount_factor", average_discount_factor_, 1.0);
+  running_maha_dist_average_=msf_core::desiredNoiseLevel_*mah_threshold_;
+  //MSF_WARN_STREAM(running_maha_dist_average_);
+  //params for divergence recovery
+  pnh.param("enable_divergence_recovery", enable_divergence_recovery_, false);
+  pnh.param("divergence_rejection_limit", rejection_divergence_threshold_, msf_core::defaultRejectionDivergenceThreshold_);
 
   MSF_INFO_STREAM_COND(use_fixed_covariance_, "Position sensor is using fixed "
                        "covariance");
@@ -58,12 +68,18 @@ PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PositionSensorHandler(
 
   if(enable_mah_outlier_rejection_)
   {
-	  MSF_INFO_STREAM("Position sensor is using outlier rejection with initial threshold: " <<
-	  mah_threshold_ << ", rejection modificator: " << mah_rejection_modification_ <<
-	  ", acceptance modificator: " << mah_acceptance_modification_ <<
-      " and reset limit: "<< mah_threshold_limit_ << "relative maximal outliers: "<<
-      max_outlier_relative_<< " and divergence limit: "<<rejection_divergence_threshold_
-      <<"bad initialization threshold"<<bad_initialization_threshold_);
+	  MSF_INFO_STREAM("Position sensor is using outlier rejection with threshold: " <<
+	  mah_threshold_);
+  }
+  if(enable_noise_estimation_)
+  {
+      MSF_INFO_STREAM("Position sensor is using noise estimation with discout factor:"<<
+      average_discount_factor_);
+  }
+  if(enable_divergence_recovery_)
+  {
+      MSF_INFO_STREAM("Position sensor is using divergence recovery with rejection limit:"<<
+      rejection_divergence_threshold_);
   }
   ros::NodeHandle nh("msf_updates");
 
@@ -128,15 +144,13 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPositionMeasu
     }
   }
   
-  //get (potentially) changed threshold
-  //chagned by position measurement
-  //ros::NodeHandle pnh("~/position_sensor");
-  //pnh.param("mah_threshold", mah_threshold_, msf_core::kDefaultMahThreshold_);
+
+  //MSF_WARN_STREAM("maha dist average before meas:"<<running_maha_dist_average_);
   shared_ptr<MEASUREMENT_TYPE> meas(new MEASUREMENT_TYPE(
       n_zp_, use_fixed_covariance_, provides_absolute_measurements_,
       this->sensorID, fixedstates, enable_mah_outlier_rejection_,
-      &mah_threshold_, mah_rejection_modification_, mah_acceptance_modification_,
-      mah_threshold_limit_, &n_rejected_, &n_curr_rejected_, &n_accepted_));
+      mah_threshold_, &running_maha_dist_average_, average_discount_factor_,
+      &n_rejected_, &n_curr_rejected_, &n_accepted_));
 
   meas->MakeFromSensorReading(msg, msg->header.stamp.toSec() - delay_);
   
@@ -146,7 +160,9 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPositionMeasu
   this->manager_.msf_core_->AddMeasurement(meas);
 
   //this part checks wether something went wrong on initialization
-  if (n_accepted_==0&&n_curr_rejected_>bad_initialization_threshold_)
+  //we dont need this part anymore since we dont completly reset
+  //means simply transform will be wrong, which is not too bad (->just wait for normal divergence to kick in)
+  /*if (n_accepted_==0&&n_curr_rejected_>bad_initialization_threshold_)
   {
       MSF_WARN_STREAM("First Measurements have all been rejected. Probably initialized on an outlier. Reinitializing");
       n_accepted_=0.0;
@@ -155,12 +171,45 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPositionMeasu
       //just to be a little safer (should decrease once implemented)
       manager_.IncreaseNoise(this->sensorID, 0.05);
       manager_.Initsingle(this->sensorID);
+    }*/
+   //this function should check wether too many measurements have been rejected -> increase noise meas
+  //or wether this sensor is currently diverging -> reset and adjust threshold
+  //CheckNoiseDivergence();
+  //MSF_INFO_STREAM("accepted"<<n_accepted_<<" rejected"<<n_rejected_<<" curr rejected"<<n_curr_rejected_);
+  if(enable_noise_estimation_)
+  {
+      //if running average is larger than upperNoiseLimit of threshold recompute noise based on this
+      if(running_maha_dist_average_>=msf_core::upperNoiseLimit_*mah_threshold_)
+      {
+          MSF_WARN_STREAM("too big:"<<running_maha_dist_average_<<"..."<<msf_core::upperNoiseLimit_*mah_threshold_);
+          manager_.IncreaseNoise(this->sensorID, running_maha_dist_average_/mah_threshold_);
+          //probably reset makes sense here since we basically start again
+          n_accepted_=0.0;
+          n_rejected_=0.0;
+          n_curr_rejected_=0.0;
+          running_maha_dist_average_=msf_core::desiredNoiseLevel_*mah_threshold_;
+          //manager_.Initsingle(this->sensorID);
+          return;
+      }
+      //if running average is lower thatn lowerNoiseLimit of threshold recompute noise based on this
+      else if(running_maha_dist_average_<=msf_core::lowerNoiseLimit_*mah_threshold_)
+      {
+          MSF_WARN_STREAM("too small:"<<running_maha_dist_average_<<"..."<<msf_core::lowerNoiseLimit_*mah_threshold_<<"after"<<n_accepted_+n_rejected_);
+          manager_.IncreaseNoise(this->sensorID, running_maha_dist_average_/mah_threshold_);
+          //probably reset makes sense here since we basically start again
+          n_accepted_=0.0;
+          n_rejected_=0.0;
+          n_curr_rejected_=0.0;
+          running_maha_dist_average_=msf_core::desiredNoiseLevel_*mah_threshold_;
+          //manager_.Initsingle(this->sensorID);
+          return;
+      }
   }
   //this function should check wether too many measurements have been rejected -> increase noise meas
   //or wether this sensor is currently diverging -> reset and adjust threshold
   //CheckNoiseDivergence();
   //MSF_INFO_STREAM("accepted"<<n_accepted_<<" rejected"<<n_rejected_<<" curr rejected"<<n_curr_rejected_);
-  if(n_rejected_+n_accepted_>msf_core::minRequestedSamplesForRejection_)
+  /*if(n_rejected_+n_accepted_>msf_core::minRequestedSamplesForRejection_)
   {
       if(n_rejected_/(n_rejected_+n_accepted_)>max_outlier_relative_)
       {
@@ -172,20 +221,27 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPositionMeasu
           //want to do this differently, i.e. adjust the value in config (may need function in manager)
           //this->SetNoises(config.position_noise_meas+0.1);
           //might want to make val depedent on how bad it is (later)
+          //compute this depending on current average of maha distance (set rejection threshold for rejected samples)
           manager_.IncreaseNoise(this->sensorID, 0.15);
           manager_.Initsingle(this->sensorID);
         }
-  }
+  }*/
+  //for position sensor we cannot really do anything besides hoping that sensor will comeback incase sensor itself diverged  
   if(n_curr_rejected_>rejection_divergence_threshold_)
   {
       MSF_WARN_STREAM("too many measurements have been rejected back to back -> increasing stability parameters and reseting");
       n_accepted_ = 0.0;
       n_rejected_ = 0.0;
       n_curr_rejected_ = 0.0;
-      mah_threshold_limit_*=1.1;
-      mah_rejection_modification_+=0.1;
-      mah_acceptance_modification_+=0.1;
+     //probably adaptive threshold is bad instead increase noise (if it is actually sensor diverging its not too bad either, will decrease later)
+      //mah_threshold_limit_*=1.1;
+      //mah_rejection_modification_+=0.1;
+      //mah_acceptance_modification_+=0.1;
+      //think about what to do with this number
+      manager_.IncreaseNoise(this->sensorID, running_maha_dist_average_/mah_threshold_);
+      running_maha_dist_average_=msf_core::desiredNoiseLevel_*mah_threshold_;
       manager_.Initsingle(this->sensorID);
+      return;
   }  
   
 

@@ -98,22 +98,51 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
       //like call their destructors (not necessary in other sensormanagers)
   }
 
+  //val is a number between 0 and 1 showwing how close to the maha_threshold we are
   virtual void IncreaseNoise(int sensorID, double val)
   {
     //how to get correct config in case of multiple sensors
-    MSF_INFO_STREAM("polymorphd called");
+    //for now very simple want to do better
+    double tempfactor=1.0+val-msf_core::desiredNoiseLevel_;
     if(sensorID==0)
     {
         MSF_INFO_STREAM("increasing pose noise");
-        config_.pose_noise_meas_p+=val;
-        config_.pose_noise_meas_q+=val;
+
+        //cant use factors in case its 0 & its very sensitive
+        if(config_.pose_noise_meas_p==0.0)
+        {
+            config_.pose_noise_meas_p+=0.01;
+        }
+        //use a factor based on val
+        else
+        {
+            config_.pose_noise_meas_p*=tempfactor;
+        }
+        //cant use factors in case its 0 & its very sensitive
+        if(config_.pose_noise_meas_q==0.0)
+        {
+            config_.pose_noise_meas_q+=0.01;
+        }
+        //use a factor based on val
+        else
+        {
+            config_.pose_noise_meas_q*=tempfactor;
+        }
         MSF_INFO_STREAM("New noise meas"<<config_.pose_noise_meas_p);
         pose_handler_->SetNoises(config_.pose_noise_meas_p, config_.pose_noise_meas_q);
     }
     else if(sensorID==1)
     {
       MSF_INFO_STREAM("increasing position noise"<<config_.position_noise_meas);
-      config_.position_noise_meas+=val;
+      if(config_.position_noise_meas==0.0)
+        {
+            config_.position_noise_meas+=0.01;
+        }
+        //use a factor based on val
+        else
+        {
+            config_.position_noise_meas*=tempfactor;
+        }
       position_handler_->SetNoises(config_.position_noise_meas);
     }
     else{
