@@ -272,7 +272,7 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
         }
   }*/
   //here either msf or rovio diverged. since we cant now just reinit both  
-  else if(n_curr_rejected_>rejection_divergence_threshold_)
+  else if(enable_divergence_recovery_ && n_curr_rejected_>rejection_divergence_threshold_)
   {
       MSF_WARN_STREAM("too many measurements have been rejected back to back -> increasing stability parameters and reseting");
       

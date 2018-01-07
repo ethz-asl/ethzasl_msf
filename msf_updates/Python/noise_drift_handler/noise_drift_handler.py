@@ -105,8 +105,9 @@ class MsfNoiseHandler:
     
     #params to estimate stddeviation of data 
     #to be set manually
-    #self.ninit_=20
-    #self.nrecv_=0
+    self.ninit_=300
+    self.started_=False
+    self.nrecv_=0
     #self.stddeviation_=0
     #self.datamean_=0
     
@@ -176,29 +177,34 @@ class MsfNoiseHandler:
       print("not supported datatype:")
       print(dtype)
 
-    #change data according to params choosen above
-    if use_noise:
-      dataarr=self.add_noise(dataarr, mu, stddeviation)
-    if create_outlier:
-      t=np.random.uniform()
-      if curr_group>0:
-        #print("creating grouped outlier")
-        dataarr=self.create_outlier(dataarr, stddeviation)
-        if dtype=="geometry_msgs/PoseWithCovarianceStamped":
-          self.pose_curr_group_-=1
-        elif dtype=="geometry_msgs/PointStamped":
-          self.position_curr_group-=1
-        elif dtype=="geometry_msgs/TransformStamped":
-          self.transform_curr_group-=1
-      elif t<p_outlier:
-        dataarr=self.create_outlier(dataarr, stddeviation)
-        if dtype=="geometry_msgs/PoseWithCovarianceStamped":
-          self.pose_curr_group_=self.pose_group_size_-1
-        elif dtype=="geometry_msgs/PointStamped":
-          self.position_curr_group=self.position_group_size_-1
-        elif dtype=="geometry_msgs/TransformStamped":
-          self.transform_curr_group=self.transform_group_size_-1
-        
+    if(self.started_):
+      #change data according to params choosen above
+      if use_noise:
+        dataarr=self.add_noise(dataarr, mu, stddeviation)
+      if create_outlier:
+        t=np.random.uniform()
+        if curr_group>0:
+          #print("creating grouped outlier")
+          dataarr=self.create_outlier(dataarr, stddeviation)
+          if dtype=="geometry_msgs/PoseWithCovarianceStamped":
+            self.pose_curr_group_-=1
+          elif dtype=="geometry_msgs/PointStamped":
+            self.position_curr_group-=1
+          elif dtype=="geometry_msgs/TransformStamped":
+            self.transform_curr_group-=1
+        elif t<p_outlier:
+          dataarr=self.create_outlier(dataarr, stddeviation)
+          if dtype=="geometry_msgs/PoseWithCovarianceStamped":
+            self.pose_curr_group_=self.pose_group_size_-1
+          elif dtype=="geometry_msgs/PointStamped":
+            self.position_curr_group=self.position_group_size_-1
+          elif dtype=="geometry_msgs/TransformStamped":
+            self.transform_curr_group=self.transform_group_size_-1
+    else:
+      self.nrecv_+=1
+      if self.nrecv_>=self.ninit_:
+        print("starting noise")
+        self.started_=True 
         
     #print(dataarr[0])
     if dtype=="geometry_msgs/PoseWithCovarianceStamped":

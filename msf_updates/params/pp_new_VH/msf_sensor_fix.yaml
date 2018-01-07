@@ -25,7 +25,8 @@ position_pose_sensor/pose_delay: -0.0358408930047
 position_pose_sensor/pose_noise_meas_p: 0.02
 position_pose_sensor/pose_noise_meas_q: 0.05
 
-position_pose_sensor/position_noise_meas: 0.1
+#position_pose_sensor/position_noise_meas: 0.1
+position_pose_sensor/position_noise_meas: 1.0
 
 position_pose_sensor/position_delay: -0.01
 position_pose_sensor/position_noise_p_ip: 0.0
@@ -53,12 +54,12 @@ pose_sensor/enable_mah_outlier_rejection: true
 pose_sensor/mah_threshold: 10.0
 
 #settings for noise estimation
-pose_sensor/enable_noise_estimation: true
+pose_sensor/enable_noise_estimation: false
 #setting this closer to 1 will make it more longtime closer to 0 more shorttime
 pose_sensor/noise_estimation_discount_factor: 0.99
 
 #settings for divergence recovery
-pose_sensor/enable_divergence_recovery: true
+pose_sensor/enable_divergence_recovery: false
 pose_sensor/divergence_rejection_limit: 50
 
 #these params are read in position_sensorhandler.hpp and therefore have prefix position_sensor
@@ -77,10 +78,10 @@ position_sensor/enable_mah_outlier_rejection: true
 position_sensor/mah_threshold: 10.0
 
 #settings for noise estimation
-position_sensor/enable_noise_estimation: true
+position_sensor/enable_noise_estimation: false
 #setting this closer to 1 will make it more longtime closer to 0 more shorttime
 position_sensor/noise_estimation_discount_factor: 0.99
 
 #settings for divergence recovery
-position_sensor/enable_divergence_recovery: true
+position_sensor/enable_divergence_recovery: false
 position_sensor/divergence_rejection_limit: 50

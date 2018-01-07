@@ -227,7 +227,7 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPositionMeasu
         }
   }*/
   //for position sensor we cannot really do anything besides hoping that sensor will comeback incase sensor itself diverged  
-  if(n_curr_rejected_>rejection_divergence_threshold_)
+  if(enable_divergence_recovery_ && n_curr_rejected_>rejection_divergence_threshold_)
   {
       MSF_WARN_STREAM("too many measurements have been rejected back to back -> increasing stability parameters and reseting");
       n_accepted_ = 0.0;
