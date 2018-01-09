@@ -35,7 +35,8 @@ PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PoseSensorHandler(
       n_zp_(1e-6),
       n_zq_(1e-6),
       delay_(0),
-      timestamp_previous_pose_(0) {
+      timestamp_previous_pose_(0),
+      needs_reinit_(false) {
   ros::NodeHandle pnh("~/pose_sensor");
 
   MSF_INFO_STREAM(
@@ -161,7 +162,12 @@ template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
     const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg) {
   received_first_measurement_ = true;
-
+  if(needs_reinit_)
+  {
+      manager_.Initsingle(this->sensorID);
+      needs_reinit_=false;
+      return;
+  }
   // Get the fixed states.
   int fixedstates = 0;
   static_assert(msf_updates::EKFState::nStateVarsAtCompileTime < 32, "Your state "
@@ -272,7 +278,7 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
         }
   }*/
   //here either msf or rovio diverged. since we cant now just reinit both  
-  else if(enable_divergence_recovery_ && n_curr_rejected_>rejection_divergence_threshold_)
+  if(enable_divergence_recovery_ && n_curr_rejected_>rejection_divergence_threshold_)
   {
       MSF_WARN_STREAM("too many measurements have been rejected back to back -> increasing stability parameters and reseting");
       
@@ -294,6 +300,7 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
       //this is the last state
       const Eigen::Quaternion<double> q = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::q>();
       const Eigen::Matrix<double, 3, 1> p = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::p>();
+      MSF_WARN_STREAM("pose for rovio:"<<p<<STREAMQUAT(q));
       srvtemp.request.T_WM.position.x = p(0,0);
       srvtemp.request.T_WM.position.y = p(1,0);
       srvtemp.request.T_WM.position.z = p(2,0);
@@ -302,8 +309,12 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
       srvtemp.request.T_WM.orientation.y = q.y();
       srvtemp.request.T_WM.orientation.z = q.z();
       clienttemp.call(srvtemp);
-      //we somehow need to wait for rovio to reinitialize->this wont work
-      manager_.Initsingle(this->sensorID);
+      needs_reinit_=true; //setting this to true will cause it to reinit on next measurement
+      received_first_measurement_=false;
+      usleep(20000); //wait a little might help
+      //rejection_divergence_threshold_=10000;
+      //something might still be in buffer? need to make sure we reinit on new measurement somehow
+      MSF_WARN_STREAM("reinitializing rovio");
       return;
   }  
 }

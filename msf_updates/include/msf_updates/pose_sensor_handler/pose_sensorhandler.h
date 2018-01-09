@@ -55,6 +55,9 @@ class PoseSensorHandler : public msf_core::SensorHandler<
 
   double timestamp_previous_pose_;  ///< Timestamp of previous pose message to subsample messages.
 
+  bool needs_reinit_; ///< set True if sensor needs a reinit after reseting rovio (meaning that it will 
+                      //reinit at first meas)
+
   msf_updates::PoseDistorter::Ptr distorter_;
 
   void ProcessPoseMeasurement(
