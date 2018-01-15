@@ -1,0 +1,10 @@
+<launch>
+    <node name="rovio" pkg="rovio" type="rovio_node" output="screen">
+        <param name="filter_config" value="$(find rovio)/cfg/rovio.info"/>
+        <param name="camera0_config" value="$(find rovio)/cfg/euroc_cam0_equidist.yaml"/>
+        <param name="camera1_config" value="$(find rovio)/cfg/euroc_cam1_equidist.yaml"/>
+    	<remap from="cam0/image_raw" to="cam0/image_raw"/>
+		<remap from="cam1/image_raw" to="cam1/image_raw"/>
+    	<remap from="imu0" to="imu0"/>
+    </node>
+</launch>

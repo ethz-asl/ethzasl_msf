@@ -18,6 +18,7 @@
  */
 #include <msf_core/eigen_utils.h>
 #include <msf_core/msf_types.h>
+#include <std_srvs/Empty.h>
 
 #ifndef POSE_SENSORHANDLER_HPP_
 #define POSE_SENSORHANDLER_HPP_
@@ -290,8 +291,13 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
       //think about what to do with this number
       manager_.IncreaseNoise(this->sensorID, running_maha_dist_average_/mah_threshold_);
       running_maha_dist_average_=msf_core::desiredNoiseLevel_*mah_threshold_;
-      //access state via manager to get pose for rovio init
+      //try to reset rovio
       ros::NodeHandle ntemp;
+      ros::ServiceClient clienttemp = ntemp.serviceClient<std_srvs::Empty>("rovio/reset");
+      std_srvs::Empty srvtemp;
+      clienttemp.call(srvtemp);
+      //access state via manager to get pose for rovio init
+      /*ros::NodeHandle ntemp;
       ros::ServiceClient clienttemp = ntemp.serviceClient<rovio::SrvResetToPose>("rovio/reset_to_pose");
       rovio::SrvResetToPose srvtemp;
       //this should be: shared_ptr<EKFState_T>&
@@ -308,10 +314,14 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
       srvtemp.request.T_WM.orientation.x = q.x();
       srvtemp.request.T_WM.orientation.y = q.y();
       srvtemp.request.T_WM.orientation.z = q.z();
-      clienttemp.call(srvtemp);
+      clienttemp.call(srvtemp);*/
+      //try to simply restart rovio (doesn't work)
+      /*std::system("rosnode kill rovio");
+      //usleep(20000); might have to wait a bit
+      std::system("roslaunch msf_updates restart_rovio.launch");*/
       needs_reinit_=true; //setting this to true will cause it to reinit on next measurement
       received_first_measurement_=false;
-      usleep(20000); //wait a little might help
+      //usleep(20000); //wait a little might help
       //rejection_divergence_threshold_=10000;
       //something might still be in buffer? need to make sure we reinit on new measurement somehow
       MSF_WARN_STREAM("reinitializing rovio");
