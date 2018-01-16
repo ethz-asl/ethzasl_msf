@@ -76,7 +76,7 @@ class MsfNoiseHandler:
     #params for pose
     self.pose_mu_=rospy.get_param("~pose_noise_mean",0.0)
     self.pose_stddeviation_=rospy.get_param("~pose_noise_number_stddeviations", 0.0)
-    self.pose_use_noise_=rospy.get_param("~pose_ use_noise", False)
+    self.pose_use_noise_=rospy.get_param("~pose_use_noise", False)
         
     self.pose_p_outlier_=rospy.get_param("~pose_probability_outlier", 0.0)
     self.pose_create_outlier_=rospy.get_param("~pose_create_outlier", False)
@@ -126,11 +126,12 @@ class MsfNoiseHandler:
     #add some big disturbance to arrin (for now 100 times stddeviation)
     #sign=np.random.randint(0,2) #need 0/1 random
     #noise=np.array([100*stddeviation for i in range(len(arrin))])
-    noise = np.random.normal(mu, 100*stddeviation, len(arrin))
-    if sign:
-      arrout=arrin+noise
-    else:
-      arrout=arrin-noise
+    noise = np.random.normal(0, 100*stddeviation, len(arrin))
+    #if sign:
+    #  arrout=arrin+noise
+    #else:
+    #  arrout=arrin-noise
+    arrout=arrin+noise
     return arrout
 
   #callback for messages. First decides which of the supported data types (currently pose_with_covariance_stamped

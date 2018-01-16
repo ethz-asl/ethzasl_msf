@@ -238,7 +238,7 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
       //if running average is larger than upperNoiseLimit of threshold recompute noise based on this
       if(running_maha_dist_average_>=msf_core::upperNoiseLimit_*mah_threshold_)
       {
-          //MSF_WARN_STREAM("too big:"<<running_maha_dist_average_<<"..."<<msf_core::upperNoiseLimit_*mah_threshold_);
+          MSF_WARN_STREAM("too big:"<<running_maha_dist_average_<<"..."<<msf_core::upperNoiseLimit_*mah_threshold_<<"after"<<n_accepted_+n_rejected_);
           manager_.IncreaseNoise(this->sensorID, running_maha_dist_average_/mah_threshold_);
           //probably reset makes sense here since we basically start again
           n_accepted_=0.0;
@@ -306,14 +306,25 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
       //this is the last state
       const Eigen::Quaternion<double> q = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::q>();
       const Eigen::Matrix<double, 3, 1> p = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::p>();
-      MSF_WARN_STREAM("pose for rovio:"<<p<<STREAMQUAT(q));
-      srvtemp.request.T_WM.position.x = p(0,0);
-      srvtemp.request.T_WM.position.y = p(1,0);
-      srvtemp.request.T_WM.position.z = p(2,0);
-      srvtemp.request.T_WM.orientation.w = q.w();
-      srvtemp.request.T_WM.orientation.x = q.x();
-      srvtemp.request.T_WM.orientation.y = q.y();
-      srvtemp.request.T_WM.orientation.z = q.z();
+      //we also need the transforms
+      const Eigen::Matrix<double, 3, 1> p_ic = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::p_ic>();
+      const Eigen::Quaternion<double> q_ic = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::q_ic>();
+      const Eigen::Matrix<double, 3, 1> p_wv = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::p_wv>();
+      const Eigen::Quaternion<double> q_wv = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::q_wv>();
+      const double scale = (const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::p_wv>())(0,0);
+      MSF_WARN_STREAM("msf position:"<<p);
+      MSF_WARN_STREAM("msf orientation:"<<STREAMQUAT(q));
+      const Eigen::Quaternion<double> q_rovio ((q_ic.inverse()*q.conjugate()*q_wv.inverse()).conjugate().normalized());
+      const Eigen::Matrix<double, 3, 1> p_rovio = q_wv.conjugate().inverse()*((p+q_ic.toRotationMatrix() * p_ic- p_wv) * scale);
+      MSF_WARN_STREAM("rovio_position: "<<p_rovio);
+
+      srvtemp.request.T_WM.position.x = p_rovio(0,0);
+      srvtemp.request.T_WM.position.y = p_rovio(1,0);
+      srvtemp.request.T_WM.position.z = p_rovio(2,0);
+      srvtemp.request.T_WM.orientation.w = q_rovio.w();
+      srvtemp.request.T_WM.orientation.x = q_rovio.x();
+      srvtemp.request.T_WM.orientation.y = q_rovio.y();
+      srvtemp.request.T_WM.orientation.z = q_rovio.z();
       clienttemp.call(srvtemp);*/
       //try to simply restart rovio (doesn't work)
       /*std::system("rosnode kill rovio");
