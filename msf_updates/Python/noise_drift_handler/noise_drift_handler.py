@@ -92,6 +92,8 @@ class MsfNoiseHandler:
     self.position_create_outlier_=rospy.get_param("~position_create_outlier", False)
     self.position_group_size_=rospy.get_param("~position_group_size", 1) #not working rn
     self.position_curr_group_=0
+
+    
     
     #params for transform
     self.transform_mu_=rospy.get_param("~transform_noise_mean",0.0)
@@ -102,6 +104,10 @@ class MsfNoiseHandler:
     self.transform_create_outlier_=rospy.get_param("~transform_create_outlier", False)
     self.transform_group_size_=rospy.get_param("~transform_group_size", 1) #not working rn
     self.transform_curr_group_=0
+    self.transform_use_fixed_diverge_time_=rospy.get_param("~transform_diverge_fixed_time", False)
+    self.transform_diverge_frame_=rospy.get_param("~transform_diverge_frame", 0)
+    self.transform_diverge_length_=rospy.get_param("~transform_diverge_length", 0)
+    self.transform_curr_frame_=0
     
     #params to estimate stddeviation of data 
     #to be set manually
@@ -166,7 +172,10 @@ class MsfNoiseHandler:
       curr_group=self.position_curr_group_
     elif dtype=="geometry_msgs/TransformStamped":
       dataarr=np.array([data.transform.translation.x, data.transform.translation.y, data.transform.translation.z])
-
+      self.transform_curr_frame_+=1
+      if self.transform_use_fixed_diverge_time_ and self.transform_curr_frame_==self.transform_diverge_frame_:
+        self.transform_curr_group_=self.transform_diverge_length_
+        print("digerging gps")
       stddeviation=self.transform_stddeviation_
       use_noise=self.transform_use_noise_
       mu=self.transform_mu_

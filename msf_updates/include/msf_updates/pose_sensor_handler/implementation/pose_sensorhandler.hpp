@@ -348,7 +348,7 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
         clienttemp.call(srvtemp);
       }
       //usleep(20000); might have to wait a bit
-      std::system("roslaunch msf_updates restart_rovio.launch");
+      //std::system("roslaunch msf_updates restart_rovio.launch");
       needs_reinit_=true; //setting this to true will cause it to reinit on next measurement
       received_first_measurement_=false;
       //usleep(20000); //wait a little might help
