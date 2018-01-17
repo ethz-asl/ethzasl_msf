@@ -13,6 +13,7 @@ msf_simulator/bin
 msf_timing/bin
 msf_core/build
 msf_updates/build
+msf_updates/params
 msf_simulator/build
 msf_timing/build
 *~

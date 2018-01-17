@@ -1,7 +1,0 @@
-#this is best transformation estimate for pose sensor in MH (to Leica)
-/pos_to_error/translation: [4.7888547, -1.78930254, 1.0457724]
-/pos_to_error/quaternion: [0.99338355, -0.0112401, 0.01525981, -0.11326921]
-/pos_to_error/truth_type: "leica"
-/pos_to_error/estimate_tf: False
-/pos_to_error/ninit_points: 2000
-/pos_to_error/data_type: "msf"
