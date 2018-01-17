@@ -67,6 +67,7 @@ PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PoseSensorHandler(
   //params for divergence recovery
   pnh.param("enable_divergence_recovery", enable_divergence_recovery_, false);
   pnh.param("divergence_rejection_limit", rejection_divergence_threshold_, msf_core::defaultRejectionDivergenceThreshold_);
+  pnh.param("use_reset_to_pose", use_reset_to_pose_, false);
   
   MSF_INFO_STREAM_COND(measurement_world_sensor_, "Pose sensor is interpreting "
                        "measurement as sensor w.r.t. world");
@@ -102,7 +103,11 @@ PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PoseSensorHandler(
       MSF_INFO_STREAM("Pose sensor is using divergence recovery with rejection limit:"<<
       rejection_divergence_threshold_);
   }
-  
+  if(use_reset_to_pose_)
+  {
+      MSF_INFO_STREAM("Pose sensor is reseting rovio to pose");
+  }
+
   ros::NodeHandle nh("msf_updates/" + topic_namespace);
   subPoseWithCovarianceStamped_ =
       nh.subscribe < geometry_msgs::PoseWithCovarianceStamped
@@ -292,44 +297,58 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
       manager_.IncreaseNoise(this->sensorID, running_maha_dist_average_/mah_threshold_);
       running_maha_dist_average_=msf_core::desiredNoiseLevel_*mah_threshold_;
       //try to reset rovio
-      ros::NodeHandle ntemp;
-      ros::ServiceClient clienttemp = ntemp.serviceClient<std_srvs::Empty>("rovio/reset");
-      std_srvs::Empty srvtemp;
-      clienttemp.call(srvtemp);
+      if(!use_reset_to_pose_)
+      {
+        ros::NodeHandle ntemp;
+        ros::ServiceClient clienttemp = ntemp.serviceClient<std_srvs::Empty>("rovio/reset");
+        std_srvs::Empty srvtemp;
+        clienttemp.call(srvtemp);
+      }
       //access state via manager to get pose for rovio init
-      /*ros::NodeHandle ntemp;
-      ros::ServiceClient clienttemp = ntemp.serviceClient<rovio::SrvResetToPose>("rovio/reset_to_pose");
-      rovio::SrvResetToPose srvtemp;
-      //this should be: shared_ptr<EKFState_T>&
-      //but no access to EKFState_T
-      const shared_ptr<EKFState_T>& latestState = this->manager_.msf_core_->GetLastState();
-      //this is the last state
-      const Eigen::Quaternion<double> q = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::q>();
-      const Eigen::Matrix<double, 3, 1> p = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::p>();
-      //we also need the transforms
-      const Eigen::Matrix<double, 3, 1> p_ic = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::p_ic>();
-      const Eigen::Quaternion<double> q_ic = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::q_ic>();
-      const Eigen::Matrix<double, 3, 1> p_wv = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::p_wv>();
-      const Eigen::Quaternion<double> q_wv = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::q_wv>();
-      const double scale = (const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::p_wv>())(0,0);
-      MSF_WARN_STREAM("msf position:"<<p);
-      MSF_WARN_STREAM("msf orientation:"<<STREAMQUAT(q));
-      const Eigen::Quaternion<double> q_rovio ((q_ic.inverse()*q.conjugate()*q_wv.inverse()).conjugate().normalized());
-      const Eigen::Matrix<double, 3, 1> p_rovio = q_wv.conjugate().inverse()*((p+q_ic.toRotationMatrix() * p_ic- p_wv) * scale);
-      MSF_WARN_STREAM("rovio_position: "<<p_rovio);
+      else
+      {
+        ros::NodeHandle ntemp;
+        ros::ServiceClient clienttemp = ntemp.serviceClient<rovio::SrvResetToPose>("rovio/reset_to_pose");
+        rovio::SrvResetToPose srvtemp;
+        //this should be: shared_ptr<EKFState_T>&
+        //but no access to EKFState_T
+        const shared_ptr<EKFState_T>& latestState = this->manager_.msf_core_->GetLastState();
+        //this is the last state
+        const Eigen::Quaternion<double> q = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::q>();
+        const Eigen::Matrix<double, 3, 1> p = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::p>();
+        //we also need the transforms
+        const Eigen::Matrix<double, 3, 1> p_ic = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::p_ic>();
+        const Eigen::Quaternion<double> q_ic = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::q_ic>();
+        const Eigen::Matrix<double, 3, 1> p_wv = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::p_wv>();
+        const Eigen::Quaternion<double> q_wv = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::q_wv>();
+        const double scale = (const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::p_wv>())(0,0);
+        MSF_WARN_STREAM("msf position:"<<p);
+        MSF_WARN_STREAM("msf orientation:"<<STREAMQUAT(q));
+        const Eigen::Quaternion<double> q_rovio ((q_ic.inverse()*q.conjugate()*q_wv.inverse()).conjugate().normalized());
+        const Eigen::Matrix<double, 3, 1> p_rovio = q_wv.conjugate().inverse()*((p+q_ic.toRotationMatrix() * p_ic- p_wv) * scale);
+        MSF_WARN_STREAM("rovio_position: "<<p_rovio);
 
-      srvtemp.request.T_WM.position.x = p_rovio(0,0);
-      srvtemp.request.T_WM.position.y = p_rovio(1,0);
-      srvtemp.request.T_WM.position.z = p_rovio(2,0);
-      srvtemp.request.T_WM.orientation.w = q_rovio.w();
-      srvtemp.request.T_WM.orientation.x = q_rovio.x();
-      srvtemp.request.T_WM.orientation.y = q_rovio.y();
-      srvtemp.request.T_WM.orientation.z = q_rovio.z();
-      clienttemp.call(srvtemp);*/
-      //try to simply restart rovio (doesn't work)
-      /*std::system("rosnode kill rovio");
+        srvtemp.request.T_WM.position.x = p_rovio(0,0);
+        srvtemp.request.T_WM.position.y = p_rovio(1,0);
+        srvtemp.request.T_WM.position.z = p_rovio(2,0);
+        if(q_rovio.w()<0)
+        {
+            srvtemp.request.T_WM.orientation.w = q_rovio.w();
+            srvtemp.request.T_WM.orientation.x = q_rovio.x();
+            srvtemp.request.T_WM.orientation.y = q_rovio.y();
+            srvtemp.request.T_WM.orientation.z = q_rovio.z();
+        }
+        else
+        {
+            srvtemp.request.T_WM.orientation.w = -q_rovio.w();
+            srvtemp.request.T_WM.orientation.x = -q_rovio.x();
+            srvtemp.request.T_WM.orientation.y = -q_rovio.y();
+            srvtemp.request.T_WM.orientation.z = -q_rovio.z();
+        }
+        clienttemp.call(srvtemp);
+      }
       //usleep(20000); might have to wait a bit
-      std::system("roslaunch msf_updates restart_rovio.launch");*/
+      std::system("roslaunch msf_updates restart_rovio.launch");
       needs_reinit_=true; //setting this to true will cause it to reinit on next measurement
       received_first_measurement_=false;
       //usleep(20000); //wait a little might help

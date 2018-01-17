@@ -89,7 +89,7 @@ class RovioDivergenceHandler:
     self.curr_frame_+=1
     #print(type(data.data))
     if self.curr_group_size_==0:
-      print("done diverging")
+      #print("done diverging")
       if self.use_fixed_time_:
         if self.curr_frame_==self.start_frame_:
           self.curr_group_size_ = self.group_size_

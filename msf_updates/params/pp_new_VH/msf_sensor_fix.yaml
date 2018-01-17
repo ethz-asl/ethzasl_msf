@@ -22,8 +22,8 @@ position_pose_sensor/pose_noise_q_wv: 0.0
 position_pose_sensor/pose_noise_p_ic: 0.1
 position_pose_sensor/pose_noise_q_ic: 0.1
 position_pose_sensor/pose_delay: -0.0358408930047
-position_pose_sensor/pose_noise_meas_p: 0.02
-position_pose_sensor/pose_noise_meas_q: 0.05
+position_pose_sensor/pose_noise_meas_p: 0.4
+position_pose_sensor/pose_noise_meas_q: 0.5
 
 position_pose_sensor/position_noise_meas: 0.1
 #position_pose_sensor/position_noise_meas: 1.0
