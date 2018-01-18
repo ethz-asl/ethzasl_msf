@@ -16,6 +16,7 @@ from math import sqrt
 
 from sensor_msgs.msg import Image as imagetype
 from sensor_msgs.msg import Imu as imutype
+from geometry_msgs.msg import Vector3Stamped as eventtype
 
 """
 $ rosmsg show sensor_msgs/Image 
@@ -51,6 +52,16 @@ geometry_msgs/Vector3 linear_acceleration
   float64 z
 float64[9] linear_acceleration_covariance
 
+rosmsg show geometry_msgs/Vector3Stamped 
+std_msgs/Header header
+  uint32 seq
+  time stamp
+  string frame_id
+geometry_msgs/Vector3 vector
+  float64 x
+  float64 y
+  float64 z
+
 """
 
 class RovioDivergenceHandler:
@@ -71,6 +82,9 @@ class RovioDivergenceHandler:
     self.cam0_pub_=rospy.Publisher("rovio_divergence_handler/cam0_output", imagetype, queue_size=20)
     self.cam1_pub_=rospy.Publisher("rovio_divergence_handler/cam1_output", imagetype, queue_size=20)
     self.imu0_pub_=rospy.Publisher("rovio_divergence_handler/imu0_output", imutype, queue_size=20)
+    
+    #this will publish (1,0,0) if rovio starts diverging and (2,0,0) if it stops diverging
+    self.events_pub_ = rospy.Publisher("rovio_divergence_handler/events", eventtype, queue_size=20)
   
 
   #makes rovio diverge by setting all data to 0
@@ -93,6 +107,12 @@ class RovioDivergenceHandler:
       if self.use_fixed_time_:
         if self.curr_frame_==self.start_frame_:
           self.curr_group_size_ = self.group_size_
+          eventout = eventtype()
+          eventout.header = data.header
+          eventout.vector.x = 1
+          eventout.vector.y = 0
+          eventout.vector.z = 0
+          self.events_pub_.publish(eventout)
           print("diverging")
       else:
         p = np.random.uniform()
@@ -102,6 +122,13 @@ class RovioDivergenceHandler:
           print("diverging")
     else:
       self.curr_group_size_-=1
+      if self.curr_group_size_==0:
+        eventout = eventtype()
+        eventout.header = data.header
+        eventout.vector.x = 2
+        eventout.vector.y = 0
+        eventout.vector.z = 0
+        self.events_pub_.publish(eventout)
       data.data = self.create_divergence(data.data)
     self.cam0_pub_.publish(data)
     

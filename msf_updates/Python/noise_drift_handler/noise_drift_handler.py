@@ -19,6 +19,7 @@ from math import sqrt
 from geometry_msgs.msg import PoseWithCovarianceStamped as posetype
 from geometry_msgs.msg import PointStamped as positiontype
 from geometry_msgs.msg import TransformStamped as transformtype
+from geometry_msgs.msg import Vector3Stamped as eventtype
 """
 $ rosmsg show geometry_msgs/PoseWithCovarianceStamped 
 std_msgs/Header header
@@ -65,6 +66,15 @@ geometry_msgs/Transform transform
     float64 z
     float64 w
 
+rosmsg show geometry_msgs/Vector3Stamped 
+std_msgs/Header header
+  uint32 seq
+  time stamp
+  string frame_id
+geometry_msgs/Vector3 vector
+  float64 x
+  float64 y
+  float64 z
 """
 
 class MsfNoiseHandler:
@@ -120,6 +130,9 @@ class MsfNoiseHandler:
     #init publisher
     self.pose_pub_=rospy.Publisher("noise_drift_handler/pose_output", posetype, queue_size=20)
     self.position_pub_=rospy.Publisher("noise_drift_handler/position_output", positiontype, queue_size=20)
+    
+    #this will publish (3,0,0) if rovio starts diverging and (4,0,0) if it stops diverging
+    self.events_pub_ = rospy.Publisher("noise_drift_handler/events", eventtype, queue_size=20)
   
   #adds gaussian distributed noise with mu and stddeviation   
   def add_noise(self, arrin, mu, stddeviation):
@@ -175,6 +188,12 @@ class MsfNoiseHandler:
       self.transform_curr_frame_+=1
       if self.transform_use_fixed_diverge_time_ and self.transform_curr_frame_==self.transform_diverge_frame_:
         self.transform_curr_group_=self.transform_diverge_length_
+        eventout = eventtype()
+        eventout.header = data.header
+        eventout.vector.x = 3
+        eventout.vector.y = 0
+        eventout.vector.z = 0
+        self.events_pub_.publish(eventout)
         print("digerging gps")
       stddeviation=self.transform_stddeviation_
       use_noise=self.transform_use_noise_
@@ -203,6 +222,13 @@ class MsfNoiseHandler:
             self.position_curr_group_-=1
           elif dtype=="geometry_msgs/TransformStamped":
             self.transform_curr_group_-=1
+            if self.transform_curr_group_==0:
+              eventout = eventtype()
+              eventout.header = data.header
+              eventout.vector.x = 4
+              eventout.vector.y = 0
+              eventout.vector.z = 0
+              self.events_pub_.publish(eventout)
         elif t<p_outlier:
           dataarr=self.create_outlier(dataarr, stddeviation)
           if dtype=="geometry_msgs/PoseWithCovarianceStamped":
