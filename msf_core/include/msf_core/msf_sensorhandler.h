@@ -22,7 +22,7 @@ namespace msf_core {
   static constexpr double kDefaultMahThreshold_ = 100.0;
   static constexpr double defaultRejectionDivergenceThreshold_ = 100.0;
   static constexpr double upperNoiseLimit_ = 0.6;
-  static constexpr double lowerNoiseLimit_ = 0.15;
+  static constexpr double lowerNoiseLimit_ = 0.2;
   static constexpr double desiredNoiseLevel_ = 0.3;
 /**
  * \class SensorHandler

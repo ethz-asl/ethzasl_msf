@@ -111,7 +111,7 @@ class MsfNoiseHandler:
     
     #params to estimate stddeviation of data 
     #to be set manually
-    self.ninit_=300
+    self.ninit_=350
     self.started_=False
     self.nrecv_=0
     #self.stddeviation_=0
@@ -200,9 +200,9 @@ class MsfNoiseHandler:
           if dtype=="geometry_msgs/PoseWithCovarianceStamped":
             self.pose_curr_group_-=1
           elif dtype=="geometry_msgs/PointStamped":
-            self.position_curr_group-=1
+            self.position_curr_group_-=1
           elif dtype=="geometry_msgs/TransformStamped":
-            self.transform_curr_group-=1
+            self.transform_curr_group_-=1
         elif t<p_outlier:
           dataarr=self.create_outlier(dataarr, stddeviation)
           if dtype=="geometry_msgs/PoseWithCovarianceStamped":

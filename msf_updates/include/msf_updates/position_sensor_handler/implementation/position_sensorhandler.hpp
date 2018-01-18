@@ -238,7 +238,7 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPositionMeasu
       //mah_rejection_modification_+=0.1;
       //mah_acceptance_modification_+=0.1;
       //think about what to do with this number
-      manager_.IncreaseNoise(this->sensorID, running_maha_dist_average_/mah_threshold_);
+      //manager_.IncreaseNoise(this->sensorID, running_maha_dist_average_/mah_threshold_);
       running_maha_dist_average_=msf_core::desiredNoiseLevel_*mah_threshold_;
       manager_.Initsingle(this->sensorID);
       return;

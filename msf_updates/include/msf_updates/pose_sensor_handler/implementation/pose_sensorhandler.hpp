@@ -238,6 +238,7 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
   //or wether this sensor is currently diverging -> reset and adjust threshold
   //CheckNoiseDivergence();
   //MSF_INFO_STREAM("accepted"<<n_accepted_<<" rejected"<<n_rejected_<<" curr rejected"<<n_curr_rejected_);
+  //MSF_WARN_STREAM("naccepted:"<<n_accepted_<<"nrejected:"<<n_rejected_);
   if(enable_noise_estimation_)
   {
       //if running average is larger than upperNoiseLimit of threshold recompute noise based on this
@@ -351,7 +352,7 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
       //std::system("roslaunch msf_updates restart_rovio.launch");
       needs_reinit_=true; //setting this to true will cause it to reinit on next measurement
       received_first_measurement_=false;
-      //usleep(20000); //wait a little might help
+      //usleep(20000); //wait a little so rovio can reinit (might help->does not)
       //rejection_divergence_threshold_=10000;
       //something might still be in buffer? need to make sure we reinit on new measurement somehow
       MSF_WARN_STREAM("reinitializing rovio");

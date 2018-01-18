@@ -384,8 +384,9 @@ struct PoseMeasurement : public PoseMeasurementBase {
       // Vision world yaw drift.
       q_err = state.Get<StateQwvIdx>();
 
-      r_old(6, 0) = -2 * (q_err.w() * q_err.z() + q_err.x() * q_err.y())
-          / (1 - 2 * (q_err.y() * q_err.y() + q_err.z() * q_err.z()));
+      //r_old(6, 0) = -2 * (q_err.w() * q_err.z() + q_err.x() * q_err.y())
+      //    / (1 - 2 * (q_err.y() * q_err.y() + q_err.z() * q_err.z()));
+      r_old(6,0) = 0.0;
 
       if (!CheckForNumeric(r_old, "r_old")) {
         MSF_ERROR_STREAM("r_old: "<<r_old);

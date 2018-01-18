@@ -278,6 +278,8 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
     //variables only from pose
     q_wv.setIdentity();  // Vision-world rotation drift.
     p_wv.setZero();  // Vision-world position drift.
+    //q_wv = Eigen::Quaterniond(-0.1338321, -0.00132899, 0.0028016, 0.99099917).conjugate();
+    //p_wv << 0.82340916, 2.22741483, 0.97403493;
 
     p_vc_c = pose_handler_->GetPositionMeasurement(); //This is potentially different for both sensors but has same name
     q_cv = pose_handler_->GetAttitudeMeasurement();
@@ -331,12 +333,17 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
       double yawinit = config_.position_yaw_init / 180 * M_PI;
       Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
       yawq.normalize();
-      q = yawq; 
+      //q = yawq;
+      Eigen::Quaterniond initpose(0.993240709, -0.0092359533, 0.0225063474, 0.1134947378);
+      q = initpose;
       //compute new transform for pose (rotational part)
       //Eigen::Quaternion<double> temp = (q_ic * q_cv.conjugate() * q_wv).conjugate();
       //q_ic = (q.toRotationMatrix().inverse()*temp.toRotationMatrix());
-      q_ic = q.conjugate()*q_wv.inverse()*q_cv.conjugate().inverse(); //better but still not correct
+      //adjust pose transformation (namely p_wv and q_wv which are the world to vision frame parameters)
+      //q_ic = q.conjugate()*q_wv.conjugate()*q_cv; //better but still not correct
+      q_wv = q_cv*q_ic.conjugate()*q.conjugate();
       q_ic.normalize();
+      q_wv.normalize();
     }
 
     MSF_WARN_STREAM("position q:" << STREAMQUAT(q)<<"pose q_cv:"<<STREAMQUAT(q_cv));
@@ -372,8 +379,9 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
     {
         //take position world frame
         p = p_vc_p - q.toRotationMatrix() * p_ip;
-        //adjust pose transformation
-        p_ic=q_ic.toRotationMatrix().inverse()*(p_wv + q_wv.conjugate().toRotationMatrix() * p_vc_c / scale - p);
+        //adjust pose transformation (namely p_wv and q_wv which are the world to vision frame parameters)
+        //p_ic=q_ic.toRotationMatrix().inverse()*(p_wv + q_wv.conjugate().toRotationMatrix() * p_vc_c / scale - p);
+        p_wv = p - q_wv.conjugate().toRotationMatrix() * p_vc_c / scale + q.toRotationMatrix() * p_ic;
     }
     MSF_WARN_STREAM("position p_vc_p:"<<p_vc_p.transpose()<<" pose p_vc_c:"<<p_vc_c.transpose());
 
@@ -426,8 +434,8 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
         //we do not change scale when reinitializing one sensor->get scale from last state
         const double scale = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::L>()(0,0); //for some reasone scale is saved as a 1 by 1 matrix... (might want to change this eventually)
         //variables from pose
-        Eigen::Matrix<double, 3, 1> p_ic, p_vc_c;
-        Eigen::Quaternion<double> q_ic, q_cv;
+        Eigen::Matrix<double, 3, 1> p_wv, p_vc_c;
+        Eigen::Quaternion<double> q_wv, q_cv;
 
         const Eigen::Matrix<double, 3, 1> p_ip = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::p_ip>();
 
@@ -454,8 +462,8 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
         P.setZero();  // Error state covariance; if zero, a default initialization in msf_core is used
 
         //variables only from pose
-        const Eigen::Quaternion<double> q_wv = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::q_wv>();
-        const Eigen::Matrix<double, 3, 1> p_wv = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::p_wv>();
+        const Eigen::Quaternion<double> q_ic = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::q_ic>();
+        const Eigen::Matrix<double, 3, 1> p_ic = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::p_ic>();
 
         p_vc_c = pose_handler_->GetPositionMeasurement(); //This is potentially different for both sensors but has same name
         q_cv = pose_handler_->GetAttitudeMeasurement();
@@ -463,12 +471,15 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
         //position is given by last state
         //we do not touch position sensor so we need to recompute transformation of pose sensor
         //compute new transform for pose (rotational part)
-        q_ic = q.conjugate()*q_wv.inverse()*q_cv.conjugate().inverse(); //looks good now
-        q_ic.normalize();
+        //q_ic = q.conjugate()*q_wv.inverse()*q_cv.conjugate().inverse(); //looks good now
+        q_wv = q_cv*q_ic.conjugate()*q.conjugate();
+        q_wv.normalize();
+        //q_ic.normalize();
 
         //compute new tranfor for pose (translational part)
-        p_ic=q_ic.toRotationMatrix().inverse()*(p_wv + q_wv.conjugate().toRotationMatrix() * p_vc_c / scale - p);
-        MSF_WARN_STREAM("new p_ic"<<p_ic<<"p_wv:"<<p_wv<<"p_vc_c:"<<p_vc_c<<"scale"<<scale<<"p"<<p);
+        //p_ic=q_ic.toRotationMatrix().inverse()*(p_wv + q_wv.conjugate().toRotationMatrix() * p_vc_c / scale - p);
+        //MSF_WARN_STREAM("new p_ic"<<p_ic<<"p_wv:"<<p_wv<<"p_vc_c:"<<p_vc_c<<"scale"<<scale<<"p"<<p);
+        p_wv = p - q_wv.conjugate().toRotationMatrix() * p_vc_c / scale + q.toRotationMatrix() * p_ic;
 
         a_m = q.inverse() * g;			/// Initial acceleration.
         // Prepare init "measurement"
