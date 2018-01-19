@@ -1,0 +1,7 @@
+#params for rovio_divergence_handler
+/rovio_divergence_handler/use_fixed_time: True
+#/rovio_divergence_handler/divergence_start_frame: 1800
+/rovio_divergence_handler/divergence_start_frame: 800
+/rovio_divergence_handler/divergence_group_size: 20
+/rovio_divergence_handler/probability_divergence: 0.0
+
