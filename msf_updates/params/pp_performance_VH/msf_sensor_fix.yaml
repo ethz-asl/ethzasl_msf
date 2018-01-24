@@ -66,8 +66,8 @@ pose_sensor/enable_divergence_recovery: true
 pose_sensor/divergence_rejection_limit: 30
 pose_sensor/use_reset_to_pose: false
 pose_sensor/use_transform_recovery: true
-pose_sensor/transform_recovery_noise_p: 0.1
-pose_sensor/transform_recovery_noise_q: 0.25
+pose_sensor/transform_recovery_noise_p: 0.005
+pose_sensor/transform_recovery_noise_q: 0.025
 pose_sensor/transform_anealing_steps: 200
 
 #these params are read in position_sensorhandler.hpp and therefore have prefix position_sensor
