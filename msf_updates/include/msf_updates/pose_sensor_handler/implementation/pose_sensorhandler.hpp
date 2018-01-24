@@ -63,12 +63,24 @@ PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PoseSensorHandler(
   //params for noise estimation
   pnh.param("enable_noise_estimation", enable_noise_estimation_, false);
   pnh.param("noise_estimation_discount_factor", average_discount_factor_, 1.0);
+  pnh.param("max_noise_threshold", max_noise_threshold_, 10.0);
   running_maha_dist_average_=msf_core::desiredNoiseLevel_*mah_threshold_;
   //params for divergence recovery
   pnh.param("enable_divergence_recovery", enable_divergence_recovery_, false);
   pnh.param("divergence_rejection_limit", rejection_divergence_threshold_, msf_core::defaultRejectionDivergenceThreshold_);
   pnh.param("use_reset_to_pose", use_reset_to_pose_, false);
-  
+  pnh.param("use_transform_recovery", use_transform_recovery_, false);
+  pnh.param("transform_recovery_noise_p", transform_recovery_noise_p_,0.0);
+  pnh.param("transform_recovery_noise_q", transform_recovery_noise_q_,0.0);
+  pnh.param("transform_anealing_steps", transform_anealing_steps_, 1);
+  transform_curr_anealing_steps_ = 0;
+  //this is how to get config
+  MANAGER_TYPE* mngr = dynamic_cast<MANAGER_TYPE*>(&manager_);
+  transform_base_noise_p_ = mngr->config_.pose_noise_p_wv;
+  transform_base_noise_q_ = mngr->config_.pose_noise_q_wv;
+
+
+
   MSF_INFO_STREAM_COND(measurement_world_sensor_, "Pose sensor is interpreting "
                        "measurement as sensor w.r.t. world");
   MSF_INFO_STREAM_COND(
@@ -103,6 +115,11 @@ PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PoseSensorHandler(
       MSF_INFO_STREAM("Pose sensor is using divergence recovery with rejection limit:"<<
       rejection_divergence_threshold_);
   }
+  if(use_transform_recovery_)
+  {
+      MSF_INFO_STREAM("Pose sensor uses transform recovery with noise p:"<<transform_recovery_noise_p_<<
+    " and q:"<<transform_recovery_noise_q_);
+  }  
   if(use_reset_to_pose_)
   {
       MSF_INFO_STREAM("Pose sensor is reseting rovio to pose");
@@ -220,19 +237,6 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
   z_q_ = meas->z_q_;
  
   this->manager_.msf_core_->AddMeasurement(meas);
-
-  //this part checks if something went wrong on initialization
-  //we dont need this anymore since we dont completly reinitialize
-  /*if (n_accepted_==0&&n_curr_rejected_>bad_initialization_threshold_)
-  {
-      MSF_WARN_STREAM("First Measurements have all been rejected. Probably initialized on an outlier. Reinitializing");
-      n_accepted_=0.0;
-      n_rejected_=0.0;
-      n_curr_rejected_=0.0;
-      //just to be safe (should devcrease once implemented)
-      manager_.IncreaseNoise(this->sensorID, 0.01);
-      manager_.Initsingle(this->sensorID);
-    }*/
     
   //this function should check wether too many measurements have been rejected -> increase noise meas
   //or wether this sensor is currently diverging -> reset and adjust threshold
@@ -246,13 +250,35 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
       {
           MSF_WARN_STREAM("too big:"<<running_maha_dist_average_<<"..."<<msf_core::upperNoiseLimit_*mah_threshold_<<"after"<<n_accepted_+n_rejected_);
           manager_.IncreaseNoise(this->sensorID, running_maha_dist_average_/mah_threshold_);
+          /*MSF_INFO_STREAM("increasing pose noise");
+          //cant use factors in case its 0 & its very sensitive
+          if(mngr->config_.pose_noise_meas_p==0.0)
+          {
+              mngr->config_.pose_noise_meas_p+=0.01;
+          }
+          //use a factor based on val
+          else
+          {
+              mngr->config_.pose_noise_meas_p = std::min(mngr->config_.pose_noise_meas_p*tempfactor, pose_handler_->GetMaxNoiseThreshold());
+          }
+          //cant use factors in case its 0 & its very sensitive
+          if(mngr->config_.pose_noise_meas_q==0.0)
+          {
+              mngr->config_.pose_noise_meas_q+=0.01;
+          }
+          //use a factor based on val
+          else
+          {
+              //q noise should be smaller
+              mngr->config_.pose_noise_meas_q = std::min(mngr->config_.pose_noise_meas_q*tempfactor, pose_handler_->GetMaxNoiseThreshold()/2);
+          }
           //probably reset makes sense here since we basically start again
           n_accepted_=0.0;
           n_rejected_=0.0;
           n_curr_rejected_=0.0;
           running_maha_dist_average_=msf_core::desiredNoiseLevel_*mah_threshold_;
           //manager_.Initsingle(this->sensorID);
-          return;
+          return;*/
       }
       //if running average is lower thatn lowerNoiseLimit of threshold recompute noise based on this
       else if(running_maha_dist_average_<=msf_core::lowerNoiseLimit_*mah_threshold_)
@@ -268,22 +294,7 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
           return;
       }
   }
-  /*if(n_rejected_+n_accepted_>msf_core::minRequestedSamplesForRejection_)
-  {
-      if(n_rejected_/(n_rejected_+n_accepted_)>max_outlier_relative_)
-      {
-          MSF_WARN_STREAM("detected too many outliers -> increasing noise meas and reseting");
-          n_accepted_=0.0;
-          n_rejected_=0.0;
-          n_curr_rejected_=0.0;
-          //auto config=manager_.Getcfg(); //this is some config type
-          //want to do this differently, i.e. adjust the value in config (may need function in manager)
-          //might want to make val depedent on how bad it is (later)
-          //compute this depending on current average of maha distance (set rejection threshold for rejected samples)
-          manager_.IncreaseNoise(this->sensorID, 0.05);
-          manager_.Initsingle(this->sensorID);
-        }
-  }*/
+
   //here either msf or rovio diverged. since we cant now just reinit both  
   if(enable_divergence_recovery_ && n_curr_rejected_>rejection_divergence_threshold_)
   {
@@ -292,7 +303,7 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
       n_accepted_ = 0.0;
       n_rejected_ = 0.0;
       n_curr_rejected_ = 0.0;
-
+      
       //probably adaptive threshold is bad instead increase noise (if it is actually sensor diverging its not too bad either, will decrease later)
       //think about what to do with this number
       manager_.IncreaseNoise(this->sensorID, running_maha_dist_average_/mah_threshold_);
@@ -332,7 +343,7 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
         srvtemp.request.T_WM.position.x = p_rovio(0,0);
         srvtemp.request.T_WM.position.y = p_rovio(1,0);
         srvtemp.request.T_WM.position.z = p_rovio(2,0);
-        if(q_rovio.w()<0)
+        if(q_rovio.w()>0)
         {
             srvtemp.request.T_WM.orientation.w = q_rovio.w();
             srvtemp.request.T_WM.orientation.x = q_rovio.x();
@@ -352,12 +363,30 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
       //std::system("roslaunch msf_updates restart_rovio.launch");
       needs_reinit_=true; //setting this to true will cause it to reinit on next measurement
       received_first_measurement_=false;
+      if(use_transform_recovery_)
+      {
+          //not sure if this works (depends on how pose_noise_p_wv is accessed: need to test)
+          mngr->config_.pose_noise_p_wv = transform_recovery_noise_p_;
+          mngr->config_.pose_noise_q_wv = transform_recovery_noise_q_;
+          //mngr->Getcfg().pose_noise_p_wv = transform_recovery_noise_p_;
+          //mngr->Getcfg().pose_noise_q_wv = transform_recovery_noise_q_;
+          transform_curr_anealing_steps_ = transform_anealing_steps_-2;
+          //service call to increase transform noise (plus need to activate anneahling)
+      }
       //usleep(20000); //wait a little so rovio can reinit (might help->does not)
       //rejection_divergence_threshold_=10000;
       //something might still be in buffer? need to make sure we reinit on new measurement somehow
       MSF_WARN_STREAM("reinitializing rovio");
       return;
-  }  
+    }
+    if(use_transform_recovery_ && transform_curr_anealing_steps_>0)
+    {
+       
+        mngr->config_.pose_noise_p_wv -= (transform_recovery_noise_p_-transform_base_noise_p_)/transform_anealing_steps_;
+        mngr->config_.pose_noise_q_wv -= (transform_recovery_noise_q_-transform_base_noise_q_)/transform_anealing_steps_;
+        transform_curr_anealing_steps_-=1;
+        //MSF_INFO_STREAM("anealing pose transform noise curr:"<<mngr->config_.pose_noise_p_wv);
+    }  
 }
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(

@@ -103,7 +103,7 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
   {
     //how to get correct config in case of multiple sensors
     //for now very simple want to do better
-    double tempfactor=1.0+val-msf_core::desiredNoiseLevel_;
+    double tempfactor=(1.0+2.0*(val-msf_core::desiredNoiseLevel_));
     if(sensorID==0)
     {
         MSF_INFO_STREAM("increasing pose noise");
@@ -112,11 +112,12 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
         if(config_.pose_noise_meas_p==0.0)
         {
             config_.pose_noise_meas_p+=0.01;
+            config_.pose_noise_p_wv = 0.2;
         }
         //use a factor based on val
         else
         {
-            config_.pose_noise_meas_p*=tempfactor;
+            config_.pose_noise_meas_p = std::min(config_.pose_noise_meas_p*tempfactor, pose_handler_->GetMaxNoiseThreshold());
         }
         //cant use factors in case its 0 & its very sensitive
         if(config_.pose_noise_meas_q==0.0)
@@ -126,7 +127,8 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
         //use a factor based on val
         else
         {
-            config_.pose_noise_meas_q*=tempfactor;
+            //q noise should be smaller
+            config_.pose_noise_meas_q = std::min(config_.pose_noise_meas_q*tempfactor, pose_handler_->GetMaxNoiseThreshold()/2);
         }
         MSF_INFO_STREAM("New noise meas"<<config_.pose_noise_meas_p);
         pose_handler_->SetNoises(config_.pose_noise_meas_p, config_.pose_noise_meas_q);
@@ -141,7 +143,7 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
         //use a factor based on val
         else
         {
-            config_.position_noise_meas*=tempfactor;
+            config_.position_noise_meas = std::min(config_.position_noise_meas*tempfactor, position_handler_->GetMaxNoiseThreshold());
         }
       position_handler_->SetNoises(config_.position_noise_meas);
     }
@@ -149,7 +151,7 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
       MSF_WARN_STREAM("Unknown sensorID: "<< sensorID);
     }
     return;
-}
+  }
 
   virtual const Config_T& Getcfg() {
     return config_;
@@ -160,7 +162,7 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
   shared_ptr<PoseSensorHandler_T> pose_handler_;
   shared_ptr<PositionSensorHandler_T> position_handler_;
 
-  Config_T config_;
+  Config_T config_; //this is really unlucky to have the same name as parents config_......
   ReconfigureServerPtr reconf_server_;  ///< Dynamic reconfigure server.
   //something with this init stuff that is in pose sensormanager seems to be missing here?
   ros::ServiceServer init_scale_srv_;
@@ -237,7 +239,7 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
   }
 
   //to make it "cleaner" couldnt this call the functions of sensor memebers :thinking:
-  void Init(double scale) const {
+  void Init(double scale){
     if(!position_handler_->ReceivedFirstMeasurement() && !pose_handler_->ReceivedFirstMeasurement())
     {
         MSF_WARN_STREAM("No Measurements recieved at all. This hardly ever makes sense. Aborting Init");
@@ -384,7 +386,13 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
         p_wv = p - q_wv.conjugate().toRotationMatrix() * p_vc_c / scale + q.toRotationMatrix() * p_ic;
     }
     MSF_WARN_STREAM("position p_vc_p:"<<p_vc_p.transpose()<<" pose p_vc_c:"<<p_vc_c.transpose());
-
+    //i think there exist 2 configs (one from msfsensormanagerROS and on from position_pose_sensormanager)
+    if(pose_handler_->use_transform_recovery_)
+    {
+      config_.pose_noise_p_wv = pose_handler_->transform_recovery_noise_p_;
+      config_.pose_noise_q_wv = pose_handler_->transform_recovery_noise_q_;
+      pose_handler_->transform_curr_anealing_steps_ = pose_handler_->transform_anealing_steps_;
+    }
     a_m = q.inverse() * g;			/// Initial acceleration.
     // Prepare init "measurement"
     // True means that this message contains initial sensor readings.

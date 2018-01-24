@@ -50,6 +50,7 @@ PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PositionSensorHandler(
   //params for noise estimation
   pnh.param("enable_noise_estimation", enable_noise_estimation_, false);
   pnh.param("noise_estimation_discount_factor", average_discount_factor_, 1.0);
+  pnh.param("max_noise_threshold", max_noise_threshold_, 10.0);
   running_maha_dist_average_=msf_core::desiredNoiseLevel_*mah_threshold_;
   //MSF_WARN_STREAM(running_maha_dist_average_);
   //params for divergence recovery

@@ -108,7 +108,7 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
     }
   }
 
-  void Init(double scale) const {
+  void Init(double scale) {
     if (scale < 0.001) {
       MSF_WARN_STREAM("init scale is "<<scale<<" correcting to 1");
       scale = 1;

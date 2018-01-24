@@ -51,6 +51,7 @@ class SensorHandler {
   double n_curr_rejected_;
   double n_accepted_;
   double rejection_divergence_threshold_;
+  double max_noise_threshold_;
 
   void SetSensorID(int ID) {
     sensorID = ID;
@@ -85,6 +86,7 @@ class SensorHandler {
   virtual ~SensorHandler() {
   }
   bool ReceivedFirstMeasurement() const {return received_first_measurement_;}
+  double GetMaxNoiseThreshold() const {return max_noise_threshold_;}
 };
 }
 #endif  // MSF_SENSORHANDLER_H_

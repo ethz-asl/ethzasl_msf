@@ -22,6 +22,7 @@
 #include <msf_core/msf_types.h>
 #include <msf_core/msf_statevisitor.h>
 #include <msf_core/msf_macros.h>
+#include <msf_core/MSF_CoreConfig.h>
 
 namespace msf_core {
 
@@ -88,7 +89,7 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
   /***
    * Init function for the EKF.
    */
-  virtual void Init(double scale) const = 0;
+  virtual void Init(double scale) = 0;
 
   /***
    * Init function in case only one (of multiple sensors should be reinitialized)

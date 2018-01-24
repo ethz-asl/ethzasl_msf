@@ -57,11 +57,18 @@ pose_sensor/mah_threshold: 5.0
 #settings for noise estimation
 pose_sensor/enable_noise_estimation: true
 #setting this closer to 1 will make it more longtime closer to 0 more shorttime
+#should think about frequency when defining this
 pose_sensor/noise_estimation_discount_factor: 0.99
+pose_sensor/max_noise_threshold: 1
 
 #settings for divergence recovery
 pose_sensor/enable_divergence_recovery: true
 pose_sensor/divergence_rejection_limit: 30
+pose_sensor/use_reset_to_pose: false
+pose_sensor/use_transform_recovery: true
+pose_sensor/transform_recovery_noise_p: 0.1
+pose_sensor/transform_recovery_noise_q: 0.25
+pose_sensor/transform_anealing_steps: 200
 
 #these params are read in position_sensorhandler.hpp and therefore have prefix position_sensor
 #########GPS PARAMETERS#######
@@ -81,8 +88,11 @@ position_sensor/mah_threshold: 5.0
 #settings for noise estimation
 position_sensor/enable_noise_estimation: true
 #setting this closer to 1 will make it more longtime closer to 0 more shorttime
+#should think about frequency when defining this
 position_sensor/noise_estimation_discount_factor: 0.999
+position_sensor/max_noise_threshold: 5
 
 #settings for divergence recovery
-position_sensor/enable_divergence_recovery: true
+#this should be false unless you expect gps to recover to different frame or have poor initialization
+position_sensor/enable_divergence_recovery: false
 position_sensor/divergence_rejection_limit: 300

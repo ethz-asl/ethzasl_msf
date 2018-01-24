@@ -58,6 +58,7 @@ class PoseSensorHandler : public msf_core::SensorHandler<
   bool needs_reinit_; ///< set True if sensor needs a reinit after reseting rovio (meaning that it will 
                       //reinit at first meas)
   bool use_reset_to_pose_;
+  
 
   msf_updates::PoseDistorter::Ptr distorter_;
 
@@ -68,7 +69,14 @@ class PoseSensorHandler : public msf_core::SensorHandler<
   void MeasurementCallback(const geometry_msgs::PoseStampedConstPtr & msg);
   void MeasurementCallback(const geometry_msgs::TransformStampedConstPtr & msg);
 
- public:
+public:
+  double transform_recovery_noise_p_;
+  double transform_recovery_noise_q_;
+  double transform_base_noise_p_;
+  double transform_base_noise_q_;
+  int transform_anealing_steps_;
+  int transform_curr_anealing_steps_;
+  bool use_transform_recovery_;
   typedef MEASUREMENT_TYPE measurement_t;
   PoseSensorHandler(MANAGER_TYPE& meas, std::string topic_namespace,
                     std::string parameternamespace, bool distortmeas);
