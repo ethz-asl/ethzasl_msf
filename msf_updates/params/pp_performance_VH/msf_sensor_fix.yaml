@@ -64,7 +64,7 @@ pose_sensor/max_noise_threshold: 1
 #settings for divergence recovery
 pose_sensor/enable_divergence_recovery: true
 pose_sensor/divergence_rejection_limit: 30
-pose_sensor/use_reset_to_pose: false
+pose_sensor/use_reset_to_pose: true
 pose_sensor/use_transform_recovery: true
 pose_sensor/transform_recovery_noise_p: 0.005
 pose_sensor/transform_recovery_noise_q: 0.025

@@ -361,8 +361,9 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
       }
       //usleep(20000); might have to wait a bit
       //std::system("roslaunch msf_updates restart_rovio.launch");
-      needs_reinit_=true; //setting this to true will cause it to reinit on next measurement
-      received_first_measurement_=false;
+      //should not need reinit since we are reseting the pose according to its transformation
+      //needs_reinit_=true; //setting this to true will cause it to reinit on next measurement
+      //received_first_measurement_=false;
       if(use_transform_recovery_)
       {
           //not sure if this works (depends on how pose_noise_p_wv is accessed: need to test)
