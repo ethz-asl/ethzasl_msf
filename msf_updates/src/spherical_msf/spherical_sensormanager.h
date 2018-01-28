@@ -60,11 +60,6 @@ class SensorManager : public msf_core::MSF_SensorManagerROS<
   virtual ~SensorManager() {
   }
 
-  virtual void IncreaseNoise(int sensorID, double val)
-  {
-    MSF_WARN_STREAM("NOT IMPLEMENTED FUNCTION");
-    return;
-  }
   
   virtual const Config_T& Getcfg() const {
     return config_;

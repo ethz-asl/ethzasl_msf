@@ -71,11 +71,6 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
   }
   virtual ~PoseSensorManager() { }
 
-  virtual void IncreaseNoise(int sensorID, double val)
-  {
-    MSF_WARN_STREAM("NOT IMPLEMENTED FUNCTION");
-    return;
-  }
 
   virtual const Config_T& Getcfg() {
     return config_;

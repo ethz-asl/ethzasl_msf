@@ -73,20 +73,6 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
     return config_;
   }
 
-  virtual void IncreaseNoise(int sensorID, double val)
-  {
-    //how to get correct config in case of multiple sensors
-    MSF_INFO_STREAM("polymorphd called");
-    if(sensorID==0)
-    {
-      config_.position_noise_meas+=val;
-      position_handler_->SetNoises(config_.position_noise_meas);
-    }
-    else{
-      MSF_WARN_STREAM("Unknown sensorID: "<< sensorID);
-    }
-    return;
-  }
  private:
   shared_ptr<msf_core::IMUHandler_ROS<msf_updates::EKFState> > imu_handler_;
   shared_ptr<PositionSensorHandler_T> position_handler_;

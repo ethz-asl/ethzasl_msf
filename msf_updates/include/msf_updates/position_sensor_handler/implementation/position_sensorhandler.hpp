@@ -180,23 +180,24 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPositionMeasu
   if(enable_noise_estimation_)
   {
       //if running average is larger than upperNoiseLimit of threshold recompute noise based on this
-      if(running_maha_dist_average_>=msf_core::upperNoiseLimit_*mah_threshold_)
+      if(running_maha_dist_average_>=msf_core::upperNoiseLimit_*mah_threshold_ || running_maha_dist_average_<=msf_core::lowerNoiseLimit_*mah_threshold_)
       {
-          MSF_WARN_STREAM("too big:"<<running_maha_dist_average_<<"..."<<msf_core::upperNoiseLimit_*mah_threshold_);
-          manager_.IncreaseNoise(this->sensorID, running_maha_dist_average_/mah_threshold_);
-          //probably reset makes sense here since we basically start again
-          n_accepted_=0.0;
-          n_rejected_=0.0;
-          n_curr_rejected_=0.0;
-          running_maha_dist_average_=msf_core::desiredNoiseLevel_*mah_threshold_;
-          //manager_.Initsingle(this->sensorID);
-          return;
-      }
-      //if running average is lower thatn lowerNoiseLimit of threshold recompute noise based on this
-      else if(running_maha_dist_average_<=msf_core::lowerNoiseLimit_*mah_threshold_)
-      {
-          MSF_WARN_STREAM("too small:"<<running_maha_dist_average_<<"..."<<msf_core::lowerNoiseLimit_*mah_threshold_<<"after"<<n_accepted_+n_rejected_);
-          manager_.IncreaseNoise(this->sensorID, running_maha_dist_average_/mah_threshold_);
+          double tempfactor=(1.0+2.0*(running_maha_dist_average_/mah_threshold_-msf_core::desiredNoiseLevel_));
+          //cant use factors in case its 0 & its very sensitive
+          if(mngr->config_.position_noise_meas==0.0)
+          {
+              mngr->config_.position_noise_meas+=0.01;
+          }
+          //use a factor based on val
+          else
+          {
+              mngr->config_.position_noise_meas = std::min(mngr->config_.position_noise_meas*tempfactor, this->GetMaxNoiseThreshold());
+          }
+          
+          MSF_INFO_STREAM("Changing position Noise measurement to:"<<mngr->config_.position_noise_meas);
+          this->SetNoises(mngr->config_.position_noise_meas);
+          //MSF_WARN_STREAM("too big:"<<running_maha_dist_average_<<"..."<<msf_core::upperNoiseLimit_*mah_threshold_);
+          //manager_.IncreaseNoise(this->sensorID, running_maha_dist_average_/mah_threshold_);
           //probably reset makes sense here since we basically start again
           n_accepted_=0.0;
           n_rejected_=0.0;
@@ -206,27 +207,7 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPositionMeasu
           return;
       }
   }
-  //this function should check wether too many measurements have been rejected -> increase noise meas
-  //or wether this sensor is currently diverging -> reset and adjust threshold
-  //CheckNoiseDivergence();
-  //MSF_INFO_STREAM("accepted"<<n_accepted_<<" rejected"<<n_rejected_<<" curr rejected"<<n_curr_rejected_);
-  /*if(n_rejected_+n_accepted_>msf_core::minRequestedSamplesForRejection_)
-  {
-      if(n_rejected_/(n_rejected_+n_accepted_)>max_outlier_relative_)
-      {
-          MSF_WARN_STREAM("detected too many outliers -> increasing noise meas and reseting");
-          n_accepted_=0.0;
-          n_rejected_=0.0;
-          n_curr_rejected_=0.0;
-          //auto config=manager_.Getcfg(); //this is some config type
-          //want to do this differently, i.e. adjust the value in config (may need function in manager)
-          //this->SetNoises(config.position_noise_meas+0.1);
-          //might want to make val depedent on how bad it is (later)
-          //compute this depending on current average of maha distance (set rejection threshold for rejected samples)
-          manager_.IncreaseNoise(this->sensorID, 0.15);
-          manager_.Initsingle(this->sensorID);
-        }
-  }*/
+  
   //for position sensor we cannot really do anything besides hoping that sensor will comeback incase sensor itself diverged  
   if(enable_divergence_recovery_ && n_curr_rejected_>rejection_divergence_threshold_)
   {
@@ -239,7 +220,20 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPositionMeasu
       //mah_rejection_modification_+=0.1;
       //mah_acceptance_modification_+=0.1;
       //think about what to do with this number
-      //manager_.IncreaseNoise(this->sensorID, running_maha_dist_average_/mah_threshold_);
+      double tempfactor=(1.0+2.0*(running_maha_dist_average_/mah_threshold_-msf_core::desiredNoiseLevel_));
+        //cant use factors in case its 0 & its very sensitive
+        if(mngr->config_.position_noise_meas==0.0)
+        {
+            mngr->config_.position_noise_meas+=0.01;
+        }
+        //use a factor based on val
+        else
+        {
+            mngr->config_.position_noise_meas = std::min(mngr->config_.position_noise_meas*tempfactor, this->GetMaxNoiseThreshold());
+        }
+        
+        MSF_INFO_STREAM("Changing position Noise measurement to:"<<mngr->config_.position_noise_meas);
+        this->SetNoises(mngr->config_.position_noise_meas);
       running_maha_dist_average_=msf_core::desiredNoiseLevel_*mah_threshold_;
       manager_.Initsingle(this->sensorID);
       return;

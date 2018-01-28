@@ -37,6 +37,7 @@ PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PoseSensorHandler(
       n_zq_(1e-6),
       delay_(0),
       timestamp_previous_pose_(0),
+      curr_reset_savetime_(0),
       needs_reinit_(false) {
   ros::NodeHandle pnh("~/pose_sensor");
 
@@ -66,9 +67,9 @@ PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PoseSensorHandler(
   pnh.param("max_noise_threshold", max_noise_threshold_, 10.0);
   running_maha_dist_average_=msf_core::desiredNoiseLevel_*mah_threshold_;
   //params for divergence recovery
-  pnh.param("enable_divergence_recovery", enable_divergence_recovery_, false);
+  pnh.param("enable_divergence_recovery", enable_divergence_recovery_, true);
   pnh.param("divergence_rejection_limit", rejection_divergence_threshold_, msf_core::defaultRejectionDivergenceThreshold_);
-  pnh.param("use_reset_to_pose", use_reset_to_pose_, false);
+  pnh.param("use_reset_to_pose", use_reset_to_pose_, true);
   pnh.param("use_transform_recovery", use_transform_recovery_, false);
   pnh.param("transform_recovery_noise_p", transform_recovery_noise_p_,0.0);
   pnh.param("transform_recovery_noise_q", transform_recovery_noise_q_,0.0);
@@ -187,6 +188,11 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
   received_first_measurement_ = true;
   if(needs_reinit_)
   {
+      if(curr_reset_savetime_>0)
+      {
+          curr_reset_savetime_--;
+          return;
+      }
       manager_.Initsingle(this->sensorID);
       needs_reinit_=false;
       return;
@@ -246,11 +252,12 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
   if(enable_noise_estimation_)
   {
       //if running average is larger than upperNoiseLimit of threshold recompute noise based on this
-      if(running_maha_dist_average_>=msf_core::upperNoiseLimit_*mah_threshold_)
+      if(running_maha_dist_average_>=msf_core::upperNoiseLimit_*mah_threshold_ || running_maha_dist_average_<=msf_core::lowerNoiseLimit_*mah_threshold_)
       {
-          MSF_WARN_STREAM("too big:"<<running_maha_dist_average_<<"..."<<msf_core::upperNoiseLimit_*mah_threshold_<<"after"<<n_accepted_+n_rejected_);
-          manager_.IncreaseNoise(this->sensorID, running_maha_dist_average_/mah_threshold_);
-          /*MSF_INFO_STREAM("increasing pose noise");
+          //MSF_WARN_STREAM("too big:"<<running_maha_dist_average_<<"..."<<msf_core::upperNoiseLimit_*mah_threshold_<<"after"<<n_accepted_+n_rejected_);
+          //manager_.IncreaseNoise(this->sensorID, running_maha_dist_average_/mah_threshold_);
+          //MSF_INFO_STREAM("increasing pose noise");
+          double tempfactor=(1.0+2.0*(running_maha_dist_average_/mah_threshold_-msf_core::desiredNoiseLevel_));
           //cant use factors in case its 0 & its very sensitive
           if(mngr->config_.pose_noise_meas_p==0.0)
           {
@@ -259,7 +266,7 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
           //use a factor based on val
           else
           {
-              mngr->config_.pose_noise_meas_p = std::min(mngr->config_.pose_noise_meas_p*tempfactor, pose_handler_->GetMaxNoiseThreshold());
+              mngr->config_.pose_noise_meas_p = std::min(mngr->config_.pose_noise_meas_p*tempfactor, this->GetMaxNoiseThreshold());
           }
           //cant use factors in case its 0 & its very sensitive
           if(mngr->config_.pose_noise_meas_q==0.0)
@@ -270,21 +277,10 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
           else
           {
               //q noise should be smaller
-              mngr->config_.pose_noise_meas_q = std::min(mngr->config_.pose_noise_meas_q*tempfactor, pose_handler_->GetMaxNoiseThreshold()/2);
-          }
-          //probably reset makes sense here since we basically start again
-          n_accepted_=0.0;
-          n_rejected_=0.0;
-          n_curr_rejected_=0.0;
-          running_maha_dist_average_=msf_core::desiredNoiseLevel_*mah_threshold_;
-          //manager_.Initsingle(this->sensorID);
-          return;*/
-      }
-      //if running average is lower thatn lowerNoiseLimit of threshold recompute noise based on this
-      else if(running_maha_dist_average_<=msf_core::lowerNoiseLimit_*mah_threshold_)
-      {
-          //MSF_WARN_STREAM("too small:"<<running_maha_dist_average_<<"..."<<msf_core::upperNoiseLimit_*mah_threshold_);
-          manager_.IncreaseNoise(this->sensorID, running_maha_dist_average_/mah_threshold_);
+              mngr->config_.pose_noise_meas_q = std::min(mngr->config_.pose_noise_meas_q*tempfactor, this->GetMaxNoiseThreshold()/2);
+            }
+          MSF_INFO_STREAM("Changing Noise measurement p to:"<<mngr->config_.pose_noise_meas_p);
+          this->SetNoises(mngr->config_.pose_noise_meas_p, mngr->config_.pose_noise_meas_q);
           //probably reset makes sense here since we basically start again
           n_accepted_=0.0;
           n_rejected_=0.0;
@@ -293,6 +289,7 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
           //manager_.Initsingle(this->sensorID);
           return;
       }
+
   }
 
   //here either msf or rovio diverged. since we cant now just reinit both  
@@ -306,7 +303,30 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
       
       //probably adaptive threshold is bad instead increase noise (if it is actually sensor diverging its not too bad either, will decrease later)
       //think about what to do with this number
-      manager_.IncreaseNoise(this->sensorID, running_maha_dist_average_/mah_threshold_);
+      double tempfactor=(1.0+2.0*(running_maha_dist_average_/mah_threshold_-msf_core::desiredNoiseLevel_));
+        //cant use factors in case its 0 & its very sensitive
+        if(mngr->config_.pose_noise_meas_p==0.0)
+        {
+            mngr->config_.pose_noise_meas_p+=0.01;
+        }
+        //use a factor based on val
+        else
+        {
+            mngr->config_.pose_noise_meas_p = std::min(mngr->config_.pose_noise_meas_p*tempfactor, this->GetMaxNoiseThreshold());
+        }
+        //cant use factors in case its 0 & its very sensitive
+        if(mngr->config_.pose_noise_meas_q==0.0)
+        {
+            mngr->config_.pose_noise_meas_q+=0.01;
+        }
+        //use a factor based on val
+        else
+        {
+            //q noise should be smaller
+            mngr->config_.pose_noise_meas_q = std::min(mngr->config_.pose_noise_meas_q*tempfactor, this->GetMaxNoiseThreshold()/2);
+        }
+        MSF_INFO_STREAM("Changing Noise measurement p to:"<<mngr->config_.pose_noise_meas_p);
+        this->SetNoises(mngr->config_.pose_noise_meas_p, mngr->config_.pose_noise_meas_q);
       running_maha_dist_average_=msf_core::desiredNoiseLevel_*mah_threshold_;
       //try to reset rovio
       if(!use_reset_to_pose_)
@@ -315,6 +335,9 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
         ros::ServiceClient clienttemp = ntemp.serviceClient<std_srvs::Empty>("rovio/reset");
         std_srvs::Empty srvtemp;
         clienttemp.call(srvtemp);
+        needs_reinit_=true; //setting this to true will cause it to reinit on next measurement
+        curr_reset_savetime_=msf_core::rovioResetSaveTime; //this will delay init by n measurements (because buffering)
+        received_first_measurement_=false;
       }
       //access state via manager to get pose for rovio init
       else

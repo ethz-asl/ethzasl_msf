@@ -58,7 +58,7 @@ class PoseSensorHandler : public msf_core::SensorHandler<
   bool needs_reinit_; ///< set True if sensor needs a reinit after reseting rovio (meaning that it will 
                       //reinit at first meas)
   bool use_reset_to_pose_;
-  
+  int curr_reset_savetime_;
 
   msf_updates::PoseDistorter::Ptr distorter_;
 

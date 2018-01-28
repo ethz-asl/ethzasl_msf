@@ -146,10 +146,6 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
   virtual double GetParamNoiseGyrbias() const = 0;
   virtual double GetParamFuzzyTrackingThreshold() const = 0;
 
-  /***
-   * This function is used to increase noise from within handler
-   */
-  virtual void IncreaseNoise(int sensorID, double val) = 0;
 
   /**
    * This functions get called by the core to publish data to external

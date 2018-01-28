@@ -24,6 +24,7 @@ namespace msf_core {
   static constexpr double upperNoiseLimit_ = 0.6;
   static constexpr double lowerNoiseLimit_ = 0.2;
   static constexpr double desiredNoiseLevel_ = 0.3;
+  static constexpr int rovioResetSaveTime = 3;
 /**
  * \class SensorHandler
  * \brief Handles a sensor driver which provides the sensor readings.

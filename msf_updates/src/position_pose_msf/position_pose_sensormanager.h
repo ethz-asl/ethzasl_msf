@@ -98,61 +98,6 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
       //like call their destructors (not necessary in other sensormanagers)
   }
 
-  //val is a number between 0 and 1 showwing how close to the maha_threshold we are
-  virtual void IncreaseNoise(int sensorID, double val)
-  {
-    //how to get correct config in case of multiple sensors
-    //for now very simple want to do better
-    double tempfactor=(1.0+2.0*(val-msf_core::desiredNoiseLevel_));
-    if(sensorID==0)
-    {
-        MSF_INFO_STREAM("increasing pose noise");
-
-        //cant use factors in case its 0 & its very sensitive
-        if(config_.pose_noise_meas_p==0.0)
-        {
-            config_.pose_noise_meas_p+=0.01;
-            config_.pose_noise_p_wv = 0.2;
-        }
-        //use a factor based on val
-        else
-        {
-            config_.pose_noise_meas_p = std::min(config_.pose_noise_meas_p*tempfactor, pose_handler_->GetMaxNoiseThreshold());
-        }
-        //cant use factors in case its 0 & its very sensitive
-        if(config_.pose_noise_meas_q==0.0)
-        {
-            config_.pose_noise_meas_q+=0.01;
-        }
-        //use a factor based on val
-        else
-        {
-            //q noise should be smaller
-            config_.pose_noise_meas_q = std::min(config_.pose_noise_meas_q*tempfactor, pose_handler_->GetMaxNoiseThreshold()/2);
-        }
-        MSF_INFO_STREAM("New noise meas"<<config_.pose_noise_meas_p);
-        pose_handler_->SetNoises(config_.pose_noise_meas_p, config_.pose_noise_meas_q);
-    }
-    else if(sensorID==1)
-    {
-      MSF_INFO_STREAM("increasing position noise"<<config_.position_noise_meas);
-      if(config_.position_noise_meas==0.0)
-        {
-            config_.position_noise_meas+=0.01;
-        }
-        //use a factor based on val
-        else
-        {
-            config_.position_noise_meas = std::min(config_.position_noise_meas*tempfactor, position_handler_->GetMaxNoiseThreshold());
-        }
-      position_handler_->SetNoises(config_.position_noise_meas);
-    }
-    else{
-      MSF_WARN_STREAM("Unknown sensorID: "<< sensorID);
-    }
-    return;
-  }
-
   virtual const Config_T& Getcfg() {
     return config_;
   }
