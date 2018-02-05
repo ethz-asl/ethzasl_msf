@@ -183,15 +183,18 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPositionMeasu
       if(running_maha_dist_average_>=msf_core::upperNoiseLimit_*mah_threshold_ || running_maha_dist_average_<=msf_core::lowerNoiseLimit_*mah_threshold_)
       {
           double tempfactor=(1.0+2.0*(running_maha_dist_average_/mah_threshold_-msf_core::desiredNoiseLevel_));
-          //cant use factors in case its 0 & its very sensitive
-          if(mngr->config_.position_noise_meas==0.0)
-          {
-              mngr->config_.position_noise_meas+=0.01;
-          }
           //use a factor based on val
+          //if factor larger one we want:
+          //not surpass max threshold
+          //increase to fixed amount if it was too small (~0) before
+          if (tempfactor>1.0)
+          {
+                mngr->config_.position_noise_meas = std::max(0.05, std::min(mngr->config_.position_noise_meas*tempfactor, this->GetMaxNoiseThreshold()));
+          }
+          //if we decrease we just use factor (without additional constraints)  
           else
           {
-              mngr->config_.position_noise_meas = std::min(mngr->config_.position_noise_meas*tempfactor, this->GetMaxNoiseThreshold());
+              mngr->config_.position_noise_meas = mngr->config_.position_noise_meas*tempfactor;
           }
           
           MSF_INFO_STREAM("Changing position Noise measurement to:"<<mngr->config_.position_noise_meas);
@@ -208,28 +211,26 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPositionMeasu
       }
   }
   
-  //for position sensor we cannot really do anything besides hoping that sensor will comeback incase sensor itself diverged  
+  //this usually makes no sense (i.e. set recovery=false) since sensor will mostly recover on its own 
   if(enable_divergence_recovery_ && n_curr_rejected_>rejection_divergence_threshold_)
   {
+      double tempfactor=(1.0+2.0*(running_maha_dist_average_/mah_threshold_-msf_core::desiredNoiseLevel_));
       MSF_WARN_STREAM("too many measurements have been rejected back to back -> increasing stability parameters and reseting");
       n_accepted_ = 0.0;
       n_rejected_ = 0.0;
       n_curr_rejected_ = 0.0;
-     //probably adaptive threshold is bad instead increase noise (if it is actually sensor diverging its not too bad either, will decrease later)
-      //mah_threshold_limit_*=1.1;
-      //mah_rejection_modification_+=0.1;
-      //mah_acceptance_modification_+=0.1;
-      //think about what to do with this number
-      double tempfactor=(1.0+2.0*(running_maha_dist_average_/mah_threshold_-msf_core::desiredNoiseLevel_));
-        //cant use factors in case its 0 & its very sensitive
-        if(mngr->config_.position_noise_meas==0.0)
+     //use a factor based on val
+        //if factor larger one we want:
+        //not surpass max threshold
+        //increase to fixed amount if it was too small (~0) before
+        if (tempfactor>1.0)
         {
-            mngr->config_.position_noise_meas+=0.01;
+            mngr->config_.position_noise_meas = std::max(0.05, std::min(mngr->config_.position_noise_meas*tempfactor, this->GetMaxNoiseThreshold()));
         }
-        //use a factor based on val
+        //if we decrease we just use factor (without additional constraints)  
         else
         {
-            mngr->config_.position_noise_meas = std::min(mngr->config_.position_noise_meas*tempfactor, this->GetMaxNoiseThreshold());
+            mngr->config_.position_noise_meas = mngr->config_.position_noise_meas*tempfactor;
         }
         
         MSF_INFO_STREAM("Changing position Noise measurement to:"<<mngr->config_.position_noise_meas);

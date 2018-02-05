@@ -258,26 +258,21 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
           //manager_.IncreaseNoise(this->sensorID, running_maha_dist_average_/mah_threshold_);
           //MSF_INFO_STREAM("increasing pose noise");
           double tempfactor=(1.0+2.0*(running_maha_dist_average_/mah_threshold_-msf_core::desiredNoiseLevel_));
-          //cant use factors in case its 0 & its very sensitive
-          if(mngr->config_.pose_noise_meas_p==0.0)
-          {
-              mngr->config_.pose_noise_meas_p+=0.01;
-          }
           //use a factor based on val
-          else
-          {
-              mngr->config_.pose_noise_meas_p = std::min(mngr->config_.pose_noise_meas_p*tempfactor, this->GetMaxNoiseThreshold());
-          }
-          //cant use factors in case its 0 & its very sensitive
-          if(mngr->config_.pose_noise_meas_q==0.0)
-          {
-              mngr->config_.pose_noise_meas_q+=0.01;
-          }
-          //use a factor based on val
-          else
-          {
-              //q noise should be smaller
-              mngr->config_.pose_noise_meas_q = std::min(mngr->config_.pose_noise_meas_q*tempfactor, this->GetMaxNoiseThreshold()/2);
+            //if factor larger one we want:
+            //not surpass max threshold
+            //increase to fixed amount if it was too small (~0) before
+            if (tempfactor>1.0)
+            {
+                mngr->config_.pose_noise_meas_p = std::max(0.05, std::min(mngr->config_.pose_noise_meas_p*tempfactor, this->GetMaxNoiseThreshold()));
+                //q noise should be smaller
+                mngr->config_.pose_noise_meas_q = std::max(0.02, std::min(mngr->config_.pose_noise_meas_q*tempfactor, this->GetMaxNoiseThreshold()/2));
+            }
+            //no additional constraints
+            else
+            {
+                mngr->config_.pose_noise_meas_p = mngr->config_.pose_noise_meas_p*tempfactor, this->GetMaxNoiseThreshold();
+                mngr->config_.pose_noise_meas_q = mngr->config_.pose_noise_meas_q*tempfactor, this->GetMaxNoiseThreshold();
             }
           MSF_INFO_STREAM("Changing Noise measurement p to:"<<mngr->config_.pose_noise_meas_p);
           this->SetNoises(mngr->config_.pose_noise_meas_p, mngr->config_.pose_noise_meas_q);
@@ -304,27 +299,23 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
       //probably adaptive threshold is bad instead increase noise (if it is actually sensor diverging its not too bad either, will decrease later)
       //think about what to do with this number
       double tempfactor=(1.0+2.0*(running_maha_dist_average_/mah_threshold_-msf_core::desiredNoiseLevel_));
-        //cant use factors in case its 0 & its very sensitive
-        if(mngr->config_.pose_noise_meas_p==0.0)
-        {
-            mngr->config_.pose_noise_meas_p+=0.01;
-        }
         //use a factor based on val
-        else
+        //if factor larger one we want:
+        //not surpass max threshold
+        //increase to fixed amount if it was too small (~0) before
+        if (tempfactor>1.0)
         {
-            mngr->config_.pose_noise_meas_p = std::min(mngr->config_.pose_noise_meas_p*tempfactor, this->GetMaxNoiseThreshold());
-        }
-        //cant use factors in case its 0 & its very sensitive
-        if(mngr->config_.pose_noise_meas_q==0.0)
-        {
-            mngr->config_.pose_noise_meas_q+=0.01;
-        }
-        //use a factor based on val
-        else
-        {
+            mngr->config_.pose_noise_meas_p = std::max(0.05, std::min(mngr->config_.pose_noise_meas_p*tempfactor, this->GetMaxNoiseThreshold()));
             //q noise should be smaller
-            mngr->config_.pose_noise_meas_q = std::min(mngr->config_.pose_noise_meas_q*tempfactor, this->GetMaxNoiseThreshold()/2);
+            mngr->config_.pose_noise_meas_q = std::max(0.02, std::min(mngr->config_.pose_noise_meas_q*tempfactor, this->GetMaxNoiseThreshold()/2));
         }
+        //no additional constraints
+        else
+        {
+            mngr->config_.pose_noise_meas_p = mngr->config_.pose_noise_meas_p*tempfactor, this->GetMaxNoiseThreshold();
+            mngr->config_.pose_noise_meas_q = mngr->config_.pose_noise_meas_q*tempfactor, this->GetMaxNoiseThreshold();
+        }
+       
         MSF_INFO_STREAM("Changing Noise measurement p to:"<<mngr->config_.pose_noise_meas_p);
         this->SetNoises(mngr->config_.pose_noise_meas_p, mngr->config_.pose_noise_meas_q);
       running_maha_dist_average_=msf_core::desiredNoiseLevel_*mah_threshold_;
