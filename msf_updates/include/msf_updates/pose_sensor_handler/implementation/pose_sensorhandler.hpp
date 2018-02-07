@@ -204,6 +204,38 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
       "larger variable to mark the fixed_states");
   // Do not exceed the 32 bits of int.
 
+  if(collect_for_init_)
+  {
+      Eigen::Vector4d newpoint;
+      //set values of newpoint
+      newpoint(0)=msg->pose.pose.position.x;
+      newpoint(1)=msg->pose.pose.position.y;
+      newpoint(2)=msg->pose.pose.position.z;
+      newpoint(3)=msg->header.stamp.toSec() - delay_;
+      init_points_.push_back(newpoint);
+      //if not ready yet need to check wether ready with new meas
+      if(!ready_for_init_)
+      {
+          if(InitPointsReady())
+          {
+            //set ready true and call manager initstable
+            ready_for_init_=true;
+            MANAGER_TYPE* mngr = dynamic_cast<MANAGER_TYPE*>(&manager_);
+            mngr->InitStable();
+          }
+      }
+      //the reason we need this is because it might think it had enough distance because of an outlier
+      //and like this both sensors need an outlier on the same frame
+      else
+      {
+          if(!InitPointsReady())
+          {
+              ready_for_init_=false;
+          }
+      }  
+        
+      return;
+  }
   // Get all the fixed states and set flag bits.
   MANAGER_TYPE* mngr = dynamic_cast<MANAGER_TYPE*>(&manager_);
 

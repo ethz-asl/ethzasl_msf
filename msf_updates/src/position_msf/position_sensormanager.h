@@ -163,6 +163,11 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
     // Call initialization in core.
     msf_core_->Init(meas);
   }
+  void InitStable()
+  {
+      MSF_WARN_STREAM("Function not implemented yet");
+      return;
+  }
 
   //since this has only 1 sensor simply call normal Init
   void Initsingle(int sensorID) const

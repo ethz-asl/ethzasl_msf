@@ -25,6 +25,8 @@ namespace msf_core {
   static constexpr double lowerNoiseLimit_ = 0.2;
   static constexpr double desiredNoiseLevel_ = 0.3;
   static constexpr int rovioResetSaveTime = 3;
+  static constexpr int minRequiredInitPoints = 30;
+  static constexpr double minRequiredInitMovement = 1.0;
 /**
  * \class SensorHandler
  * \brief Handles a sensor driver which provides the sensor readings.
@@ -54,6 +56,7 @@ class SensorHandler {
   double rejection_divergence_threshold_;
   double max_noise_threshold_;
 
+
   void SetSensorID(int ID) {
     sensorID = ID;
   }
@@ -69,7 +72,28 @@ class SensorHandler {
     }
     lastseq_ = seq;
   }
- public:
+  bool InitPointsReady()
+  {
+    //conditions for ready
+    if(init_points_.size()>minRequiredInitPoints && (init_points_[0].head(3)-init_points_[init_points_.size()-1].head(3)).norm()>minRequiredInitMovement)
+    {
+      //points are not allowed to be on a straight line:
+      //use QR and check residual to see wether can be approximated by a line or not
+      if(true) //TODO
+      {
+        return true;
+      }
+    }
+    return false;  
+  }
+public:
+  //vars for stable init
+  bool collect_for_init_;
+  bool ready_for_init_;
+  //data sturcture for collecting points for stable init (if runtime is problematic may want to use something better)
+  //each vector saves: x,y,z,t
+  std::vector<Eigen::Vector4d> init_points_;
+  
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
   SensorHandler(MSF_SensorManager<EKFState_T>& mng,
@@ -82,7 +106,8 @@ class SensorHandler {
         parameternamespace_(parameternamespace),
         received_first_measurement_(false),
         n_rejected_(0), n_curr_rejected_(0),
-        n_accepted_(0){
+        n_accepted_(0), collect_for_init_(false),
+        ready_for_init_(false){
   }
   virtual ~SensorHandler() {
   }

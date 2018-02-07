@@ -194,7 +194,11 @@ class PosePressureSensorManager : public msf_core::MSF_SensorManagerROS<
     this->msf_core_->Init(meas);
 
 }
-
+void InitStable()
+  {
+      MSF_WARN_STREAM("Function not implemented yet");
+      return;
+  }
   //look at position pose sensormanager
   void Initsingle(int sensorID) const
   {

@@ -57,6 +57,8 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
+  bool use_stable_initialization_;
+
   shared_ptr<MSF_Core<EKFState_T> > msf_core_;  ///< The ekf core instance.
 
   MSF_SensorManager();
@@ -92,7 +94,12 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
   virtual void Init(double scale) = 0;
 
   /***
-   * Init function in case only one (of multiple sensors should be reinitialized)
+   * stable initialization function
+   * gets called from sensorhandlers and should start actual init once all sensors are ready
+   */
+  virtual void InitStable() = 0;
+  /***
+   * Init function in case only one (of multiple sensors should be REinitialized)
    */
   virtual void Initsingle(int sensorID) const = 0;
 

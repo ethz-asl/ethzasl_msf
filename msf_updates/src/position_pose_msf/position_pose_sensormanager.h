@@ -27,9 +27,9 @@
 #include <msf_updates/pose_sensor_handler/pose_measurement.h>
 #include <msf_updates/position_sensor_handler/position_sensorhandler.h>
 #include <msf_updates/position_sensor_handler/position_measurement.h>
-#include <msf_updates/PositionPoseSensorConfig.h> //look at differences in these config files
-//look very much the same
+#include <msf_updates/PositionPoseSensorConfig.h> 
 
+#include <Eigen/Geometry>
 
 //dont I need these includes (as in pose sensor handler)
 #include "sensor_fusion_comm/InitScale.h"
@@ -64,6 +64,11 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
       ros::NodeHandle pnh = ros::NodeHandle("~/position_pose_sensor")) {
 
     bool distortmeas = false;  ///< Distort the pose measurements
+    pnh.param("use_stable_initialization", use_stable_initialization_, false);
+    if(use_stable_initialization_)
+    {
+        MSF_WARN_STREAM("sensormanager is using stable initialization");
+    }
     //initializing sensorID with 0
     ResetSensorID();
     //now each sensor will have a ID according to its position in vector (which can be used to access)
@@ -190,6 +195,210 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
         MSF_WARN_STREAM("No Measurements recieved at all. This hardly ever makes sense. Aborting Init");
         return;
     }
+    if(use_stable_initialization_)
+    {
+        //tell sensorhandlers to start collecting for stable initialization
+        pose_handler_->collect_for_init_=true;
+        pose_handler_->init_points_.clear();
+        position_handler_->collect_for_init_=true;
+        position_handler_->init_points_.clear();
+        //don't need to do anything else rn: wait until both sensors tell ready
+    }
+    else
+    {
+        //variables from pose
+        Eigen::Matrix<double, 3, 1> p_ic, p_vc_c, p_wv;
+        Eigen::Quaternion<double> q_wv, q_ic, q_cv;
+
+        //variables from position
+        Eigen::Matrix<double, 3, 1> p_ip, p_vc_p;
+
+        //this SHOULD be the same for both since its orientation
+        //if available get it from pose (since position has no orientation per se)
+        //otherwise get it from yawinit (as in position sensor)
+        //for position need to be somewhat smart. probably makes sense to use position sensor since its more "absolute"
+        //than pose sensor (if available)
+        Eigen::Quaternion<double> q;
+        Eigen::Matrix<double, 3, 1> p;
+
+        //variables that have same meaning+value in both
+        Eigen::Matrix<double, 3, 1> v, b_w, b_a, g, w_m, a_m;
+        msf_core::MSF_Core<EKFState_T>::ErrorStateCov P;
+
+        // init values (why are they not taken from some settings file)
+        //this means code needs to be recompiled (and wont speedup either since
+        //not const)
+        //these values are shared for both position and pose
+        g << 0, 0, 9.81;	        /// Gravity.
+        b_w << 0, 0, 0;		/// Bias gyroscopes.
+        b_a << 0, 0, 0;		/// Bias accelerometer.
+
+        v << 0, 0, 0;			/// Robot velocity (IMU centered).
+        w_m << 0, 0, 0;		/// Initial angular velocity.
+
+        P.setZero();  // Error state covariance; if zero, a default initialization in msf_core is used
+
+        //variables only from pose
+        q_wv.setIdentity();  // Vision-world rotation drift.
+        p_wv.setZero();  // Vision-world position drift.
+        //q_wv = Eigen::Quaterniond(-0.1338321, -0.00132899, 0.0028016, 0.99099917).conjugate();
+        //p_wv << 0.82340916, 2.22741483, 0.97403493;
+
+        p_vc_c = pose_handler_->GetPositionMeasurement(); //This is potentially different for both sensors but has same name
+        q_cv = pose_handler_->GetAttitudeMeasurement();
+
+        //variables only from position
+        //probably only need yawinit if we cannot estimate it from pose->will see
+        
+        p_vc_p = position_handler_->GetPositionMeasurement(); //This is potentially different for both sensors but has same name
+        
+
+        // Check if we have already input from the measurement sensor.
+        if (!pose_handler_->ReceivedFirstMeasurement())
+        {
+        MSF_WARN_STREAM(
+            "No measurements received yet to initialize position - using [0 0 0]");
+        MSF_WARN_STREAM(
+            "No measurements received yet to initialize attitude - using [1 0 0 0]");
+        }
+        if (!position_handler_->ReceivedFirstMeasurement())
+        MSF_WARN_STREAM(
+            "No measurements received yet to initialize position - using [0 0 0]");
+        ros::NodeHandle pnh("~");
+        //from pose
+        pnh.param("pose_sensor/init/p_ic/x", p_ic[0], 0.0);
+        pnh.param("pose_sensor/init/p_ic/y", p_ic[1], 0.0);
+        pnh.param("pose_sensor/init/p_ic/z", p_ic[2], 0.0);
+
+        pnh.param("pose_sensor/init/q_ic/w", q_ic.w(), 1.0);
+        pnh.param("pose_sensor/init/q_ic/x", q_ic.x(), 0.0);
+        pnh.param("pose_sensor/init/q_ic/y", q_ic.y(), 0.0);
+        pnh.param("pose_sensor/init/q_ic/z", q_ic.z(), 0.0);
+        q_ic.normalize();
+        //from position
+        pnh.param("position_sensor/init/p_ip/x", p_ip[0], 0.0);
+        pnh.param("position_sensor/init/p_ip/y", p_ip[1], 0.0);
+        pnh.param("position_sensor/init/p_ip/z", p_ip[2], 0.0);
+
+        // Calculate initial attitude and position based on sensor measurements.
+        if (!pose_handler_->ReceivedFirstMeasurement()) {  // If there is no pose measurement, compute q as in position sensormanager
+        double yawinit = config_.position_yaw_init / 180 * M_PI;
+        Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
+        yawq.normalize();
+        q = yawq; 
+        }
+        else if(!position_handler_->ReceivedFirstMeasurement())//if there is no position measurement compute q as in pose sensormanager
+        {
+            q = (q_ic * q_cv.conjugate() * q_wv).conjugate(); //i believe quaternions here are handled as matrices
+            q.normalize();
+        }
+        else {  // If there are both take orientation from position handler (since we want to live in position frame)
+        double yawinit = config_.position_yaw_init / 180 * M_PI;
+        Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
+        yawq.normalize();
+        q = yawq;
+        Eigen::Quaterniond initpose(0.993240709, -0.0092359533, 0.0225063474, 0.1134947378);
+        q = initpose;
+        //compute new transform for pose (rotational part)
+        //Eigen::Quaternion<double> temp = (q_ic * q_cv.conjugate() * q_wv).conjugate();
+        //q_ic = (q.toRotationMatrix().inverse()*temp.toRotationMatrix());
+        //adjust pose transformation (namely p_wv and q_wv which are the world to vision frame parameters)
+        //q_ic = q.conjugate()*q_wv.conjugate()*q_cv; //better but still not correct
+        q_wv = q_cv*q_ic.conjugate()*q.conjugate();
+        q_ic.normalize();
+        q_wv.normalize();
+        }
+
+        MSF_WARN_STREAM("position q:" << STREAMQUAT(q)<<"pose q_cv:"<<STREAMQUAT(q_cv));
+        
+        //need to think carefully about next part: want to have one "6Dof pose" for both sensors togethe
+        //but might potentially be different:
+        //easy case: only one recieved measurement->need to ignore second
+        //otherwise may somehow "average"
+        //also should probably compute transform between the 2 somehow based on that
+        //will somehow have to compute transform between pos and pose (given transformation is only from measurement point
+        //to IMU but coordinate frame is potentially very different)
+        //maybe smartest is to go to position frame? (since this is somewhat absolute)
+        //basically: if there is only one measurement given we simply take this as "worldframe"
+        //(after transformation according to parameters)
+        //if both are given we need to decide one (should prefare position probably)
+        //and correct the transformation of the second one
+        //this will also be important for delayed initialization and so on (initializing only one sensor->how to?)
+
+        //only position measurement recieved. position as in position sensormanager
+        if(!pose_handler_->ReceivedFirstMeasurement())
+        {
+            p = p_vc_p - q.toRotationMatrix() * p_ip;
+        }
+        //only pose measurement recieved. position as in pose sensormanager
+        else if(!position_handler_->ReceivedFirstMeasurement())
+        {
+            p = p_wv + q_wv.conjugate().toRotationMatrix() * p_vc_c / scale
+            - q.toRotationMatrix() * p_ic;
+        }
+        
+        //both measurements recieved...need to do something smart 
+        else
+        {
+            //take position world frame
+            p = p_vc_p - q.toRotationMatrix() * p_ip;
+            //adjust pose transformation (namely p_wv and q_wv which are the world to vision frame parameters)
+            //p_ic=q_ic.toRotationMatrix().inverse()*(p_wv + q_wv.conjugate().toRotationMatrix() * p_vc_c / scale - p);
+            p_wv = p - q_wv.conjugate().toRotationMatrix() * p_vc_c / scale + q.toRotationMatrix() * p_ic;
+        }
+        MSF_WARN_STREAM("position p_vc_p:"<<p_vc_p.transpose()<<" pose p_vc_c:"<<p_vc_c.transpose());
+        //i think there exist 2 configs (one from msfsensormanagerROS and on from position_pose_sensormanager)
+        if(pose_handler_->use_transform_recovery_)
+        {
+        config_.pose_noise_p_wv = pose_handler_->transform_recovery_noise_p_;
+        config_.pose_noise_q_wv = pose_handler_->transform_recovery_noise_q_;
+        pose_handler_->transform_curr_anealing_steps_ = pose_handler_->transform_anealing_steps_;
+        }
+        a_m = q.inverse() * g;			/// Initial acceleration.
+        // Prepare init "measurement"
+        // True means that this message contains initial sensor readings.
+        shared_ptr < msf_core::MSF_InitMeasurement<EKFState_T>
+            > meas(new msf_core::MSF_InitMeasurement<EKFState_T>(true));
+
+        meas->SetStateInitValue < StateDefinition_T::p > (p);
+        meas->SetStateInitValue < StateDefinition_T::v > (v);
+        meas->SetStateInitValue < StateDefinition_T::q > (q);
+        meas->SetStateInitValue < StateDefinition_T::b_w > (b_w);
+        meas->SetStateInitValue < StateDefinition_T::b_a > (b_a);
+        meas->SetStateInitValue < StateDefinition_T::L
+            > (Eigen::Matrix<double, 1, 1>::Constant(scale));
+        meas->SetStateInitValue < StateDefinition_T::q_wv > (q_wv);
+        meas->SetStateInitValue < StateDefinition_T::p_wv > (p_wv);
+        meas->SetStateInitValue < StateDefinition_T::q_ic > (q_ic);
+        meas->SetStateInitValue < StateDefinition_T::p_ic > (p_ic);
+        meas->SetStateInitValue < StateDefinition_T::p_ip > (p_ip);
+
+        SetStateCovariance(meas->GetStateCovariance());  // Call my set P function.
+        meas->Getw_m() = w_m;
+        meas->Geta_m() = a_m;
+        meas->time = ros::Time::now().toSec();
+
+        // Call initialization in core.
+        msf_core_->Init(meas);
+    }
+    
+}
+
+void InitStable()
+{
+    double scale=1.0; //should do something with that
+    //check wether all sensors are ready for init
+    if(!pose_handler_->ready_for_init_ || !position_handler_->ready_for_init_)
+    {
+        //not ready yet
+        MSF_INFO_STREAM("one sensor called initstable but not all sensors ready yet: keep collecting");
+        return;
+    }
+    MSF_INFO_STREAM("initstable called and all sensors ready");
+    position_handler_->ready_for_init_=false;
+    position_handler_->collect_for_init_=false;
+    pose_handler_->ready_for_init_=false;
+    pose_handler_->collect_for_init_=false;
     //variables from pose
     Eigen::Matrix<double, 3, 1> p_ic, p_vc_c, p_wv;
     Eigen::Quaternion<double> q_wv, q_ic, q_cv;
@@ -197,10 +406,6 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
     //variables from position
     Eigen::Matrix<double, 3, 1> p_ip, p_vc_p;
 
-    //this SHOULD be the same for both since its orientation
-    //if available get it from pose (since position has no orientation per se)
-    //otherwise get it from yawinit (as in position sensor)
-    //for position need to be somewhat smart. probably makes sense to use position sensor since its more "absolute"
     //than pose sensor (if available)
     Eigen::Quaternion<double> q;
     Eigen::Matrix<double, 3, 1> p;
@@ -223,31 +428,19 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
     P.setZero();  // Error state covariance; if zero, a default initialization in msf_core is used
 
     //variables only from pose
+    //set those as transform from vision world to gps world (estimated from points)
     q_wv.setIdentity();  // Vision-world rotation drift.
     p_wv.setZero();  // Vision-world position drift.
-    //q_wv = Eigen::Quaterniond(-0.1338321, -0.00132899, 0.0028016, 0.99099917).conjugate();
-    //p_wv << 0.82340916, 2.22741483, 0.97403493;
 
-    p_vc_c = pose_handler_->GetPositionMeasurement(); //This is potentially different for both sensors but has same name
+    p_vc_c = pose_handler_->GetPositionMeasurement(); 
     q_cv = pose_handler_->GetAttitudeMeasurement();
 
     //variables only from position
     //probably only need yawinit if we cannot estimate it from pose->will see
     
-    p_vc_p = position_handler_->GetPositionMeasurement(); //This is potentially different for both sensors but has same name
+    p_vc_p = position_handler_->GetPositionMeasurement(); 
     
 
-    // Check if we have already input from the measurement sensor.
-    if (!pose_handler_->ReceivedFirstMeasurement())
-    {
-    MSF_WARN_STREAM(
-        "No measurements received yet to initialize position - using [0 0 0]");
-    MSF_WARN_STREAM(
-        "No measurements received yet to initialize attitude - using [1 0 0 0]");
-    }
-    if (!position_handler_->ReceivedFirstMeasurement())
-      MSF_WARN_STREAM(
-          "No measurements received yet to initialize position - using [0 0 0]");
     ros::NodeHandle pnh("~");
     //from pose
     pnh.param("pose_sensor/init/p_ic/x", p_ic[0], 0.0);
@@ -264,79 +457,152 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
     pnh.param("position_sensor/init/p_ip/y", p_ip[1], 0.0);
     pnh.param("position_sensor/init/p_ip/z", p_ip[2], 0.0);
 
-    // Calculate initial attitude and position based on sensor measurements.
-    if (!pose_handler_->ReceivedFirstMeasurement()) {  // If there is no pose measurement, compute q as in position sensormanager
-      double yawinit = config_.position_yaw_init / 180 * M_PI;
-      Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
-      yawq.normalize();
-      q = yawq; 
-    }
-    else if(!position_handler_->ReceivedFirstMeasurement())//if there is no position measurement compute q as in pose sensormanager
-    {
-        q = (q_ic * q_cv.conjugate() * q_wv).conjugate(); //i believe quaternions here are handled as matrices
-        q.normalize();
-    }
-    else {  // If there are both take orientation from position handler (since we want to live in position frame)
-      double yawinit = config_.position_yaw_init / 180 * M_PI;
-      Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
-      yawq.normalize();
-      //q = yawq;
-      Eigen::Quaterniond initpose(0.993240709, -0.0092359533, 0.0225063474, 0.1134947378);
-      q = initpose;
-      //compute new transform for pose (rotational part)
-      //Eigen::Quaternion<double> temp = (q_ic * q_cv.conjugate() * q_wv).conjugate();
-      //q_ic = (q.toRotationMatrix().inverse()*temp.toRotationMatrix());
-      //adjust pose transformation (namely p_wv and q_wv which are the world to vision frame parameters)
-      //q_ic = q.conjugate()*q_wv.conjugate()*q_cv; //better but still not correct
-      q_wv = q_cv*q_ic.conjugate()*q.conjugate();
-      q_ic.normalize();
-      q_wv.normalize();
-    }
-
-    MSF_WARN_STREAM("position q:" << STREAMQUAT(q)<<"pose q_cv:"<<STREAMQUAT(q_cv));
+    //can only occur if both (or all in general) sensors have recieved measurement
+    double yawinit = config_.position_yaw_init / 180 * M_PI;
+    Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
+    yawq.normalize();
+    q = yawq;
+    MSF_INFO_STREAM("checkpoint 1");
+    //the difference we allow (between measurements)
+    const double epsilon = 1e-3;
+    //both will be resized once we know how many entries to expect
+    Eigen::MatrixXd positionframe(1,1);
+    Eigen::MatrixXd poseframe(1,1);
     
-    //need to think carefully about next part: want to have one "6Dof pose" for both sensors togethe
-    //but might potentially be different:
-    //easy case: only one recieved measurement->need to ignore second
-    //otherwise may somehow "average"
-    //also should probably compute transform between the 2 somehow based on that
-    //will somehow have to compute transform between pos and pose (given transformation is only from measurement point
-    //to IMU but coordinate frame is potentially very different)
-    //maybe smartest is to go to position frame? (since this is somewhat absolute)
-    //basically: if there is only one measurement given we simply take this as "worldframe"
-    //(after transformation according to parameters)
-    //if both are given we need to decide one (should prefare position probably)
-    //and correct the transformation of the second one
-    //this will also be important for delayed initialization and so on (initializing only one sensor->how to?)
-
-    //only position measurement recieved. position as in position sensormanager
-    if(!pose_handler_->ReceivedFirstMeasurement())
+    //find first measurement that is ~at same time
+    //iterators would be nicer but need to walk backward aswell
+    //auto posit = position_handler_->init_points_.begin();
+    //auto poseit = pose_handler_->init_points_.begin();
+    int positioncurr=0;
+    int posecurr=0;
+    int positionfinal=position_handler_->init_points_.size()-1;
+    int posefinal=pose_handler_->init_points_.size()-1;
+    if(position_handler_->init_points_[positioncurr](3)>pose_handler_->init_points_[posecurr](3))
     {
-        p = p_vc_p - q.toRotationMatrix() * p_ip;
+        while(position_handler_->init_points_[positioncurr](3)>pose_handler_->init_points_[posecurr](3)+epsilon)
+        {
+            posecurr++;
+        }
     }
-    //only pose measurement recieved. position as in pose sensormanager
-    else if(!position_handler_->ReceivedFirstMeasurement())
-    {
-        p = p_wv + q_wv.conjugate().toRotationMatrix() * p_vc_c / scale
-        - q.toRotationMatrix() * p_ic;
-    }
-    
-    //both measurements recieved...need to do something smart 
     else
     {
-        //take position world frame
-        p = p_vc_p - q.toRotationMatrix() * p_ip;
-        //adjust pose transformation (namely p_wv and q_wv which are the world to vision frame parameters)
-        //p_ic=q_ic.toRotationMatrix().inverse()*(p_wv + q_wv.conjugate().toRotationMatrix() * p_vc_c / scale - p);
-        p_wv = p - q_wv.conjugate().toRotationMatrix() * p_vc_c / scale + q.toRotationMatrix() * p_ic;
+        while(pose_handler_->init_points_[posecurr](3)>position_handler_->init_points_[positioncurr](3)+epsilon)
+        {
+            positioncurr++;
+        }
     }
-    MSF_WARN_STREAM("position p_vc_p:"<<p_vc_p.transpose()<<" pose p_vc_c:"<<p_vc_c.transpose());
-    //i think there exist 2 configs (one from msfsensormanagerROS and on from position_pose_sensormanager)
+    //do same for end
+    if(position_handler_->init_points_[positionfinal](3)>pose_handler_->init_points_[posefinal](3))
+    {
+        while(position_handler_->init_points_[positionfinal](3)>pose_handler_->init_points_[posefinal](3)+epsilon)
+        {
+            positionfinal--;
+        }
+    }
+    else
+    {
+        while(pose_handler_->init_points_[posefinal](3)>position_handler_->init_points_[positionfinal](3)+epsilon)
+        {
+            posefinal--;
+        }
+    }
+    MSF_INFO_STREAM("checkpoint 2"); //between checkpoint 2 and 3 there is a problem with memory allocation (somehow figure out what)
+    //now both iterators should be at measurement with approx same time
+    //check which vector is shorter (this determines next meas)
+    //do not locally transform pose (since we dont know complete rotation)
+    //can reverse engineer it later
+    if((positionfinal-positioncurr)>(posefinal-posecurr))
+    {
+        //compute number of entries: (not sure this works like that)
+        const int nentries = posefinal-posecurr-2; //-2 since we want to ignore the last entry (could potentially have to big time diff) and we average 2
+        MSF_INFO_STREAM("nentries:"<<nentries<<" off:"<<pose_handler_->init_points_.size());
+        positionframe.resize(3,nentries);
+        poseframe.resize(3,nentries);
+        for(int i=0;i<nentries;++i)
+        {
+            if(posecurr+1>=posefinal)
+            {
+                MSF_WARN_STREAM("pose iterator overshooting...this should not be possible");
+            }
+            MSF_WARN_STREAM("iteration:"<<i);
+            Eigen::Vector3d temppose = (pose_handler_->init_points_[posecurr].head(3)+pose_handler_->init_points_[++posecurr].head(3))/2.0;
+            int ntemp=1;
+            Eigen::Vector3d temppos = position_handler_->init_points_[positioncurr].head(3)-q.toRotationMatrix()*p_ip; //transform as given by params (gps to imu)
+            positioncurr++;
+            while(position_handler_->init_points_[positioncurr](3)+epsilon<pose_handler_->init_points_[posecurr](3))
+            {
+                temppos+=position_handler_->init_points_[positioncurr].head(3)-q.toRotationMatrix()*p_ip;
+                ntemp++;
+                positioncurr++;
+                if(positioncurr>=positionfinal)
+                {
+                    MSF_WARN_STREAM("position iterator overshooting...this is strange but not impossible");
+                }
+            }
+            poseframe.col(i)=temppose;
+            positionframe.col(i)=temppos/ntemp;
+        }
+    }
+    //do not locally transform pose (since we dont know complete rotation)
+    //can reverse engineer it later
+    else
+    {
+        //compute number of entries: (not sure this works like that)
+        const int nentries = positionfinal-positioncurr-2;
+        positionframe.resize(3,nentries);
+        poseframe.resize(3,nentries);
+        for(int i=0;i<nentries;++i)
+        {
+            Eigen::Vector3d temppos = (position_handler_->init_points_[positioncurr].head(3)-q.toRotationMatrix()*p_ip+position_handler_->init_points_[++positioncurr].head(3)-q.toRotationMatrix()*p_ip)/2.0; //transform as given by params (gps to imu)
+            int ntemp=1;
+            Eigen::Vector3d temppose = pose_handler_->init_points_[posecurr].head(3);
+            posecurr++;
+            while(pose_handler_->init_points_[posecurr](3)+epsilon<position_handler_->init_points_[positioncurr](3))
+            {
+                temppose+=pose_handler_->init_points_[posecurr].head(3);
+                ntemp++;
+                posecurr++;
+            }
+            poseframe.col(i)=temppose/ntemp;
+            positionframe.col(i)=temppos;
+        }
+    }
+    MSF_INFO_STREAM("checkpoint 3");
+    //call eigen umeyama
+    Eigen::MatrixXd homogeneous_transform = Eigen::umeyama(poseframe, positionframe, false); //not 100% about from to
+    //postprocess transforms and do actual init using transformed estimate from pose (since its expected to have less noise)
+    Eigen::Matrix3d R_temp = homogeneous_transform.topLeftCorner(3,3);
+    Eigen::Quaterniond q_pose(R_temp);
+    Eigen::Vector3d p_pose = homogeneous_transform.topRightCorner(3,1);
+    MSF_INFO_STREAM("Q_umeyama:"<<STREAMQUAT(q_pose)<<"T_umeyama"<<p_pose);
+    //normalize just to make sure
+    q_pose.normalize();
+
+    Eigen::Quaternion<double> q_imu = (q_ic * q_cv.conjugate()).conjugate(); //this should be drone orientation in its own frame
+    q = q_pose * q_imu; //this should then bes (pseudo) orientation in gps frame such that acceleration in x (imu) gives movement in x (gps) this looks correct
+    q.normalize();
+    MSF_INFO_STREAM("orientation in gps frame:"<<STREAMQUAT(q));
+    q_wv = q_cv*q_ic.conjugate()*q.conjugate(); //so this should be how to extract q_wv (not sure) this does not
+    MSF_INFO_STREAM("transformed rovio orientation:"<<STREAMQUAT((q_ic * q_cv.conjugate() * q_wv).conjugate()));
+    //normalize just to make sure
+    q_ic.normalize();
+    q_wv.normalize();
+
+    //this should be position in drone frame (not exactly sure about plus or minus)
+    //p = p_vc_c + q_pose * p_pose;
+    p = p_vc_c + p_pose; //i think this one looks correct
+    MSF_INFO_STREAM("Positoin in gps frame:"<<p);
+
+    //from this we can compute p_wv (not sure about this one)
+    p_wv = p - q_wv.conjugate().toRotationMatrix() * p_vc_c / scale + q.toRotationMatrix() * p_ic;
+    MSF_INFO_STREAM("transformed rovio position:"<<p_wv + q_wv.conjugate().toRotationMatrix() * p_vc_c / scale
+            - q.toRotationMatrix() * p_ic);
+
     if(pose_handler_->use_transform_recovery_)
     {
-      config_.pose_noise_p_wv = pose_handler_->transform_recovery_noise_p_;
-      config_.pose_noise_q_wv = pose_handler_->transform_recovery_noise_q_;
-      pose_handler_->transform_curr_anealing_steps_ = pose_handler_->transform_anealing_steps_;
+    config_.pose_noise_p_wv = pose_handler_->transform_recovery_noise_p_;
+    config_.pose_noise_q_wv = pose_handler_->transform_recovery_noise_q_;
+    pose_handler_->transform_curr_anealing_steps_ = pose_handler_->transform_anealing_steps_;
     }
     a_m = q.inverse() * g;			/// Initial acceleration.
     // Prepare init "measurement"
@@ -364,7 +630,6 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
 
     // Call initialization in core.
     msf_core_->Init(meas);
-    
 }
 
   //distinguish between sensors and reinit this sensor only
@@ -482,8 +747,8 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
         const Eigen::Quaternion<double> q_ic = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::q_ic>();
 
         //since we are only reinitializing one sensor take last state as "truth" and recompute this transform
-        const Eigen::Quaternion<double> q = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::q>();;
-        const Eigen::Matrix<double, 3, 1> p = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::p>();;
+        const Eigen::Quaternion<double> q = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::q>();
+        const Eigen::Matrix<double, 3, 1> p = const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::p>();
 
         //variables that have same meaning+value in both
         Eigen::Matrix<double, 3, 1> g, w_m, a_m;

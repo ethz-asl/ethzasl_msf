@@ -8,6 +8,9 @@ core/core_noise_accbias: 0.00005
 core/core_noise_gyr: 0.0013
 core/core_noise_gyrbias: 0.0000013
 
+#stablility param for sensormanager
+position_pose_sensor/use_stable_initialization: true
+
 #these params are defined in PositionPoseSensor.cfg and therefore have prefix position_pose_sensor
 position_pose_sensor/pose_fixed_scale: true
 position_pose_sensor/pose_fixed_p_ic: true
@@ -23,10 +26,10 @@ position_pose_sensor/pose_noise_p_ic: 0.0
 position_pose_sensor/pose_noise_q_ic: 0.0
 #position_pose_sensor/pose_delay: -0.0358408930047
 position_pose_sensor/pose_delay: -0.1258408930047
-#position_pose_sensor/pose_noise_meas_p: 0.02
-position_pose_sensor/pose_noise_meas_p: 0.002
-#position_pose_sensor/pose_noise_meas_q: 0.05
-position_pose_sensor/pose_noise_meas_q: 0.005
+position_pose_sensor/pose_noise_meas_p: 0.02
+#position_pose_sensor/pose_noise_meas_p: 0.002
+position_pose_sensor/pose_noise_meas_q: 0.05
+#position_pose_sensor/pose_noise_meas_q: 0.005
 
 position_pose_sensor/position_noise_meas: 0.1
 #position_pose_sensor/position_noise_meas: 1.0
@@ -34,6 +37,9 @@ position_pose_sensor/position_noise_meas: 0.1
 position_pose_sensor/position_delay: -0.01
 position_pose_sensor/position_noise_p_ip: 0.01
 position_pose_sensor/position_fixed_p_ip: false
+
+#position_pose_sensor/position_yaw_init: 10
+position_pose_sensor/position_yaw_init: 13
 
 
 #these params are read in pose_sensorhandler.hpp and therefore have prefix pose_sensor
