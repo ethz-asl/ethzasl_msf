@@ -234,7 +234,7 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
           }
       }  
         
-      return;
+      //return;
   }
   // Get all the fixed states and set flag bits.
   MANAGER_TYPE* mngr = dynamic_cast<MANAGER_TYPE*>(&manager_);

@@ -297,8 +297,18 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
         Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
         yawq.normalize();
         q = yawq;
-        Eigen::Quaterniond initpose(0.993240709, -0.0092359533, 0.0225063474, 0.1134947378);
+        Eigen::Quaterniond initpose(0.993240709, -0.0092359533, 0.0225063474, 0.1134947378); //at 0 secs V1_easy
+        //Eigen::Quaterniond initpose(-0.4059299835, -0.0317710142, 0.0307095237, 0.9128353501); //at 20 secs V1_easy (for testing someting)
+
         q = initpose;
+        Eigen::Quaterniond q_transform(0.877, -0.0188, 0.014, 0.479);
+        //0.886, 0.0281, -0.0221, -0.463
+        /*MSF_INFO_STREAM("q_transform*q_cv="<<STREAMQUAT((q_transform*q_cv).normalized()));
+        MSF_INFO_STREAM("q_transform.conj*q_cv="<<STREAMQUAT((q_transform.conjugate()*q_cv).normalized()));
+        MSF_INFO_STREAM("q_cv*q_transform="<<STREAMQUAT((q_cv*q_transform).normalized()));
+        MSF_INFO_STREAM("q_cv*q_transform.conj="<<STREAMQUAT((q_cv*q_transform.conjugate()).normalized()));
+        MSF_INFO_STREAM("their approach"<<STREAMQUAT(((q_cv.conjugate()*q_transform).conjugate()).normalized()));
+        MSF_INFO_STREAM("correct"<<STREAMQUAT(q.normalized()));*/
         //compute new transform for pose (rotational part)
         //Eigen::Quaternion<double> temp = (q_ic * q_cv.conjugate() * q_wv).conjugate();
         //q_ic = (q.toRotationMatrix().inverse()*temp.toRotationMatrix());
@@ -399,69 +409,13 @@ void InitStable()
     position_handler_->collect_for_init_=false;
     pose_handler_->ready_for_init_=false;
     pose_handler_->collect_for_init_=false;
-    //variables from pose
-    Eigen::Matrix<double, 3, 1> p_ic, p_vc_c, p_wv;
-    Eigen::Quaternion<double> q_wv, q_ic, q_cv;
-
-    //variables from position
-    Eigen::Matrix<double, 3, 1> p_ip, p_vc_p;
-
-    //than pose sensor (if available)
-    Eigen::Quaternion<double> q;
-    Eigen::Matrix<double, 3, 1> p;
-
-    //variables that have same meaning+value in both
-    Eigen::Matrix<double, 3, 1> v, b_w, b_a, g, w_m, a_m;
-    msf_core::MSF_Core<EKFState_T>::ErrorStateCov P;
-
-    // init values (why are they not taken from some settings file)
-    //this means code needs to be recompiled (and wont speedup either since
-    //not const)
-    //these values are shared for both position and pose
-    g << 0, 0, 9.81;	        /// Gravity.
-    b_w << 0, 0, 0;		/// Bias gyroscopes.
-    b_a << 0, 0, 0;		/// Bias accelerometer.
-
-    v << 0, 0, 0;			/// Robot velocity (IMU centered).
-    w_m << 0, 0, 0;		/// Initial angular velocity.
-
-    P.setZero();  // Error state covariance; if zero, a default initialization in msf_core is used
-
-    //variables only from pose
-    //set those as transform from vision world to gps world (estimated from points)
-    q_wv.setIdentity();  // Vision-world rotation drift.
-    p_wv.setZero();  // Vision-world position drift.
-
-    p_vc_c = pose_handler_->GetPositionMeasurement(); 
-    q_cv = pose_handler_->GetAttitudeMeasurement();
-
-    //variables only from position
-    //probably only need yawinit if we cannot estimate it from pose->will see
     
-    p_vc_p = position_handler_->GetPositionMeasurement(); 
-    
-
-    ros::NodeHandle pnh("~");
-    //from pose
-    pnh.param("pose_sensor/init/p_ic/x", p_ic[0], 0.0);
-    pnh.param("pose_sensor/init/p_ic/y", p_ic[1], 0.0);
-    pnh.param("pose_sensor/init/p_ic/z", p_ic[2], 0.0);
-
-    pnh.param("pose_sensor/init/q_ic/w", q_ic.w(), 1.0);
-    pnh.param("pose_sensor/init/q_ic/x", q_ic.x(), 0.0);
-    pnh.param("pose_sensor/init/q_ic/y", q_ic.y(), 0.0);
-    pnh.param("pose_sensor/init/q_ic/z", q_ic.z(), 0.0);
-    q_ic.normalize();
-    //from position
-    pnh.param("position_sensor/init/p_ip/x", p_ip[0], 0.0);
-    pnh.param("position_sensor/init/p_ip/y", p_ip[1], 0.0);
-    pnh.param("position_sensor/init/p_ip/z", p_ip[2], 0.0);
 
     //can only occur if both (or all in general) sensors have recieved measurement
-    double yawinit = config_.position_yaw_init / 180 * M_PI;
+    /*double yawinit = config_.position_yaw_init / 180 * M_PI;
     Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
     yawq.normalize();
-    q = yawq;
+    q = yawq;*/
     MSF_INFO_STREAM("checkpoint 1");
     //the difference we allow (between measurements)
     const double epsilon = 1e-3;
@@ -527,11 +481,11 @@ void InitStable()
             MSF_WARN_STREAM("iteration:"<<i);
             Eigen::Vector3d temppose = (pose_handler_->init_points_[posecurr].head(3)+pose_handler_->init_points_[++posecurr].head(3))/2.0;
             int ntemp=1;
-            Eigen::Vector3d temppos = position_handler_->init_points_[positioncurr].head(3)-q.toRotationMatrix()*p_ip; //transform as given by params (gps to imu)
+            Eigen::Vector3d temppos = position_handler_->init_points_[positioncurr].head(3); //dont transform since we dont know orientation
             positioncurr++;
             while(position_handler_->init_points_[positioncurr](3)+epsilon<pose_handler_->init_points_[posecurr](3))
             {
-                temppos+=position_handler_->init_points_[positioncurr].head(3)-q.toRotationMatrix()*p_ip;
+                temppos+=position_handler_->init_points_[positioncurr].head(3);
                 ntemp++;
                 positioncurr++;
                 if(positioncurr>=positionfinal)
@@ -553,7 +507,7 @@ void InitStable()
         poseframe.resize(3,nentries);
         for(int i=0;i<nentries;++i)
         {
-            Eigen::Vector3d temppos = (position_handler_->init_points_[positioncurr].head(3)-q.toRotationMatrix()*p_ip+position_handler_->init_points_[++positioncurr].head(3)-q.toRotationMatrix()*p_ip)/2.0; //transform as given by params (gps to imu)
+            Eigen::Vector3d temppos = (position_handler_->init_points_[positioncurr].head(3)+position_handler_->init_points_[++positioncurr].head(3))/2.0; //dont transform since we dont know orientation
             int ntemp=1;
             Eigen::Vector3d temppose = pose_handler_->init_points_[posecurr].head(3);
             posecurr++;
@@ -568,8 +522,8 @@ void InitStable()
         }
     }
     MSF_INFO_STREAM("checkpoint 3");
-    //call eigen umeyama
-    Eigen::MatrixXd homogeneous_transform = Eigen::umeyama(poseframe, positionframe, false); //not 100% about from to
+    //call eigen umeyama (gives transform from ROVIO frame to GPS frame)
+    Eigen::MatrixXd homogeneous_transform = Eigen::umeyama(poseframe, positionframe, false); //not 100% about from to (think its correct)
     //postprocess transforms and do actual init using transformed estimate from pose (since its expected to have less noise)
     Eigen::Matrix3d R_temp = homogeneous_transform.topLeftCorner(3,3);
     Eigen::Quaterniond q_pose(R_temp);
@@ -578,20 +532,101 @@ void InitStable()
     //normalize just to make sure
     q_pose.normalize();
 
-    Eigen::Quaternion<double> q_imu = (q_ic * q_cv.conjugate()).conjugate(); //this should be drone orientation in its own frame
-    q = q_pose * q_imu; //this should then bes (pseudo) orientation in gps frame such that acceleration in x (imu) gives movement in x (gps) this looks correct
-    q.normalize();
-    MSF_INFO_STREAM("orientation in gps frame:"<<STREAMQUAT(q));
-    q_wv = q_cv*q_ic.conjugate()*q.conjugate(); //so this should be how to extract q_wv (not sure) this does not
-    MSF_INFO_STREAM("transformed rovio orientation:"<<STREAMQUAT((q_ic * q_cv.conjugate() * q_wv).conjugate()));
-    //normalize just to make sure
+
+    //variables from pose
+    Eigen::Matrix<double, 3, 1> p_ic, p_vc_c, p_wv;
+    Eigen::Quaternion<double> q_wv, q_ic, q_cv;
+
+    //variables from position
+    Eigen::Matrix<double, 3, 1> p_ip, p_vc_p;
+
+    //than pose sensor (if available)
+    Eigen::Quaternion<double> q;
+    Eigen::Matrix<double, 3, 1> p;
+
+    //variables that have same meaning+value in both
+    Eigen::Matrix<double, 3, 1> v, b_w, b_a, g, w_m, a_m;
+    msf_core::MSF_Core<EKFState_T>::ErrorStateCov P;
+
+    // init values (why are they not taken from some settings file)
+    //this means code needs to be recompiled (and wont speedup either since
+    //not const)
+    //these values are shared for both position and pose
+    g << 0, 0, 9.81;	        /// Gravity.
+    b_w << 0, 0, 0;		/// Bias gyroscopes.
+    b_a << 0, 0, 0;		/// Bias accelerometer.
+
+    v << 0, 0, 0;			/// Robot velocity (IMU centered). why zero? :thinking: if this is large in reality will cause relativly large error?
+    //we could estimate it based on last few rovio data i think
+    w_m << 0, 0, 0;		/// Initial angular velocity.
+
+    P.setZero();  // Error state covariance; if zero, a default initialization in msf_core is used
+
+    //variables only from pose
+    //set those as transform from vision world to gps world (estimated from points)
+    q_wv.setIdentity();  // Vision-world rotation drift.
+    p_wv.setZero();  // Vision-world position drift.
+
+    p_vc_c = pose_handler_->GetPositionMeasurement(); 
+    q_cv = pose_handler_->GetAttitudeMeasurement();
+
+    //variables only from position
+    //probably only need yawinit if we cannot estimate it from pose->will see
+    
+    p_vc_p = position_handler_->GetPositionMeasurement(); 
+    
+
+    ros::NodeHandle pnh("~");
+    //from pose
+    pnh.param("pose_sensor/init/p_ic/x", p_ic[0], 0.0);
+    pnh.param("pose_sensor/init/p_ic/y", p_ic[1], 0.0);
+    pnh.param("pose_sensor/init/p_ic/z", p_ic[2], 0.0);
+
+    pnh.param("pose_sensor/init/q_ic/w", q_ic.w(), 1.0);
+    pnh.param("pose_sensor/init/q_ic/x", q_ic.x(), 0.0);
+    pnh.param("pose_sensor/init/q_ic/y", q_ic.y(), 0.0);
+    pnh.param("pose_sensor/init/q_ic/z", q_ic.z(), 0.0);
     q_ic.normalize();
+    //from position
+    pnh.param("position_sensor/init/p_ip/x", p_ip[0], 0.0);
+    pnh.param("position_sensor/init/p_ip/y", p_ip[1], 0.0);
+    pnh.param("position_sensor/init/p_ip/z", p_ip[2], 0.0);
+
+
+    Eigen::Quaternion<double> q_imu = (q_ic * q_cv.conjugate()).conjugate(); //this should be drone orientation in its own frame
+    //this should be the same as q_cv*q_ic.conjugate()
+    //q = q_pose * q_imu; //this should then bes (pseudo) orientation in gps frame such that acceleration in x (imu) gives movement in x (gps) this looks correct
+    //try this (probably too simple)
+    //q = q_pose.conjugate()*q_cv;
+    //MISTAKE HERE
+    //q = (q_pose*q_cv.conjugate()).conjugate();
+    //q_wv=q_pose; //this looks best until now but i dont think its quite it...besides it still behaves strange when reseting to pose (for whatever reason)
+    //q_wv.w()=1.0;
+    //q_wv.x()=0.0;
+    //q_wv.y()=0.0;
+    //q_wv.z()=0.0;
+    //this looks good (some problem with reseting though (after diverging somehow strange...))
+    //maybe correct q_wv includes q_ic (forgot about that)
+    q_wv=q_pose.conjugate();
     q_wv.normalize();
+    q = (q_ic * q_cv.conjugate() * q_wv).conjugate();
+    q.normalize();
+
+    MSF_INFO_STREAM("orientation in gps frame:"<<STREAMQUAT(q));
+    Eigen::Quaterniond initpose(-0.4059299835, -0.0317710142, 0.0307095237, 0.9128353501);
+    MSF_INFO_STREAM("correct orientation in gps frame:"<<STREAMQUAT(initpose));
+    //q_wv = q_cv*q_ic.conjugate()*q.conjugate(); //so this should be how to extract q_wv (not sure) this does not
+    MSF_INFO_STREAM("transformed rovio orientation:"<<STREAMQUAT((q_ic * q_cv.conjugate() * q_wv).conjugate()));
+
+    //q_wv.normalize();
 
     //this should be position in drone frame (not exactly sure about plus or minus)
     //p = p_vc_c + q_pose * p_pose;
-    p = p_vc_c + p_pose; //i think this one looks correct
+    //maybe rotate?
+    p = q_pose*p_vc_c + p_pose-q*p_ip;
     MSF_INFO_STREAM("Positoin in gps frame:"<<p);
+    MSF_INFO_STREAM("True position (in gps frame):"<<p_vc_p);
+    MSF_INFO_STREAM("latest saved point:"<<position_handler_->init_points_[position_handler_->init_points_.size()-5]);
 
     //from this we can compute p_wv (not sure about this one)
     p_wv = p - q_wv.conjugate().toRotationMatrix() * p_vc_c / scale + q.toRotationMatrix() * p_ic;
@@ -604,7 +639,7 @@ void InitStable()
     config_.pose_noise_q_wv = pose_handler_->transform_recovery_noise_q_;
     pose_handler_->transform_curr_anealing_steps_ = pose_handler_->transform_anealing_steps_;
     }
-    a_m = q.inverse() * g;			/// Initial acceleration.
+    a_m = q.inverse() * g;			/// Initial acceleration. (i think this is garbage)
     // Prepare init "measurement"
     // True means that this message contains initial sensor readings.
     shared_ptr < msf_core::MSF_InitMeasurement<EKFState_T>

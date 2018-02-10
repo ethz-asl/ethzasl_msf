@@ -165,7 +165,7 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPositionMeasu
               ready_for_init_=false;
           }
       }  
-      return;
+      //return;
   }
   
   // Get all the fixed states and set flag bits.
