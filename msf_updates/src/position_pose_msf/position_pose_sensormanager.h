@@ -301,7 +301,7 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
         //Eigen::Quaterniond initpose(-0.4059299835, -0.0317710142, 0.0307095237, 0.9128353501); //at 20 secs V1_easy (for testing someting)
 
         q = initpose;
-        Eigen::Quaterniond q_transform(0.877, -0.0188, 0.014, 0.479);
+        //Eigen::Quaterniond q_transform(0.877, -0.0188, 0.014, 0.479);
         //0.886, 0.0281, -0.0221, -0.463
         /*MSF_INFO_STREAM("q_transform*q_cv="<<STREAMQUAT((q_transform*q_cv).normalized()));
         MSF_INFO_STREAM("q_transform.conj*q_cv="<<STREAMQUAT((q_transform.conjugate()*q_cv).normalized()));

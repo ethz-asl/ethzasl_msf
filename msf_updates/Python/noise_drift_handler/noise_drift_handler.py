@@ -194,7 +194,7 @@ class MsfNoiseHandler:
         eventout.vector.y = 0
         eventout.vector.z = 0
         self.events_pub_.publish(eventout)
-        print("digerging gps")
+        print("diverging gps")
       stddeviation=self.transform_stddeviation_
       use_noise=self.transform_use_noise_
       mu=self.transform_mu_

@@ -38,8 +38,8 @@ position_pose_sensor/position_delay: -0.01
 position_pose_sensor/position_noise_p_ip: 0.01
 position_pose_sensor/position_fixed_p_ip: false
 
-#position_pose_sensor/position_yaw_init: 10
-position_pose_sensor/position_yaw_init: 13
+position_pose_sensor/position_yaw_init: 10
+#position_pose_sensor/position_yaw_init: 0
 
 
 #these params are read in pose_sensorhandler.hpp and therefore have prefix pose_sensor
@@ -79,7 +79,8 @@ pose_sensor/divergence_rejection_limit: 30
 pose_sensor/use_reset_to_pose: true
 #pose_sensor/use_transform_recovery: false
 pose_sensor/use_transform_recovery: true
-pose_sensor/transform_recovery_noise_p: 0.005
+#choose same as initial noise estimate
+pose_sensor/transform_recovery_noise_p: 0.002
 pose_sensor/transform_recovery_noise_q: 0.025
 pose_sensor/transform_anealing_steps: 200
 
