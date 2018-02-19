@@ -360,9 +360,9 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
         //i think there exist 2 configs (one from msfsensormanagerROS and on from position_pose_sensormanager)
         if(pose_handler_->use_transform_recovery_)
         {
-        config_.pose_noise_p_wv = pose_handler_->transform_recovery_noise_p_;
-        config_.pose_noise_q_wv = pose_handler_->transform_recovery_noise_q_;
-        pose_handler_->transform_curr_anealing_steps_ = pose_handler_->transform_anealing_steps_;
+        config_.pose_noise_p_wv = std::min(config_.pose_noise_meas_p/2.0, pose_handler_->transform_recovery_noise_p_);
+        config_.pose_noise_q_wv = std::min(config_.pose_noise_meas_q/2.0, pose_handler_->transform_recovery_noise_q_);
+        pose_handler_->transform_curr_anealing_steps_ = pose_handler_->transform_anealing_steps_-2;
         }
         a_m = q.inverse() * g;			/// Initial acceleration.
         // Prepare init "measurement"

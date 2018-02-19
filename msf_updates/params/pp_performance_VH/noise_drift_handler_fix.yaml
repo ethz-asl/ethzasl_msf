@@ -12,7 +12,7 @@
 /noise_drift_handler/transform_use_noise: true
 /noise_drift_handler/transform_probability_outlier: 0.00
 /noise_drift_handler/transform_group_size: 1
-/noise_drift_handler/transform_create_outlier: create
+/noise_drift_handler/transform_create_outlier: true
 /noise_drift_handler/transform_diverge_fixed_time: true
 #/noise_drift_handler/transform_diverge_frame: 3000
 /noise_drift_handler/transform_diverge_frame: 8000

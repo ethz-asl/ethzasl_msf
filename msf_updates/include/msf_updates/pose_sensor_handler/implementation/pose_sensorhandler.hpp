@@ -412,9 +412,9 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
       //received_first_measurement_=false;
       if(use_transform_recovery_)
       {
-          //not sure if this works (depends on how pose_noise_p_wv is accessed: need to test)
-          mngr->config_.pose_noise_p_wv = transform_recovery_noise_p_;
-          mngr->config_.pose_noise_q_wv = transform_recovery_noise_q_;
+          //not sure if this works (depends on how pose_noise_p_wv is accessed: need to test, i think its fine)
+          mngr->config_.pose_noise_p_wv = std::min(mngr->config_.pose_noise_meas_p/2.0, transform_recovery_noise_p_);
+          mngr->config_.pose_noise_q_wv = std::min(mngr->config_.pose_noise_meas_q/2.0,transform_recovery_noise_q_);
           //mngr->Getcfg().pose_noise_p_wv = transform_recovery_noise_p_;
           //mngr->Getcfg().pose_noise_q_wv = transform_recovery_noise_q_;
           transform_curr_anealing_steps_ = transform_anealing_steps_-2;

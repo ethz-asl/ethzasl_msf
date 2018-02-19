@@ -35,8 +35,8 @@ position_pose_sensor/position_noise_meas: 0.1
 #position_pose_sensor/position_noise_meas: 1.0
 
 position_pose_sensor/position_delay: -0.01
-position_pose_sensor/position_noise_p_ip: 0.01
-position_pose_sensor/position_fixed_p_ip: false
+position_pose_sensor/position_noise_p_ip: 0.00
+position_pose_sensor/position_fixed_p_ip: true
 
 position_pose_sensor/position_yaw_init: 10
 #position_pose_sensor/position_yaw_init: 0
