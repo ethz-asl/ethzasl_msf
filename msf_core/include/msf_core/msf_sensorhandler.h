@@ -26,7 +26,7 @@ namespace msf_core {
   static constexpr double desiredNoiseLevel_ = 0.3;
   static constexpr int rovioResetSaveTime = 3;
   static constexpr int minRequiredInitPoints = 30;
-  static constexpr double minRequiredInitMovement = 2.0;
+  static constexpr double minRequiredInitMovement = 1.0;
 /**
  * \class SensorHandler
  * \brief Handles a sensor driver which provides the sensor readings.
@@ -98,7 +98,8 @@ class SensorHandler {
       Eigen::VectorXd eigenvalues = (X.transpose()*P*X).eigenvalues().real();
       std::sort(eigenvalues.data(), eigenvalues.data()+eigenvalues.size(), std::greater<double>());
       //now should be sorted
-      if(eigenvalues(1)>=0.1) 
+      //this basically means movement orthogonal to main direction has to be at least 1/10 of it
+      if(eigenvalues(1)/eigenvalues(0)>=0.1) 
       {
         return true;
       }
