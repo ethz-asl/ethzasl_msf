@@ -623,13 +623,14 @@ void InitStable()
     //this should be position in drone frame (not exactly sure about plus or minus)
     //p = p_vc_c + q_pose * p_pose;
     //maybe rotate?
-    p = q_pose*p_vc_c + p_pose-q*p_ip;
+    //p = q_pose*p_vc_c + p_pose-q*p_ip;
+    p = q_pose*p_vc_c + p_pose-q*p_ic; //i think this is correct
     MSF_INFO_STREAM("Positoin in gps frame:"<<p);
     MSF_INFO_STREAM("True position (in gps frame):"<<p_vc_p);
     MSF_INFO_STREAM("latest saved point:"<<position_handler_->init_points_[position_handler_->init_points_.size()-5]);
 
     //from this we can compute p_wv (not sure about this one)
-    p_wv = p - q_wv.conjugate().toRotationMatrix() * p_vc_c / scale + q.toRotationMatrix() * p_ic;
+    p_wv = p - q_wv.conjugate().toRotationMatrix() * p_vc_c / scale + q.toRotationMatrix() * p_ic; //this should give the same as p_wv=p_pose
     MSF_INFO_STREAM("transformed rovio position:"<<p_wv + q_wv.conjugate().toRotationMatrix() * p_vc_c / scale
             - q.toRotationMatrix() * p_ic);
 

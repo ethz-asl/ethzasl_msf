@@ -144,8 +144,10 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPositionMeasu
       newpoint(1)=msg->point.y;
       newpoint(2)=msg->point.z;
       newpoint(3)=msg->header.stamp.toSec() - delay_;
+      //MSF_INFO_STREAM(newpoint);
       init_points_.push_back(newpoint);
       //if not ready yet need to check wether ready with new meas
+      //MSF_INFO_STREAM("position calling");
       if(!ready_for_init_)
       {
           if(InitPointsReady())

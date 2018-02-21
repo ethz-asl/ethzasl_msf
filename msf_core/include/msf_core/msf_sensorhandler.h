@@ -26,7 +26,7 @@ namespace msf_core {
   static constexpr double desiredNoiseLevel_ = 0.3;
   static constexpr int rovioResetSaveTime = 3;
   static constexpr int minRequiredInitPoints = 30;
-  static constexpr double minRequiredInitMovement = 1.0;
+  static constexpr double minRequiredInitMovement = 0.5;
 /**
  * \class SensorHandler
  * \brief Handles a sensor driver which provides the sensor readings.
@@ -77,6 +77,7 @@ class SensorHandler {
     //conditions for ready
     if(init_points_.size()>minRequiredInitPoints && (init_points_[0].head(3)-init_points_[init_points_.size()-1].head(3)).norm()>minRequiredInitMovement)
     {
+      //MSF_INFO_STREAM("check1 success");
       //points are not allowed to be on a straight line:
       //use QR and check residual to see wether can be approximated by a line or not
       //does PCA as described in https://math.stackexchange.com/questions/1611308/best-fit-line-with-3d-points
@@ -99,8 +100,10 @@ class SensorHandler {
       std::sort(eigenvalues.data(), eigenvalues.data()+eigenvalues.size(), std::greater<double>());
       //now should be sorted
       //this basically means movement orthogonal to main direction has to be at least 1/10 of it
+      //MSF_INFO_STREAM(eigenvalues);
       if(eigenvalues(1)/eigenvalues(0)>=0.1) 
       {
+        //MSF_INFO_STREAM("check2 success");
         return true;
       }
     }

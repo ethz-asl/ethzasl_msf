@@ -214,6 +214,7 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
       newpoint(3)=msg->header.stamp.toSec() - delay_;
       init_points_.push_back(newpoint);
       //if not ready yet need to check wether ready with new meas
+      //MSF_INFO_STREAM("pose calling");
       if(!ready_for_init_)
       {
           if(InitPointsReady())
@@ -382,8 +383,12 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
         const double scale = (const_cast<const EKFState_T&>(*latestState).template Get<StateDefinition_T::p_wv>())(0,0);
         MSF_WARN_STREAM("msf position:"<<p);
         MSF_WARN_STREAM("msf orientation:"<<STREAMQUAT(q));
-        const Eigen::Quaternion<double> q_rovio ((q_ic.inverse()*q.conjugate()*q_wv.inverse()).conjugate().normalized());
-        const Eigen::Matrix<double, 3, 1> p_rovio = q_wv.conjugate().inverse()*((p+q_ic.toRotationMatrix() * p_ic- p_wv) * scale);
+        //q = (q_ic * q_cv.conjugate() * q_wv).conjugate();
+        const Eigen::Quaternion<double> q_rovio ((q_ic.conjugate()*q.conjugate()*q_wv.conjugate()).conjugate().normalized());
+        //q_pose=q_wv.conjugate()
+        //p = q_pose*p_vc_c + p_pose-q*p_ic;
+        const Eigen::Matrix<double, 3, 1> p_rovio = q_wv*(p - p_wv + q * p_ic);
+        //const Eigen::Matrix<double, 3, 1> p_rovio = q_wv*((p+q_ic.toRotationMatrix() * p_ic- p_wv) * scale);
         MSF_WARN_STREAM("rovio_position: "<<p_rovio);
 
         srvtemp.request.T_WM.position.x = p_rovio(0,0);
