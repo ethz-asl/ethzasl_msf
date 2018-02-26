@@ -19,6 +19,7 @@ from math import sqrt
 from geometry_msgs.msg import PoseWithCovarianceStamped as posetype
 from geometry_msgs.msg import PointStamped as positiontype
 from geometry_msgs.msg import TransformStamped as transformtype
+from sensor_msgs.msg import NavSatFix as gpstype
 from geometry_msgs.msg import Vector3Stamped as eventtype
 """
 $ rosmsg show geometry_msgs/PoseWithCovarianceStamped 
@@ -66,6 +67,33 @@ geometry_msgs/Transform transform
     float64 z
     float64 w
 
+$ rosmsg show sensor_msgs/NavSatFix 
+uint8 COVARIANCE_TYPE_UNKNOWN=0
+uint8 COVARIANCE_TYPE_APPROXIMATED=1
+uint8 COVARIANCE_TYPE_DIAGONAL_KNOWN=2
+uint8 COVARIANCE_TYPE_KNOWN=3
+std_msgs/Header header
+  uint32 seq
+  time stamp
+  string frame_id
+sensor_msgs/NavSatStatus status
+  int8 STATUS_NO_FIX=-1
+  int8 STATUS_FIX=0
+  int8 STATUS_SBAS_FIX=1
+  int8 STATUS_GBAS_FIX=2
+  uint16 SERVICE_GPS=1
+  uint16 SERVICE_GLONASS=2
+  uint16 SERVICE_COMPASS=4
+  uint16 SERVICE_GALILEO=8
+  int8 status
+  uint16 service
+float64 latitude
+float64 longitude
+float64 altitude
+float64[9] position_covariance
+uint8 position_covariance_type
+
+
 rosmsg show geometry_msgs/Vector3Stamped 
 std_msgs/Header header
   uint32 seq
@@ -105,7 +133,7 @@ class MsfNoiseHandler:
 
     
     
-    #params for transform
+    #params for transform (we handle NavSatFix as transform for params)
     self.transform_mu_=rospy.get_param("~transform_noise_mean",0.0)
     self.transform_stddeviation_=rospy.get_param("~transform_noise_number_stddeviations", 0.0)
     self.transform_use_noise_=rospy.get_param("~transform_use_noise", False)
@@ -130,6 +158,7 @@ class MsfNoiseHandler:
     #init publisher
     self.pose_pub_=rospy.Publisher("noise_drift_handler/pose_output", posetype, queue_size=20)
     self.position_pub_=rospy.Publisher("noise_drift_handler/position_output", positiontype, queue_size=20)
+    self.gps_pub_ = rospy.Publisher("noise_drift_handler/gps_output", gpstype, queue_size=20)
     
     #this will publish (3,0,0) if rovio starts diverging and (4,0,0) if it stops diverging
     self.events_pub_ = rospy.Publisher("noise_drift_handler/events", eventtype, queue_size=20)
@@ -203,6 +232,26 @@ class MsfNoiseHandler:
       create_outlier=self.transform_create_outlier_
       group_size=self.transform_group_size_
       curr_group=self.transform_curr_group_
+    elif dtype=="sensor_msgs/NavSatFix":
+      dataarr=np.array([data.latitude, data.longitude, data.altitude])
+      self.transform_curr_frame_+=1
+      if self.transform_use_fixed_diverge_time_ and self.transform_curr_frame_==self.transform_diverge_frame_:
+        self.transform_curr_group_=self.transform_diverge_length_
+        eventout = eventtype()
+        eventout.header = data.header
+        eventout.vector.x = 3
+        eventout.vector.y = 0
+        eventout.vector.z = 0
+        self.events_pub_.publish(eventout)
+        print("diverging gps")
+      stddeviation=self.transform_stddeviation_
+      use_noise=self.transform_use_noise_
+      mu=self.transform_mu_
+      
+      p_outlier=self.transform_p_outlier_
+      create_outlier=self.transform_create_outlier_
+      group_size=self.transform_group_size_
+      curr_group=self.transform_curr_group_
     else:
       print("not supported datatype:")
       print(dtype)
@@ -229,6 +278,15 @@ class MsfNoiseHandler:
               eventout.vector.y = 0
               eventout.vector.z = 0
               self.events_pub_.publish(eventout)
+          elif dtype=="sensor_msgs/NavSatFix":
+            self.transform_curr_group_-=1
+            if self.transform_curr_group_==0:
+              eventout = eventtype()
+              eventout.header = data.header
+              eventout.vector.x = 4
+              eventout.vector.y = 0
+              eventout.vector.z = 0
+              self.events_pub_.publish(eventout)
         elif t<p_outlier:
           dataarr=self.create_outlier(dataarr, stddeviation)
           if dtype=="geometry_msgs/PoseWithCovarianceStamped":
@@ -236,6 +294,8 @@ class MsfNoiseHandler:
           elif dtype=="geometry_msgs/PointStamped":
             self.position_curr_group=self.position_group_size_-1
           elif dtype=="geometry_msgs/TransformStamped":
+            self.transform_curr_group=self.transform_group_size_-1
+          elif dtype=="geometry_msgs/NavSatFix":
             self.transform_curr_group=self.transform_group_size_-1
     else:
       self.nrecv_+=1
@@ -266,6 +326,16 @@ class MsfNoiseHandler:
       datan.point.y = dataarr[1]
       datan.point.z = dataarr[2]
       self.position_pub_.publish(datan)
+    elif dtype=="sensor_msgs/NavSatFix":
+      datan=gpstype()
+      datan.header = data.header
+      datan.status = data.status
+      datan.latitude = dataarr[0]
+      datan.longitude = dataarr[1]
+      datan.altitude = dataarr[2]
+      datan.position_covariance = data.position_covariance
+      datan.position_covariance_type = data.position_covariance_type
+      self.gps_pub_.publish(datan)
     else:
       print("not supported datatype (output):")
       print(dtype)
@@ -277,6 +347,8 @@ class MsfNoiseHandler:
     rospy.Subscriber(topic_position, positiontype, self.callback)
     topic_transform="noise_drift_handler/transform_input"
     rospy.Subscriber(topic_transform, transformtype, self.callback)
+    topic_gps="noise_drift_handler/gps_input"
+    rospy.Subscriber(topic_gps, gpstype, self.callback)
     rospy.spin()
       
   def reconfigure(self, config, level):

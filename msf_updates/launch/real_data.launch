@@ -3,7 +3,7 @@
     <node  name="msf_position_pose_sensor" pkg="msf_updates" type="position_pose_sensor" clear_params="true" output="screen">			
         <remap from="msf_core/imu_state_input" to="/raven/imu" />
         <rosparam file="$(find msf_updates)/params/real_data/msf_sensor_fix.yaml"/>
-        <remap from="msf_updates/navsatfix_input" to="/raven/gps" />
+        <remap from="msf_updates/navsatfix_input" to="/noise_drift_handler/gps_output" />
         <remap from="msf_updates/pose_with_covariance_input" to="noise_drift_handler/pose_output" />
         <param name="capability_group" value="MSF" />
     </node>    
@@ -17,7 +17,7 @@
 
     <node name="noise_drift_handler" pkg="msf_updates" type="noise_drift_handler.py" output="screen">
         <remap from="noise_drift_handler/pose_input" to="/rovio/pose_with_covariance_stamped"/>
-        <remap from="noise_drift_handler/transform_input" to="/vicon/firefly_sbx/firefly_sbx"/>
+        <remap from="noise_drift_handler/gps_input" to="/raven/gps"/>
         <rosparam file="$(find msf_updates)/params/real_data/noise_drift_handler_fix.yaml"/>
     </node>
     

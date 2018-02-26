@@ -200,8 +200,10 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
         //tell sensorhandlers to start collecting for stable initialization
         pose_handler_->collect_for_init_=true;
         pose_handler_->init_points_.clear();
+        pose_handler_->total_init_movement_=0.0;
         position_handler_->collect_for_init_=true;
         position_handler_->init_points_.clear();
+        position_handler_->total_init_movement_=0.0;
         //don't need to do anything else rn: wait until both sensors tell ready
     }
     else

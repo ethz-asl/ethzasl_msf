@@ -26,7 +26,7 @@ namespace msf_core {
   static constexpr double desiredNoiseLevel_ = 0.3;
   static constexpr int rovioResetSaveTime = 3;
   static constexpr int minRequiredInitPoints = 30;
-  static constexpr double minRequiredInitMovement = 0.5;
+  static constexpr double minRequiredInitMovement = 1.0;
 /**
  * \class SensorHandler
  * \brief Handles a sensor driver which provides the sensor readings.
@@ -57,6 +57,7 @@ class SensorHandler {
   double max_noise_threshold_;
 
 
+
   void SetSensorID(int ID) {
     sensorID = ID;
   }
@@ -75,7 +76,7 @@ class SensorHandler {
   bool InitPointsReady()
   {
     //conditions for ready
-    if(init_points_.size()>minRequiredInitPoints && (init_points_[0].head(3)-init_points_[init_points_.size()-1].head(3)).norm()>minRequiredInitMovement)
+    if(total_init_movement_>minRequiredInitMovement)
     {
       //MSF_INFO_STREAM("check1 success");
       //points are not allowed to be on a straight line:
@@ -113,6 +114,7 @@ public:
   //vars for stable init
   bool collect_for_init_;
   bool ready_for_init_;
+  double total_init_movement_;
   //data sturcture for collecting points for stable init (if runtime is problematic may want to use something better)
   //each vector saves: x,y,z,t
   std::vector<Eigen::Vector4d> init_points_;
@@ -130,7 +132,7 @@ public:
         received_first_measurement_(false),
         n_rejected_(0), n_curr_rejected_(0),
         n_accepted_(0), collect_for_init_(false),
-        ready_for_init_(false){
+        ready_for_init_(false), total_init_movement_(0){
   }
   virtual ~SensorHandler() {
   }
