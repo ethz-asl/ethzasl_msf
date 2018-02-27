@@ -406,21 +406,9 @@ void InitStable()
         MSF_INFO_STREAM("one sensor called initstable but not all sensors ready yet: keep collecting");
         return;
     }
-    MSF_INFO_STREAM("initstable called and all sensors ready");
-    position_handler_->ready_for_init_=false;
-    position_handler_->collect_for_init_=false;
-    pose_handler_->ready_for_init_=false;
-    pose_handler_->collect_for_init_=false;
-    
 
-    //can only occur if both (or all in general) sensors have recieved measurement
-    /*double yawinit = config_.position_yaw_init / 180 * M_PI;
-    Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
-    yawq.normalize();
-    q = yawq;*/
-    MSF_INFO_STREAM("checkpoint 1");
     //the difference we allow (between measurements)
-    const double epsilon = 1e-3;
+    const double epsilon = 1e-6;
     //both will be resized once we know how many entries to expect
     Eigen::MatrixXd positionframe(1,1);
     Eigen::MatrixXd poseframe(1,1);
@@ -462,7 +450,7 @@ void InitStable()
             posefinal--;
         }
     }
-    MSF_INFO_STREAM("checkpoint 2"); //between checkpoint 2 and 3 there is a problem with memory allocation (somehow figure out what)
+
     //now both iterators should be at measurement with approx same time
     //check which vector is shorter (this determines next meas)
     //do not locally transform pose (since we dont know complete rotation)
@@ -480,7 +468,7 @@ void InitStable()
             {
                 MSF_WARN_STREAM("pose iterator overshooting...this should not be possible");
             }
-            MSF_WARN_STREAM("iteration:"<<i);
+            //MSF_WARN_STREAM("iteration:"<<i);
             Eigen::Vector3d temppose = (pose_handler_->init_points_[posecurr].head(3)+pose_handler_->init_points_[++posecurr].head(3))/2.0;
             int ntemp=1;
             Eigen::Vector3d temppos = position_handler_->init_points_[positioncurr].head(3); //dont transform since we dont know orientation
@@ -523,7 +511,33 @@ void InitStable()
             positionframe.col(i)=temppos;
         }
     }
-    MSF_INFO_STREAM("checkpoint 3");
+
+    //proper way of checking for stability would be: COV(X,Y)=1/nYKX^T, with K={1-1/n on diag and -1/n else} has rank>=d-1=2 (now should check that first 2 eigenvalues are "large")
+    //try this (need to set 1 handler ready_for_init false, else this won't be called again, need to do time alignement first)
+    const int npoints = positionframe.cols();
+    Eigen::MatrixXd K = Eigen::MatrixXd::Constant(npoints, npoints, -1.0/npoints);
+    K.diagonal() = Eigen::ArrayXd::Constant(npoints, 1.0-1.0/npoints);
+    Eigen::MatrixXd covariance = 1.0/npoints*positionframe*K*poseframe.transpose();
+    Eigen::VectorXd eigenvalues = covariance.eigenvalues().real().cwiseAbs();
+    std::sort(eigenvalues.data(), eigenvalues.data()+eigenvalues.size(), std::greater<double>());
+    //now should be sorted
+    //now the first two eigenvalues should be >= some value for stability (its sufficient to look at 2nd largest)
+    MSF_INFO_STREAM(eigenvalues);
+    if(eigenvalues(1)<0.02) //try this 
+    {
+      //not stable dont initialize
+      //set one to false s.t. this gets called again
+      pose_handler_->ready_for_init_=false;
+      return;
+    }
+    MSF_INFO_STREAM("initstable called and all sensors ready");
+    position_handler_->ready_for_init_=false;
+    position_handler_->collect_for_init_=false;
+    pose_handler_->ready_for_init_=false;
+    pose_handler_->collect_for_init_=false;
+    
+
+
     //call eigen umeyama (gives transform from ROVIO frame to GPS frame)
     Eigen::MatrixXd homogeneous_transform = Eigen::umeyama(poseframe, positionframe, false); //not 100% about from to (think its correct)
     //postprocess transforms and do actual init using transformed estimate from pose (since its expected to have less noise)

@@ -78,6 +78,7 @@ class SensorHandler {
     //conditions for ready
     if(total_init_movement_>minRequiredInitMovement)
     {
+      /*
       //MSF_INFO_STREAM("check1 success");
       //points are not allowed to be on a straight line:
       //use QR and check residual to see wether can be approximated by a line or not
@@ -106,7 +107,8 @@ class SensorHandler {
       {
         //MSF_INFO_STREAM("check2 success");
         return true;
-      }
+      }*/
+      return true;
     }
     return false;  
   }

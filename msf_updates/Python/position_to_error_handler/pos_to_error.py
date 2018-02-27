@@ -109,12 +109,12 @@ class PosToError:
       self.points_=np.zeros((3,self.ninit_points_)) #matrix to store all init points (each point has 3 coordinates)
       self.truth_points_=np.zeros((3,self.ninit_points_)) #matrix to store all truth points (each point has 3 coordinates)
     else:
-	  self.translation_=rospy.get_param("~translation", [0,0,0])#translation x, y, z
+      self.translation_=rospy.get_param("~translation", [0,0,0])#translation x, y, z
       #rotation is given as a quaternion. quaternion is w, x, y, z
-	  self.rotation_=quaternion_to_matrix(rospy.get_param("~quaternion", [1,0,0,0]))#3x3 rotation matrix.
-	  print(self.translation_)
-	  print(self.rotation_)
-	  self.init_meas_=True
+      self.rotation_=quaternion_to_matrix(rospy.get_param("~quaternion", [1,0,0,0]))#3x3 rotation matrix.
+      print(self.translation_)
+      print(self.rotation_)
+      self.init_meas_=True
 
   #computes the l2 norm of the difference between arrin and truth.
   #Both should be 1-D np arrays with same dimension
