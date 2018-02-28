@@ -106,7 +106,7 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
 
   Config_T config_; //this is really unlucky to have the same name as parents config_......
   ReconfigureServerPtr reconf_server_;  ///< Dynamic reconfigure server.
-  //something with this init stuff that is in pose sensormanager seems to be missing here?
+
   ros::ServiceServer init_scale_srv_;
   ros::ServiceServer init_height_srv_;
   /**
@@ -190,6 +190,7 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
     if(use_stable_initialization_)
     {
         //tell sensorhandlers to start collecting for stable initialization
+        MSF_INFO_STREAM("Collecting for stable initialization started");
         pose_handler_->collect_for_init_=true;
         pose_handler_->init_points_.clear();
         pose_handler_->total_init_movement_=0.0;
@@ -292,7 +293,6 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
         yawq.normalize();
         q = yawq;
         Eigen::Quaterniond initpose(0.993240709, -0.0092359533, 0.0225063474, 0.1134947378); //at 0 secs V1_easy
-        //Eigen::Quaterniond initpose(-0.4059299835, -0.0317710142, 0.0307095237, 0.9128353501); //at 20 secs V1_easy (for testing someting)
 
         q = initpose;
         q_wv = q_cv*q_ic.conjugate()*q.conjugate();
@@ -300,21 +300,7 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
         q_wv.normalize();
         }
 
-        MSF_WARN_STREAM("position q:" << STREAMQUAT(q)<<"pose q_cv:"<<STREAMQUAT(q_cv));
         
-        //need to think carefully about next part: want to have one "6Dof pose" for both sensors togethe
-        //but might potentially be different:
-        //easy case: only one recieved measurement->need to ignore second
-        //otherwise may somehow "average"
-        //also should probably compute transform between the 2 somehow based on that
-        //will somehow have to compute transform between pos and pose (given transformation is only from measurement point
-        //to IMU but coordinate frame is potentially very different)
-        //maybe smartest is to go to position frame? (since this is somewhat absolute)
-        //basically: if there is only one measurement given we simply take this as "worldframe"
-        //(after transformation according to parameters)
-        //if both are given we need to decide one (should prefare position probably)
-        //and correct the transformation of the second one
-        //this will also be important for delayed initialization and so on (initializing only one sensor->how to?)
 
         //only position measurement recieved. position as in position sensormanager
         if(!pose_handler_->ReceivedFirstMeasurement())
@@ -328,7 +314,9 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
             - q.toRotationMatrix() * p_ic;
         }
         
-        //both measurements recieved...need to do something smart 
+        //both measurements recieved
+        //based on current measurement and assumption that orientation in position frame is given
+        //compute transform p_wv, q_wv such that both sensors map to same pose in common frame
         else
         {
             //take position world frame
@@ -337,8 +325,7 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
             //p_ic=q_ic.toRotationMatrix().inverse()*(p_wv + q_wv.conjugate().toRotationMatrix() * p_vc_c / scale - p);
             p_wv = p - q_wv.conjugate().toRotationMatrix() * p_vc_c / scale + q.toRotationMatrix() * p_ic;
         }
-        MSF_WARN_STREAM("position p_vc_p:"<<p_vc_p.transpose()<<" pose p_vc_c:"<<p_vc_c.transpose());
-        //i think there exist 2 configs (one from msfsensormanagerROS and on from position_pose_sensormanager)
+
         if(pose_handler_->use_transform_recovery_)
         {
         config_.pose_noise_p_wv = std::min(config_.pose_noise_meas_p/2.0, pose_handler_->transform_recovery_noise_p_);
@@ -382,7 +369,6 @@ void InitStable()
     if(!pose_handler_->ready_for_init_ || !position_handler_->ready_for_init_)
     {
         //not ready yet
-        MSF_INFO_STREAM("one sensor called initstable but not all sensors ready yet: keep collecting");
         return;
     }
 
@@ -394,8 +380,6 @@ void InitStable()
     
     //find first measurement that is ~at same time
     //iterators would be nicer but need to walk backward aswell
-    //auto posit = position_handler_->init_points_.begin();
-    //auto poseit = pose_handler_->init_points_.begin();
     int positioncurr=0;
     int posecurr=0;
     int positionfinal=position_handler_->init_points_.size()-1;
@@ -438,7 +422,6 @@ void InitStable()
     {
         //compute number of entries: (not sure this works like that)
         const int nentries = posefinal-posecurr-2; //-2 since we want to ignore the last entry (could potentially have to big time diff) and we average 2
-        MSF_INFO_STREAM("nentries:"<<nentries<<" off:"<<pose_handler_->init_points_.size());
         positionframe.resize(3,nentries);
         poseframe.resize(3,nentries);
         for(int i=0;i<nentries;++i)
@@ -501,7 +484,6 @@ void InitStable()
     std::sort(eigenvalues.data(), eigenvalues.data()+eigenvalues.size(), std::greater<double>());
     //now should be sorted
     //now the first two eigenvalues should be >= some value for stability (its sufficient to look at 2nd largest)
-    MSF_INFO_STREAM(eigenvalues);
     if(eigenvalues(1)<0.02) //try this 
     {
       //not stable dont initialize
@@ -509,7 +491,7 @@ void InitStable()
       pose_handler_->ready_for_init_=false;
       return;
     }
-    MSF_INFO_STREAM("initstable called and all sensors ready");
+    MSF_INFO_STREAM("initstable called and all sensors ready, using Eigen::umeyama to estimate transform");
     position_handler_->ready_for_init_=false;
     position_handler_->collect_for_init_=false;
     pose_handler_->ready_for_init_=false;
@@ -523,7 +505,7 @@ void InitStable()
     Eigen::Matrix3d R_temp = homogeneous_transform.topLeftCorner(3,3);
     Eigen::Quaterniond q_pose(R_temp);
     Eigen::Vector3d p_pose = homogeneous_transform.topRightCorner(3,1);
-    MSF_INFO_STREAM("Q_umeyama:"<<STREAMQUAT(q_pose)<<"T_umeyama"<<p_pose);
+
     //normalize just to make sure
     q_pose.normalize();
 
@@ -596,22 +578,13 @@ void InitStable()
     q = (q_ic * q_cv.conjugate() * q_wv).conjugate();
     q.normalize();
 
-    MSF_INFO_STREAM("orientation in gps frame:"<<STREAMQUAT(q));
-    Eigen::Quaterniond initpose(-0.4059299835, -0.0317710142, 0.0307095237, 0.9128353501);
-    MSF_INFO_STREAM("correct orientation in gps frame:"<<STREAMQUAT(initpose));
-    //q_wv = q_cv*q_ic.conjugate()*q.conjugate(); //so this should be how to extract q_wv (not sure) this does not
-    MSF_INFO_STREAM("transformed rovio orientation:"<<STREAMQUAT((q_ic * q_cv.conjugate() * q_wv).conjugate()));
+
 
 
     p = q_pose*p_vc_c + p_pose-q*p_ic; //i think this is correct
-    MSF_INFO_STREAM("Positoin in gps frame:"<<p);
-    MSF_INFO_STREAM("True position (in gps frame):"<<p_vc_p);
-    MSF_INFO_STREAM("latest saved point:"<<position_handler_->init_points_[position_handler_->init_points_.size()-5]);
 
     //from this we can compute p_wv (not sure about this one)
     p_wv = p - q_wv.conjugate().toRotationMatrix() * p_vc_c / scale + q.toRotationMatrix() * p_ic; //this should give the same as p_wv=p_pose
-    MSF_INFO_STREAM("transformed rovio position:"<<p_wv + q_wv.conjugate().toRotationMatrix() * p_vc_c / scale
-            - q.toRotationMatrix() * p_ic);
 
     if(pose_handler_->use_transform_recovery_)
     {

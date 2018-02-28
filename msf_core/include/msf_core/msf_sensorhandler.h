@@ -78,36 +78,6 @@ class SensorHandler {
     //conditions for ready
     if(total_init_movement_>minRequiredInitMovement)
     {
-      /*
-      //MSF_INFO_STREAM("check1 success");
-      //points are not allowed to be on a straight line:
-      //use QR and check residual to see wether can be approximated by a line or not
-      //does PCA as described in https://math.stackexchange.com/questions/1611308/best-fit-line-with-3d-points
-      //1/n X^T*P*X is the covariance of the points
-      //P is 1-1/n on the diagonal and -1/n elsewhere
-      const int npoints=init_points_.size();
-      Eigen::MatrixXd P = Eigen::MatrixXd::Constant(npoints, npoints, -1.0/npoints);
-      P.diagonal() = Eigen::ArrayXd::Constant(npoints, 1.0-1.0/npoints);
-      //build X matrix
-      Eigen::MatrixXd X(1,1);
-      X.resize(npoints, 3);
-      for (int i=0; i<npoints;++i)
-      {
-        X.row(i)=init_points_[i].head(3);
-      }
-      //now the largest eigenvalue gives the "length" of the line (with its corresponding eigenvector as direction) [not interested in that]
-      //the second eigenvalue is ~the error
-      //to have it a relative good 2d movement maybe use some constraint on 2nd largest/largest (think about this)
-      Eigen::VectorXd eigenvalues = (X.transpose()*P*X).eigenvalues().real();
-      std::sort(eigenvalues.data(), eigenvalues.data()+eigenvalues.size(), std::greater<double>());
-      //now should be sorted
-      //this basically means movement orthogonal to main direction has to be at least 1/10 of it
-      //MSF_INFO_STREAM(eigenvalues);
-      if(eigenvalues(1)/eigenvalues(0)>=0.1) 
-      {
-        //MSF_INFO_STREAM("check2 success");
-        return true;
-      }*/
       return true;
     }
     return false;  
