@@ -241,7 +241,9 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPositionMeasu
       n_accepted_ = 0.0;
       n_rejected_ = 0.0;
       n_curr_rejected_ = 0.0;
-     //use a factor based on val
+      if(enable_noise_estimation_)
+      {
+        //use a factor based on val
         //if factor larger one we want:
         //not surpass max threshold
         //increase to fixed amount if it was too small (~0) before
@@ -257,6 +259,7 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPositionMeasu
         
         MSF_INFO_STREAM("Changing position Noise measurement to:"<<mngr->config_.position_noise_meas);
         this->SetNoises(mngr->config_.position_noise_meas);
+      }
       running_maha_dist_average_=msf_core::desiredNoiseLevel_*mah_threshold_;
       manager_.Initsingle(this->sensorID);
       return;
