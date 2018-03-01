@@ -277,67 +277,6 @@ struct PoseMeasurement : public PoseMeasurementBase {
     // Constant(driftwvattfix ? 0.0 : 1.0); // fix vision world yaw drift because unobservable otherwise (see PhD Thesis)
 
   }
-  /**
-   * this method add description (overriding base)
-   */
-  /*template<class H_type, class Res_type, class R_type>
-  void CalculateAndApplyCorrection(
-    shared_ptr<EKFState_T> state, msf_core::MSF_Core<EKFState_T>& core,
-    const Eigen::MatrixBase<H_type>& H_delayed,
-    const Eigen::MatrixBase<Res_type> & res_delayed,
-    const Eigen::MatrixBase<R_type>& R_delayed) {
-
-  EIGEN_STATIC_ASSERT_FIXED_SIZE (H_type);
-  EIGEN_STATIC_ASSERT_FIXED_SIZE (R_type);
-
-  // Get measurements.
-  /// Correction from EKF update.
-  Eigen::Matrix<double, msf_core::MSF_Core<EKFState_T>::nErrorStatesAtCompileTime, 1> correction_;
-
-  R_type S;
-  R_type S_inverse;
-  Eigen::Matrix<double, msf_core::MSF_Core<EKFState_T>::nErrorStatesAtCompileTime,
-      R_type::RowsAtCompileTime> K;
-  typename msf_core::MSF_Core<EKFState_T>::ErrorStateCov & P = state->P;
-
-
-  S = H_delayed * P * H_delayed.transpose() + R_delayed;
-  S_inverse = S.inverse();
-  
-  MSF_WARN_STREAM("overriding for Pose with mah_threshold"<<mah_threshold_);
-  
-  if(enable_mah_outlier_rejection_){ //could do this earlier to save computation time
-	ros::NodeHandle pnh("~/pose_sensor");
-	  //MSF_WARN_STREAM("outlier rejection active");
-    //calculate mahalanobis distance
-    //Eigen::MatrixXd mah_dist_squared_temp = res_delayed.transpose() * S_inverse * res_delayed;//is this correct (this should output a scalar right?)
-    double mah_dist_squared=res_delayed.transpose() * S_inverse * res_delayed;
-    //double mah_dist_squared = mah_dist_squared_temp(0,0);
-
-    //reject point as outlier if distance above threshold
-    //if (sqrt(mah_dist_squared) > mah_threshold_){ //should not compute sqrt for efficiency
-    if(mah_dist_squared>mah_threshold_*mah_threshold_){
-	  //mah_threshold_*=2;
-	  //MSF_WARN_STREAM("new mah_threshold"<<mah_threshold_);
-      MSF_WARN_STREAM("rejecting reading as outlier with distance squared"<<mah_dist_squared);
-      pnh.setParam("mah_threshold", 2*mah_threshold_);
-      return;
-    }
-    pnh.setParam("mah_threshold", 0.9*mah_threshold_);
-  }
-  //mah_threshold_*=1.2;
-  K = P * H_delayed.transpose() * S_inverse;
-  correction_ = K * res_delayed;
-  const typename msf_core::MSF_Core<EKFState_T>::ErrorStateCov KH =
-      (msf_core::MSF_Core<EKFState_T>::ErrorStateCov::Identity() - K * H_delayed);
-  P = KH * P * KH.transpose() + K * R_delayed * K.transpose();
-
-  // Make sure P stays symmetric.
-  P = 0.5 * (P + P.transpose());
-
-  core.ApplyCorrection(state, correction_);
-} */
-  
   
   
   

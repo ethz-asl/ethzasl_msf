@@ -58,14 +58,12 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
   typename MSF_Core<EKFState_T>::ErrorStateCov & P = state->P;
 
   S = H_delayed * P * H_delayed.transpose() + R_delayed;
-  S_inverse = S.inverse();
-  //we need this anyways
+  S_inverse = S.inverse(); //probably could do better than computing the inverse
   double mah_dist_squared=res_delayed.transpose() * S_inverse * res_delayed;
-  //MSF_INFO_STREAM("mah dist squared:"<<mah_dist_squared);
-  if(enable_mah_outlier_rejection_){ //could do this earlier to save computation time (maybe?)
+
+  if(enable_mah_outlier_rejection_){
 
     if(mah_dist_squared>mah_threshold_*mah_threshold_){
-      //MSF_INFO_STREAM("Rejecting outlier with res delayed:"<<res_delayed.transpose());
       //in case a measurement is rejected we dont apply it
       //count the rejected measurement
       (*n_rejected_)++;

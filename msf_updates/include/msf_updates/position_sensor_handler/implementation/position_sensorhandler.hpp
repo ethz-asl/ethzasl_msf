@@ -198,23 +198,7 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPositionMeasu
   
   this->manager_.msf_core_->AddMeasurement(meas);
 
-  //this part checks wether something went wrong on initialization
-  //we dont need this part anymore since we dont completly reset
-  //means simply transform will be wrong, which is not too bad (->just wait for normal divergence to kick in)
-  /*if (n_accepted_==0&&n_curr_rejected_>bad_initialization_threshold_)
-  {
-      MSF_WARN_STREAM("First Measurements have all been rejected. Probably initialized on an outlier. Reinitializing");
-      n_accepted_=0.0;
-      n_rejected_=0.0;
-      n_curr_rejected_=0.0;
-      //just to be a little safer (should decrease once implemented)
-      manager_.IncreaseNoise(this->sensorID, 0.05);
-      manager_.Initsingle(this->sensorID);
-    }*/
-   //this function should check wether too many measurements have been rejected -> increase noise meas
-  //or wether this sensor is currently diverging -> reset and adjust threshold
-  //CheckNoiseDivergence();
-  //MSF_INFO_STREAM("accepted"<<n_accepted_<<" rejected"<<n_rejected_<<" curr rejected"<<n_curr_rejected_);
+  
   if(enable_noise_estimation_)
   {
       //if running average is larger than upperNoiseLimit of threshold recompute noise based on this
