@@ -1,0 +1,10 @@
+#this is the parameter file for corrupting rovio IMU such that ROVIO diverges
+#this should ONLY be used for TESTING purposes and is not necessary for the system to run
+#depending on the mapping the corresponding parameters should be set (and are selfexplanatory)
+#params for rovio_divergence_handler
+/rovio_divergence_handler/use_fixed_time: True
+#/rovio_divergence_handler/divergence_start_frame: 1800
+/rovio_divergence_handler/divergence_start_frame: 800
+/rovio_divergence_handler/divergence_group_size: 20
+/rovio_divergence_handler/probability_divergence: 0.0
+

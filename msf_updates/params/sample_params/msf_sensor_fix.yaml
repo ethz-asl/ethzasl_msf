@@ -1,0 +1,157 @@
+#this parameter file belongs to msf_sensor fusion, i.e. the main programm
+#this should be the scale coming out of the pose sensor (i.e. rovio)
+scale_init: 1
+#this should be true when using a rosbag and false when running live
+#note that if you use playback you should use "--clock" in your rosbag play command
+core/data_playback: true
+core/fixed_bias: false
+
+#########IMU PARAMETERS#######
+core/core_noise_acc: 0.083
+core/core_noise_accbias: 0.00005
+core/core_noise_gyr: 0.0013
+core/core_noise_gyrbias: 0.0000013
+
+#this switches between stable and simple initialization
+#it should be false when you can assure that the drone is aligned with the GPS frame on initialization and true otherwise
+#it will also work fine with true and an aligned drone but you loose some accuracy compared to simple initialization
+#in stable initialization the system will start to collect measurementpoints on init service call until conditions are
+#met for a stable initialization
+position_pose_sensor/use_stable_initialization: true
+
+#these params are defined in PositionPoseSensor.cfg and therefore have prefix position_pose_sensor
+#they define which parameters are fixed and which are variable, i.e. part of the state
+#this is for the scale
+position_pose_sensor/pose_fixed_scale: true
+#these two are the for the transform between the rovio IMU and the drone IMU (typically fixed and known apriori)
+position_pose_sensor/pose_fixed_p_ic: true
+position_pose_sensor/pose_fixed_q_ic: true
+#these two are for the transform between rovio frame and GPS frame (typically unknown and subject to error and drift) 
+position_pose_sensor/pose_fixed_p_wv: false
+position_pose_sensor/pose_fixed_q_wv: false
+
+#these params are the uncertainty corresponding to above transforms
+#for consistency it should be 0 if the transform is fixed and >0 otherwise
+#this uncertainty must not be larger than the uncertainty of the sensor (see below)
+position_pose_sensor/pose_noise_scale: 0.0
+position_pose_sensor/pose_noise_p_wv: 0.001
+position_pose_sensor/pose_noise_q_wv: 0.0025
+position_pose_sensor/pose_noise_p_ic: 0.0
+position_pose_sensor/pose_noise_q_ic: 0.0
+
+#this is the delay of the sensor, i.e. the time between measurement and processing of the measurement by MSF
+#it should be <0
+position_pose_sensor/pose_delay: -0.0358408930047
+position_pose_sensor/position_delay: -0.01
+
+#these are the uncertainty of the respective sensor
+#in general choosing too large values will decrease precision
+#choosing too small values will decrease stability
+#the values should be choose approximately as the standard deviation of the noise in the measurements assuming gaussian distribution
+position_pose_sensor/pose_noise_meas_p: 0.02
+position_pose_sensor/pose_noise_meas_q: 0.05
+position_pose_sensor/position_noise_meas: 1.0
+
+#these are the parameters for the transform between the GPS measurement point and the drone IMU (similar as for pose above)
+position_pose_sensor/position_fixed_p_ip: true
+position_pose_sensor/position_noise_p_ip: 0.00
+
+#yaw init can be used to define the yaw of the drone on initialization (i.e. the x-rotation)
+#If set to 0 the initial pose of the drone in the GPS frame is (1,0,0,0)<->(w,x,y,z)
+#else it is (cos(yaw/ 2), 0, 0, sin(yaw/ 2))
+#yaw is given in degrees
+#this parameter is only relevant if stable initialization is false
+position_pose_sensor/position_yaw_init: 0
+
+
+#these params are read in pose_sensorhandler.hpp and therefore have prefix pose_sensor
+#they define the (initial) transform between rovio IMU and the drone IMU
+pose_sensor/init/q_ic/x: 0.807264573826
+pose_sensor/init/q_ic/y: -0.000354456866938
+pose_sensor/init/q_ic/z: 0.590149775732
+pose_sensor/init/q_ic/w: 0.00685743456288
+
+pose_sensor/init/p_ic/x: 0.118867928682
+pose_sensor/init/p_ic/y: -0.0292211469162
+pose_sensor/init/p_ic/z: -0.062828441889
+#until here
+
+
+#this parameter defines wether the measurements are given as absolut measurements (i.e. rovio) or relative (to the last measurement)
+pose_sensor/pose_absolute_measurements: true
+
+#this parameter defines wether fixed covariance (true) or covariance from sensor (false) should be used.
+#This can only be set false if the sensor provides covariance (no experiments done without fixed covariance)
+pose_sensor/pose_use_fixed_covariance: true
+pose_sensor/pose_measurement_world_sensor: true  # selects if sensor measures its position w.r.t. world (true, e.g. Vicon, Rovio) or the position of the world coordinate system w.r.t. the sensor (false, e.g. ethzasl_ptam)
+
+#these params are read in position_sensorhandler.hpp and therefore have prefix position_sensor
+#########GPS PARAMETERS#######
+#these are very similar to the ones above for pose
+position_sensor/init/p_ip/x: 0.06901
+position_sensor/init/p_ip/y: -0.02781
+position_sensor/init/p_ip/z: -0.12395
+
+position_sensor/position_absolute_measurements: true
+position_sensor/position_use_fixed_covariance: true
+position_sensor/position_measurement_world_sensor: true 
+
+
+#settings for outlierrejection
+#these parameters define wether mahalanobis distance based outlierrejection should be used or not
+#if set to true all measurements with mahalanobis distance larger then the defined mah_threshold are rejected as outliers
+#using a threshold of ~5.0 turned out to be reasonable. Note that the mahalanobis distance is approximately inverse proportianal to 
+#the noise measurement of the corresponding sensor
+#for all further stability parameters this must be set true
+pose_sensor/enable_mah_outlier_rejection: true
+pose_sensor/mah_threshold: 5.0
+position_sensor/enable_mah_outlier_rejection: true
+position_sensor/mah_threshold: 5.0
+
+#settings for noise estimation
+#this settings defined wether noise should be fixed (false) or estimated online (true) using the initial value as starting value
+#when true the noise parameter is adjusted if the discounted sum of the mahalanobis distance goes above or below a threshold relative to the rejection threshold.
+pose_sensor/enable_noise_estimation: true
+position_sensor/enable_noise_estimation: true
+#this is the discount factor of the sum
+#setting this closer to 1 will make it more longtime oriented, closer to 0 more shorttime focused
+#when defining this you should think about the frequency of a sensor (i.e. time to adapt should be similar for different sensors)
+#this means a sensor with higher frequency should have a value closer to 1
+#a value of 0.999 turned out to be reasonable for a frequency of 100Hz
+pose_sensor/noise_estimation_discount_factor: 0.99
+position_sensor/noise_estimation_discount_factor: 0.999
+#this parameter can be used to define an upper limit for noise estimate
+#in practice this means as long as a sensors noise is above this threshold most of its measurements will be rejected
+#setting this to very large values will allow arbitrary values
+#when using more sensors making this small could serve as a "selection" mechanism on which sensors to consider
+pose_sensor/max_noise_threshold: 1
+position_sensor/max_noise_threshold: 5
+
+#settings for divergence recovery
+#NOTE: there is a big difference in functionality of this between pose and position sensor.
+#Here we discuss pose sensor
+#If this is set to true msf will try to recover ROVIO if more measurements than divergence_rejection_limit are rejected back-to-back
+pose_sensor/enable_divergence_recovery: true
+pose_sensor/divergence_rejection_limit: 30
+#If this is set to true MSF will use ROVIO's reset_to_pose function using the inverse transformed of the current MSF estimate
+#This will maintain the transform
+#If set to false it will completly reset rovio and compute a new transform based on the currents MSF state estimate and the first rovio 
+#measurement
+pose_sensor/use_reset_to_pose: true
+#If this is set to true the noise of the transform will temporairly increase after reseting. This in general increases stability
+#the value of the transform noise will be min(transform_recovery_noise_p, pose_noise_meas_p/2) to assure stability
+pose_sensor/use_transform_recovery: true
+#these are the paramse corresponding to the recovery noise
+pose_sensor/transform_recovery_noise_p: 0.002
+pose_sensor/transform_recovery_noise_q: 0.025
+#these are the number of annealing steps, i.e. while this number of measurements the transform noise will decrease linearly to reach its original level
+pose_sensor/transform_anealing_steps: 200
+
+#this should be false unless you expect gps to recover to different frame or have poor initialization
+#Here we discuss recovery for gps sensor
+#If divergency recovery is set true MSF will compute a new transform for GPS if divergence_rejection_limit measurements are rejected back-to-back
+#this usually makes no sense since in general GPS will recover to its initial frame by its own
+#only set this to true if you expect GPS frame to change midflight
+position_sensor/enable_divergence_recovery: false
+position_sensor/divergence_rejection_limit: 300
+#Transform recovery is only relevant if divergence recovery is set true and behaves as for pose sensor (is this even implemented????)

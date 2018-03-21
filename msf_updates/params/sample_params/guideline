@@ -1,0 +1,16 @@
+(very) simple guideline on how to run MSF from a Rosbag
+Things marked in "[]" are only for testing purposes and are not required for the system to run
+In "<>" are commands to type in console. Note that most commands have to be executed in a separate Console
+since they are required to run.
+
+1) Get enough Console Tabs :-)
+2) Start a roscore service <roscore>
+3) Tell ros to use simulation time <rosparam set /use_sim_time true>
+4) Start playback of your rosbag file USE --clock option <rosbag play /path_to_your_rosbag --clock --pause>
+5) Start MSF, Rovio and other nodes needed using a launch file. You can find a sample launch file under msf_updates/launch/sample_launch.launch <roslaunch msf_updates your_launchfile.launch
+6) Unpause your rosbag playback (using "space") until MSF recieved at least one measurement from each sensor (it will generate an output once it did) and pause playback again
+7) Start the dynamic reconfigure server and use the "init" service call <rosrun rqt_reconfigure rqt_reconfigure> in the window that opens go to your_sensor_name->position_pose_sensor and click on core_init_filter
+[8) the msf_plotting_utility git (git@gitlab.ethz.ch:huberya/msf_plotting_utility.git) provides some plotting utility for results. To record a rosbag that can be used for the provided python scripts
+use the record_all bash script <./record_all>]
+[9) To plot topics while running use rqt_plot and subscribe to the topics <rosrun rqt_plot rqt_plot]
+10) Unpause the rosbag playback. Now the system should run

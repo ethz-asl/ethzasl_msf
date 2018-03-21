@@ -1,10 +1,13 @@
+#this is the parameter file for adding noise and outlier to data
+#this should ONLY be used for TESTING purposes and is not necessary for the system to run
+#depending on the mapping the corresponding parameters should be set (and are selfexplanatory)
 #params for pose
 /noise_drift_handler/pose_noise_mean: 0.0
 /noise_drift_handler/pose_noise_number_stddeviations: 1.0
 /noise_drift_handler/pose_use_noise: false
-/noise_drift_handler/pose_probability_outlier: 0.0
+/noise_drift_handler/pose_probability_outlier: 0.1
 /noise_drift_handler/pose_group_size: 1
-/noise_drift_handler/pose_create_outlier: true
+/noise_drift_handler/pose_create_outlier: false
 
 #params for transform
 /noise_drift_handler/transform_noise_mean: 0.0

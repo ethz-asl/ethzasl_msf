@@ -74,7 +74,9 @@ class RovioDivergenceHandler:
     self.start_frame_=rospy.get_param("~divergence_start_frame", 1000)
     self.group_size_=rospy.get_param("~divergence_group_size", 1)
     self.prob_divergence_=rospy.get_param("~probability_divergence", 0.0)
-        
+    print("active")
+    print(self.start_frame_)
+    
     self.curr_group_size_ = 0
     self.curr_frame_ = 0
     
