@@ -21,6 +21,7 @@
     	<remap from="imu0" to="rovio_divergence_handler/imu0_output"/>
     </node>
     
+    <!--all in- and outputs for the additional codes can be found on the wiki-->
     <!--this is an optional node to compute the error of the MSF estimate (datainput) to the Groundtruth (truthinput) online-->
     <node name="pos_to_error" pkg="msf_updates" type="pos_to_error.py" output="screen">
         <remap from="pos_to_error/datainput" to="msf_core/state_out"/>
