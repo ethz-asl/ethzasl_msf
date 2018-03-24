@@ -141,13 +141,13 @@ struct PoseMeasurement : public PoseMeasurementBase {
                   int sensorID, bool enable_mah_outlier_rejection,
                   double mah_threshold, double* running_maha_dist_average,
                   double average_discount_factor, 
-                  double* n_rejected, double* n_curr_rejected, double* n_accepted,
+                  double* n_rejected, double* n_curr_rejected, double* n_accepted, std::ofstream* ts_IO_outfile,
                   int fixedstates, msf_updates::PoseDistorter::Ptr distorter =
                       msf_updates::PoseDistorter::Ptr())
       : PoseMeasurementBase(isabsoluteMeasurement, sensorID,
                             enable_mah_outlier_rejection, mah_threshold,
                             running_maha_dist_average, average_discount_factor,
-                            n_rejected, n_curr_rejected, n_accepted),
+                            n_rejected, n_curr_rejected, n_accepted, ts_IO_outfile),
         n_zp_(n_zp),
         n_zq_(n_zq),
         measurement_world_sensor_(measurement_world_sensor),

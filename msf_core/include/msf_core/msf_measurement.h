@@ -37,7 +37,7 @@ class MSF_MeasurementBase {
                       bool enable_mah_outlier_rejection, double mah_threshold,
                       double* running_maha_dist_average, double average_discount_factor,
                       double* n_rejected, double* n_curr_rejected,
-                      double* n_accepted);
+                      double* n_accepted, std::ofstream* ts_IO_outfile);
   virtual ~MSF_MeasurementBase() {}
   /**
    * \brief The method called by the msf_core to apply the measurement
@@ -92,6 +92,8 @@ class MSF_MeasurementBase {
   double* n_curr_rejected_;
   double* n_accepted_;
 
+  //ofstream for creating training set for LSTM
+  std::ofstream* ts_IO_outfile_;
 };
 
 /**
@@ -112,7 +114,7 @@ class MSF_InvalidMeasurement : public MSF_MeasurementBase<EKFState_T> {
     return "invalid";
   }
   MSF_InvalidMeasurement()
-      : MSF_MeasurementBase<EKFState_T>(true, constants::INVALID_ID, false, 0.0, NULL, 0.0, NULL, NULL, NULL) {
+      : MSF_MeasurementBase<EKFState_T>(true, constants::INVALID_ID, false, 0.0, NULL, 0.0, NULL, NULL, NULL, NULL) {
   }
   virtual ~MSF_InvalidMeasurement() {
   }
@@ -140,12 +142,12 @@ class MSF_Measurement : public MSF_MeasurementBase<EKFState_T> {
                   bool enable_mah_outlier_rejection, double mah_threshold,
                   double* running_maha_dist_average, double average_discount_factor,
                   double* n_rejected, double* n_curr_rejected,
-                  double* n_accepted)
+                  double* n_accepted, std::ofstream* ts_IO_outfile)
       : MSF_MeasurementBase<EKFState_T>(isAbsoluteMeasurement, sensorID,
                                         enable_mah_outlier_rejection,
                                         mah_threshold, running_maha_dist_average,
                                         average_discount_factor, n_rejected,
-                                        n_curr_rejected, n_accepted) {
+                                        n_curr_rejected, n_accepted, ts_IO_outfile) {
     R_.setZero();
   }
   virtual ~MSF_Measurement() { }
@@ -189,7 +191,7 @@ class MSF_InitMeasurement : public MSF_MeasurementBase<EKFState_T> {
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW MSF_InitMeasurement(
       bool ContainsInitialSensorReadings)
-      : MSF_MeasurementBase<EKFState_T>(true, constants::INVALID_ID, false, 0.0, NULL, 0.0, NULL, NULL, NULL) {
+      : MSF_MeasurementBase<EKFState_T>(true, constants::INVALID_ID, false, 0.0, NULL, 0.0, NULL, NULL, NULL, NULL) {
     ContainsInitialSensorReadings_ = ContainsInitialSensorReadings;
     this->time = ros::Time::now().toSec();
   }

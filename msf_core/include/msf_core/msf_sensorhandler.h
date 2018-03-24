@@ -16,7 +16,8 @@
  */
 #ifndef MSF_SENSORHANDLER_H_
 #define MSF_SENSORHANDLER_H_
-
+#include <iostream>
+#include <fstream>
 namespace msf_core {
 
   static constexpr double kDefaultMahThreshold_ = 100.0;
@@ -55,6 +56,8 @@ class SensorHandler {
   double n_accepted_;
   double rejection_divergence_threshold_;
   double max_noise_threshold_;
+  std::ofstream* ts_IO_outfile_ = NULL;
+  std::ofstream ts_IO_outfile_obj_;
 
 
 

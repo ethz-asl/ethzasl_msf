@@ -236,8 +236,6 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
         //variables only from pose
         q_wv.setIdentity();  // Vision-world rotation drift.
         p_wv.setZero();  // Vision-world position drift.
-        //q_wv = Eigen::Quaterniond(-0.1338321, -0.00132899, 0.0028016, 0.99099917).conjugate();
-        //p_wv << 0.82340916, 2.22741483, 0.97403493;
 
         p_vc_c = pose_handler_->GetPositionMeasurement(); //This is potentially different for both sensors but has same name
         q_cv = pose_handler_->GetAttitudeMeasurement();

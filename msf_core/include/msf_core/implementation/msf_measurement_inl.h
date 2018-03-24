@@ -24,7 +24,7 @@ MSF_MeasurementBase<EKFState_T>::MSF_MeasurementBase(bool isabsoluteMeasurement,
                       bool enable_mah_outlier_rejection, double mah_threshold,
                       double* running_maha_dist_average, double average_discount_factor,
                       double* n_rejected, double* n_curr_rejected,
-                      double* n_accepted)
+                      double* n_accepted, std::ofstream* ts_IO_outfile)
     : sensorID_(sensorID),
       isabsolute_(isabsoluteMeasurement),
       enable_mah_outlier_rejection_(enable_mah_outlier_rejection),
@@ -32,7 +32,7 @@ MSF_MeasurementBase<EKFState_T>::MSF_MeasurementBase(bool isabsoluteMeasurement,
       running_maha_dist_average_(running_maha_dist_average),
       average_discount_factor_(average_discount_factor),
       n_rejected_(n_rejected), n_curr_rejected_(n_curr_rejected),
-      n_accepted_(n_accepted),
+      n_accepted_(n_accepted), ts_IO_outfile_(ts_IO_outfile),
       time(0) {
 }
 
@@ -60,7 +60,15 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
   S = H_delayed * P * H_delayed.transpose() + R_delayed;
   S_inverse = S.inverse(); //probably could do better than computing the inverse
   double mah_dist_squared=res_delayed.transpose() * S_inverse * res_delayed;
-
+  
+  /*this part is only to create training sets for LSTM noise learning and should otherwise be deactivated by setting 
+  sensortype/create_training_set: False*/
+  //this is formatting for eigen
+  Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", ", ", "", "", "", ";");
+  if(ts_IO_outfile_!=NULL)
+  {
+    *ts_IO_outfile_<<res_delayed.format(CommaInitFmt)<<std::endl;
+  }
   if(enable_mah_outlier_rejection_){
 
     if(mah_dist_squared>mah_threshold_*mah_threshold_){

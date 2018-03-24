@@ -82,6 +82,18 @@ PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PositionSensorHandler(
       MSF_INFO_STREAM("Position sensor is using divergence recovery with rejection limit:"<<
       rejection_divergence_threshold_);
   }
+
+  //This part is for creating training sets for noise estimation LSTM
+  bool create_ts;
+  pnh.param("create_training_set", create_ts, false);
+  if(create_ts)
+  {
+      std::string path_to_ts;
+      std::string default_ts="default.txt"; //for some reason I cant put ""
+      pnh.param("path_to_training_set", path_to_ts, default_ts);
+      ts_IO_outfile_obj_.open(path_to_ts, std::ios_base::app);
+      ts_IO_outfile_=&ts_IO_outfile_obj_;
+  }
   ros::NodeHandle nh("msf_updates");
 
   subPointStamped_ =
@@ -189,7 +201,7 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPositionMeasu
       n_zp_, use_fixed_covariance_, provides_absolute_measurements_,
       this->sensorID, fixedstates, enable_mah_outlier_rejection_,
       mah_threshold_, &running_maha_dist_average_, average_discount_factor_,
-      &n_rejected_, &n_curr_rejected_, &n_accepted_));
+      &n_rejected_, &n_curr_rejected_, &n_accepted_, ts_IO_outfile_));
 
   meas->MakeFromSensorReading(msg, msg->header.stamp.toSec() - delay_);
   
