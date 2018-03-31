@@ -113,29 +113,69 @@ class MsfNoiseHandler:
     
     #params for pose
     self.pose_mu_=rospy.get_param("~pose_noise_mean",0.0)
-    self.pose_stddeviation_=rospy.get_param("~pose_noise_number_stddeviations", 0.0)
+    self.pose_stddeviation_p_=rospy.get_param("~pose_noise_stddeviation_p", 0.0)
+    self.pose_stddeviation_q_=rospy.get_param("~pose_noise_stddeviation_q", 0.0)
     self.pose_use_noise_=rospy.get_param("~pose_use_noise", False)
         
     self.pose_p_outlier_=rospy.get_param("~pose_probability_outlier", 0.0)
     self.pose_create_outlier_=rospy.get_param("~pose_create_outlier", False)
     self.pose_group_size_=rospy.get_param("~pose_group_size", 1) #not working rn
-    self.pose_curr_group_=0
+    self.pose_curr_group_=0 
+    self.pose_noise_type_=rospy.get_param("pose_noise_type", "normal")
+    self.pose_curr_frame_=0
+    
+    #params for training set creation (for noise estimation LSTM)
+    self.pose_create_ts_=rospy.get_param("~pose_create_ts", False)
+    self.pose_path_to_ts_=rospy.get_param("~pose_path_to_ts", "")
+    #this is the sequence length one intends to use for the lstm. choosing it ~ as the frequency works fine
+    self.pose_lstm_sequence_length_ =rospy.get_param("~pose_lstm_sequence_length", 10)
+    self.pose_original_noise_p_=rospy.get_param("~pose_original_noise_p", 0.0)#this should be the noise that is originally in the data
+    self.pose_original_noise_q_=rospy.get_param("~pose_original_noise_q", 0.0)#this should be the noise that is originally in the data
+    if self.pose_use_noise_ and self.pose_create_ts_:
+        with open(self.pose_path_to_ts_, "a") as myfile:
+          myfile.write("starting new training sequence\n")
+          
+    #these params are for setting meta noise (i.e. non constant noise during a run especially for training)
+    self.pose_use_meta_noise_=rospy.get_param("~pose_use_meta_noise", False)
+    self.pose_noise_change_frequency_ = round(self.pose_lstm_sequence_length_/2) #play with this
+    self.pose_meta_noise_mean_p_ = rospy.get_param("~pose_meta_noise_mean_p", 0.0)
+    self.pose_meta_noise_dev_p_ = rospy.get_param("~pose_meta_noise_dev_p", 0.0)
+    self.pose_meta_noise_mean_q_ = rospy.get_param("~pose_meta_noise_mean_q", 0.0)
+    self.pose_meta_noise_dev_q_ = rospy.get_param("~pose_meta_noise_dev_q", 0.0)
+    
     
     #params for position
     self.position_mu_=rospy.get_param("~position_noise_mean",0.0)
-    self.position_stddeviation_=rospy.get_param("~position_noise_number_stddeviations", 0.0)
+    self.position_stddeviation_=rospy.get_param("~position_noise_stddeviation_p", 0.0)
     self.position_use_noise_=rospy.get_param("~position_use_noise", False)
         
     self.position_p_outlier_=rospy.get_param("~position_probability_outlier", 0.0)
     self.position_create_outlier_=rospy.get_param("~position_create_outlier", False)
     self.position_group_size_=rospy.get_param("~position_group_size", 1) #not working rn
     self.position_curr_group_=0
-
+    
+	#params for training set creation (for noise estimation LSTM)
+    self.position_create_ts_=rospy.get_param("~position_create_ts", False)
+    self.position_path_to_ts_=rospy.get_param("~position_path_to_ts", "")
+    #this is the sequence length one intends to use for the lstm. choosing it ~ as the frequency works fine
+    self.position_lstm_sequence_length_ =rospy.get_param("~position_lstm_sequence_length", 10)
+    self.position_original_noise_p_=rospy.get_param("~position_original_noise_p", 0.0)
+    if self.position_use_noise_ and self.position_create_ts_:
+        with open(self.position_path_to_ts_, "a") as myfile:
+          myfile.write("starting new training sequence\n")
+          
+    #these params are for setting meta noise (i.e. non constant noise during a run especially for training)
+    self.position_use_meta_noise_=rospy.get_param("~position_use_meta_noise", False)
+    self.position_noise_change_frequency_ = round(self.position_lstm_sequence_length_/2) #play with this
+    self.position_meta_noise_mean_p_ = rospy.get_param("~position_meta_noise_mean_p", 0.0)
+    self.position_meta_noise_dev_p_ = rospy.get_param("~position_meta_noise_dev_p", 0.0)
+    self.position_meta_noise_mean_q_ = rospy.get_param("~position_meta_noise_mean_q", 0.0)
+    self.position_meta_noise_dev_q_ = rospy.get_param("~position_meta_noise_dev_q", 0.0)
     
     
     #params for transform (we handle NavSatFix as transform for params)
     self.transform_mu_=rospy.get_param("~transform_noise_mean",0.0)
-    self.transform_stddeviation_=rospy.get_param("~transform_noise_number_stddeviations", 0.0)
+    self.transform_stddeviation_=rospy.get_param("~transform_noise_stddeviation_p", 0.0)
     self.transform_use_noise_=rospy.get_param("~transform_use_noise", False)
         
     self.transform_p_outlier_=rospy.get_param("~transform_probability_outlier", 0.0)
@@ -146,6 +186,15 @@ class MsfNoiseHandler:
     self.transform_diverge_frame_=rospy.get_param("~transform_diverge_frame", 0)
     self.transform_diverge_length_=rospy.get_param("~transform_diverge_length", 0)
     self.transform_curr_frame_=0
+    
+	#params for training set creation (for noise estimation LSTM)
+    self.transform_create_ts_=rospy.get_param("~transform_create_ts", False)
+    self.transform_path_to_ts_=rospy.get_param("~transform_path_to_ts", "")
+    self.transform_original_noise_p_=rospy.get_param("~transform_original_noise_p", 0.0)
+    if self.transform_use_noise_ and self.transform_create_ts_:
+        with open(self.transform_path_to_ts_, "a") as myfile:
+          myfile.write("starting new training sequence\n")
+    #for transform meta noise use position meta noise for now
     
     #params to estimate stddeviation of data 
     #to be set manually
@@ -163,10 +212,19 @@ class MsfNoiseHandler:
     #this will publish (3,0,0) if rovio starts diverging and (4,0,0) if it stops diverging
     self.events_pub_ = rospy.Publisher("noise_drift_handler/events", eventtype, queue_size=20)
   
-  #adds gaussian distributed noise with mu and stddeviation   
-  def add_noise(self, arrin, mu, stddeviation):
-    noise=np.random.normal(mu, stddeviation, len(arrin))
+  #adds gaussian distributed noise with mu and stddeviation(for 3DOF)
+  def add_noise3dof(self, arrin, mu, stddeviation):
+    noise=np.random.normal(mu, stddeviation, 3)
     arrout=arrin+noise
+    return arrout
+  #adds gaussian distributed noise with mu and stddeviation-p and stddeviation_q (for 6DOF, supposed to be translation, orientation)
+  def add_noise6dof(self, arrin, mu, stddeviation_p, stddeviation_q):
+    arrout=arrin
+    noise_p=np.random.normal(mu, stddeviation_p, 3)
+    arrout[:3]+=noise_p
+    noise_q=np.random.normal(mu, stddeviation_q, 4)
+    arrout[3:]+=noise_q
+    arrout[3:] = arrout[3:]/np.linalg.norm(arrout[3:]) #normalize to make valid quaternion
     return arrout
 
   #creates an oultier based on arring in by adding or subtracting 100 times stddeviation to arrin
@@ -174,7 +232,7 @@ class MsfNoiseHandler:
     #add some big disturbance to arrin (for now 100 times stddeviation)
     #sign=np.random.randint(0,2) #need 0/1 random
     #noise=np.array([100*stddeviation for i in range(len(arrin))])
-    noise = np.random.normal(0, 100*stddeviation, len(arrin))
+    noise = np.random.normal(0, 100*(stddeviation+0.1), len(arrin))
     #if sign:
     #  arrout=arrin+noise
     #else:
@@ -189,13 +247,30 @@ class MsfNoiseHandler:
     #decide which datatype is current and set params accordingly
     dtype=str(data._type)
     if dtype=="geometry_msgs/PoseWithCovarianceStamped":
+      self.pose_curr_frame_+=1
       dataarr=np.array([data.pose.pose.position.x, data.pose.pose.position.y, data.pose.pose.position.z,
       data.pose.pose.orientation.x, data.pose.pose.orientation.y, data.pose.pose.orientation.z,
       data.pose.pose.orientation.w])
       
-      stddeviation=self.pose_stddeviation_
+      #this part is for changing noise and used for creating trainingsets
+      if self.pose_use_meta_noise_ and self.pose_curr_frame_%self.pose_noise_change_frequency_==0:
+        print("using meta noise")
+        self.pose_stddeviation_p_+=np.random.normal(self.pose_meta_noise_mean_p_, self.pose_meta_noise_dev_p_)
+        self.pose_stddeviation_q_+=np.random.normal(self.pose_meta_noise_mean_q_, self.pose_meta_noise_dev_q_)
+        #make sure these stay positive
+        self.pose_stddeviation_p_=max(0.0, self.pose_stddeviation_p_)
+        self.pose_stddeviation_q_=max(0.0, self.pose_stddeviation_q_)
+      
+      stddeviation_p=self.pose_stddeviation_p_
+      stddeviation_q=self.pose_stddeviation_q_
+      stddeviation=stddeviation_p #for outlier
       use_noise=self.pose_use_noise_
       mu=self.pose_mu_
+      if use_noise and self.pose_create_ts_:
+        with open(self.pose_path_to_ts_, "a") as myfile:
+          myfile.write(str(stddeviation_p+self.pose_original_noise_p_)+", "+str(stddeviation_q+self.pose_original_noise_q_)+"\n")
+
+
       
       p_outlier=self.pose_p_outlier_
       create_outlier=self.pose_create_outlier_
@@ -207,6 +282,9 @@ class MsfNoiseHandler:
       stddeviation=self.position_stddeviation_
       use_noise=self.position_use_noise_
       mu=self.position_mu_
+      if use_noise and self.position_create_ts_:
+        with open(self.position_path_to_ts_, "a") as myfile:
+          myfile.write(str(stddeviation))
       
       p_outlier=self.position_p_outlier_
       create_outlier=self.position_create_outlier_
@@ -215,6 +293,11 @@ class MsfNoiseHandler:
     elif dtype=="geometry_msgs/TransformStamped":
       dataarr=np.array([data.transform.translation.x, data.transform.translation.y, data.transform.translation.z])
       self.transform_curr_frame_+=1
+      #this part is for changing noise and used for creating trainingsets
+      if self.position_use_meta_noise_ and self.transform_curr_frame_%self.position_noise_change_frequency_==0:
+        self.transform_stddeviation_+=np.random.normal(self.position_meta_noise_mean_p_, self.position_meta_noise_dev_p_)
+        #make sure these stay positive
+        self.transform_stddeviation_=max(0.0, self.transform_stddeviation_)
       if self.transform_use_fixed_diverge_time_ and self.transform_curr_frame_==self.transform_diverge_frame_:
         self.transform_curr_group_=self.transform_diverge_length_
         eventout = eventtype()
@@ -227,7 +310,10 @@ class MsfNoiseHandler:
       stddeviation=self.transform_stddeviation_
       use_noise=self.transform_use_noise_
       mu=self.transform_mu_
-      
+      if use_noise and self.transform_create_ts_:
+        with open(self.transform_path_to_ts_, "a") as myfile:
+          myfile.write(str(stddeviation+self.position_original_noise_p_)+"\n")
+          
       p_outlier=self.transform_p_outlier_
       create_outlier=self.transform_create_outlier_
       group_size=self.transform_group_size_
@@ -235,6 +321,13 @@ class MsfNoiseHandler:
     elif dtype=="sensor_msgs/NavSatFix":
       dataarr=np.array([data.latitude, data.longitude, data.altitude])
       self.transform_curr_frame_+=1
+      #this part is for changing noise and used for creating trainingsets
+      if self.position_use_meta_noise_ and self.transform_curr_frame_%self.position_noise_change_frequency_==0:
+        self.transform_stddeviation_+=np.random.normal(self.position_meta_noise_mean_p_, self.position_meta_noise_dev_p_)
+        #make sure these stay positive
+        self.transform_stddeviation_=max(0.0, self.transform_stddeviation_)
+
+ 
       if self.transform_use_fixed_diverge_time_ and self.transform_curr_frame_==self.transform_diverge_frame_:
         self.transform_curr_group_=self.transform_diverge_length_
         eventout = eventtype()
@@ -247,7 +340,10 @@ class MsfNoiseHandler:
       stddeviation=self.transform_stddeviation_
       use_noise=self.transform_use_noise_
       mu=self.transform_mu_
-      
+      if use_noise and self.transform_create_ts_:
+        with open(self.transform_path_to_ts_, "a") as myfile:
+          myfile.write(str(stddeviation+self.transform_original_noise_p_)+"\n")
+          
       p_outlier=self.transform_p_outlier_
       create_outlier=self.transform_create_outlier_
       group_size=self.transform_group_size_
@@ -259,7 +355,12 @@ class MsfNoiseHandler:
     if(self.started_):
       #change data according to params choosen above
       if use_noise:
-        dataarr=self.add_noise(dataarr, mu, stddeviation)
+        if(len(dataarr)==3):
+          dataarr=self.add_noise3dof(dataarr, mu, stddeviation)
+        elif(len(dataarr)==7):
+          dataarr=self.add_noise6dof(dataarr, mu, stddeviation_p, stddeviation_q)
+        else:
+          print("unrecognised array length:"+str(len(dataarr)))
       if create_outlier:
         t=np.random.uniform()
         if curr_group>0:

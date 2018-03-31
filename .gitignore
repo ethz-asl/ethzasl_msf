@@ -31,3 +31,5 @@ documentation
 cfg/__init__.py
 .vscode
 msf_updates/Python/noise_estimation/data/
+msf_updates/Python/noise_estimation/Model/
+

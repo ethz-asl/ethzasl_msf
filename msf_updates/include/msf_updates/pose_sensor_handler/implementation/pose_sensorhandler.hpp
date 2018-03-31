@@ -135,6 +135,8 @@ PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PoseSensorHandler(
       std::string default_ts="default.txt"; //for some reason I cant put ""
       pnh.param("path_to_training_set", path_to_ts, default_ts);
       ts_IO_outfile_obj_.open(path_to_ts, std::ios_base::app);
+      //for postprocessing add this line at beginning of every training sequence
+      ts_IO_outfile_obj_<<"starting new training sequence"<<std::endl;
       ts_IO_outfile_=&ts_IO_outfile_obj_;
   }
   
@@ -323,7 +325,6 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
             //probably reset makes sense here since we basically start again
             n_accepted_=0.0;
             n_rejected_=0.0;
-            n_curr_rejected_=0.0;
             running_maha_dist_average_=msf_core::desiredNoiseLevel_*mah_threshold_;
             return;
       }

@@ -64,7 +64,7 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
   /*this part is only to create training sets for LSTM noise learning and should otherwise be deactivated by setting 
   sensortype/create_training_set: False*/
   //this is formatting for eigen
-  Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", ", ", "", "", "", ";");
+  Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", ", ", "", "", "", "");
   if(ts_IO_outfile_!=NULL)
   {
     *ts_IO_outfile_<<res_delayed.format(CommaInitFmt)<<std::endl;
