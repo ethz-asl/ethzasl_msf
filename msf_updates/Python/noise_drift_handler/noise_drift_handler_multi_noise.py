@@ -113,6 +113,13 @@ class MsfNoiseHandler:
     #if mean is 0 then adding pure noise
     #if mean != 0 then is creating some drift aswell (not yet)
     
+    #parameter to define type of noise (i.e. normal, uniform,...)
+    #no matter what you will always have to specifie the standardevaition and the mean
+    #other parameters are computed based on them
+    self.noise_type_=rospy.get_param("~noise_type", "normal")
+    print(self.noise_type_)
+    
+    
     #params for pose
     self.pose_mu_=rospy.get_param("~pose_noise_mean",0.0)
     self.pose_stddeviation_p_=rospy.get_param("~pose_noise_stddeviation_p", 0.0)
@@ -216,21 +223,44 @@ class MsfNoiseHandler:
   
   #adds gaussian distributed noise with mu and stddeviation(for 3DOF)
   def add_noise3dof(self, arrin, mu, stddeviation):
-    noise=np.random.normal(mu, stddeviation, 3)
-    arrout=arrin+noise
+    if self.noise_type_=="normal":
+      noise=np.random.normal(mu, stddeviation, 3)
+      arrout=arrin+noise
+    elif self.noise_type_=="uniform":
+      unifrange=sqrt(12*stddeviation)
+      noise=np.random.uniform(mu-unifrange/2.0, mu+unifrange/2.0, 3)
+      arrout=arrin+noise
+    else:
+      print("unknown noise type "+str(self.noise_type_))
     return arrout
   #adds gaussian distributed noise with mu and stddeviation-p and stddeviation_q (for 6DOF, supposed to be translation, orientation)
   def add_noise6dof(self, arrin, mu, stddeviation_p, stddeviation_q):
     arrout=arrin
-    noise_p=np.random.normal(mu, stddeviation_p, 3)
-    arrout[:3]+=noise_p
+    if self.noise_type_=="normal":
+      noise_p=np.random.normal(mu, stddeviation_p, 3)
+      arrout[:3]+=noise_p
+    elif self.noise_type_=="uniform":
+      unifrange=sqrt(12*stddeviation_p)
+      noise_p=np.random.uniform(mu-unifrange/2.0, mu+unifrange/2.0, 3)
+      arrout[:3]+=noise_p
+    else:
+		print("unknown noise type "+str(self.noise_type_))
     #convert quaternion to euler angles and apply noise in that space (more meaningful, not sure if this
     #correct way of doing it though (has different arangement w, x, y, z instead of x, y, z, w
     [ai, aj, ak] = euler_from_quaternion([arrout[6],arrout[3], arrout[4], arrout[5]])
-    noise_q=np.random.normal(mu, stddeviation_q, 3)
-    ai+=noise_q[0]
-    aj+=noise_q[1]
-    ak+=noise_q[2]
+    if self.noise_type_=="normal":
+      noise_q=np.random.normal(mu, stddeviation_q, 3)
+      ai+=noise_q[0]
+      aj+=noise_q[1]
+      ak+=noise_q[2]
+    elif self.noise_type_=="uniform":
+      unifrange=sqrt(12*stddeviation_q)
+      noise_q=np.random.uniform(mu-unifrange/2.0, mu+unifrange/2.0, 3)
+      ai+=noise_q[0]
+      aj+=noise_q[1]
+      ak+=noise_q[2]
+    else:
+      print("unknown noise type "+str(self.noise_type_))
     #convert back
     q_temp = quaternion_from_euler(ai, aj, ak)
     arrout[3]=q_temp[1]

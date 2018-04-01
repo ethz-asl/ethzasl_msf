@@ -15,7 +15,7 @@ POSITION_FEATURE_FILE="/home/yannick/catkin_ws/src/ethzasl_msf/msf_updates/Pytho
 POSITION_LABEL_FILE="/home/yannick/catkin_ws/src/ethzasl_msf/msf_updates/Python/noise_estimation/data/train_position_labels.txt"
 POSE_FEATURE_FILE="/home/yannick/catkin_ws/src/ethzasl_msf/msf_updates/Python/noise_estimation/data/train_pose_feats.txt"
 POSE_LABEL_FILE="/home/yannick/catkin_ws/src/ethzasl_msf/msf_updates/Python/noise_estimation/data/train_pose_labels.txt"
-N_RUNS = 5
+N_RUNS = 10
 P_MIN_NOISE = 0.05
 P_MAX_NOISE = 2.0
 Q_MIN_NOISE = 0.0005
@@ -28,13 +28,16 @@ META_NOISE_DEV_MAX = 0.1
 POSE_LSTM_SEQUENCE_LENGTH=20 #corresponds to the frequency of the sensor
 POSITION_LSTM_SEQUENCE_LENGTH=100 #corresponds to the frequency of the sensor
 #need more params such as meta noise and change of noise in general
-def run_single(position_dev, position_noise_type, position_meta_noise_mean, position_meta_noise_dev, position_p_outlier,
-		pose_dev_p, pose_dev_q, pose_noise_type, pose_meta_noise_mean_p, pose_meta_noise_dev_p,
+def run_single(noise_type, position_dev, position_meta_noise_mean, position_meta_noise_dev, position_p_outlier,
+		pose_dev_p, pose_dev_q, pose_meta_noise_mean_p, pose_meta_noise_dev_p,
 		pose_meta_noise_mean_q, pose_meta_noise_dev_q, pose_p_outlier, launch_file, rosbag_file):
 	#write configuration file for noise_drift_handler (noise_drift_handler_fix.yaml)
 	with open(os.path.join(CONFIG_PATH, "noise_drift_handler_fix.yaml"), "w") as noise_drift_config:
 		noise_drift_config.write(
-"""#params for pose
+"""
+#global param
+/noise_drift_handler/noise_type: """+str(noise_type)+"""
+#params for pose
 /noise_drift_handler/pose_noise_mean: 0.0
 /noise_drift_handler/pose_noise_stddeviation_p: """+str(pose_dev_p)+"""
 /noise_drift_handler/pose_noise_stddeviation_q: """+str(pose_dev_q)+"""
@@ -169,7 +172,7 @@ pose_sensor/enable_noise_estimation: true
 #setting this closer to 1 will make it more longtime closer to 0 more shorttime
 #should think about frequency when defining this
 pose_sensor/noise_estimation_discount_factor: 0.99
-pose_sensor/max_noise_threshold: 1
+pose_sensor/max_noise_threshold: 2
 
 #settings for noise estimation
 position_sensor/enable_noise_estimation: true
@@ -215,11 +218,10 @@ pose_sensor/path_to_training_set: """+str(POSE_FEATURE_FILE))
 	#sleep(120)
 for i in range(N_RUNS):
 	#select all possible parameters as randomly as possible
+	noise_type = np.random.choice(NOISE_TYPE)
 	#parameters for position
 	#initial noise
 	position_dev = np.random.uniform(P_MIN_NOISE, P_MAX_NOISE)
-	#noise type
-	position_noise_type = np.random.choice(NOISE_TYPE)
 	#meta noise
 	position_meta_noise_mean = np.random.uniform(-META_NOISE_MEAN_MAX, META_NOISE_MEAN_MAX)
 	position_meta_noise_dev = np.random.uniform(0, META_NOISE_DEV_MAX)
@@ -228,19 +230,17 @@ for i in range(N_RUNS):
 	#parameters for pose
 	#initial noise
 	pose_dev_p = np.random.uniform(P_MIN_NOISE/5, P_MAX_NOISE/5)
-	#pose_dev_q = np.random.uniform(Q_MIN_NOISE, Q_MAX_NOISE)
-	pose_dev_q=0.0
-	#noise type
-	pose_noise_type = np.random.choice(NOISE_TYPE)
+	pose_dev_q = np.random.uniform(Q_MIN_NOISE, Q_MAX_NOISE)
+	#pose_dev_q=0.0
 	#meta noise
 	pose_meta_noise_mean_p = np.random.uniform(-META_NOISE_MEAN_MAX, META_NOISE_MEAN_MAX)
 	pose_meta_noise_dev_p = np.random.uniform(0, META_NOISE_DEV_MAX)
-	#pose_meta_noise_mean_q = np.random.uniform(-META_NOISE_MEAN_MAX/10, META_NOISE_MEAN_MAX/10)
-	#pose_meta_noise_dev_q = np.random.uniform(0, META_NOISE_DEV_MAX/10)
-	pose_meta_noise_mean_q = 0.0
-	pose_meta_noise_dev_q = 0.0
+	pose_meta_noise_mean_q = np.random.uniform(-META_NOISE_MEAN_MAX/10, META_NOISE_MEAN_MAX/10)
+	pose_meta_noise_dev_q = np.random.uniform(0, META_NOISE_DEV_MAX/10)
+	#pose_meta_noise_mean_q = 0.0
+	#pose_meta_noise_dev_q = 0.0
 	pose_p_outlier = np.random.uniform(MIN_P_OUTLIER, MAX_P_OUTLIER)
 	#run a single round
-	run_single(position_dev, position_noise_type, position_meta_noise_mean, position_meta_noise_dev, position_p_outlier,
-		pose_dev_p, pose_dev_q, pose_noise_type, pose_meta_noise_mean_p, pose_meta_noise_dev_p,
+	run_single(noise_type, position_dev, position_meta_noise_mean, position_meta_noise_dev, position_p_outlier,
+		pose_dev_p, pose_dev_q, pose_meta_noise_mean_p, pose_meta_noise_dev_p,
 		pose_meta_noise_mean_q, pose_meta_noise_dev_q, pose_p_outlier, LAUNCH_FILE, ROSBAG_FILE)
