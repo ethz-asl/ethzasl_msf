@@ -1,8 +1,10 @@
 import tensorflow as tf
+import tensorflow.contrib.layers as layers
+import numpy as np
 
 map_fn = tf.map_fn
 
-def build_LSTM_simple_model(n_features, num_noise_params, max_sequence_length, initial_state=0, batchsize = 32, seed = 42, train = True):
+def build_LSTM_dynamic_model(n_features, num_noise_params, max_sequence_length, initial_state=0, batchsize = 32, seed = 42, train = True):
 	
 	TINY = 1e-6 
 	
@@ -10,8 +12,9 @@ def build_LSTM_simple_model(n_features, num_noise_params, max_sequence_length, i
 	LEARNING_RATE = 0.01
 	dropout_rate_input = 0.2
 	dropout_rate_hidden = 0.5
+	INPUT_SIZE = n_features
 	n_hidden_RNN = 81
-	n_out_RNN = n_features
+	OUTPUT_SIZE = num_noise_params
 	#hidden_fcl_sizes = [512, 512]
 	activ = tf.nn.sigmoid
 	regularization_param = 1.0
@@ -27,9 +30,9 @@ def build_LSTM_simple_model(n_features, num_noise_params, max_sequence_length, i
 	# Define the Model
 
 	# Inputs Paceholders
-	feats_inpt = tf.placeholder(tf.float32, shape = [max_sequence_length, batchsize, n_features], name = "input_features")
+	feats_inpt = tf.placeholder(tf.float32, shape = [None, None, INPUT_SIZE], name = "input_features")
 	
-	labels = tf.placeholder(tf.float32, shape = [max_sequence_length, batchsize, num_noise_params], name = "input_labels")
+	labels = tf.placeholder(tf.float32, shape = [None, None, OUTPUT_SIZE], name = "input_labels")
 	
 	drop_prob_input = dropout_rate_input
 	drop_prob_hidden = dropout_rate_hidden
@@ -41,12 +44,12 @@ def build_LSTM_simple_model(n_features, num_noise_params, max_sequence_length, i
 
 
 	# The LSTM with additional dropout
-	rnn_cell = tf.contrib.rnn.BasicLSTMCell(n_hidden_RNN)
-	initial_state =  tf.zeros([batchsize, rnn_cell.state_size])
+	rnn_cell = tf.contrib.rnn.BasicLSTMCell(n_hidden_RNN, state_is_tuple=True)
+	
+	batch_size = tf.shape(feats_inpt)[1]
 
-	#if initial_state == 0: #not initialized
-	#	initial_state = rnn_cell.zero_state(batchsize, tf.float32)
-	final_state=initial_state
+	initial_state = rnn_cell.zero_state(batchsize, tf.float32)
+	
 	rnn_outputs, state = tf.nn.dynamic_rnn(rnn_cell, feats_inpt, initial_state=initial_state, dtype=tf.float32, time_major=True) #output is rnn_outputs, rnn_states
 
 	
@@ -68,7 +71,7 @@ def build_LSTM_simple_model(n_features, num_noise_params, max_sequence_length, i
 	train_step = tf.train.RMSPropOptimizer(LEARNING_RATE).minimize(error)
 
 	# Return training step, loss, predictions, accuracy and input placeholders
-	return [train_step, cross_entropy, error, feats_inpt, labels, state]
+	return [train_step, cross_entropy, error, feats_inpt, labels]
 
 
 
