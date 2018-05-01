@@ -62,11 +62,12 @@ struct PressureMeasurement : public PressureMeasurementBase {
   PressureMeasurement(double n_zp, bool isabsoluteMeasurement, int sensorID,
                       bool enable_mah_outlier_rejection, double mah_threshold,
                       double* running_maha_dist_average, double average_discount_factor,
-                      double* n_rejected, double* n_curr_rejected, double* n_accepted, std::ofstream* ts_IO_outfile)
+                      double* n_rejected, double* n_curr_rejected, double* n_accepted,
+                      std::string NN_eval_key, std::ofstream* ts_IO_outfile)
       : PressureMeasurementBase(isabsoluteMeasurement, sensorID,
                                 enable_mah_outlier_rejection, mah_threshold,
                                 running_maha_dist_average, average_discount_factor,
-                               n_rejected, n_curr_rejected, n_accepted, ts_IO_outfile),
+                               n_rejected, n_curr_rejected, n_accepted, NN_eval_key, ts_IO_outfile),
         n_zp_(n_zp) {}
   virtual std::string Type() { return "pressure"; }
   /**

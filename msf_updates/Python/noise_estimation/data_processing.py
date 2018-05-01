@@ -85,7 +85,7 @@ def load_all_data(feature_file, label_file, sequence_length):
 #to assure run postprocess_ts.py
 #sequence length is the sequence length of the training data
 def load_all_data(feature_file, label_file, sequence_length):
-	NVAL=8
+	NVAL=24
 	#read files do preprocessing: split file sequences into actual sequence length
 	featf = open(feature_file, "r")
 	labelf = open(label_file, "r")
@@ -125,7 +125,8 @@ def load_all_data(feature_file, label_file, sequence_length):
 	sequence_list_l.pop()
 	combined = list(zip(sequence_list_f, sequence_list_l))
 	shuffle(combined)
-
+	
+	sequence_list_f[:], sequence_list_l[:] = zip(*combined)
 	#sequence_list_f[:], sequence_list_l[:] = zip(*combined)
 	#print(sequence_list_f)
 

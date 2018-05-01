@@ -170,6 +170,12 @@ class MSF_Core {
                        ErrorState & correction, double fuzzythres = 100.1);
 
 
+  /** publisher for residual 
+   * used in NN noise estimation
+   * publishing is done inside measurement_inl.h
+   */
+  ros::Publisher pubRes_;
+  
   /**
    * \brief Ctor takes a pointer to an object which does the user defined
    * calculations and provides interfaces for initialization etc.

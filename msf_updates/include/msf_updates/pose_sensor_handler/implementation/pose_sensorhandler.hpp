@@ -19,6 +19,8 @@
 #include <msf_core/eigen_utils.h>
 #include <msf_core/msf_types.h>
 #include <std_srvs/Empty.h>
+#include <sensor_fusion_comm/AddListener.h>
+#include <sensor_fusion_comm/EvalListener.h>
 
 #ifndef POSE_SENSORHANDLER_HPP_
 #define POSE_SENSORHANDLER_HPP_
@@ -66,6 +68,26 @@ PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PoseSensorHandler(
   pnh.param("noise_estimation_discount_factor", average_discount_factor_, 1.0);
   pnh.param("max_noise_threshold", max_noise_threshold_, 10.0);
   running_maha_dist_average_=msf_core::desiredNoiseLevel_*mah_threshold_;
+
+  //this is for noise estimation using a neural network
+  pnh.param("use_nn_noise_estimation", use_nn_noise_estimation_, false);
+  std::string emptystr="";
+  pnh.param("tf_key", tf_key_, emptystr);
+  pnh.param("tf_network_path", tf_network_path_, emptystr);
+  pnh.param("tf_input_name", tf_input_name_, emptystr);
+  pnh.param("tf_output_name", tf_output_name_, emptystr);
+  pnh.param("tf_max_memory", tf_max_memory_, 0);
+  pnh.param("tf_eval_frequency", tf_eval_frequency_, 1);
+  if(use_nn_noise_estimation_)
+  {
+    enable_noise_estimation_=true;
+    MSF_INFO_STREAM("using NN to predict noise parameters with update frequency "<<tf_eval_frequency_);
+  }
+  else
+  {
+      tf_key_="";
+  }
+
   //params for divergence recovery
   pnh.param("enable_divergence_recovery", enable_divergence_recovery_, true);
   pnh.param("divergence_rejection_limit", rejection_divergence_threshold_, msf_core::defaultRejectionDivergenceThreshold_);
@@ -286,7 +308,7 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
       provides_absolute_measurements_, this->sensorID,
       enable_mah_outlier_rejection_, mah_threshold_, &running_maha_dist_average_,
       average_discount_factor_, &n_rejected_, &n_curr_rejected_,
-      &n_accepted_, ts_IO_outfile_, fixedstates, distorter_));
+      &n_accepted_, tf_key_, ts_IO_outfile_, fixedstates, distorter_));
 
   meas->MakeFromSensorReading(msg, msg->header.stamp.toSec() - delay_);
 
@@ -299,34 +321,61 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
   //or wether this sensor is currently diverging -> use recovery and increase noise meas
   if(enable_noise_estimation_)
   {
-      //if running average is larger than upperNoiseLimit of threshold recompute noise based on this
-      if(running_maha_dist_average_>=msf_core::upperNoiseLimit_*mah_threshold_ || running_maha_dist_average_<=msf_core::lowerNoiseLimit_*mah_threshold_)
+      //+1 is for not evaluating with 0 messages
+      if(use_nn_noise_estimation_)
       {
+          //TODO make separate counter
+          //MSF_INFO_STREAM((int)(n_accepted_+n_rejected_+1)%tf_eval_frequency_<<"val "<<n_accepted_);
+          if(((int)(n_accepted_+n_rejected_+1)%tf_eval_frequency_)==0)
+            {
+            //make service call to evaluation
+            MSF_WARN_STREAM("evaluating NN"<<n_accepted_<<" "<<n_rejected_<<" "<<tf_eval_frequency_);
+            ros::NodeHandle ntemp;
+            ros::ServiceClient clienttemp = ntemp.serviceClient<sensor_fusion_comm::EvalListener>("eval_node/eval_listener");
+            sensor_fusion_comm::EvalListener srvtemp;
+            srvtemp.request.key = tf_key_;
+            
+            if(clienttemp.call(srvtemp))
+            {
+                MSF_INFO_STREAM("new noise"<<srvtemp.response.output[0]<<"and "<<srvtemp.response.output[1]);
+                mngr->config_.pose_noise_meas_p = srvtemp.response.output[0];
+                    mngr->config_.pose_noise_meas_q = srvtemp.response.output[1];
+                //set noise
+                return;
+            }
+          }
+      }
+      else
+      {
+        //if running average is larger than upperNoiseLimit of threshold recompute noise based on this
+        if(running_maha_dist_average_>=msf_core::upperNoiseLimit_*mah_threshold_ || running_maha_dist_average_<=msf_core::lowerNoiseLimit_*mah_threshold_)
+        {
 
-            double tempfactor=(1.0+2.0*(running_maha_dist_average_/mah_threshold_-msf_core::desiredNoiseLevel_));
-            //use a factor based on val
-            //if factor larger one we want:
-            //not surpass max threshold
-            //increase to fixed amount if it was too small (~0) before
-            if (tempfactor>1.0)
-            {
-                mngr->config_.pose_noise_meas_p = std::max(0.05, std::min(mngr->config_.pose_noise_meas_p*tempfactor, this->GetMaxNoiseThreshold()));
-                //q noise should be smaller
-                mngr->config_.pose_noise_meas_q = std::max(0.02, std::min(mngr->config_.pose_noise_meas_q*tempfactor, this->GetMaxNoiseThreshold()/2));
-            }
-            //no additional constraints
-            else
-            {
-                mngr->config_.pose_noise_meas_p = mngr->config_.pose_noise_meas_p*tempfactor, this->GetMaxNoiseThreshold();
-                mngr->config_.pose_noise_meas_q = mngr->config_.pose_noise_meas_q*tempfactor, this->GetMaxNoiseThreshold();
-            }
-            MSF_INFO_STREAM("Changing Noise measurement p to:"<<mngr->config_.pose_noise_meas_p);
-            this->SetNoises(mngr->config_.pose_noise_meas_p, mngr->config_.pose_noise_meas_q);
-            //probably reset makes sense here since we basically start again
-            n_accepted_=0.0;
-            n_rejected_=0.0;
-            running_maha_dist_average_=msf_core::desiredNoiseLevel_*mah_threshold_;
-            return;
+                double tempfactor=(1.0+2.0*(running_maha_dist_average_/mah_threshold_-msf_core::desiredNoiseLevel_));
+                //use a factor based on val
+                //if factor larger one we want:
+                //not surpass max threshold
+                //increase to fixed amount if it was too small (~0) before
+                if (tempfactor>1.0)
+                {
+                    mngr->config_.pose_noise_meas_p = std::max(0.05, std::min(mngr->config_.pose_noise_meas_p*tempfactor, this->GetMaxNoiseThreshold()));
+                    //q noise should be smaller
+                    mngr->config_.pose_noise_meas_q = std::max(0.02, std::min(mngr->config_.pose_noise_meas_q*tempfactor, this->GetMaxNoiseThreshold()/2));
+                }
+                //no additional constraints
+                else
+                {
+                    mngr->config_.pose_noise_meas_p = mngr->config_.pose_noise_meas_p*tempfactor, this->GetMaxNoiseThreshold();
+                    mngr->config_.pose_noise_meas_q = mngr->config_.pose_noise_meas_q*tempfactor, this->GetMaxNoiseThreshold();
+                }
+                MSF_INFO_STREAM("Changing Noise measurement p to:"<<mngr->config_.pose_noise_meas_p);
+                this->SetNoises(mngr->config_.pose_noise_meas_p, mngr->config_.pose_noise_meas_q);
+                //probably reset makes sense here since we basically start again
+                n_accepted_=0.0;
+                n_rejected_=0.0;
+                running_maha_dist_average_=msf_core::desiredNoiseLevel_*mah_threshold_;
+                return;
+        }
       }
 
   }

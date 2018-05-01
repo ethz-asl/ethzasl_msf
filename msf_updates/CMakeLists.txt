@@ -16,6 +16,8 @@ find_package(catkin REQUIRED COMPONENTS roscpp rospy msf_core geometry_msgs sens
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 
+
+
 generate_dynamic_reconfigure_options(
     cfg/PosePressureSensor.cfg
     cfg/PositionPoseSensor.cfg
@@ -24,12 +26,14 @@ generate_dynamic_reconfigure_options(
     cfg/SphericalPositionSensor.cfg
 )
 
+
 catkin_package(
     DEPENDS
     CATKIN_DEPENDS roscpp msf_core geometry_msgs sensor_fusion_comm
     INCLUDE_DIRS include ${catkin_INCLUDE_DIRS}
     LIBRARIES pose_distorter
 )
+
 
 add_library(pose_distorter src/msf_distort/PoseDistorter.cc)
 target_link_libraries(pose_distorter ${catkin_LIBRARIES})

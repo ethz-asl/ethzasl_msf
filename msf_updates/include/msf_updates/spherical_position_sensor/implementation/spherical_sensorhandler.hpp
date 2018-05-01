@@ -143,7 +143,7 @@ void AngleSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
       n_za_, use_fixed_covariance_, provides_absolute_measurements_,
       this->sensorID, fixedstates, enable_mah_outlier_rejection_,
       mah_threshold_, &running_maha_dist_average_, average_discount_factor_,
-      &n_rejected_, &n_curr_rejected_, &n_accepted_, ts_IO_outfile_));
+      &n_rejected_, &n_curr_rejected_, &n_accepted_, tf_key_, ts_IO_outfile_));
 
   meas->MakeFromSensorReading(msg, msg->header.stamp.toSec() - delay_);
 
@@ -285,7 +285,7 @@ void DistanceSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
       n_zd_, use_fixed_covariance_, provides_absolute_measurements_,
       this->sensorID, fixedstates, enable_mah_outlier_rejection_,
       mah_threshold_, &running_maha_dist_average_, average_discount_factor_,
-      &n_rejected_, &n_curr_rejected_, &n_accepted_, ts_IO_outfile_));
+      &n_rejected_, &n_curr_rejected_, &n_accepted_, tf_key_, ts_IO_outfile_));
 
   meas->MakeFromSensorReading(msg, msg->header.stamp.toSec() - delay_);
 

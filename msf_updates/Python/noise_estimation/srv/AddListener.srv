@@ -1,0 +1,13 @@
+#the key to identify itself under potentially different listeners
+string key
+#the path to the tfnetwork protobuff file (*.pb)
+string tfnetworkpath
+
+#the name of input and output layer
+string inputname
+string outputname
+
+#the maximal memory length
+int64 maxmemory
+---
+std_msgs/Empty nothing

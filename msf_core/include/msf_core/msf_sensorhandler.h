@@ -49,6 +49,7 @@ class SensorHandler {
   bool enable_noise_estimation_;
   double running_maha_dist_average_;
   double average_discount_factor_;
+  int tf_eval_frequency_;
   //params for divergence recovery
   bool enable_divergence_recovery_;
   double n_rejected_;
@@ -90,6 +91,15 @@ public:
   bool collect_for_init_;
   bool ready_for_init_;
   double total_init_movement_;
+
+  //params for noise estimation using a neural net
+  bool use_nn_noise_estimation_;
+  std::string tf_key_;
+  std::string tf_network_path_;
+  std::string tf_input_name_;
+  std::string tf_output_name_;
+  int tf_max_memory_;
+
   //data sturcture for collecting points for stable init (if runtime is problematic may want to use something better)
   //each vector saves: x,y,z,t
   std::vector<Eigen::Vector4d> init_points_;

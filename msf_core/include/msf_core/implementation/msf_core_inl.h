@@ -35,12 +35,18 @@
 #include <msf_core/falsecolor.h>
 #include <msf_core/msf_types.h>
 
+//datatype for publisher
+#include <sensor_fusion_comm/ArrayWithKey.h>
+
 namespace msf_core {
 template<typename EKFState_T>
 MSF_Core<EKFState_T>::MSF_Core(const MSF_SensorManager<EKFState_T>& GetUserCalc)
     : usercalc_(GetUserCalc) {  // The interface for the user to customize EKF
   // interna, DO ABSOLUTELY NOT USE THIS POINTER INSIDE THIS CTOR!!
 
+  //initialize publisher for residual
+  ros::NodeHandle nh("msf_core");
+  pubRes_ = nh.advertise < sensor_fusion_comm::ArrayWithKey > ("Residual", 10);
   // Set the output precision for numeric values.
   std::setprecision(NUMERIC_PREC);
   initialized_ = false;

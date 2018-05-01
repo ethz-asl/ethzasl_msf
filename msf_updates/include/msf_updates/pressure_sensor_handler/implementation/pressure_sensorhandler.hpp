@@ -97,7 +97,7 @@ void PressureSensorHandler::MeasurementCallback(
       new pressure_measurement::PressureMeasurement(
           n_zp_, true, this->sensorID, enable_mah_outlier_rejection_,
           mah_threshold_, &running_maha_dist_average_, average_discount_factor_,
-          &n_rejected_, &n_curr_rejected_, &n_accepted_, ts_IO_outfile_));
+          &n_rejected_, &n_curr_rejected_, &n_accepted_, tf_key_, ts_IO_outfile_));
   meas->MakeFromSensorReading(msg, msg->header.stamp.toSec());
 
   z_p_ = meas->z_p_;  // Store this for the init procedure.

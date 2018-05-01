@@ -17,6 +17,7 @@
 #ifndef MEASUREMENT_INL_H_
 #define MEASUREMENT_INL_H_
 #include <msf_core/msf_core.h>
+#include <sensor_fusion_comm/ArrayWithKey.h>
 
 namespace msf_core {
 template<typename EKFState_T>
@@ -24,7 +25,7 @@ MSF_MeasurementBase<EKFState_T>::MSF_MeasurementBase(bool isabsoluteMeasurement,
                       bool enable_mah_outlier_rejection, double mah_threshold,
                       double* running_maha_dist_average, double average_discount_factor,
                       double* n_rejected, double* n_curr_rejected,
-                      double* n_accepted, std::ofstream* ts_IO_outfile)
+                      double* n_accepted, std::string NN_eval_key, std::ofstream* ts_IO_outfile)
     : sensorID_(sensorID),
       isabsolute_(isabsoluteMeasurement),
       enable_mah_outlier_rejection_(enable_mah_outlier_rejection),
@@ -32,7 +33,7 @@ MSF_MeasurementBase<EKFState_T>::MSF_MeasurementBase(bool isabsoluteMeasurement,
       running_maha_dist_average_(running_maha_dist_average),
       average_discount_factor_(average_discount_factor),
       n_rejected_(n_rejected), n_curr_rejected_(n_curr_rejected),
-      n_accepted_(n_accepted), ts_IO_outfile_(ts_IO_outfile),
+      n_accepted_(n_accepted), NN_eval_key_(NN_eval_key), ts_IO_outfile_(ts_IO_outfile),
       time(0) {
 }
 
@@ -68,6 +69,16 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
   if(ts_IO_outfile_!=NULL)
   {
     *ts_IO_outfile_<<res_delayed.format(CommaInitFmt)<<std::endl;
+  }
+  if(NN_eval_key_!="")
+  {
+    //im sure this is way to much copying but couldn't find a better way yet
+    sensor_fusion_comm::ArrayWithKey Resmsg;
+    Resmsg.key=NN_eval_key_;
+    Eigen::MatrixXd restemp=res_delayed;
+    std::vector<double> vec(restemp.data(), restemp.data() + restemp.rows() * restemp.cols());
+    Resmsg.data=vec;
+    core.pubRes_.publish(Resmsg);
   }
   if(enable_mah_outlier_rejection_){
 

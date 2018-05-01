@@ -85,11 +85,12 @@ struct AngleMeasurement : public AngleMeasurementBase {
                    bool isabsoluteMeasurement, int sensorID, int fixedstates,
                    bool enable_mah_outlier_rejection, double mah_threshold,
                    double* running_maha_dist_average, double average_discount_factor,
-                   double* n_rejected, double* n_curr_rejected, double* n_accepted, std::ofstream* ts_IO_outfile)
+                   double* n_rejected, double* n_curr_rejected, double* n_accepted,
+                   std::string NN_eval_key, std::ofstream* ts_IO_outfile)
       : AngleMeasurementBase(isabsoluteMeasurement, sensorID,
                              enable_mah_outlier_rejection, mah_threshold,
                              running_maha_dist_average, average_discount_factor,
-                             n_rejected, n_curr_rejected, n_accepted, ts_IO_outfile),
+                             n_rejected, n_curr_rejected, n_accepted, NN_eval_key, ts_IO_outfile),
         n_za_(n_za),
         fixed_covariance_(fixed_covariance),
         fixedstates_(fixedstates) {}
@@ -376,11 +377,11 @@ struct DistanceMeasurement : public DistanceMeasurementBase {
                       bool enable_mah_outlier_rejection, double mah_threshold,
                       double* running_maha_dist_average, double average_discount_factor,
                       double* n_rejected, double* n_curr_rejected,
-                      double* n_accepted, std::ofstream* ts_IO_outfile)
+                      double* n_accepted, std::string NN_eval_key, std::ofstream* ts_IO_outfile)
       : DistanceMeasurementBase(isabsoluteMeasurement, sensorID,
                                 enable_mah_outlier_rejection, mah_threshold,
                                 running_maha_dist_average, average_discount_factor,
-                                n_rejected, n_curr_rejected, n_accepted, ts_IO_outfile),
+                                n_rejected, n_curr_rejected, n_accepted, NN_eval_key, ts_IO_outfile),
         n_zd_(n_zd),
         fixed_covariance_(fixed_covariance),
         fixedstates_(fixedstates) {}

@@ -1,0 +1,10 @@
+#the key to identify itself under potentially different listeners
+string key
+
+#the new input data
+float64[] data 
+
+#a boolean wether to evaluate the network (True) or simply add the data to memory (False)
+bool eval
+---
+float64[] output

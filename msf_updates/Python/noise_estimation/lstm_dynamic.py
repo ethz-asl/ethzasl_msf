@@ -4,7 +4,7 @@ import numpy as np
 
 map_fn = tf.map_fn
 
-def build_LSTM_dynamic_model(n_features, num_noise_params, max_sequence_length, initial_state=0, batchsize = 32, seed = 42, train = True):
+def build_LSTM_dynamic_model(n_features, num_noise_params, max_sequence_length, initial_state=0, seed = 42, train = True):
 	
 	TINY = 1e-6 
 	
@@ -45,10 +45,9 @@ def build_LSTM_dynamic_model(n_features, num_noise_params, max_sequence_length, 
 
 	# The LSTM with additional dropout
 	rnn_cell = tf.contrib.rnn.BasicLSTMCell(n_hidden_RNN, state_is_tuple=True)
-	
-	batch_size = tf.shape(feats_inpt)[1]
 
-	initial_state = rnn_cell.zero_state(batchsize, tf.float32)
+
+	initial_state = rnn_cell.zero_state(tf.shape(feats_inpt)[1], tf.float32)
 	
 	rnn_outputs, state = tf.nn.dynamic_rnn(rnn_cell, feats_inpt, initial_state=initial_state, dtype=tf.float32, time_major=True) #output is rnn_outputs, rnn_states
 
@@ -56,13 +55,16 @@ def build_LSTM_dynamic_model(n_features, num_noise_params, max_sequence_length, 
 	final_projection = lambda x: tf.contrib.layers.linear(x, num_outputs=num_noise_params, activation_fn=activ)
 	
 	# apply projection to every timestep.
-	predicted_outputs = map_fn(final_projection, rnn_outputs)
-
+	predicted_outputs = map_fn(final_projection, rnn_outputs, name="predictions")
+	
+	prediction = tf.identity(predicted_outputs, name="prediction")
+	#tf.summary.tensor_summary(name="predictions", tensor=predicted_outputs)
 
 	#with tf.name_scope("cross_entropy_ns"):
 	# compute elementwise cross entropy.
-	cross_entropy = -(labels * tf.log(predicted_outputs + TINY) + (1.0 - labels) * tf.log(1.0 - predicted_outputs + TINY))
-	error = tf.reduce_mean(cross_entropy, name="error")
+	#cross_entropy = -(labels * tf.log(predicted_outputs + TINY) + (1.0 - labels) * tf.log(1.0 - predicted_outputs + TINY))
+	#error = tf.reduce_mean(cross_entropy, name="error")
+	error = tf.losses.mean_squared_error(labels, predicted_outputs)
 	tf.summary.scalar("error", error)
 
 	final_state=state
@@ -71,7 +73,7 @@ def build_LSTM_dynamic_model(n_features, num_noise_params, max_sequence_length, 
 	train_step = tf.train.RMSPropOptimizer(LEARNING_RATE).minimize(error)
 
 	# Return training step, loss, predictions, accuracy and input placeholders
-	return [train_step, cross_entropy, error, feats_inpt, labels]
+	return [train_step, error, feats_inpt, labels, predicted_outputs]
 
 
 

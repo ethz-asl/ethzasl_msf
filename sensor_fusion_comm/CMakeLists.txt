@@ -18,6 +18,7 @@ add_message_files(
   ExtEkf.msg
   ExtState.msg
   PointWithCovarianceStamped.msg
+  ArrayWithKey.msg
 )
 
 #uncomment if you have defined services
@@ -25,6 +26,8 @@ add_service_files(
   FILES
   InitScale.srv
   InitHeight.srv
+  AddListener.srv
+  EvalListener.srv
 )
 
 generate_messages(
