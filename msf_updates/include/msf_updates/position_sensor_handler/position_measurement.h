@@ -138,9 +138,11 @@ struct PositionMeasurement : public PositionMeasurementBase {
 
     H.block<3, 3>(0, idxstartcorr_q_) = -C_q.transpose() * p_prism_imu_sk;  // q
 
-    H.block<3, 3>(0, idxstartcorr_p_pi_) =
-        fixed_p_pos_imu ?
-            Eigen::Matrix<double, 3, 3>::Zero() : (C_q.transpose()).eval();  //p_pos_imu_
+    if (fixed_p_pos_imu) {
+      H.block<3, 3>(0, idxstartcorr_p_pi_).setZero();
+    } else {
+      H.block<3, 3>(0, idxstartcorr_p_pi_) = (C_q.transpose()).eval();  //p_pos_imu_
+    }
 
   }
 
