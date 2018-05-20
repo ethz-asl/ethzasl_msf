@@ -193,6 +193,8 @@ class MSF_Core {
 
   /// Is the filter initialized, so that we can propagate the state?
   bool initialized_;
+  /// Time the filter was initialized, so that we can discard delayed messages.
+  double initTime_;
   /// Is there a state prediction, so we can apply measurements?
   bool predictionMade_;
   /// Was the filter pushed to fuzzy state by a measurement?
