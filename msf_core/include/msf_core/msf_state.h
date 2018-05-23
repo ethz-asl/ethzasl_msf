@@ -27,6 +27,7 @@
 #include <msf_core/eigen_conversions.h>
 #include <nav_msgs/Odometry.h>
 #include <sensor_fusion_comm/ExtState.h>
+#include <geometry_msgs/TransformStamped.h>
 #include <sensor_fusion_comm/DoubleArrayStamped.h>
 #include <sensor_fusion_comm/DoubleMatrixStamped.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
@@ -226,6 +227,12 @@ struct GenericState_T {
    * \note It does not set the header.
    */
   void ToOdometryMsg(nav_msgs::Odometry& odometry);
+
+    /**
+   * \brief Assembles a Transform message from the state.
+   * \note It does not set the header.
+   */
+  void ToOdometryMsg(geometry_msgs::TransformStamped& transform);
 
   /**
    * \brief Assemble an ExtState message from the state.
