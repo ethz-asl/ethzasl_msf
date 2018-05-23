@@ -232,7 +232,7 @@ struct GenericState_T {
    * \brief Assembles a Transform message from the state.
    * \note It does not set the header.
    */
-  void ToOdometryMsg(geometry_msgs::TransformStamped& transform);
+  void ToTransformMsg(geometry_msgs::TransformStamped& transform);
 
   /**
    * \brief Assemble an ExtState message from the state.
