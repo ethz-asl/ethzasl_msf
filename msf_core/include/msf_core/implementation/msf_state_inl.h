@@ -26,6 +26,7 @@
 #include <vector>
 #include <msf_core/eigen_conversions.h>
 #include <nav_msgs/Odometry.h>
+#include <geometry_msgs/TransformStamped.h>
 #include <sensor_fusion_comm/ExtState.h>
 #include <sensor_fusion_comm/DoubleArrayStamped.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
@@ -145,6 +146,17 @@ void GenericState_T<stateVector_T, StateDefinition_T>::ToOdometryMsg(
                                      odometry.twist.twist.angular);
 
   GetTwistCovarianceInImuFrame(odometry.twist.covariance);
+}
+
+/// Assembles an Transform message from the state.
+/** it does not set the header */
+template<typename stateVector_T, typename StateDefinition_T>
+void GenericState_T<stateVector_T, StateDefinition_T>::ToTransformMsg(
+    geometry_msgs::TransformStamped& transform) {
+  eigen_conversions::Vector3dToPoint(Get<StateDefinition_T::p>(),
+                                     transform.transform.translation);
+  eigen_conversions::QuaternionToMsg(Get<StateDefinition_T::q>(),
+                                     transform.transform.rotation);
 }
 
 /// Assembles an ExtState message from the state
