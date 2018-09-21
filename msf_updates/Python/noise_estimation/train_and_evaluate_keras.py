@@ -40,8 +40,8 @@ model_path = "./Model/"
 # CAUTION: you may overwrite parameters of another model.
 use_stored_model = False
 # Hyperparameters (global constants)
-BATCHSIZE = 4
-N_EPOCHS = 40
+BATCHSIZE = 32
+N_EPOCHS = 80
 if DEBUG: 
 	N_EPOCHS = 4
 # Length of sequences used for training (i.e n measurements per line): need to create data reading
@@ -87,6 +87,7 @@ kerasopt=optimizers.Adam(lr=0.001)
 kerasmodel.compile(optimizer=kerasopt,loss='mse')
 kerasmodel.fit(features_train, labels_train, epochs=N_EPOCHS, verbose=DEBUG, batch_size=BATCHSIZE, validation_data=(features_val, labels_val))
 
+kerasmodel.save(model_path+model_name+'.h5')
 		
 ########################################################################
 # Evaluate the model on the validation data
