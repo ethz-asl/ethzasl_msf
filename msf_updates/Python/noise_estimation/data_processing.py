@@ -96,13 +96,13 @@ def load_all_data(feature_file, label_file, sequence_length):
 	#0 is separator
 	idx = 1
 	nsequence = 0
-	while idx<len(featlines):
+	while idx<len(featlines) and idx<len(labellines):
 		sequence_list_f.append([])
 		sequence_list_l.append([])
 		i = 0
 		skip = 0
-		while idx+i<len(featlines) and i<sequence_length:
-			if featlines[idx+i]=="starting new training sequence\n":
+		while idx+i<len(featlines) and idx+i<len(labellines) and i<sequence_length:
+			if featlines[idx+i]=="starting new training sequence\n" or labellines[idx+i]=="starting new training sequence\n":
 				skip = 1
 				#remove incomplete list parts
 				sequence_list_f.pop()
