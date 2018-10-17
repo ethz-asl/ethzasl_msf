@@ -11,7 +11,9 @@ roslib.load_manifest('msf_updates')
 import rospy
 import numpy as np
 import tensorflow as tf
+import keras
 import os
+import time
 from sensor_fusion_comm.srv import *
 from sensor_fusion_comm.msg import ArrayWithKey as datatype
 """
@@ -19,70 +21,74 @@ rosmsg show sensor_fusion_comm/ArrayWithKey
 string key
 float64[] data
 """
-def load_graph(path_to_model):
-	"""Creates a graph from saved GraphDef file and returns a saver."""
-	# Creates graph from saved graph_def.pb.
-	model_filename = path_to_model
-	with tf.gfile.GFile(model_filename, 'rb') as f:
-		graph_def = tf.GraphDef()
-		graph_def.ParseFromString(f.read())
 
-	with tf.Graph().as_default() as graph:
-		tf.import_graph_def(
-			graph_def, 
-			input_map=None, 
-			return_elements=None, 
-			name="", 
-			op_dict=None, 
-			producer_op_list=None
-		)
-	return graph
-
+#this is an ugly workaround for ros being multithreaded and tensorflow not liking that
+#idea is to have global graphs and set the correct one as active bevore predicting
+#see: https://stackoverflow.com/questions/41990014/load-multiple-models-in-tensorflow
+# https://github.com/keras-team/keras/issues/6462
+#and for global dictionaries: https://stackoverflow.com/questions/37009767/python-make-a-dictionary-created-in-a-function-visible-to-outside-world
+global graphs
+if 'graphs' not in globals():
+	graphs = {}
+global sessions
+if 'sessions' not in globals():
+	sessions = {}
 
 
 class EvalObject:
-	#tfnetworkpath is the path to the tensorflow model (*.pb) to be evaluated
-	#frequency gives the number of data after which the model should be evaluated
-	#maxsequencelength gives the maximal memory length
-	#inputname is the name of the input tensor and outputname 
-	#the name of the outputtensor
-	def __init__(self, tfnetworkpath, maxmemory, inputname="inputs", outputname="outputs"):
-		self.tfnetworkpath_=tfnetworkpath
-		self.tfnetwork_ = load_graph(self.tfnetworkpath_) #the actual tfnetwork
+	def __init__(self, modelfile, modelweights, maxmemory, evalfrequency, key):
+		print("starting")
+		#self.model=keras.models.load_model(modelfile)
+		#how to load keras models in multithreaded environment
+		graph = tf.Graph()
+		with graph.as_default():
+			session = tf.Session()
+			with session.as_default():
+				with open(modelfile) as arch_file:
+					self.model = keras.models.model_from_json(arch_file.read())
+					self.model.load_weights(modelweights)
+					#graphs[key]=tf.get_default_graph()
+					graphs[key]=graph
+					sessions[key]=session
+
 		self.memory_=[]
 		self.memory_.append([]) #need 3d becase of batch (use 1 however)
 		self.maxmemory_ = maxmemory
-		self.inputname_=inputname
-		self.outputname_=outputname
-	
+		self.evalfrequency = evalfrequency
+		self.counter=int(evalfrequency/2)
+		self.currprediction=0
+		self.key=key
+		print("done")
+		
 	def evaluate(self):
-		with tf.Session(graph=self.tfnetwork_) as sess:
-			input_tensor = sess.graph.get_tensor_by_name(self.inputname_)
-			tempmemory=np.einsum('ijk->jik', np.asarray(self.memory_))
-			print(tempmemory.shape)
-			predictions_tensor = sess.graph.get_tensor_by_name(self.outputname_)
-			predictions = sess.run(predictions_tensor,
-                           {input_tensor: tempmemory})#this specifies the input layer I think
-
-			return predictions[-1,0,:]
+		return self.currprediction
+		
 	def addMeas(self, data):
-		if len(self.memory_)<self.maxmemory_:
+		if len(self.memory_[0])<self.maxmemory_:
 			self.memory_[0].append(data)
 		else:
 			self.memory_[0].pop(0)
 			self.memory_[0].append(data)
-
+		self.counter+=1
+		if self.counter>=self.evalfrequency:
+			self.counter-=self.evalfrequency
+			print(np.asarray(self.memory_).shape)
+			with graphs[self.key].as_default():
+				with sessions[self.key].as_default():
+					self.currprediction = self.model.predict(np.asarray(self.memory_))[0,:]
+					#self.currprediction = models[self.key].predict(np.asarray(self.memory_))[0,:]
+			
 class TFEvaluationHandler:
 	def __init__(self):
 		#get all parameters from ros config file
-		
+		self.i=0
 		self.ObjectDictionary = {} #we need a service that allows to add objects to this dictionary with a given key
 			
 
 	#service calls
 	#adding itself as a new listener
 	def handle_add_listener(self, req):
-		newEvalObject = EvalObject(req.tfnetworkpath, req.maxmemory, req.inputname, req.outputname)
+		newEvalObject = EvalObject(req.tfnetworkpath, req.tfnetworkweights, req.maxmemory, req.evalfrequency, req.key)
 		self.ObjectDictionary[req.key]=newEvalObject
 		print ("added listener")
 		return True

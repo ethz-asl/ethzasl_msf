@@ -74,8 +74,7 @@ PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PoseSensorHandler(
   std::string emptystr="";
   pnh.param("tf_key", tf_key_, emptystr);
   pnh.param("tf_network_path", tf_network_path_, emptystr);
-  pnh.param("tf_input_name", tf_input_name_, emptystr);
-  pnh.param("tf_output_name", tf_output_name_, emptystr);
+  pnh.param("tf_network_weights", tf_network_weights_, emptystr);
   pnh.param("tf_max_memory", tf_max_memory_, 0);
   pnh.param("tf_eval_frequency", tf_eval_frequency_, 1);
   if(use_nn_noise_estimation_)

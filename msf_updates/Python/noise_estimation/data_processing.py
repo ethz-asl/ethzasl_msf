@@ -135,6 +135,7 @@ def load_all_data(feature_file, label_file, sequence_length):
 	#need to split into train and val
 	return [features[:, NVAL:, :], labels[:,NVAL:,:], features[:, :NVAL, :], labels[:,:NVAL,:]]
 
+
 """
 # Here the input and the labels of the model is prepared. 
 # We take a batch for all data (i.e features and labels)

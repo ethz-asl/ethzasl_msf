@@ -195,9 +195,23 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
         sensor_fusion_comm::AddListener srvtemp;
         srvtemp.request.key = position_handler_->tf_key_;
         srvtemp.request.tfnetworkpath = position_handler_->tf_network_path_;
-        srvtemp.request.inputname = position_handler_->tf_input_name_;
-        srvtemp.request.outputname = position_handler_->tf_output_name_;
+        srvtemp.request.tfnetworkweights = position_handler_->tf_network_weights_;
+        srvtemp.request.evalfrequency = position_handler_->tf_eval_frequency_;
         srvtemp.request.maxmemory = position_handler_->tf_max_memory_;
+
+        clienttemp.call(srvtemp);
+    }
+    if(pose_handler_->use_nn_noise_estimation_)
+    {
+        //if a sensor is using nn noise estimation make service call to tf evaluation node
+        ros::NodeHandle ntemp;
+        ros::ServiceClient clienttemp = ntemp.serviceClient<sensor_fusion_comm::AddListener>("eval_node/add_listener");
+        sensor_fusion_comm::AddListener srvtemp;
+        srvtemp.request.key = pose_handler_->tf_key_;
+        srvtemp.request.tfnetworkpath = pose_handler_->tf_network_path_;
+        srvtemp.request.tfnetworkweights = pose_handler_->tf_network_weights_;
+        srvtemp.request.evalfrequency = pose_handler_->tf_eval_frequency_;
+        srvtemp.request.maxmemory = pose_handler_->tf_max_memory_;
 
         clienttemp.call(srvtemp);
     }

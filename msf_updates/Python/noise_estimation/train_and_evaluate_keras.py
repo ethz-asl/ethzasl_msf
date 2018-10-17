@@ -18,8 +18,13 @@ from math import floor
 #from lstm_simple import *
 #model_constructor = build_LSTM_simple_model
 
+"""
 model_name = "KerasLSTM"
 from keras_lstm import *
+model_constructor = build_keras_LSTM_model
+"""
+model_name = "KerasLSTM2"
+from keras_lstm2 import *
 model_constructor = build_keras_LSTM_model
 
 if len(sys.argv)!=3:
@@ -32,7 +37,7 @@ labelfile=sys.argv[2]
 
 ########################################################################
 # Debugging? (Use True on local machine.)
-DEBUG = True
+DEBUG = False
 # Where to store the model 
 model_path = "./Model/"
 # Whether to use the stored model
@@ -40,8 +45,8 @@ model_path = "./Model/"
 # CAUTION: you may overwrite parameters of another model.
 use_stored_model = False
 # Hyperparameters (global constants)
-BATCHSIZE = 32
-N_EPOCHS = 80
+BATCHSIZE = 128
+N_EPOCHS = 100
 if DEBUG: 
 	N_EPOCHS = 4
 # Length of sequences used for training (i.e n measurements per line): need to create data reading
@@ -73,11 +78,11 @@ print("")
 #here data is sequencelength, ntraining, ndim
 [features_train, labels_train, features_val, labels_val] = load_all_data(featfile, labelfile, max_sequence_length)
 features_train = np.einsum('ijk->jik', features_train)
-labels_train = np.einsum('ijk->jik', labels_train)
+labels_train = np.einsum('ijk->jik', labels_train)[:,-1,:]
 features_val = np.einsum('ijk->jik', features_val)
-labels_val = np.einsum('ijk->jik', labels_val)
+labels_val = np.einsum('ijk->jik', labels_val)[:,-1,:]
 
-kerasmodel = model_constructor(features_train.shape[2], labels_train.shape[2], max_sequence_length, seed = 42)
+kerasmodel = model_constructor(features_train.shape[2], labels_train.shape[1], max_sequence_length, seed = 42)
 
 ########################################################################
 # Train the model
@@ -85,7 +90,10 @@ print("Training the model: " + model_name + "...")
 
 kerasopt=optimizers.Adam(lr=0.001)
 kerasmodel.compile(optimizer=kerasopt,loss='mse')
-kerasmodel.fit(features_train, labels_train, epochs=N_EPOCHS, verbose=DEBUG, batch_size=BATCHSIZE, validation_data=(features_val, labels_val))
+for i in range(20):
+	kerasmodel.fit(features_train, labels_train, epochs=10, verbose=DEBUG, batch_size=BATCHSIZE, validation_data=(features_val, labels_val))
+	score=kerasmodel.evaluate(features_val,labels_val)
+	print(score)
 
 kerasmodel.save(model_path+model_name+'.h5')
 		

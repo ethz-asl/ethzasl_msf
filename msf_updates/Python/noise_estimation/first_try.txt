@@ -1,0 +1,59 @@
+Sender: LSF System <lsfadmin@lo-s4-026>
+Subject: Job 792873: <python train_and_evaluate_keras.py data/train_position_feats.txt data/train_position_labels.txt> in cluster <leonhard> Done
+
+Job <python train_and_evaluate_keras.py data/train_position_feats.txt data/train_position_labels.txt> was submitted from host <lo-login-02> by user <huberya> in cluster <leonhard> at Mon Sep 24 08:51:40 2018
+Job was executed on host(s) <lo-s4-026>, in queue <gpu.4h>, as user <huberya> in cluster <leonhard> at Mon Sep 24 08:51:59 2018
+</cluster/home/huberya> was used as the home directory.
+</cluster/home/huberya/noise_estimation> was used as the working directory.
+Started at Mon Sep 24 08:51:59 2018
+Terminated at Mon Sep 24 10:17:58 2018
+Results reported at Mon Sep 24 10:17:58 2018
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+python train_and_evaluate_keras.py data/train_position_feats.txt data/train_position_labels.txt
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   7284.62 sec.
+    Max Memory :                                 2460 MB
+    Average Memory :                             1167.12 MB
+    Total Requested Memory :                     4096.00 MB
+    Delta Memory :                               1636.00 MB
+    Max Swap :                                   -
+    Max Processes :                              3
+    Max Threads :                                13
+    Run time :                                   5186 sec.
+    Turnaround time :                            5178 sec.
+
+The output (if any) follows:
+
+2018-09-24 08:52:45.425528: I tensorflow/core/platform/cpu_feature_guard.cc:140] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
+2018-09-24 08:52:45.762626: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1344] Found device 0 with properties: 
+name: GeForce GTX 1080 Ti major: 6 minor: 1 memoryClockRate(GHz): 1.582
+pciBusID: 0000:0c:00.0
+totalMemory: 10.92GiB freeMemory: 10.76GiB
+2018-09-24 08:52:45.762671: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1423] Adding visible gpu devices: 0
+2018-09-24 08:52:46.143527: I tensorflow/core/common_runtime/gpu/gpu_device.cc:911] Device interconnect StreamExecutor with strength 1 edge matrix:
+2018-09-24 08:52:46.143590: I tensorflow/core/common_runtime/gpu/gpu_device.cc:917]      0 
+2018-09-24 08:52:46.143605: I tensorflow/core/common_runtime/gpu/gpu_device.cc:930] 0:   N 
+2018-09-24 08:52:46.143986: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1041] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 10417 MB memory) -> physical GPU (device: 0, name: GeForce GTX 1080 Ti, pci bus id: 0000:0c:00.0, compute capability: 6.1)
+General parameters:
+	Number of epochs: 100
+	Batch Size: 128
+	Max. Sequence Length: 100
+	Save model parameters every: 500 steps.
+	Using saved model? False
+
+Training the model: KerasLSTM...
+
+24/24 [==============================] - 0s 1ms/step
+/cluster/apps/python/3.6.4/lib64/python3.6/site-packages/h5py/__init__.py:36: FutureWarning: Conversion of the second argument of issubdtype from `float` to `np.floating` is deprecated. In future, it will be treated as `np.float64 == np.dtype(float).type`.
+  from ._conv import register_converters as _register_converters
+Using TensorFlow backend.
+0.7424216866493225

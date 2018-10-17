@@ -2,10 +2,10 @@
 string key
 #the path to the tfnetwork protobuff file (*.pb)
 string tfnetworkpath
+string tfnetworkweights
 
-#the name of input and output layer
-string inputname
-string outputname
+#the evaluation frequency
+int64 evalfrequency
 
 #the maximal memory length
 int64 maxmemory
