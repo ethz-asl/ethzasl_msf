@@ -16,6 +16,7 @@ import os
 import time
 from sensor_fusion_comm.srv import *
 from sensor_fusion_comm.msg import ArrayWithKey as datatype
+import threading
 """
 rosmsg show sensor_fusion_comm/ArrayWithKey 
 string key
@@ -58,6 +59,7 @@ class EvalObject:
 		self.counter=int(evalfrequency/2)
 		self.currprediction=0
 		self.key=key
+		self.lock=threading.Lock()
 		print("done")
 		
 	def evaluate(self):
@@ -71,7 +73,9 @@ class EvalObject:
 			self.memory_[0].append(data)
 		self.counter+=1
 		if self.counter>=self.evalfrequency:
+			print(self.counter)
 			self.counter-=self.evalfrequency
+			print(self.counter)
 			print(np.asarray(self.memory_).shape)
 			with graphs[self.key].as_default():
 				with sessions[self.key].as_default():
@@ -96,13 +100,17 @@ class TFEvaluationHandler:
 	#a listener evaluating its network
 	def handle_eval_listener(self, req):
 		print("evaluating")
-		result=self.ObjectDictionary[req.key].evaluate() 
+		self.ObjectDictionary[req.key].lock.acquire()
+		result=self.ObjectDictionary[req.key].evaluate()
+		self.ObjectDictionary[req.key].lock.release()
 		response=EvalListenerResponse()
 		response.output=result
 		return response
 			
 	def callback(self, data):
+		self.ObjectDictionary[data.key].lock.acquire()
 		self.ObjectDictionary[data.key].addMeas(data.data)
+		self.ObjectDictionary[data.key].lock.release()
 		
 	#creating the service calse
 	def add_listener_server(self):

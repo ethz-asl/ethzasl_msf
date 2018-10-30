@@ -240,12 +240,13 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPositionMeasu
       //+1 is for not evaluating with 0 messages
       if(use_nn_noise_estimation_)
       {
-          //TODO make separate counter
+          n_noise_estimation_point_++;
           //MSF_INFO_STREAM((int)(n_accepted_+n_rejected_+1)%tf_eval_frequency_<<"val "<<n_accepted_);
-          if(((int)(n_accepted_+n_rejected_+1)%tf_eval_frequency_)==0)
+          if(n_noise_estimation_point_>=tf_eval_frequency_)
             {
             //make service call to evaluation
-            MSF_WARN_STREAM("evaluating NN"<<n_accepted_<<" "<<n_rejected_<<" "<<tf_eval_frequency_);
+            MSF_WARN_STREAM("evaluating NN"<<n_noise_estimation_point_<<" "<<tf_eval_frequency_);
+            n_noise_estimation_point_-=tf_eval_frequency_;
             ros::NodeHandle ntemp;
             ros::ServiceClient clienttemp = ntemp.serviceClient<sensor_fusion_comm::EvalListener>("eval_node/eval_listener");
             sensor_fusion_comm::EvalListener srvtemp;
