@@ -232,6 +232,7 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
         //variables from pose
         Eigen::Matrix<double, 3, 1> p_ic, p_vc_c, p_wv;
         Eigen::Quaternion<double> q_wv, q_ic, q_cv;
+        Eigen::Quaterniond initpose_vision;
 
         //variables from position
         Eigen::Matrix<double, 3, 1> p_ip, p_vc_p;
@@ -315,7 +316,7 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
         }
         else {  // If there are both take orientation from position handler (since we want to live in position frame)
             //this is garbage
-            double yawinit = config_.position_yaw_init / 180 * M_PI;
+            /*double yawinit = config_.position_yaw_init / 180 * M_PI;
             Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
             yawq.normalize();
             q = yawq;
@@ -324,13 +325,27 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
             //Eigen::Quaterniond initpose(0.99760719619, -0.0192131440495, 0.0232805294934, -0.0621993098934);//at 0 secs V3_hard (w,x,y,z)
 
             q = initpose;
-            q_wv = q_cv*q_ic.conjugate()*q.conjugate();
+            q_wv = (q * q_ic * q_cv.conjugate()).conjugate();
             q_ic.normalize();
-            q_wv.normalize();
+            q_wv.normalize();*/
+
+            q_ic.normalize();
+            q_cv.normalize();
+            //orientation of the drone in GPS frame (for now assume given)
+            Eigen::Quaterniond initpose_gps(0.993240709, -0.0092359533, 0.0225063474, 0.1134947378); //at 0 secs V1_easy (w,x,y,z)
+            initpose_gps.normalize();
+            //orientation of the drone in Vision frame
+            
+            initpose_vision=q_cv*q_ic.conjugate();
+            initpose_vision.normalize();
+
+            q_wv=initpose_vision*initpose_gps.conjugate();
+            q=initpose_gps;
+
         }
 
         
-
+        //do same here with transformation (i.e. think carefully)
         //only position measurement recieved. position as in position sensormanager
         if(!pose_handler_->ReceivedFirstMeasurement())
         {
@@ -348,11 +363,16 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
         //compute transform p_wv, q_wv such that both sensors map to same pose in common frame
         else
         {
-            //take position world frame
-            p = p_vc_p - q.toRotationMatrix() * p_ip;
+            //position of IMU in GPS frame THINK ABOUT THIS
+            p = p_vc_p - q.toRotationMatrix() * p_ip; //is - right here
+            //position of IMU in Vision frame
+            Eigen::Matrix<double, 3, 1> p_vision;
+            p_vision = (p_vc_c/scale - initpose_vision.toRotationMatrix()*p_ic); //same here with -
+            p_wv=p-q_wv.conjugate()*p_vision;
             //adjust pose transformation (namely p_wv and q_wv which are the world to vision frame parameters)
             //p_ic=q_ic.toRotationMatrix().inverse()*(p_wv + q_wv.conjugate().toRotationMatrix() * p_vc_c / scale - p);
-            p_wv = p - q_wv.conjugate().toRotationMatrix() * p_vc_c / scale + q.toRotationMatrix() * p_ic;
+            //p_wv = p - q_wv.conjugate().toRotationMatrix() * p_vc_c / scale + q.toRotationMatrix() * p_ic;
+            //p_wv = p_vc_c - q_wv.toRotationMatrix() * p_vc_c / scale + q.toRotationMatrix() * p_ic;
         }
 
         if(pose_handler_->use_transform_recovery_)

@@ -9,7 +9,7 @@ core/core_noise_gyr: 0.0013
 core/core_noise_gyrbias: 0.0000013
 
 #stablility param for sensormanager
-position_pose_sensor/use_stable_initialization: true
+position_pose_sensor/use_stable_initialization: false
 
 #these params are defined in PositionPoseSensor.cfg and therefore have prefix position_pose_sensor
 position_pose_sensor/pose_fixed_scale: true
@@ -54,6 +54,15 @@ pose_sensor/init/p_ic/y: -0.0292211469162
 pose_sensor/init/p_ic/z: -0.062828441889
 #until here
 
+#pose_sensor/init/q_ic/x: 0.0
+#pose_sensor/init/q_ic/y: 0.0
+#pose_sensor/init/q_ic/z: 0.0
+#pose_sensor/init/q_ic/w: 1.0
+
+#pose_sensor/init/p_ic/x: 0.0
+#pose_sensor/init/p_ic/y: 0.0
+#pose_sensor/init/p_ic/z: 0.0
+
 pose_sensor/pose_absolute_measurements: true
 pose_sensor/pose_use_fixed_covariance: true
 pose_sensor/pose_measurement_world_sensor: true  # selects if sensor measures its position w.r.t. world (true, e.g. Vicon) or the position of the world coordinate system w.r.t. the sensor (false, e.g. ethzasl_ptam
@@ -63,6 +72,10 @@ pose_sensor/pose_measurement_world_sensor: true  # selects if sensor measures it
 position_sensor/init/p_ip/x: 0.06901
 position_sensor/init/p_ip/y: -0.02781
 position_sensor/init/p_ip/z: -0.12395
+
+#position_sensor/init/p_ip/x: 0.0
+#position_sensor/init/p_ip/y: 0.0
+#position_sensor/init/p_ip/z: 0.0
 
 position_sensor/position_absolute_measurements: true
 position_sensor/position_use_fixed_covariance: true
