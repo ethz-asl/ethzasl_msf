@@ -303,10 +303,10 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
 
         // Calculate initial attitude and position based on sensor measurements.
         if (!pose_handler_->ReceivedFirstMeasurement()) {  // If there is no pose measurement, compute q as in position sensormanager
-        double yawinit = config_.position_yaw_init / 180 * M_PI;
-        Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
-        yawq.normalize();
-        q = yawq; 
+            double yawinit = config_.position_yaw_init / 180 * M_PI;
+            Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
+            yawq.normalize();
+            q = yawq; 
         }
         else if(!position_handler_->ReceivedFirstMeasurement())//if there is no position measurement compute q as in pose sensormanager
         {
@@ -314,16 +314,19 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
             q.normalize();
         }
         else {  // If there are both take orientation from position handler (since we want to live in position frame)
-        double yawinit = config_.position_yaw_init / 180 * M_PI;
-        Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
-        yawq.normalize();
-        q = yawq;
-        Eigen::Quaterniond initpose(0.993240709, -0.0092359533, 0.0225063474, 0.1134947378); //at 0 secs V1_easy
+            //this is garbage
+            double yawinit = config_.position_yaw_init / 180 * M_PI;
+            Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
+            yawq.normalize();
+            q = yawq;
+            //these are simply taken from vicon groundtruth (want to chagne this by using stable initialization)
+            Eigen::Quaterniond initpose(0.993240709, -0.0092359533, 0.0225063474, 0.1134947378); //at 0 secs V1_easy (w,x,y,z)
+            //Eigen::Quaterniond initpose(0.99760719619, -0.0192131440495, 0.0232805294934, -0.0621993098934);//at 0 secs V3_hard (w,x,y,z)
 
-        q = initpose;
-        q_wv = q_cv*q_ic.conjugate()*q.conjugate();
-        q_ic.normalize();
-        q_wv.normalize();
+            q = initpose;
+            q_wv = q_cv*q_ic.conjugate()*q.conjugate();
+            q_ic.normalize();
+            q_wv.normalize();
         }
 
         
