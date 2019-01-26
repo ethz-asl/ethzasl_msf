@@ -619,21 +619,23 @@ void InitStable()
     pnh.param("position_sensor/init/p_ip/z", p_ip[2], 0.0);
 
 
-    Eigen::Quaternion<double> q_imu = (q_ic * q_cv.conjugate()).conjugate(); //this should be drone orientation in its own frame
+    //Eigen::Quaternion<double> q_imu = (q_ic * q_cv.conjugate()).conjugate(); //this should be drone orientation in its own frame
     //this should be the same as q_cv*q_ic.conjugate()
 
     q_wv=q_pose.conjugate();
+    //q_wv=q_pose;
     q_wv.normalize();
-    q = (q_ic * q_cv.conjugate() * q_wv).conjugate();
+    //q = (q_ic * q_cv.conjugate() * q_wv).conjugate();
+    q=q_wv.conjugate()*q_cv*q_ic.conjugate();
     q.normalize();
 
 
 
 
-    p = q_pose*p_vc_c + p_pose-q*p_ic; //i think this is correct
-
+    //p = q_pose*p_vc_c + p_pose-q*p_ic; //i think this is correct
+    p=p_vc_p-q*p_ip;
     //from this we can compute p_wv (not sure about this one)
-    p_wv = p - q_wv.conjugate().toRotationMatrix() * p_vc_c / scale + q.toRotationMatrix() * p_ic; //this should give the same as p_wv=p_pose
+    p_wv = p - q_wv.conjugate().toRotationMatrix() * (p_vc_c / scale +  q_cv*q_ic.conjugate()* p_ic); //this should give the same as p_wv=p_pose
 
     if(pose_handler_->use_transform_recovery_)
     {
