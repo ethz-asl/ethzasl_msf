@@ -60,11 +60,11 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     bool distortmeas = false;  ///< Distort the pose measurements
 
     pose_handler_.reset(
-        new PoseSensorHandler_T(*this, "", "pose_sensor", distortmeas));
+        new PoseSensorHandler_T(*this, "pose_sensor", "pose_sensor", distortmeas));
     AddHandler(pose_handler_);
 
     position_handler_.reset(
-        new PositionSensorHandler_T(*this, "", "position_sensor"));
+        new PositionSensorHandler_T(*this, "position_sensor", "position_sensor"));
     AddHandler(position_handler_);
 
     reconf_server_.reset(new ReconfigureServer(pnh));

@@ -48,7 +48,7 @@ PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PositionSensorHandler(
   MSF_INFO_STREAM_COND(!provides_absolute_measurements_, "Position sensor is "
                        "handling measurements as relative values");
 
-  ros::NodeHandle nh("msf_updates");
+  ros::NodeHandle nh("msf_updates/" + topic_namespace);
 
   subPointStamped_ =
       nh.subscribe<geometry_msgs::PointStamped>
