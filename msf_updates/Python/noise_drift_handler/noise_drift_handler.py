@@ -115,8 +115,8 @@ class MsfNoiseHandler:
     
     #params for pose
     self.pose_mu_=rospy.get_param("~pose_noise_mean",0.0)
-    self.pose_stddeviation_p_=rospy.get_param("~pose_noise_stddeviation_p", 0.0)
-    self.pose_stddeviation_q_=rospy.get_param("~pose_noise_stddeviation_q", 0.0)
+    self.pose_stddeviation_p_=rospy.get_param("~pose_noise_stddeviation_p", 1.0)
+    self.pose_stddeviation_q_=rospy.get_param("~pose_noise_stddeviation_q", 1.0)
     self.pose_use_noise_=rospy.get_param("~pose_use_noise", False)
         
     self.pose_p_outlier_=rospy.get_param("~pose_probability_outlier", 0.0)
@@ -148,7 +148,7 @@ class MsfNoiseHandler:
     
     #params for position
     self.position_mu_=rospy.get_param("~position_noise_mean",0.0)
-    self.position_stddeviation_=rospy.get_param("~position_noise_stddeviation_p", 0.0)
+    self.position_stddeviation_=rospy.get_param("~position_noise_stddeviation_p", 1.0)
     self.position_use_noise_=rospy.get_param("~position_use_noise", False)
         
     self.position_p_outlier_=rospy.get_param("~position_probability_outlier", 0.0)
@@ -177,7 +177,7 @@ class MsfNoiseHandler:
     
     #params for transform (we handle NavSatFix as transform for params)
     self.transform_mu_=rospy.get_param("~transform_noise_mean",0.0)
-    self.transform_stddeviation_=rospy.get_param("~transform_noise_stddeviation_p", 0.0)
+    self.transform_stddeviation_=rospy.get_param("~transform_noise_stddeviation_p", 1.0)
     self.transform_use_noise_=rospy.get_param("~transform_use_noise", False)
         
     self.transform_p_outlier_=rospy.get_param("~transform_probability_outlier", 0.0)
@@ -200,7 +200,9 @@ class MsfNoiseHandler:
     
     #params to estimate stddeviation of data 
     #to be set manually
-    self.ninit_=350
+    #self.ninit_=350
+    #this is to allow stable init
+    self.ninit_=2000
     self.started_=False
     self.nrecv_=0
     #self.stddeviation_=0

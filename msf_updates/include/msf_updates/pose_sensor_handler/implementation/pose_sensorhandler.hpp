@@ -318,7 +318,7 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
     
   //this function should check wether too many measurements have been rejected -> increase noise meas
   //or wether this sensor is currently diverging -> use recovery and increase noise meas
-  if(enable_noise_estimation_)
+  if(enable_noise_estimation_&&!collect_for_init_)
   {
       //+1 is for not evaluating with 0 messages
       if(use_nn_noise_estimation_)
@@ -335,7 +335,7 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
             sensor_fusion_comm::EvalListener srvtemp;
             srvtemp.request.key = tf_key_;
             
-            if(clienttemp.call(srvtemp))
+            if(clienttemp.call(srvtemp)&&srvtemp.response.output[0]!=-1)
             {
                 MSF_INFO_STREAM("new noise"<<srvtemp.response.output[0]<<"and "<<srvtemp.response.output[1]);
                 mngr->config_.pose_noise_meas_p = srvtemp.response.output[0];

@@ -96,17 +96,30 @@ pose_sensor/enable_noise_estimation: true
 #pose_sensor/enable_noise_estimation: false
 #setting this closer to 1 will make it more longtime closer to 0 more shorttime
 #should think about frequency when defining this
-pose_sensor/noise_estimation_discount_factor: 0.99
-pose_sensor/max_noise_threshold: 1
+#pose_sensor/noise_estimation_discount_factor: 0.99
+#pose_sensor/max_noise_threshold: 1
+
+pose_sensor/use_nn_noise_estimation: true
+pose_sensor/tf_key: posesensor
+pose_sensor/tf_network_path: /home/yannick/catkin_ws/src/ethzasl_msf/msf_updates/Python/noise_estimation/Model/pose_working_arch.json
+pose_sensor/tf_network_weights: /home/yannick/catkin_ws/src/ethzasl_msf/msf_updates/Python/noise_estimation/Model/pose_working_weights.h5
+pose_sensor/tf_max_memory: 200
+pose_sensor/tf_eval_frequency: 100
 
 #settings for noise estimation
 #position_sensor/enable_noise_estimation: false
 position_sensor/enable_noise_estimation: true
 #setting this closer to 1 will make it more longtime closer to 0 more shorttime
 #should think about frequency when defining this
-position_sensor/noise_estimation_discount_factor: 0.999
-position_sensor/max_noise_threshold: 5
+#position_sensor/noise_estimation_discount_factor: 0.999
+#position_sensor/max_noise_threshold: 5
 
+position_sensor/use_nn_noise_estimation: true
+position_sensor/tf_key: positionsensor
+position_sensor/tf_network_path: /home/yannick/catkin_ws/src/ethzasl_msf/msf_updates/Python/noise_estimation/Model/position_working_arch.json
+position_sensor/tf_network_weights: /home/yannick/catkin_ws/src/ethzasl_msf/msf_updates/Python/noise_estimation/Model/position_working_weights.h5
+position_sensor/tf_max_memory: 500
+position_sensor/tf_eval_frequency: 1000
 
 #settings for divergence recovery
 #pose_sensor/enable_divergence_recovery: false

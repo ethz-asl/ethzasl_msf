@@ -235,7 +235,7 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPositionMeasu
   this->manager_.msf_core_->AddMeasurement(meas);
 
   
-  if(enable_noise_estimation_)
+  if(enable_noise_estimation_&&!collect_for_init_)
   {
       //+1 is for not evaluating with 0 messages
       if(use_nn_noise_estimation_)
@@ -252,7 +252,7 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPositionMeasu
             sensor_fusion_comm::EvalListener srvtemp;
             srvtemp.request.key = tf_key_;
             
-            if(clienttemp.call(srvtemp))
+            if(clienttemp.call(srvtemp)&&srvtemp.response.output[0]!=-1)
             {
                 MSF_INFO_STREAM("new noise"<<srvtemp.response.output[0]);
                 mngr->config_.position_noise_meas = srvtemp.response.output[0];

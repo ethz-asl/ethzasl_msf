@@ -104,7 +104,10 @@ class TFEvaluationHandler:
 		result=self.ObjectDictionary[req.key].evaluate()
 		self.ObjectDictionary[req.key].lock.release()
 		response=EvalListenerResponse()
-		response.output=result
+		if result is 0:
+			response.output=[-1]
+		else:
+			response.output=result
 		return response
 			
 	def callback(self, data):

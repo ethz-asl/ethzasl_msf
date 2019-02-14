@@ -302,6 +302,12 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
         pnh.param("position_sensor/init/p_ip/y", p_ip[1], 0.0);
         pnh.param("position_sensor/init/p_ip/z", p_ip[2], 0.0);
 
+        Eigen::Quaternion<double> initpose_gps;
+        pnh.param("position_sensor/init/pose/w", initpose_gps.w(), 1.0);
+        pnh.param("position_sensor/init/pose/x", initpose_gps.x(), 0.0);
+        pnh.param("position_sensor/init/pose/y", initpose_gps.y(), 0.0);
+        pnh.param("position_sensor/init/pose/z", initpose_gps.z(), 0.0);
+
         // Calculate initial attitude and position based on sensor measurements.
         if (!pose_handler_->ReceivedFirstMeasurement()) {  // If there is no pose measurement, compute q as in position sensormanager
             double yawinit = config_.position_yaw_init / 180 * M_PI;
@@ -316,23 +322,20 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
         }
         else {  // If there are both take orientation from position handler (since we want to live in position frame)
             //this is garbage
-            /*double yawinit = config_.position_yaw_init / 180 * M_PI;
-            Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
-            yawq.normalize();
-            q = yawq;
-            //these are simply taken from vicon groundtruth (want to chagne this by using stable initialization)
-            Eigen::Quaterniond initpose(0.993240709, -0.0092359533, 0.0225063474, 0.1134947378); //at 0 secs V1_easy (w,x,y,z)
-            //Eigen::Quaterniond initpose(0.99760719619, -0.0192131440495, 0.0232805294934, -0.0621993098934);//at 0 secs V3_hard (w,x,y,z)
-
-            q = initpose;
-            q_wv = (q * q_ic * q_cv.conjugate()).conjugate();
-            q_ic.normalize();
-            q_wv.normalize();*/
 
             q_ic.normalize();
             q_cv.normalize();
             //orientation of the drone in GPS frame (for now assume given)
-            Eigen::Quaterniond initpose_gps(0.993240709, -0.0092359533, 0.0225063474, 0.1134947378); //at 0 secs V1_easy (w,x,y,z)
+            //Eigen::Quaterniond initpose_gps(0.993240709, -0.0092359533, 0.0225063474, 0.1134947378); //at 0 secs V1_easy (w,x,y,z)
+            //Eigen::Quaterniond initpose_gps(0.997609002734, -0.0191316931928, 0.0233401735257, -0.062173083234); //at 0 secs V1_hard (w,x,y,z)
+            if (initpose_gps.w()==1.0)
+            {
+                //not set use yawinit (probably not precise, should use stable init instead)
+                double yawinit = config_.position_yaw_init / 180 * M_PI;
+                Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
+                yawq.normalize();
+                initpose_gps = yawq; 
+            }
             initpose_gps.normalize();
             //orientation of the drone in Vision frame
             
@@ -369,10 +372,7 @@ bool InitScale(sensor_fusion_comm::InitScale::Request &req,
             Eigen::Matrix<double, 3, 1> p_vision;
             p_vision = (p_vc_c/scale - initpose_vision.toRotationMatrix()*p_ic); //same here with -
             p_wv=p-q_wv.conjugate()*p_vision;
-            //adjust pose transformation (namely p_wv and q_wv which are the world to vision frame parameters)
-            //p_ic=q_ic.toRotationMatrix().inverse()*(p_wv + q_wv.conjugate().toRotationMatrix() * p_vc_c / scale - p);
-            //p_wv = p - q_wv.conjugate().toRotationMatrix() * p_vc_c / scale + q.toRotationMatrix() * p_ic;
-            //p_wv = p_vc_c - q_wv.toRotationMatrix() * p_vc_c / scale + q.toRotationMatrix() * p_ic;
+            
         }
 
         if(pose_handler_->use_transform_recovery_)
