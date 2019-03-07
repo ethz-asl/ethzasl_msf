@@ -338,9 +338,10 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
             if(clienttemp.call(srvtemp)&&srvtemp.response.output[0]!=-1)
             {
                 MSF_INFO_STREAM("new noise"<<srvtemp.response.output[0]<<"and "<<srvtemp.response.output[1]);
-                mngr->config_.pose_noise_meas_p = srvtemp.response.output[0];
-                    mngr->config_.pose_noise_meas_q = srvtemp.response.output[1];
+                mngr->config_.pose_noise_meas_p = std::max(0.05, std::min(srvtemp.response.output[0], this->GetMaxNoiseThreshold()));
+                mngr->config_.pose_noise_meas_q = std::max(0.02, std::min(srvtemp.response.output[1], this->GetMaxNoiseThreshold()/2));
                 //set noise
+                this->SetNoises(mngr->config_.pose_noise_meas_p, mngr->config_.pose_noise_meas_q);
                 return;
             }
           }

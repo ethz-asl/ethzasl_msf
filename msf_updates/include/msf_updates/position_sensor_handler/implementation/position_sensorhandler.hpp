@@ -255,8 +255,9 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPositionMeasu
             if(clienttemp.call(srvtemp)&&srvtemp.response.output[0]!=-1)
             {
                 MSF_INFO_STREAM("new noise"<<srvtemp.response.output[0]);
-                mngr->config_.position_noise_meas = srvtemp.response.output[0];
+                mngr->config_.position_noise_meas = std::max(0.05, std::min(srvtemp.response.output[0], this->GetMaxNoiseThreshold()));
                 //set noise
+                this->SetNoises(mngr->config_.position_noise_meas);
                 return;
             }
           }
