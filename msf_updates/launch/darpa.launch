@@ -1,4 +1,8 @@
 <launch>
+
+  <arg name="global_frame_id" default="map" />
+  <arg name="local_frame_id" default="odom" />
+
   <!--
   <node  name="msf_position_pose_sensor" pkg="msf_updates" type="position_pose_sensor" clear_params="true" output="screen">
     <remap from="msf_core/imu_state_input" to="/VersaVIS/imu" />
@@ -9,9 +13,13 @@
   </node>
   -->
 
+  <param name="msf_core/msf_output_frame" value="odom"/>
   <node name="pose_sensor_rovio" pkg="msf_updates" type="pose_sensor" clear_params="true" output="screen">
-      <remap from="msf_core/imu_state_input" to="/os1_cloud_node/imu" />
+      <remap from="msf_core/imu_state_input" to="/VersaVIS/imu" />
       <remap from="msf_updates/transform_input" to="rovio/transform" />
+      <rosparam file="$(find msf_updates)/params/msf_parameters_vision_adis_p23022.txt"/>
+      <param name="capability_group" value="MSF" />
+
   </node>
 
   <node name="rovio" pkg="rovio" type="rovio_node" output="screen">
@@ -20,5 +28,9 @@
     <remap from="cam0/image_raw" to="/VersaVIS/cam0/image_raw"/>
     <remap from="imu0" to="/VersaVIS/imu"/>
     <param name="world_frame" value="odom"/>
+    <param name="capability_group" value="Rovio" />
   </node>
+
+  <node pkg="tf" type="static_transform_publisher" name="world_tf_broadcaster" args="0 0 0 0 0 0 1 world odom 100"/>
+
 </launch>
