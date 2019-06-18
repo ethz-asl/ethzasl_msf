@@ -1,0 +1,140 @@
+scale_init: 1
+core/data_playback: true
+core/fixed_bias: false
+
+#########IMU PARAMETERS#######
+core/core_noise_acc: 0.083
+core/core_noise_accbias: 0.00005
+core/core_noise_gyr: 0.0013
+core/core_noise_gyrbias: 0.0000013
+
+#stablility param for sensormanager
+position_pose_sensor/use_stable_initialization: true
+
+#these params are defined in PositionPoseSensor.cfg and therefore have prefix position_pose_sensor
+position_pose_sensor/pose_fixed_scale: true
+position_pose_sensor/pose_fixed_p_ic: true
+position_pose_sensor/pose_fixed_q_ic: true
+position_pose_sensor/pose_fixed_p_wv: false
+position_pose_sensor/pose_fixed_q_wv: false
+
+position_pose_sensor/pose_noise_scale: 0.0
+
+position_pose_sensor/pose_noise_p_wv: 0.001
+position_pose_sensor/pose_noise_q_wv: 0.0025
+position_pose_sensor/pose_noise_p_ic: 0.0
+position_pose_sensor/pose_noise_q_ic: 0.0
+#position_pose_sensor/pose_delay: -0.0358408930047
+position_pose_sensor/pose_delay: -0.1258408930047
+position_pose_sensor/pose_noise_meas_p: 0.02
+#position_pose_sensor/pose_noise_meas_p: 0.002
+position_pose_sensor/pose_noise_meas_q: 0.05
+#position_pose_sensor/pose_noise_meas_q: 0.005
+
+#position_pose_sensor/position_noise_meas: 0.1
+position_pose_sensor/position_noise_meas: 1.0
+
+position_pose_sensor/position_delay: -0.01
+position_pose_sensor/position_noise_p_ip: 0.00
+position_pose_sensor/position_fixed_p_ip: true
+
+#position_pose_sensor/position_yaw_init: 10
+position_pose_sensor/position_yaw_init: 0
+
+
+#these params are read in pose_sensorhandler.hpp and therefore have prefix pose_sensor
+#these params actually dont matter
+pose_sensor/init/q_ic/x: 0.807264573826
+pose_sensor/init/q_ic/y: -0.000354456866938
+pose_sensor/init/q_ic/z: 0.590149775732
+pose_sensor/init/q_ic/w: 0.00685743456288
+
+pose_sensor/init/p_ic/x: 0.118867928682
+pose_sensor/init/p_ic/y: -0.0292211469162
+pose_sensor/init/p_ic/z: -0.062828441889
+#until here
+
+#pose_sensor/init/q_ic/x: 0.0
+#pose_sensor/init/q_ic/y: 0.0
+#pose_sensor/init/q_ic/z: 0.0
+#pose_sensor/init/q_ic/w: 1.0
+
+#pose_sensor/init/p_ic/x: 0.0
+#pose_sensor/init/p_ic/y: 0.0
+#pose_sensor/init/p_ic/z: 0.0
+
+pose_sensor/pose_absolute_measurements: true
+pose_sensor/pose_use_fixed_covariance: true
+pose_sensor/pose_measurement_world_sensor: true  # selects if sensor measures its position w.r.t. world (true, e.g. Vicon) or the position of the world coordinate system w.r.t. the sensor (false, e.g. ethzasl_ptam
+
+#these params are read in position_sensorhandler.hpp and therefore have prefix position_sensor
+#########GPS PARAMETERS#######
+#position_sensor/init/p_ip/x: 0.06901
+#position_sensor/init/p_ip/y: -0.02781
+#position_sensor/init/p_ip/z: -0.12395
+
+position_sensor/init/p_ip/x: 0.0
+position_sensor/init/p_ip/y: 0.0
+position_sensor/init/p_ip/z: 0.0
+
+position_sensor/position_absolute_measurements: true
+position_sensor/position_use_fixed_covariance: true
+position_sensor/position_measurement_world_sensor: true 
+
+
+#settings for outlierrejection
+#pose_sensor/enable_mah_outlier_rejection: false
+pose_sensor/enable_mah_outlier_rejection: true
+pose_sensor/mah_threshold: 5.0
+
+#position_sensor/enable_mah_outlier_rejection: false
+position_sensor/enable_mah_outlier_rejection: true
+position_sensor/mah_threshold: 5.0
+
+#settings for noise estimation
+pose_sensor/enable_noise_estimation: true
+#pose_sensor/enable_noise_estimation: false
+#setting this closer to 1 will make it more longtime closer to 0 more shorttime
+#should think about frequency when defining this
+#pose_sensor/noise_estimation_discount_factor: 0.99
+#pose_sensor/max_noise_threshold: 1
+
+pose_sensor/use_nn_noise_estimation: true
+pose_sensor/tf_key: posesensor
+pose_sensor/tf_network_path: /home/yannick/catkin_ws/src/ethzasl_msf/msf_updates/Python/noise_estimation/Model/pose_working_arch.json
+pose_sensor/tf_network_weights: /home/yannick/catkin_ws/src/ethzasl_msf/msf_updates/Python/noise_estimation/Model/pose_working_weights.h5
+pose_sensor/tf_max_memory: 200
+pose_sensor/tf_eval_frequency: 100
+
+#settings for noise estimation
+#position_sensor/enable_noise_estimation: false
+position_sensor/enable_noise_estimation: true
+#setting this closer to 1 will make it more longtime closer to 0 more shorttime
+#should think about frequency when defining this
+#position_sensor/noise_estimation_discount_factor: 0.999
+#position_sensor/max_noise_threshold: 5
+
+position_sensor/use_nn_noise_estimation: true
+position_sensor/tf_key: positionsensor
+position_sensor/tf_network_path: /home/yannick/catkin_ws/src/ethzasl_msf/msf_updates/Python/noise_estimation/Model/position_working_arch.json
+position_sensor/tf_network_weights: /home/yannick/catkin_ws/src/ethzasl_msf/msf_updates/Python/noise_estimation/Model/position_working_weights.h5
+position_sensor/tf_max_memory: 500
+position_sensor/tf_eval_frequency: 1000
+
+#settings for divergence recovery
+#pose_sensor/enable_divergence_recovery: false
+pose_sensor/enable_divergence_recovery: true
+pose_sensor/divergence_rejection_limit: 30
+#pose_sensor/use_reset_to_pose: false
+pose_sensor/use_reset_to_pose: true
+#pose_sensor/use_transform_recovery: false
+pose_sensor/use_transform_recovery: true
+#choose same as initial noise estimate
+pose_sensor/transform_recovery_noise_p: 0.002
+pose_sensor/transform_recovery_noise_q: 0.025
+pose_sensor/transform_anealing_steps: 200
+
+#settings for divergence recovery
+#this should be false unless you expect gps to recover to different frame or have poor initialization
+position_sensor/enable_divergence_recovery: false
+position_sensor/divergence_rejection_limit: 300

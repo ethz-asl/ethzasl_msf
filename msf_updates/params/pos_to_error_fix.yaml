@@ -1,0 +1,9 @@
+#this is best transformation estimate for VH1 (from position frame)
+#/pos_to_error/translation: [0.06901, -0.02781, -0.12395]
+/pos_to_error/translation: [0.0, 0.0, 0.0]
+#/pos_to_error/translation: [-0.02569529, 10.13916346, -0.1208922 ]
+/pos_to_error/quaternion: [1, 0, 0, 0]
+/pos_to_error/truth_type: "vicon"
+/pos_to_error/estimate_tf: false
+/pos_to_error/ninit_points: 2000
+/pos_to_error/data_type: "msf"

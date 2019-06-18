@@ -5,7 +5,7 @@
     <!-- this is used to remap output from one topic to input of another. usage: remap from="input_name" to="output_name"-->
     <remap from="msf_core/imu_state_input" to="/fcu/imu" />
     <!--this is how to select a parameters file-->
-    <rosparam file="$(find msf_updates)/params/pp_performance_VH/msf_sensor_fix.yaml"/>
+    <rosparam file="$(find msf_updates)/params/msf_sensor_fix.yaml"/>
     <remap from="msf_updates/position_input" to="/noise_drift_handler/position_output" />
     <remap from="msf_updates/pose_with_covariance_input" to="noise_drift_handler/pose_output" />
     <param name="capability_group" value="MSF" />
