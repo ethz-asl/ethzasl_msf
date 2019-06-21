@@ -2,26 +2,27 @@
 
   <arg name="global_frame_id" default="map" />
   <arg name="local_frame_id" default="odom" />
+  <param name="use_sim_time" value="True" />
 
-  <!--
-  <node  name="msf_position_pose_sensor" pkg="msf_updates" type="position_pose_sensor" clear_params="true" output="screen">
-    <remap from="msf_core/imu_state_input" to="/VersaVIS/imu" />
-    <rosparam file="$(find msf_updates)/params/msf_sensor_fix.yaml"/>
-    <remap from="msf_updates/position_input" to="/noise_drift_handler/position_output" />
-    <remap from="msf_updates/pose_with_covariance_input" to="noise_drift_handler/pose_output" />
-    <param name="capability_group" value="MSF" />
-  </node>
-  -->
+   # ARL Coordinate Frame Facilitators
+   <arg name="pi"      value="3.141592654"/>
+   <arg name="half_pi" value="1.570796327"/>
+   <arg name="deg2rad" value="0.017453293"/>
+   <arg name="z_offset"     value="0.0"/>
+   <arg name="pitch_offset" value="$(eval 1.570796327 + 0.0 * 0.017453293)"/>  # (90+) 0 [ENU-deg]
+   <arg name="yaw_offset"   value="$(eval 1.570796327 + 0.0 * 0.017453293)"/>  # (90+) 0 [ENU-deg]
 
+
+  <!-- === MSF ================================================================================= -->
   <param name="msf_core/msf_output_frame" value="odom"/>
   <node name="pose_sensor_rovio" pkg="msf_updates" type="pose_sensor" clear_params="true" output="screen">
       <remap from="msf_core/imu_state_input" to="/VersaVIS/imu" />
       <remap from="msf_updates/transform_input" to="rovio/transform" />
       <rosparam file="$(find msf_updates)/params/msf_parameters_vision_adis_p23022.txt"/>
       <param name="capability_group" value="MSF" />
-
   </node>
 
+  <!-- === ROVIO =============================================================================== -->
   <node name="rovio" pkg="rovio" type="rovio_node" output="screen">
     <param name="filter_config" value="$(find rovio)/cfg/lidarstick_rovio.info"/>
     <param name="camera0_config" value="$(find rovio)/cfg/lidarstick_180_cam0.yaml"/>
@@ -30,7 +31,44 @@
     <param name="world_frame" value="odom"/>
     <param name="capability_group" value="Rovio" />
   </node>
+  
+  <node name="rovio2" pkg="rovio" type="rovio_node" output="screen">
+    <param name="filter_config" value="$(find rovio)/cfg/lidarstick_rovio.info"/>
+    <param name="camera1_config" value="$(find rovio)/cfg/lidarstick_180_cam1.yaml"/>
+    <remap from="cam1/image_raw" to="/VersaVIS/cam1/image_raw"/>
+    <remap from="imu0" to="/VersaVIS/imu"/>
+    <param name="world_frame" value="odom"/>
+    <param name="capability_group" value="Rovio" />
+    <remap from="rovio/transform" to="msf_updates/transform_input"/>
+  </node>
 
-  <node pkg="tf" type="static_transform_publisher" name="world_tf_broadcaster" args="0 0 0 0 0 0 1 world odom 100"/>
+  <!-- === LOAM ================================================================================ -->
+  <arg name="scanPeriod" default="0.1" />
+  <node pkg="loam" type="multiScanRegistration" name="multiScanRegistration" output="screen">
+     <param name="lidar" value="O1-64" /> <!-- options: VLP-16  HDL-32  HDL-64E O1-64 -->
+     <param name="scanPeriod" value="$(arg scanPeriod)" />
+     <remap from="/multi_scan_points" to="/os1_cloud_node/points" />
+   </node>
+
+   <node pkg="loam" type="laserOdometry" name="laserOdometry" output="screen" respawn="true">
+     <param name="scanPeriod" value="$(arg scanPeriod)" />
+   </node>
+
+   <node pkg="loam" type="laserMapping" name="laserMapping" output="screen">
+     <param name="scanPeriod" value="$(arg scanPeriod)" />
+   </node>
+
+  <!-- === RVIZ ================================================================================ -->
+  <arg name="rviz" default="true" />
+  <group if="$(arg rviz)">
+     <node launch-prefix="nice" pkg="rviz" type="rviz" name="rviz" args="-d $(find msf_updates)/cfg/darpa.rviz" />
+   </group>
+
+  <node pkg="tf" type="static_transform_publisher" name="world_tf_broadcaster" args="2 2 2 0 0 0 1 world odom 100"/>
+ <node pkg="tf" type="static_transform_publisher" name="pose_lidar_broadcaster" args="-0.100817 -0.00368789 -0.0998847 -0.921726 0.387789 -0.0058081 -0.00257711 imu aft_mapped 100" />
+ <node pkg="tf" type="static_transform_publisher" name="pose_lidar_broadcaster2" args="-0.100817 -0.00368789 -0.0998847 -0.921726 0.387789 -0.0058081 -0.00257711 imu laser_odom 100" />
+
+
+ <node pkg="rosservice" type="rosservice" name="initialize" args="call --wait /pose_sensor_rovio/pose_sensor/initialize_msf_scale 1"/>
 
 </launch>
