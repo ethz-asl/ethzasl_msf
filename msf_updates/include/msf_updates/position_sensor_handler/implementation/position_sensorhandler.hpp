@@ -60,6 +60,10 @@ PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PositionSensorHandler(
       nh.subscribe<sensor_msgs::NavSatFix>
   ("navsatfix_input", 20, &PositionSensorHandler::MeasurementCallback, this);
 
+  subOdometry_ =
+      nh.subscribe<nav_msgs::Odometry>
+  ("odometry_input", 20, &PositionSensorHandler::MeasurementCallback, this);
+
   z_p_.setZero();
 
 }
@@ -168,6 +172,26 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
 
   ProcessPositionMeasurement(pointwCov);
 }
+
+template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
+void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
+    const nav_msgs::OdometryConstPtr& msg) {
+  this->SequenceWatchDog(msg->header.seq, subOdometry_.getTopic());
+
+  MSF_INFO_STREAM_ONCE(
+      "*** position sensor got first measurement from topic "
+          << this->topic_namespace_ << "/" << subOdometry_.getTopic()
+          << " ***");
+
+  sensor_fusion_comm::PointWithCovarianceStampedPtr pointwCov(
+      new sensor_fusion_comm::PointWithCovarianceStamped);
+  pointwCov->header = msg->header;
+
+  // Fixed covariance will be set in measurement class -> MakeFromSensorReadingImpl.
+  pointwCov->point = msg->pose.pose.position;
+  
+  ProcessPositionMeasurement(pointwCov);
+  }
 
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(

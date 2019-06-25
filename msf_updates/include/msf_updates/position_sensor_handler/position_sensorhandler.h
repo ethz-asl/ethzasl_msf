@@ -23,6 +23,7 @@
 #include <geometry_msgs/PointStamped.h>
 #include <geometry_msgs/TransformStamped.h>
 #include <sensor_msgs/NavSatFix.h>
+#include <nav_msgs/Odometry.h>
 #include <msf_core/gps_conversion.h>
 #include <sensor_fusion_comm/PointWithCovarianceStamped.h>
 
@@ -41,6 +42,7 @@ class PositionSensorHandler : public msf_core::SensorHandler<
   ros::Subscriber subPointStamped_;
   ros::Subscriber subTransformStamped_;
   ros::Subscriber subNavSatFix_;
+  ros::Subscriber subOdometry_;
   msf_core::GPSConversion gpsConversion_;
 
   bool use_fixed_covariance_;  ///< Use fixed covariance set by dynamic reconfigure.
@@ -51,6 +53,7 @@ class PositionSensorHandler : public msf_core::SensorHandler<
   void MeasurementCallback(const geometry_msgs::PointStampedConstPtr & msg);
   void MeasurementCallback(const geometry_msgs::TransformStampedConstPtr & msg);
   void MeasurementCallback(const sensor_msgs::NavSatFixConstPtr& msg);
+  void MeasurementCallback(const nav_msgs::OdometryConstPtr& msg);
 
  public:
   typedef MEASUREMENT_TYPE measurement_t;

@@ -23,6 +23,7 @@
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <nav_msgs/Odometry.h>
 #include <msf_updates/PoseDistorter.h>
 
 namespace msf_pose_sensor {
@@ -41,6 +42,7 @@ class PoseSensorHandler : public msf_core::SensorHandler<
   ros::Subscriber subPoseWithCovarianceStamped_;
   ros::Subscriber subTransformStamped_;
   ros::Subscriber subPoseStamped_;
+  ros::Subscriber subOdometry_;
 
   bool measurement_world_sensor_;  ///< Defines if the pose of the sensor is
                                    // measured in world coordinates (true, default)
@@ -62,6 +64,7 @@ class PoseSensorHandler : public msf_core::SensorHandler<
       const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg);
   void MeasurementCallback(const geometry_msgs::PoseStampedConstPtr & msg);
   void MeasurementCallback(const geometry_msgs::TransformStampedConstPtr & msg);
+  void MeasurementCallback(const nav_msgs::OdometryConstPtr& msg);
 
  public:
   typedef MEASUREMENT_TYPE measurement_t;

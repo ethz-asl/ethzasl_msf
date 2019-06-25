@@ -28,4 +28,4 @@ documentation
 *.wikidoc
 *.cfgc
 cfg/__init__.py
-
+*.vscode

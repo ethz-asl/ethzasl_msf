@@ -75,6 +75,9 @@ PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PoseSensorHandler(
   subPoseStamped_ = nh.subscribe < geometry_msgs::PoseStamped
       > ("pose_input", 20, &PoseSensorHandler::MeasurementCallback, this);
 
+  subOdometry_ = nh.subscribe<nav_msgs::Odometry>
+    ("odometry_input", 20, &PoseSensorHandler::MeasurementCallback, this);
+
   z_p_.setZero();
   z_q_.setIdentity();
 
@@ -230,6 +233,31 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
 
   ProcessPoseMeasurement(pose);
 }
+
+template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
+void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
+    const nav_msgs::OdometryConstPtr& msg) {
+  this->SequenceWatchDog(msg->header.seq, subOdometry_.getTopic());
+
+  MSF_INFO_STREAM_ONCE(
+      "*** pose sensor got first measurement from topic "
+          << this->topic_namespace_ << "/" << subOdometry_.getTopic()
+          << " ***");
+
+  geometry_msgs::PoseWithCovarianceStampedPtr pose(
+      new geometry_msgs::PoseWithCovarianceStamped());
+
+  pose->header = msg->header;
+
+  // Fixed covariance will be set in measurement class -> MakeFromSensorReadingImpl.
+  if(!use_fixed_covariance_) { // Take covariance from sensor
+    pose->pose = msg->pose;
+  } else{ // Fixed covariances
+    pose->pose.pose = msg->pose.pose;
+  }
+  
+  ProcessPoseMeasurement(pose);
+  }
 
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
