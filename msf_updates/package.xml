@@ -22,10 +22,14 @@
   <build_depend>geometry_msgs</build_depend>
   <build_depend>nav_msgs</build_depend>
   <build_depend>sensor_fusion_comm</build_depend>
+  <build_depend>mav_startup</build_depend>
 
   <run_depend>roscpp</run_depend>
   <run_depend>msf_core</run_depend>
   <run_depend>geometry_msgs</run_depend>
   <run_depend>sensor_fusion_comm</run_depend>
   <run_depend>nav_msgs</run_depend>
+  <run_depend>mav_startup</run_depend>
+
+
 </package>

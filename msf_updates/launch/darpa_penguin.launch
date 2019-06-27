@@ -81,13 +81,17 @@
   <!-- === Horrible TFs to make it =================================================================================== -->
   <node pkg="tf" type="static_transform_publisher" name="world_tf_broadcaster1" args="0.0310099648145 -0.87255560408 0.217658683746 -0.00645332001163  0.000251434537011 -0.0578951065533 0.998301782067 world odom 100" />
   <node pkg="tf" type="static_transform_publisher" name="world_tf_broadcaster2" args="0 0 0 -0.00186232 0.0669071 0.00972055 0.99771 odom lidar_sensor_init 100" />
+
   <!-- === Fix lidar frame due to calibration file from old firmware version === -->
-  <node pkg="tf" type="static_transform_publisher" name="world_tf_broadcaster3" args="0 0 0 0 0 1 0 lidar_sensor_init lidar_init 100" /> <!-- Rotated by 180deg -->
+  <node pkg="tf" type="static_transform_publisher" name="world_tf_broadcaster3" args="0 0 0 0 0 1 0 lidar_sensor_init lidar_init 100" /> 
+  <!-- Rotated by 180deg -->
+
   <!-- === ===-->
-  <!-- <node pkg="tf" type="static_transform_publisher" name="world_tf_broadcaster7" args="0 0 0 0 0 0 1 lidar_sensor_init /camera_init_CORRECTED 100" />  -->
-  <node pkg="tf" type="static_transform_publisher" name="world_tf_broadcaster4" args="0 0 0 0.5 0.5 0.5 0.5 lidar_init /camera_init 100" />
+  <!-- <node pkg="tf" type="static_transform_publisher" name="world_tf_broadcaster7" args="0 0 0 0 0 0 1 lidar_sensor_init /loam_init_CORRECTED 100" />  -->
+  <node pkg="tf" type="static_transform_publisher" name="world_tf_broadcaster4" args="0 0 0 0.5 0.5 0.5 0.5 lidar_init /loam_init 100" />
+
   <!-- === Rotate backwards to get IMU frame from camera (=lidar) frame === -->
-  <node pkg="tf" type="static_transform_publisher" name="world_tf_broadcaster5" args="0 0 0 -0.5 0.5 0.5 0.5 camera os1_sensor 100" />
+  <node pkg="tf" type="static_transform_publisher" name="world_tf_broadcaster5" args="0 0 0 -0.5 0.5 0.5 0.5 loam_state os1_sensor 100" />
   <node pkg="tf" type="static_transform_publisher" name="world_tf_broadcaster6" args="0.024036253 0.010857284 -0.131314456 0.0031883 -0.066857 -0.0100591 0.9977068 os1_sensor imu_loam 100" />
 
 
