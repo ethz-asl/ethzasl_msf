@@ -1,0 +1,66 @@
+<!-- this is a sample launch file to run MSF with rovio and position Input from Vicon-->
+<launch>
+  <!-- <arg name="global_frame_id" default="map" />
+  <arg name="local_frame_id" default="imu" /> -->
+  <arg name="mav_name" default="penguin"/>
+
+  <arg name="rovio_fuse" default="false"/>
+  <arg name="loam_fuse" default="true" />
+  <arg name="rviz" default="true"/>
+
+  <param name="use_sim_time" value="True" />
+
+  <arg name="scanPeriod" default="0.1" />
+
+  # ARL Coordinate Frame Facilitators
+  <arg name="pi"      value="3.141592654"/>
+  <arg name="half_pi" value="1.570796327"/>
+  <arg name="deg2rad" value="0.017453293"/>
+  <arg name="z_offset"     value="0.0"/>
+  <arg name="pitch_offset" value="$(eval 1.570796327 + 0.0 * 0.017453293)"/>  # (90+) 0 [ENU-deg]
+  <arg name="yaw_offset"   value="$(eval 1.570796327 + 0.0 * 0.017453293)"/>  # (90+) 0 [ENU-deg]
+
+  <group ns="$(arg mav_name)">
+    <!-- === MSF ================================================================================ -->
+    <node  name="msf_pose_sensor" pkg="msf_updates" type="pose_sensor" clear_params="true" output="screen">
+      <remap from="msf_core/imu_state_input" to="/penguin/os1_cloud_node/imu" />
+      <remap from="msf_updates/transform_input" to="loam_state" />
+      <rosparam file="$(find msf_updates)/params/darpa_loam_replay.yaml"/>
+    </node>
+
+    <!-- === LOAM =============================================================================== -->
+    <node pkg="loam" type="multiScanRegistration" name="multiScanRegistration" output="screen" if="$(arg loam_fuse)">
+      <param name="lidar" value="O1-64" /> <!-- options: VLP-16  HDL-32  HDL-64E O1-64 -->
+      <param name="scanPeriod" value="$(arg scanPeriod)" />
+      <remap from="/multi_scan_points" to="/penguin/os1_cloud_node/points" />
+      <!-- <remap from="/imu/data" to="/penguin/mavros/imu/data_raw"/> -->
+    </node>
+
+    <node pkg="loam" type="laserOdometry" name="laserOdometry" output="screen" respawn="true" if="$(arg loam_fuse)">
+      <param name="scanPeriod" value="$(arg scanPeriod)" />
+    </node>
+
+    <node pkg="loam" type="laserMapping" name="laserMapping" output="screen" if="$(arg loam_fuse)">
+      <param name="scanPeriod" value="$(arg scanPeriod)" />
+      <!-- <remap from="/imu/data" to="/penguin/mavros/imu/data_raw"/> -->
+    </node>
+    
+    <node pkg="loam" type="transformMaintenance" name="transformMaintenance" output="screen">
+    </node>
+  </group>
+
+  <!-- === RVIZ ================================================================================= -->
+  <group if="$(arg rviz)">
+    <node launch-prefix="nice" pkg="rviz" type="rviz" name="rviz" args="-d $(find loam)/rviz_cfg/loam_velodyne.rviz" />
+  </group>
+
+  <!-- === Horrible TFs to make it =================================================================================== -->
+  <node pkg="tf" type="static_transform_publisher" name="world_tf_broadcaster1" args="0.0310099648145 -0.87255560408 0.217658683746 -0.00645332001163  0.000251434537011 -0.0578951065533 0.998301782067 world odom 100" />
+  <node pkg="tf" type="static_transform_publisher" name="world_tf_broadcaster2" args="0 0 0 0 0 0 1 odom loam_init 100" />
+  <node pkg="tf" type="static_transform_publisher" name="world_tf_broadcaster22" args="0 0 0 0 0 0 1 odom loam_init_CORRECTED 100" />
+
+
+
+  <node pkg="rosservice" type="rosservice" name="initialize" args="call --wait /pose_sensor_rovio/pose_sensor/initialize_msf_scale 1"/>
+
+</launch>

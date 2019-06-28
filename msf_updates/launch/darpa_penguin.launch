@@ -87,7 +87,7 @@
   <!-- Rotated by 180deg -->
 
   <!-- === ===-->
-  <!-- <node pkg="tf" type="static_transform_publisher" name="world_tf_broadcaster7" args="0 0 0 0 0 0 1 lidar_sensor_init /loam_init_CORRECTED 100" />  -->
+  <node pkg="tf" type="static_transform_publisher" name="world_tf_broadcaster7" args="0 0 0 0 0 0 1 lidar_sensor_init /loam_init_CORRECTED 100" /> 
   <node pkg="tf" type="static_transform_publisher" name="world_tf_broadcaster4" args="0 0 0 0.5 0.5 0.5 0.5 lidar_init /loam_init 100" />
 
   <!-- === Rotate backwards to get IMU frame from camera (=lidar) frame === -->
