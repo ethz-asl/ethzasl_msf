@@ -1,6 +1,7 @@
 # MSF Parameters for Loam with OS-1 used in Denver
 scale_init: 1.0
 data_playback: true
+msf_output_frame: odom
 
 core/core_fixed_bias: false
 #########ADIS IMU PARAMETERS#######
@@ -20,14 +21,14 @@ core/core_noise_gyrbias: 3e-6
 
 #init position offset lidar center to onboard imu
 # Denver hack house calibration
-pose_sensor/init/q_ic/x: -0.00186232
-pose_sensor/init/q_ic/y: 0.0669071
-pose_sensor/init/q_ic/z: 0.00972055
-pose_sensor/init/q_ic/w: 0.99771
+pose_sensor/init/q_ic/x: 0.0
+pose_sensor/init/q_ic/y: 0.0
+pose_sensor/init/q_ic/z: 0.0
+pose_sensor/init/q_ic/w: 1.0
 
-pose_sensor/init/p_ip/x: -0.00607641
-pose_sensor/init/p_ip/y: -0.0106566
-pose_sensor/init/p_ip/z:  0.133374
+pose_sensor/init/p_ip/x: 0.0
+pose_sensor/init/p_ip/y: 0.0
+pose_sensor/init/p_ip/z: 0.0
 
 pose_sensor/pose_fixed_scale: true
 pose_sensor/pose_fixed_p_ic: true
@@ -37,4 +38,5 @@ pose_sensor/pose_fixed_q_wv: true
 
 pose_sensor/pose_absolute_measurements: true # not relative to last measurement
 pose_sensor/pose_use_fixed_covariance: true
-pose_sensor/pose_measurement_world_sensor: true  # selects if sensor measures its position w.r.t. world (true, e.g. Vicon) or the position of the world coordinate system w.r.t. the sensor (false, e.g. ethzasl_ptam)
+
+pose_sensor/pose_measurement_world_sensor: true # selects if sensor measures its position w.r.t. world (true, e.g. Vicon) or the position of the world coordinate system w.r.t. the sensor (false, e.g. ethzasl_ptam)
