@@ -70,8 +70,8 @@
       <!-- <remap from="/imu/data" to="/penguin/mavros/imu/data_raw"/> -->
     </node>
     
-    <node pkg="loam" type="transformMaintenance" name="transformMaintenance" output="screen">
-    </node>
+    <!-- <node pkg="loam" type="transformMaintenance" name="transformMaintenance" output="screen"> -->
+    <!-- </node> -->
     
     <node pkg="loam" type="transformOdometry" name="transformOdometry" output="screen">
     </node>

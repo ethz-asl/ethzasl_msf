@@ -5,19 +5,30 @@ msf_output_frame: odom
 
 core/core_fixed_bias: false
 #########ADIS IMU PARAMETERS#######
-# core/core_noise_acc: 0.083
-# core/core_noise_accbias: 0.00005
-# core/core_noise_gyr: 0.0013
-# core/core_noise_gyrbias: 0.0000013
-core/core_noise_acc: 0.02
-core/core_noise_accbias: 8e-5
-core/core_noise_gyr: 0.004
-core/core_noise_gyrbias: 3e-6
+core/core_noise_acc: 0.083
+core/core_noise_accbias: 0.00005
+core/core_noise_gyr: 0.0013
+core/core_noise_gyrbias: 0.0000013
+# core/core_noise_acc: 0.02
+# core/core_noise_accbias: 8e-5
+# core/core_noise_gyr: 0.004
+# core/core_noise_gyrbias: 3e-6
 
-# position_sensor/position_noise_meas: 0.05
-# position_sensor/position_fixed_p_ip: true
-# position_sensor/position_delay: 0.0
-# position_sensor/position_noise_p_ip: 0.01
+pose_sensor/enable_noise_estimation: false
+# pose_sensor/pose_noise_meas: 0.9
+# pose_sensor/pose_noise_p_ip: 0.5
+
+pose_sensor/fixed_scale: 1.0
+
+pose_sensor/pose_noise_p_wv: 0.02
+pose_sensor/pose_noise_q_wv: 0.05
+pose_sensor/pose_noise_p_ic: 0.02
+pose_sensor/pose_noise_q_ic: 0.05
+# pose_sensor/pose_delay: -0.1258408930047
+# pose_sensor/pose_noise_meas_p: 2.0
+# pose_sensor/pose_noise_meas_q: 5.0
+pose_sensor/pose_noise_meas_p: 0.2
+pose_sensor/pose_noise_meas_q: 0.5
 
 #init position offset lidar center to onboard imu
 # Denver hack house calibration
@@ -40,3 +51,6 @@ pose_sensor/pose_absolute_measurements: true # not relative to last measurement
 pose_sensor/pose_use_fixed_covariance: true
 
 pose_sensor/pose_measurement_world_sensor: true # selects if sensor measures its position w.r.t. world (true, e.g. Vicon) or the position of the world coordinate system w.r.t. the sensor (false, e.g. ethzasl_ptam)
+
+# pose_sensor/enable_mah_outlier_rejection: true
+# pose_sensor/mah_threshold: 2.5
