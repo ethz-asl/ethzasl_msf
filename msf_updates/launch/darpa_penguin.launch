@@ -28,7 +28,7 @@
       <rosparam file="$(find msf_updates)/params/darpa_rovio_replay.yaml" if="$(arg rovio_fuse)" />
       <remap from="msf_updates/transform_input" to="rovio/transform" if="$(arg rovio_fuse)" />
       <!-- === if LOAM === -->
-      <rosparam file="$(find msf_updates)/params/darpa_loam_replay.yaml" if="$(arg loam_fuse)"/>
+      <rosparam file="$(find msf_updates)/params/darpa_loam.yaml" if="$(arg loam_fuse)"/>
       <remap from="msf_updates/odometry_input" to="/integrated_imu_to_init" if="$(arg loam_fuse)"/>
       <param name="msf_output_frame" value="odom"/>
     </node>
@@ -44,7 +44,6 @@
     </node>
 
     <!-- <node name="rovio_ref" pkg="rovio" type="rovio_node" output="screen">
-      <param name="filter_config" value="$(find rovio)/cfg/rovio_fusion.info" />
       <param name="filter_config" value="$(find mav_startup)/parameters/mavs/$(arg mav_name)/blackfly/rovio_filter_blackfly.info" />
       <param name="camera0_config" value="$(find mav_startup)/parameters/mavs/$(arg mav_name)/blackfly/rovio_equidist_cam0.yaml" />
       <remap from="cam0/image_raw" to="image_raw" />

@@ -5,14 +5,15 @@ msf_output_frame: odom
 
 core/core_fixed_bias: false
 #########ADIS IMU PARAMETERS#######
-# core/core_noise_acc: 0.083
-# core/core_noise_accbias: 0.00005
-# core/core_noise_gyr: 0.0013
-# core/core_noise_gyrbias: 0.0000013
-core/core_noise_acc: 0.02
-core/core_noise_accbias: 8e-5
-core/core_noise_gyr: 0.004
-core/core_noise_gyrbias: 3e-6
+# core/core_noise_acc: 0.01
+# core/core_noise_accbias: 0.0002
+# core/core_noise_gyr: 0.005
+# core/core_noise_gyrbias: 4.0e-06
+# from imu_adis16448.yaml
+core/core_noise_acc: 0.015
+core/core_noise_accbias: 8e-6
+core/core_noise_gyr: 0.0025
+core/core_noise_gyrbias: 3e-5
 
 pose_sensor/enable_noise_estimation: false
 # pose_sensor/pose_noise_meas: 0.9
@@ -20,14 +21,14 @@ pose_sensor/enable_noise_estimation: false
 
 pose_sensor/fixed_scale: 1.0
 
-# pose_sensor/pose_noise_p_wv: 0.0
-# pose_sensor/pose_noise_q_wv: 0.0
-# pose_sensor/pose_noise_p_ic: 0.0
-# pose_sensor/pose_noise_q_ic: 0.0
+pose_sensor/pose_noise_p_wv: 0.0
+pose_sensor/pose_noise_q_wv: 0.0
+pose_sensor/pose_noise_p_ic: 0.0 # set to estimate position & rotation of imu to fcu
+pose_sensor/pose_noise_q_ic: 0.0 # also need to set pose_fixed_*_ic to false!
 pose_sensor/pose_delay: -0.1258408930047
 # pose_sensor/pose_noise_meas_p: 2.0
 # pose_sensor/pose_noise_meas_q: 5.0
-pose_sensor/pose_noise_meas_p: 0.002
+pose_sensor/pose_noise_meas_p: 0.0025  
 pose_sensor/pose_noise_meas_q: 0.005
 # pose_sensor/pose_noise_meas_p: 1.2
 # pose_sensor/pose_noise_meas_q: 0.08
