@@ -1,6 +1,6 @@
  # MSF Parameters for Loam with OS-1 used in Denver
 scale_init: 1.0
-data_playback: false
+data_playback: true
 msf_output_frame: odom
 
 core/core_fixed_bias: false
@@ -10,10 +10,14 @@ core/core_fixed_bias: false
 # core/core_noise_gyr: 0.005
 # core/core_noise_gyrbias: 4.0e-06
 # from imu_adis16448.yaml
-core/core_noise_acc: 0.015
-core/core_noise_accbias: 8e-6
-core/core_noise_gyr: 0.0025
+core/core_noise_acc: 0.01
+core/core_noise_accbias: 8e-5
+core/core_noise_gyr: 0.002
 core/core_noise_gyrbias: 3e-5
+# core/core_noise_acc: 0.015
+# core/core_noise_accbias: 8e-6
+# core/core_noise_gyr: 0.0025
+# core/core_noise_gyrbias: 3e-5
 
 pose_sensor/enable_noise_estimation: false
 # pose_sensor/pose_noise_meas: 0.9
@@ -23,26 +27,39 @@ pose_sensor/fixed_scale: 1.0
 
 pose_sensor/pose_noise_p_wv: 0.0
 pose_sensor/pose_noise_q_wv: 0.0
-pose_sensor/pose_noise_p_ic: 0.0 # set to estimate position & rotation of imu to fcu
-pose_sensor/pose_noise_q_ic: 0.0 # also need to set pose_fixed_*_ic to false!
-pose_sensor/pose_delay: -0.1258408930047
+pose_sensor/pose_noise_p_ic: 0.02 # set to estimate position & rotation of imu to fcu
+pose_sensor/pose_noise_q_ic: 0.06 # also need to set pose_fixed_*_ic to false!
+pose_sensor/pose_delay:  0.1258408930047
 # pose_sensor/pose_noise_meas_p: 2.0
 # pose_sensor/pose_noise_meas_q: 5.0
-pose_sensor/pose_noise_meas_p: 0.0025  
-pose_sensor/pose_noise_meas_q: 0.005
+# -----------
+# ARL parameters:
+# pose_sensor/pose_noise_meas_p: 0.050 #0.025 ###0.01
+# pose_sensor/pose_noise_meas_q: 0.085 #0.0425 ###0.017
+# ------------ 
+# kinda ok with laserMaintenance
+pose_sensor/pose_noise_meas_p: 0.8 #0.25  
+pose_sensor/pose_noise_meas_q: 1.0 #0.5
+# -------------------------------
+# to jumpy below
+#pose_sensor/pose_noise_meas_p: 0.25  
+#pose_sensor/pose_noise_meas_q: 0.5
 # pose_sensor/pose_noise_meas_p: 1.2
 # pose_sensor/pose_noise_meas_q: 0.08
 
 #init position offset lidar center to onboard imu
 # Denver hack house calibration
-pose_sensor/init/q_ic/x: 0.0
-pose_sensor/init/q_ic/y: 0.0
-pose_sensor/init/q_ic/z: 0.0
-pose_sensor/init/q_ic/w: 1.0
+pose_sensor/init/q_ic/w: 1.0 #0.5381
+pose_sensor/init/q_ic/x: 0.0 #0.4693
+pose_sensor/init/q_ic/y: 0.0 #-0.4615
+pose_sensor/init/q_ic/z: 0.0 #-0.5265
 
-pose_sensor/init/p_ip/x: 0.0
-pose_sensor/init/p_ip/y: 0.0
-pose_sensor/init/p_ip/z: 0.0
+pose_sensor/init/p_ic/x: 0.0 #-0.0061
+pose_sensor/init/p_ic/y: 0.0 #-0.0107
+pose_sensor/init/p_ic/z:  0.0 #0.1334
+
+#  orientation_quat: [0.5381 0.4693 -0.4615 -0.5265]
+                #  position: [-0.0061 -0.0107 0.1334]
 
 pose_sensor/pose_fixed_scale: true
 pose_sensor/pose_fixed_p_ic: true
@@ -54,6 +71,8 @@ pose_sensor/pose_absolute_measurements: true # not relative to last measurement
 pose_sensor/pose_use_fixed_covariance: true
 
 pose_sensor/pose_measurement_world_sensor: true # selects if sensor measures its position w.r.t. world (true, e.g. Vicon) or the position of the world coordinate system w.r.t. the sensor (false, e.g. ethzasl_ptam)
+
+pose_sensor/pose_sensor/pose_measurement_minimum_dt: 0.005 # Sets the minimum time in seconds between two pose measurements.
 
 # pose_sensor/enable_mah_outlier_rejection: true
 # pose_sensor/mah_threshold: 2.5
