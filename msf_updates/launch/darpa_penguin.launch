@@ -28,8 +28,9 @@
       <rosparam file="$(find msf_updates)/params/darpa_rovio_replay.yaml" if="$(arg rovio_fuse)" />
       <remap from="msf_updates/transform_input" to="rovio/transform" if="$(arg rovio_fuse)" />
       <!-- === if LOAM === -->
-      <rosparam file="$(find msf_updates)/params/darpa_loam.yaml" if="$(arg loam_fuse)"/>
-      <remap from="msf_updates/odometry_input" to="/integrated_imu_to_init" if="$(arg loam_fuse)"/>
+      <!-- <rosparam file="$(find msf_updates)/params/darpa_loam.yaml" if="$(arg loam_fuse)"/> -->
+      <rosparam file="$(find msf_updates)/params/darpa_loam_calibration.yaml" if="$(arg loam_fuse)"/>
+      <remap from="msf_updates/odometry_input" to="/integrated_to_init" if="$(arg loam_fuse)"/>
       <param name="msf_output_frame" value="odom"/>
     </node>
 
@@ -84,8 +85,9 @@
 
   <!-- === Horrible TFs to make it =================================================================================== -->
   <!-- <node pkg="tf" type="static_transform_publisher" name="world_tf_broadcaster1" args="0.0310099648145 -0.87255560408 0.217658683746 -0.00645332001163  0.000251434537011 -0.0578951065533 0.998301782067 world odom 100" /> -->
-  <!-- <node pkg="tf" type="static_transform_publisher" name="world_tf_broadcaster1" args="0 0 0 0 0 0 1 odom /loam_init 100" /> -->
+  <node pkg="tf" type="static_transform_publisher" name="world_tf_broadcaster1" args="0 0 0 0 0 0 1 odom world 100" />
   <node pkg="tf" type="static_transform_publisher" name="world_tf_broadcaster2" args="-0.0061 -0.0107 0.1334 0.4693 -0.4615 -0.5265 0.5381 odom /loam_init 100"/>
+
   <!-- <node pkg="tf" type="static_transform_publisher" name="world_tf_broadcaster2" args="-0.00607641 -0.0106566 0.133374 -0.00186232 0.0669071 0.00972055 0.99771 odom os1_sensor_init 100"/>  -->
   <!-- -0.00849099 0.00625691 0.139634 -0.058159 -0.00254162 -0.998148 0.0176717 odom lidar_init 100" /> -->
   <!-- <node pkg="tf" type="static_transform_publisher" name="world_tf_broadcaster3" args="0 0 0 0.5 0.5 0.5 0.5 os1_sensor_init lidar 100" /> -->

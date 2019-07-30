@@ -1,7 +1,7 @@
  # MSF Parameters for Loam with OS-1 used in Denver
 scale_init: 1.0
 data_playback: true
-msf_output_frame: odom
+core/msf_output_frame: odom
 
 core/core_fixed_bias: false
 #########ADIS IMU PARAMETERS#######
@@ -27,8 +27,8 @@ pose_sensor/fixed_scale: 1.0
 
 pose_sensor/pose_noise_p_wv: 0.0
 pose_sensor/pose_noise_q_wv: 0.0
-pose_sensor/pose_noise_p_ic: 0.02 # set to estimate position & rotation of imu to fcu
-pose_sensor/pose_noise_q_ic: 0.06 # also need to set pose_fixed_*_ic to false!
+pose_sensor/pose_noise_p_ic: 0.0 # set to estimate position & rotation of imu to fcu
+pose_sensor/pose_noise_q_ic: 0.0 # also need to set pose_fixed_*_ic to false!
 pose_sensor/pose_delay:  0.1258408930047
 # pose_sensor/pose_noise_meas_p: 2.0
 # pose_sensor/pose_noise_meas_q: 5.0
@@ -38,12 +38,12 @@ pose_sensor/pose_delay:  0.1258408930047
 # pose_sensor/pose_noise_meas_q: 0.085 #0.0425 ###0.017
 # ------------ 
 # kinda ok with laserMaintenance
-pose_sensor/pose_noise_meas_p: 0.8 #0.25  
-pose_sensor/pose_noise_meas_q: 1.0 #0.5
+pose_sensor/pose_noise_meas_p:  0.8 #0.25  
+pose_sensor/pose_noise_meas_q:  1.0 #0.5
 # -------------------------------
 # to jumpy below
-#pose_sensor/pose_noise_meas_p: 0.25  
-#pose_sensor/pose_noise_meas_q: 0.5
+# pose_sensor/pose_noise_meas_p: 0.25  
+# pose_sensor/pose_noise_meas_q: 0.5
 # pose_sensor/pose_noise_meas_p: 1.2
 # pose_sensor/pose_noise_meas_q: 0.08
 
@@ -62,8 +62,8 @@ pose_sensor/init/p_ic/z:  0.0 #0.1334
                 #  position: [-0.0061 -0.0107 0.1334]
 
 pose_sensor/pose_fixed_scale: true
-pose_sensor/pose_fixed_p_ic: true
-pose_sensor/pose_fixed_q_ic: true
+pose_sensor/pose_fixed_p_ic: false
+pose_sensor/pose_fixed_q_ic: false
 pose_sensor/pose_fixed_p_wv: true
 pose_sensor/pose_fixed_q_wv: true
 
