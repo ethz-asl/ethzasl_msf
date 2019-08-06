@@ -66,3 +66,9 @@ target_link_libraries(test_similaritytransform similaritytransform)
 catkin_add_gtest(test_static_statelist src/test/test_staticstatelist.cc)
 target_link_libraries(test_static_statelist pthread ${PROJECT_NAME})
 
+install(TARGETS msf_core similaritytransform
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
