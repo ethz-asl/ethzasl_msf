@@ -30,6 +30,7 @@
 #include <sensor_fusion_comm/DoubleArrayStamped.h>
 #include <sensor_fusion_comm/DoubleMatrixStamped.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include <maplab_msgs/OdometryWithImuBiases.h>
 
 namespace msf_core {
 
@@ -226,6 +227,12 @@ struct GenericState_T {
    * \note It does not set the header.
    */
   void ToOdometryMsg(nav_msgs::Odometry& odometry);
+
+  /**
+   * \brief Assembles a Maplab Odometry message from the state.
+   * \note It does not set the header.
+   */
+  void ToMaplabOdometryMsg(maplab_msgs::OdometryWithImuBiases& odometry);
 
   /**
    * \brief Assemble an ExtState message from the state.
