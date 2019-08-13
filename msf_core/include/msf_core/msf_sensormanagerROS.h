@@ -204,7 +204,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
   virtual void PublishStateAfterPropagation(
       const shared_ptr<EKFState_T>& state) const {
 
-    if (pubPoseCrtl_.getNumSubscribers() || pubPose_.getNumSubscribers() || pubOdometry_.getNumSubscribers()) {
+    if (pubPoseCrtl_.getNumSubscribers() || pubPose_.getNumSubscribers() || pubOdometry_.getNumSubscribers() || pubMaplabOdometry_.getNumSubscribers()) {
       static int msg_seq = 0;
 
       geometry_msgs::PoseWithCovarianceStamped msgPose;
@@ -223,15 +223,13 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
       state->ToOdometryMsg(msgOdometry);
       pubOdometry_.publish(msgOdometry);
 
-      std::cout << "BEFORE PUBLISH" << std::endl; 
       maplab_msgs::OdometryWithImuBiases msgMaplabOdometry;
-      msgOdometry.header.stamp = ros::Time(state->time);
-      msgOdometry.header.seq = msg_seq++;
-      msgOdometry.header.frame_id = msf_output_frame_;
-      msgOdometry.child_frame_id = "imu";
+      msgMaplabOdometry.header.stamp = ros::Time(state->time);
+      msgMaplabOdometry.header.seq = msg_seq++;
+      msgMaplabOdometry.header.frame_id = msf_output_frame_;
+      msgMaplabOdometry.child_frame_id = "imu";
       state->ToMaplabOdometryMsg(msgMaplabOdometry);
       pubMaplabOdometry_.publish(msgMaplabOdometry);
-      std::cout << "AFTER PUBLISH" << std::endl; 
 
       sensor_fusion_comm::ExtState msgPoseCtrl;
       msgPoseCtrl.header = msgPose.header;
