@@ -28,6 +28,7 @@
 #include <geometry_msgs/PointStamped.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <nav_msgs/Odometry.h>
+#include <maplab_msgs/OdometryWithImuBiases.h>
 #include <sensor_msgs/Imu.h>
 #include <tf/transform_broadcaster.h>
 
@@ -63,6 +64,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
   ros::Publisher pubState_;  ///< Publishes all states of the filter.
   ros::Publisher pubPose_;  ///< Publishes 6DoF pose output.
   ros::Publisher pubOdometry_;  ///< Publishes odometry output.
+  ros::Publisher pubMaplabOdometry_;  ///< Publishes odometry output.
   ros::Publisher pubPoseAfterUpdate_;  ///< Publishes 6DoF pose output after the update has been applied.
   ros::Publisher pubPoseCrtl_;  ///< Publishes 6DoF pose including velocity output.
   ros::Publisher pubCorrect_;  ///< Publishes corrections for external state propagation.
@@ -96,6 +98,8 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
     pubPose_ = nh.advertise < geometry_msgs::PoseWithCovarianceStamped
         > ("pose", 100);
     pubOdometry_ = nh.advertise < nav_msgs::Odometry> ("odometry", 100);
+    pubMaplabOdometry_ = nh.advertise < maplab_msgs::OdometryWithImuBiases>
+      ("maplab_odometry", 100);
     pubPoseAfterUpdate_ = nh.advertise
         < geometry_msgs::PoseWithCovarianceStamped > ("pose_after_update", 100);
     pubPoseCrtl_ = nh.advertise < sensor_fusion_comm::ExtState
@@ -218,6 +222,16 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
       msgOdometry.child_frame_id = "imu";
       state->ToOdometryMsg(msgOdometry);
       pubOdometry_.publish(msgOdometry);
+
+      std::cout << "BEFORE PUBLISH" << std::endl; 
+      maplab_msgs::OdometryWithImuBiases msgMaplabOdometry;
+      msgOdometry.header.stamp = ros::Time(state->time);
+      msgOdometry.header.seq = msg_seq++;
+      msgOdometry.header.frame_id = msf_output_frame_;
+      msgOdometry.child_frame_id = "imu";
+      state->ToMaplabOdometryMsg(msgMaplabOdometry);
+      pubMaplabOdometry_.publish(msgMaplabOdometry);
+      std::cout << "AFTER PUBLISH" << std::endl; 
 
       sensor_fusion_comm::ExtState msgPoseCtrl;
       msgPoseCtrl.header = msgPose.header;
