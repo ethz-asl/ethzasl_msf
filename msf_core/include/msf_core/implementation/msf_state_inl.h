@@ -147,6 +147,39 @@ void GenericState_T<stateVector_T, StateDefinition_T>::ToOdometryMsg(
   GetTwistCovarianceInImuFrame(odometry.twist.covariance);
 }
 
+template<typename stateVector_T, typename StateDefinition_T>
+void GenericState_T<stateVector_T, StateDefinition_T>::ToMaplabOdometryMsg(
+    maplab_msgs::OdometryWithImuBiases& odometry) {
+  eigen_conversions::Vector3dToPoint(Get<StateDefinition_T::p>(),
+                                     odometry.pose.pose.position);
+  eigen_conversions::QuaternionToMsg(Get<StateDefinition_T::q>(),
+                                     odometry.pose.pose.orientation);
+  GetPoseCovariance(odometry.pose.covariance);
+
+  const msf_core::Quaternion& q_W_I = Get<StateDefinition_T::q>();
+
+  // Express velocity in body frame as demanded
+  // by the ROS odometry message specification.
+  const msf_core::Vector3& v_W =  Get<StateDefinition_T::v>();
+  const msf_core::Vector3 v_I = q_W_I.inverse().toRotationMatrix() * v_W;
+  eigen_conversions::Vector3dToPoint(v_I,
+                                     odometry.twist.twist.linear);
+
+  // Subtract bias from gyro measurement.
+  eigen_conversions::Vector3dToPoint(w_m - Get<StateDefinition_T::b_w>(),
+                                     odometry.twist.twist.angular);
+  GetTwistCovarianceInImuFrame(odometry.twist.covariance);
+
+  // State of the odometry
+  odometry.odometry_state = 0u;
+
+  // Bias
+  eigen_conversions::Vector3dToPoint(Get<StateDefinition_T::b_w>(),
+                                     odometry.gyro_bias);
+  eigen_conversions::Vector3dToPoint(Get<StateDefinition_T::b_a>(),
+                                     odometry.accel_bias);
+}
+
 /// Assembles an ExtState message from the state
 /** it does not set the header */
 template<typename stateVector_T, typename StateDefinition_T>
