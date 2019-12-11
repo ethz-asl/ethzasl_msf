@@ -14,7 +14,7 @@ add_definitions(-DBOOST_NO_CXX11_VARIADIC_TEMPLATES)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake/)
 
-find_package(catkin REQUIRED COMPONENTS sensor_msgs dynamic_reconfigure msf_timing tf glog_catkin cmake_modules)
+find_package(catkin REQUIRED COMPONENTS sensor_msgs dynamic_reconfigure msf_timing tf glog_catkin cmake_modules maplab_msgs)
 find_package(Eigen REQUIRED)
 
 find_package(Doxygen)
@@ -52,10 +52,10 @@ catkin_package(
 install(DIRECTORY cmake
         DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
-add_library(${PROJECT_NAME} src/lib/msf_tools.cc src/lib/falsecolor.cc 
+add_library(${PROJECT_NAME} src/lib/msf_tools.cc src/lib/falsecolor.cc
                      src/lib/gps_conversion.cc)
 target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
-add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencfg) # ${MSF_DOCUMENTATION}) 
+add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencfg) # ${MSF_DOCUMENTATION})
 
 add_library(similaritytransform src/similaritytransform.cc)
 target_link_libraries(similaritytransform ${catkin_LIBRARIES})

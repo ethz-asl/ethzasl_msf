@@ -21,9 +21,11 @@
   <build_depend>msf_core</build_depend>
   <build_depend>geometry_msgs</build_depend>
   <build_depend>sensor_fusion_comm</build_depend>
+  <build_depend>maplab_msgs</build_depend>
 
   <run_depend>roscpp</run_depend>
   <run_depend>msf_core</run_depend>
   <run_depend>geometry_msgs</run_depend>
   <run_depend>sensor_fusion_comm</run_depend>
+  <run_depend>maplab_msgs</run_depend>
 </package>
