@@ -109,13 +109,13 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
     v << 0, 0, 0;			/// Robot velocity (IMU centered).
     w_m << 0, 0, 0;		/// Initial angular velocity.
 
-    // Set the initial yaw alignment of body to world (the frame in which the
+    // Set the initial alignment of body to world (the frame in which the
     // position sensor measures).
-    double yawinit = config_.position_yaw_init / 180 * M_PI;
-    Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
-    yawq.normalize();
-
-    q = yawq;
+    q.x() = config_.position_q_IB_x;
+    q.y() = config_.position_q_IB_y;
+    q.z() = config_.position_q_IB_z;
+    q.w() = config_.position_q_IB_w;
+    q.normalize();
 
     P.setZero();  // Error state covariance; if zero, a default initialization
                   // in msf_core is used
