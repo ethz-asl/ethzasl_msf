@@ -12,7 +12,7 @@ set(CMAKE_BUILD_TYPE Release)
 #build with boost 1.6x
 add_definitions(-DBOOST_NO_CXX11_VARIADIC_TEMPLATES)
 
-find_package(catkin REQUIRED COMPONENTS roscpp msf_core geometry_msgs sensor_fusion_comm)
+find_package(catkin REQUIRED COMPONENTS roscpp msf_core geometry_msgs sensor_fusion_comm maplab_msgs)
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 
