@@ -358,7 +358,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
       tf_broadcaster_.sendTransform(
           tf::StampedTransform(
               transform, ros::Time::now() /*ros::Time(latestState->time_)*/,
-              msf_output_frame_, msf_state_frame));
+              msf_output_frame_, msf_state_frame_));
     }
 
     if (pubCovCore_.getNumSubscribers()) {
