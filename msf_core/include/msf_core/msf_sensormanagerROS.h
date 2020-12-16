@@ -71,6 +71,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
   ros::Publisher pubCovCoreAux_; ///< Publishes the covariance matrix for the cross-correlations between core and auxiliary states.
 
   std::string msf_output_frame_;
+  std::string msf_state_frame_;
 
   mutable tf::TransformBroadcaster tf_broadcaster_;
 
@@ -87,6 +88,8 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
 
     pnh.param("data_playback", this->data_playback_, false);
     pnh.param("msf_output_frame", msf_output_frame_, std::string("world"));
+    pnh.param("msf_state_frame", msf_state_frame_, std::string("state"));
+
 
     ros::NodeHandle nh("msf_core");
 
@@ -344,7 +347,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
       tf_broadcaster_.sendTransform(
           tf::StampedTransform(
               transform, ros::Time::now() /*ros::Time(latestState->time_)*/,
-              msf_output_frame_, "state"));
+              msf_output_frame_, msf_state_frame_));
     }
 
     if (pubCovCore_.getNumSubscribers()) {
