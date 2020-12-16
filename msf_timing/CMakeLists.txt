@@ -34,4 +34,8 @@ add_library(${PROJECT_NAME} src/Timer.cc)
 catkin_add_gtest(${PROJECT_NAME}_tests src/test/testMSFTiming.cc)
 target_link_libraries(${PROJECT_NAME}_tests ${PROJECT_NAME} pthread)
 
-
+install(TARGETS msf_timing
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)

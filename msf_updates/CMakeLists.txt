@@ -47,3 +47,9 @@ endif()
 
 add_executable(test_distort src/test/test_distort.cc)
 target_link_libraries(test_distort pose_distorter)
+
+install(TARGETS pose_distorter
+  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
