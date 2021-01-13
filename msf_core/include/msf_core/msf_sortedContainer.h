@@ -302,9 +302,10 @@ class SortedContainer {
    */
   inline void ClearOlderThan(double age) {
     double newest = GetLast()->time;
-    iterator_T it = GetIteratorClosest(newest - age);
-    if (newest - it->second->time < age)
+    double oldest = GetFirst()->time;
+    if (newest - oldest < age)
       return;  //there is no state older than time
+    iterator_T it = GetIteratorClosest(newest - age);
     if (it->second->time > stateList.begin()->second->time)
       stateList.erase(stateList.begin(), it);
   }
