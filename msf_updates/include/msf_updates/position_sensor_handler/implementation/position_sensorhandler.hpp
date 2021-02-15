@@ -55,14 +55,14 @@ PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PositionSensorHandler(
   ("position_input", 20, &PositionSensorHandler::MeasurementCallback, this);
   subTransformStamped_ =
       nh.subscribe<geometry_msgs::TransformStamped>
-  ("transform_input", 20, &PositionSensorHandler::MeasurementCallback, this);
+  ("transform_position_input", 20, &PositionSensorHandler::MeasurementCallback, this);
   subNavSatFix_ =
       nh.subscribe<sensor_msgs::NavSatFix>
   ("navsatfix_input", 20, &PositionSensorHandler::MeasurementCallback, this);
 
   subOdometry_ =
       nh.subscribe<nav_msgs::Odometry>
-  ("odometry_input", 20, &PositionSensorHandler::MeasurementCallback, this);
+  ("odometry_position_input", 20, &PositionSensorHandler::MeasurementCallback, this);
 
   z_p_.setZero();
 
