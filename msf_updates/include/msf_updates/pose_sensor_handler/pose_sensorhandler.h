@@ -25,6 +25,7 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <nav_msgs/Odometry.h>
 #include <msf_updates/PoseDistorter.h>
+#include <tf/transform_listener.h>
 
 namespace msf_pose_sensor {
 
@@ -43,6 +44,9 @@ class PoseSensorHandler : public msf_core::SensorHandler<
   ros::Subscriber subTransformStamped_;
   ros::Subscriber subPoseStamped_;
   ros::Subscriber subOdometry_;
+
+  // tf Lookup tools (TIMON customization)
+  tf::TransformListener _tfListener;
 
   bool measurement_world_sensor_;  ///< Defines if the pose of the sensor is
                                    // measured in world coordinates (true, default)

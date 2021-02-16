@@ -242,7 +242,7 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
   MSF_INFO_STREAM_ONCE(
       "*** pose sensor got first measurement from topic "
           << this->topic_namespace_ << "/" << subOdometry_.getTopic()
-          << " ***");
+          << " *** IT IS SE ODOM!!!");
 
   geometry_msgs::PoseWithCovarianceStampedPtr pose(
       new geometry_msgs::PoseWithCovarianceStamped());
@@ -254,6 +254,36 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
     pose->pose = msg->pose;
   } else{ // Fixed covariances
     pose->pose.pose = msg->pose.pose;
+    
+
+    // Transform things into Map frame, either only translation or full pose, to be checked!
+    bool transform_frame = true;
+    if (transform_frame) {
+      try {
+        tf::StampedTransform T_LS;
+        _tfListener.waitForTransform("odom", "camera_init_CORRECTED", msg->header.stamp, ros::Duration(10.0));
+       // _tfListener.lookupTransform("odom", "camera_init_CORRECTED", msg->header.stamp, T_LS);
+
+        geometry_msgs::PoseStamped stamped_in, stamped_out;
+        stamped_in.pose = msg->pose.pose;
+        stamped_in.header = msg->header;
+
+        _tfListener.transformPose("camera_init_CORRECTED", stamped_in, stamped_out); 
+        // TODO: specify lookup time! TIMON!!
+
+        //pose->pose.pose.position.x = stamped_out.vector.x;
+        //pose->pose.pose.position.y = stamped_out.vector.y;
+        //pose->pose.pose.position.z = stamped_out.vector.z;
+
+        //std::cout << "frame_id : " << pointwCov->header.frame_id << std::endl;
+        pose->pose.pose = stamped_out.pose;
+        pose->header = msg->header;  // Check if header passing is correct!
+        pose->header.frame_id = "camera_init_CORRECTED";
+        
+      } catch (tf::TransformException ex) {
+          ROS_WARN_THROTTLE(5.0, "%s", ex.what());
+      }
+    }
   }
   
   ProcessPoseMeasurement(pose);

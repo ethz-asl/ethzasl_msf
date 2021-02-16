@@ -26,6 +26,7 @@
 #include <nav_msgs/Odometry.h>
 #include <msf_core/gps_conversion.h>
 #include <sensor_fusion_comm/PointWithCovarianceStamped.h>
+#include <tf/transform_listener.h>
 
 namespace msf_position_sensor {
 
@@ -44,6 +45,9 @@ class PositionSensorHandler : public msf_core::SensorHandler<
   ros::Subscriber subNavSatFix_;
   ros::Subscriber subOdometry_;
   msf_core::GPSConversion gpsConversion_;
+
+  // tf Lookup tools (TIMON customization)
+  tf::TransformListener _tfListener;
 
   bool use_fixed_covariance_;  ///< Use fixed covariance set by dynamic reconfigure.
   bool provides_absolute_measurements_;  ///< Does this sensor measure relative or absolute values.

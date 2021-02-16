@@ -155,6 +155,8 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
           << this->topic_namespace_ << "/" << subTransformStamped_.getTopic()
           << " ***");
 
+  
+
   if (msg->header.seq % 5 != 0) {  //slow down vicon
     MSF_WARN_STREAM_ONCE("Measurement throttling is on, dropping every but the "
                          "5th message");
@@ -165,10 +167,52 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
       new sensor_fusion_comm::PointWithCovarianceStamped);
   pointwCov->header = msg->header;
 
-  // Fixed covariance will be set in measurement class -> MakeFromSensorReadingImpl.
+  // Here: transform message to odom frame!
+  //
+  bool transform_frame = false;
+  if (transform_frame) {
+    try {
+      tf::StampedTransform T_LS;
+      _tfListener.waitForTransform("/camera_init_CORRECTED", "odom", msg->header.stamp, ros::Duration(10.0));
+      _tfListener.lookupTransform("/camera_init_CORRECTED", "odom", msg->header.stamp, T_LS);
+
+      //tf::Stamped<tf::Vector3> vector_in_stamped, vector_out_stamped;
+      //tf::Vector3 vector_in;
+      //vector_in.setX(msg->transform.translation.x);
+      //vector_in.setY(msg->transform.translation.y);
+      //vector_in.setZ(msg->transform.translation.z);
+      //vector_in_stamped.setData(vector_in);
+      //vector_in_stamped.frame_id_ = msg->header.frame_id;
+      //vector_in_stamped.stamp_ = msg->header.stamp;
+
+      geometry_msgs::Vector3Stamped stamped_in, stamped_out;
+      stamped_in.vector.x = msg->transform.translation.x;
+      stamped_in.vector.y = msg->transform.translation.y;
+      stamped_in.vector.z = msg->transform.translation.z;
+      stamped_in.header = msg->header;
+
+      _tfListener.transformVector("odom", stamped_in, stamped_out); 
+      // TODO: specify lookup time! TIMON!!
+
+      pointwCov->point.x = stamped_out.vector.x;
+      pointwCov->point.y = stamped_out.vector.y;
+      pointwCov->point.z = stamped_out.vector.z;
+
+      //std::cout << "frame_id : " << pointwCov->header.frame_id << std::endl;
+
+      pointwCov->header = msg->header;
+      pointwCov->header.frame_id = "odom";
+      
+    } catch (tf::TransformException ex) {
+        ROS_WARN_THROTTLE(5.0, "%s", ex.what());
+    }
+  }
+
   pointwCov->point.x = msg->transform.translation.x;
   pointwCov->point.y = msg->transform.translation.y;
   pointwCov->point.z = msg->transform.translation.z;
+
+  //std::cout << "frame_id 2 : " << pointwCov->header.frame_id << std::endl;
 
   ProcessPositionMeasurement(pointwCov);
 }
@@ -191,7 +235,7 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
   pointwCov->point = msg->pose.pose.position;
   
   ProcessPositionMeasurement(pointwCov);
-  }
+}
 
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
