@@ -189,7 +189,10 @@ class PositionSensorManager : public msf_core::MSF_SensorManagerROS<
 
   virtual void AugmentCorrectionVector(
       Eigen::Matrix<double, EKFState_T::nErrorStatesAtCompileTime, 1>& correction) const {
-    UNUSED(correction);
+    // Set the gyro bias values to zero, since we used fixed biases for gyro
+    correction(9) = 0.0;
+    correction(10) = 0.0;
+    correction(11) = 0.0;
   }
 
   virtual void SanityCheckCorrection(

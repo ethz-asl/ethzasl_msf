@@ -130,6 +130,7 @@ class MSF_SensorManager : public StateVisitor<EKFState_T> {
   virtual double GetParamNoiseAccbias() const = 0;
   virtual double GetParamNoiseGyr() const = 0;
   virtual double GetParamNoiseGyrbias() const = 0;
+  virtual Eigen::Matrix<double, 3, 1> GetParamGyrBias() const = 0;
   virtual double GetParamFuzzyTrackingThreshold() const = 0;
 
   /**

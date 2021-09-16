@@ -168,6 +168,9 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
   virtual double GetParamNoiseGyrbias() const {
     return config_.core_noise_gyrbias;
   }
+  virtual Eigen::Matrix<double, 3, 1> GetParamGyrBias() const {
+    return Eigen::Matrix<double, 3, 1>(config_.gyro_bias_x, config_.gyro_bias_y, config_.gyro_bias_z);
+  }
   virtual double GetParamFuzzyTrackingThreshold() const {
     return 0.1;
   }

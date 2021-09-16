@@ -181,6 +181,11 @@ void MSF_Core<EKFState_T>::ProcessIMU(
   timer_PropPrepare.Stop();
 
   msf_timing::DebugTimer timer_PropState("PropState");
+
+  // Set gyro bias to fix value (from dynamic reconfigure)
+  currentState->template Set<StateDefinition_T::b_w>(usercalc_.GetParamGyrBias());
+  lastState->template Set<StateDefinition_T::b_w>(usercalc_.GetParamGyrBias());
+
   //propagate state and covariance
   PropagateState(lastState, currentState);
   timer_PropState.Stop();

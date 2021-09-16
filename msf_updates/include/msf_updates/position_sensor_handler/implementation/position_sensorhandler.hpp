@@ -151,11 +151,11 @@ void PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
           << this->topic_namespace_ << "/" << subTransformStamped_.getTopic()
           << " ***");
 
-  if (msg->header.seq % 5 != 0) {  //slow down vicon
+/*  if (msg->header.seq % 5 != 0) {  //slow down vicon
     MSF_WARN_STREAM_ONCE("Measurement throttling is on, dropping every but the "
                          "5th message");
     return;
-  }
+  }*/
 
   sensor_fusion_comm::PointWithCovarianceStampedPtr pointwCov(
       new sensor_fusion_comm::PointWithCovarianceStamped);
