@@ -22,7 +22,7 @@ generate_dynamic_reconfigure_options(
     cfg/SinglePoseSensor.cfg
     cfg/SinglePositionSensor.cfg
     cfg/SphericalPositionSensor.cfg
-    #TODO: add VelocitySensor config
+    cfg/SingleVelocitySensor.cfg
 )
 
 catkin_package(
