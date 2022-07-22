@@ -20,6 +20,7 @@ msf_core/cfg/cpp/
 .project
 .cproject
 .settings
+.vscode
 doc
 html
 documentation
