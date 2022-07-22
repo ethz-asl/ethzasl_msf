@@ -26,9 +26,9 @@ MSF_MeasurementBase<EKFState_T>::MSF_MeasurementBase(bool isabsoluteMeasurement,
                                                      double mah_threshold)
     : sensorID_(sensorID),
       isabsolute_(isabsoluteMeasurement),
+      time(0),
       enable_mah_outlier_rejection_(enable_mah_outlier_rejection),
-      mah_threshold_(mah_threshold),
-      time(0) {
+      mah_threshold_(mah_threshold) {
 }
 
 template<typename EKFState_T>
