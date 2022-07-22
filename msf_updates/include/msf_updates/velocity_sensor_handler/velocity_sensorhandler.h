@@ -19,11 +19,11 @@
 #ifndef VELOCITY_SENSORHANDLER_H_
 #define VELOCITY_SENSORHANDLER_H_
 
+#include <geometry_msgs/TwistWithCovarianceStamped.h>
 #include <msf_core/msf_sensormanagerROS.h>
 
-#include <geometry_msgs/TwistWithCovarianceStamped.h>
-
 namespace msf_velocity_sensor {
+
 template <typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 class VelocityXYSensorHandler
     : public msf_core::SensorHandler<typename msf_updates::EKFState> {
@@ -31,15 +31,17 @@ class VelocityXYSensorHandler
   Eigen::Matrix<double, 2, 1> z_v_{
       Eigen::Matrix<double, 2, 1>::Zero()};  ///< Velocity measurement.
   double n_zv_{0.0};                         ///< Velocity measurement noise.
-  double delay{0.0};  ///< Delay to be subtracted from the ros-timestamp of the
-                      ///< measurement provided by this sensor
-  bool use_fiuxed_covariance_{
+  double delay_{0.0};  ///< Delay to be subtracted from the ros-timestamp of the
+                       ///< measurement provided by this sensor
+  bool use_fixed_covariance_{
       true};  ///< Use fixed covariance set by dynamic reconfigure
   bool provides_absolute_measurements_{
       true};  ///< Does this sensor measure relative or absolute values
 
   ros::Subscriber subTwistWCovarianceStamped_;
 
+  void ProcessVelocityMeasurement(
+      const geometry_msgs::TwistWithCovarianceStampedConstPtr& msg);
   void MeasurementCallback(
       const geometry_msgs::TwistWithCovarianceStampedConstPtr& msg);
 
@@ -51,10 +53,13 @@ class VelocityXYSensorHandler
                           std::string parameternamespace);
 
   // Used for the init.
-  Eigen::Matrix<double, 2, 1> GetPositionMeasurement() {
-    return z_v_;
-  }               
+  Eigen::Matrix<double, 2, 1> GetVelocityMeasurement() { return z_v_; }
+  // Setters to configure values.
+  void SetNoises(double n_zv);
+  void SetDelay(double delay);
 };
 }  // namespace msf_velocity_sensor
 
-#endif
+#include "implementation/velocity_sensorhandler.hpp"
+
+#endif  // VELOCITY_SENSORHANDLER_H_

@@ -22,18 +22,17 @@
 #include <msf_core/eigen_utils.h>
 #include <msf_core/msf_core.h>
 #include <msf_core/msf_measurement.h>
-#include <sensor_fusion_comm/PointWithCovarianceStamped.h>
+#include <geometry_msgs/TwistWithCovarianceStamped.h>
 
 namespace msf_updates {
 namespace velocity_xy_measurement {
 enum { nMeasurements = 2 };
 
 /**
- * \brief A measurement as provided by an velocity sensor, e.g. optical flow.
+ * \brief A 2D measurement as provided by an velocity sensor, e.g. optical flow.
  */
-
 typedef msf_core::MSF_Measurement<
-    sensor_fusion_comm::PointWithCovarianceStamped,
+    geometry_msgs::TwistWithCovarianceStampedConstPtr,
     Eigen::Matrix<double, nMeasurements, nMeasurements>, msf_updates::EKFState>
     VelocityXYMeasurementBase;
 
@@ -43,7 +42,7 @@ struct VelocityXYMeasurement : public VelocityXYMeasurementBase {
   typedef Measurement_t::Measurement_ptr measptr_t;
 
   virtual void MakeFromSensorReadingImpl(measptr_t msg) {
-    // TODO:
+    // TODO(clanegge): Get measurements from message and compute covariance?
   }
 
  public:
@@ -54,9 +53,8 @@ struct VelocityXYMeasurement : public VelocityXYMeasurementBase {
   double _n_zv{0.0};                         /// Velocity measurement noise.
 
   bool _fixed_covariance{true};
-  int _fixedstates{0};  // TODO: What does this do? Maybe remove?
+  int _fixedstates{0};  // TODO(clanegge): What does this do? Maybe remove?
 
-  // TODO: Do we need all of these typedefs?
   typedef msf_updates::EKFState EKFState_T;
   typedef EKFState_T::StateSequence_T StateSequence_T;
   typedef EKFState_T::StateDefinition_T StateDefinition_T;
@@ -74,17 +72,22 @@ struct VelocityXYMeasurement : public VelocityXYMeasurementBase {
 
   virtual std::string Type() { return "velocity_xy"; }
 
-  virtual void CalculateH(shared_ptr<EKFState_T> state_in, Eigen::Matrix<double, nMeasurements, msf_core::MSF_Core<EKFState_T>::nErrorStatesAtCompileTime>& H){
-    // TODO: Do we need to calculate H? Pressure Sensor doesn't have it
+  virtual void CalculateH(
+      shared_ptr<EKFState_T> state_in,
+      Eigen::Matrix<double, nMeasurements,
+                    msf_core::MSF_Core<EKFState_T>::nErrorStatesAtCompileTime>&
+          H) {
+    // TODO(clanegge): Do we need to calculate H? Pressure Sensor doesn't have it
   }
 
   /**
-   * The method called by the msf_core to apply the measurement represented by this object.
+   * The method called by the msf_core to apply the measurement represented by
+   * this object.
    */
   virtual void Apply(shared_ptr<EKFState_T> state_nonconst_new,
                      msf_core::MSF_Core<EKFState_T>& core) {
-                      //TODO: 
-                     }
+    // TODO(clanegge): Complete Apply function
+  }
 };
 
 }  // namespace velocity_xy_measurement

@@ -25,14 +25,48 @@ namespace msf_velocity_sensor {
 template <typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 VelocityXYSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::
     VelocityXYSensorHandler(MANAGER_TYPE& meas, std::string topic_namespace,
-                            std::string parameter_namespace)
-    : SensorHandler<msf_updates::EFKState>(meas, topic_namespace,
+                            std::string parameternamespace)
+    : SensorHandler<msf_updates::EKFState>(meas, topic_namespace,
                                            parameternamespace),
-      n_zv_(1e-6),  // TODO: What should the value of this be?
+      n_zv_(1e-6),  // TODO(clanegge): What should the value of this be?
       delay_(0.0) {
   // TODO:
 }
 
+template <typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
+void VelocityXYSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::SetNoises(
+    double n_zv) {
+  n_zv_ = n_zv;
+}
+
+template <typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
+void VelocityXYSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::SetDelay(
+    double delay) {
+  delay_ = delay;
+}
+
+template <typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
+void VelocityXYSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::
+    ProcessVelocityMeasurement(
+        const geometry_msgs::TwistWithCovarianceStampedConstPtr& msg) {
+  received_first_measurement_ = true;
+
+  // TODO(clanegge): process measurements and add measurement to core
+}
+
+template <typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
+void VelocityXYSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::
+    MeasurementCallback(
+        const geometry_msgs::TwistWithCovarianceStampedConstPtr& msg) {
+  this->SequenceWatchDog(msg->header.seq,
+                         subTwistWCovarianceStamped_.getTopic());
+  MSF_INFO_STREAM_ONCE("*** velocity sensor got first measurement from topic "
+                       << this->topic_namespace_ << "/"
+                       << subTransformStamped_.getTopic() << " ***");
+
+  ProcessVelocityMeasurement(msg);
+}
+
 }  // namespace msf_velocity_sensor
 
-#endif
+#endif  // VELOCITY_SENSORHANDLER_HPP_
