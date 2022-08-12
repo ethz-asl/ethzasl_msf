@@ -40,11 +40,11 @@ typedef shared_ptr<ReconfigureServer> ReconfigureServerPtr;
 class VelocitySensorManager
     : public msf_core::MSF_SensorManagerROS<msf_updates::EKFState> {
   typedef VelocityXYSensorHandler<
-      msf_updates::velocity_xy_measurement::VelocityXYMeasurement,
+      msf_updates::velocity_xy_measurement::VelocityXYMeasurement<>,
       VelocitySensorManager>
       VelocityXYSensorHandler_T;
   friend class VelocityXYSensorHandler<
-      msf_updates::velocity_xy_measurement::VelocityXYMeasurement,
+      msf_updates::velocity_xy_measurement::VelocityXYMeasurement<>,
       VelocitySensorManager>;
 
  public:
@@ -102,6 +102,8 @@ class VelocitySensorManager
     }
 
     Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_iv;
+    Eigen::Matrix<double, 2, 1>
+        v_v;  // velocity measured by sensor in velocity sensor frame
     Eigen::Quaternion<double> q, q_iv;
     msf_core::MSF_Core<EKFState_T>::ErrorStateCov P;
 
@@ -113,10 +115,44 @@ class VelocitySensorManager
     v << 0., 0., 0.;    /// Robot velocity (IMU centered).
     w_m << 0., 0., 0.;  /// Initial angular velocity.
 
+    // intial body frame aligned with world frame as its anyway unobservable
+    p.setZero();
+    // TODO(clanegge): check if world frame is gravity aligned!
+    q.setIdentity();
+
     P.setZero();  // Error state covariance; if zero a default initialization in
                   // msf_core is used.
 
-    // TODO(clanegge): calculate/define initial values
+    v_v = velocity_handler_->GetVelocityMeasurement();
+
+    MSF_INFO_STREAM("initial measurement vel:[" << v_v.transpose() << "]");
+
+    // Check if we have already input fromthe measurement sensor
+    if (!velocity_handler_->ReceivedFirstMeasurement()) {
+      MSF_WARN_STREAM(
+          "No measurements received yet to initialize velocity - using [0 0 "
+          "0]");
+      v_v = Eigen::Matrix<double, 2, 1>::Zero();
+    }
+
+    ros::NodeHandle pnh("~");
+    // Get transformation between velocity sensor and body (IMU) frame
+    pnh.param("velocity_sensor/init/p_iv/x", p_iv[0], 0.0);
+    pnh.param("velocity_sensor/init/p_iv/y", p_iv[1], 0.0);
+    pnh.param("velocity_sensor/init/p_iv/z", p_iv[2], 0.0);
+
+    pnh.param("velocity_sensor/init/q_iv/w", q_iv.w(), 1.0);
+    pnh.param("velocity_sensor/init/q_iv/x", q_iv.x(), 0.0);
+    pnh.param("velocity_sensor/init/q_iv/y", q_iv.y(), 0.0);
+    pnh.param("velocity_sensor/init/q_iv/z", q_iv.z(), 0.0);
+    q_iv.normalize();
+
+    // Calculate init velocity based on sensor measurements.
+    // 3d state of measured velocity with z value set to zero:
+    Eigen::Matrix<double, 3, 1> v_v_3d(v_v[0], v_v[1], 0.0);
+    v = q_iv.toRotationMatrix() * v_v_3d;  // w_m = 0
+
+    a_m = q.inverse() * g;  // Initial acceleration
 
     // Preapare init "measurement"
     // True means that this message contains initial sensor readings.
