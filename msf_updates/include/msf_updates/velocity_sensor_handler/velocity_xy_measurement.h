@@ -77,10 +77,11 @@ struct VelocityXYMeasurement : public VelocityXYMeasurementBase {
 
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-  Eigen::Matrix<double, 2, 1> _z_v{
-      Eigen::Matrix<double, 2, 1>::Zero()};  /// Velocity measurement in xy
-                                             /// sensor coordinates.
-  double _n_zv{0.0};                         /// Velocity measurement noise.
+  Eigen::Matrix<double, nMeasurements, 1> _z_v{
+      Eigen::Matrix<double, nMeasurements,
+                    1>::Zero()};  /// Velocity measurement in xy
+                                  /// sensor coordinates.
+  double _n_zv{0.0};              /// Velocity measurement noise.
 
   bool _fixed_covariance{false};
   int _fixedstates{0};
@@ -109,6 +110,57 @@ struct VelocityXYMeasurement : public VelocityXYMeasurementBase {
       Eigen::Matrix<double, nMeasurements,
                     msf_core::MSF_Core<EKFState_T>::nErrorStatesAtCompileTime>&
           H) {
+    const EKFState_T& state =
+        *state_in;  // Get a const ref, so we can read core states.
+
+    H.setZero();
+
+    // Get rotation matrices.
+    Eigen::Matrix<double, 3, 3> C_vi =
+        state.Get<StateQivIdx>().conjugate().toRotationMatrix();
+
+    // Preprocess for elements in H matrix.
+    Eigen::Matrix<double, 3, 3> piv_sk = Skew(state.Get<StatePivIdx>());
+
+    // Get indices of states in error vector
+    enum {
+      kIdxstartcorr_v =
+          msf_tmp::GetStartIndexInCorrection<StateSequence_T,
+                                             StateDefinition_T::v>::value,
+      kIdxstartcorr_bw =
+          msf_tmp::GetStartIndexInCorrection<StateSequence_T,
+                                             StateDefinition_T::b_w>::value,
+    };
+
+    // Read the fixed states flags.
+    bool calibposfix = (_fixedstates & 1 << StatePivIdx);
+    bool calibattfix = (_fixedstates & 1 << StateQivIdx);
+
+    // TODO(clanegge) :
+    if (!calibposfix || !calibattfix) {
+      MSF_ERROR_STREAM(
+          "Online calibration of velocity sensor not implemented yet. Using "
+          "fixed transform.");
+      calibposfix = true;
+      calibattfix = true;
+    }
+
+    if (calibposfix) {
+      state_in->ClearCrossCov<StatePivIdx>();
+    }
+    if (calibattfix) {
+      state_in->ClearCrossCov<StateQivIdx>();
+    }
+
+    // Construct H matrix.
+    // velocity:
+    // C_vi * i_v_i
+    H.block<2, 3>(0, kIdxstartcorr_v) = C_vi.block<2, 3>(0, 0);
+
+    // gyro bias/angular velocity:
+    // Cross term C_vi*( [i_omega_i - i_b_w] x r_iv)
+    // = C_vi*r_iv_skew*i_b_w
+    H.block<2, 3>(0, kIdxstartcorr_bw) = (C_vi * piv_sk).block<2, 3>(0, 0);
   }
 
   /**
@@ -117,7 +169,51 @@ struct VelocityXYMeasurement : public VelocityXYMeasurementBase {
    */
   virtual void Apply(shared_ptr<EKFState_T> state_nonconst_new,
                      msf_core::MSF_Core<EKFState_T>& core) {
-    // TODO(clanegge): Complete Apply function
+    const EKFState_T& state = *state_nonconst_new;
+    // init variables
+    Eigen::Matrix<double, nMeasurements,
+                  msf_core::MSF_Core<EKFState_T>::nErrorStatesAtCompileTime>
+        H_new;
+    Eigen::Matrix<double, nMeasurements, 1> r_old;
+
+    CalculateH(state_nonconst_new, H_new);
+
+    // Get rotation matrices.
+    Eigen::Matrix<double, 3, 3> C_vi =
+        state.Get<StateQivIdx>().conjugate().toRotationMatrix();
+
+    // Construct residuals.
+    // 3d Sensor velocity in imu frame:
+    Eigen::Matrix<double, 3, 1> i_v_v =
+        (state.Get<StateDefinition_T::v>() +
+         (state.w_m - state.Get<StateDefinition_T::b_w>())
+             .cross(state.Get<StatePivIdx>()));
+
+    // We only measure x & y velocities - ignore z
+    r_old = _z_v - (C_vi * i_v_v).block<2, 1>(0, 0);
+
+    if (!CheckForNumeric(r_old, "r_old")) {
+      MSF_ERROR_STREAM("r_old: " << r_old);
+      MSF_WARN_STREAM(
+          "state: "
+          << const_cast<EKFState_T&>(state).ToEigenVector().transpose());
+    }
+    if (!CheckForNumeric(H_new, "H_old")) {
+      MSF_ERROR_STREAM("H_old: " << H_new);
+      MSF_WARN_STREAM(
+          "state: "
+          << const_cast<EKFState_T&>(state).ToEigenVector().transpose());
+    }
+    if (!CheckForNumeric(R_, "R_")) {
+      MSF_ERROR_STREAM("R_: " << R_);
+      MSF_WARN_STREAM(
+          "state: "
+          << const_cast<EKFState_T&>(state).ToEigenVector().transpose());
+    }
+
+    // Call update step in base class.
+    this->CalculateAndApplyCorrection(state_nonconst_new, core, H_new, r_old,
+                                      R_);
   }
 };
 
