@@ -99,8 +99,16 @@ void VelocityXYSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::
   if (mngr) {
     if (mngr->Getcfg().velocity_fixed_p_iv) {
       fixedstates |= 1 << MEASUREMENT_TYPE::AuxState::p_iv;
+    } else{
+      // TODO(clanegge):
+      MSF_ERROR_STREAM("Online calibration of velocity sensor not implemented yet. Using fixed position.");
+      fixedstates |= 1 << MEASUREMENT_TYPE::AuxState::p_iv;
     }
     if (mngr->Getcfg().velocity_fixed_q_iv) {
+      fixedstates |= 1 << MEASUREMENT_TYPE::AuxState::q_iv;
+    } else{
+      // TODO(clanegge):
+      MSF_ERROR_STREAM("Online calibration of velocity sensor not implemented yet. Using fixed rotation.");
       fixedstates |= 1 << MEASUREMENT_TYPE::AuxState::q_iv;
     }
   }
