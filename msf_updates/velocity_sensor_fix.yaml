@@ -1,0 +1,67 @@
+/use_sim_time: true
+data_playback: true             # Set to true for playback, set to false on the real system.
+
+##############################
+#########IMU PARAMETERS#######
+##############################
+# The IMU measurement model used in msf contains two types of sensor errors, 
+# a high frequency additive white noise and 
+# a slower varying sensor bias.  
+# See the following link for more information 
+# https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model-and-Intrinsics
+# 
+# The white noise is characterized with the continuous time noise spectral density. 
+# The noise spectral density is sometime also referred to as noise density.
+# The units of the noise spectral density are:
+#  acc:  [m/s^2/sqrt(Hz)]
+#  gyro: [rad/s/sqrt(Hz)]
+# The noise spectral density can be found in the datasheet of the IMU.
+# 
+# The variation of the bias is characterized as a random walk. 
+# See https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model-and-Intrinsics for more information
+# The units of the random walk are:
+#  acc:  [m/s^3/sqrt(Hz)]
+#  gyro: [rad/s^2/sqrt(Hz)]
+ 
+####### ADIS 16448
+core/core_noise_acc: 0.0022563    # [m/s^2/sqrt(Hz)] 
+core/core_noise_gyr: 0.0004       # [rad/s/sqrt(Hz)] 
+
+core/core_fixed_bias: false
+core/core_noise_accbias: 8e-5     # [m/s^3/sqrt(Hz)]
+core/core_noise_gyrbias: 3e-6     # [rad/s^2/sqrt(Hz)]
+
+#######################################
+#########Pose Sensor Parameters #######
+#######################################
+velocity_sensor/velocity_absolute_measurements: true
+
+velocity_sensor/velocity_delay: 0.02                      # [s] delay of pose sensor w.r.t. imu
+
+# For the pose sensor noise levels use the std deviation the units are
+#  velocity: [m/s]
+velocity_sensor/use_fixed_covariance: true
+velocity_sensor/velocity_noise_meas: 0.01              # [m/s]
+
+velocity_sensor/enable_mah_outlier_rejection: true
+velocity_sensor/mah_threshold: 50.0
+
+
+# Transformation that expresses the position and orientation of the imu frame 
+# w.r.t the vision/camera frame
+velocity_sensor/velocity_fixed_p_iv: true              
+velocity_sensor/velocity_noise_p_iv: 0.0                  
+velocity_sensor/velocity_fixed_q_iv: true
+velocity_sensor/velocity_noise_q_iv: 0.0                  
+
+velocity_sensor/init/q_iv/w: 0.0
+velocity_sensor/init/q_iv/x: 0.9734404
+velocity_sensor/init/q_iv/y: 0.2289405
+velocity_sensor/init/q_iv/z: 0.0
+velocity_sensor/init/p_iv/x: 139.97   
+velocity_sensor/init/p_iv/y: 71.14
+velocity_sensor/init/p_iv/z: -62.12
+
+
+
+

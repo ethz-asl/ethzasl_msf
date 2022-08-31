@@ -1,0 +1,9 @@
+<launch>
+    <node name="msf_velocity_sensor" pkg="msf_updates" type="velocity_sensor" clear_params="true" output="screen">
+           <remap from="msf_core/imu_state_input" to="/versavis/imu" />
+           
+          <remap from="msf_updates/twist_with_covariance_stamped_input" to="/linear_velocity" />
+          
+          <rosparam file="$(find msf_updates)/velocity_sensor_fix.yaml"/>
+    </node>
+</launch>
