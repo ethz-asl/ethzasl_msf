@@ -65,6 +65,9 @@ class VelocitySensorManager
     ReconfigureServer::CallbackType f =
         boost::bind(&VelocitySensorManager::Config, this, _1, _2);
     reconf_server_->setCallback(f);
+
+    // TODO(clanegge): Initiliaze filter directly, should we make it a service call?
+    Init(1.0);
   }
 
   virtual ~VelocitySensorManager() {}
