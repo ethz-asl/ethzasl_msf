@@ -27,7 +27,7 @@ data_playback: true             # Set to true for playback, set to false on the 
 core/core_noise_acc: 0.0022563    # [m/s^2/sqrt(Hz)] 
 core/core_noise_gyr: 0.0004       # [rad/s/sqrt(Hz)] 
 
-core/core_fixed_bias: false
+core/core_fixed_bias: true
 core/core_noise_accbias: 8e-5     # [m/s^3/sqrt(Hz)]
 core/core_noise_gyrbias: 3e-6     # [rad/s^2/sqrt(Hz)]
 
@@ -36,32 +36,55 @@ core/core_noise_gyrbias: 3e-6     # [rad/s^2/sqrt(Hz)]
 #######################################
 velocity_sensor/velocity_absolute_measurements: true
 
-velocity_sensor/velocity_delay: 0.02                      # [s] delay of pose sensor w.r.t. imu
+velocity_sensor/velocity_delay: 0.0                      # [s] delay of pose sensor w.r.t. imu
 
 # For the pose sensor noise levels use the std deviation the units are
 #  velocity: [m/s]
 velocity_sensor/use_fixed_covariance: true
-velocity_sensor/velocity_noise_meas: 0.01              # [m/s]
+velocity_sensor/velocity_noise_meas: 0.00025 #0.015             # [rad] # [m/s]
 
-velocity_sensor/enable_mah_outlier_rejection: true
-velocity_sensor/mah_threshold: 50.0
+velocity_sensor/enable_mah_outlier_rejection: false
+velocity_sensor/mah_threshold: 0.1 #50.0
 
 
 # Transformation that expresses the position and orientation of the imu frame 
 # w.r.t the vision/camera frame
 velocity_sensor/velocity_fixed_p_iv: true              
-velocity_sensor/velocity_noise_p_iv: 0.0                  
+velocity_sensor/velocity_noise_p_iv: 0.1                  
 velocity_sensor/velocity_fixed_q_iv: true
-velocity_sensor/velocity_noise_q_iv: 0.0                  
+velocity_sensor/velocity_noise_q_iv: 0.1                  
 
 velocity_sensor/init/q_iv/w: 0.0
-velocity_sensor/init/q_iv/x: 0.9734404
-velocity_sensor/init/q_iv/y: 0.2289405
+velocity_sensor/init/q_iv/x: 0.8502144
+velocity_sensor/init/q_iv/y: -0.5264365
 velocity_sensor/init/q_iv/z: 0.0
-velocity_sensor/init/p_iv/x: 139.97   
-velocity_sensor/init/p_iv/y: 71.14
-velocity_sensor/init/p_iv/z: -62.12
+velocity_sensor/init/p_iv/x: 0.13997   
+velocity_sensor/init/p_iv/y: 0.07114
+velocity_sensor/init/p_iv/z: -0.06212
 
+#x_motion + 3d_motion
+# velocity_sensor/init/b_w/x: 0.00325329
+# velocity_sensor/init/b_w/y: -0.01088387
+# velocity_sensor/init/b_w/z: 0.0050056
 
+# velocity_sensor/init/b_a/x: -0.08425053
+# velocity_sensor/init/b_a/y: -0.24245523
+# velocity_sensor/init/b_a/z: -0.09430353
 
+# xy_motion
+# velocity_sensor/init/b_w/x: 0.00363727
+# velocity_sensor/init/b_w/y: -0.01117709
+# velocity_sensor/init/b_w/z: 0.00548732
 
+# velocity_sensor/init/b_a/x: -0.15281135
+# velocity_sensor/init/b_a/y: -0.22750096
+# velocity_sensor/init/b_a/z: -0.09585607
+
+# xyyaw2_motion
+velocity_sensor/init/b_w/x: 0.00386765
+velocity_sensor/init/b_w/y: -0.01122596
+velocity_sensor/init/b_w/z: 0.00510334
+
+velocity_sensor/init/b_a/x: -0.2366533
+velocity_sensor/init/b_a/y: -0.18615201
+velocity_sensor/init/b_a/z: -0.09258741
