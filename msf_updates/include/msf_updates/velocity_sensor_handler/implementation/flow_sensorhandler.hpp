@@ -16,16 +16,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef VELOCITY_SENSORHANDLER_HPP_
-#define VELOCITY_SENSORHANDLER_HPP_
+#ifndef FLOW_SENSORHANDLER_HPP_
+#define FLOW_SENSORHANDLER_HPP_
 #include <msf_core/eigen_utils.h>
 #include <msf_core/msf_types.h>
 
 namespace msf_velocity_sensor {
 template <typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
-VelocityXYSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::
-    VelocityXYSensorHandler(MANAGER_TYPE& meas, std::string topic_namespace,
-                            std::string parameternamespace)
+FlowSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::FlowSensorHandler(
+    MANAGER_TYPE& meas, std::string topic_namespace,
+    std::string parameternamespace)
     : SensorHandler<msf_updates::EKFState>(meas, topic_namespace,
                                            parameternamespace),
       z_v_(Eigen::Matrix<double, 2, 1>::Zero()),
@@ -60,28 +60,24 @@ VelocityXYSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::
                        "from sensor");
 
   ros::NodeHandle nh("msf_updates/" + topic_namespace);
-  subTwistWCovarianceStamped_ =
-      nh.subscribe<geometry_msgs::TwistWithCovarianceStamped>(
-          "twist_with_covariance_stamped_input", 20,
-          &VelocityXYSensorHandler::MeasurementCallback, this);
+
+  subOpticalFlow_ = nh.subscribe<arkflow_ros::OpticalFlow>(
+      "optical_flow_input", 20, &FlowSensorHandler::MeasurementCallback, this);
 }
 
 template <typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
-void VelocityXYSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::SetNoises(
-    double n_zv) {
+void FlowSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::SetNoises(double n_zv) {
   n_zv_ = n_zv;
 }
 
 template <typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
-void VelocityXYSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::SetDelay(
-    double delay) {
+void FlowSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::SetDelay(double delay) {
   delay_ = delay;
 }
 
 template <typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
-void VelocityXYSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::
-    ProcessVelocityMeasurement(
-        const geometry_msgs::TwistWithCovarianceStampedConstPtr& msg) {
+void FlowSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessFlowMeasurement(
+    const arkflow_ros::OpticalFlowConstPtr& msg) {
   received_first_measurement_ = true;
 
   // Get the fixed states.
@@ -130,18 +126,16 @@ void VelocityXYSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::
 }
 
 template <typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
-void VelocityXYSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::
-    MeasurementCallback(
-        const geometry_msgs::TwistWithCovarianceStampedConstPtr& msg) {
-  this->SequenceWatchDog(msg->header.seq,
-                         subTwistWCovarianceStamped_.getTopic());
+void FlowSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
+    const arkflow_ros::OpticalFlowConstPtr& msg) {
+  this->SequenceWatchDog(msg->header.seq, subOpticalFlow_.getTopic());
   MSF_INFO_STREAM_ONCE("*** velocity sensor got first measurement from topic "
                        << this->topic_namespace_ << "/"
-                       << subTwistWCovarianceStamped_.getTopic() << " ***");
+                       << subOpticalFlow_.getTopic() << " ***");
 
-  ProcessVelocityMeasurement(msg);
+  ProcessFlowMeasurement(msg);
 }
 
 }  // namespace msf_velocity_sensor
 
-#endif  // VELOCITY_SENSORHANDLER_HPP_
+#endif  // FLOW_SENSORHANDLER_HPP_
