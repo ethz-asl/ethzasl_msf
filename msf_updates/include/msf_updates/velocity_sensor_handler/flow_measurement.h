@@ -54,8 +54,7 @@ struct FlowMeasurement : public FlowMeasurementBase {
 
     // Get measurements
     _z_v =
-        Eigen::Matrix<double, 2, 1>(msg->flow_integral_x,
-        msg->flow_integral_y);
+        Eigen::Matrix<double, 2, 1>(msg->flow_integral_x, msg->flow_integral_y);
     z_dt_ = msg->integration_interval;
     z_range_ = msg->range;
 
@@ -184,20 +183,18 @@ struct FlowMeasurement : public FlowMeasurementBase {
     Eigen::Matrix<double, 3, 3> C_vi =
         state.Get<StateQivIdx>().conjugate().toRotationMatrix();
 
+    // Get body velocity and convert to imu frame
+    const msf_core::Quaternion& q_W_I = state.Get<StateDefinition_T::q>();
+    const msf_core::Vector3& v_W = state.Get<StateDefinition_T::v>();
+    const msf_core::Vector3 v_I = q_W_I.inverse().toRotationMatrix() * v_W;
+
     // 3d Sensor velocity in imu frame:
-    Eigen::Matrix<double, 3, 1> i_v_v =
-        (state.Get<StateDefinition_T::v>() +
-         (state.w_m - state.Get<StateDefinition_T::b_w>())
-             .cross(state.Get<StatePivIdx>()));
+    Eigen::Matrix<double, 3, 1> I_v_v =
+        (v_I + (state.w_m - state.Get<StateDefinition_T::b_w>())
+                   .cross(state.Get<StatePivIdx>()));
 
     // Construct residuals.
-    r_old = _z_v - ((C_vi * i_v_v).block<2, 1>(0, 0) * z_dt_ / z_range_);
-    // std::cout << _z_v[0] << " - "
-    //           << ((C_vi * i_v_v).block<2, 1>(0, 0) * z_dt_ / z_range_)[0]
-    //           << " = " << r_old[0] << std::endl;
-    // std::cout << _z_v[1] << " - "
-    //           << ((C_vi * i_v_v).block<2, 1>(0, 0) * z_dt_ / z_range_)[1]
-    //           << " = " << r_old[1] << std::endl;
+    r_old = _z_v - ((C_vi * I_v_v).block<2, 1>(0, 0) * z_dt_ / z_range_);
 
     if (!CheckForNumeric(r_old, "r_old")) {
       MSF_ERROR_STREAM("r_old: " << r_old);
