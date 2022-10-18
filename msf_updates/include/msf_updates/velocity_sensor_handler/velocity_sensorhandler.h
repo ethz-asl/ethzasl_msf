@@ -21,6 +21,7 @@
 
 #include <geometry_msgs/TwistWithCovarianceStamped.h>
 #include <msf_core/msf_sensormanagerROS.h>
+#include <nav_msgs/Odometry.h>
 
 namespace msf_velocity_sensor {
 
@@ -39,15 +40,24 @@ class VelocityXYSensorHandler
       true};  ///< Does this sensor measure relative or absolute values
 
   ros::Subscriber subTwistWCovarianceStamped_;
+  ros::Subscriber subOdometry_;
 
   void ProcessVelocityMeasurement(
       const geometry_msgs::TwistWithCovarianceStampedConstPtr& msg);
   void MeasurementCallback(
       const geometry_msgs::TwistWithCovarianceStampedConstPtr& msg);
+  void ProcessVelocityMeasurement(const nav_msgs::OdometryConstPtr& msg);
+  void MeasurementCallback(const nav_msgs::OdometryConstPtr& msg);
 
  public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   typedef MEASUREMENT_TYPE measurement_t;
+
+  // TODO(clanegge): Find a better way of how to do this
+  // Store sensor specific transformation from imu to sensor (needed for multi
+  // sensor setup)
+  Eigen::Matrix<double, 3, 3> C_vi_{Eigen::Matrix<double, 3, 3>::Identity()};
+  Eigen::Matrix<double, 3, 1> p_iv_{Eigen::Vector3d::Zero()};
 
   VelocityXYSensorHandler(MANAGER_TYPE& meas, std::string topic_namespace,
                           std::string parameternamespace);

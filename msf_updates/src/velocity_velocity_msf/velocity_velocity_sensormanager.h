@@ -39,31 +39,32 @@ typedef msf_updates::SingleVelocitySensorConfig Config_T;
 typedef dynamic_reconfigure::Server<Config_T> ReconfigureServer;
 typedef shared_ptr<ReconfigureServer> ReconfigureServerPtr;
 
-class VelocitySensorManager
+class VelocityVelocitySensorManager
     : public msf_core::MSF_SensorManagerROS<msf_updates::EKFState> {
   typedef VelocityXYSensorHandler<
       msf_updates::velocity_xy_measurement::VelocityXYMeasurement<>,
-      VelocitySensorManager>
+      VelocityVelocitySensorManager>
       VelocityXYSensorHandler_T;
   typedef FlowSensorHandler<msf_updates::flow_measurement::FlowMeasurement<>,
-                            VelocitySensorManager>
+                            VelocityVelocitySensorManager>
       FlowSensorHandler_T;
 
   friend class VelocityXYSensorHandler<
       msf_updates::velocity_xy_measurement::VelocityXYMeasurement<>,
-      VelocitySensorManager>;
+      VelocityVelocitySensorManager>;
 
   friend class FlowSensorHandler<
-      msf_updates::flow_measurement::FlowMeasurement<>, VelocitySensorManager>;
+      msf_updates::flow_measurement::FlowMeasurement<>,
+      VelocityVelocitySensorManager>;
 
  public:
   typedef msf_updates::EKFState EKFState_T;
   typedef EKFState_T::StateSequence_T StateSequence_T;
   typedef EKFState_T::StateDefinition_T StateDefinition_T;
 
-  VelocitySensorManager(
-      ros::NodeHandle pnh = ros::NodeHandle("~/velocity_sensor"))
-      : use_flow_(true) {
+  VelocityVelocitySensorManager(
+      ros::NodeHandle pnh = ros::NodeHandle("~/velocity_velocity_sensor"))
+      : use_flow_(false) {
     imu_handler_.reset(new msf_core::IMUHandler_ROS<msf_updates::EKFState>(
         *this, "msf_core", "imu_handler"));
 
@@ -72,30 +73,34 @@ class VelocitySensorManager
           new FlowSensorHandler_T(*this, "", "velocity_sensor"));
       AddHandler(flow_handler_);
     } else {
-      velocity_handler_.reset(
-          new VelocityXYSensorHandler_T(*this, "", "velocity_sensor"));
-      AddHandler(velocity_handler_);
+      velocity_handler_0_.reset(
+          new VelocityXYSensorHandler_T(*this, "velocity_sensor_1", "velocity_sensor_1"));
+      AddHandler(velocity_handler_0_);
+      velocity_handler_1_.reset(
+          new VelocityXYSensorHandler_T(*this, "velocity_sensor_2", "velocity_sensor_2"));
+      AddHandler(velocity_handler_1_);
     }
 
     reconf_server_.reset(new ReconfigureServer(pnh));
     ReconfigureServer::CallbackType f =
-        boost::bind(&VelocitySensorManager::Config, this, _1, _2);
+        boost::bind(&VelocityVelocitySensorManager::Config, this, _1, _2);
     reconf_server_->setCallback(f);
 
     // TODO(clanegge): Initialize filter directly, should we make it a service
     // call?
-    Init(1.0);
+    // Init(1.0);
   }
 
-  virtual ~VelocitySensorManager() {}
+  virtual ~VelocityVelocitySensorManager() {}
 
   virtual const Config_T& Getcfg() { return config_; }
 
  private:
   shared_ptr<msf_core::IMUHandler_ROS<msf_updates::EKFState>> imu_handler_;
-  shared_ptr<VelocityXYSensorHandler_T> velocity_handler_;
+  shared_ptr<VelocityXYSensorHandler_T> velocity_handler_0_;
+  shared_ptr<VelocityXYSensorHandler_T> velocity_handler_1_;
   shared_ptr<FlowSensorHandler_T> flow_handler_;
-  const bool use_flow_{true};
+  const bool use_flow_{false};
 
   Config_T config_;
   ReconfigureServerPtr reconf_server_;
@@ -109,8 +114,11 @@ class VelocitySensorManager
       flow_handler_->SetNoises(config.velocity_noise_meas);
       flow_handler_->SetDelay(config.velocity_delay);
     } else {
-      velocity_handler_->SetNoises(config.velocity_noise_meas);
-      velocity_handler_->SetDelay(config.velocity_delay);
+      // Using same sensor so setting same config
+      velocity_handler_0_->SetNoises(config.velocity_noise_meas);
+      velocity_handler_0_->SetDelay(config.velocity_delay);
+      velocity_handler_1_->SetNoises(config.velocity_noise_meas);
+      velocity_handler_1_->SetDelay(config.velocity_delay);
     }
 
     if ((level & msf_updates::SingleVelocitySensor_INIT_FILTER) &&
@@ -152,10 +160,13 @@ class VelocitySensorManager
     if (use_flow_) {
       v_v = Eigen::Matrix<double, 2, 1>::Zero();
     } else {
-      v_v = velocity_handler_->GetVelocityMeasurement();
+      // For initialization we will only use measurements from sensor 0
+      // (otherwise a bit complicated to figure out which sensor to trust..)
+      // TODO(clanegge): maybe initialize directly with zero instead.
+      v_v = velocity_handler_0_->GetVelocityMeasurement();
       MSF_INFO_STREAM("initial measurement vel:[" << v_v.transpose() << "]");
       // Check if we have already input from the measurement sensor
-      if (!velocity_handler_->ReceivedFirstMeasurement()) {
+      if (!velocity_handler_0_->ReceivedFirstMeasurement()) {
         MSF_WARN_STREAM(
             "No measurements received yet to initialize velocity - using [0 0 "
             "0]");
@@ -186,7 +197,7 @@ class VelocitySensorManager
     // Calculate init velocity based on sensor measurements.
     // 3d state of measured velocity with z value set to zero:
     Eigen::Matrix<double, 3, 1> v_v_3d(v_v[0], v_v[1], 0.0);
-    // v = q_iv.toRotationMatrix() * v_v_3d;  // w_m = 0
+    v = q_iv.toRotationMatrix() * v_v_3d;  // w_m = 0
 
     a_m = q.inverse() * g;  // Initial acceleration
 

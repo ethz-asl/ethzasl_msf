@@ -43,6 +43,12 @@ struct VelocityXYMeasurement : public VelocityXYMeasurementBase {
   typedef VelocityXYMeasurementBase Measurement_t;
   typedef Measurement_t::Measurement_ptr measptr_t;
 
+  const Eigen::Matrix<double, 3, 3> C_vi_{
+      Eigen::Matrix<double, 3, 3>::Identity()};
+  const Eigen::Vector3d piv_{Eigen::Vector3d::Zero()};
+  const Eigen::Matrix<double, 3, 3> piv_sk_{
+      Eigen::Matrix<double, 3, 3>::Zero()};
+
   virtual void MakeFromSensorReadingImpl(measptr_t msg) {
     Eigen::Matrix<
         double, nMeasurements,
@@ -96,9 +102,14 @@ struct VelocityXYMeasurement : public VelocityXYMeasurementBase {
   VelocityXYMeasurement(double n_zv, bool fixed_covariance,
                         bool isabsoluteMeasurement, int sensorID,
                         bool enable_mah_outlier_rejection, double mah_threshold,
-                        int fixedstates)
+                        int fixedstates,
+                        const Eigen::Matrix<double, 3, 3>& C_vi,
+                        const Eigen::Matrix<double, 3, 1>& p_iv)
       : VelocityXYMeasurementBase(isabsoluteMeasurement, sensorID,
                                   enable_mah_outlier_rejection, mah_threshold),
+        C_vi_(C_vi),
+        piv_(p_iv),
+        piv_sk_(Skew(p_iv)),
         _n_zv(n_zv),
         _fixed_covariance(fixed_covariance),
         _fixedstates(fixedstates) {}
@@ -116,17 +127,23 @@ struct VelocityXYMeasurement : public VelocityXYMeasurementBase {
     H.setZero();
 
     // Get rotation matrices.
-    Eigen::Matrix<double, 3, 3> C_vi =
-        state.Get<StateQivIdx>().conjugate().toRotationMatrix();
+    // Eigen::Matrix<double, 3, 3> C_vi =
+    //     state.Get<StateQivIdx>().conjugate().toRotationMatrix();
 
     // Preprocess for elements in H matrix.
-    Eigen::Matrix<double, 3, 3> piv_sk = Skew(state.Get<StatePivIdx>());
+    // Eigen::Matrix<double, 3, 3> piv_sk = Skew(state.Get<StatePivIdx>());
+
+    const Eigen::Matrix<double, 3, 3> C_I_W =
+        state.Get<StateDefinition_T::q>().inverse().toRotationMatrix();
 
     // Get indices of states in error vector
     enum {
       kIdxstartcorr_v =
           msf_tmp::GetStartIndexInCorrection<StateSequence_T,
                                              StateDefinition_T::v>::value,
+      kIdxstartcorr_q =
+          msf_tmp::GetStartIndexInCorrection<StateSequence_T,
+                                             StateDefinition_T::q>::value,
       kIdxstartcorr_bw =
           msf_tmp::GetStartIndexInCorrection<StateSequence_T,
                                              StateDefinition_T::b_w>::value,
@@ -155,12 +172,20 @@ struct VelocityXYMeasurement : public VelocityXYMeasurementBase {
     // Construct H matrix.
     // velocity:
     // C_vi * i_v_i
-    H.block<2, 3>(0, kIdxstartcorr_v) = C_vi.block<2, 3>(0, 0);
+    H.block<2, 3>(0, kIdxstartcorr_v) =
+        // C_vi_.block<2, 3>(0, 0);
+        (C_vi_ * C_I_W).block<2, 3>(0, 0);
+    // H.block<2, 3>(0, kIdxstartcorr_v) = C_vi.block<2, 3>(0, 0);
+
+    // H.block<2, 3>(0, kIdxstartcorr_q) =
+        (C_vi_ * Skew(C_I_W * state.Get<StateDefinition_T::v>()))
+            .block<2, 3>(0, 0);
 
     // gyro bias/angular velocity:
     // Cross term C_vi*( [i_omega_i - i_b_w] x r_iv)
     // = C_vi*r_iv_skew*i_b_w
-    H.block<2, 3>(0, kIdxstartcorr_bw) = (C_vi * piv_sk).block<2, 3>(0, 0);
+    H.block<2, 3>(0, kIdxstartcorr_bw) = (C_vi_ * piv_sk_).block<2, 3>(0, 0);
+    // H.block<2, 3>(0, kIdxstartcorr_bw) = (C_vi * piv_sk).block<2, 3>(0, 0);
   }
 
   /**
@@ -175,22 +200,33 @@ struct VelocityXYMeasurement : public VelocityXYMeasurementBase {
                   msf_core::MSF_Core<EKFState_T>::nErrorStatesAtCompileTime>
         H_new;
     Eigen::Matrix<double, nMeasurements, 1> r_old;
-
     CalculateH(state_nonconst_new, H_new);
 
     // Get rotation matrices.
-    Eigen::Matrix<double, 3, 3> C_vi =
-        state.Get<StateQivIdx>().conjugate().toRotationMatrix();
+    // Eigen::Matrix<double, 3, 3> C_vi =
+    //     state.Get<StateQivIdx>().conjugate().toRotationMatrix();
+
+    // Get body velocity and convert to imu frame
+    const msf_core::Quaternion& q_W_I = state.Get<StateDefinition_T::q>();
+    const msf_core::Vector3& v_W = state.Get<StateDefinition_T::v>();
+    const msf_core::Vector3 v_I = q_W_I.inverse().toRotationMatrix() * v_W;
 
     // Construct residuals.
     // 3d Sensor velocity in imu frame:
     Eigen::Matrix<double, 3, 1> i_v_v =
-        (state.Get<StateDefinition_T::v>() +
-         (state.w_m - state.Get<StateDefinition_T::b_w>())
-             .cross(state.Get<StatePivIdx>()));
+        (v_I + (state.w_m - state.Get<StateDefinition_T::b_w>()).cross(piv_));
+    // Eigen::Matrix<double, 3, 1> i_v_v =
+    //     (state.Get<StateDefinition_T::v>() +
+    //      (state.w_m - state.Get<StateDefinition_T::b_w>())
+    //          .cross(state.Get<StatePivIdx>()));
 
     // We only measure x & y velocities - ignore z
-    r_old = _z_v - (C_vi * i_v_v).block<2, 1>(0, 0);
+    Eigen::Vector2d model_z = (C_vi_ * i_v_v).block<2, 1>(0, 0);
+    MSF_WARN_STREAM("Measurement:\n" << _z_v);
+    MSF_WARN_STREAM("Model:\n" << model_z);
+    MSF_WARN_STREAM("State:\n" << state.Get<StateDefinition_T::v>());
+    r_old = _z_v - (C_vi_ * i_v_v).block<2, 1>(0, 0);
+    // r_old = _z_v - (C_vi * i_v_v).block<2, 1>(0, 0);
 
     if (!CheckForNumeric(r_old, "r_old")) {
       MSF_ERROR_STREAM("r_old: " << r_old);

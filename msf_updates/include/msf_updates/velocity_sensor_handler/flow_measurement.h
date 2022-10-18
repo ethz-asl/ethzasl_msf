@@ -43,6 +43,8 @@ struct FlowMeasurement : public FlowMeasurementBase {
   double z_dt_{0.0};
   double z_range_{0.0};
 
+  ros::Publisher pubMahaDist_;
+
   virtual void MakeFromSensorReadingImpl(measptr_t msg) {
     Eigen::Matrix<
         double, nMeasurements,
@@ -98,12 +100,15 @@ struct FlowMeasurement : public FlowMeasurementBase {
   FlowMeasurement(double n_zv, bool fixed_covariance,
                   bool isabsoluteMeasurement, int sensorID,
                   bool enable_mah_outlier_rejection, double mah_threshold,
-                  int fixedstates)
+                  int fixedstates, ros::NodeHandle& nh)
       : FlowMeasurementBase(isabsoluteMeasurement, sensorID,
                             enable_mah_outlier_rejection, mah_threshold),
         _n_zv(n_zv),
         _fixed_covariance(fixed_covariance),
-        _fixedstates(fixedstates) {}
+        _fixedstates(fixedstates) {
+    pubMahaDist_ =
+        nh.advertise<geometry_msgs::PointStamped>("mahalanobis_distance", 100);
+  }
 
   virtual std::string Type() { return "velocity_flow"; }
 
@@ -117,19 +122,26 @@ struct FlowMeasurement : public FlowMeasurementBase {
 
     H.setZero();
 
-    // TODO(clanegge): Make sure this is the correct way around
     // Get rotation matrices.
     Eigen::Matrix<double, 3, 3> C_vi =
-        state.Get<StateQivIdx>().conjugate().toRotationMatrix();
+        state.Get<StateQivIdx>().inverse().toRotationMatrix();
 
     // Preprocess for elements in H matrix.
     Eigen::Matrix<double, 3, 3> piv_sk = Skew(state.Get<StatePivIdx>());
+
+    const Eigen::Matrix<double, 3, 3> C_I_W =
+        state.Get<StateDefinition_T::q>().inverse().toRotationMatrix();
+
+    Eigen::Matrix<double, 3, 1> W_v_sk = state.Get<StateDefinition_T::v>();
 
     // Get indices of states in error vector
     enum {
       kIdxstartcorr_v =
           msf_tmp::GetStartIndexInCorrection<StateSequence_T,
                                              StateDefinition_T::v>::value,
+      kIdxstartcorr_q =
+          msf_tmp::GetStartIndexInCorrection<StateSequence_T,
+                                             StateDefinition_T::q>::value,
       kIdxstartcorr_bw =
           msf_tmp::GetStartIndexInCorrection<StateSequence_T,
                                              StateDefinition_T::b_w>::value,
@@ -157,13 +169,20 @@ struct FlowMeasurement : public FlowMeasurementBase {
 
     // Construct H matrix.
     // velocity:
-    // C_vi * i_v_i
+    // C_vi * Ciw * w_v_i
     H.block<2, 3>(0, kIdxstartcorr_v) =
-        C_vi.block<2, 3>(0, 0) * z_dt_ / z_range_;
+        (C_vi * C_I_W).block<2, 3>(0, 0) * z_dt_ / z_range_;
 
+    // attitude:
+    //  d/dC_WI (C_vi *(C_WI)^T * W_v) = C_vi * skew((C_WI)^T * W_v)
+    // See https://github.com/borglab/gtsam/blob/4.0.3/doc/math.pdf , page 6
+    H.block<2, 3>(0, kIdxstartcorr_q) =
+        (C_vi * Skew(C_I_W * state.Get<StateDefinition_T::v>()))
+            .block<2, 3>(0, 0) *
+        z_dt_ / z_range_;
     // gyro bias/angular velocity:
-    // Cross term C_vi*( [i_omega_i - i_b_w] x r_iv)
-    // = C_vi*r_iv_skew*i_b_w
+    // Cross term C_vi*( [i_omega_i - i_b_w]
+    // x r_iv) = C_vi*r_iv_skew*i_b_w
     H.block<2, 3>(0, kIdxstartcorr_bw) =
         (C_vi * piv_sk).block<2, 3>(0, 0) * z_dt_ / z_range_;
   }
@@ -180,8 +199,11 @@ struct FlowMeasurement : public FlowMeasurementBase {
     CalculateH(state_nonconst_new, H_new);
 
     // Get rotation matrices.
+    // TODO(clanegge): Check in sim if we actually need the conjugate here or
+    // not!
     Eigen::Matrix<double, 3, 3> C_vi =
-        state.Get<StateQivIdx>().conjugate().toRotationMatrix();
+        // state.Get<StateQivIdx>().conjugate().toRotationMatrix();
+        state.Get<StateQivIdx>().toRotationMatrix();
 
     // Get body velocity and convert to imu frame
     const msf_core::Quaternion& q_W_I = state.Get<StateDefinition_T::q>();
@@ -213,6 +235,19 @@ struct FlowMeasurement : public FlowMeasurementBase {
       MSF_WARN_STREAM(
           "state: "
           << const_cast<EKFState_T&>(state).ToEigenVector().transpose());
+    }
+
+    {
+      static int msg_seq = 0;
+      Eigen::Matrix<double, 2, 2> S =
+          H_new * state_nonconst_new->P * H_new.transpose() + R_;
+      double maha_dist = std::sqrt(r_old.transpose() * S.inverse() * r_old);
+
+      geometry_msgs::PointStamped msg;
+      msg.header.stamp = ros::Time(state_nonconst_new->time);
+      msg.header.seq = msg_seq++;
+      msg.point.x = maha_dist;
+      pubMahaDist_.publish(msg);
     }
 
     // Call update step in base class.

@@ -1,0 +1,120 @@
+/use_sim_time: true
+data_playback: true             # Set to true for playback, set to false on the real system.
+
+##############################
+#########IMU PARAMETERS#######
+##############################
+# The IMU measurement model used in msf contains two types of sensor errors, 
+# a high frequency additive white noise and 
+# a slower varying sensor bias.  
+# See the following link for more information 
+# https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model-and-Intrinsics
+# 
+# The white noise is characterized with the continuous time noise spectral density. 
+# The noise spectral density is sometime also referred to as noise density.
+# The units of the noise spectral density are:
+#  acc:  [m/s^2/sqrt(Hz)]
+#  gyro: [rad/s/sqrt(Hz)]
+# The noise spectral density can be found in the datasheet of the IMU.
+# 
+# The variation of the bias is characterized as a random walk. 
+# See https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model-and-Intrinsics for more information
+# The units of the random walk are:
+#  acc:  [m/s^3/sqrt(Hz)]
+#  gyro: [rad/s^2/sqrt(Hz)]
+ 
+####### ADIS 16448
+# core/core_noise_acc: 0.0022563    # [m/s^2/sqrt(Hz)] 
+# core/core_noise_gyr: 0.0004       # [rad/s/sqrt(Hz)] 
+
+core/core_fixed_bias: false
+# core/core_noise_accbias: 8e-5     # [m/s^3/sqrt(Hz)]
+# core/core_noise_gyrbias: 3e-6     # [rad/s^2/sqrt(Hz)]
+core/core_noise_acc: 0.083
+core/core_noise_accbias: 0.0083
+core/core_noise_gyr: 0.0013
+core/core_noise_gyrbias: 0.00013
+
+#######################################
+#########Pose Sensor Parameters #######
+#######################################
+velocity_sensor_1/velocity_absolute_measurements: true
+velocity_sensor_2/velocity_absolute_measurements: true
+
+velocity_sensor/velocity_delay: 0.0                      # [s] delay of pose sensor w.r.t. imu
+
+# For the pose sensor noise levels use the std deviation the units are
+#  velocity: [m/s]
+velocity_sensor_1/use_fixed_covariance: true
+velocity_sensor_2/use_fixed_covariance: true
+
+velocity_velocity_sensor/velocity_noise_meas: 0.0001 # 0.00025 #0.015             # [rad] # [m/s]
+
+velocity_sensor_1/enable_mah_outlier_rejection: false
+velocity_sensor_2/enable_mah_outlier_rejection: false
+
+velocity_sensor_1/mah_threshold: 0.1 #50.0
+velocity_sensor_2/mah_threshold: 0.1 #50.0
+
+# Transformation that expresses the position and orientation of the imu frame 
+# w.r.t the vision/camera frame
+velocity_velocity_sensor/velocity_fixed_p_iv: true              
+velocity_velocity_sensor/velocity_noise_p_iv: 0.1                  
+velocity_velocity_sensor/velocity_fixed_q_iv: true
+velocity_velocity_sensor/velocity_noise_q_iv: 0.1                  
+
+# ------
+# Sensor specific params:
+velocity_sensor_1/init/q_iv/w: 0.0
+velocity_sensor_1/init/q_iv/x: 1.0
+velocity_sensor_1/init/q_iv/y: 0.0
+velocity_sensor_1/init/q_iv/z: 0.0
+velocity_sensor_1/init/p_iv/x: 0.0   
+velocity_sensor_1/init/p_iv/y: 0.0
+velocity_sensor_1/init/p_iv/z: -0.1
+
+velocity_sensor_2/init/q_iv/w: 0.7071068
+velocity_sensor_2/init/q_iv/x: 0.0
+velocity_sensor_2/init/q_iv/y: 0.7071068
+velocity_sensor_2/init/q_iv/z: 0.0
+velocity_sensor_2/init/p_iv/x: 0.0   
+velocity_sensor_2/init/p_iv/y: 0.0
+velocity_sensor_2/init/p_iv/z: -0.1
+# ------
+
+#x_motion + 3d_motion
+# velocity_sensor/init/b_w/x: 0.00325329
+# velocity_sensor/init/b_w/y: -0.01088387
+# velocity_sensor/init/b_w/z: 0.0050056
+
+# velocity_sensor/init/b_a/x: -0.08425053
+# velocity_sensor/init/b_a/y: -0.24245523
+# velocity_sensor/init/b_a/z: -0.09430353
+
+# xy_motion
+# velocity_sensor/init/b_w/x: 0.00363727
+# velocity_sensor/init/b_w/y: -0.01117709
+# velocity_sensor/init/b_w/z: 0.00548732
+
+# velocity_sensor/init/b_a/x: -0.15281135
+# velocity_sensor/init/b_a/y: -0.22750096
+# velocity_sensor/init/b_a/z: -0.09585607
+
+# xyyaw2_motion
+# velocity_velocity_sensor/init/b_w/x: -0.000518
+# velocity_velocity_sensor/init/b_w/y: -0.008286
+# velocity_velocity_sensor/init/b_w/z: -0.001349
+
+# velocity_velocity_sensor/init/b_a/x: -0.1750
+# velocity_velocity_sensor/init/b_a/y: -0.0971
+# velocity_velocity_sensor/init/b_a/z: -0.0532
+
+# sim
+velocity_velocity_sensor/init/b_w/x: -0.0007562894192425386
+velocity_velocity_sensor/init/b_w/y: 0.005396830057312661
+velocity_velocity_sensor/init/b_w/z: -3.936351517311163e-05
+
+velocity_velocity_sensor/init/b_a/x: -0.186313807984814
+velocity_velocity_sensor/init/b_a/y: -0.15287205536840281
+velocity_velocity_sensor/init/b_a/z: -0.02952
+
