@@ -39,6 +39,7 @@ class FlowSensorHandler
       true};  ///< Does this sensor measure relative or absolute values
 
   ros::Subscriber subOpticalFlow_;
+  ros::NodeHandle nh_;
 
   void ProcessFlowMeasurement(const arkflow_ros::OpticalFlowConstPtr& msg);
   void MeasurementCallback(const arkflow_ros::OpticalFlowConstPtr& msg);

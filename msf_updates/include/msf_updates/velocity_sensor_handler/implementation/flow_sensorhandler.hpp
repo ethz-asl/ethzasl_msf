@@ -59,9 +59,9 @@ FlowSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::FlowSensorHandler(
                        "Velocity sensor is using covariance "
                        "from sensor");
 
-  ros::NodeHandle nh("msf_updates/" + topic_namespace);
+  nh_ = ros::NodeHandle("msf_updates/" + topic_namespace);
 
-  subOpticalFlow_ = nh.subscribe<arkflow_ros::OpticalFlow>(
+  subOpticalFlow_ = nh_.subscribe<arkflow_ros::OpticalFlow>(
       "optical_flow_input", 20, &FlowSensorHandler::MeasurementCallback, this);
 }
 
@@ -116,7 +116,7 @@ void FlowSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessFlowMeasurement(
   shared_ptr<MEASUREMENT_TYPE> meas(new MEASUREMENT_TYPE(
       n_zv_, use_fixed_covariance_, provides_absolute_measurements_,
       this->sensorID, enable_mah_outlier_rejection_, mah_threshold_,
-      fixedstates));
+      fixedstates, nh_));
 
   meas->MakeFromSensorReading(msg, msg->header.stamp.toSec() - delay_);
 
