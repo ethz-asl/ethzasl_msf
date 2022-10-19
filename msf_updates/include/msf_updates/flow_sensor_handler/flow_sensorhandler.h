@@ -22,7 +22,7 @@
 #include <arkflow_ros/OpticalFlow.h>
 #include <msf_core/msf_sensormanagerROS.h>
 
-namespace msf_velocity_sensor {
+namespace msf_flow_sensor {
 
 template <typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 class FlowSensorHandler
@@ -57,7 +57,7 @@ class FlowSensorHandler
   void SetNoises(double n_zv);
   void SetDelay(double delay);
 };
-}  // namespace msf_velocity_sensor
+}  // namespace msf_flow_sensor
 
 #include "implementation/flow_sensorhandler.hpp"
 

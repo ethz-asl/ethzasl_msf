@@ -17,8 +17,8 @@
  * limitations under the License.
  */
 
-#ifndef VELOCITY_MEASUREMENTMANAGER_H_
-#define VELOCITY_MEASUREMENTMANAGER_H_
+#ifndef VELOCITY_VELOCITY_MEASUREMENTMANAGER_H_
+#define VELOCITY_VELOCITY_MEASUREMENTMANAGER_H_
 
 // clang-format off
 #include <ros/ros.h>
@@ -28,8 +28,6 @@
 #include <msf_core/msf_IMUHandler_ROS.h>
 #include "msf_statedef.hpp"
 #include <msf_updates/velocity_sensor_handler/velocity_sensorhandler.h>
-#include <msf_updates/velocity_sensor_handler/flow_sensorhandler.h>
-#include <msf_updates/velocity_sensor_handler/flow_measurement.h>
 #include <msf_updates/velocity_sensor_handler/velocity_xy_measurement.h>
 #include <msf_updates/SingleVelocitySensorConfig.h>
 // clang-format on
@@ -45,16 +43,9 @@ class VelocityVelocitySensorManager
       msf_updates::velocity_xy_measurement::VelocityXYMeasurement<>,
       VelocityVelocitySensorManager>
       VelocityXYSensorHandler_T;
-  typedef FlowSensorHandler<msf_updates::flow_measurement::FlowMeasurement<>,
-                            VelocityVelocitySensorManager>
-      FlowSensorHandler_T;
 
   friend class VelocityXYSensorHandler<
       msf_updates::velocity_xy_measurement::VelocityXYMeasurement<>,
-      VelocityVelocitySensorManager>;
-
-  friend class FlowSensorHandler<
-      msf_updates::flow_measurement::FlowMeasurement<>,
       VelocityVelocitySensorManager>;
 
  public:
@@ -63,23 +54,16 @@ class VelocityVelocitySensorManager
   typedef EKFState_T::StateDefinition_T StateDefinition_T;
 
   VelocityVelocitySensorManager(
-      ros::NodeHandle pnh = ros::NodeHandle("~/velocity_velocity_sensor"))
-      : use_flow_(false) {
+      ros::NodeHandle pnh = ros::NodeHandle("~/velocity_velocity_sensor")) {
     imu_handler_.reset(new msf_core::IMUHandler_ROS<msf_updates::EKFState>(
         *this, "msf_core", "imu_handler"));
 
-    if (use_flow_) {
-      flow_handler_.reset(
-          new FlowSensorHandler_T(*this, "", "velocity_sensor"));
-      AddHandler(flow_handler_);
-    } else {
-      velocity_handler_0_.reset(
-          new VelocityXYSensorHandler_T(*this, "velocity_sensor_1", "velocity_sensor_1"));
-      AddHandler(velocity_handler_0_);
-      velocity_handler_1_.reset(
-          new VelocityXYSensorHandler_T(*this, "velocity_sensor_2", "velocity_sensor_2"));
-      AddHandler(velocity_handler_1_);
-    }
+    velocity_handler_0_.reset(new VelocityXYSensorHandler_T(
+        *this, "velocity_sensor_1", "velocity_sensor_1"));
+    AddHandler(velocity_handler_0_);
+    velocity_handler_1_.reset(new VelocityXYSensorHandler_T(
+        *this, "velocity_sensor_2", "velocity_sensor_2"));
+    AddHandler(velocity_handler_1_);
 
     reconf_server_.reset(new ReconfigureServer(pnh));
     ReconfigureServer::CallbackType f =
@@ -99,8 +83,6 @@ class VelocityVelocitySensorManager
   shared_ptr<msf_core::IMUHandler_ROS<msf_updates::EKFState>> imu_handler_;
   shared_ptr<VelocityXYSensorHandler_T> velocity_handler_0_;
   shared_ptr<VelocityXYSensorHandler_T> velocity_handler_1_;
-  shared_ptr<FlowSensorHandler_T> flow_handler_;
-  const bool use_flow_{false};
 
   Config_T config_;
   ReconfigureServerPtr reconf_server_;
@@ -110,16 +92,11 @@ class VelocityVelocitySensorManager
    */
   virtual void Config(Config_T& config, uint32_t level) {
     config_ = config;
-    if (use_flow_) {
-      flow_handler_->SetNoises(config.velocity_noise_meas);
-      flow_handler_->SetDelay(config.velocity_delay);
-    } else {
-      // Using same sensor so setting same config
-      velocity_handler_0_->SetNoises(config.velocity_noise_meas);
-      velocity_handler_0_->SetDelay(config.velocity_delay);
-      velocity_handler_1_->SetNoises(config.velocity_noise_meas);
-      velocity_handler_1_->SetDelay(config.velocity_delay);
-    }
+    // Using same sensor so setting same config
+    velocity_handler_0_->SetNoises(config.velocity_noise_meas);
+    velocity_handler_0_->SetDelay(config.velocity_delay);
+    velocity_handler_1_->SetNoises(config.velocity_noise_meas);
+    velocity_handler_1_->SetDelay(config.velocity_delay);
 
     if ((level & msf_updates::SingleVelocitySensor_INIT_FILTER) &&
         config.core_init_filter == true) {
@@ -157,21 +134,17 @@ class VelocityVelocitySensorManager
 
     P.setZero();  // Error state covariance; if zero a default initialization in
                   // msf_core is used.
-    if (use_flow_) {
+    // For initialization we will only use measurements from sensor 0
+    // (otherwise a bit complicated to figure out which sensor to trust..)
+    // TODO(clanegge): maybe initialize directly with zero instead.
+    v_v = velocity_handler_0_->GetVelocityMeasurement();
+    MSF_INFO_STREAM("initial measurement vel:[" << v_v.transpose() << "]");
+    // Check if we have already input from the measurement sensor
+    if (!velocity_handler_0_->ReceivedFirstMeasurement()) {
+      MSF_WARN_STREAM(
+          "No measurements received yet to initialize velocity - using [0 0 "
+          "0]");
       v_v = Eigen::Matrix<double, 2, 1>::Zero();
-    } else {
-      // For initialization we will only use measurements from sensor 0
-      // (otherwise a bit complicated to figure out which sensor to trust..)
-      // TODO(clanegge): maybe initialize directly with zero instead.
-      v_v = velocity_handler_0_->GetVelocityMeasurement();
-      MSF_INFO_STREAM("initial measurement vel:[" << v_v.transpose() << "]");
-      // Check if we have already input from the measurement sensor
-      if (!velocity_handler_0_->ReceivedFirstMeasurement()) {
-        MSF_WARN_STREAM(
-            "No measurements received yet to initialize velocity - using [0 0 "
-            "0]");
-        v_v = Eigen::Matrix<double, 2, 1>::Zero();
-      }
     }
 
     ros::NodeHandle pnh("~");

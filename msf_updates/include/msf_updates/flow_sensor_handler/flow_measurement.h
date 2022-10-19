@@ -33,8 +33,7 @@ typedef msf_core::MSF_Measurement<
     Eigen::Matrix<double, nMeasurements, nMeasurements>, msf_updates::EKFState>
     FlowMeasurementBase;
 
-template <int StateQivIdx = EKFState::StateDefinition_T::q_iv,
-          int StatePivIdx = EKFState::StateDefinition_T::p_iv>
+template <int StateQivIdx, int StatePivIdx>
 struct FlowMeasurement : public FlowMeasurementBase {
  private:
   typedef FlowMeasurementBase Measurement_t;
@@ -86,7 +85,6 @@ struct FlowMeasurement : public FlowMeasurementBase {
                     1>::Zero()};  /// Velocity measurement in xy
                                   /// sensor coordinates.
   double _n_zv{0.0};              /// Velocity measurement noise.
-
   bool _fixed_covariance{false};
   int _fixedstates{0};
 
@@ -123,7 +121,7 @@ struct FlowMeasurement : public FlowMeasurementBase {
     H.setZero();
 
     // Get rotation matrices.
-    Eigen::Matrix<double, 3, 3> C_vi =
+    const Eigen::Matrix<double, 3, 3> C_vi =
         state.Get<StateQivIdx>().inverse().toRotationMatrix();
 
     // Preprocess for elements in H matrix.
@@ -132,7 +130,7 @@ struct FlowMeasurement : public FlowMeasurementBase {
     const Eigen::Matrix<double, 3, 3> C_I_W =
         state.Get<StateDefinition_T::q>().inverse().toRotationMatrix();
 
-    Eigen::Matrix<double, 3, 1> W_v_sk = state.Get<StateDefinition_T::v>();
+    Eigen::Matrix<double, 3, 1> W_v = state.Get<StateDefinition_T::v>();
 
     // Get indices of states in error vector
     enum {
@@ -147,25 +145,9 @@ struct FlowMeasurement : public FlowMeasurementBase {
                                              StateDefinition_T::b_w>::value,
     };
 
-    // Read the fixed states flags.
-    bool calibposfix = (_fixedstates & 1 << StatePivIdx);
-    bool calibattfix = (_fixedstates & 1 << StateQivIdx);
-
-    // TODO(clanegge):
-    if (!calibposfix || !calibattfix) {
-      MSF_ERROR_STREAM(
-          "Online calibration of velocity sensor not implemented yet. Using "
-          "fixed transform.");
-      calibposfix = true;
-      calibattfix = true;
-    }
-
-    if (calibposfix) {
-      state_in->ClearCrossCov<StatePivIdx>();
-    }
-    if (calibattfix) {
-      state_in->ClearCrossCov<StateQivIdx>();
-    }
+    // Fixed extrinsics.
+    state_in->ClearCrossCov<StatePivIdx>();
+    state_in->ClearCrossCov<StateQivIdx>();
 
     // Construct H matrix.
     // velocity:
@@ -177,12 +159,10 @@ struct FlowMeasurement : public FlowMeasurementBase {
     //  d/dC_WI (C_vi *(C_WI)^T * W_v) = C_vi * skew((C_WI)^T * W_v)
     // See https://github.com/borglab/gtsam/blob/4.0.3/doc/math.pdf , page 6
     H.block<2, 3>(0, kIdxstartcorr_q) =
-        (C_vi * Skew(C_I_W * state.Get<StateDefinition_T::v>()))
-            .block<2, 3>(0, 0) *
-        z_dt_ / z_range_;
+        (C_vi * Skew(C_I_W * W_v)).block<2, 3>(0, 0) * z_dt_ / z_range_;
+
     // gyro bias/angular velocity:
-    // Cross term C_vi*( [i_omega_i - i_b_w]
-    // x r_iv) = C_vi*r_iv_skew*i_b_w
+    // Cross term C_vi*( [i_omega_i - i_b_w] x r_iv) = C_vi*r_iv_skew*i_b_w
     H.block<2, 3>(0, kIdxstartcorr_bw) =
         (C_vi * piv_sk).block<2, 3>(0, 0) * z_dt_ / z_range_;
   }
@@ -199,11 +179,8 @@ struct FlowMeasurement : public FlowMeasurementBase {
     CalculateH(state_nonconst_new, H_new);
 
     // Get rotation matrices.
-    // TODO(clanegge): Check in sim if we actually need the conjugate here or
-    // not!
     Eigen::Matrix<double, 3, 3> C_vi =
-        // state.Get<StateQivIdx>().conjugate().toRotationMatrix();
-        state.Get<StateQivIdx>().toRotationMatrix();
+        state.Get<StateQivIdx>().inverse().toRotationMatrix();
 
     // Get body velocity and convert to imu frame
     const msf_core::Quaternion& q_W_I = state.Get<StateDefinition_T::q>();
