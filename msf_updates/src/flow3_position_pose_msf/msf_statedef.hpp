@@ -41,6 +41,12 @@ enum StateDefinition {
   p_iv_1,
   q_iv_2,
   p_iv_2,
+  L,
+  q_wv,
+  p_wv,
+  q_ic,
+  p_ic,
+  p_ip
 };
 
 namespace {
@@ -64,6 +70,7 @@ typedef boost::fusion::vector<
         msf_core::CoreStateWithoutPropagation>,  ///< Acceleration biases.
 
     // States not varying during propagation.
+    // Velocity sensors
     msf_core::StateVar_T<Eigen::Quaternion<double>, q_iv_0>,  ///< Rotation from the IMU frame to the velocity sensor 1 frame expressed in the IMU frame.
     msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_iv_0>,  ///< Translation from the IMU frame to the velocity sensor 1 frame expressed in the IMU frame.
 
@@ -71,7 +78,17 @@ typedef boost::fusion::vector<
     msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_iv_1>,  ///< Translation from the IMU frame to the velocity sensor 1 frame expressed in the IMU frame.
 
     msf_core::StateVar_T<Eigen::Quaternion<double>, q_iv_2>,  ///< Rotation from the IMU frame to the velocity sensor 1 frame expressed in the IMU frame.
-    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_iv_2>  ///< Translation from the IMU frame to the velocity sensor 1 frame expressed in the IMU frame.
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_iv_2>,  ///< Translation from the IMU frame to the velocity sensor 1 frame expressed in the IMU frame.
+    
+    // Position pose sensors
+    msf_core::StateVar_T<Eigen::Matrix<double, 1, 1>, L>,     ///< Visual scale.
+    msf_core::StateVar_T<Eigen::Quaternion<double>, q_wv,  ///< Rotation from the world frame to the frame in which the pose is measured expressed in the world frame.
+        msf_core::AuxiliaryNonTemporalDrifting>,  ///< Translation from the world frame to the frame in which the pose is measured expressed in the world frame.
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_wv>,  ///< Vision world position drift.
+    msf_core::StateVar_T<Eigen::Quaternion<double>, q_ic>,  ///< Rotation from the IMU frame to the camera frame expressed in the IMU frame.
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_ic>,  ///< Translation from the IMU frame to the camera frame expressed in the IMU frame.
+    msf_core::StateVar_T<Eigen::Matrix<double, 3, 1>, p_ip>  ///< Translation from the IMU frame to the position sensor frame expressed in the IMU frame.
+
     > fullState_T;
 }  // namespace
 //clang-format on
