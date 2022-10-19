@@ -215,18 +215,9 @@ struct VelocityXYMeasurement : public VelocityXYMeasurementBase {
     // 3d Sensor velocity in imu frame:
     Eigen::Matrix<double, 3, 1> i_v_v =
         (v_I + (state.w_m - state.Get<StateDefinition_T::b_w>()).cross(piv_));
-    // Eigen::Matrix<double, 3, 1> i_v_v =
-    //     (state.Get<StateDefinition_T::v>() +
-    //      (state.w_m - state.Get<StateDefinition_T::b_w>())
-    //          .cross(state.Get<StatePivIdx>()));
-
+    
     // We only measure x & y velocities - ignore z
-    Eigen::Vector2d model_z = (C_vi_ * i_v_v).block<2, 1>(0, 0);
-    MSF_WARN_STREAM("Measurement:\n" << _z_v);
-    MSF_WARN_STREAM("Model:\n" << model_z);
-    MSF_WARN_STREAM("State:\n" << state.Get<StateDefinition_T::v>());
     r_old = _z_v - (C_vi_ * i_v_v).block<2, 1>(0, 0);
-    // r_old = _z_v - (C_vi * i_v_v).block<2, 1>(0, 0);
 
     if (!CheckForNumeric(r_old, "r_old")) {
       MSF_ERROR_STREAM("r_old: " << r_old);

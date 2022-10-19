@@ -23,6 +23,7 @@ generate_dynamic_reconfigure_options(
     cfg/SinglePositionSensor.cfg
     cfg/SphericalPositionSensor.cfg
     cfg/SingleVelocitySensor.cfg
+    cfg/Flow3Sensor.cfg
 )
 
 catkin_package(
@@ -46,6 +47,8 @@ add_subdirectory(src/position_pose_msf)
 add_subdirectory(src/spherical_msf)
 add_subdirectory(src/velocity_msf)
 add_subdirectory(src/velocity_velocity_msf)
+add_subdirectory(src/flow3_msf)
+
 endif()
 
 add_executable(test_distort src/test/test_distort.cc)
