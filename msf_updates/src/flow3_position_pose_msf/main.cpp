@@ -17,12 +17,12 @@
  * limitations under the License.
  */
 
-#include "flow3_sensormanager.h"
+#include "flow3_position_pose_sensormanager.h"
 
 int main(int argc, char** argv) {
   ros::init(argc, argv, "msf_flow3_sensor");
 
-  msf_updates::Flow3SensorManager manager;
+  msf_updates::Flow3PositionPoseSensorManager manager;
 
   ros::spin();
 
