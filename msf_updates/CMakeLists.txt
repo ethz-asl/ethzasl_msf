@@ -12,7 +12,7 @@ set(CMAKE_BUILD_TYPE Release)
 #build with boost 1.6x
 add_definitions(-DBOOST_NO_CXX11_VARIADIC_TEMPLATES)
 
-find_package(catkin REQUIRED COMPONENTS roscpp msf_core geometry_msgs sensor_fusion_comm)
+find_package(catkin REQUIRED COMPONENTS roscpp msf_core geometry_msgs sensor_fusion_comm arkflow_ros)
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 
@@ -29,7 +29,7 @@ generate_dynamic_reconfigure_options(
 
 catkin_package(
     DEPENDS
-    CATKIN_DEPENDS roscpp msf_core geometry_msgs sensor_fusion_comm
+    CATKIN_DEPENDS roscpp msf_core geometry_msgs sensor_fusion_comm arkflow_ros
     INCLUDE_DIRS include ${catkin_INCLUDE_DIRS}
     LIBRARIES pose_distorter
 )
