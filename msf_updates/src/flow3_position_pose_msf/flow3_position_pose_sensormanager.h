@@ -34,6 +34,7 @@
 #include <msf_updates/position_sensor_handler/position_sensorhandler.h>
 #include <msf_updates/position_sensor_handler/position_measurement.h>
 #include <msf_updates/Flow3PositionPoseSensorConfig.h>
+#include "sensor_fusion_comm/InitScale.h"
 // clang-format on
 
 namespace msf_updates {
@@ -115,13 +116,16 @@ class Flow3PositionPoseSensorManager
         new PoseSensorHandler_T(*this, "", "pose_sensor", false));
     AddHandler(pose_handler_);
 
-    position_handler_.reset(new PositionSensorHandler_T(*this, "", "position_sensor"));
+    position_handler_.reset(
+        new PositionSensorHandler_T(*this, "", "position_sensor"));
     AddHandler(position_handler_);
 
     reconf_server_.reset(new ReconfigureServer(pnh));
     ReconfigureServer::CallbackType f =
         boost::bind(&Flow3PositionPoseSensorManager::Config, this, _1, _2);
     reconf_server_->setCallback(f);
+
+    init_scale_srv_ = pnh.advertiseService("initialize_msf_scale", &Flow3PositionPoseSensorManager::InitScale, this);
   }
 
   virtual ~Flow3PositionPoseSensorManager() {}
@@ -139,7 +143,9 @@ class Flow3PositionPoseSensorManager
   Config_T config_;
   ReconfigureServerPtr reconf_server_;
 
-  /**
+  ros::ServiceServer init_scale_srv_;
+
+    /**
    * \brief Dynamic reconfigure callback.
    */
   virtual void Config(Config_T& config, uint32_t level) {
@@ -160,14 +166,14 @@ class Flow3PositionPoseSensorManager
     position_handler_->SetDelay(config.position_delay);
 
     if ((level & msf_updates::Flow3PositionPoseSensor_INIT_FILTER) &&
-        config.core_init_filter == true) {
+        config.core_init_filter) {
       Init(config.pose_initial_scale);
       config.core_init_filter = false;
     }
 
     // Init call with "set height" checkbox.
     if ((level & msf_updates::Flow3PositionPoseSensor_SET_HEIGHT) &&
-        config.core_set_height == true) {
+        config.core_set_height) {
       Eigen::Matrix<double, 3, 1> p = pose_handler_->GetPositionMeasurement();
       if (p.norm() == 0) {
         MSF_WARN_STREAM(
@@ -180,7 +186,16 @@ class Flow3PositionPoseSensorManager
       config.core_set_height = false;
     }
   }
-  void Init(double scale) const {
+
+    bool InitScale(sensor_fusion_comm::InitScale::Request &req,
+                   sensor_fusion_comm::InitScale::Response &res) {
+        ROS_INFO("Initialize filter with scale %f", req.scale);
+        Init(req.scale);
+        res.result = "Initialized scale";
+        return true;
+    }
+
+  void Init(double scale) const override {
     if (scale < 0.001) {
       MSF_WARN_STREAM("init scale is " << scale << " correcting to 1.");
       scale = 1;
@@ -202,7 +217,7 @@ class Flow3PositionPoseSensorManager
     v << 0., 0., 0.;    /// Robot velocity (IMU centered).
     w_m << 0., 0., 0.;  /// Initial angular velocity.
 
-    // intial body frame aligned with world frame as its anyway unobservable
+    // initial body frame aligned with world frame as its anyway unobservable
     p.setZero();
     // TODO(clanegge): check if world frame is gravity aligned!
     q.setIdentity();
@@ -319,7 +334,7 @@ class Flow3PositionPoseSensorManager
     p_wv = p - p_vision;  // Shift the vision frame so that it fits the position
     // measurement
 
-    // Preapare init "measurement"
+    // Prepare init "measurement"
     // True means that this message contains initial sensor readings.
     shared_ptr<msf_core::MSF_InitMeasurement<EKFState_T>> meas(
         new msf_core::MSF_InitMeasurement<EKFState_T>(true));
@@ -353,7 +368,7 @@ class Flow3PositionPoseSensorManager
   }
 
   // Prior to this call, all states are initialized to zero/identity.
-  virtual void ResetState(EKFState_T& state) const {
+  void ResetState(EKFState_T& state) const override {
     // Set scale to 1.
     Eigen::Matrix<double, 1, 1> scale;
     scale << 1.0;
