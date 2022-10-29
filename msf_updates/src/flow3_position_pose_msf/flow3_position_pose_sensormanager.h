@@ -303,7 +303,7 @@ class Flow3PositionPoseSensorManager
     yawq.normalize();
 
     q = yawq;
-    q_wv = (q * q_ic * q_vc.conjugate()).conjugate();
+    q_wv = q * q_ic * q_vc.conjugate(); //.conjugate();
 
     MSF_WARN_STREAM("q " << STREAMQUAT(q));
     MSF_WARN_STREAM("q_wv " << STREAMQUAT(q_wv));
