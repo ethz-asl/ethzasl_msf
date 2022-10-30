@@ -33,8 +33,8 @@ class PoseSensorHandler : public msf_core::SensorHandler<
     typename msf_updates::EKFState> {
  private:
 
-  Eigen::Quaternion<double> z_q_;  ///< Attitude measurement camera seen from world.
-  Eigen::Matrix<double, 3, 1> z_p_;  ///< Position measurement camera seen from world.
+  Eigen::Quaternion<double> z_q_;  ///< Attitude measurement camera seen from world. (q_vc)
+  Eigen::Matrix<double, 3, 1> z_p_;  ///< Position measurement camera seen from world. (v_p_vc)
   double n_zp_, n_zq_;  ///< Position and attitude measurement noise.
   double delay_;        ///< Delay to be subtracted from the ros-timestamp of
   // the measurement provided by this sensor.
