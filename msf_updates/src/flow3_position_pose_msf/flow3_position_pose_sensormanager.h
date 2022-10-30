@@ -228,7 +228,8 @@ class Flow3PositionPoseSensorManager
     q_wv.setIdentity();  // World-vision rotation drift.
     p_wv.setZero();      // World-vision position drift.
 
-    p_pos = position_handler_->GetPositionMeasurement();
+//    p_pos = position_handler_->GetPositionMeasurement();
+    p_pos = Eigen::Vector3d::Zero();  // kick out position measurements for now
 
     p_vc = pose_handler_->GetPositionMeasurement();
     q_vc = pose_handler_->GetAttitudeMeasurement();
@@ -250,41 +251,41 @@ class Flow3PositionPoseSensorManager
 
     ros::NodeHandle pnh("~");
     // Load initial biases and sensor extrinsics
-    pnh.param("flow_sensor/init/b_w/x", b_w[0], 0.0);
-    pnh.param("flow_sensor/init/b_w/y", b_w[1], 0.0);
-    pnh.param("flow_sensor/init/b_w/z", b_w[2], 0.0);
+    pnh.param("core/init/b_w/x", b_w[0], 0.0);
+    pnh.param("core/init/b_w/y", b_w[1], 0.0);
+    pnh.param("core/init/b_w/z", b_w[2], 0.0);
 
-    pnh.param("flow_sensor/init/b_a/x", b_a[0], 0.0);
-    pnh.param("flow_sensor/init/b_a/y", b_a[1], 0.0);
-    pnh.param("flow_sensor/init/b_a/z", b_a[2], 0.0);
+    pnh.param("core/init/b_a/x", b_a[0], 0.0);
+    pnh.param("core/init/b_a/y", b_a[1], 0.0);
+    pnh.param("core/init/b_a/z", b_a[2], 0.0);
 
     // Get transformation between flow sensors and body (IMU) frame
     // First:
-    pnh.param("flow_sensor/init/p_iv_0/x", p_iv_0[0], 0.0);
-    pnh.param("flow_sensor/init/p_iv_0/y", p_iv_0[1], 0.0);
-    pnh.param("flow_sensor/init/p_iv_0/z", p_iv_0[2], 0.0);
-    pnh.param("flow_sensor/init/q_iv_0/w", q_iv_0.w(), 1.0);
-    pnh.param("flow_sensor/init/q_iv_0/x", q_iv_0.x(), 0.0);
-    pnh.param("flow_sensor/init/q_iv_0/y", q_iv_0.y(), 0.0);
-    pnh.param("flow_sensor/init/q_iv_0/z", q_iv_0.z(), 0.0);
+    pnh.param("flow_sensor_0/init/p_iv/x", p_iv_0[0], 0.0);
+    pnh.param("flow_sensor_0/init/p_iv/y", p_iv_0[1], 0.0);
+    pnh.param("flow_sensor_0/init/p_iv/z", p_iv_0[2], 0.0);
+    pnh.param("flow_sensor_0/init/q_iv/w", q_iv_0.w(), 1.0);
+    pnh.param("flow_sensor_0/init/q_iv/x", q_iv_0.x(), 0.0);
+    pnh.param("flow_sensor_0/init/q_iv/y", q_iv_0.y(), 0.0);
+    pnh.param("flow_sensor_0/init/q_iv/z", q_iv_0.z(), 0.0);
     q_iv_0.normalize();
     // Second
-    pnh.param("flow_sensor/init/p_iv_1/x", p_iv_1[0], 0.0);
-    pnh.param("flow_sensor/init/p_iv_1/y", p_iv_1[1], 0.0);
-    pnh.param("flow_sensor/init/p_iv_1/z", p_iv_1[2], 0.0);
-    pnh.param("flow_sensor/init/q_iv_1/w", q_iv_1.w(), 1.0);
-    pnh.param("flow_sensor/init/q_iv_1/x", q_iv_1.x(), 0.0);
-    pnh.param("flow_sensor/init/q_iv_1/y", q_iv_1.y(), 0.0);
-    pnh.param("flow_sensor/init/q_iv_1/z", q_iv_1.z(), 0.0);
+    pnh.param("flow_sensor_1/init/p_iv/x", p_iv_1[0], 0.0);
+    pnh.param("flow_sensor_1/init/p_iv/y", p_iv_1[1], 0.0);
+    pnh.param("flow_sensor_1/init/p_iv/z", p_iv_1[2], 0.0);
+    pnh.param("flow_sensor_1/init/q_iv/w", q_iv_1.w(), 1.0);
+    pnh.param("flow_sensor_1/init/q_iv/x", q_iv_1.x(), 0.0);
+    pnh.param("flow_sensor_1/init/q_iv/y", q_iv_1.y(), 0.0);
+    pnh.param("flow_sensor_1/init/q_iv/z", q_iv_1.z(), 0.0);
     q_iv_1.normalize();
     // Third:
-    pnh.param("flow_sensor/init/p_iv_2/x", p_iv_2[0], 0.0);
-    pnh.param("flow_sensor/init/p_iv_2/y", p_iv_2[1], 0.0);
-    pnh.param("flow_sensor/init/p_iv_2/z", p_iv_2[2], 0.0);
-    pnh.param("flow_sensor/init/q_iv_2/w", q_iv_2.w(), 1.0);
-    pnh.param("flow_sensor/init/q_iv_2/x", q_iv_2.x(), 0.0);
-    pnh.param("flow_sensor/init/q_iv_2/y", q_iv_2.y(), 0.0);
-    pnh.param("flow_sensor/init/q_iv_2/z", q_iv_2.z(), 0.0);
+    pnh.param("flow_sensor_2/init/p_iv/x", p_iv_2[0], 0.0);
+    pnh.param("flow_sensor_2/init/p_iv/y", p_iv_2[1], 0.0);
+    pnh.param("flow_sensor_2/init/p_iv/z", p_iv_2[2], 0.0);
+    pnh.param("flow_sensor_2/init/q_iv/w", q_iv_2.w(), 1.0);
+    pnh.param("flow_sensor_2/init/q_iv/x", q_iv_2.x(), 0.0);
+    pnh.param("flow_sensor_2/init/q_iv/y", q_iv_2.y(), 0.0);
+    pnh.param("flow_sensor_2/init/q_iv/z", q_iv_2.z(), 0.0);
     q_iv_2.normalize();
 
     pnh.param("pose_sensor/init/p_ic/x", p_ic[0], 0.0);
@@ -317,22 +318,32 @@ class Flow3PositionPoseSensorManager
     Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
     yawq.normalize();
 
-    q = yawq;
-    q_wv = q * q_ic * q_vc.conjugate(); //.conjugate();
+//    q = yawq;
+    q.setIdentity();
+    q_wv = (q * q_ic * q_vc.conjugate()).conjugate();  // Wrong notation! q_wv is actually q_vw!!
+    // TODO: check if q_wv is used everywhere as q_vw!
 
     MSF_WARN_STREAM("q " << STREAMQUAT(q));
     MSF_WARN_STREAM("q_wv " << STREAMQUAT(q_wv));
 
-    Eigen::Matrix<double, 3, 1> p_vision =
-        q_wv.conjugate().toRotationMatrix() * p_vc / scale -
-        q.toRotationMatrix() * p_ic;
+    Eigen::Matrix<double, 3, 1> p_vision =  // W_p_VI
+        q_wv.conjugate() * p_vc - q * p_ic;
 
     // TODO (slynen): what if there is no initial position measurement? Then we
     //  have to shift vision-world later on, before applying the first position
     //  measurement.
-    p = p_pos - q.toRotationMatrix() * p_ip;
+    p = Eigen::Vector3d::Zero(); // p_pos - q.toRotationMatrix() * p_ip;
     p_wv = p - p_vision;  // Shift the vision frame so that it fits the position
-    // measurement
+    // measurement = W_p_WI + W_pIV
+
+      MSF_INFO_STREAM("p_vc: " << p_vc.transpose());
+      MSF_INFO_STREAM("q_wv * p_vc: " << (q_wv.conjugate() * p_vc).transpose());
+      MSF_INFO_STREAM("p_ic: " << p_ic.transpose());
+      MSF_INFO_STREAM("p_vision: " << p_vision.transpose());
+      MSF_INFO_STREAM("p_wv: " << p_wv.transpose());
+      MSF_INFO_STREAM("b_a: " << b_a.transpose());
+      MSF_INFO_STREAM("b_w: " << b_w.transpose());
+
 
     // Prepare init "measurement"
     // True means that this message contains initial sensor readings.

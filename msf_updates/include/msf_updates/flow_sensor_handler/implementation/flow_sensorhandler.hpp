@@ -109,7 +109,7 @@ template <typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 void FlowSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
     const arkflow_ros::OpticalFlowConstPtr& msg) {
   this->SequenceWatchDog(msg->header.seq, subOpticalFlow_.getTopic());
-  MSF_INFO_STREAM_ONCE("*** velocity sensor got first measurement from topic "
+  MSF_INFO_STREAM_ONCE("*** flow sensor got first measurement from topic "
                        << this->topic_namespace_ << "/"
                        << subOpticalFlow_.getTopic() << " ***");
 
