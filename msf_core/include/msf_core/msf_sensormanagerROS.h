@@ -73,6 +73,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
   std::string msf_output_frame_;
   std::string odom_child_frame_;
   std::string tf_target_frame_;
+  bool enable_tcp_no_delay_; ///< Subscribe to sensor with minimum TCP delay (requires more CPU).
 
   mutable tf::TransformBroadcaster tf_broadcaster_;
 
@@ -91,6 +92,7 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
     pnh.param("msf_output_frame", msf_output_frame_, std::string("world"));
     pnh.param("odometry_child_frame", odom_child_frame_, std::string("imu"));
     pnh.param("tf_target_frame", tf_target_frame_, std::string("state"));
+    pnh.param("enable_tcp_no_delay", enable_tcp_no_delay_, false);
 
     ros::NodeHandle nh("msf_core");
 
@@ -174,6 +176,9 @@ struct MSF_SensorManagerROS : public msf_core::MSF_SensorManager<EKFState_T> {
   }
   virtual double GetParamFuzzyTrackingThreshold() const {
     return 0.1;
+  }
+  virtual bool GetParamEnableTcpNoDelay() const {
+    return enable_tcp_no_delay_;
   }
   virtual void PublishStateInitial(const shared_ptr<EKFState_T>& state) const {
     /**
