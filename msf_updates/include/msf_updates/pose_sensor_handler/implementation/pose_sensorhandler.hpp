@@ -43,6 +43,8 @@ PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PoseSensorHandler(
             true);
   pnh.param("pose_measurement_world_sensor", measurement_world_sensor_, true);
   pnh.param("pose_use_fixed_covariance", use_fixed_covariance_, false);
+  bool enable_tcp_no_delay;
+  pnh.param("enable_tcp_no_delay", enable_tcp_no_delay, false);
   pnh.param("pose_measurement_minimum_dt", pose_measurement_minimum_dt_, 0.05);
   pnh.param("enable_mah_outlier_rejection", enable_mah_outlier_rejection_, false);
   pnh.param("mah_threshold", mah_threshold_, msf_core::kDefaultMahThreshold_);
@@ -60,6 +62,9 @@ PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PoseSensorHandler(
                        "Pose sensor is using covariance "
                        "from sensor");
 
+  MSF_INFO_STREAM_COND(enable_tcp_no_delay, "Pose sensor uses TCP no delay.");
+  MSF_INFO_STREAM_COND(!enable_tcp_no_delay, "Pose sensor does not use TCP no delay.");
+
   MSF_INFO_STREAM_COND(provides_absolute_measurements_,
                        "Pose sensor is handling "
                        "measurements as absolute values");
@@ -69,11 +74,11 @@ PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PoseSensorHandler(
   ros::NodeHandle nh("msf_updates/" + topic_namespace);
   subPoseWithCovarianceStamped_ =
       nh.subscribe < geometry_msgs::PoseWithCovarianceStamped
-          > ("pose_with_covariance_input", 20, &PoseSensorHandler::MeasurementCallback, this);
+          > ("pose_with_covariance_input", 20, &PoseSensorHandler::MeasurementCallback, this, enable_tcp_no_delay ? ros::TransportHints().tcpNoDelay() : ros::TransportHints());
   subTransformStamped_ = nh.subscribe < geometry_msgs::TransformStamped
-      > ("transform_input", 20, &PoseSensorHandler::MeasurementCallback, this);
+      > ("transform_input", 20, &PoseSensorHandler::MeasurementCallback, this, enable_tcp_no_delay ? ros::TransportHints().tcpNoDelay() : ros::TransportHints());
   subPoseStamped_ = nh.subscribe < geometry_msgs::PoseStamped
-      > ("pose_input", 20, &PoseSensorHandler::MeasurementCallback, this);
+      > ("pose_input", 20, &PoseSensorHandler::MeasurementCallback, this, enable_tcp_no_delay ? ros::TransportHints().tcpNoDelay() : ros::TransportHints());
 
   z_p_.setZero();
   z_q_.setIdentity();
