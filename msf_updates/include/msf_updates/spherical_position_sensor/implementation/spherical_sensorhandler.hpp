@@ -46,7 +46,8 @@ AngleSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::AngleSensorHandler(
                 "Angle sensor is using covariance from sensor");
 
   MSF_INFO_STREAM_COND(enable_tcp_no_delay, "Angle sensor uses TCP no delay.");
-  MSF_INFO_STREAM_COND(!enable_tcp_no_delay, "Angle sensor does not use TCP no delay.");
+  MSF_INFO_STREAM_COND(!enable_tcp_no_delay,
+                       "Angle sensor does not use TCP no delay.");
 
   ROS_INFO_COND(provides_absolute_measurements_,
                 "Angle sensor is handling measurements as absolute values");
@@ -55,8 +56,10 @@ AngleSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::AngleSensorHandler(
 
   ros::NodeHandle nh("msf_updates");
 
-  subPointStamped_ = nh.subscribe<geometry_msgs::PointStamped>
-      ("angle_input", 20, &AngleSensorHandler::MeasurementCallback, this, enable_tcp_no_delay ? ros::TransportHints().tcpNoDelay() : ros::TransportHints());
+  subPointStamped_ = nh.subscribe<geometry_msgs::PointStamped>(
+      "angle_input", 20, &AngleSensorHandler::MeasurementCallback, this,
+      enable_tcp_no_delay ? ros::TransportHints().tcpNoDelay()
+                          : ros::TransportHints());
 
   z_a_.setZero();
 
@@ -146,8 +149,10 @@ DistanceSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::DistanceSensorHandler(
   ROS_INFO_COND(!use_fixed_covariance_,
                 "Distance sensor is using covariance from sensor");
 
-  MSF_INFO_STREAM_COND(enable_tcp_no_delay, "Distance sensor uses TCP no delay.");
-  MSF_INFO_STREAM_COND(!enable_tcp_no_delay, "Distance sensor does not use TCP no delay.");
+  MSF_INFO_STREAM_COND(enable_tcp_no_delay,
+                       "Distance sensor uses TCP no delay.");
+  MSF_INFO_STREAM_COND(!enable_tcp_no_delay,
+                       "Distance sensor does not use TCP no delay.");
 
   ROS_INFO_COND(provides_absolute_measurements_,
                 "Distance sensor is handling measurements as absolute values");
@@ -156,9 +161,10 @@ DistanceSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::DistanceSensorHandler(
 
   ros::NodeHandle nh("msf_updates");
 
-  subPointStamped_ =
-      nh.subscribe<geometry_msgs::PointStamped>
-      ("distance_input", 20, &DistanceSensorHandler::MeasurementCallback, this, enable_tcp_no_delay ? ros::TransportHints().tcpNoDelay() : ros::TransportHints());
+  subPointStamped_ = nh.subscribe<geometry_msgs::PointStamped>(
+      "distance_input", 20, &DistanceSensorHandler::MeasurementCallback, this,
+      enable_tcp_no_delay ? ros::TransportHints().tcpNoDelay()
+                          : ros::TransportHints());
 
   z_d_.setZero();
 

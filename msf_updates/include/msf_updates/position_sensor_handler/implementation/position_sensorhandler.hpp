@@ -45,8 +45,10 @@ PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PositionSensorHandler(
   MSF_INFO_STREAM_COND(!use_fixed_covariance_, "Position sensor is using "
                        "covariance from sensor");
 
-  MSF_INFO_STREAM_COND(enable_tcp_no_delay, "Position sensor uses TCP no delay.");
-  MSF_INFO_STREAM_COND(!enable_tcp_no_delay, "Position sensor does not use TCP no delay.");
+  MSF_INFO_STREAM_COND(enable_tcp_no_delay,
+                       "Position sensor uses TCP no delay.");
+  MSF_INFO_STREAM_COND(!enable_tcp_no_delay,
+                       "Position sensor does not use TCP no delay.");
 
   MSF_INFO_STREAM_COND(provides_absolute_measurements_, "Position sensor is "
                        "handling measurements as absolute values");
@@ -55,15 +57,18 @@ PositionSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PositionSensorHandler(
 
   ros::NodeHandle nh("msf_updates");
 
-  subPointStamped_ =
-      nh.subscribe<geometry_msgs::PointStamped>
-  ("position_input", 20, &PositionSensorHandler::MeasurementCallback, this, enable_tcp_no_delay ? ros::TransportHints().tcpNoDelay() : ros::TransportHints());
-  subTransformStamped_ =
-      nh.subscribe<geometry_msgs::TransformStamped>
-  ("transform_input", 20, &PositionSensorHandler::MeasurementCallback, this, enable_tcp_no_delay ? ros::TransportHints().tcpNoDelay() : ros::TransportHints());
-  subNavSatFix_ =
-      nh.subscribe<sensor_msgs::NavSatFix>
-  ("navsatfix_input", 20, &PositionSensorHandler::MeasurementCallback, this, enable_tcp_no_delay ? ros::TransportHints().tcpNoDelay() : ros::TransportHints());
+  subPointStamped_ = nh.subscribe<geometry_msgs::PointStamped>(
+      "position_input", 20, &PositionSensorHandler::MeasurementCallback, this,
+      enable_tcp_no_delay ? ros::TransportHints().tcpNoDelay()
+                          : ros::TransportHints());
+  subTransformStamped_ = nh.subscribe<geometry_msgs::TransformStamped>(
+      "transform_input", 20, &PositionSensorHandler::MeasurementCallback, this,
+      enable_tcp_no_delay ? ros::TransportHints().tcpNoDelay()
+                          : ros::TransportHints());
+  subNavSatFix_ = nh.subscribe<sensor_msgs::NavSatFix>(
+      "navsatfix_input", 20, &PositionSensorHandler::MeasurementCallback, this,
+      enable_tcp_no_delay ? ros::TransportHints().tcpNoDelay()
+                          : ros::TransportHints());
 
   z_p_.setZero();
 
