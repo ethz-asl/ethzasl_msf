@@ -91,7 +91,9 @@ PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PoseSensorHandler(
       enable_tcp_no_delay ? ros::TransportHints().tcpNoDelay()
                           : ros::TransportHints());
   subOdometry_ = nh.subscribe<nav_msgs::Odometry>(
-      "odometry_input", 20, &PoseSensorHandler::MeasurementCallback, this);
+      "odometry_input", 20, &PoseSensorHandler::MeasurementCallback, this,
+      enable_tcp_no_delay ? ros::TransportHints().tcpNoDelay()
+                          : ros::TransportHints());
 
   z_p_.setZero();
   z_q_.setIdentity();
