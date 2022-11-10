@@ -201,37 +201,36 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
   ProcessPoseMeasurement(msg);
 }
 
-    template <typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
-    void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
-            const nav_msgs::OdometryConstPtr& msg) {
-        this->SequenceWatchDog(msg->header.seq, subOdometry_.getTopic());
-        MSF_INFO_STREAM_ONCE("*** pose sensor got first measurement from topic "
-                                     << this->topic_namespace_ << "/"
-                                     << subOdometry_.getTopic() << " ***");
+template <typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
+void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
+    const nav_msgs::OdometryConstPtr &msg) {
+  this->SequenceWatchDog(msg->header.seq, subOdometry_.getTopic());
+  MSF_INFO_STREAM_ONCE("*** pose sensor got first measurement from topic "
+                       << this->topic_namespace_ << "/"
+                       << subOdometry_.getTopic() << " ***");
 
-        double time_now = msg->header.stamp.toSec();
-        const double epsilon = 0.001;  // Small time correction to avoid rounding
-        // errors in the timestamps.
-        if (time_now - timestamp_previous_pose_ <=
-            pose_measurement_minimum_dt_ - epsilon) {
-            MSF_WARN_STREAM_THROTTLE(
-                    30,
-                    "Pose measurement throttling is on, dropping messages"
-                    "to be below " +
-                    std::to_string(1 / pose_measurement_minimum_dt_) + " Hz");
-            return;
-        }
+  double time_now = msg->header.stamp.toSec();
+  const double epsilon = 0.001; // Small time correction to avoid rounding
+  // errors in the timestamps.
+  if (time_now - timestamp_previous_pose_ <=
+      pose_measurement_minimum_dt_ - epsilon) {
+    MSF_WARN_STREAM_THROTTLE(
+        30, "Pose measurement throttling is on, dropping messages"
+            "to be below " +
+                std::to_string(1 / pose_measurement_minimum_dt_) + " Hz");
+    return;
+  }
 
-        timestamp_previous_pose_ = time_now;
+  timestamp_previous_pose_ = time_now;
 
-        geometry_msgs::PoseWithCovarianceStampedPtr pose(
-                new geometry_msgs::PoseWithCovarianceStamped());
+  geometry_msgs::PoseWithCovarianceStampedPtr pose(
+      new geometry_msgs::PoseWithCovarianceStamped());
 
-        pose->header = msg->header;
-        pose->pose = msg->pose;
+  pose->header = msg->header;
+  pose->pose = msg->pose;
 
-        ProcessPoseMeasurement(pose);
-    }
+  ProcessPoseMeasurement(pose);
+}
 
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
