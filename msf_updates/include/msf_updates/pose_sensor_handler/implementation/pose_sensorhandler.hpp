@@ -144,6 +144,20 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
     const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg) {
   received_first_measurement_ = true;
 
+  // Measurement throttling.
+  double time_now = msg->header.stamp.toSec();
+  const double epsilon = 0.001; // Small time correction to avoid rounding
+  // errors in the timestamps.
+  if (time_now - timestamp_previous_pose_ <=
+      pose_measurement_minimum_dt_ - epsilon) {
+    MSF_WARN_STREAM_THROTTLE(
+        30, "Pose measurement throttling is on, dropping messages"
+            "to be below " +
+                std::to_string(1 / pose_measurement_minimum_dt_) + " Hz");
+    return;
+  }
+  timestamp_previous_pose_ = time_now;
+
   // Get the fixed states.
   int fixedstates = 0;
   static_assert(msf_updates::EKFState::nStateVarsAtCompileTime < 32, "Your state "
@@ -188,6 +202,7 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
 
   this->manager_.msf_core_->AddMeasurement(meas);
 }
+
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
     const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg) {
@@ -209,20 +224,6 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
                        << this->topic_namespace_ << "/"
                        << subOdometry_.getTopic() << " ***");
 
-  double time_now = msg->header.stamp.toSec();
-  const double epsilon = 0.001; // Small time correction to avoid rounding
-  // errors in the timestamps.
-  if (time_now - timestamp_previous_pose_ <=
-      pose_measurement_minimum_dt_ - epsilon) {
-    MSF_WARN_STREAM_THROTTLE(
-        30, "Pose measurement throttling is on, dropping messages"
-            "to be below " +
-                std::to_string(1 / pose_measurement_minimum_dt_) + " Hz");
-    return;
-  }
-
-  timestamp_previous_pose_ = time_now;
-
   geometry_msgs::PoseWithCovarianceStampedPtr pose(
       new geometry_msgs::PoseWithCovarianceStamped());
 
@@ -240,17 +241,6 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
       "*** pose sensor got first measurement from topic "
           << this->topic_namespace_ << "/" << subTransformStamped_.getTopic()
           << " ***");
-
-  double time_now = msg->header.stamp.toSec();
-  const double epsilon = 0.001; // Small time correction to avoid rounding errors in the timestamps.
-  if (time_now - timestamp_previous_pose_ <= pose_measurement_minimum_dt_ - epsilon) {
-    MSF_WARN_STREAM_THROTTLE(30, "Pose measurement throttling is on, dropping messages"
-                             "to be below " +
-                             std::to_string(1/pose_measurement_minimum_dt_) + " Hz");
-    return;
-  }
-
-  timestamp_previous_pose_ = time_now;
 
   geometry_msgs::PoseWithCovarianceStampedPtr pose(
       new geometry_msgs::PoseWithCovarianceStamped());
