@@ -92,8 +92,7 @@ PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PoseSensorHandler(
       enable_tcp_no_delay ? ros::TransportHints().tcpNoDelay()
                           : ros::TransportHints());
 
-
-    z_p_.setZero();
+  z_p_.setZero();
   z_q_.setIdentity();
 
   if (distortmeas) {
