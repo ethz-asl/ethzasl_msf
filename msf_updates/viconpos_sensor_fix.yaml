@@ -3,6 +3,7 @@
 
 #########IMU PARAMETERS#######
 ######## Asctec Firefly IMU
+/pose_sensor/core/enable_tcp_no_delay: false
 /pose_sensor/core/core_noise_acc: 0.083
 /pose_sensor/core/core_noise_accbias: 0.0083
 /pose_sensor/core/core_noise_gyr: 0.0013
@@ -35,5 +36,6 @@
 /pose_sensor/pose_sensor/pose_absolute_measurements: true
 /pose_sensor/pose_sensor/pose_use_fixed_covariance: true
 /pose_sensor/pose_sensor/pose_measurement_world_sensor: true  # selects if sensor measures its position w.r.t. world (true, e.g. Vicon) or the position of the world coordinate system w.r.t. the sensor (false, e.g. ethzasl_ptam
+/pose_sensor/pose_sensor/enable_tcp_no_delay: false
 
 /pose_sensor/pose_sensor/pose_measurement_minimum_dt: 0.05  # Sets the minimum time in seconds between two pose measurements.

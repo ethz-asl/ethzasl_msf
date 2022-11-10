@@ -30,12 +30,21 @@ PressureSensorHandler::PressureSensorHandler(
   ros::NodeHandle pnh("~/pressure_sensor");
   ros::NodeHandle nh("msf_updates");
 
-  pnh.param("enable_mah_outlier_rejection", enable_mah_outlier_rejection_, false);
+  bool enable_tcp_no_delay;
+  pnh.param("enable_tcp_no_delay", enable_tcp_no_delay, false);
+  pnh.param("enable_mah_outlier_rejection", enable_mah_outlier_rejection_,
+            false);
   pnh.param("mah_threshold", mah_threshold_, msf_core::kDefaultMahThreshold_);
 
-  subPressure_ =
-      nh.subscribe<geometry_msgs::PointStamped>
-      ("pressure_height", 20, &PressureSensorHandler::MeasurementCallback, this);
+  MSF_INFO_STREAM_COND(enable_tcp_no_delay,
+                       "Pressure sensor uses TCP no delay.");
+  MSF_INFO_STREAM_COND(!enable_tcp_no_delay,
+                       "Pressure sensor does not use TCP no delay.");
+
+  subPressure_ = nh.subscribe<geometry_msgs::PointStamped>(
+      "pressure_height", 20, &PressureSensorHandler::MeasurementCallback, this,
+      enable_tcp_no_delay ? ros::TransportHints().tcpNoDelay()
+                          : ros::TransportHints());
 
   memset(heightbuff, 0, sizeof(double) * heightbuffsize);
 
