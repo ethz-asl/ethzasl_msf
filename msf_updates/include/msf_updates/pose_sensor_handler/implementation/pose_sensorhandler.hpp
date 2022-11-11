@@ -87,6 +87,10 @@ PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::PoseSensorHandler(
       "pose_input", 20, &PoseSensorHandler::MeasurementCallback, this,
       enable_tcp_no_delay ? ros::TransportHints().tcpNoDelay()
                           : ros::TransportHints());
+  subOdometry_ = nh.subscribe<nav_msgs::Odometry>(
+      "odometry_input", 20, &PoseSensorHandler::MeasurementCallback, this,
+      enable_tcp_no_delay ? ros::TransportHints().tcpNoDelay()
+                          : ros::TransportHints());
 
   z_p_.setZero();
   z_q_.setIdentity();
@@ -140,6 +144,20 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
     const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg) {
   received_first_measurement_ = true;
 
+  // Measurement throttling.
+  double time_now = msg->header.stamp.toSec();
+  const double epsilon = 0.001; // Small time correction to avoid rounding
+  // errors in the timestamps.
+  if (time_now - timestamp_previous_pose_ <=
+      pose_measurement_minimum_dt_ - epsilon) {
+    MSF_WARN_STREAM_THROTTLE(
+        30, "Pose measurement throttling is on, dropping messages"
+            "to be below " +
+                std::to_string(1 / pose_measurement_minimum_dt_) + " Hz");
+    return;
+  }
+  timestamp_previous_pose_ = time_now;
+
   // Get the fixed states.
   int fixedstates = 0;
   static_assert(msf_updates::EKFState::nStateVarsAtCompileTime < 32, "Your state "
@@ -184,6 +202,7 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::ProcessPoseMeasurement(
 
   this->manager_.msf_core_->AddMeasurement(meas);
 }
+
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
     const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg) {
@@ -197,6 +216,23 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
   ProcessPoseMeasurement(msg);
 }
 
+template <typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
+void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
+    const nav_msgs::OdometryConstPtr &msg) {
+  this->SequenceWatchDog(msg->header.seq, subOdometry_.getTopic());
+  MSF_INFO_STREAM_ONCE("*** pose sensor got first measurement from topic "
+                       << this->topic_namespace_ << "/"
+                       << subOdometry_.getTopic() << " ***");
+
+  geometry_msgs::PoseWithCovarianceStampedPtr pose(
+      new geometry_msgs::PoseWithCovarianceStamped());
+
+  pose->header = msg->header;
+  pose->pose = msg->pose;
+
+  ProcessPoseMeasurement(pose);
+}
+
 template<typename MEASUREMENT_TYPE, typename MANAGER_TYPE>
 void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
     const geometry_msgs::TransformStampedConstPtr & msg) {
@@ -205,17 +241,6 @@ void PoseSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::MeasurementCallback(
       "*** pose sensor got first measurement from topic "
           << this->topic_namespace_ << "/" << subTransformStamped_.getTopic()
           << " ***");
-
-  double time_now = msg->header.stamp.toSec();
-  const double epsilon = 0.001; // Small time correction to avoid rounding errors in the timestamps.
-  if (time_now - timestamp_previous_pose_ <= pose_measurement_minimum_dt_ - epsilon) {
-    MSF_WARN_STREAM_THROTTLE(30, "Pose measurement throttling is on, dropping messages"
-                             "to be below " +
-                             std::to_string(1/pose_measurement_minimum_dt_) + " Hz");
-    return;
-  }
-
-  timestamp_previous_pose_ = time_now;
 
   geometry_msgs::PoseWithCovarianceStampedPtr pose(
       new geometry_msgs::PoseWithCovarianceStamped());
