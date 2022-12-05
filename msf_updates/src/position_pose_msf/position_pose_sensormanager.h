@@ -213,6 +213,7 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
 
     q = yawq;
     q_wv = (q * q_ic * q_vc.conjugate()).conjugate(); // Wrong notation! q_wv is actually q_vw!
+    // TODO: check if q_wv is used everywhere as q_vw & rename!
 
     MSF_WARN_STREAM("q " << STREAMQUAT(q));
     MSF_WARN_STREAM("q_wv " << STREAMQUAT(q_wv));
@@ -226,7 +227,7 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     p_wv = p - p_vision;  // Shift the vision frame so that it fits the position
     // measurement
 
-    a_m = q.inverse() * g;			    /// Initial acceleration.
+    a_m = (q.inverse() * g) - b_a;			    /// De-biased initial acceleration.
 
     //TODO (slynen) Fix this.
     //we want z from vision (we did scale init), so:

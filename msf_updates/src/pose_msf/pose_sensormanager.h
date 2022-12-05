@@ -158,8 +158,6 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
 
     // init values
     g << 0, 0, 9.81;	        /// Gravity.
-    b_w << 0, 0, 0;		/// Bias gyroscopes.
-    b_a << 0, 0, 0;		/// Bias accelerometer.
 
     v << 0, 0, 0;			/// Robot velocity (IMU centered).
     w_m << 0, 0, 0;		/// Initial angular velocity.
@@ -184,6 +182,17 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
           "No measurements received yet to initialize attitude - using [1 0 0 0]");
 
     ros::NodeHandle pnh("~");
+    pnh.param("core/init/b_w/x", b_w[0], 0.0);
+    pnh.param("core/init/b_w/y", b_w[1], 0.0);
+    pnh.param("core/init/b_w/z", b_w[2], 0.0);
+
+    pnh.param("core/init/b_a/x", b_a[0], 0.0);
+    pnh.param("core/init/b_a/y", b_a[1], 0.0);
+    pnh.param("core/init/b_a/z", b_a[2], 0.0);
+
+    MSF_INFO_STREAM("b_a: " << b_a.transpose());
+    MSF_INFO_STREAM("b_w: " << b_w.transpose());
+
     pnh.param("pose_sensor/init/p_ic/x", p_ic[0], 0.0);
     pnh.param("pose_sensor/init/p_ic/y", p_ic[1], 0.0);
     pnh.param("pose_sensor/init/p_ic/z", p_ic[2], 0.0);
@@ -205,7 +214,7 @@ class PoseSensorManager : public msf_core::MSF_SensorManagerROS<
     p = p_wv + q_wv.conjugate().toRotationMatrix() * p_vc / scale
         - q.toRotationMatrix() * p_ic;
 
-    a_m = q.inverse() * g;			/// Initial acceleration.
+    a_m = (q.inverse() * g) - b_a;			/// De-biased initial acceleration.
 
     // Prepare init "measurement"
     // True means that this message contains initial sensor readings.
