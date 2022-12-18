@@ -78,6 +78,9 @@ public:
   Eigen::Quaterniond GetAttitudeMeasurement() {
     return z_q_;
   }
+  bool IsMeasurementWorldToSensor() const {
+    return measurement_world_sensor_;
+  }
   //setters for configure values
   void SetNoises(double n_zp, double n_zq);
   void SetDelay(double delay);
