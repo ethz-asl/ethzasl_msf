@@ -168,12 +168,12 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
 
     // Check if we have already input from the measurement sensor.
     if (!pose_handler_->ReceivedFirstMeasurement())
-      MSF_WARN_STREAM(
+      MSF_ERROR_STREAM(
           "No measurements received yet to initialize vision position and attitude - "
-          "using [0 0 0] and [1 0 0 0] respectively");
+          "cannot initialize filter.");
     if (!position_handler_->ReceivedFirstMeasurement())
-      MSF_WARN_STREAM(
-          "No measurements received yet to initialize absolute position - using [0 0 0]");
+      MSF_ERROR_STREAM(
+          "No measurements received yet to initialize absolute position - cannot initialize filter.");
 
     ros::NodeHandle pnh("~");
     pnh.param("core/init/b_w/x", b_w[0], 0.0);
@@ -207,18 +207,21 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     // Calculate initial attitude and position based on sensor measurements
     // here we take the attitude from the pose sensor and augment it with
     // global yaw init.
-    double yawinit = config_.position_yaw_init / 180 * M_PI;
-    Eigen::Quaterniond yawq(cos(yawinit / 2), 0, 0, sin(yawinit / 2));
+    // TODO: assumes that world frame & body frame is gravity aligned.. not always the case..
+    // TODO: compute rotation relative to gravity of IMU and pass as ros-parameter?
+    double yawinit = config_.position_yaw_init / 180. * M_PI;
+    Eigen::Quaterniond yawq(cos(yawinit / 2.), 0., 0., sin(yawinit / 2.));
     yawq.normalize();
 
     q = yawq;
-    q_wv = (q * q_ic * q_vc.conjugate()).conjugate(); // Wrong notation! q_wv is actually q_vw!
+    q_wv = (q * q_ic * q_vc.conjugate()); //.conjugate(); // Wrong notation! q_wv is actually q_vw!
     // TODO: check if q_wv is used everywhere as q_vw & rename!
 
     MSF_WARN_STREAM("q " << STREAMQUAT(q));
     MSF_WARN_STREAM("q_wv " << STREAMQUAT(q_wv));
 
-    Eigen::Matrix<double, 3, 1> p_vision = q_wv.conjugate() * p_vc / scale - q * p_ic; // W_p_VI
+//    Eigen::Matrix<double, 3, 1> p_vision = q_wv.conjugate() * p_vc / scale - q * p_ic; // W_p_VI
+    Eigen::Matrix<double, 3, 1> p_vision = q_wv * p_vc / scale - q * p_ic; // W_p_VI
 
     //TODO (slynen): what if there is no initial position measurement? Then we
     // have to shift vision-world later on, before applying the first position
