@@ -28,6 +28,9 @@
 #include <msf_updates/PosePressureSensorConfig.h>
 #include <msf_updates/SinglePoseSensorConfig.h>
 
+#include "sensor_fusion_comm/InitScale.h"
+
+
 namespace msf_pose_pressure_sensor {
 
 typedef msf_updates::PosePressureSensorConfig Config_T;
@@ -64,6 +67,9 @@ class PosePressureSensorManager : public msf_core::MSF_SensorManagerROS<
     ReconfigureServer::CallbackType f = boost::bind(
         &PosePressureSensorManager::Config, this, _1, _2);
     reconf_server_->setCallback(f);
+
+    init_scale_srv_ = pnh.advertiseService("initialize_msf_scale",
+                                           &PosePressureSensorManager::InitScale, this);
   }
 
   virtual ~PosePressureSensorManager() {
@@ -80,6 +86,7 @@ class PosePressureSensorManager : public msf_core::MSF_SensorManagerROS<
 
   Config_T config_;
   ReconfigureServerPtr reconf_server_;
+  ros::ServiceServer init_scale_srv_;
 
   /**
    * \brief Dynamic reconfigure callback.
@@ -112,6 +119,14 @@ class PosePressureSensorManager : public msf_core::MSF_SensorManagerROS<
     pressure_handler_->SetNoises(config.press_noise_meas_p);
   }
 
+  bool InitScale(sensor_fusion_comm::InitScale::Request &req,
+                 sensor_fusion_comm::InitScale::Response &res) {
+    ROS_INFO("Initialize filter with scale %f", req.scale);
+    Init(req.scale);
+    res.result = "Initialized scale";
+    return true;
+  }
+
   void Init(double scale) const {
     Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ic, p_vc;
     Eigen::Quaternion<double> q, q_wv, q_ic, q_vc;
@@ -120,8 +135,6 @@ class PosePressureSensorManager : public msf_core::MSF_SensorManagerROS<
 
     // init values
     g << 0, 0, 9.81;	/// Gravity.
-    b_w << 0, 0, 0;		/// Bias gyroscopes.
-    b_a << 0, 0, 0;		/// Bias accelerometer.
 
     v << 0, 0, 0;			/// Robot velocity (IMU centered).
     w_m << 0, 0, 0;		/// Initial angular velocity.
@@ -145,6 +158,17 @@ class PosePressureSensorManager : public msf_core::MSF_SensorManagerROS<
           "using [0 0 0] and [1 0 0 0] respectively");
 
     ros::NodeHandle pnh("~");
+    pnh.param("core/init/b_w/x", b_w[0], 0.0);
+    pnh.param("core/init/b_w/y", b_w[1], 0.0);
+    pnh.param("core/init/b_w/z", b_w[2], 0.0);
+
+    pnh.param("core/init/b_a/x", b_a[0], 0.0);
+    pnh.param("core/init/b_a/y", b_a[1], 0.0);
+    pnh.param("core/init/b_a/z", b_a[2], 0.0);
+
+    MSF_INFO_STREAM("b_a: " << b_a.transpose());
+    MSF_INFO_STREAM("b_w: " << b_w.transpose());
+
     pnh.param("pose_sensor/init/p_ic/x", p_ic[0], 0.0);
     pnh.param("pose_sensor/init/p_ic/y", p_ic[1], 0.0);
     pnh.param("pose_sensor/init/p_ic/z", p_ic[2], 0.0);
@@ -165,7 +189,7 @@ class PosePressureSensorManager : public msf_core::MSF_SensorManagerROS<
     p = q_wv.conjugate().toRotationMatrix() * p_vc / scale
         - q.toRotationMatrix() * p_ic;
 
-    a_m = q.inverse() * g;			/// Initial acceleration.
+    a_m = (q.inverse() * g) - b_a;			/// De-biased initial acceleration.
 
     // Prepare init "measurement".
     // True menas that we will also set the initial sensor readings.
