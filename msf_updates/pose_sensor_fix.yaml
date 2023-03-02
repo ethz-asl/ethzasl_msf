@@ -30,6 +30,8 @@ core/core_fixed_bias: false
 core/core_noise_accbias: 8e-5     # [m/s^3/sqrt(Hz)]
 core/core_noise_gyrbias: 3e-6     # [rad/s^2/sqrt(Hz)]
 
+core/enable_tcp_no_delay: false
+
 ####### mpu6000
 #core/core_noise_acc: 0.003924    # [m/s^2/sqrt(Hz)] mpu6000 datasheet
 #core/core_noise_gyr: 0.00008726  # [rad/s/sqrt(Hz)] mpu6000 datasheet
@@ -42,6 +44,7 @@ core/core_noise_gyrbias: 3e-6     # [rad/s^2/sqrt(Hz)]
 #########Pose Sensor Parameters #######
 #######################################
 pose_sensor/pose_absolute_measurements: true
+pose_sensor/enable_tcp_no_delay: false
 pose_sensor/pose_measurement_world_sensor: false  # Selects if sensor measures its position 
                                                   # w.r.t. world (true, e.g. Vicon) or the position 
                                                   # of the world coordinate system w.r.t. the 

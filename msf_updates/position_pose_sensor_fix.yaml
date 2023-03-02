@@ -2,6 +2,7 @@
 data_playback: true
 
 core/core_fixed_bias: false
+core/enable_tcp_no_delay: false
 
 #########IMU PARAMETERS#######
 ####### bluebird
@@ -50,10 +51,12 @@ position_pose_sensor/pose_fixed_p_ic: false
 position_pose_sensor/pose_fixed_q_ic: false
 position_pose_sensor/pose_fixed_p_wv: false
 position_pose_sensor/pose_fixed_q_wv: false
+position_pose_sensor/enable_tcp_no_delay: false
 
 pose_sensor/pose_absolute_measurements: false
 pose_sensor/pose_use_fixed_covariance: false
 pose_sensor/pose_measurement_world_sensor: false  # selects if sensor measures its position w.r.t. world (true, e.g. Vicon) or the position of the world coordinate system w.r.t. the sensor (false, e.g. ethzasl_ptam)
+pose_sensor/enable_tcp_no_delay: false
 
 position_pose_sensor/position_delay: 0.001
 position_pose_sensor/position_noise_meas: 0.1
@@ -70,5 +73,6 @@ position_pose_sensor/position_yaw_init: -128.0
 position_pose_sensor/position_fixed_p_ip: true
 position_sensor/position_use_fixed_covariance: false
 position_sensor/position_absolute_measurements: true
+position_sensor/enable_tcp_no_delay: false
 
 

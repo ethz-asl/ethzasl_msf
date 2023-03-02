@@ -35,10 +35,27 @@ class IMUHandler_ROS : public IMUHandler<EKFState_T> {
 
     ros::NodeHandle nh(topic_namespace);
 
-    subImu_ = nh.subscribe("imu_state_input", 100, &IMUHandler_ROS::IMUCallback,
-                           this);
-    subState_ = nh.subscribe("hl_state_input", 10,
-                             &IMUHandler_ROS::StateCallback, this);
+    MSF_INFO_STREAM_COND(
+        static_cast<MSF_SensorManagerROS<EKFState_T> &>(this->manager_)
+            .GetParamEnableTcpNoDelay(),
+        "IMU sensor uses TCP no delay.");
+    MSF_INFO_STREAM_COND(
+        !static_cast<MSF_SensorManagerROS<EKFState_T> &>(this->manager_)
+             .GetParamEnableTcpNoDelay(),
+        "IMU sensor does not use TCP no delay.");
+
+    subImu_ = nh.subscribe(
+        "imu_state_input", 100, &IMUHandler_ROS::IMUCallback, this,
+        static_cast<MSF_SensorManagerROS<EKFState_T> &>(this->manager_)
+                .GetParamEnableTcpNoDelay()
+            ? ros::TransportHints().tcpNoDelay()
+            : ros::TransportHints());
+    subState_ = nh.subscribe(
+        "hl_state_input", 10, &IMUHandler_ROS::StateCallback, this,
+        static_cast<MSF_SensorManagerROS<EKFState_T> &>(this->manager_)
+                .GetParamEnableTcpNoDelay()
+            ? ros::TransportHints().tcpNoDelay()
+            : ros::TransportHints());
   }
 
   virtual ~IMUHandler_ROS() { }

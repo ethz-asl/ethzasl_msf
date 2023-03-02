@@ -34,6 +34,8 @@ AngleSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::AngleSensorHandler(
       delay_(0) {
   ros::NodeHandle pnh("~/spherical_position_sensor");
   pnh.param("use_fixed_covariance", use_fixed_covariance_, true);
+  bool enable_tcp_no_delay;
+  pnh.param("enable_tcp_no_delay", enable_tcp_no_delay, false);
   pnh.param("absolute_measurements", provides_absolute_measurements_, false);
   pnh.param("enable_mah_outlier_rejection", enable_mah_outlier_rejection_, false);
   pnh.param("mah_threshold", mah_threshold_, msf_core::kDefaultMahThreshold_);
@@ -43,6 +45,10 @@ AngleSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::AngleSensorHandler(
   ROS_INFO_COND(!use_fixed_covariance_,
                 "Angle sensor is using covariance from sensor");
 
+  MSF_INFO_STREAM_COND(enable_tcp_no_delay, "Angle sensor uses TCP no delay.");
+  MSF_INFO_STREAM_COND(!enable_tcp_no_delay,
+                       "Angle sensor does not use TCP no delay.");
+
   ROS_INFO_COND(provides_absolute_measurements_,
                 "Angle sensor is handling measurements as absolute values");
   ROS_INFO_COND(!provides_absolute_measurements_,
@@ -50,8 +56,10 @@ AngleSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::AngleSensorHandler(
 
   ros::NodeHandle nh("msf_updates");
 
-  subPointStamped_ = nh.subscribe<geometry_msgs::PointStamped>
-      ("angle_input", 20, &AngleSensorHandler::MeasurementCallback, this);
+  subPointStamped_ = nh.subscribe<geometry_msgs::PointStamped>(
+      "angle_input", 20, &AngleSensorHandler::MeasurementCallback, this,
+      enable_tcp_no_delay ? ros::TransportHints().tcpNoDelay()
+                          : ros::TransportHints());
 
   z_a_.setZero();
 
@@ -130,6 +138,8 @@ DistanceSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::DistanceSensorHandler(
       delay_(0) {
   ros::NodeHandle pnh("~/spherical_position_sensor");
   pnh.param("use_fixed_covariance", use_fixed_covariance_, true);
+  bool enable_tcp_no_delay;
+  pnh.param("enable_tcp_no_delay", enable_tcp_no_delay, false);
   pnh.param("absolute_measurements", provides_absolute_measurements_, false);
   pnh.param("enable_mah_outlier_rejection", enable_mah_outlier_rejection_, false);
   pnh.param("mah_threshold", mah_threshold_, msf_core::kDefaultMahThreshold_);
@@ -139,6 +149,11 @@ DistanceSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::DistanceSensorHandler(
   ROS_INFO_COND(!use_fixed_covariance_,
                 "Distance sensor is using covariance from sensor");
 
+  MSF_INFO_STREAM_COND(enable_tcp_no_delay,
+                       "Distance sensor uses TCP no delay.");
+  MSF_INFO_STREAM_COND(!enable_tcp_no_delay,
+                       "Distance sensor does not use TCP no delay.");
+
   ROS_INFO_COND(provides_absolute_measurements_,
                 "Distance sensor is handling measurements as absolute values");
   ROS_INFO_COND(!provides_absolute_measurements_,
@@ -146,9 +161,10 @@ DistanceSensorHandler<MEASUREMENT_TYPE, MANAGER_TYPE>::DistanceSensorHandler(
 
   ros::NodeHandle nh("msf_updates");
 
-  subPointStamped_ =
-      nh.subscribe<geometry_msgs::PointStamped>
-      ("distance_input", 20, &DistanceSensorHandler::MeasurementCallback, this);
+  subPointStamped_ = nh.subscribe<geometry_msgs::PointStamped>(
+      "distance_input", 20, &DistanceSensorHandler::MeasurementCallback, this,
+      enable_tcp_no_delay ? ros::TransportHints().tcpNoDelay()
+                          : ros::TransportHints());
 
   z_d_.setZero();
 

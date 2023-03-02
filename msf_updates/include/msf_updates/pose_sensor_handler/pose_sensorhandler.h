@@ -23,6 +23,7 @@
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <nav_msgs/Odometry.h>
 #include <msf_updates/PoseDistorter.h>
 
 namespace msf_pose_sensor {
@@ -32,8 +33,8 @@ class PoseSensorHandler : public msf_core::SensorHandler<
     typename msf_updates::EKFState> {
  private:
 
-  Eigen::Quaternion<double> z_q_;  ///< Attitude measurement camera seen from world.
-  Eigen::Matrix<double, 3, 1> z_p_;  ///< Position measurement camera seen from world.
+  Eigen::Quaternion<double> z_q_;  ///< Attitude measurement camera seen from world. (q_vc)
+  Eigen::Matrix<double, 3, 1> z_p_;  ///< Position measurement camera seen from world. (v_p_vc)
   double n_zp_, n_zq_;  ///< Position and attitude measurement noise.
   double delay_;        ///< Delay to be subtracted from the ros-timestamp of
   // the measurement provided by this sensor.
@@ -41,6 +42,7 @@ class PoseSensorHandler : public msf_core::SensorHandler<
   ros::Subscriber subPoseWithCovarianceStamped_;
   ros::Subscriber subTransformStamped_;
   ros::Subscriber subPoseStamped_;
+  ros::Subscriber subOdometry_;
 
   bool measurement_world_sensor_;  ///< Defines if the pose of the sensor is
                                    // measured in world coordinates (true, default)
@@ -62,8 +64,10 @@ class PoseSensorHandler : public msf_core::SensorHandler<
       const geometry_msgs::PoseWithCovarianceStampedConstPtr & msg);
   void MeasurementCallback(const geometry_msgs::PoseStampedConstPtr & msg);
   void MeasurementCallback(const geometry_msgs::TransformStampedConstPtr & msg);
+  void MeasurementCallback(const nav_msgs::OdometryConstPtr & msg);
 
- public:
+
+public:
   typedef MEASUREMENT_TYPE measurement_t;
   PoseSensorHandler(MANAGER_TYPE& meas, std::string topic_namespace,
                     std::string parameternamespace, bool distortmeas);
