@@ -56,3 +56,4 @@ jobs:
 
       - name: Run ethzasl_msf tests
         run: source /opt/ros/${{ env.rosdistro }}/setup.bash && catkin run_tests msf_core msf_timing
+        shell: bash
