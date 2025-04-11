@@ -1,11 +1,6 @@
 name: Build ethzasl_msf
 on:
   push:
-    branches:
-      - "master"
-  pull_request:
-    branches:
-      - "master"
   schedule:
     - cron: '0 0 * * 0' # every Sunday at midnight
 
