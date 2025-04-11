@@ -30,6 +30,13 @@ jobs:
           update-alternatives --set g++ /usr/bin/g++-${{ matrix.gcc}}
           gcc --version
           g++ --version
+
+      - uses: actions/checkout@v4
+        name: Checkout catkin_simple
+        with:
+          repository: catkin/catkin_simple
+          path: catkin_ws/src/catkin_simple
+
       - uses: actions/checkout@v4
         name: Checkout glog_catkin
         with:
