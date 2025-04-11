@@ -53,3 +53,6 @@ jobs:
         run: source /opt/ros/${{ env.rosdistro }}/setup.bash && catkin build ethzasl_msf && source ${GITHUB_WORKSPACE}/catkin_ws/devel/setup.bash
         working-directory: catkin_ws
         shell: bash
+
+      - name: Run ethzasl_msf tests
+        run: source /opt/ros/${{ env.rosdistro }}/setup.bash && catkin run_tests msf_core msf_timing
