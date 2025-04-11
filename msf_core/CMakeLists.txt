@@ -14,7 +14,7 @@ add_definitions(-DBOOST_NO_CXX11_VARIADIC_TEMPLATES)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake/)
 
-find_package(catkin REQUIRED COMPONENTS sensor_msgs dynamic_reconfigure msf_timing tf glog_catkin cmake_modules)
+find_package(catkin REQUIRED COMPONENTS sensor_msgs dynamic_reconfigure msf_timing tf glog_catkin cmake_modules sensor_fusion_comm)
 find_package(Eigen REQUIRED)
 
 find_package(Doxygen)
