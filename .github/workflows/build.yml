@@ -41,3 +41,8 @@ jobs:
         with:
           repository: ethz-asl/ethzasl_msf
           path: catkin_ws/src/ethzasl_msf
+
+      - name: Build ethzasl_msf
+        run: source /opt/ros/${{ matrix.rosdistro }}/setup.bash && catkin build ethzasl_msf && source ${GITHUB_WORKSPACE}/catkin_ws/devel/setup.bash
+        working-directory: catkin_ws
+        shell: bash
