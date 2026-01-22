@@ -29,6 +29,9 @@
 #include <msf_updates/position_sensor_handler/position_measurement.h>
 #include <msf_updates/PositionPoseSensorConfig.h>
 
+#include "sensor_fusion_comm/InitScale.h"
+
+
 namespace msf_updates {
 
 typedef msf_updates::PositionPoseSensorConfig Config_T;
@@ -64,13 +67,16 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     AddHandler(pose_handler_);
 
     position_handler_.reset(
-        new PositionSensorHandler_T(*this, "", "position_sensor"));
+        new PositionSensorHandler_T(*this, "position_sensor", "position_sensor"));
     AddHandler(position_handler_);
 
     reconf_server_.reset(new ReconfigureServer(pnh));
     ReconfigureServer::CallbackType f = boost::bind(&this_T::Config, this, _1,
                                                     _2);
     reconf_server_->setCallback(f);
+
+    init_scale_srv_ = pnh.advertiseService("initialize_msf_scale",
+                                             &PositionPoseSensorManager::InitScale, this);
   }
   virtual ~PositionPoseSensorManager() {
   }
@@ -86,8 +92,9 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
 
   Config_T config_;
   ReconfigureServerPtr reconf_server_;  ///< Dynamic reconfigure server.
+  ros::ServiceServer init_scale_srv_;
 
-  /**
+    /**
    * \brief Dynamic reconfigure callback.
    */
   virtual void Config(Config_T &config, uint32_t level) {
@@ -121,6 +128,14 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     }
   }
 
+  bool InitScale(sensor_fusion_comm::InitScale::Request &req,
+                 sensor_fusion_comm::InitScale::Response &res) {
+      ROS_INFO("Initialize filter with scale %f", req.scale);
+      Init(req.scale);
+      res.result = "Initialized scale";
+      return true;
+    }
+
   void Init(double scale) const {
     Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ic, p_vc, p_wv,
         p_ip, p_pos;
@@ -129,11 +144,12 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
 
     // init values
     g << 0, 0, 9.81;	/// Gravity.
-    b_w << 0, 0, 0;		/// Bias gyroscopes.
-    b_a << 0, 0, 0;		/// Bias accelerometer.
 
     v << 0, 0, 0;			/// Robot velocity (IMU centered).
     w_m << 0, 0, 0;		/// Initial angular velocity.
+
+    q.setIdentity();
+    p.setZero();
 
     q_wv.setIdentity();  // World-vision rotation drift.
     p_wv.setZero();      // World-vision position drift.
@@ -160,6 +176,17 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
           "No measurements received yet to initialize absolute position - using [0 0 0]");
 
     ros::NodeHandle pnh("~");
+    pnh.param("core/init/b_w/x", b_w[0], 0.0);
+    pnh.param("core/init/b_w/y", b_w[1], 0.0);
+    pnh.param("core/init/b_w/z", b_w[2], 0.0);
+
+    pnh.param("core/init/b_a/x", b_a[0], 0.0);
+    pnh.param("core/init/b_a/y", b_a[1], 0.0);
+    pnh.param("core/init/b_a/z", b_a[2], 0.0);
+
+    MSF_INFO_STREAM("b_a: " << b_a.transpose());
+    MSF_INFO_STREAM("b_w: " << b_w.transpose());
+
     pnh.param("pose_sensor/init/p_ic/x", p_ic[0], 0.0);
     pnh.param("pose_sensor/init/p_ic/y", p_ic[1], 0.0);
     pnh.param("pose_sensor/init/p_ic/z", p_ic[2], 0.0);
@@ -185,22 +212,22 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     yawq.normalize();
 
     q = yawq;
-    q_wv = (q * q_ic * q_vc.conjugate()).conjugate();
+    q_wv = (q * q_ic * q_vc.conjugate()).conjugate(); // Wrong notation! q_wv is actually q_vw!
+    // TODO: check if q_wv is used everywhere as q_vw & rename!
 
     MSF_WARN_STREAM("q " << STREAMQUAT(q));
     MSF_WARN_STREAM("q_wv " << STREAMQUAT(q_wv));
 
-    Eigen::Matrix<double, 3, 1> p_vision = q_wv.conjugate().toRotationMatrix()
-        * p_vc / scale - q.toRotationMatrix() * p_ic;
+    Eigen::Matrix<double, 3, 1> p_vision = q_wv.conjugate() * p_vc / scale - q * p_ic; // W_p_VI
 
     //TODO (slynen): what if there is no initial position measurement? Then we
     // have to shift vision-world later on, before applying the first position
     // measurement.
-    p = p_pos - q.toRotationMatrix() * p_ip;
+    p = p_pos - q * p_ip;
     p_wv = p - p_vision;  // Shift the vision frame so that it fits the position
     // measurement
 
-    a_m = q.inverse() * g;			    /// Initial acceleration.
+    a_m = (q.inverse() * g) - b_a;			    /// De-biased initial acceleration.
 
     //TODO (slynen) Fix this.
     //we want z from vision (we did scale init), so:

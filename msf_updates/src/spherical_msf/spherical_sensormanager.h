@@ -26,6 +26,9 @@
 #include <msf_updates/spherical_position_sensor/spherical_measurement.h>
 #include <msf_updates/SphericalPositionSensorConfig.h>
 
+#include "sensor_fusion_comm/InitScale.h"
+
+
 namespace msf_spherical_position {
 
 typedef msf_updates::SphericalPositionSensorConfig Config_T;
@@ -56,6 +59,9 @@ class SensorManager : public msf_core::MSF_SensorManagerROS<
     ReconfigureServer::CallbackType f = boost::bind(&SensorManager::Config,
                                                     this, _1, _2);
     reconf_server_->setCallback(f);
+
+    init_scale_srv_ = pnh.advertiseService("initialize_msf_scale",
+                                           &SensorManager::InitScale, this);
   }
   virtual ~SensorManager() {
   }
@@ -70,6 +76,7 @@ class SensorManager : public msf_core::MSF_SensorManagerROS<
 
   Config_T config_;
   ReconfigureServerPtr reconf_server_;
+  ros::ServiceServer init_scale_srv_;
 
   /**
    * \brief Dynamic reconfigure callback.
@@ -88,6 +95,14 @@ class SensorManager : public msf_core::MSF_SensorManagerROS<
     }
   }
 
+  bool InitScale(sensor_fusion_comm::InitScale::Request &req,
+                 sensor_fusion_comm::InitScale::Response &res) {
+    ROS_INFO("Initialize filter with scale %f", req.scale);
+    Init(req.scale);
+    res.result = "Initialized scale";
+    return true;
+  }
+
   void Init(double scale) const {
     if (scale < 0.001) {
       ROS_WARN_STREAM("Init scale is " << scale << " correcting to 1.");
@@ -100,8 +115,6 @@ class SensorManager : public msf_core::MSF_SensorManagerROS<
 
     // Init values.
     g << 0, 0, 9.81;	        /// Gravity.
-    b_w << 0, 0, 0;		/// Bias gyroscopes.
-    b_a << 0, 0, 0;		/// Bias accelerometer.
 
     v << 0, 0, 0;			/// Robot velocity (IMU centered).
     w_m << 0, 0, 0;		/// Initial angular velocity.
@@ -134,6 +147,17 @@ class SensorManager : public msf_core::MSF_SensorManagerROS<
           "No measurements received yet to initialize position - using [0 0 0]");
 
     ros::NodeHandle pnh("~");
+    pnh.param("core/init/b_w/x", b_w[0], 0.0);
+    pnh.param("core/init/b_w/y", b_w[1], 0.0);
+    pnh.param("core/init/b_w/z", b_w[2], 0.0);
+
+    pnh.param("core/init/b_a/x", b_a[0], 0.0);
+    pnh.param("core/init/b_a/y", b_a[1], 0.0);
+    pnh.param("core/init/b_a/z", b_a[2], 0.0);
+
+    MSF_INFO_STREAM("b_a: " << b_a.transpose());
+    MSF_INFO_STREAM("b_w: " << b_w.transpose());
+
     pnh.param("position_sensor/init/p_ip/x", p_ip[0], 0.0);
     pnh.param("position_sensor/init/p_ip/y", p_ip[1], 0.0);
     pnh.param("position_sensor/init/p_ip/z", p_ip[2], 0.0);
@@ -141,7 +165,7 @@ class SensorManager : public msf_core::MSF_SensorManagerROS<
     // Calculate initial attitude and position based on sensor measurements.
     p = p_vc - q.toRotationMatrix() * p_ip;
 
-    a_m = q.inverse() * g;			/// Initial acceleration.
+    a_m = (q.inverse() * g) - b_a;			/// Initial acceleration.
 
     // Prepare init "measurement".
     shared_ptr < msf_core::MSF_InitMeasurement<EKFState_T>
