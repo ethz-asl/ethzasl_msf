@@ -11,6 +11,7 @@ set(CMAKE_BUILD_TYPE Release)
 
 #build with boost 1.6x
 add_definitions(-DBOOST_NO_CXX11_VARIADIC_TEMPLATES)
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 
 find_package(catkin REQUIRED COMPONENTS roscpp msf_core geometry_msgs sensor_fusion_comm)
 

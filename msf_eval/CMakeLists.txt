@@ -17,7 +17,7 @@ ptam_com)
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 
 catkin_package(
     DEPENDS opencv2
