@@ -1,0 +1,60 @@
+name: Build ethzasl_msf
+on:
+  push:
+  schedule:
+    - cron: '0 0 * * 0' # every Sunday at midnight
+
+jobs:
+  build:
+    runs-on: [self-hosted, linux]
+    env:
+      rosdistro: ${{ matrix.ubuntu == '20.04' && 'noetic' || 'one' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        gcc: [ '9', '10', '11' ]
+        ubuntu: [ '20.04', '22.04' ]
+    container:
+      image: omavteam/ubuntu-omav-ros:ros-desktop-${{ matrix.ubuntu }}
+      credentials:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    name: Ubuntu ${{ matrix.ubuntu }} - GCC ${{ matrix.gcc }}
+    steps:
+      - name: Install image-geometry
+        run: apt update && apt install -y ros-${{ env.rosdistro }}-image-geometry
+
+      - name: Switch GCC version
+        run: |
+          update-alternatives --set gcc /usr/bin/gcc-${{ matrix.gcc }}
+          update-alternatives --set g++ /usr/bin/g++-${{ matrix.gcc}}
+          gcc --version
+          g++ --version
+
+      - uses: actions/checkout@v4
+        name: Checkout catkin_simple
+        with:
+          repository: catkin/catkin_simple
+          path: catkin_ws/src/catkin_simple
+
+      - uses: actions/checkout@v4
+        name: Checkout glog_catkin
+        with:
+          repository: ethz-asl/glog_catkin
+          path: catkin_ws/src/glog_catkin
+
+      - uses: actions/checkout@v4
+        name: Checkout ethzasl_msf
+        with:
+          repository: ethz-asl/ethzasl_msf
+          path: catkin_ws/src/ethzasl_msf
+
+      - name: Build ethzasl_msf
+        run: source /opt/ros/${{ env.rosdistro }}/setup.bash && catkin build ethzasl_msf && source ${GITHUB_WORKSPACE}/catkin_ws/devel/setup.bash
+        working-directory: catkin_ws
+        shell: bash
+
+      - name: Run ethzasl_msf tests
+        run: source /opt/ros/${{ env.rosdistro }}/setup.bash && catkin run_tests msf_core msf_timing
+        working-directory: catkin_ws
+        shell: bash

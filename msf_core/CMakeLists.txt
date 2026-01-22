@@ -14,7 +14,7 @@ add_definitions(-DBOOST_NO_CXX11_VARIADIC_TEMPLATES)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake/)
 
-find_package(catkin REQUIRED COMPONENTS sensor_msgs dynamic_reconfigure msf_timing tf glog_catkin cmake_modules)
+find_package(catkin REQUIRED COMPONENTS sensor_msgs dynamic_reconfigure msf_timing tf glog_catkin cmake_modules sensor_fusion_comm)
 find_package(Eigen REQUIRED)
 
 find_package(Doxygen)
@@ -31,9 +31,9 @@ include_directories(include ${Eigen_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused-parameter")
 if (CMAKE_COMPILER_IS_GNUCC)
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 else()
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 endif()
 
 # Enable timing the core
