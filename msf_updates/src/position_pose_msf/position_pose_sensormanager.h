@@ -124,7 +124,7 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
   void Init(double scale) const {
     Eigen::Matrix<double, 3, 1> p, v, b_w, b_a, g, w_m, a_m, p_ic, p_vc, p_wv,
         p_ip, p_pos;
-    Eigen::Quaternion<double> q, q_wv, q_ic, q_vc;
+    Eigen::Quaternion<double> q, q_wv, q_ic, q_pose;
     msf_core::MSF_Core<EKFState_T>::ErrorStateCov P;
 
     // init values
@@ -143,10 +143,10 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     p_pos = position_handler_->GetPositionMeasurement();
 
     p_vc = pose_handler_->GetPositionMeasurement();
-    q_vc = pose_handler_->GetAttitudeMeasurement();
+    q_pose = pose_handler_->GetAttitudeMeasurement();  // Can be q_cv (vicon) or q_vc (ptam).
 
     MSF_INFO_STREAM(
-        "initial measurement vision: pos:["<<p_vc.transpose()<<"] orientation: " <<STREAMQUAT(q_vc));
+        "initial measurement vision: pos:["<<p_vc.transpose()<<"] orientation: " <<STREAMQUAT(q_pose));
     MSF_INFO_STREAM(
         "initial measurement position: pos:["<<p_pos.transpose()<<"]");
 
@@ -185,12 +185,17 @@ class PositionPoseSensorManager : public msf_core::MSF_SensorManagerROS<
     yawq.normalize();
 
     q = yawq;
-    q_wv = (q * q_ic * q_vc.conjugate()).conjugate();
+    if (pose_handler_->IsMeasurementWorldToSensor()) {  // q_pose = q_vc
+      q_wv = (q * q_ic * q_pose.conjugate()).conjugate();
+    }
+    else {  // q_pose = q_cv
+      q_wv = (q * q_ic * q_pose).conjugate();
+    }
 
     MSF_WARN_STREAM("q " << STREAMQUAT(q));
     MSF_WARN_STREAM("q_wv " << STREAMQUAT(q_wv));
 
-    Eigen::Matrix<double, 3, 1> p_vision = q_wv.conjugate().toRotationMatrix()
+    Eigen::Matrix<double, 3, 1> p_vision = q_wv.toRotationMatrix()
         * p_vc / scale - q.toRotationMatrix() * p_ic;
 
     //TODO (slynen): what if there is no initial position measurement? Then we
