@@ -15,6 +15,8 @@
  * limitations under the License.
  */
 
+#include <iostream>
+
 #include <msf_core/msf_core.h>
 #include <msf_core/testing_entrypoint.h>
 
@@ -207,6 +209,53 @@ TEST(MSF_Core, RuntimeTimeComputation_CopyForNonPropagationStates) {
                    const_ref_second_state.Get<q_>().y());
   EXPECT_DOUBLE_EQ(const_ref_first_state.Get<q_>().z(),
                    const_ref_second_state.Get<q_>().z());
+}
+
+namespace {
+
+enum CovarianceStateDefinition { covariance_state };
+// SetPCore only needs a covariance with room for its 15 core states.
+typedef boost::fusion::vector<msf_core::StateVar_T<
+    Eigen::Matrix<double, 15, 1>, covariance_state,
+    msf_core::AuxiliaryNonTemporalDrifting> > CovarianceStateSequence;
+typedef msf_core::GenericState_T<CovarianceStateSequence,
+    CovarianceStateDefinition> CovarianceState;
+
+class CovarianceSensorManager : public msf_core::MSF_SensorManager<CovarianceState> {
+ public:
+  typedef msf_core::MSF_Core<CovarianceState>::ErrorStateCov Covariance;
+  typedef msf_core::MSF_Core<CovarianceState>::ErrorState Correction;
+
+  void ResetState(CovarianceState&) const override {}
+  void Init(double) const override {}
+  void InitState(CovarianceState&) const override {}
+  void CalculateQAuxiliaryStates(CovarianceState&, double) const override {}
+  void SetStateCovariance(Covariance&) const override {}
+  void AugmentCorrectionVector(Correction&) const override {}
+  void SanityCheckCorrection(CovarianceState&, const CovarianceState&,
+                            Correction&) const override {}
+  bool GetParamFixedBias() const override { return false; }
+  double GetParamNoiseAcc() const override { return 0.0; }
+  double GetParamNoiseAccbias() const override { return 0.0; }
+  double GetParamNoiseGyr() const override { return 0.0; }
+  double GetParamNoiseGyrbias() const override { return 0.0; }
+  double GetParamFuzzyTrackingThreshold() const override { return 0.0; }
+  void PublishStateInitial(const shared_ptr<CovarianceState>&) const override {}
+  void PublishStateAfterPropagation(const shared_ptr<CovarianceState>&) const override {}
+  void PublishStateAfterUpdate(const shared_ptr<CovarianceState>&) const override {}
+};
+
+}  // namespace
+
+TEST(MSF_Core, InitialCovarianceIsSymmetric) {
+  CovarianceSensorManager manager;
+  CovarianceSensorManager::Covariance covariance;
+  manager.msf_core_->SetPCore(covariance);
+
+  // The original startup entries are 0.0122 and 0.0129.
+  EXPECT_NEAR(covariance(0, 1), 0.01255, 1e-14);
+  EXPECT_NEAR(covariance(1, 0), 0.01255, 1e-14);
+  EXPECT_TRUE(covariance.isApprox(covariance.transpose(), 1e-14));
 }
 
 MSF_UNITTEST_ENTRYPOINT
