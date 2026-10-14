@@ -85,7 +85,7 @@ void MSF_Core<EKFState_T>::SetPCore(
             -0.0002, -0.0002, -0.0004, -0.0001, 0.0003, 0.0001, -0.0001, -0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0010, 0.0000,
             -0.0000, 0.0000, -0.0001, 0.0000, 0.0000, -0.0001, -0.0000, -0.0000, -0.0000, 0.0000, 0.0000, -0.0000, 0.0000, 0.0000, 0.0001;
 
-  P_core = 0.5 * (P_core + P_core.transpose());
+  P_core = (0.5 * (P_core + P_core.transpose())).eval();
   P.template block<coreErrorStates, coreErrorStates>(0, 0) = P_core;
 }
 
