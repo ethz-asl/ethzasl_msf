@@ -74,7 +74,7 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
   P = KH * P * KH.transpose() + K * R_delayed * K.transpose();
 
   // Make sure P stays symmetric.
-  P = 0.5 * (P + P.transpose());
+  P = (0.5 * (P + P.transpose())).eval();
 
   core.ApplyCorrection(state, correction_);
 }
@@ -118,7 +118,7 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrection(
   P = KH * P * KH.transpose() + K * R_delayed * K.transpose();
 
   // Make sure P stays symmetric.
-  P = 0.5 * (P + P.transpose());
+  P = (0.5 * (P + P.transpose())).eval();
 
   core.ApplyCorrection(state, correction_);
 }
@@ -192,7 +192,7 @@ void MSF_MeasurementBase<EKFState_T>::CalculateAndApplyCorrectionRelative(
 
   // Make sure P stays symmetric.
   // TODO (slynen): EV, set Evalues<eps to zero, then reconstruct.
-  state_new->P = 0.5 * (state_new->P + state_new->P.transpose());
+  state_new->P = (0.5 * (state_new->P + state_new->P.transpose())).eval();
 
   core.ApplyCorrection(state_new, correction_);
 }
